@@ -1,0 +1,11 @@
+{
+  "name": "verb",
+  "version": "0.1.0",
+  "dependencies": {
+    "mocha" : "*"
+    , "should" : "*"
+    , "labor" : "*"
+    , "binomial" : "*"
+    , "numeric" : "*"
+  }
+}

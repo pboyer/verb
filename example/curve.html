@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+<body>
+
+
+<canvas id="myCanvas" width="800" height="800" style="border:1px solid #d3d3d3;">
+Your browser does not support the HTML5 canvas tag.</canvas>
+
+<script src="../node_modules/numeric/numeric-1.2.6.min.js"></script>
+<script src="../nurbs.js"></script>
+
+<script>
+
+	// var degree = 2
+	// 	, n = 6
+	// 	, u = 0
+	// 	, knot_vector = [0, 0, 0, 1, 2, 3, 4, 5, 5, 5]
+	// 	, control_points = [ [50, 80], [120, 50], [200, 100], [200, 150], [250, 200], [300, 150], [320, 200] ]
+	// 	, p = [];
+
+	// var c=document.getElementById("myCanvas");
+	// var ctx=c.getContext("2d");
+	// ctx.beginPath();
+
+	// ctx.moveTo(50,80);
+
+	// for (var i = 0; i < 100; i++) 
+	// {
+	// 	u = 5 * (i / 99 ); 
+	// 	p = nurbs.curve_point( degree, knot_vector, control_points, u);
+	// 	console.log(u);
+	// 	console.log(p);
+	// 	ctx.lineTo(p[0],p[1]);
+		
+	// }
+	// ctx.stroke();
+
+	// control_points.every(function(elem) {
+	// 	ctx.beginPath();
+	// 	ctx.arc(elem[0],elem[1],5,0,2*Math.PI);
+	// 	ctx.stroke();
+	// 	return true;
+	// });
+
+	var degree = 3
+		, n = 4
+		, u = 0
+		, knot_vector = [0, 0, 0, 0, 1, 1, 1, 1]
+		, control_points = [ [20, 400], [120, 50], [240, 50], [400, 400] ]
+		, p = [];
+
+	var c=document.getElementById("myCanvas");
+	var ctx=c.getContext("2d");
+	ctx.beginPath();
+
+	ctx.moveTo(20, 400);
+	for (var i = 0; i < 100; i++) 
+	{
+		u = 1 * (i / 99 ); 
+		p = nurbs.curve_point( degree, knot_vector, control_points, u);
+		ctx.lineTo(p[0],p[1]);
+		
+	}
+	ctx.stroke();
+
+	for (var i = 0; i < 10; i++) 
+	{
+		u = 1 * (i / 9 ); 
+		console.log( u );
+		p = nurbs.curve_derivs_given_n( n, degree, knot_vector, control_points, u, 3 );
+
+		ctx.strokeStyle="red";
+
+		// first derivative
+		ctx.beginPath();
+		ctx.moveTo( p[0][0], p[0][1] );
+		ctx.lineTo( p[0][0] + 0.2 * p[1][0], p[0][1] + 0.2 * p[1][1] );
+		ctx.stroke();
+
+	}
+	
+	ctx.strokeStyle="black";
+	control_points.every(function(elem) {
+		ctx.beginPath();
+		ctx.arc(elem[0],elem[1],5,0,2*Math.PI);
+		ctx.stroke();
+		return true;
+	});
+
+
+
+</script>
+
+</body>
+</html>
+
