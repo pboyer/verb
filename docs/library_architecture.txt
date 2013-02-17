@@ -1,0 +1,37 @@
+VERB.geom
+
+	BoundingBox
+	
+	NURBSSurface
+	NURBSCurve
+	TrimmedNURBSSurface
+	TrimmedNURBSCurve
+	Circle
+	Cone
+	Conic
+
+	BRep
+	BRepFace
+	BRepEdge
+
+	Mesh
+	MeshFace
+	MeshEdge
+
+
+
+VERB.core
+
+	Engine
+
+VERB.eval
+
+	VERB.eval.nurbs
+		// does evaluation, loft, intersect, join
+	VERB.eval.mesh
+		// does all sorts of operations on meshes
+	VERB.eval.math
+		// does fancy & expensive math
+
+
+

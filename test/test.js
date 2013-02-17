@@ -1,5 +1,5 @@
 var should = require('should')
-	, nurbs = require('./nurbs_objects.js');
+	, nurbs = require('../src/nurbs_objects.js');
 
 describe("nurbs",function(){
 
@@ -628,7 +628,7 @@ describe("nurbs",function(){
 
 	it('BoundingBox init', function(done){
 
-		var bb1 = new nurbs.BoundingBox( [5,5,5], [10,10,10]);
+		var bb1 = new VERB.geom.BoundingBox( [5,5,5], [10,10,10]);
 
 		should.equal( bb1.min[0], 5 );
 		should.equal( bb1.min[1], 5 );
@@ -644,9 +644,9 @@ describe("nurbs",function(){
 
 	it('BoundingBox.intersects', function(done){
 
-		var bb1 = new nurbs.BoundingBox( [5,5,5], [10,10,10])
-			, bb2 = new nurbs.BoundingBox( [0,0,0], [10,10,10])
-			, bb3 = new nurbs.BoundingBox( [-2,-2,-2], [-1,-1,-1] );
+		var bb1 = new VERB.geom.BoundingBox( [5,5,5], [10,10,10])
+			, bb2 = new VERB.geom.BoundingBox( [0,0,0], [10,10,10])
+			, bb3 = new VERB.geom.BoundingBox( [-2,-2,-2], [-1,-1,-1] );
 
 		should.equal( bb1.intersects(bb2), true );
 		should.equal( bb1.intersects(bb3), false );
@@ -659,9 +659,9 @@ describe("nurbs",function(){
 	it('BoundingBox.intersect', function(done){
 
 		// initialize a bounding box
-		var bb1 = new nurbs.BoundingBox( [5,5,5], [10,10,10])
-			, bb2 = new nurbs.BoundingBox( [0,0,0], [10,10,10])
-			, bb3 = new nurbs.BoundingBox( [-2,-2,-2], [-1,-1,-1] );
+		var bb1 = new VERB.geom.BoundingBox( [5,5,5], [10,10,10])
+			, bb2 = new VERB.geom.BoundingBox( [0,0,0], [10,10,10])
+			, bb3 = new VERB.geom.BoundingBox( [-2,-2,-2], [-1,-1,-1] );
 
 		// intersect bounding boxes
 		var int_bb1_bb2 = bb1.intersect(bb2)
@@ -684,14 +684,14 @@ describe("nurbs",function(){
 	it('BoundingBox.intervals_overlap', function(done){
 
 		// check if intervals overlap
-		should.equal( nurbs.BoundingBox.prototype.intervals_overlap( 0, 1, 0, 10 ), true );
-		should.equal( nurbs.BoundingBox.prototype.intervals_overlap( 0, 1, 1, 10 ), true );
-		should.equal( nurbs.BoundingBox.prototype.intervals_overlap( 0, 1, 1+1e-3, 10 ), false );
-		should.equal( nurbs.BoundingBox.prototype.intervals_overlap( 0, 1, 2, 10 ), false );
+		should.equal( VERB.geom.BoundingBox.prototype.intervals_overlap( 0, 1, 0, 10 ), true );
+		should.equal( VERB.geom.BoundingBox.prototype.intervals_overlap( 0, 1, 1, 10 ), true );
+		should.equal( VERB.geom.BoundingBox.prototype.intervals_overlap( 0, 1, 1+1e-3, 10 ), false );
+		should.equal( VERB.geom.BoundingBox.prototype.intervals_overlap( 0, 1, 2, 10 ), false );
 
 		// contains
-		var bb4 = new nurbs.BoundingBox( [0,0,0], [1,1,1] )
-			, bb5 = new nurbs.BoundingBox()
+		var bb4 = new VERB.geom.BoundingBox( [0,0,0], [1,1,1] )
+			, bb5 = new VERB.geom.BoundingBox()
 
 		should.equal( bb4.contains( [0,0,0] ), true );
 		should.equal( bb4.contains( [1,1,1] ), true );
@@ -710,8 +710,8 @@ describe("nurbs",function(){
 	it('BoundingBox.contains', function(done){
 
 		// contains
-		var bb4 = new nurbs.BoundingBox( [0,0,0], [1,1,1] )
-			, bb5 = new nurbs.BoundingBox();
+		var bb4 = new VERB.geom.BoundingBox( [0,0,0], [1,1,1] )
+			, bb5 = new VERB.geom.BoundingBox();
 
 		should.equal( bb4.contains( [0,0,0] ), true );
 		should.equal( bb4.contains( [1,1,1] ), true );
