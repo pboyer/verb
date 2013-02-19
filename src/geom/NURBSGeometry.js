@@ -4,7 +4,5 @@ VERB.geom.NURBSGeometry = function() {
 
 }.inherits(VERB.geom.Geometry);
 
-VERB.geom.NURBSGeometry.prototype.nurbs_engine = VERB.nurbs_engine;
-
 
 

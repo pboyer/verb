@@ -19,7 +19,7 @@ VERB.core.Engine = function(options) {
 		try {
 			_pool = new labor.Pool(_url, _num_threads );
 			_pool.start();
-		} catch {
+		} catch (err) {
 			_error_handler( 'Failed to initialize labor.Pool.' );
 			return false;
 		}
@@ -39,8 +39,7 @@ VERB.core.Engine = function(options) {
 	this.eval = function(func, arguments_array, callback )
 	{
 		// if we are to use the pool we must init it 
-		if ( _use_pool && ( _pool || ( _pool === undefined && init_pool() ) ) )
-		{
+		if ( _use_pool && ( _pool || ( _pool === undefined && init_pool() ) ) ) {
 			_pool.addWork( func, arguments_array, callback );
 		}	else {
 			var that = this;
@@ -59,7 +58,7 @@ VERB.core.Engine = function(options) {
 
 	this.set_use_pool = function( use_pool ) {
 
-		if ( use_pool && _pool === undefined && init_pool()  {
+		if ( use_pool && _pool === undefined && init_pool() ) {
 			_use_pool = use_pool;
 			return true;
 		} else if ( !use_pool ) {

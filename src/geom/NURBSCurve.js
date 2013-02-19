@@ -4,7 +4,7 @@ VERB.geom.NurbsCurve = function( degree, control_points, weights, knots ) {
 	VERB.geom.NURBSGeometry.call(this);
 
 	// check for valid relations
-	if ( !VERB.geom.are_valid_relations( degree, control_points.length, knots.length ) ) 
+	if ( !VERB.eval.nurbs.are_valid_relations( degree, control_points.length, knots.length ) ) 
 	{
 		console.warn( "Invalid relations were used to instantiate a NurbsCurve - using defaults.")
 		var _control_points = [];
@@ -17,7 +17,7 @@ else
 	{
 		// private members
 		var _control_points = control_points.slice(0);
-		var _homo_control_points = VERB.geom.homogenize_1d( control_points, weights );
+		var _homo_control_points = VERB.eval.nurbs.homogenize_1d( control_points, weights );
 		var _knots = knots.slice(0);
 		var _weights = weights.slice(0);
 		var _degree = degree;
@@ -42,7 +42,7 @@ else
 	};
 
 	this.point_sync = function( u ) {
-		return this.nurbs_engine.eval_sync( 'rational_curve_point', _degree, _knot_vector, _homo_control_points, u ] );
+		return this.nurbs_engine.eval_sync( 'rational_curve_point', [ _degree, _knot_vector, _homo_control_points, u ] );
 	};
 
 	this.derivs_sync = function( u, num_derivs ) {
@@ -61,4 +61,6 @@ else
 	// 	// TODO: here we would use the worker to generate all of the points
 	// 	// wait for callback
 	// };
+
+};
 

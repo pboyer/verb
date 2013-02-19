@@ -1,11 +1,18 @@
 {
   "name": "verb",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "dependencies": {
-    "mocha" : "*"
-    , "should" : "*"
-    , "labor" : "*"
-    , "binomial" : "*"
-    , "numeric" : "*"
+    "labor": "*",
+    "binomial": "*",
+    "numeric": "*"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "should": "*",
+    "binomial": "*",
+    "grunt": "*",
+    "grunt-contrib-uglify": "*",
+    "grunt-contrib-concat": "*",
+    "grunt-simple-mocha": "0.3.2"
   }
 }
