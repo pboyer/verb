@@ -3,7 +3,8 @@ if ( typeof exports != 'object' || exports === undefined )  // browser context
 	var VERB = {}
 		, numeric = window.numeric
 		, binomial = window.binomial
-		, labor = window.labor;
+		, labor = window.labor
+		, _ = window.underscore;
 }
 else // node.js context
 {
@@ -11,11 +12,14 @@ else // node.js context
 		, numeric = require('numeric')
 		, binomial = require('binomial')
 		, labor = require('labor')
+		, _ = require('underscore');
 }
 
 VERB.geom = {};
 VERB.core = {};
 VERB.eval = {};
+
+VERB.eval.nurbs = {};
 
 VERB.init = function() {
 
@@ -23,6 +27,27 @@ VERB.init = function() {
 	VERB.geom.NURBSGeometry.prototype.nurbs_engine = VERB.nurbs_engine;
 	
 }
+
+if (typeof Object.create !== 'function') {
+    Object.create = function (o) {
+        function F() {}
+        F.prototype = o;
+        return new F();
+    };
+}
+
+Function.prototype.method = function (name, func) {
+    this.prototype[name] = func;
+    return this;
+};
+
+Function.method('inherits', function (parent) {
+    this.prototype = new parent();
+    var d = {}, 
+        p = this.prototype;
+    this.prototype.constructor = parent; 
+    return this;
+});
 
 // engine nurbs handles nurbs eval requests
 // it also acknowledges whether there are web workers available 
@@ -500,6 +525,107 @@ VERB.geom.NurbsSurface = function( degree, control_points, weights, knots ) {
 }.inherits( VERB.geom.NURBSGeometry );
 
 
+
+/**
+ * Compute the derivatives at a point on a NURBS surface
+ *
+ * @param {Number} integer degree of surface in u direction
+ * @param {Array} array of nondecreasing knot values in u direction
+ * @param {Number} integer degree of surface in v direction
+ * @param {Array} array of nondecreasing knot values in v direction
+ * @param {Array} 3d array of control points, where rows are the u dir, and columns run along the positive v direction, 
+ 									and where each control point is an array of length (dim)  
+ * @param {Number} u parameter at which to evaluate the derivatives
+ * @param {Number} v parameter at which to evaluate the derivatives
+ * @param {Array} 1d array of control point weights 
+ * @return {Array} a point represented by an array of length (dim)
+ * @api public
+ */
+
+VERB.eval.nurbs.curve_knot_insert = function( degree, knots, control_points, u, s, r ) {
+
+	// np is n for the initial curve
+	// nq is n for the output curve with knots inserted
+	// k is the span on which the knots are inserted
+	// s is the initial multiplicity of the point
+	// r is the number of times to insert the knot
+	// control_points is initial set of control points
+
+	var dim = control_points[0].length
+		, np = knots.length - degree - 2
+		, num_pts = control_points.length
+		, k = VERB.eval.nurbs.knot_span( degree, u, knots )
+		, mp = np + degree + 1
+		, nq = np + r
+		, num_pts_post = num_pts + r    
+		, Rw = new Array( degree + 1 )  
+		, knots_post = new Array( knots.length + r ) 
+		, control_points_post = new Array( num_pts_post ) 
+		, i = 0;
+
+	// new knot vector
+	for (i = 0; i <= k; i++) {
+		knots_post[i] = knots[i];
+	}
+	
+	for (i = 1; i <= r; i++) {
+		knots_post[k+i] = u; 
+	}
+
+	for (i = k+1; i <= mp; i++)
+	{
+		knots_post[i+r] = knots[i];
+	}
+
+	// control point generation
+	for (i = 0; i <= k-degree; i++)
+	{
+		control_points_post[i] = control_points[i]; 
+	}
+
+	for (i = k-s; i <= np; i++)
+	{
+		control_points_post[i+r] = control_points[i];
+	}
+
+	for (i = 0; i <= degree-s; i++)
+	{
+		console.log(control_points[k-degree+1])
+		Rw[i] = control_points[k-degree+1];
+	}
+
+	var L = 0
+		, alpha = 0;
+
+	// insert knot r times
+	for (var j = 1; j <= r; j++) {
+
+		L = k-degree+j;
+
+		for (i = 0; i <= degree-j-s; i++) {
+
+			alpha = ( u - knots[L+i] ) / ( knots[i+k+1] - knots[L+i] );
+			Rw[i] = numeric.add( numeric.mul( alpha, Rw[i+1] ), numeric.mul( (1.0 - alpha), Rw[i]) );
+
+		}
+
+		control_points_post[ L ] = Rw[0];
+		control_points_post[k+r-j-s] = Rw[degree-j-s];
+
+	}
+
+	console.log( Rw );
+	console.log( L );
+
+	// not so confident about this part
+	for (i = L+1; i < k-s; i++) // set remaining control points
+	{
+		control_points_post[i] = Rw[ i - L ];
+	}
+
+	return [knots_post, control_points_post];
+
+}
 
 /**
  * Compute the derivatives at a point on a NURBS surface

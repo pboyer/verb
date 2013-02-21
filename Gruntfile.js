@@ -10,7 +10,7 @@ module.exports = function(grunt) {
       build: {
         files: {
           'build/<%= pkg.name %>.js': ['src/VERB.js', 'src/core/*.js', 'src/geom/*.js', 'src/eval/nurbs.js' ],
-          'build/<%= pkg.name %>_nurbs_eval.js': ['src/eval/*.js']
+          'build/<%= pkg.name %>_nurbs_eval.js': ['src/eval/eval_header.js', 'src/eval/nurbs.js']
         }
       }
     },
@@ -31,8 +31,6 @@ module.exports = function(grunt) {
     simplemocha: {
       options: {
         globals: ['should'],
-        timeout: 3000,
-        ignoreLeaks: false,
         grep: '*-test',
         ui: 'bdd',
         reporter: 'tap'
