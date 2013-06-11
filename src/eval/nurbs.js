@@ -1,4 +1,195 @@
 /**
+ * Intersect two NURBS surfaces
+ *
+ * @param {Number} integer degree of surface in u direction
+ * @param {Array} array of nondecreasing knot values in u direction
+ * @param {Number} integer degree of surface in v direction
+ * @param {Array} array of nondecreasing knot values in v direction
+ * @param {Array} 3d array of control points, top to bottom is increasing u direction, left to right is increasing v direction,
+ 									and where each control point is an array of length (dim+1)
+ * @param {Number} u parameter at which to evaluate the surface point
+ * @param {Number} v parameter at which to evaluate the surface point
+ * @return {Array} a point represented by an array of length (dim)
+ * @api public
+ */
+
+VERB.eval.nurbs.rational_surface_surface_intersect = function( not, sure, yet ) {
+
+
+
+}
+
+
+/**
+ * Intersect two NURBS curves
+ *
+ * @param {Number} integer degree of curve1
+ * @param {Array} array of nondecreasing knot values for curve 1
+ * @param {Array} 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
+ 									and form (wi*pi, wi) for curve 1
+ * @param {Number} integer degree of curve2
+ * @param {Array} array of nondecreasing knot values for curve 2
+ * @param {Array} 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
+ 									and form (wi*pi, wi) for curve 2
+ * @param {Number} tolerance for the intersection
+ * @return {Array} a 2d array specifying the intersections on u params of intersections on curve 1 and cruve 2
+ * @api public
+ */
+
+VERB.eval.nurbs.rational_curve_curve_bb_intersect = function( degree1, knot_vector1, control_points1, degree2, knot_vector2, control_points2, tol ) {
+
+
+
+}
+
+
+/**
+ * Sample a NURBS curve assuming parameterization 0 to 1, corresponds to http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf
+ *
+ * @param {Number} integer degree
+ * @param {Array} array of nondecreasing knot values 
+ * @param {Array} 1d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi) 
+ * @param {Number} integer number of samples
+ * @return {Array} an dictionary of parameter - point pairs
+ * @api public
+ */
+
+VERB.eval.nurbs.rational_curve_regular_sample = function( degree, knot_vector, control_points, num_samples ) {
+
+	return VERB.eval.nurbs.rational_curve_regular_sample_range( degree, knot_vector, control_points, 0, 1.0, num_samples );
+
+}
+
+/**
+ * Sample a NURBS curve assuming parameterization 0 to 1, corresponds to http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf
+ *
+ * @param {Number} integer degree
+ * @param {Array} array of nondecreasing knot values 
+ * @param {Array} 1d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi) 
+ * @param {Number} start parameter for sampling
+ * @param {Number} end parameter for sampling
+ * @param {Number} integer number of samples
+ * @return {Array} an dictionary of parameter - point pairs
+ * @api public
+ */
+
+VERB.eval.nurbs.rational_curve_regular_sample_range = function( degree, knot_vector, control_points, start_u, end_u, num_samples ) {
+
+	if (num_samples < 1){
+		num_samples = 2;
+	}
+
+	var p = [],
+		span = (end_u - start_u) / (num_samples - 1),
+		u = 0;
+
+	for (var i = 0; i < num_samples; i++){
+
+		u = start_u + span * i;
+		p.push( [u].concat( VERB.eval.nurbs.rational_curve_point(degree, knot_vector, control_points, u) ) );
+		
+	}
+
+	return p;
+
+}
+
+/**
+ * Sample a NURBS curve assuming parameterization 0 to 1, corresponds to http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf
+ *
+ * @param {Number} integer degree
+ * @param {Array} array of nondecreasing knot values 
+ * @param {Array} 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
+ 									and form (wi*pi, wi) 
+ * @param {Number} tolerance for the adaptive scheme
+ * @return {Array} an array of dim + 1 length where the first element is the param where it was sampled and the remaining the pt
+ * @api public
+ */
+
+VERB.eval.nurbs.rational_curve_adaptive_sample = function( degree, knot_vector, control_points, tol ) {
+
+	return VERB.eval.nurbs.rational_curve_adaptive_sample_range( degree, knot_vector, control_points, 0, 1.0, tol );
+
+}
+
+/**
+ * Sample a NURBS curve at 3 points, facilitating adaptive sampling
+ *
+ * @param {Number} integer degree
+ * @param {Array} array of nondecreasing knot values 
+ * @param {Array} 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
+ 									and form (wi*pi, wi) 
+ * @param {Number} start parameter for sampling
+ * @param {Number} end parameter for sampling
+ * @return {Array} an array of dim + 1 length where the first element is the param where it was sampled and the remaining the pt
+ * @api public
+ */
+
+VERB.eval.nurbs.rational_curve_adaptive_sample_range = function( degree, knot_vector, control_points, start_u, end_u, tol ) {
+
+	// sample curve at three pts
+	var p1 = VERB.eval.nurbs.rational_curve_point(degree, knot_vector, control_points, start_u),
+		p3 = VERB.eval.nurbs.rational_curve_point(degree, knot_vector, control_points, end_u),
+		t = 0.45 + 0.1 * Math.random(),
+		mid_u = start_u + (end_u - start_u) * t,
+		p2 = VERB.eval.nurbs.rational_curve_point(degree, knot_vector, control_points, mid_u);
+
+		// the if three points are "flat", return the two end pts
+		if ( VERB.eval.nurbs.three_points_are_flat( p1, p2, p3, tol ) ) {
+
+			return [ 	[start_u, p1[0], p1[1], p1[2]], 
+								[ end_u, p3[0], p3[1], p3[2] ] ];
+
+		} else {
+
+			// recurse on the two halves
+			var left_pts = VERB.eval.nurbs.rational_curve_adaptive_sample_range( degree, knot_vector, control_points, start_u, mid_u, tol )
+				, right_pts = VERB.eval.nurbs.rational_curve_adaptive_sample_range( degree, knot_vector, control_points, mid_u, end_u, tol );
+
+			// concatenate the two		
+			return left_pts.slice(0, -1).concat(right_pts);
+
+		}
+}
+
+/**
+ * Determine if three points form a straight line within a given tolerance for their 2 * squared area
+ *
+ *          * p2
+ *         / \
+ *        /   \
+ *       /     \ 
+ *      /       \
+ *  p1 * -------- * p3
+ *
+ * The area metric is 2 * the squared norm of the cross product of two edges, requiring no square roots and no divisions
+ *
+ * @param {Array} p1
+ * @param {Array} p2
+ * @param {Array} p3
+ * @param {Number} The tolerance for whether the three points form a line
+ * @return {Boolean} Whether the triangle passes the test
+ * @api public
+ */
+
+VERB.eval.nurbs.three_points_are_flat = function( p1_arr, p2_arr, p3_arr, tol ) {
+
+	// convert to vectors, this is probably unnecessary
+	var p1 = new VERB.geom.Vector( p1_arr ),
+		p2 = new VERB.geom.Vector( p2_arr ),
+		p3 = new VERB.geom.Vector( p3_arr );
+
+	// find the area of the triangle wihout using a square root
+	var norm = p2.minus( p1 ).cross( p3.minus( p1 ) ),
+			area = norm.dot( norm );
+
+	return area < tol;
+
+}
+
+
+
+/**
  * Compute the derivatives at a point on a NURBS surface
  *
  * @param {Number} integer degree of surface in u direction

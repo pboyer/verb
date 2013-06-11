@@ -28,15 +28,16 @@ module.exports = function(grunt) {
       }
     },
 
+    // test
     simplemocha: {
-      options: {
-        globals: ['should'],
-        grep: '*-test',
-        ui: 'bdd',
-        reporter: 'tap'
-      },
-
-      all: { src: 'test/test.js' }
+      all: {
+        src: 'test/test.js', 
+        options: {
+          globals: ['should'],
+          ui: 'bdd',
+          reporter: 'tap'
+        },
+      }
     }
 
   });

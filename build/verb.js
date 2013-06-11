@@ -415,6 +415,460 @@ VERB.geom.Geometry = function() {
 	};
 
 };
+/**
+ * k-d Tree JavaScript - V 1.0
+ *
+ * https://github.com/ubilabs/kd-tree-javascript
+ *
+ * @author Mircea Pricop <pricop@ubilabs.net>, 2012
+ * @author Martin Kleppe <kleppe@ubilabs.net>, 2012
+ * @author Ubilabs http://ubilabs.net, 2012
+ * @license MIT License <http://www.opensource.org/licenses/mit-license.php>
+ *
+ * Modified for use with VERB by pboyer 2013
+ */
+
+(function(){
+  
+  function Node(obj, dimension, parent) {
+    this.obj = obj;
+    this.left = null;
+    this.right = null;
+    this.parent = parent;
+    this.dimension = dimension;
+  }
+
+  function kdTree(points, metric, dimensions) {
+
+    var self = this;
+    
+    function buildTree(points, depth, parent) {
+      var dim = depth % dimensions.length,
+        median,
+        node;
+
+      if (points.length === 0) {
+        return null;
+      }
+      if (points.length === 1) {
+        return new Node(points[0], dim, parent);
+      }
+
+      points.sort(function (a, b) {
+        return a[dimensions[dim]] - b[dimensions[dim]];
+      });
+
+      median = Math.floor(points.length / 2);
+      node = new Node(points[median], dim, parent);
+      node.left = buildTree(points.slice(0, median), depth + 1, node);
+      node.right = buildTree(points.slice(median + 1), depth + 1, node);
+
+      return node;
+    }
+
+    this.root = buildTree(points, 0, null);
+
+    this.insert = function (point) {
+      function innerSearch(node, parent) {
+
+        if (node === null) {
+          return parent;
+        }
+
+        var dimension = dimensions[node.dimension];
+        if (point[dimension] < node.obj[dimension]) {
+          return innerSearch(node.left, node);
+        } else {
+          return innerSearch(node.right, node);
+        }
+      }
+
+      var insertPosition = innerSearch(this.root, null),
+        newNode,
+        dimension;
+
+      if (insertPosition === null) {
+        this.root = new Node(point, 0, null);
+        return;
+      }
+
+      newNode = new Node(point, (insertPosition.dimension + 1) % dimensions.length, insertPosition);
+      dimension = dimensions[insertPosition.dimension];
+
+      if (point[dimension] < insertPosition.obj[dimension]) {
+        insertPosition.left = newNode;
+      } else {
+        insertPosition.right = newNode;
+      }
+    };
+
+    this.remove = function (point) {
+      var node;
+
+      function nodeSearch(node) {
+        if (node === null) {
+          return null;
+        }
+
+        if (node.obj === point) {
+          return node;
+        }
+
+        var dimension = dimensions[node.dimension];
+
+        if (point[dimension] < node.obj[dimension]) {
+          return nodeSearch(node.left, node);
+        } else {
+          return nodeSearch(node.right, node);
+        }
+      }
+
+      function removeNode(node) {
+        var nextNode,
+          nextObj,
+          pDimension;
+
+        function findMax(node, dim) {
+          var dimension,
+            own,
+            left,
+            right,
+            max;
+
+          if (node === null) {
+            return null;
+          }
+
+          dimension = dimensions[dim];
+          if (node.dimension === dim) {
+            if (node.right !== null) {
+              return findMax(node.right, dim);
+            }
+            return node;
+          }
+
+          own = node.obj[dimension];
+          left = findMax(node.left, dim);
+          right = findMax(node.right, dim);
+          max = node;
+
+          if (left !== null && left.obj[dimension] > own) {
+            max = left;
+          }
+
+          if (right !== null && right.obj[dimension] > max.obj[dimension]) {
+            max = right;
+          }
+          return max;
+        }
+
+        function findMin(node, dim) {
+          var dimension,
+            own,
+            left,
+            right,
+            min;
+
+          if (node === null) {
+            return null;
+          }
+
+          dimension = dimensions[dim];
+
+          if (node.dimension === dim) {
+            if (node.left !== null) {
+              return findMin(node.left, dim);
+            }
+            return node;
+          }
+
+          own = node.obj[dimension];
+          left = findMin(node.left, dim);
+          right = findMin(node.right, dim);
+          min = node;
+
+          if (left !== null && left.obj[dimension] < own) {
+            min = left;
+          }
+          if (right !== null && right.obj[dimension] < min.obj[dimension]) {
+            min = right;
+          }
+          return min;
+        }
+
+        if (node.left === null && node.right === null) {
+          if (node.parent === null) {
+            self.root = null;
+            return;
+          }
+
+          pDimension = dimensions[node.parent.dimension];
+
+          if (node.obj[pDimension] < node.parent.obj[pDimension]) {
+            node.parent.left = null;
+          } else {
+            node.parent.right = null;
+          }
+          return;
+        }
+
+        if (node.left !== null) {
+          nextNode = findMax(node.left, node.dimension);
+        } else {
+          nextNode = findMin(node.right, node.dimension);
+        }
+
+        nextObj = nextNode.obj;
+        removeNode(nextNode);
+        node.obj = nextObj;
+
+      }
+
+      node = nodeSearch(self.root);
+
+      if (node === null) { return; }
+
+      removeNode(node);
+    };
+
+    this.nearest = function (point, maxNodes, maxDistance) {
+      var i,
+        result,
+        bestNodes;
+
+      bestNodes = new BinaryHeap(
+        function (e) { return -e[1]; }
+      );
+
+      function nearestSearch(node) {
+        var bestChild,
+          dimension = dimensions[node.dimension],
+          ownDistance = metric(point, node.obj),
+          linearPoint = {},
+          linearDistance,
+          otherChild,
+          i;
+
+        function saveNode(node, distance) {
+          bestNodes.push([node, distance]);
+          if (bestNodes.size() > maxNodes) {
+            bestNodes.pop();
+          }
+        }
+
+        for (i = 0; i < dimensions.length; i += 1) {
+          if (i === node.dimension) {
+            linearPoint[dimensions[i]] = point[dimensions[i]];
+          } else {
+            linearPoint[dimensions[i]] = node.obj[dimensions[i]];
+          }
+        }
+
+        linearDistance = metric(linearPoint, node.obj);
+
+        if (node.right === null && node.left === null) {
+          if (bestNodes.size() < maxNodes || ownDistance < bestNodes.peek()[1]) {
+            saveNode(node, ownDistance);
+          }
+          return;
+        }
+
+        if (node.right === null) {
+          bestChild = node.left;
+        } else if (node.left === null) {
+          bestChild = node.right;
+        } else {
+          if (point[dimension] < node.obj[dimension]) {
+            bestChild = node.left;
+          } else {
+            bestChild = node.right;
+          }
+        }
+
+        nearestSearch(bestChild);
+
+        if (bestNodes.size() < maxNodes || ownDistance < bestNodes.peek()[1]) {
+          saveNode(node, ownDistance);
+        }
+
+        if (bestNodes.size() < maxNodes || Math.abs(linearDistance) < bestNodes.peek()[1]) {
+          if (bestChild === node.left) {
+            otherChild = node.right;
+          } else {
+            otherChild = node.left;
+          }
+          if (otherChild !== null) {
+            nearestSearch(otherChild);
+          }
+        }
+      }
+
+      if (maxDistance) {
+        for (i = 0; i < maxNodes; i += 1) {
+          bestNodes.push([null, maxDistance]);
+        }
+      }
+
+      nearestSearch(self.root);
+
+      result = [];
+
+      for (i = 0; i < maxNodes; i += 1) {
+        if (bestNodes.content[i][0]) {
+          result.push([bestNodes.content[i][0].obj, bestNodes.content[i][1]]);
+        }
+      }
+      return result;
+    };
+
+    this.balanceFactor = function () {
+      function height(node) {
+        if (node === null) {
+          return 0;
+        }
+        return Math.max(height(node.left), height(node.right)) + 1;
+      }
+
+      function count(node) {
+        if (node === null) {
+          return 0;
+        }
+        return count(node.left) + count(node.right) + 1;
+      }
+
+      return height(self.root) / (Math.log(count(self.root)) / Math.log(2));
+    };
+  }
+
+  // Binary heap implementation from:
+  // http://eloquentjavascript.net/appendix2.html
+
+  function BinaryHeap(scoreFunction){
+    this.content = [];
+    this.scoreFunction = scoreFunction;
+  }
+
+  BinaryHeap.prototype = {
+    push: function(element) {
+      // Add the new element to the end of the array.
+      this.content.push(element);
+      // Allow it to bubble up.
+      this.bubbleUp(this.content.length - 1);
+    },
+
+    pop: function() {
+      // Store the first element so we can return it later.
+      var result = this.content[0];
+      // Get the element at the end of the array.
+      var end = this.content.pop();
+      // If there are any elements left, put the end element at the
+      // start, and let it sink down.
+      if (this.content.length > 0) {
+        this.content[0] = end;
+        this.sinkDown(0);
+      }
+      return result;
+    },
+
+    peek: function() {
+      return this.content[0];
+    },
+
+    remove: function(node) {
+      var len = this.content.length;
+      // To remove a value, we must search through the array to find
+      // it.
+      for (var i = 0; i < len; i++) {
+        if (this.content[i] == node) {
+          // When it is found, the process seen in 'pop' is repeated
+          // to fill up the hole.
+          var end = this.content.pop();
+          if (i != len - 1) {
+            this.content[i] = end;
+            if (this.scoreFunction(end) < this.scoreFunction(node))
+              this.bubbleUp(i);
+            else
+              this.sinkDown(i);
+          }
+          return;
+        }
+      }
+      throw new Error("Node not found.");
+    },
+
+    size: function() {
+      return this.content.length;
+    },
+
+    bubbleUp: function(n) {
+      // Fetch the element that has to be moved.
+      var element = this.content[n];
+      // When at 0, an element can not go up any further.
+      while (n > 0) {
+        // Compute the parent element's index, and fetch it.
+        var parentN = Math.floor((n + 1) / 2) - 1,
+            parent = this.content[parentN];
+        // Swap the elements if the parent is greater.
+        if (this.scoreFunction(element) < this.scoreFunction(parent)) {
+          this.content[parentN] = element;
+          this.content[n] = parent;
+          // Update 'n' to continue at the new position.
+          n = parentN;
+        }
+        // Found a parent that is less, no need to move it further.
+        else {
+          break;
+        }
+      }
+    },
+
+    sinkDown: function(n) {
+      // Look up the target element and its score.
+      var length = this.content.length,
+          element = this.content[n],
+          elemScore = this.scoreFunction(element);
+
+      while(true) {
+        // Compute the indices of the child elements.
+        var child2N = (n + 1) * 2, child1N = child2N - 1;
+        // This is used to store the new position of the element,
+        // if any.
+        var swap = null;
+        // If the first child exists (is inside the array)...
+        if (child1N < length) {
+          // Look it up and compute its score.
+          var child1 = this.content[child1N],
+              child1Score = this.scoreFunction(child1);
+          // If the score is less than our element's, we need to swap.
+          if (child1Score < elemScore)
+            swap = child1N;
+        }
+        // Do the same checks for the other child.
+        if (child2N < length) {
+          var child2 = this.content[child2N],
+              child2Score = this.scoreFunction(child2);
+          if (child2Score < (swap == null ? elemScore : child1Score)){
+            swap = child2N;
+          }
+        }
+
+        // If the element needs to be moved, swap it, and continue.
+        if (swap != null) {
+          this.content[n] = this.content[swap];
+          this.content[swap] = element;
+          n = swap;
+        }
+        // Otherwise, we are done.
+        else {
+          break;
+        }
+      }
+    }
+  };
+
+  VERB.geom.KDTree = kdTree;
+
+})(VERB);
 
 VERB.geom.NurbsCurve = function( degree, control_points, weights, knots ) {
 
@@ -526,6 +980,264 @@ VERB.geom.NurbsSurface = function( degree, control_points, weights, knots ) {
 
 
 
+VERB.geom.Vector = function(x, y, z) {
+
+  if (arguments.length == 3) {
+    this.x = x;
+    this.y = y;
+    this.z = z;
+  } else if ('x' in x) {
+    this.x = x.x;
+    this.y = x.y;
+    this.z = x.z;
+  } else {
+    this.x = x[0];
+    this.y = x[1];
+    this.z = x[2];
+  }
+
+};
+
+VERB.geom.Vector.prototype = {
+  clone: function() {
+    return new VERB.geom.Vector(this.x, this.y, this.z);
+  },
+
+  negated: function() {
+    return new VERB.geom.Vector(-this.x, -this.y, -this.z);
+  },
+
+  plus: function(a) {
+    return new VERB.geom.Vector(this.x + a.x, this.y + a.y, this.z + a.z);
+  },
+
+  minus: function(a) {
+    return new VERB.geom.Vector(this.x - a.x, this.y - a.y, this.z - a.z);
+  },
+
+  times: function(a) {
+    return new VERB.geom.Vector(this.x * a, this.y * a, this.z * a);
+  },
+
+  dividedBy: function(a) {
+    return new VERB.geom.Vector(this.x / a, this.y / a, this.z / a);
+  },
+
+  dot: function(a) {
+    return this.x * a.x + this.y * a.y + this.z * a.z;
+  },
+
+  lerp: function(a, t) {
+    return this.plus(a.minus(this).times(t));
+  },
+
+  length: function() {
+    return Math.sqrt(this.dot(this));
+  },
+
+  unit: function() {
+    return this.dividedBy(this.length());
+  },
+
+  cross: function(a) {
+    return new VERB.geom.Vector(
+      this.y * a.z - this.z * a.y,
+      this.z * a.x - this.x * a.z,
+      this.x * a.y - this.y * a.x
+    );
+  }
+};
+/**
+ * Intersect two NURBS surfaces
+ *
+ * @param {Number} integer degree of surface in u direction
+ * @param {Array} array of nondecreasing knot values in u direction
+ * @param {Number} integer degree of surface in v direction
+ * @param {Array} array of nondecreasing knot values in v direction
+ * @param {Array} 3d array of control points, top to bottom is increasing u direction, left to right is increasing v direction,
+ 									and where each control point is an array of length (dim+1)
+ * @param {Number} u parameter at which to evaluate the surface point
+ * @param {Number} v parameter at which to evaluate the surface point
+ * @return {Array} a point represented by an array of length (dim)
+ * @api public
+ */
+
+VERB.eval.nurbs.rational_surface_surface_intersect = function( not, sure, yet ) {
+
+
+
+}
+
+
+/**
+ * Intersect two NURBS curves
+ *
+ * @param {Number} integer degree of curve1
+ * @param {Array} array of nondecreasing knot values for curve 1
+ * @param {Array} 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
+ 									and form (wi*pi, wi) for curve 1
+ * @param {Number} integer degree of curve2
+ * @param {Array} array of nondecreasing knot values for curve 2
+ * @param {Array} 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
+ 									and form (wi*pi, wi) for curve 2
+ * @param {Number} tolerance for the intersection
+ * @return {Array} a 2d array specifying the intersections on u params of intersections on curve 1 and cruve 2
+ * @api public
+ */
+
+VERB.eval.nurbs.rational_curve_curve_bb_intersect = function( degree1, knot_vector1, control_points1, degree2, knot_vector2, control_points2, tol ) {
+
+
+
+}
+
+
+/**
+ * Sample a NURBS curve assuming parameterization 0 to 1, corresponds to http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf
+ *
+ * @param {Number} integer degree
+ * @param {Array} array of nondecreasing knot values 
+ * @param {Array} 1d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi) 
+ * @param {Number} integer number of samples
+ * @return {Array} an dictionary of parameter - point pairs
+ * @api public
+ */
+
+VERB.eval.nurbs.rational_curve_regular_sample = function( degree, knot_vector, control_points, num_samples ) {
+
+	return VERB.eval.nurbs.rational_curve_regular_sample_range( degree, knot_vector, control_points, 0, 1.0, num_samples );
+
+}
+
+/**
+ * Sample a NURBS curve assuming parameterization 0 to 1, corresponds to http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf
+ *
+ * @param {Number} integer degree
+ * @param {Array} array of nondecreasing knot values 
+ * @param {Array} 1d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi) 
+ * @param {Number} start parameter for sampling
+ * @param {Number} end parameter for sampling
+ * @param {Number} integer number of samples
+ * @return {Array} an dictionary of parameter - point pairs
+ * @api public
+ */
+
+VERB.eval.nurbs.rational_curve_regular_sample_range = function( degree, knot_vector, control_points, start_u, end_u, num_samples ) {
+
+	if (num_samples < 1){
+		num_samples = 2;
+	}
+
+	var p = [],
+		span = (end_u - start_u) / (num_samples - 1),
+		u = 0;
+
+	for (var i = 0; i < num_samples; i++){
+
+		u = start_u + span * i;
+		p.push( [u].concat( VERB.eval.nurbs.rational_curve_point(degree, knot_vector, control_points, u) ) );
+		
+	}
+
+	return p;
+
+}
+
+/**
+ * Sample a NURBS curve assuming parameterization 0 to 1, corresponds to http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf
+ *
+ * @param {Number} integer degree
+ * @param {Array} array of nondecreasing knot values 
+ * @param {Array} 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
+ 									and form (wi*pi, wi) 
+ * @param {Number} tolerance for the adaptive scheme
+ * @return {Array} an array of dim + 1 length where the first element is the param where it was sampled and the remaining the pt
+ * @api public
+ */
+
+VERB.eval.nurbs.rational_curve_adaptive_sample = function( degree, knot_vector, control_points, tol ) {
+
+	return VERB.eval.nurbs.rational_curve_adaptive_sample_range( degree, knot_vector, control_points, 0, 1.0, tol );
+
+}
+
+/**
+ * Sample a NURBS curve at 3 points, facilitating adaptive sampling
+ *
+ * @param {Number} integer degree
+ * @param {Array} array of nondecreasing knot values 
+ * @param {Array} 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
+ 									and form (wi*pi, wi) 
+ * @param {Number} start parameter for sampling
+ * @param {Number} end parameter for sampling
+ * @return {Array} an array of dim + 1 length where the first element is the param where it was sampled and the remaining the pt
+ * @api public
+ */
+
+VERB.eval.nurbs.rational_curve_adaptive_sample_range = function( degree, knot_vector, control_points, start_u, end_u, tol ) {
+
+	// sample curve at three pts
+	var p1 = VERB.eval.nurbs.rational_curve_point(degree, knot_vector, control_points, start_u),
+		p3 = VERB.eval.nurbs.rational_curve_point(degree, knot_vector, control_points, end_u),
+		t = 0.45 + 0.1 * Math.random(),
+		mid_u = start_u + (end_u - start_u) * t,
+		p2 = VERB.eval.nurbs.rational_curve_point(degree, knot_vector, control_points, mid_u);
+
+		// the if three points are "flat", return the two end pts
+		if ( VERB.eval.nurbs.three_points_are_flat( p1, p2, p3, tol ) ) {
+
+			return [ 	[start_u, p1[0], p1[1], p1[2]], 
+								[ end_u, p3[0], p3[1], p3[2] ] ];
+
+		} else {
+
+			// recurse on the two halves
+			var left_pts = VERB.eval.nurbs.rational_curve_adaptive_sample_range( degree, knot_vector, control_points, start_u, mid_u, tol )
+				, right_pts = VERB.eval.nurbs.rational_curve_adaptive_sample_range( degree, knot_vector, control_points, mid_u, end_u, tol );
+
+			// concatenate the two		
+			return left_pts.slice(0, -1).concat(right_pts);
+
+		}
+}
+
+/**
+ * Determine if three points form a straight line within a given tolerance for their 2 * squared area
+ *
+ *          * p2
+ *         / \
+ *        /   \
+ *       /     \ 
+ *      /       \
+ *  p1 * -------- * p3
+ *
+ * The area metric is 2 * the squared norm of the cross product of two edges, requiring no square roots and no divisions
+ *
+ * @param {Array} p1
+ * @param {Array} p2
+ * @param {Array} p3
+ * @param {Number} The tolerance for whether the three points form a line
+ * @return {Boolean} Whether the triangle passes the test
+ * @api public
+ */
+
+VERB.eval.nurbs.three_points_are_flat = function( p1_arr, p2_arr, p3_arr, tol ) {
+
+	// convert to vectors, this is probably unnecessary
+	var p1 = new VERB.geom.Vector( p1_arr ),
+		p2 = new VERB.geom.Vector( p2_arr ),
+		p3 = new VERB.geom.Vector( p3_arr );
+
+	// find the area of the triangle wihout using a square root
+	var norm = p2.minus( p1 ).cross( p3.minus( p1 ) ),
+			area = norm.dot( norm );
+
+	return area < tol;
+
+}
+
+
+
 /**
  * Compute the derivatives at a point on a NURBS surface
  *
@@ -590,7 +1302,6 @@ VERB.eval.nurbs.curve_knot_insert = function( degree, knots, control_points, u, 
 
 	for (i = 0; i <= degree-s; i++)
 	{
-		console.log(control_points[k-degree+1])
 		Rw[i] = control_points[k-degree+1];
 	}
 
@@ -613,9 +1324,6 @@ VERB.eval.nurbs.curve_knot_insert = function( degree, knots, control_points, u, 
 		control_points_post[k+r-j-s] = Rw[degree-j-s];
 
 	}
-
-	console.log( Rw );
-	console.log( L );
 
 	// not so confident about this part
 	for (i = L+1; i < k-s; i++) // set remaining control points

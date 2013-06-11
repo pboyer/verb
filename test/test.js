@@ -1,6 +1,7 @@
 var should = require('should')
 	, VERB = require('../build/VERB.js');
 
+
 describe("nurbs",function(){
 
 	it('knot_span_given_n', function(){
@@ -621,9 +622,97 @@ describe("nurbs",function(){
 			, control_points = [ [1, 0], [1,1], [0,1] ];
 
 		var p = VERB.eval.nurbs.curve_knot_insert( degree, knot_vector, control_points, u, 0, 1 );
-		console.log ( p )
+		// should.equal(0, 1);
+
 	});
 
+	it('three_points_are_flat should identify flat line by returning true', function(){
+
+		// this represents a single quarter arc, using a rational bezier curve
+		var p1 = [0,0,0],
+			p2 = [0,2,0],
+			p3 = [0,4,0];
+
+		should.equal(true, VERB.eval.nurbs.three_points_are_flat(p1,p2,p3,1e-5));
+
+	});
+
+	it('rational_curve_point can make a line', function(){
+
+		var degree = 1
+			, knot_vector = [0, 0, 1, 1]
+			, control_points = [ [0, 0, 0], [10, 0, 0] ]
+			, weights = [1, 1]
+			, u1 = 0.0
+			, u2 = 0.5
+			, u3 = 1.0;
+
+		var p1 = VERB.eval.nurbs.rational_curve_point( degree, knot_vector, VERB.eval.nurbs.homogenize_1d( control_points, weights), u1);
+		var p2 = VERB.eval.nurbs.rational_curve_point( degree, knot_vector, VERB.eval.nurbs.homogenize_1d( control_points, weights), u2);
+		var p3 = VERB.eval.nurbs.rational_curve_point( degree, knot_vector, VERB.eval.nurbs.homogenize_1d( control_points, weights), u3);
+		
+		should.equal(p1[0], 0);
+		should.equal(p2[0], 5);
+		should.equal(p3[0], 10);
+
+	});
+
+	it('rational_curve_adaptive_sample returns two end points for a line', function(){
+
+		var degree = 1
+			, knot_vector = [0, 0, 1, 1]
+			, control_points = [ [0, 0, 0], [10, 0, 0] ]
+			, weights = [1, 1];
+
+		var p = VERB.eval.nurbs.rational_curve_adaptive_sample( degree, knot_vector, VERB.eval.nurbs.homogenize_1d( control_points, weights), 1e-5);	
+		
+		should.equal(p[0][0], 0);
+		should.equal(p[1][0], 1);
+
+	});
+
+
+	it('rational_curve_adaptive_sample makes more points for an arc', function(){
+
+		var degree = 2
+			, knot_vector = [0, 0, 0, 1, 1, 1 ]
+			, weights = [1, 1, 2]
+			, control_points = [ [1, 0, 0], [1, 1, 0], [0, 1, 0] ];
+
+		var p = VERB.eval.nurbs.rational_curve_adaptive_sample( degree, knot_vector, VERB.eval.nurbs.homogenize_1d( control_points, weights), 1e-8);	
+		var p2 = VERB.eval.nurbs.rational_curve_adaptive_sample( degree, knot_vector, VERB.eval.nurbs.homogenize_1d( control_points, weights), 1e-4);	
+		
+		var prev = - 1e-8;
+		for (var i = 0; i < p.length; i++){
+			p[i][0].should.be.above(prev);
+			p[i][0].should.be.within(-1e-8,1 + 1e-8);
+			prev = p[i][0];
+		}
+
+		should.notEqual(p.length, 0);
+		should.notEqual(p2.length, 0);
+		should.notEqual(p.length, p2.length);
+
+		should.equal(p[p.length-1][0], 1.0);
+		should.equal(p2[p2.length-1][0], 1.0);
+
+	});
+
+	it('rational_curve_regular_sample should return 10 samples when asked to', function(){
+
+		var degree = 2
+			, knot_vector = [0, 0, 0, 1, 1, 1 ]
+			, weights = [1, 1, 2]
+			, control_points = [ [1, 0, 0], [1, 1, 0], [0, 1, 0] ]
+			, numSamples = 10;
+
+		var p = VERB.eval.nurbs.rational_curve_regular_sample( degree, knot_vector, VERB.eval.nurbs.homogenize_1d( control_points, weights), numSamples);	
+
+		should.equal(p.length, 10);
+		should.equal(p[0][0], 0);
+
+	});
+			
 });
 
 describe("BoundingBox",function(){
@@ -639,7 +728,6 @@ describe("BoundingBox",function(){
 		should.equal( bb1.max[0], 10 );
 		should.equal( bb1.max[1], 10 );
 		should.equal( bb1.max[2], 10 );
-
 	
 	});
 
@@ -651,9 +739,7 @@ describe("BoundingBox",function(){
 
 		should.equal( bb1.intersects(bb2), true );
 		should.equal( bb1.intersects(bb3), false );
-		should.equal( bb2.intersects(bb3), false );
-
-		
+		should.equal( bb2.intersects(bb3), false );		
 
 	});
 
@@ -678,8 +764,7 @@ describe("BoundingBox",function(){
 
 		should.equal( int_bb1_bb3, null ); //non-intersect is null
 
-		
-
+	
 	});
 
 	it('BoundingBox.intervals_overlap', function(){
