@@ -1,3 +1,7 @@
+
+
+
+
 /**
  * Intersect two NURBS surfaces
  *
@@ -15,10 +19,44 @@
 
 VERB.eval.nurbs.rational_surface_surface_intersect = function( not, sure, yet ) {
 
-
+	// tesselate two nurbs surfaces
+	// VERB.eval.mesh.parametric_mesh_mesh_intersect
+		// put polygons into kd trees
+		// intersect polygons via kd trees
+		// build up curves
+		// return poly line curves for further refinement
 
 }
 
+/**
+ * Intersect two meshes
+ *
+ * @param {Number} integer degree of surface in u direction
+ * @param {Array} array of nondecreasing knot values in u direction
+ * @param {Number} integer degree of surface in v direction
+ * @param {Array} array of nondecreasing knot values in v direction
+ * @param {Array} 3d array of control points, top to bottom is increasing u direction, left to right is increasing v direction,
+ 									and where each control point is an array of length (dim+1)
+ * @param {Number} u parameter at which to evaluate the surface point
+ * @param {Number} v parameter at which to evaluate the surface point
+ * @return {Array} a point represented by an array of length (dim)
+ * @api public
+ */
+
+VERB.eval.mesh.parametric_mesh_mesh_intersect = function( not, sure, yet ) {
+
+	// tesselate two nurbs surfaces
+	// call subroutine to:
+		// put polygons into kd trees
+		// intersect polygons via kd trees
+		// build up curves
+		// return poly line curves for further refinement
+
+	// sqr = function(x) { return x*x; };
+	// objective = function(x) { return sqr(10*(x[1]-x[0]*x[0])) + sqr(1-x[0]); }
+	// numeric.uncmin(objective,[-1.2,1])
+
+}
 
 /**
  * Intersect two NURBS curves
@@ -36,11 +74,172 @@ VERB.eval.nurbs.rational_surface_surface_intersect = function( not, sure, yet ) 
  * @api public
  */
 
-VERB.eval.nurbs.rational_curve_curve_bb_intersect = function( degree1, knot_vector1, control_points1, degree2, knot_vector2, control_points2, tol ) {
+VERB.eval.nurbs.rational_curve_curve_bb_intersect = function( degree1, knot_vector1, control_points1, degree2, knot_vector2, control_points2, sample_tol, tol ) {
 
+	// sample the two curves adaptively
+	var up1 = VERB.eval.nurbs.parametric_polyline_polyline_bb_intersect( degree1, knot_vector1, control_points1, sample_tol )
+		, up2 = VERB.eval.nurbs.parametric_polyline_polyline_bb_intersect( degree1, knot_vector1, control_points1, sample_tol )
+		, u1 = _.map(up1, function(el) { return el[0]; })
+		, u2 = _.map(up2, function(el) { return el[0]; })
+		, p1 = _.map(up1, function(el) { return el.slice(1) })
+		, p2 = _.map(up2, function(el) { return el.slice(1) });
 
+	return VERB.eval.nurbs.parametric_polyline_polyline_bb_intersect( p1, p2, u1, u2, tol );
 
 }
+
+/**
+ * Intersect two polyline curves, keeping track of parameterization on each
+ *
+ * @param {Array} array of [parameter point] values for curve 1
+ * @param {Array} array of [parameter point] values for curve 2
+ * @param {Number} tolerance for the intersection
+ * @return {Array} a 2d array specifying the intersections on u params of intersections on curve 1 and cruve 2
+ * @api public
+ */
+
+VERB.eval.nurbs.parametric_polyline_polyline_bb_intersect = function( p1, p2, u1, u2, tol ) {
+
+	var bb1 = new VERB.geom.BoundingBox(p1)
+		, bb2 = new VERB.geom.BoundingBox(p2)
+
+	if ( !bb1.intersects(bb2) ) return;
+
+	if (p1.length === 2 && p2.length === 2 ){
+
+			var inter = VERB.eval.geom.segment_segment_intersect(p1[0],p1[1], p2[0], p2[1], tol);
+
+			if ( inter != null ){
+
+				// replace with interpolant
+			 	inter[0][0] = inter[0][0] * ( u1[1]-u1[0] ) + u1[0];
+			 	inter[1][0] = inter[1][0] * ( u2[1]-u2[0] ) + u2[0];
+
+			 	return inter;
+
+			} 
+
+	} else if (p1.length === 2) {
+
+		var p2_mid = Math.ceil( p2.length / 2 ),
+				p2_a = p2.slice( 0, p2_mid ),
+				u2_a = u2.slice(0, p2_mid ),
+				p2_b = p2.slice( p2_mid-1 )
+				u2_b = p2.slice( p2_mid-1 );
+
+		return 	 VERB.eval.nurbs.parametric_polyline_polyline_bb_intersect(p1, p2_a, u1, u2_a, tol)
+		.concat( VERB.eval.nurbs.parametric_polyline_polyline_bb_intersect(p1, p2_b, u1, u2_b, tol) );
+
+	} else if (p2.length === 2) {
+
+		var p1_mid = Math.ceil( p1.length / 2 ),
+				p1_a = p1.slice( 0, p1_mid ),
+				u1_a = u1.slice(0, p1_mid ),
+				p1_b = p1.slice( p1_mid-1 )
+				u1_b = p1.slice( p1_mid-1 );
+
+		return 		 VERB.eval.nurbs.parametric_polyline_polyline_bb_intersect(p2, p1_a, u2, p1_a, tol)
+			.concat( VERB.eval.nurbs.parametric_polyline_polyline_bb_intersect(p2, p1_b, u2, u1_b, tol) );
+
+	} else {
+
+		var p1_mid = Math.ceil( p1.length / 2 ),
+				p1_a = p1.slice( 0, p1_mid ),
+				u1_a = u1.slice(0, p1_mid ),
+				p1_b = p1.slice( p1_mid-1 ),
+				u1_b = p1.slice( p1_mid-1 ),
+				p2_mid = Math.ceil( p2.length / 2 ),
+				p2_a = p2.slice( 0, p2_mid ),
+				u2_a = u2.slice(0, p2_mid ),
+				p2_b = p2.slice( p2_mid-1 ),
+				u2_b = p2.slice( p2_mid-1 );
+
+		return 		 VERB.eval.nurbs.parametric_polyline_polyline_bb_intersect(p1_a, p2_a, u1_a, p2_a, tol)
+			.concat( VERB.eval.nurbs.parametric_polyline_polyline_bb_intersect(p1_a, p2_b, u1_a, u2_b, tol) )
+			.concat( VERB.eval.nurbs.parametric_polyline_polyline_bb_intersect(p1_b, p2_a, u1_b, u2_a, tol) )
+			.concat( VERB.eval.nurbs.parametric_polyline_polyline_bb_intersect(p1_b, p2_b, u1_b, u2_b, tol) );
+
+	}
+
+	return [];
+
+}
+
+/**
+ * Find the closest parameter on two rays, see http://geomalgorithms.com/a07-_distance.html
+ *
+ * @param {Array} first point on a
+ * @param {Array} second point on a
+ * @param {Array} first point on b
+ * @param {Array} second point on b
+ * @param {Number} tolerance for the intersection
+ * @return {Array} a 2d array specifying the intersections on u params of intersections on curve 1 and cruve 2
+ * @api public
+ */
+
+VERB.eval.geom.segment_segment_intersect = function( a0, a1, b0, b1, tol ) {
+
+	// get axis and length of segments
+	var a1ma0 = numeric.sub(a1, a0),
+			aN = Math.sqrt( numeric.dot(a1ma0, a1ma0) ),
+			a = numeric.mul( 1/ aN, a1ma0 )
+			b1mb0 = numeric.sub(b1, b0),
+			bN = Math.sqrt( numeric.dot(b1mb0, b1mb0) ),
+			a = numeric.mul( 1 / bN, a1ma0 )
+			int_params = ray_ray_intersect(a0, a, b0, b);
+
+	if ( int_params != null ) {
+
+		var u1 = Math.min( Math.max( 0, int_params[0] / a ), 1.0),
+				u2 = Math.min( Math.max( 0, int_params[1] / b ), 1.0),
+				int_a = numeric.add( numeric.mul( u1, a1ma0 ), a0 ),
+				int_b = numeric.add( numeric.mul( u2, b1mb0 ), b0 ),
+				dist = numeric.norm2Squared( numeric.sub(int_a, int_b) );
+
+		if (  dist < tolerance*tolerance ) {
+			return [ [u1].concat(int_a), [u2].concat(int_b) ] ;
+		} 
+
+	}
+	
+	return null;
+
+ }
+
+
+/**
+ * Find the closest parameter on two rays, see http://geomalgorithms.com/a07-_distance.html
+ *
+ * @param {Array} origin for ray 1
+ * @param {Array} direction of ray 1, assumed normalized
+ * @param {Array} origin for ray 1
+ * @param {Array} direction of ray 1, assumed normalized
+ * @return {Array} a 2d array specifying the intersections on u params of intersections on curve 1 and cruve 2
+ * @api public
+ */
+
+VERB.eval.geom.ray_ray_intersect = function( a0, a, b0, b ) {
+
+   var dab = numeric.dot( a, b ),
+		   dab0 = numeric.dot( a, b0 ),
+		   daa0 = numeric.dot( a, a0 ),
+		   dbb0 = numeric.dot( b, b0 ),
+		   dba0 = numeric.dot( b, a0 ),
+		   daa = numeric.dot( a, a ),
+		   dbb = numeric.dot( b, b ),
+		   div = daa*dbb - dab*dab;
+
+   if ( abs( div ) < EPSILON ) { // parallel case
+	   return null;
+   }
+
+   var num = dab * (dab0-daa0) - daa * (dbb0-dba0),
+   		 w = num / div,
+			 t = (dab0 - daa0 + w * dab)/daa;
+
+		return [t, w];
+
+ }
 
 
 /**
@@ -87,7 +286,7 @@ VERB.eval.nurbs.rational_curve_regular_sample_range = function( degree, knot_vec
 
 		u = start_u + span * i;
 		p.push( [u].concat( VERB.eval.nurbs.rational_curve_point(degree, knot_vector, control_points, u) ) );
-		
+
 	}
 
 	return p;

@@ -19,7 +19,10 @@ VERB.geom = {};
 VERB.core = {};
 VERB.eval = {};
 
-VERB.eval.nurbs = {};
+VERB.eval.nurbs = VERB.eval.nurbs || {};
+VERB.eval.mesh = VERB.eval.mesh || {};
+
+VERB.EPSILON = 1e-8;
 
 VERB.init = function() {
 

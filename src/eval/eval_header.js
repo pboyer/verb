@@ -10,5 +10,7 @@ else // node.js context
 var VERB = VERB || {};
 VERB.eval = VERB.eval || {};
 VERB.eval.nurbs = VERB.eval.nurbs || {};
+VERB.eval.mesh = VERB.eval.mesh || {};
+VERB.EPSILON = 1e-8;
 
 var router = new labor.Router(VERB.eval.nurbs);
