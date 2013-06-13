@@ -46,15 +46,75 @@ VERB.eval.nurbs.rational_surface_surface_intersect = function( not, sure, yet ) 
 VERB.eval.mesh.parametric_mesh_mesh_intersect = function( not, sure, yet ) {
 
 	// tesselate two nurbs surfaces
+
 	// call subroutine to:
 		// put polygons into kd trees
 		// intersect polygons via kd trees
 		// build up curves
 		// return poly line curves for further refinement
 
-	// sqr = function(x) { return x*x; };
-	// objective = function(x) { return sqr(10*(x[1]-x[0]*x[0])) + sqr(1-x[0]); }
-	// numeric.uncmin(objective,[-1.2,1])
+}
+
+
+/**
+ * Tesselate an untrimmed nurbs surface
+ *
+ * @param {Number} integer degree of surface in u direction
+ * @param {Array} array of nondecreasing knot values in u direction
+ * @param {Number} integer degree of surface in v direction
+ * @param {Array} array of nondecreasing knot values in v direction
+ * @param {Array} 3d array of control points, top to bottom is increasing u direction, left to right is increasing v direction,
+ 									and where each control point is an array of length (dim+1)
+ * @param {Number} u parameter at which to evaluate the surface point
+ * @param {Number} v parameter at which to evaluate the surface point
+ * @return {Array} a point represented by an array of length (dim)
+ * @api public
+ */
+
+VERB.eval.nurbs.rational_surface_tesselate = function( degree1, knot_vector1, control_points1 ) {
+
+	// tesselate two nurbs surfaces
+	
+	// call subroutine to:
+		// put polygons into kd trees
+		// intersect polygons via kd trees
+		// build up curves
+		// return poly line curves for further refinement
+
+}
+
+/**
+ * Refine an intersection pair for two curves given an initial guess.  This is an unconstrained minimization,
+ * so the caller is responsible for providing a very good initial guess.
+ *
+ * @param {Number} integer degree of curve1
+ * @param {Array} array of nondecreasing knot values for curve 1
+ * @param {Array} 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
+ 									and form (wi*pi, wi) for curve 1
+ * @param {Number} integer degree of curve2
+ * @param {Array} array of nondecreasing knot values for curve 2
+ * @param {Array} 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
+ 									and form (wi*pi, wi) for curve 2
+ * @param {Array} length 2 array with first param guess in first position and second param guess in second position
+ * @return {Array} a length 3 array containing the [ distance * distance, u1, u2 ]
+ * @api public
+ */
+
+VERB.eval.nurbs.rational_curve_curve_bb_intersect_refine = function( degree1, knot_vector1, control_points1, degree2, knot_vector2, control_points2, start_params ) {
+
+	var objective = function(x) { 
+
+		var p1 = VERB.eval.nurbs.rational_curve_point(degree1, knot_vector1, control_points1, x[0])
+			, p2 = VERB.eval.nurbs.rational_curve_point(degree2, knot_vector2, control_points2, x[1])
+			, p1_p2 = numeric.sub(p1, p2);
+
+		return numeric.dot(p1_p2norm, p1_p2norm);
+
+	}
+
+	var sol_obj = numeric.uncmin( objective, start_params);
+
+	return [sol_obj.f].concat( sol_obj.solution );
 
 }
 
