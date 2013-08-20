@@ -65,21 +65,71 @@ VERB.eval.mesh.parametric_mesh_mesh_intersect = function( not, sure, yet ) {
  * @param {Array} array of nondecreasing knot values in v direction
  * @param {Array} 3d array of control points, top to bottom is increasing u direction, left to right is increasing v direction,
  									and where each control point is an array of length (dim+1)
- * @param {Number} u parameter at which to evaluate the surface point
- * @param {Number} v parameter at which to evaluate the surface point
- * @return {Array} a point represented by an array of length (dim)
+ * @return {Array} first element of array is an array of positions, second element are 3-tupples of triangle windings
  * @api public
  */
 
-VERB.eval.nurbs.rational_surface_tesselate = function( degree1, knot_vector1, control_points1 ) {
+VERB.eval.nurbs.rational_surface_tesselate_naive = function( degree_u, knot_vector_u, degree_v, knot_vector_v, homo_control_points, divs_u, divs_v ) {
 
-	// tesselate two nurbs surfaces
-	
-	// call subroutine to:
-		// put polygons into kd trees
-		// intersect polygons via kd trees
-		// build up curves
-		// return poly line curves for further refinement
+	if ( divs_u < 1 ) {
+		divs_u = 1;
+	}
+
+	if ( divs_v < 1 ) {
+		divs_v = 1;
+	}
+
+	var span_u = 1 / divs_u,
+		span_v = 1 / divs_v;
+  
+  var points = [];
+
+  // generate all points
+	for (var i = 0; i < divs_u + 1; i++) {
+		for (var j = 0; j < divs_v + 1; j++) {
+
+			var pt_u = i * span_u, 
+				pt_v = j * span_v;
+
+			points.push( VERB.eval.nurbs.rational_surface_point( degree_u, knot_vector_u,  degree_v, knot_vector_v, homo_control_points, pt_u, pt_v ) );
+
+		}
+	}
+
+	//  u dir
+  //  |
+  //  v 
+  //
+  //  v dir -->
+  //
+	//  a ---- d 
+	//  | \    |
+	//  |  \   |
+ 	//  |   \  |
+	//  |    \ | 
+	//	b ---- c 
+  //
+
+  var faces = [];
+
+  // generate all faces
+	for (var i = 0; i < divs_u ; i++) {
+		for (var j = 0; j < divs_v ; j++) {
+
+			var a_i = i * (divs_v + 1) + j,
+				b_i = (i + 1) * (divs_v + 1) + j,
+				c_i = b_i + 1,
+				d_i = a_i + 1,
+				abc = [a_i, b_i, c_i],
+				acd = [a_i, c_i, d_i];
+
+			faces.push(abc);
+			faces.push(acd);
+
+		}
+	}
+
+	return [points, faces];
 
 }
 
