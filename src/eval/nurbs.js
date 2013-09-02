@@ -84,30 +84,17 @@ VERB.eval.mesh.mesh_mesh_intersect_aabb = function( points1, tris1, uvs1, points
 /**
  * Intersect two triangles
  *
- * @param {Number} integer degree of surface in u direction
- * @param {Array} array of nondecreasing knot values in u direction
- * @param {Number} integer degree of surface in v direction
- * @param {Array} array of nondecreasing knot values in v direction
- * @param {Array} 3d array of control points, top to bottom is increasing u direction, left to right is increasing v direction,
- 									and where each control point is an array of length (dim+1)
- * @param {Number} u parameter at which to evaluate the surface point
- * @param {Number} v parameter at which to evaluate the surface point
+ * @param {Array} array of length 3 arrays of numbers representing the points of mesh1
+ * @param {Array} array of length 3 arrays of number representing the triangles of mesh1
+ * @param {Array} array of length 3 arrays of numbers representing the points of mesh2
+ * @param {Array} array of length 3 arrays of number representing the triangles of mesh2
  * @return {Array} a point represented by an array of length (dim)
  * @api public
  */
 
-VERB.eval.mesh.mesh_mesh_intersect_aabb = function( points1, tris1, uvs1, points2, tris2, uvs2 ) {
+VERB.eval.mesh.intersect_tri_tri = function( points1, tri1, points2, tri2 ) {
 
-	// build aabb for each mesh
-	var tri_indices1 = _.range(tris1.length)
-	  , tri_indices2 = _.range(tris2.length)
-	  , aabb1 = VERB.eval.mesh.make_mesh_aabb_tree( points1, tris1, tri_indices1 )
-	  , aabb2 = VERB.eval.mesh.make_mesh_aabb_tree( points2, tris2, tri_indices2 )
-  
-  // intersect and get the pairs of triangle intersctions
-		, intersection_pairs = VERB.eval.mesh.intersect_aabb_tree( points1, tris1, points2, tris2, aabb1, aabb2 );
 
-	// get the segments of the intersection crv with uvs
 
 }
 
@@ -125,34 +112,34 @@ VERB.eval.mesh.mesh_mesh_intersect_aabb = function( points1, tris1, uvs1, points
  * @api public
  */
 
-VERB.eval.mesh.intersect_aabb_tree = function( points1, tris1, points2, tris2, aabb1, aabb2 ) {
+VERB.eval.mesh.intersect_aabb_trees = function( points1, tris1, points2, tris2, aabb_tree1, aabb_tree2 ) {
 
-  var intersects = aabb1.bounding_box.intersects( aabb2.bounding_box );
+  var intersects = aabb_tree1.bounding_box.intersects( aabb_tree2.bounding_box );
 
   if (!intersects){
   	return [];
   }
 
-  if (aabb1.children.length === 0 && aabb2.children.length === 0){
+  if (aabb_tree1.children.length === 0 && aabb_tree2.children.length === 0){ 
 
-  	return [ [aabb1.triangle, aabb2.triangle ] ]; 
+  	return [ [aabb_tree1.triangle, aabb_tree2.triangle ] ]; 
 
-  } else if (aabb1.children.length === 0 && aabb2.children.length != 0){
+  } else if (aabb_tree1.children.length === 0 && aabb_tree2.children.length != 0){
 
-  	return     VERB.eval.mesh.intersect_aabb_tree( points1, tris1, points2, tris2, aabb1, aabb2.children[0] )
-  		.concat( VERB.eval.mesh.intersect_aabb_tree( points1, tris1, points2, tris2, aabb1, aabb2.children[1] ) );
+  	return     VERB.eval.mesh.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1, aabb_tree2.children[0] )
+  		.concat( VERB.eval.mesh.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1, aabb_tree2.children[1] ) );
 
-  } else if (aabb1.children.length != 0 && aabb2.children.length != 0){
+  } else if (aabb_tree1.children.length != 0 && aabb_tree2.children.length === 0){
 
-  	return     VERB.eval.mesh.intersect_aabb_tree( points1, tris1, points2, tris2, aabb1.children[0], aabb2 )
-  		.concat( VERB.eval.mesh.intersect_aabb_tree( points1, tris1, points2, tris2, aabb1.children[1], aabb2 ) );
+  	return     VERB.eval.mesh.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[0], aabb_tree2 )
+  		.concat( VERB.eval.mesh.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[1], aabb_tree2 ) );
 
-  } else if (aabb1.children.length === 0 && aabb2.children.length != 0){
+  } else if (aabb_tree1.children.length != 0 && aabb_tree2.children.length != 0){
 
-  	return     VERB.eval.mesh.intersect_aabb_tree( points1, tris1, points2, tris2, aabb1.children[0], aabb2.children[0] )
-  		.concat( VERB.eval.mesh.intersect_aabb_tree( points1, tris1, points2, tris2, aabb1.children[0], aabb2.children[1] ) )
-  		.concat( VERB.eval.mesh.intersect_aabb_tree( points1, tris1, points2, tris2, aabb1.children[1], aabb2.children[0] ) )
-  		.concat( VERB.eval.mesh.intersect_aabb_tree( points1, tris1, points2, tris2, aabb1.children[1], aabb2.children[1] ) );
+  	return     VERB.eval.mesh.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[0], aabb_tree2.children[0] )
+  		.concat( VERB.eval.mesh.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[0], aabb_tree2.children[1] ) )
+  		.concat( VERB.eval.mesh.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[1], aabb_tree2.children[0] ) )
+  		.concat( VERB.eval.mesh.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[1], aabb_tree2.children[1] ) );
 
   }
 
@@ -164,7 +151,7 @@ VERB.eval.mesh.intersect_aabb_tree = function( points1, tris1, points2, tris2, a
  *
  * @param {Array} array of length 3 arrays of numbers representing the points
  * @param {Array} array of length 3 arrays of number representing the triangles
- * @param {Array} array of numbers representing the relevant triangles
+ * @param {Array} array of numbers representing the relevant triangles to use to form aabb
  * @return {Array} a point represented by an array of length (dim)
  * @api public
  */
@@ -177,7 +164,7 @@ VERB.eval.mesh.make_mesh_aabb_tree = function( points, tris, tri_indices ) {
 
 	// if only one ele, terminate recursion and store the triangles
 	if (tri_indices.length === 1){
-		aabb.triangle = tri_indices;
+		aabb.triangle = tri_indices[0];
 		return aabb;
 	}
 
