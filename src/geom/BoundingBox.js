@@ -12,7 +12,7 @@ VERB.geom.BoundingBox = function() {
 	this.max = [0,0,0];
 
  	var pt_args = Array.prototype.slice.call( arguments, 0);
- 	this.add_points_sync(pt_args);
+ 	this.add_elements_sync(pt_args);
 }	
 
 /**
@@ -24,7 +24,7 @@ VERB.geom.BoundingBox = function() {
  * @api public
  */
 
-VERB.geom.BoundingBox.prototype.add_points = function( point_array, callback ) 
+VERB.geom.BoundingBox.prototype.add_elements = function( point_array, callback ) 
 {
 
 	var that = this; 
@@ -45,7 +45,7 @@ VERB.geom.BoundingBox.prototype.add_points = function( point_array, callback )
  * @api public
  */
 
-VERB.geom.BoundingBox.prototype.add_points_sync = function( point_array ) 
+VERB.geom.BoundingBox.prototype.add_elements_sync = function( point_array ) 
 {
 	var that = this; 
 	_.each( point_array, function(elem) {
@@ -188,8 +188,8 @@ VERB.geom.BoundingBox.prototype.intersects = function( bb ) {
 		, b2 = bb.max;
 
 	if ( this.intervals_overlap(a1[0], a2[0], b1[0], b2[0]) 
-				&& this.intervals_overlap(a1[1], a2[1], b1[1], b2[1]) 
-				&& this.intervals_overlap(a1[2], a2[2], b1[2], b2[2] ) )
+			&& this.intervals_overlap(a1[1], a2[1], b1[1], b2[1]) 
+			&& this.intervals_overlap(a1[2], a2[2], b1[2], b2[2] ) )
 	{
 		return true;
 	}
@@ -199,7 +199,7 @@ VERB.geom.BoundingBox.prototype.intersects = function( bb ) {
 };
 
 /**
- * Clear the bounding box, leaving it in an uninitialized state.  Call add, add_points in order to 
+ * Clear the bounding box, leaving it in an uninitialized state.  Call add, add_elements in order to 
  * initialize
  *
  * @return {Object} this BoundingBox for chaining
@@ -210,6 +210,39 @@ VERB.geom.BoundingBox.prototype.clear = function( bb ) {
 
 	this.initialized = false;
 	return this;
+
+};
+
+/**
+ * Get longest axis of bounding box
+ *
+ * @return {Number} Index of longest axis
+ * @api public
+ */
+
+VERB.geom.BoundingBox.prototype.get_longest_axis = function( bb ) {
+
+	var axis_lengths = [ 	this.get_axis_length(0), 
+							this.get_axis_length(1), 
+							this.get_axis_length(2)];
+
+	return axis_lengths.indexOf(Math.max.apply(Math, axis_lengths));
+
+};
+
+/**
+ * Get length of given axis. 
+ *
+ * @param {Number} Index of axis to inspect (between 0 and 2)
+ * @return {Number} Length of the given axis.  If axis is out of bounds, returns 0.
+ * @api public
+ */
+
+VERB.geom.BoundingBox.prototype.get_axis_length = function( i ) {
+
+	if (i < 0 || i > 2) return 0;
+
+	return Math.abs( this.min[i] - this.max[i] );
 
 };
 

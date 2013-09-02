@@ -1,7 +1,3 @@
-
-
-
-
 /**
  * Intersect two NURBS surfaces
  *
@@ -29,7 +25,7 @@ VERB.eval.nurbs.rational_surface_surface_intersect = function( not, sure, yet ) 
 }
 
 /**
- * Intersect two meshes
+ * Intersect two meshes via aabb intersection
  *
  * @param {Number} integer degree of surface in u direction
  * @param {Array} array of nondecreasing knot values in u direction
@@ -43,7 +39,7 @@ VERB.eval.nurbs.rational_surface_surface_intersect = function( not, sure, yet ) 
  * @api public
  */
 
-VERB.eval.mesh.parametric_mesh_mesh_intersect = function( not, sure, yet ) {
+VERB.eval.mesh.mesh_mesh_intersect = function( vertices1, triangles1, uvs1, aabb1, vertices2, triangles2, uvs2, aabb2) {
 
 	// tesselate two nurbs surfaces
 
@@ -55,6 +51,276 @@ VERB.eval.mesh.parametric_mesh_mesh_intersect = function( not, sure, yet ) {
 
 }
 
+/**
+ * Intersect two meshes via aabb intersection
+ *
+ * @param {Number} integer degree of surface in u direction
+ * @param {Array} array of nondecreasing knot values in u direction
+ * @param {Number} integer degree of surface in v direction
+ * @param {Array} array of nondecreasing knot values in v direction
+ * @param {Array} 3d array of control points, top to bottom is increasing u direction, left to right is increasing v direction,
+ 									and where each control point is an array of length (dim+1)
+ * @param {Number} u parameter at which to evaluate the surface point
+ * @param {Number} v parameter at which to evaluate the surface point
+ * @return {Array} a point represented by an array of length (dim)
+ * @api public
+ */
+
+VERB.eval.mesh.mesh_mesh_intersect_aabb = function( points1, tris1, uvs1, points2, tris2, uvs2 ) {
+
+	// build aabb for each mesh
+	var tri_indices1 = _.range(tris1.length)
+	  , tri_indices2 = _.range(tris2.length)
+	  , aabb1 = VERB.eval.mesh.make_mesh_aabb_tree( points1, tris1, tri_indices1 )
+	  , aabb2 = VERB.eval.mesh.make_mesh_aabb_tree( points2, tris2, tri_indices2 )
+  
+  // intersect and get the pairs of triangle intersctions
+		, intersection_pairs = VERB.eval.mesh.intersect_aabb_tree( points1, tris1, points2, tris2, aabb1, aabb2 );
+
+	// get the segments of the intersection crv with uvs
+
+}
+
+/**
+ * Intersect two triangles
+ *
+ * @param {Number} integer degree of surface in u direction
+ * @param {Array} array of nondecreasing knot values in u direction
+ * @param {Number} integer degree of surface in v direction
+ * @param {Array} array of nondecreasing knot values in v direction
+ * @param {Array} 3d array of control points, top to bottom is increasing u direction, left to right is increasing v direction,
+ 									and where each control point is an array of length (dim+1)
+ * @param {Number} u parameter at which to evaluate the surface point
+ * @param {Number} v parameter at which to evaluate the surface point
+ * @return {Array} a point represented by an array of length (dim)
+ * @api public
+ */
+
+VERB.eval.mesh.mesh_mesh_intersect_aabb = function( points1, tris1, uvs1, points2, tris2, uvs2 ) {
+
+	// build aabb for each mesh
+	var tri_indices1 = _.range(tris1.length)
+	  , tri_indices2 = _.range(tris2.length)
+	  , aabb1 = VERB.eval.mesh.make_mesh_aabb_tree( points1, tris1, tri_indices1 )
+	  , aabb2 = VERB.eval.mesh.make_mesh_aabb_tree( points2, tris2, tri_indices2 )
+  
+  // intersect and get the pairs of triangle intersctions
+		, intersection_pairs = VERB.eval.mesh.intersect_aabb_tree( points1, tris1, points2, tris2, aabb1, aabb2 );
+
+	// get the segments of the intersection crv with uvs
+
+}
+
+
+/**
+ *  Intersect two aabb trees - a recursive function
+ *
+ * @param {Array} array of length 3 arrays of numbers representing the points of mesh1
+ * @param {Array} array of length 3 arrays of number representing the triangles of mesh1
+ * @param {Array} array of length 3 arrays of numbers representing the points of mesh2
+ * @param {Array} array of length 3 arrays of number representing the triangles of mesh2
+ * @param {Object} nested object representing the aabb tree of the first mesh
+ * @param {Object} nested object representing the aabb tree of the second mesh
+ * @return {Array} a list of pairs of triangle indices for mesh1 and mesh2 that are intersecting
+ * @api public
+ */
+
+VERB.eval.mesh.intersect_aabb_tree = function( points1, tris1, points2, tris2, aabb1, aabb2 ) {
+
+  var intersects = aabb1.bounding_box.intersects( aabb2.bounding_box );
+
+  if (!intersects){
+  	return [];
+  }
+
+  if (aabb1.children.length === 0 && aabb2.children.length === 0){
+
+  	return [ [aabb1.triangle, aabb2.triangle ] ]; 
+
+  } else if (aabb1.children.length === 0 && aabb2.children.length != 0){
+
+  	return     VERB.eval.mesh.intersect_aabb_tree( points1, tris1, points2, tris2, aabb1, aabb2.children[0] )
+  		.concat( VERB.eval.mesh.intersect_aabb_tree( points1, tris1, points2, tris2, aabb1, aabb2.children[1] ) );
+
+  } else if (aabb1.children.length != 0 && aabb2.children.length != 0){
+
+  	return     VERB.eval.mesh.intersect_aabb_tree( points1, tris1, points2, tris2, aabb1.children[0], aabb2 )
+  		.concat( VERB.eval.mesh.intersect_aabb_tree( points1, tris1, points2, tris2, aabb1.children[1], aabb2 ) );
+
+  } else if (aabb1.children.length === 0 && aabb2.children.length != 0){
+
+  	return     VERB.eval.mesh.intersect_aabb_tree( points1, tris1, points2, tris2, aabb1.children[0], aabb2.children[0] )
+  		.concat( VERB.eval.mesh.intersect_aabb_tree( points1, tris1, points2, tris2, aabb1.children[0], aabb2.children[1] ) )
+  		.concat( VERB.eval.mesh.intersect_aabb_tree( points1, tris1, points2, tris2, aabb1.children[1], aabb2.children[0] ) )
+  		.concat( VERB.eval.mesh.intersect_aabb_tree( points1, tris1, points2, tris2, aabb1.children[1], aabb2.children[1] ) );
+
+  }
+
+}
+
+
+/**
+ * Make tree of axis aligned bounding boxes 
+ *
+ * @param {Array} array of length 3 arrays of numbers representing the points
+ * @param {Array} array of length 3 arrays of number representing the triangles
+ * @param {Array} array of numbers representing the relevant triangles
+ * @return {Array} a point represented by an array of length (dim)
+ * @api public
+ */
+
+VERB.eval.mesh.make_mesh_aabb_tree = function( points, tris, tri_indices ) {
+
+	// build bb
+	var aabb = { 	bounding_box: VERB.eval.mesh.make_mesh_aabb( points, tris, tri_indices ), 
+								children: [] };
+
+	// if only one ele, terminate recursion and store the triangles
+	if (tri_indices.length === 1){
+		aabb.triangle = tri_indices;
+		return aabb;
+	}
+
+	// sort triangles in sub mesh
+	var sorted_tri_indices = VERB.eval.mesh.sort_tris_on_longest_axis( aabb.bounding_box, points, tris, tri_indices )
+		, tri_indices_a = sorted_tri_indices.slice( 0, Math.floor( sorted_tri_indices.length / 2 ) )
+		, tri_indices_b = sorted_tri_indices.slice( Math.floor( sorted_tri_indices.length / 2 ), sorted_tri_indices.length );
+
+	// recurse 
+	aabb.children = [ VERB.eval.mesh.make_mesh_aabb_tree(points, tris, tri_indices_a), 
+										VERB.eval.mesh.make_mesh_aabb_tree(points, tris, tri_indices_b) ];
+
+	// return result
+	return aabb;
+
+}
+
+/**
+ * Form axis-aligned bounding box from triangles of mesh
+ *
+ * @param {Array} array of length 3 arrays of numbers representing the points
+ * @param {Array} array of length 3 arrays of number representing the triangles
+ * @param {Array} array of numbers representing the relevant triangles
+ * @return {Array} a point represented by an array of length (dim)
+ * @api public
+ */
+
+VERB.eval.mesh.make_mesh_aabb = function( points, tris, tri_indices ) {
+
+	var bb = new VERB.geom.BoundingBox();
+
+	for (var i = tri_indices.length - 1; i >= 0; i--) {
+		
+		var tri_i = tri_indices[i];
+
+		bb.add( points[ tris[ tri_i ][0] ] );
+		bb.add( points[ tris[ tri_i ][1] ] );
+		bb.add( points[ tris[ tri_i ][2] ] );
+
+	};
+
+	return bb;
+
+}
+
+/**
+ * Sort triangles on longest axis
+ *
+ * @param {Number} integer degree of surface in u direction
+ * @param {Array} array of nondecreasing knot values in u direction
+ * @param {Number} integer degree of surface in v direction
+ * @param {Array} array of nondecreasing knot values in v direction
+ * @return {Array} a point represented by an array of length (dim)
+ * @api public
+ */
+
+VERB.eval.mesh.sort_tris_on_longest_axis = function( container_bb, points, tris, tri_indices ) {
+
+	// get longest axis of bb
+	var long_axis = container_bb.get_longest_axis();
+
+	// map position on longest axis to index in tri_indices
+	var axis_position_map = [];
+	for (var i = tri_indices.length - 1; i >= 0; i--) {
+
+		// centroid-centered
+
+		// var tri_i = tri_indices[i], 
+		// 	tri_centroid = VERB.eval.mesh.get_tri_centroid( points, tris[ tri_i ] );
+		// axis_position_map.push( [ tri_centroid[long_axis], tri_i ] );
+
+		// min position
+		var tri_i = tri_indices[i],
+			tri_min = VERB.eval.mesh.get_min_coordinate_on_axis( points, tris[ tri_i ], long_axis );
+
+		axis_position_map.push( [ tri_min, tri_i ] );
+
+	}
+
+	// sort by axis position
+	axis_position_map.sort(function(a,b) { return a[0] > b[0] } );
+
+	// box up the tri_indices in sorted_order
+	var sorted_tri_indices = [];
+	for (var i = 0, l = axis_position_map.length; i < l; i++) {
+		sorted_tri_indices.push( axis_position_map[i][1] );
+	}
+
+	return sorted_tri_indices;
+
+}
+
+/**
+ * Get min coordinate on axis
+ *
+ * @param {Array} array of length 3 arrays of numbers representing the points
+ * @param {Array} length 3 array of point indices for the triangle
+ * @return {Number} a point represented by an array of length 3
+ * @api public
+ */
+
+VERB.eval.mesh.get_min_coordinate_on_axis = function( points, tri, axis ) {
+
+	var axis_coords = [];
+
+	// for each vertex
+	for (var i = 0; i < 3; i++){
+		axis_coords.push( points[ tri[i] ][ axis ] );
+	}
+
+	return Math.min.apply(Math, axis_coords);
+};
+
+/**
+ * Get triangle centroid
+ *
+ * @param {Array} array of length 3 arrays of numbers representing the points
+ * @param {Array} length 3 array of point indices for the triangle
+ * @return {Array} a point represented by an array of length 3
+ * @api public
+ */
+
+VERB.eval.mesh.get_tri_centroid = function( points, tri ) {
+
+	var centroid = [0,0,0];
+
+	// for each vertex
+	for (var i = 0; i < 3; i++){
+
+		// for each point index
+		for (var j = 0; j < 3; j++){
+			centroid[j] += points[ tri[i] ][j];
+		}
+
+	}
+
+	for (var i = 0; i < 3; i++){
+		centroid[i] /= 3;
+	}
+
+	return centroid;
+};
+
 
 /**
  * Tesselate an untrimmed nurbs surface
@@ -65,11 +331,12 @@ VERB.eval.mesh.parametric_mesh_mesh_intersect = function( not, sure, yet ) {
  * @param {Array} array of nondecreasing knot values in v direction
  * @param {Array} 3d array of control points, top to bottom is increasing u direction, left to right is increasing v direction,
  									and where each control point is an array of length (dim+1)
- * @return {Array} first element of array is an array of positions, second element are 3-tupples of triangle windings
+ * @return {Array} first element of array is an array of positions, second element are 3-tuple of triangle windings, third element is the 
+                   uvs
  * @api public
  */
 
-VERB.eval.nurbs.rational_surface_tesselate_naive = function( degree_u, knot_vector_u, degree_v, knot_vector_v, homo_control_points, divs_u, divs_v ) {
+VERB.eval.mesh.rational_surface_tesselate_naive = function( degree_u, knot_vector_u, degree_v, knot_vector_v, homo_control_points, divs_u, divs_v ) {
 
 	if ( divs_u < 1 ) {
 		divs_u = 1;
@@ -83,6 +350,7 @@ VERB.eval.nurbs.rational_surface_tesselate_naive = function( degree_u, knot_vect
 		span_v = 1 / divs_v;
   
   var points = [];
+  var uvs = [];
 
   // generate all points
 	for (var i = 0; i < divs_u + 1; i++) {
@@ -91,6 +359,7 @@ VERB.eval.nurbs.rational_surface_tesselate_naive = function( degree_u, knot_vect
 			var pt_u = i * span_u, 
 				pt_v = j * span_v;
 
+			uvs.push( [pt_u, pt_v] );
 			points.push( VERB.eval.nurbs.rational_surface_point( degree_u, knot_vector_u,  degree_v, knot_vector_v, homo_control_points, pt_u, pt_v ) );
 
 		}
@@ -129,7 +398,7 @@ VERB.eval.nurbs.rational_surface_tesselate_naive = function( degree_u, knot_vect
 		}
 	}
 
-	return [points, faces];
+	return { points: points, faces : faces, uvs: uvs};
 
 }
 

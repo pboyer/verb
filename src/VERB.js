@@ -20,6 +20,7 @@ VERB.core = {};
 VERB.eval = {};
 
 VERB.eval.nurbs = VERB.eval.nurbs || {};
+VERB.eval.geom = VERB.eval.geom || {};
 VERB.eval.mesh = VERB.eval.mesh || {};
 
 VERB.EPSILON = 1e-8;
