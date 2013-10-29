@@ -16,11 +16,8 @@
 VERB.eval.nurbs.intersect_rational_surfaces = function( not, sure, yet ) {
 
 	// tesselate two nurbs surfaces
-	// VERB.eval.mesh.parametric_mesh_mesh_intersect
-		// put polygons into kd trees
-		// intersect polygons via kd trees
-		// build up curves
-		// return poly line curves for further refinement
+	// VERB.eval.mesh.intersect_meshes_by_aabb
+	// refine the curves using the two surfaces
 
 }
 
@@ -80,7 +77,9 @@ VERB.eval.mesh.intersect_meshes_by_aabb = function( points1, tris1, uvs1, points
 		, intersection_pairs = VERB.eval.mesh.intersect_aabb_tree( points1, tris1, points2, tris2, aabb1, aabb2 );
 
 	// get the segments of the intersection crv with uvs
-		
+
+	// sort the intersection segments
+
 }
 
 /**
