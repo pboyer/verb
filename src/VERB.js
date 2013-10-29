@@ -26,10 +26,8 @@ VERB.eval.mesh = VERB.eval.mesh || {};
 VERB.EPSILON = 1e-8;
 
 VERB.init = function() {
-
 	VERB.nurbs_engine = new VERB.core.Engine( VERB.eval.nurbs );
 	VERB.geom.NURBSGeometry.prototype.nurbs_engine = VERB.nurbs_engine;
-	
 }
 
 if (typeof Object.create !== 'function') {

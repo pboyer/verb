@@ -13,7 +13,7 @@
  * @api public
  */
 
-VERB.eval.nurbs.rational_surface_surface_intersect = function( not, sure, yet ) {
+VERB.eval.nurbs.intersect_rational_surfaces = function( not, sure, yet ) {
 
 	// tesselate two nurbs surfaces
 	// VERB.eval.mesh.parametric_mesh_mesh_intersect
@@ -39,7 +39,7 @@ VERB.eval.nurbs.rational_surface_surface_intersect = function( not, sure, yet ) 
  * @api public
  */
 
-VERB.eval.mesh.mesh_mesh_intersect = function( vertices1, triangles1, uvs1, aabb1, vertices2, triangles2, uvs2, aabb2) {
+VERB.eval.mesh.intersect_meshes = function( vertices1, triangles1, uvs1, aabb1, vertices2, triangles2, uvs2, aabb2) {
 
 	// tesselate two nurbs surfaces
 
@@ -48,6 +48,8 @@ VERB.eval.mesh.mesh_mesh_intersect = function( vertices1, triangles1, uvs1, aabb
 		// intersect polygons via kd trees
 		// build up curves
 		// return poly line curves for further refinement
+
+		// return collection of lists of points with parameter values
 
 }
 
@@ -66,7 +68,7 @@ VERB.eval.mesh.mesh_mesh_intersect = function( vertices1, triangles1, uvs1, aabb
  * @api public
  */
 
-VERB.eval.mesh.mesh_mesh_intersect_aabb = function( points1, tris1, uvs1, points2, tris2, uvs2 ) {
+VERB.eval.mesh.intersect_meshes_by_aabb = function( points1, tris1, uvs1, points2, tris2, uvs2 ) {
 
 	// build aabb for each mesh
 	var tri_indices1 = _.range(tris1.length)
@@ -78,7 +80,7 @@ VERB.eval.mesh.mesh_mesh_intersect_aabb = function( points1, tris1, uvs1, points
 		, intersection_pairs = VERB.eval.mesh.intersect_aabb_tree( points1, tris1, points2, tris2, aabb1, aabb2 );
 
 	// get the segments of the intersection crv with uvs
-
+		
 }
 
 /**
@@ -92,12 +94,151 @@ VERB.eval.mesh.mesh_mesh_intersect_aabb = function( points1, tris1, uvs1, points
  * @api public
  */
 
-VERB.eval.mesh.intersect_tri_tri = function( points1, tri1, points2, tri2 ) {
+VERB.eval.geom.intersect_tris = function( points1, tri1, uvs1, points2, tri2, uvs2 ) {
 
+	// unpack the input
+  var seg1a = [ points1[ tr1[0] ], points1[ tr1[1] ] ]
+  	, seg1b = [ points1[ tr1[1] ], points1[ tr1[2] ] ]
+  	, seg1c = [ points1[ tr1[2] ], points1[ tr1[0] ] ]
+  	, seg2a = [ points2[ tr2[0] ], points2[ tr2[1] ] ]
+  	, seg2b = [ points2[ tr2[1] ], points2[ tr2[2] ] ]
+  	, seg2c = [ points2[ tr2[2] ], points2[ tr2[0] ] ] 
+  	, segs1 = [ seg1a, seg1b, seg1c ]
+  	, segs2 = [ seg2a, seg2b, seg2c ]
+  	, int_results = []
+  	, tri2norm = VERB.eval.geom.get_tri_norm(points2, tri2)
+  	, pt2 = points2[ tr2[0] ];
 
+  for (var i = 0; i < 3; i++){
+  	
+  	var result = VERB.eval.geom.intersect_segment_with_plane( segs1[i][0], segs2[i][1], pt2, tri2norm );
+    
+    if ( result.intersects ){
+    	int_results.push( result );
+    }
+
+  }
+
+  // if you don't have 2 intersections you do not have an intersection,
+  // 0 would mean a glancing intersection
+  // 3 means we don't have a triangle
+  if ( int_results.length !== 2 ){
+  	return null;
+  }
+
+  // what portions of the segment lie within triangle 2
+
+  // intersect edges of triangle 2 with the segment, obtaining the "inner" triangle
+  var seg = [int_results[0].point, int_results[1].point ]
+  	, seg_int_results = [];
+
+  for (var i = 0; i < 3; i++){
+  	var seg_int_result = VERB.eval.geom.intersect_segments( seg[0], seg[1], seg, b1, tol );
+  	if ( seg_int_result ){
+  		seg_int_results.push( seg_int_result );
+  	}
+  }
+
+  // all intersections should be with uv's 
+
+  if ( seg_int_results.length === 0 ) {
+
+  	// tri1 is intersecting and the intersection segment
+  	// is inside tri2
+
+  	// return the two outer points
+
+  } else if ( seg_int_results.length === 1 ) {
+
+  	// tri1 is intersecting and the intersection segment
+  	// is partially inside tri2
+
+  	// return the end point of seg that is INSIDE tri2 and the intersection
+
+  } else if ( seg_int_results.length === 2 ) {
+
+  	// tri1 is intersecting and the intersection segment's
+  	// end points are outside of tri2
+
+  	// return the two seg_int_results 
+
+  } 
 
 }
 
+/**
+ *  Intersect ray/segment with triangle (from http://geomalgorithms.com/a06-_intersect-2.html)
+ *
+ *  If intersecting a ray, the param needs to be between 0 and 1 and the caller is responsible
+ *  for making that check
+ *
+ * @param {Array} array of length 3 representing first point of the segment
+ * @param {Array} array of length 3 representing second point of the segment
+ * @param {Array} array of length 3 arrays representing the points of the triangle
+ * @param {Array} array of length 3 containing int indices in the array of points, this allows passing a full mesh
+ * @return {Object} an object with an "intersects" property that is true or false and if true, a 
+ 			"s" property giving the param on u, and "t" is the property on v, a "point" property
+ 			where the intersection took place, and "p" property representing the parameter along the segment
+ * @api public
+ */
+
+VERB.eval.geom.intersect_segment_with_tri = function( p1, p0, points, tri ) {
+
+	var v0 = points[ tri[0] ]
+		, v1 = points[ tri[1] ]
+		, v2 = points[ tri[2] ]
+		, u = numeric.sub( v1, v0 )
+		, v = numeric.sub( v2, v0 )
+		, udotv = numeric.dot(u,v)
+		, udotu = numeric.dot(u,u)
+		, vdotv = numeric.dot(v,v)
+		, denom = udotv * udotv - udotu * vdotv
+		, s = ((udotv * numeric.dot(u,v)) - (vdotv * numeric.dot(w,u))) / denom
+		, t = ((udotv * numeric.dot(w,u)) - (udotu * numeric.dot(w,v))) / denom;
+
+	if (s > 1.0 + EPSILON || t > 1.0 + EPSILON || t < -EPSILON || s < -EPSILON || s + t > 1.0 + EPSILON){
+		return null;
+	}
+
+	var pt = numeric.add( v0, numeric.add( numeric.mul( s, u ), numeric.mul( t, v ) ) )
+		, p1mp0 = numeric.sub(p1, p0)
+		, p1mp0norm = numeric.dot( p1mp0, p1mp0 )
+		, ptmp0 = numeric.sub(pt, p0)
+		, ptmp0norm = numeric.dot( ptmp0, ptmp0 )
+		, p = ptmp0norm / p1mp0norm;
+
+	return { point: pt, s: s, t: t, param: p };
+
+}
+
+/**
+ *  Intersect ray/segment with plane (from http://geomalgorithms.com/a06-_intersect-2.html)
+ *
+ *  If intersecting a ray, the param needs to be between 0 and 1 and the caller is responsible
+ *  for making that check
+ *
+ * @param {Array} array of length 3 representing first point of the segment
+ * @param {Array} array of length 3 representing second point of the segment
+ * @param {Array} array of length 3 representing an origin point on the plane
+ * @param {Array} array of length 3 representing the normal of the plane
+ * @return {Object} an object with an "intersects" property that is true or false and if true, a 
+ 			"param" property giving the intersection parameter on the ray/segment.  
+ * @api public
+ */
+
+VERB.eval.geom.intersect_segment_with_plane = function( p0, p1, v0, n ) {
+
+	var denom = numeric.dot( n, numeric.sub(p0,p1) );
+
+	if ( abs( denom ) < EPSILON ) { // parallel case
+   	return null;
+ 	}
+
+ 	var numer = numeric.dot( n, numeric.sub(v0,p0) );
+
+	return { param: numer / denom };
+
+}
 
 /**
  *  Intersect two aabb trees - a recursive function
@@ -112,7 +253,7 @@ VERB.eval.mesh.intersect_tri_tri = function( points1, tri1, points2, tri2 ) {
  * @api public
  */
 
-VERB.eval.mesh.intersect_aabb_trees = function( points1, tris1, points2, tris2, aabb_tree1, aabb_tree2 ) {
+VERB.eval.geom.intersect_aabb_trees = function( points1, tris1, points2, tris2, aabb_tree1, aabb_tree2 ) {
 
   var intersects = aabb_tree1.bounding_box.intersects( aabb_tree2.bounding_box );
 
@@ -156,7 +297,7 @@ VERB.eval.mesh.intersect_aabb_trees = function( points1, tris1, points2, tris2, 
  * @api public
  */
 
-VERB.eval.mesh.make_mesh_aabb_tree = function( points, tris, tri_indices ) {
+VERB.eval.mesh.get_aabb_tree_from_mesh = function( points, tris, tri_indices ) {
 
 	// build bb
 	var aabb = { 	bounding_box: VERB.eval.mesh.make_mesh_aabb( points, tris, tri_indices ), 
@@ -192,7 +333,7 @@ VERB.eval.mesh.make_mesh_aabb_tree = function( points, tris, tri_indices ) {
  * @api public
  */
 
-VERB.eval.mesh.make_mesh_aabb = function( points, tris, tri_indices ) {
+VERB.eval.mesh.get_aabb_from_mesh = function( points, tris, tri_indices ) {
 
 	var bb = new VERB.geom.BoundingBox();
 
@@ -233,7 +374,7 @@ VERB.eval.mesh.sort_tris_on_longest_axis = function( container_bb, points, tris,
 		// centroid-centered
 
 		// var tri_i = tri_indices[i], 
-		// 	tri_centroid = VERB.eval.mesh.get_tri_centroid( points, tris[ tri_i ] );
+		// 	tri_centroid = VERB.eval.geom.get_tri_centroid( points, tris[ tri_i ] );
 		// axis_position_map.push( [ tri_centroid[long_axis], tri_i ] );
 
 		// min position
@@ -287,18 +428,16 @@ VERB.eval.mesh.get_min_coordinate_on_axis = function( points, tri, axis ) {
  * @api public
  */
 
-VERB.eval.mesh.get_tri_centroid = function( points, tri ) {
+VERB.eval.geom.get_tri_centroid = function( points, tri ) {
 
 	var centroid = [0,0,0];
 
 	// for each vertex
 	for (var i = 0; i < 3; i++){
-
 		// for each point index
 		for (var j = 0; j < 3; j++){
 			centroid[j] += points[ tri[i] ][j];
 		}
-
 	}
 
 	for (var i = 0; i < 3; i++){
@@ -306,8 +445,30 @@ VERB.eval.mesh.get_tri_centroid = function( points, tri ) {
 	}
 
 	return centroid;
+
 };
 
+/**
+ * Get triangle normal
+ *
+ * @param {Array} array of length 3 arrays of numbers representing the points
+ * @param {Array} length 3 array of point indices for the triangle
+ * @return {Array} a normal vector represented by an array of length 3
+ * @api public
+ */
+
+VERB.eval.geom.get_tri_norm = function( points, tri ) {
+
+	var v0 = points[ tri[0] ]
+		, v1 = points[ tri[1] ]
+		, v2 = points[ tri[2] ]
+		, u = numeric.sub( v1, v0 )
+		, v = numeric.sub( v2, v0 )
+		, n = numeric.cross( u, v );
+
+	return numeric.mul( numeric.norm2( n ), n );
+
+};
 
 /**
  * Tesselate an untrimmed nurbs surface
@@ -323,7 +484,7 @@ VERB.eval.mesh.get_tri_centroid = function( points, tri ) {
  * @api public
  */
 
-VERB.eval.mesh.rational_surface_tesselate_naive = function( degree_u, knot_vector_u, degree_v, knot_vector_v, homo_control_points, divs_u, divs_v ) {
+VERB.eval.mesh.tesselate_rational_surface_naive = function( degree_u, knot_vector_u, degree_v, knot_vector_v, homo_control_points, divs_u, divs_v ) {
 
 	if ( divs_u < 1 ) {
 		divs_u = 1;
@@ -352,7 +513,7 @@ VERB.eval.mesh.rational_surface_tesselate_naive = function( degree_u, knot_vecto
 		}
 	}
 
-	//  u dir
+  //  u dir
   //  |
   //  v 
   //
@@ -414,7 +575,7 @@ VERB.eval.nurbs.rational_curve_curve_bb_intersect_refine = function( degree1, kn
 			, p2 = VERB.eval.nurbs.rational_curve_point(degree2, knot_vector2, control_points2, x[1])
 			, p1_p2 = numeric.sub(p1, p2);
 
-		return numeric.dot(p1_p2norm, p1_p2norm);
+		return numeric.dot(p1_p2, p1_p2);
 
 	}
 
@@ -440,7 +601,7 @@ VERB.eval.nurbs.rational_curve_curve_bb_intersect_refine = function( degree1, kn
  * @api public
  */
 
-VERB.eval.nurbs.rational_curve_curve_bb_intersect = function( degree1, knot_vector1, control_points1, degree2, knot_vector2, control_points2, sample_tol, tol ) {
+VERB.eval.nurbs.intersect_rational_curves_by_aabb = function( degree1, knot_vector1, control_points1, degree2, knot_vector2, control_points2, sample_tol, tol ) {
 
 	// sample the two curves adaptively
 	var up1 = VERB.eval.nurbs.parametric_polyline_polyline_bb_intersect( degree1, knot_vector1, control_points1, sample_tol )
@@ -464,7 +625,7 @@ VERB.eval.nurbs.rational_curve_curve_bb_intersect = function( degree1, knot_vect
  * @api public
  */
 
-VERB.eval.nurbs.parametric_polyline_polyline_bb_intersect = function( p1, p2, u1, u2, tol ) {
+VERB.eval.nurbs.intersect_parametric_polylines_by_aabb = function( p1, p2, u1, u2, tol ) {
 
 	var bb1 = new VERB.geom.BoundingBox(p1)
 		, bb2 = new VERB.geom.BoundingBox(p2)
@@ -543,7 +704,7 @@ VERB.eval.nurbs.parametric_polyline_polyline_bb_intersect = function( p1, p2, u1
  * @api public
  */
 
-VERB.eval.geom.segment_segment_intersect = function( a0, a1, b0, b1, tol ) {
+VERB.eval.geom.intersect_segments = function( a0, a1, b0, b1, tol ) {
 
 	// get axis and length of segments
 	var a1ma0 = numeric.sub(a1, a0),
@@ -584,7 +745,7 @@ VERB.eval.geom.segment_segment_intersect = function( a0, a1, b0, b1, tol ) {
  * @api public
  */
 
-VERB.eval.geom.ray_ray_intersect = function( a0, a, b0, b ) {
+VERB.eval.geom.intersect_rays = function( a0, a, b0, b ) {
 
    var dab = numeric.dot( a, b ),
 		   dab0 = numeric.dot( a, b0 ),
@@ -619,7 +780,7 @@ VERB.eval.geom.ray_ray_intersect = function( a0, a, b0, b ) {
  * @api public
  */
 
-VERB.eval.nurbs.rational_curve_regular_sample = function( degree, knot_vector, control_points, num_samples ) {
+VERB.eval.nurbs.sample_rational_curve_regularly = function( degree, knot_vector, control_points, num_samples ) {
 
 	return VERB.eval.nurbs.rational_curve_regular_sample_range( degree, knot_vector, control_points, 0, 1.0, num_samples );
 
@@ -638,7 +799,7 @@ VERB.eval.nurbs.rational_curve_regular_sample = function( degree, knot_vector, c
  * @api public
  */
 
-VERB.eval.nurbs.rational_curve_regular_sample_range = function( degree, knot_vector, control_points, start_u, end_u, num_samples ) {
+VERB.eval.nurbs.sample_rational_curve_range_regularly = function( degree, knot_vector, control_points, start_u, end_u, num_samples ) {
 
 	if (num_samples < 1){
 		num_samples = 2;
@@ -671,7 +832,7 @@ VERB.eval.nurbs.rational_curve_regular_sample_range = function( degree, knot_vec
  * @api public
  */
 
-VERB.eval.nurbs.rational_curve_adaptive_sample = function( degree, knot_vector, control_points, tol ) {
+VERB.eval.nurbs.sample_rational_curve_adaptively = function( degree, knot_vector, control_points, tol ) {
 
 	return VERB.eval.nurbs.rational_curve_adaptive_sample_range( degree, knot_vector, control_points, 0, 1.0, tol );
 
@@ -690,7 +851,7 @@ VERB.eval.nurbs.rational_curve_adaptive_sample = function( degree, knot_vector, 
  * @api public
  */
 
-VERB.eval.nurbs.rational_curve_adaptive_sample_range = function( degree, knot_vector, control_points, start_u, end_u, tol ) {
+VERB.eval.nurbs.sample_rational_curve_range_adaptively = function( degree, knot_vector, control_points, start_u, end_u, tol ) {
 
 	// sample curve at three pts
 	var p1 = VERB.eval.nurbs.rational_curve_point(degree, knot_vector, control_points, start_u),
@@ -737,7 +898,7 @@ VERB.eval.nurbs.rational_curve_adaptive_sample_range = function( degree, knot_ve
  * @api public
  */
 
-VERB.eval.nurbs.three_points_are_flat = function( p1_arr, p2_arr, p3_arr, tol ) {
+VERB.eval.nurbs.are_three_points_are_flat = function( p1_arr, p2_arr, p3_arr, tol ) {
 
 	// convert to vectors, this is probably unnecessary
 	var p1 = new VERB.geom.Vector( p1_arr ),

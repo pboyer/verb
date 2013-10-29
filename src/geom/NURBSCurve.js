@@ -23,7 +23,6 @@ else
 		var _degree = degree;
 	}
 
-	// PRIVILEGED METHODS
 	this.set_control_point = function( u_index, value ) {
 		_control_points[u_index] = value;
 		_homo_control_points[u_index] = value * _weights[u_index];

@@ -22,7 +22,7 @@
 		<script src="js/Three.js"></script>
 		<script src="js/TrackballControls.js"></script>
 		<script src="js/stats.js"></script>
-		<script src="../nurbs.js"></script>
+		<script src="../build/verb.min.js"></script>
 
 		<script>
 
@@ -91,6 +91,8 @@
 				stats.domElement.style.zIndex = 100;
 				container.appendChild( stats.domElement );
 
+				VERB.init();
+
 				controls = new THREE.TrackballControls(camera);
 			
 				window.addEventListener( 'resize', onWindowResize, false );
@@ -114,7 +116,7 @@
 					{
 						v = j / v_divs;
 
-						p = nurbs.surface_point( degree_u, knot_vector_u, degree_v, knot_vector_v, control_points, u, v );
+						p = VERB.eval.nurbs.surface_point( degree_u, knot_vector_u, degree_v, knot_vector_v, control_points, u, v );
 						sphere.geometry.vertices[count].x = p[0];
 						sphere.geometry.vertices[count].y = p[1];
 						sphere.geometry.vertices[count].z = p[2];
@@ -177,7 +179,7 @@
 					{
 						v = j / v_divs;
 
-						p = nurbs.surface_point( degree_u, knot_vector_u, degree_v, knot_vector_v, control_points, u, v );
+						p = VERB.eval.nurbs.surface_point( degree_u, knot_vector_u, degree_v, knot_vector_v, control_points, u, v );
 						geometry.vertices.push( new THREE.Vector3( p[0], p[1], p[2]) ); 
 						v_indices[i].push(count++);
 

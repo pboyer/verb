@@ -19,11 +19,7 @@ VERB.geom = {};
 VERB.core = {};
 VERB.eval = {};
 
-VERB.eval.nurbs = VERB.eval.nurbs || {};
-VERB.eval.geom = VERB.eval.geom || {};
-VERB.eval.mesh = VERB.eval.mesh || {};
-
-VERB.EPSILON = 1e-8;
+VERB.eval.nurbs = {};
 
 VERB.init = function() {
 
@@ -165,7 +161,7 @@ VERB.geom.BoundingBox = function() {
 	this.max = [0,0,0];
 
  	var pt_args = Array.prototype.slice.call( arguments, 0);
- 	this.add_elements_sync(pt_args);
+ 	this.add_points_sync(pt_args);
 }	
 
 /**
@@ -177,7 +173,7 @@ VERB.geom.BoundingBox = function() {
  * @api public
  */
 
-VERB.geom.BoundingBox.prototype.add_elements = function( point_array, callback ) 
+VERB.geom.BoundingBox.prototype.add_points = function( point_array, callback ) 
 {
 
 	var that = this; 
@@ -198,7 +194,7 @@ VERB.geom.BoundingBox.prototype.add_elements = function( point_array, callback )
  * @api public
  */
 
-VERB.geom.BoundingBox.prototype.add_elements_sync = function( point_array ) 
+VERB.geom.BoundingBox.prototype.add_points_sync = function( point_array ) 
 {
 	var that = this; 
 	_.each( point_array, function(elem) {
@@ -341,8 +337,8 @@ VERB.geom.BoundingBox.prototype.intersects = function( bb ) {
 		, b2 = bb.max;
 
 	if ( this.intervals_overlap(a1[0], a2[0], b1[0], b2[0]) 
-			&& this.intervals_overlap(a1[1], a2[1], b1[1], b2[1]) 
-			&& this.intervals_overlap(a1[2], a2[2], b1[2], b2[2] ) )
+				&& this.intervals_overlap(a1[1], a2[1], b1[1], b2[1]) 
+				&& this.intervals_overlap(a1[2], a2[2], b1[2], b2[2] ) )
 	{
 		return true;
 	}
@@ -352,7 +348,7 @@ VERB.geom.BoundingBox.prototype.intersects = function( bb ) {
 };
 
 /**
- * Clear the bounding box, leaving it in an uninitialized state.  Call add, add_elements in order to 
+ * Clear the bounding box, leaving it in an uninitialized state.  Call add, add_points in order to 
  * initialize
  *
  * @return {Object} this BoundingBox for chaining
@@ -363,39 +359,6 @@ VERB.geom.BoundingBox.prototype.clear = function( bb ) {
 
 	this.initialized = false;
 	return this;
-
-};
-
-/**
- * Get longest axis of bounding box
- *
- * @return {Number} Index of longest axis
- * @api public
- */
-
-VERB.geom.BoundingBox.prototype.get_longest_axis = function( bb ) {
-
-	var axis_lengths = [ 	this.get_axis_length(0), 
-							this.get_axis_length(1), 
-							this.get_axis_length(2)];
-
-	return axis_lengths.indexOf(Math.max.apply(Math, axis_lengths));
-
-};
-
-/**
- * Get length of given axis. 
- *
- * @param {Number} Index of axis to inspect (between 0 and 2)
- * @return {Number} Length of the given axis.  If axis is out of bounds, returns 0.
- * @api public
- */
-
-VERB.geom.BoundingBox.prototype.get_axis_length = function( i ) {
-
-	if (i < 0 || i > 2) return 0;
-
-	return Math.abs( this.min[i] - this.max[i] );
 
 };
 
@@ -1101,414 +1064,10 @@ VERB.geom.Vector.prototype = {
 
 VERB.eval.nurbs.rational_surface_surface_intersect = function( not, sure, yet ) {
 
-	// tesselate two nurbs surfaces
-	// VERB.eval.mesh.parametric_mesh_mesh_intersect
-		// put polygons into kd trees
-		// intersect polygons via kd trees
-		// build up curves
-		// return poly line curves for further refinement
-
-}
-
-/**
- * Intersect two meshes via aabb intersection
- *
- * @param {Number} integer degree of surface in u direction
- * @param {Array} array of nondecreasing knot values in u direction
- * @param {Number} integer degree of surface in v direction
- * @param {Array} array of nondecreasing knot values in v direction
- * @param {Array} 3d array of control points, top to bottom is increasing u direction, left to right is increasing v direction,
- 									and where each control point is an array of length (dim+1)
- * @param {Number} u parameter at which to evaluate the surface point
- * @param {Number} v parameter at which to evaluate the surface point
- * @return {Array} a point represented by an array of length (dim)
- * @api public
- */
-
-VERB.eval.mesh.mesh_mesh_intersect = function( vertices1, triangles1, uvs1, aabb1, vertices2, triangles2, uvs2, aabb2) {
-
-	// tesselate two nurbs surfaces
-
-	// call subroutine to:
-		// put polygons into kd trees
-		// intersect polygons via kd trees
-		// build up curves
-		// return poly line curves for further refinement
-
-}
-
-/**
- * Intersect two meshes via aabb intersection
- *
- * @param {Number} integer degree of surface in u direction
- * @param {Array} array of nondecreasing knot values in u direction
- * @param {Number} integer degree of surface in v direction
- * @param {Array} array of nondecreasing knot values in v direction
- * @param {Array} 3d array of control points, top to bottom is increasing u direction, left to right is increasing v direction,
- 									and where each control point is an array of length (dim+1)
- * @param {Number} u parameter at which to evaluate the surface point
- * @param {Number} v parameter at which to evaluate the surface point
- * @return {Array} a point represented by an array of length (dim)
- * @api public
- */
-
-VERB.eval.mesh.mesh_mesh_intersect_aabb = function( points1, tris1, uvs1, points2, tris2, uvs2 ) {
-
-	// build aabb for each mesh
-	var tri_indices1 = _.range(tris1.length)
-	  , tri_indices2 = _.range(tris2.length)
-	  , aabb1 = VERB.eval.mesh.make_mesh_aabb_tree( points1, tris1, tri_indices1 )
-	  , aabb2 = VERB.eval.mesh.make_mesh_aabb_tree( points2, tris2, tri_indices2 )
-  
-  // intersect and get the pairs of triangle intersctions
-		, intersection_pairs = VERB.eval.mesh.intersect_aabb_tree( points1, tris1, points2, tris2, aabb1, aabb2 );
-
-	// get the segments of the intersection crv with uvs
-
-}
-
-/**
- * Intersect two triangles
- *
- * @param {Array} array of length 3 arrays of numbers representing the points of mesh1
- * @param {Array} array of length 3 arrays of number representing the triangles of mesh1
- * @param {Array} array of length 3 arrays of numbers representing the points of mesh2
- * @param {Array} array of length 3 arrays of number representing the triangles of mesh2
- * @return {Array} a point represented by an array of length (dim)
- * @api public
- */
-
-VERB.eval.mesh.intersect_tri_tri = function( points1, tri1, points2, tri2 ) {
-
 
 
 }
 
-
-/**
- *  Intersect two aabb trees - a recursive function
- *
- * @param {Array} array of length 3 arrays of numbers representing the points of mesh1
- * @param {Array} array of length 3 arrays of number representing the triangles of mesh1
- * @param {Array} array of length 3 arrays of numbers representing the points of mesh2
- * @param {Array} array of length 3 arrays of number representing the triangles of mesh2
- * @param {Object} nested object representing the aabb tree of the first mesh
- * @param {Object} nested object representing the aabb tree of the second mesh
- * @return {Array} a list of pairs of triangle indices for mesh1 and mesh2 that are intersecting
- * @api public
- */
-
-VERB.eval.mesh.intersect_aabb_trees = function( points1, tris1, points2, tris2, aabb_tree1, aabb_tree2 ) {
-
-  var intersects = aabb_tree1.bounding_box.intersects( aabb_tree2.bounding_box );
-
-  if (!intersects){
-  	return [];
-  }
-
-  if (aabb_tree1.children.length === 0 && aabb_tree2.children.length === 0){ 
-
-  	return [ [aabb_tree1.triangle, aabb_tree2.triangle ] ]; 
-
-  } else if (aabb_tree1.children.length === 0 && aabb_tree2.children.length != 0){
-
-  	return     VERB.eval.mesh.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1, aabb_tree2.children[0] )
-  		.concat( VERB.eval.mesh.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1, aabb_tree2.children[1] ) );
-
-  } else if (aabb_tree1.children.length != 0 && aabb_tree2.children.length === 0){
-
-  	return     VERB.eval.mesh.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[0], aabb_tree2 )
-  		.concat( VERB.eval.mesh.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[1], aabb_tree2 ) );
-
-  } else if (aabb_tree1.children.length != 0 && aabb_tree2.children.length != 0){
-
-  	return     VERB.eval.mesh.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[0], aabb_tree2.children[0] )
-  		.concat( VERB.eval.mesh.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[0], aabb_tree2.children[1] ) )
-  		.concat( VERB.eval.mesh.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[1], aabb_tree2.children[0] ) )
-  		.concat( VERB.eval.mesh.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[1], aabb_tree2.children[1] ) );
-
-  }
-
-}
-
-
-/**
- * Make tree of axis aligned bounding boxes 
- *
- * @param {Array} array of length 3 arrays of numbers representing the points
- * @param {Array} array of length 3 arrays of number representing the triangles
- * @param {Array} array of numbers representing the relevant triangles to use to form aabb
- * @return {Array} a point represented by an array of length (dim)
- * @api public
- */
-
-VERB.eval.mesh.make_mesh_aabb_tree = function( points, tris, tri_indices ) {
-
-	// build bb
-	var aabb = { 	bounding_box: VERB.eval.mesh.make_mesh_aabb( points, tris, tri_indices ), 
-								children: [] };
-
-	// if only one ele, terminate recursion and store the triangles
-	if (tri_indices.length === 1){
-		aabb.triangle = tri_indices[0];
-		return aabb;
-	}
-
-	// sort triangles in sub mesh
-	var sorted_tri_indices = VERB.eval.mesh.sort_tris_on_longest_axis( aabb.bounding_box, points, tris, tri_indices )
-		, tri_indices_a = sorted_tri_indices.slice( 0, Math.floor( sorted_tri_indices.length / 2 ) )
-		, tri_indices_b = sorted_tri_indices.slice( Math.floor( sorted_tri_indices.length / 2 ), sorted_tri_indices.length );
-
-	// recurse 
-	aabb.children = [ VERB.eval.mesh.make_mesh_aabb_tree(points, tris, tri_indices_a), 
-										VERB.eval.mesh.make_mesh_aabb_tree(points, tris, tri_indices_b) ];
-
-	// return result
-	return aabb;
-
-}
-
-/**
- * Form axis-aligned bounding box from triangles of mesh
- *
- * @param {Array} array of length 3 arrays of numbers representing the points
- * @param {Array} array of length 3 arrays of number representing the triangles
- * @param {Array} array of numbers representing the relevant triangles
- * @return {Array} a point represented by an array of length (dim)
- * @api public
- */
-
-VERB.eval.mesh.make_mesh_aabb = function( points, tris, tri_indices ) {
-
-	var bb = new VERB.geom.BoundingBox();
-
-	for (var i = tri_indices.length - 1; i >= 0; i--) {
-		
-		var tri_i = tri_indices[i];
-
-		bb.add( points[ tris[ tri_i ][0] ] );
-		bb.add( points[ tris[ tri_i ][1] ] );
-		bb.add( points[ tris[ tri_i ][2] ] );
-
-	};
-
-	return bb;
-
-}
-
-/**
- * Sort triangles on longest axis
- *
- * @param {Number} integer degree of surface in u direction
- * @param {Array} array of nondecreasing knot values in u direction
- * @param {Number} integer degree of surface in v direction
- * @param {Array} array of nondecreasing knot values in v direction
- * @return {Array} a point represented by an array of length (dim)
- * @api public
- */
-
-VERB.eval.mesh.sort_tris_on_longest_axis = function( container_bb, points, tris, tri_indices ) {
-
-	// get longest axis of bb
-	var long_axis = container_bb.get_longest_axis();
-
-	// map position on longest axis to index in tri_indices
-	var axis_position_map = [];
-	for (var i = tri_indices.length - 1; i >= 0; i--) {
-
-		// centroid-centered
-
-		// var tri_i = tri_indices[i], 
-		// 	tri_centroid = VERB.eval.mesh.get_tri_centroid( points, tris[ tri_i ] );
-		// axis_position_map.push( [ tri_centroid[long_axis], tri_i ] );
-
-		// min position
-		var tri_i = tri_indices[i],
-			tri_min = VERB.eval.mesh.get_min_coordinate_on_axis( points, tris[ tri_i ], long_axis );
-
-		axis_position_map.push( [ tri_min, tri_i ] );
-
-	}
-
-	// sort by axis position
-	axis_position_map.sort(function(a,b) { return a[0] > b[0] } );
-
-	// box up the tri_indices in sorted_order
-	var sorted_tri_indices = [];
-	for (var i = 0, l = axis_position_map.length; i < l; i++) {
-		sorted_tri_indices.push( axis_position_map[i][1] );
-	}
-
-	return sorted_tri_indices;
-
-}
-
-/**
- * Get min coordinate on axis
- *
- * @param {Array} array of length 3 arrays of numbers representing the points
- * @param {Array} length 3 array of point indices for the triangle
- * @return {Number} a point represented by an array of length 3
- * @api public
- */
-
-VERB.eval.mesh.get_min_coordinate_on_axis = function( points, tri, axis ) {
-
-	var axis_coords = [];
-
-	// for each vertex
-	for (var i = 0; i < 3; i++){
-		axis_coords.push( points[ tri[i] ][ axis ] );
-	}
-
-	return Math.min.apply(Math, axis_coords);
-};
-
-/**
- * Get triangle centroid
- *
- * @param {Array} array of length 3 arrays of numbers representing the points
- * @param {Array} length 3 array of point indices for the triangle
- * @return {Array} a point represented by an array of length 3
- * @api public
- */
-
-VERB.eval.mesh.get_tri_centroid = function( points, tri ) {
-
-	var centroid = [0,0,0];
-
-	// for each vertex
-	for (var i = 0; i < 3; i++){
-
-		// for each point index
-		for (var j = 0; j < 3; j++){
-			centroid[j] += points[ tri[i] ][j];
-		}
-
-	}
-
-	for (var i = 0; i < 3; i++){
-		centroid[i] /= 3;
-	}
-
-	return centroid;
-};
-
-
-/**
- * Tesselate an untrimmed nurbs surface
- *
- * @param {Number} integer degree of surface in u direction
- * @param {Array} array of nondecreasing knot values in u direction
- * @param {Number} integer degree of surface in v direction
- * @param {Array} array of nondecreasing knot values in v direction
- * @param {Array} 3d array of control points, top to bottom is increasing u direction, left to right is increasing v direction,
- 									and where each control point is an array of length (dim+1)
- * @return {Array} first element of array is an array of positions, second element are 3-tuple of triangle windings, third element is the 
-                   uvs
- * @api public
- */
-
-VERB.eval.mesh.rational_surface_tesselate_naive = function( degree_u, knot_vector_u, degree_v, knot_vector_v, homo_control_points, divs_u, divs_v ) {
-
-	if ( divs_u < 1 ) {
-		divs_u = 1;
-	}
-
-	if ( divs_v < 1 ) {
-		divs_v = 1;
-	}
-
-	var span_u = 1 / divs_u,
-		span_v = 1 / divs_v;
-  
-  var points = [];
-  var uvs = [];
-
-  // generate all points
-	for (var i = 0; i < divs_u + 1; i++) {
-		for (var j = 0; j < divs_v + 1; j++) {
-
-			var pt_u = i * span_u, 
-				pt_v = j * span_v;
-
-			uvs.push( [pt_u, pt_v] );
-			points.push( VERB.eval.nurbs.rational_surface_point( degree_u, knot_vector_u,  degree_v, knot_vector_v, homo_control_points, pt_u, pt_v ) );
-
-		}
-	}
-
-	//  u dir
-  //  |
-  //  v 
-  //
-  //  v dir -->
-  //
-	//  a ---- d 
-	//  | \    |
-	//  |  \   |
- 	//  |   \  |
-	//  |    \ | 
-	//	b ---- c 
-  //
-
-  var faces = [];
-
-  // generate all faces
-	for (var i = 0; i < divs_u ; i++) {
-		for (var j = 0; j < divs_v ; j++) {
-
-			var a_i = i * (divs_v + 1) + j,
-				b_i = (i + 1) * (divs_v + 1) + j,
-				c_i = b_i + 1,
-				d_i = a_i + 1,
-				abc = [a_i, b_i, c_i],
-				acd = [a_i, c_i, d_i];
-
-			faces.push(abc);
-			faces.push(acd);
-
-		}
-	}
-
-	return { points: points, faces : faces, uvs: uvs};
-
-}
-
-/**
- * Refine an intersection pair for two curves given an initial guess.  This is an unconstrained minimization,
- * so the caller is responsible for providing a very good initial guess.
- *
- * @param {Number} integer degree of curve1
- * @param {Array} array of nondecreasing knot values for curve 1
- * @param {Array} 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
- 									and form (wi*pi, wi) for curve 1
- * @param {Number} integer degree of curve2
- * @param {Array} array of nondecreasing knot values for curve 2
- * @param {Array} 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
- 									and form (wi*pi, wi) for curve 2
- * @param {Array} length 2 array with first param guess in first position and second param guess in second position
- * @return {Array} a length 3 array containing the [ distance * distance, u1, u2 ]
- * @api public
- */
-
-VERB.eval.nurbs.rational_curve_curve_bb_intersect_refine = function( degree1, knot_vector1, control_points1, degree2, knot_vector2, control_points2, start_params ) {
-
-	var objective = function(x) { 
-
-		var p1 = VERB.eval.nurbs.rational_curve_point(degree1, knot_vector1, control_points1, x[0])
-			, p2 = VERB.eval.nurbs.rational_curve_point(degree2, knot_vector2, control_points2, x[1])
-			, p1_p2 = numeric.sub(p1, p2);
-
-		return numeric.dot(p1_p2norm, p1_p2norm);
-
-	}
-
-	var sol_obj = numeric.uncmin( objective, start_params);
-
-	return [sol_obj.f].concat( sol_obj.solution );
-
-}
 
 /**
  * Intersect two NURBS curves
@@ -1526,172 +1085,11 @@ VERB.eval.nurbs.rational_curve_curve_bb_intersect_refine = function( degree1, kn
  * @api public
  */
 
-VERB.eval.nurbs.rational_curve_curve_bb_intersect = function( degree1, knot_vector1, control_points1, degree2, knot_vector2, control_points2, sample_tol, tol ) {
+VERB.eval.nurbs.rational_curve_curve_bb_intersect = function( degree1, knot_vector1, control_points1, degree2, knot_vector2, control_points2, tol ) {
 
-	// sample the two curves adaptively
-	var up1 = VERB.eval.nurbs.parametric_polyline_polyline_bb_intersect( degree1, knot_vector1, control_points1, sample_tol )
-		, up2 = VERB.eval.nurbs.parametric_polyline_polyline_bb_intersect( degree1, knot_vector1, control_points1, sample_tol )
-		, u1 = _.map(up1, function(el) { return el[0]; })
-		, u2 = _.map(up2, function(el) { return el[0]; })
-		, p1 = _.map(up1, function(el) { return el.slice(1) })
-		, p2 = _.map(up2, function(el) { return el.slice(1) });
 
-	return VERB.eval.nurbs.parametric_polyline_polyline_bb_intersect( p1, p2, u1, u2, tol );
 
 }
-
-/**
- * Intersect two polyline curves, keeping track of parameterization on each
- *
- * @param {Array} array of [parameter point] values for curve 1
- * @param {Array} array of [parameter point] values for curve 2
- * @param {Number} tolerance for the intersection
- * @return {Array} a 2d array specifying the intersections on u params of intersections on curve 1 and cruve 2
- * @api public
- */
-
-VERB.eval.nurbs.parametric_polyline_polyline_bb_intersect = function( p1, p2, u1, u2, tol ) {
-
-	var bb1 = new VERB.geom.BoundingBox(p1)
-		, bb2 = new VERB.geom.BoundingBox(p2)
-
-	if ( !bb1.intersects(bb2) ) return;
-
-	if (p1.length === 2 && p2.length === 2 ){
-
-			var inter = VERB.eval.geom.segment_segment_intersect(p1[0],p1[1], p2[0], p2[1], tol);
-
-			if ( inter != null ){
-
-				// replace with interpolant
-			 	inter[0][0] = inter[0][0] * ( u1[1]-u1[0] ) + u1[0];
-			 	inter[1][0] = inter[1][0] * ( u2[1]-u2[0] ) + u2[0];
-
-			 	return inter;
-
-			} 
-
-	} else if (p1.length === 2) {
-
-		var p2_mid = Math.ceil( p2.length / 2 ),
-				p2_a = p2.slice( 0, p2_mid ),
-				u2_a = u2.slice(0, p2_mid ),
-				p2_b = p2.slice( p2_mid-1 )
-				u2_b = p2.slice( p2_mid-1 );
-
-		return 	 VERB.eval.nurbs.parametric_polyline_polyline_bb_intersect(p1, p2_a, u1, u2_a, tol)
-		.concat( VERB.eval.nurbs.parametric_polyline_polyline_bb_intersect(p1, p2_b, u1, u2_b, tol) );
-
-	} else if (p2.length === 2) {
-
-		var p1_mid = Math.ceil( p1.length / 2 ),
-				p1_a = p1.slice( 0, p1_mid ),
-				u1_a = u1.slice(0, p1_mid ),
-				p1_b = p1.slice( p1_mid-1 )
-				u1_b = p1.slice( p1_mid-1 );
-
-		return 		 VERB.eval.nurbs.parametric_polyline_polyline_bb_intersect(p2, p1_a, u2, p1_a, tol)
-			.concat( VERB.eval.nurbs.parametric_polyline_polyline_bb_intersect(p2, p1_b, u2, u1_b, tol) );
-
-	} else {
-
-		var p1_mid = Math.ceil( p1.length / 2 ),
-				p1_a = p1.slice( 0, p1_mid ),
-				u1_a = u1.slice(0, p1_mid ),
-				p1_b = p1.slice( p1_mid-1 ),
-				u1_b = p1.slice( p1_mid-1 ),
-				p2_mid = Math.ceil( p2.length / 2 ),
-				p2_a = p2.slice( 0, p2_mid ),
-				u2_a = u2.slice(0, p2_mid ),
-				p2_b = p2.slice( p2_mid-1 ),
-				u2_b = p2.slice( p2_mid-1 );
-
-		return 		 VERB.eval.nurbs.parametric_polyline_polyline_bb_intersect(p1_a, p2_a, u1_a, p2_a, tol)
-			.concat( VERB.eval.nurbs.parametric_polyline_polyline_bb_intersect(p1_a, p2_b, u1_a, u2_b, tol) )
-			.concat( VERB.eval.nurbs.parametric_polyline_polyline_bb_intersect(p1_b, p2_a, u1_b, u2_a, tol) )
-			.concat( VERB.eval.nurbs.parametric_polyline_polyline_bb_intersect(p1_b, p2_b, u1_b, u2_b, tol) );
-
-	}
-
-	return [];
-
-}
-
-/**
- * Find the closest parameter on two rays, see http://geomalgorithms.com/a07-_distance.html
- *
- * @param {Array} first point on a
- * @param {Array} second point on a
- * @param {Array} first point on b
- * @param {Array} second point on b
- * @param {Number} tolerance for the intersection
- * @return {Array} a 2d array specifying the intersections on u params of intersections on curve 1 and cruve 2
- * @api public
- */
-
-VERB.eval.geom.segment_segment_intersect = function( a0, a1, b0, b1, tol ) {
-
-	// get axis and length of segments
-	var a1ma0 = numeric.sub(a1, a0),
-			aN = Math.sqrt( numeric.dot(a1ma0, a1ma0) ),
-			a = numeric.mul( 1/ aN, a1ma0 )
-			b1mb0 = numeric.sub(b1, b0),
-			bN = Math.sqrt( numeric.dot(b1mb0, b1mb0) ),
-			a = numeric.mul( 1 / bN, a1ma0 )
-			int_params = ray_ray_intersect(a0, a, b0, b);
-
-	if ( int_params != null ) {
-
-		var u1 = Math.min( Math.max( 0, int_params[0] / a ), 1.0),
-				u2 = Math.min( Math.max( 0, int_params[1] / b ), 1.0),
-				int_a = numeric.add( numeric.mul( u1, a1ma0 ), a0 ),
-				int_b = numeric.add( numeric.mul( u2, b1mb0 ), b0 ),
-				dist = numeric.norm2Squared( numeric.sub(int_a, int_b) );
-
-		if (  dist < tolerance*tolerance ) {
-			return [ [u1].concat(int_a), [u2].concat(int_b) ] ;
-		} 
-
-	}
-	
-	return null;
-
- }
-
-
-/**
- * Find the closest parameter on two rays, see http://geomalgorithms.com/a07-_distance.html
- *
- * @param {Array} origin for ray 1
- * @param {Array} direction of ray 1, assumed normalized
- * @param {Array} origin for ray 1
- * @param {Array} direction of ray 1, assumed normalized
- * @return {Array} a 2d array specifying the intersections on u params of intersections on curve 1 and cruve 2
- * @api public
- */
-
-VERB.eval.geom.ray_ray_intersect = function( a0, a, b0, b ) {
-
-   var dab = numeric.dot( a, b ),
-		   dab0 = numeric.dot( a, b0 ),
-		   daa0 = numeric.dot( a, a0 ),
-		   dbb0 = numeric.dot( b, b0 ),
-		   dba0 = numeric.dot( b, a0 ),
-		   daa = numeric.dot( a, a ),
-		   dbb = numeric.dot( b, b ),
-		   div = daa*dbb - dab*dab;
-
-   if ( abs( div ) < EPSILON ) { // parallel case
-	   return null;
-   }
-
-   var num = dab * (dab0-daa0) - daa * (dbb0-dba0),
-   		 w = num / div,
-			 t = (dab0 - daa0 + w * dab)/daa;
-
-		return [t, w];
-
- }
 
 
 /**
@@ -1738,7 +1136,7 @@ VERB.eval.nurbs.rational_curve_regular_sample_range = function( degree, knot_vec
 
 		u = start_u + span * i;
 		p.push( [u].concat( VERB.eval.nurbs.rational_curve_point(degree, knot_vector, control_points, u) ) );
-
+		
 	}
 
 	return p;
