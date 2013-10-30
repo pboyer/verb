@@ -1,0 +1,1 @@
+// a data structure representing a polyline - basically an ordered list of points

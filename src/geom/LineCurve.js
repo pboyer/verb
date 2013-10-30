@@ -1,0 +1,1 @@
+// inherits from curve, wraps the line data structure

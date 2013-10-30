@@ -1,3 +1,6 @@
+
+
+
 VERB.geom.NURBSGeometry = function() {
 
 	VERB.geom.Geometry.call(this);

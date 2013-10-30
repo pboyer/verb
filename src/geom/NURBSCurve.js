@@ -1,3 +1,4 @@
+// should inherit from curve
 
 VERB.geom.NurbsCurve = function( degree, control_points, weights, knots ) {
 

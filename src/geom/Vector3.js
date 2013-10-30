@@ -1,4 +1,4 @@
-VERB.geom.Vector = function(x, y, z) {
+VERB.geom.Vector3 = function(x, y, z) {
 
   if (arguments.length == 3) {
     this.x = x;
@@ -16,29 +16,29 @@ VERB.geom.Vector = function(x, y, z) {
 
 };
 
-VERB.geom.Vector.prototype = {
+VERB.geom.Vector3.prototype = {
   clone: function() {
-    return new VERB.geom.Vector(this.x, this.y, this.z);
+    return new VERB.geom.Vector3(this.x, this.y, this.z);
   },
 
   negated: function() {
-    return new VERB.geom.Vector(-this.x, -this.y, -this.z);
+    return new VERB.geom.Vector3(-this.x, -this.y, -this.z);
   },
 
   plus: function(a) {
-    return new VERB.geom.Vector(this.x + a.x, this.y + a.y, this.z + a.z);
+    return new VERB.geom.Vector3(this.x + a.x, this.y + a.y, this.z + a.z);
   },
 
   minus: function(a) {
-    return new VERB.geom.Vector(this.x - a.x, this.y - a.y, this.z - a.z);
+    return new VERB.geom.Vector3(this.x - a.x, this.y - a.y, this.z - a.z);
   },
 
   times: function(a) {
-    return new VERB.geom.Vector(this.x * a, this.y * a, this.z * a);
+    return new VERB.geom.Vector3(this.x * a, this.y * a, this.z * a);
   },
 
   dividedBy: function(a) {
-    return new VERB.geom.Vector(this.x / a, this.y / a, this.z / a);
+    return new VERB.geom.Vector3(this.x / a, this.y / a, this.z / a);
   },
 
   dot: function(a) {
@@ -58,7 +58,7 @@ VERB.geom.Vector.prototype = {
   },
 
   cross: function(a) {
-    return new VERB.geom.Vector(
+    return new VERB.geom.Vector3(
       this.y * a.z - this.z * a.y,
       this.z * a.x - this.x * a.z,
       this.x * a.y - this.y * a.x

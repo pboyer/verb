@@ -1,0 +1,1 @@
+// a base class for curves, inherits from geometry

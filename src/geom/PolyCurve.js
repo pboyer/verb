@@ -1,0 +1,1 @@
+// a compound curve - inherits from curve

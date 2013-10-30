@@ -1,0 +1,1 @@
+// a data structure representing an interval
