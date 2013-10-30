@@ -29,6 +29,6 @@ VERB.geom.NurbsSurface = function( degree, control_points, weights, knots ) {
 
 	};
 
-}.inherits( VERB.geom.NURBSGeometry );
+}.inherits( VERB.geom.Surface );
 
 

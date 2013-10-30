@@ -2,7 +2,7 @@
 
 VERB.geom.NurbsCurve = function( degree, control_points, weights, knots ) {
 
-	VERB.geom.NURBSGeometry.call(this);
+	VERB.geom.Curve.call(this);
 
 	// check for valid relations
 	if ( !VERB.eval.nurbs.are_valid_relations( degree, control_points.length, knots.length ) ) 
@@ -62,5 +62,5 @@ else
 		// wait for callback
 	};
 
-};
+}.inherits(VERB.geom.Curve);
 
