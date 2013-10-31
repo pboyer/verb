@@ -1,1 +1,9 @@
-// a data structure representing a plane
+VERB.geom.Plane = function( axis, origin ) {
+
+	VERB.geom.Surface.call(this);
+
+	
+
+};
+
+

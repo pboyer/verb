@@ -1,1 +1,16 @@
-// Represents an extrusion, or objects such as beams or linearly extruded elements, that can be represented by profile curves and two miter planes at the extremes.
+VERB.geom.Extrusion = function(profile, axis, length) {
+
+	VERB.geom.Surface.call(this);
+
+	this.axis = axis;
+	this.base = base;
+	this.top = top;
+	this.radius = radius;
+
+}.inherits( VERB.geom.Surface );
+
+VERB.geom.Extrusion.prototype = {
+
+	// 
+
+};

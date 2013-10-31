@@ -1,1 +1,13 @@
-// a data structure representing a polyline - basically an ordered list of points
+var Polyline = function(points) {
+
+	if (points){
+		this.points = points;
+	} else {
+		this.points = [];
+	}
+
+	this.AsCurve = function(){
+		// build from points
+	}
+
+}
