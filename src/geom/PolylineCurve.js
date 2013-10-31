@@ -1,8 +1,7 @@
-var PolylineCurve = function( points ){
-
+VERB.geom.PolylineCurve = function( polyline ){
 
 	_degree = 1;
-	// construct homo control points
+	_control_points = polyline.points.slice(0);
 
 	this.point_sync = function( u ) {
 		return this.nurbs_engine.eval_sync( 'rational_curve_point', [ _degree, _knot_vector, _homo_control_points, u ] );
@@ -17,7 +16,7 @@ var PolylineCurve = function( points ){
 	};
 
 	this.derivs = function( u, num_derivs, callback ) {
-		this.nurbs_engine.eval( 'rational_curve_derivs', [ _degree, _knot_vector, _homo_control_points, u, num_derivs  ], callback ); 
+		// this.nurbs_engine.eval( 'rational_curve_derivs', [ _degree, _knot_vector, _homo_control_points, u, num_derivs  ], callback ); 
 	};
 
 	this.points = function( num_samples, callback ) {
@@ -25,4 +24,4 @@ var PolylineCurve = function( points ){
 		// wait for callback
 	};
 
-}
+}.inherits( VERB.geom.Curve );

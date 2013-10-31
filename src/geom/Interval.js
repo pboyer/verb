@@ -1,6 +1,7 @@
-// a data structure representing a 1d interval
+VERB.geom.Inverval = function(min, max) {
 
-// start and end
-// width
-// by start and width
+	this.min = min;
+	this.max = max;
 
+
+};

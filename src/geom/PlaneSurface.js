@@ -2,10 +2,10 @@ VERB.geom.PlaneSurface = function( plane ) {
 
 	VERB.geom.Surface.call(this);
 
-	// set the plane type
+	var _plane = plane;
 
 	this.point = function(u, v, callback) {
-		
+
 	};
 
 	this.derivs = function(u, v, num_u, num_v, callback) {

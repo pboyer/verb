@@ -1,4 +1,4 @@
-var Polyline = function(points) {
+VERB.geom.Polyline = function(points) {
 
 	if (points){
 		this.points = points;
@@ -6,7 +6,7 @@ var Polyline = function(points) {
 		this.points = [];
 	}
 
-	this.AsCurve = function(){
+	this.as_nurbs_curve = function(){
 		// build from points
 	}
 

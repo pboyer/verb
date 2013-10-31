@@ -11,9 +11,7 @@ VERB.geom.NurbsCurve = function( degree, control_points, weights, knots ) {
 		var _knots = [];
 		var _weights = [];
 		var _degree = 2;
-	}
-else
-	{
+	} else {
 		// private members
 		var _control_points = control_points.slice(0);
 		var _homo_control_points = VERB.eval.nurbs.homogenize_1d( control_points, weights );
