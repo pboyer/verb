@@ -1,19 +1,19 @@
-VERB.geom.Arc = function(center, xaxis, yaxis, start_angle, end_angle) {
+VERB.geom.Arc = function(center, xaxis, yaxis, interval) {
 
 	VERB.geom.Geometry.call(this);
 
-	this.center = center;
-	this.xaxis = xaxis;
-	this.yaxis = yaxis;
-	this.start_angle = start_angle;
-	this.end_angle = end_angle;
+	// other constructors
+	// circle, interval
+	// circle, angle
+	// 3 pts
 
-};
+	var _center = center;
+	var _xaxis = xaxis;
+	var _yaxis = yaxis;
+	var _interval = interval;
 
-VERB.geom.Arc.prototype = {
-
-  AsNurbsCurve: function() {
-    // construct nurbs surface
-  }
+	this.as_nurbs_curve = function() {
+		// construct nurbs surface
+	}
 
 };
