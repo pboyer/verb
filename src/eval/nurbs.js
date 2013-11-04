@@ -1,4 +1,94 @@
 /**
+ * Generate the control points, weights, and knots of an arbitrary arc
+ * (Corresponds to Algorithm A7.1 from Piegl & Tiller)
+ *
+ * @param {Array} the center of the arc
+ * @param {Array} the xaxis of the arc
+ * @param {Array} orthogonal yaxis of the arc
+ * @param {Number} radius of the arc
+ * @param {Number} start angle of the arc, between 0 and 2pi
+ * @param {Number} end angle of the arc, between 0 and 2pi, greater than the start angle
+ * @return {Object} an object with the following properties: control_points, weights, knots, degree
+ * @api public
+ */
+
+VERB.eval.nurbs.get_arc = function( center, xaxis, yaxis, radius, start_angle, end_angle ) {
+
+	// if the end angle is less than the start angle, do a circle
+	if (end_angle < start_angle) end_angle = 2 * Math.PI + start_angle;
+
+	var theta = end_angle - start_angle
+		, narcs = 0;
+
+	// how many arcs?
+	if (theta <= Math.PI / 2) {
+		narcs = 1;
+	} else {
+		if (theta <= Math.PI){
+			narcs = 2;
+		} else if (theta <= 3 * Math.PI / 2){
+			narcs = 3;
+		} else {
+			narcs = 4;
+		}
+	}
+
+	var dtheta = theta / narcs
+		, n = 2 * narcs
+		. w1 = Math.cos( dtheta / 2) 
+		, P0 = numeric.add( center, numeric.mul( radius, Math.cos(start_angle), xaxis), numeric.mul( radius, Math.sin(start_angle), yaxis ) )
+		, T0 = numeric.sub( numeric.mul( Math.cos(start_angle), yaxis ), numeric.mul( Math.sin(start_angle), xaxis) )
+		, Pw = VERB.eval.nurbs.zeros_1d(narcs * 2)
+		, Pw[0] = P0
+		, index = 0
+		, angle = start_angle;
+
+	for (var i = 1; i <= narcs; i++){
+
+		var angle += dtheta;
+		var P2 = numeric.add( center, numeric.mul( radius, Math.cos(angle), xaxis), numeric.mul( radius, Math.sin(angle), yaxis ) )
+
+		Pw[index+2] = P2;
+
+		var T2 = numeric.sub( numeric.mul( Math.cos(angle), yaxis ), numeric.mul( Math.sin(angle), xaxis) )
+
+		var params = VERB.eval.geom.intersect_rays(P0, T0, P2, T2);
+		var P1 = numeric.add( P0, numeric.mul(T0, params[0]));
+
+		Pw[index+1] = numeric.mul(w1, P1);
+
+		index += 2;
+
+		if (i < narcs){
+			P0 = P2;
+			T0 = T2;
+		}
+	}
+
+	j = 2 * narcs + 1;
+
+	for (var i = 0; i < 3; i++){
+		U[i] = 0.0;
+		U[i+j] = 1.0;
+	}
+
+	switch (narcs){
+		case 1: break;
+		case 2: U[3] = U[4] = 0.5; break;
+		case 3: U[3] = U[4] = 1/3;
+						U[5] = U[6] = 2/3; break;
+		case 4: U[3] = U[4] = 0.25;
+						U[5] = U[6] = 0.5;
+						U[7] = U[8] = 0.75; break;
+	}
+
+	return {knots: U, control_points: Pw, degree: 2 };
+
+
+}
+
+
+/**
  * Intersect two NURBS surfaces
  *
  * @param {Number} integer degree of surface in u direction
@@ -465,7 +555,7 @@ VERB.eval.geom.get_tri_norm = function( points, tri ) {
 		, v = numeric.sub( v2, v0 )
 		, n = numeric.cross( u, v );
 
-	return numeric.mul( numeric.norm2( n ), n );
+	return numeric.mul( 1 / numeric.norm2( n ), n );
 
 };
 
@@ -740,7 +830,7 @@ VERB.eval.geom.intersect_segments = function( a0, a1, b0, b1, tol ) {
  * @param {Array} direction of ray 1, assumed normalized
  * @param {Array} origin for ray 1
  * @param {Array} direction of ray 1, assumed normalized
- * @return {Array} a 2d array specifying the intersections on u params of intersections on curve 1 and cruve 2
+ * @return {Array} a 2d array specifying the intersections on u params of intersections on curve 1 and curve 2
  * @api public
  */
 
@@ -915,7 +1005,7 @@ VERB.eval.nurbs.are_three_points_are_flat = function( p1_arr, p2_arr, p3_arr, to
 
 
 /**
- * Compute the derivatives at a point on a NURBS surface
+ * Insert a knot along a rational curve
  *
  * @param {Number} integer degree of surface in u direction
  * @param {Array} array of nondecreasing knot values in u direction

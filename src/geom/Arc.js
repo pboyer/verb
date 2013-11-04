@@ -12,7 +12,10 @@ VERB.geom.Arc = function(center, xaxis, yaxis, radius, interval) {
 	this.interval = interval;
 
 	this.as_nurbs_curve = function() {
-		// construct nurbs surface
+		
+		var curve_props = this.nurbs_engine.eval_sync( 'get_arc', [ this.center, this.xaxis, this.yaxis, this.radius, this.start_interval, this.end_interval ] );
+		return new VERB.geom.NurbsCurve(curve_props.degree, curve_props.control_points, curve_props.weight, curve_props.knots );
+
 	}
 
 };

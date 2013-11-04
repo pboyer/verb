@@ -2,7 +2,7 @@ var should = require('should')
 	, VERB = require('../build/VERB.js');
 
 
-describe("nurbs",function(){
+describe("VERB.nurbs",function(){
 
 	it('knot_span_given_n', function(){
 
@@ -810,3 +810,9 @@ describe("BoundingBox",function(){
 	});
 
 });
+
+// test me:
+
+// get_tri_norm
+// aabb methods
+// knot insert
