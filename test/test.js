@@ -1073,10 +1073,28 @@ describe("BoundingBox",function(){
 
 });
 
-
 describe("VERB.nurbs.get_arc",function(){
 
-	it('returns correct result for arc from 0 to 45 deg', function(){
+	it('returns correct result for unit arc from 0 to 90 deg', function(){
+
+		var center = [0,0,0]
+			, x = [1,0,0]
+			, y = [0,1,0]
+			, r = 1
+			, start = 0
+			, end = Math.PI/2;
+
+		var arc_components = VERB.eval.nurbs.get_arc(center, x, y, 1, start, end);
+
+		var p = VERB.eval.nurbs.rational_curve_point( arc_components.degree, arc_components.knots, VERB.eval.nurbs.homogenize_1d( arc_components.control_points, arc_components.weights), 0.5);
+
+		should.equal( Math.abs( p[0] - Math.sqrt(2)/2 ) < VERB.EPSILON, true );
+		should.equal( Math.abs( p[1] - Math.sqrt(2)/2 ) < VERB.EPSILON, true );
+		should.equal( p[2], 0 );
+
+	});
+
+	it('returns correct result for unit arc from 0 to 45 deg', function(){
 
 		var center = [0,0,0]
 			, x = [1,0,0]
@@ -1087,7 +1105,49 @@ describe("VERB.nurbs.get_arc",function(){
 
 		var arc_components = VERB.eval.nurbs.get_arc(center, x, y, 1, start, end);
 
-		// should.equal( 4, arc_components );
+		var p = VERB.eval.nurbs.rational_curve_point( arc_components.degree, arc_components.knots, VERB.eval.nurbs.homogenize_1d( arc_components.control_points, arc_components.weights), 1);
+
+		should.equal( Math.abs( p[0] - Math.sqrt(2)/2 ) < VERB.EPSILON, true );
+		should.equal( Math.abs( p[1] - Math.sqrt(2)/2 ) < VERB.EPSILON, true );
+		should.equal( p[2], 0 );
+
+	});
+
+	it('returns correct result for unit arc from 45 to 135 deg', function(){
+
+		var center = [0,0,0]
+			, x = [1,0,0]
+			, y = [0,1,0]
+			, r = 1
+			, start = Math.PI/4
+			, end = 3*Math.PI/4;
+
+		var arc_components = VERB.eval.nurbs.get_arc(center, x, y, 1, start, end);
+
+		var p = VERB.eval.nurbs.rational_curve_point( arc_components.degree, arc_components.knots, VERB.eval.nurbs.homogenize_1d( arc_components.control_points, arc_components.weights), 0.5);
+
+		should.equal( Math.abs( p[0] ) < VERB.EPSILON, true );
+		should.equal( Math.abs( p[1] - 1 ) < VERB.EPSILON, true );
+		should.equal( p[2], 0 );
+
+	});
+
+	it('returns correct result for unit circle', function(){
+
+		var center = [0,0,0]
+			, x = [1,0,0]
+			, y = [0,1,0]
+			, r = 1
+			, start = 0
+			, end = Math.PI * 2;
+
+		var arc_components = VERB.eval.nurbs.get_arc(center, x, y, 1, start, end);
+
+		var p = VERB.eval.nurbs.rational_curve_point( arc_components.degree, arc_components.knots, VERB.eval.nurbs.homogenize_1d( arc_components.control_points, arc_components.weights), 0.5);
+
+		should.equal( Math.abs( p[0] + 1) < VERB.EPSILON, true );
+		should.equal( Math.abs( p[1] ) < VERB.EPSILON, true );
+		should.equal( p[2], 0 );
 
 	});
 
@@ -1095,49 +1155,6 @@ describe("VERB.nurbs.get_arc",function(){
 
 
 
-// describe("VERB.eval.geom.get_tri_centroid",function(){
-
-// 	it('returns correct result for zeroed tri', function(){
-
-// 		var a = [0,0,0]
-// 			, b = [1,0,0]
-// 			, c = [0,1,0]
-// 			, r = 1
-// 			, start = 0
-// 			, end = Math.PI/4;
-
-// 		should.equal( 4, VERB.eval.nurbs.get_arc(center, x, y, 1, start, end) );
-
-// 	});
-
-// 	it('returns correct result for tri in xy plane', function(){
-
-// 		var a = [0,0,0]
-// 			, b = [1,0,0]
-// 			, c = [0,1,0]
-// 			, r = 1
-// 			, start = 0
-// 			, end = Math.PI/4;
-
-// 		should.equal( 4, VERB.eval.nurbs.get_arc(center, x, y, 1, start, end) );
-
-// 	});
-
-// 	it('returns correct result for tri in arbitrary plane', function(){
-
-// 		var a = [0,0,0]
-// 			, b = [1,0,0]
-// 			, c = [0,1,0]
-// 			, r = 1
-// 			, start = 0
-// 			, end = Math.PI/4;
-
-// 		should.equal( 4, VERB.eval.nurbs.get_arc(center, x, y, 1, start, end) );
-
-// 	});
-
-
-// });
 
 // describe("VERB.eval.geom.get_tri_norm",function(){
 
