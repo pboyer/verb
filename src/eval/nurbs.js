@@ -38,14 +38,15 @@ VERB.eval.nurbs.get_arc = function( center, xaxis, yaxis, radius, start_angle, e
 		. w1 = Math.cos( dtheta / 2) 
 		, P0 = numeric.add( center, numeric.mul( radius, Math.cos(start_angle), xaxis), numeric.mul( radius, Math.sin(start_angle), yaxis ) )
 		, T0 = numeric.sub( numeric.mul( Math.cos(start_angle), yaxis ), numeric.mul( Math.sin(start_angle), xaxis) )
-		, Pw = VERB.eval.nurbs.zeros_1d(narcs * 2)
-		, Pw[0] = P0
+		, Pw = VERB.eval.nurbs.zeros_1d( narcs * 2 )
 		, index = 0
 		, angle = start_angle;
 
+	Pw[0] = P0;
+
 	for (var i = 1; i <= narcs; i++){
 
-		var angle += dtheta;
+		angle += dtheta;
 		var P2 = numeric.add( center, numeric.mul( radius, Math.cos(angle), xaxis), numeric.mul( radius, Math.sin(angle), yaxis ) )
 
 		Pw[index+2] = P2;
@@ -923,7 +924,7 @@ VERB.eval.nurbs.sample_rational_curve_range_regularly = function( degree, knot_v
 
 VERB.eval.nurbs.sample_rational_curve_adaptively = function( degree, knot_vector, control_points, tol ) {
 
-	return VERB.eval.nurbs.rational_curve_adaptive_sample_range( degree, knot_vector, control_points, 0, 1.0, tol );
+	return VERB.eval.nurbs.sample_rational_curve_range_adaptively( degree, knot_vector, control_points, 0, 1.0, tol );
 
 }
 
@@ -958,8 +959,8 @@ VERB.eval.nurbs.sample_rational_curve_range_adaptively = function( degree, knot_
 		} else {
 
 			// recurse on the two halves
-			var left_pts = VERB.eval.nurbs.rational_curve_adaptive_sample_range( degree, knot_vector, control_points, start_u, mid_u, tol )
-				, right_pts = VERB.eval.nurbs.rational_curve_adaptive_sample_range( degree, knot_vector, control_points, mid_u, end_u, tol );
+			var left_pts = VERB.eval.nurbs.sample_rational_curve_range_adaptively( degree, knot_vector, control_points, start_u, mid_u, tol )
+				, right_pts = VERB.eval.nurbs.sample_rational_curve_range_adaptively( degree, knot_vector, control_points, mid_u, end_u, tol );
 
 			// concatenate the two		
 			return left_pts.slice(0, -1).concat(right_pts);
@@ -987,12 +988,12 @@ VERB.eval.nurbs.sample_rational_curve_range_adaptively = function( degree, knot_
  * @api public
  */
 
-VERB.eval.nurbs.are_three_points_are_flat = function( p1_arr, p2_arr, p3_arr, tol ) {
+VERB.eval.nurbs.three_points_are_flat = function( p1_arr, p2_arr, p3_arr, tol ) {
 
 	// convert to vectors, this is probably unnecessary
-	var p1 = new VERB.geom.Vector( p1_arr ),
-		p2 = new VERB.geom.Vector( p2_arr ),
-		p3 = new VERB.geom.Vector( p3_arr );
+	var p1 = new VERB.geom.Vector3( p1_arr ),
+		p2 = new VERB.geom.Vector3( p2_arr ),
+		p3 = new VERB.geom.Vector3( p3_arr );
 
 	// find the area of the triangle wihout using a square root
 	var norm = p2.minus( p1 ).cross( p3.minus( p1 ) ),

@@ -20,6 +20,6 @@ VERB.geom.PlaneSurface = function( plane ) {
 
 	};
 
-}.inherits( VERB.geom.Surface );
+};
 
 

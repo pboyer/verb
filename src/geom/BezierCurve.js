@@ -42,5 +42,5 @@ VERB.geom.BezierCurve = function( degree, control_points ) {
 
 	};
 
-}.inherits(VERB.geom.Curve);
+};
 

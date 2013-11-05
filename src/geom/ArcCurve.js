@@ -7,4 +7,4 @@ VERB.geom.ArcCurve = function( arc ) {
 	//closest point
 	//
 
-}.inherits( VERB.geom.Curve );
+};

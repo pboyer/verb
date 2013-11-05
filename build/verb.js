@@ -149,12 +149,90 @@ VERB.core.uid = (function(){
 		return id++;
 	};
 })();
-// inherits from curve
+VERB.geom.Arc = function(center, xaxis, yaxis, radius, interval) {
+
+	// other constructors
+	// circle, interval
+	// circle, angle
+	// 3 pts
+
+	this.center = center;
+	this.xaxis = xaxis;
+	this.yaxis = yaxis;
+	this.radius = radius;
+	this.interval = interval;
+
+	this.as_nurbs_curve = function() {
+		
+		var curve_props = this.nurbs_engine.eval_sync( 'get_arc', [ this.center, this.xaxis, this.yaxis, this.radius, this.start_interval, this.end_interval ] );
+		return new VERB.geom.NurbsCurve(curve_props.degree, curve_props.control_points, curve_props.weight, curve_props.knots );
+
+	}
+
+};
+
+VERB.geom.ArcCurve = function( arc ) {
+
+	VERB.geom.Curve.call(this);
+
+	var _arc = arc;
+
+	//closest point
+	//
+
+};
+
 // a topology of surfaces
 
 
 
-// inherits from curve
+VERB.geom.BezierCurve = function( degree, control_points ) {
+
+	VERB.geom.Curve.call(this);
+
+	// a bezier can be represented exactly as a rational b-spline curve
+	// the form of the knot vector is [0,0,..,1,1] - the number of 0s is the degree + 1
+	// IOW, the cubic bezier has this knot vector [0,0,0,0,1,1,1,1]
+	var _knot_vector = [];
+	for (var i = 0; i < degree + 1; i++){ _knots.push(0); }
+	for (var i = 0; i < degree + 1; i++){ _knots.push(1); }
+
+	var _control_points = control_points.slice(0);
+	var _degree = degree;
+
+	this.set_control_point = function( index, value ) {
+		if (index < 0 || index >= _control_points.length ) {
+			return this;
+		}
+		_control_points[index] = value;
+		return this;
+	};
+
+	this.point_sync = function( u ) {
+		return this.nurbs_engine.eval_sync( 'curve_point', [ _degree, _knot_vector, _control_points, u ] );
+	};
+
+	this.derivs_sync = function( u, num_derivs ) {
+		return this.nurbs_engine.eval_sync( 'curve_derivs', [ _degree, _knot_vector, _control_points, u, num_derivs] );
+	};
+
+	this.point = function( u, callback ) {
+		nurbs_engine.eval( 'curve_point', [ _degree, _knot_vector, _control_points, u ], callback ); 
+		return this;
+	};
+
+	this.derivs = function( u, num_derivs, callback ) {
+		this.nurbs_engine.eval( 'curve_derivs', [ _degree, _knot_vector, _control_points, u, num_derivs  ], callback ); 
+		return this;
+	};
+
+	this.points = function( num_samples, callback ) {
+
+	};
+
+};
+
+
 /**
  * BoundngBox Constructor
  *
@@ -441,95 +519,126 @@ VERB.geom.BoundingBox.prototype.intersect = function( bb ) {
 }
 
 
-// non axis-aligned bbox
-// is a data structure representing a circle
+VERB.geom.Box = function(center, xaxis, yaxis, interval) {
 
-function makeCircle(O, X, Y, r, ths, the, n, U, Pw) {
+	VERB.geom.Geometry.call(this);
 
-	if (the < ths) the = 360 + ths;
-	var theta = the - ths
-		, narcs = 0;
+	var _center = center;
+	var _xaxis = xaxis;
+	var _yaxis = yaxis;
+	var _interval = interval;
 
-	if (theta <= 90) {
-		narcs = 1;
-	} else {
-		if (theta <= 180){
-			narcs = 2;
-		} else if (theta <= 270){
-			narcs = 3;
-		} else {
-			narcs = 4;
-		}
+	this.as_nurbs_curve = function() {
+		// construct nurbs surface
 	}
 
-	var dtheta = theta / narcs
-		, n = 2 * narcs
-		. w1 = Math.cos( dtheta / 2) // convert to rads
-		, P0 = O + r * Math.cos(ths) * X + r * Math.sin(ths) * Y
-		, T0 = -Math.sin(ths) * X + Math.cos(ths) * Y
-		, Pw[0] = P0
-		, index = 0
-		, angle = ths;
 
-	for (var i = 1; i <= narcs; i++){
+};
 
-		var angle += dtheta;
-		var P2 = O + r * Math.cos(angle) * X + r * Math.sin(angle) * Y;
-		Pw[index+2] = P2;
-		var T2 = -Math.sin(angle) * X + Math.cos(angle) * Y;
-		Intersect3DLines(P0, T0, P2, T2, dummy, dummy, P1);
-		Pw[index+1] = w1 * P1;
-		index += 2;
-		if (i < narcs){
-			P0 = P2;
-			T0 = T2;
-		}
+VERB.geom.Circle = function(center, xaxis, yaxis, radius) {
+
+	VERB.geom.Geometry.call(this);
+
+	// other constructors
+	// 3 pts
+
+	this.center = center;
+	this.xaxis = xaxis;
+	this.yaxis = yaxis;
+	this.radius = radius;
+
+	this.as_curve = function() {
+		// construct nurbs surface
 	}
 
-	j = 2 * narcs + 1;
+};
 
-	for (var i = 0; i < 3; i++){
-		U[i] = 0.0;
-		U[i+j] = 1.0;
-	}
+VERB.geom.Cone = function(axis, base, top, radius) {
 
-	switch (narcs){
-		case 1: break;
-		case 2: U[3] = U[4] = 0.5; break;
-		case 3: U[3] = U[4] = 1/3;
-						U[5] = U[6] = 2/3; break;
-		case 4: U[3] = U[4] = 0.25;
-						U[5] = U[6] = 0.5;
-						U[7] = U[8] = 0.75; break;
-	}
+	this.axis = axis;
+	this.base = base;
+	this.top = top;
+	this.radius = radius;
 
-}
-// is a data structure representing a cone
-/**
- * Curve constructor
- *
- * @return {Object} Newly formed Curve object
- * @api public
- */	
+	this.as_nurbs_surface = function() {
+    // construct nurbs surface
+  }
+
+};
 
 VERB.geom.Curve = function() {
 
 	VERB.geom.Geometry.call(this);
 
-}.inherits(VERB.geom.Geometry);
+};
 
 
 
 
-// a data structure representing a cylinder
-// Represents an extrusion, or objects such as beams or linearly extruded elements, that can be represented by profile curves and two miter planes at the extremes.
-/**
- * Geometry Constructor.
- *
- * @return {Object} Newly formed Geometry object
- * @api public
- */	
+VERB.geom.Cylinder = function(axis, base, xaxis, height) {
 
+	this.axis = axis;
+	this.base = base;
+	this.xaxis = xaxis;
+	this.height = height;
+
+	this.as_nurbs_surface = function() {
+	  // construct nurbs surface
+	}
+
+};
+
+VERB.geom.Ellipse = function(center, xaxis, yaxis, minorradius, majorradius) {
+
+	VERB.geom.Geometry.call(this);
+
+	// other constructors
+	// 3 pts
+
+	this.center = center;
+	this.xaxis = xaxis;
+	this.yaxis = yaxis;
+	this.minorradius = minorradius;
+	this.majorradius = majorradius;
+
+};
+
+VERB.geom.Extrusion = function(profile, axis, length) {
+
+	VERB.geom.Surface.call(this);
+
+	this.axis = axis;
+	this.base = base;
+	this.top = top;
+	this.radius = radius;
+
+	// construct nurbs representation
+
+	this.point = function(u, v, callback) {
+
+	};
+
+	this.derivs = function(u, v, num_u, num_v, callback) {
+
+	};
+
+	this.point_sync = function(u, v) {
+
+	};
+
+	this.derivs_sync = function(u, v, num_u, num_v) {
+
+	};
+
+	this.tesselate = function(){
+		
+	};
+
+	this.tesselate_sync = function(){
+
+	};
+
+};
 VERB.geom.Geometry = function() { 
 
 	var id = VERB.core.uid();
@@ -538,19 +647,47 @@ VERB.geom.Geometry = function() {
 	};
 
 };
-// a data structure representing a 1d interval
+VERB.geom.Inverval = function(min, max) {
 
-// start and end
-// width
-// by start and width
-// a data structure representing a line
-// inherits from curve, wraps the line data structure
+	this.min = min;
+	this.max = max;
+
+
+};
+
+VERB.geom.Inverval2 = function(minu, maxu, minv, maxv) {
+
+	this.uinterval = new VERB.geom.Interval(minu, maxu);
+	this.vinterval = new VERB.geom.Interval(minv, maxv);
+
+};
+
+VERB.geom.Line = function(start, end) {
+
+	this.start = start;
+	this.end = end;
+
+};
+
+VERB.geom.LineCurve = function( line ) {
+
+	VERB.geom.Curve.call(this);
+
+	var _line = line;
+
+	this.point = function(u){
+		// lerp
+	}
+
+	this.deriv = function(u){
+		// axis, the rest are 0
+	}
+
+}.inherits( VERB.geom.Curve ); 
 // a 4x4 matrix that can transform a vector
 // a data structure representing a winged edge mesh  - inherits from Geometry
 // a quad or tri
 // point on a mesh
-// should inherit from curve
-
 VERB.geom.NurbsCurve = function( degree, control_points, weights, knots ) {
 
 	VERB.geom.Curve.call(this);
@@ -564,9 +701,7 @@ VERB.geom.NurbsCurve = function( degree, control_points, weights, knots ) {
 		var _knots = [];
 		var _weights = [];
 		var _degree = 2;
-	}
-else
-	{
+	} else {
 		// private members
 		var _control_points = control_points.slice(0);
 		var _homo_control_points = VERB.eval.nurbs.homogenize_1d( control_points, weights );
@@ -618,7 +753,7 @@ else
 
 VERB.geom.NurbsSurface = function( degree, control_points, weights, knots ) {
 
-	VERB.geom.NURBSGeometry.call(this);
+	VERB.geom.Surface.call(this);
 
 	// private members
 	var _control_points = control_points.slice(0);
@@ -627,18 +762,13 @@ VERB.geom.NurbsSurface = function( degree, control_points, weights, knots ) {
 	var _degree = degree;
 
 	this.set_control_point = function(u_index, v_index, value) {
-
+		
 	};
 
 	this.set_weight = function(u_index, v_index, value) {
 
 	};
 
-	this.set_control_point = function(u_index, v_index, value) {
-
-	};
-
-	// privileged methods
 	this.point = function(u, v, callback) {
 
 	};
@@ -647,17 +777,133 @@ VERB.geom.NurbsSurface = function( degree, control_points, weights, knots ) {
 
 	};
 
-}.inherits( VERB.geom.Surface );
+	this.point_sync = function(u, v) {
+
+	};
+
+	this.derivs_sync = function(u, v, num_u, num_v) {
+
+	};
+
+	this.tesselate = function(){
+		
+	};
+
+	this.tesselate_sync = function(){
+
+	};
+
+};
 
 
 
-// a data structure representing a plane
-// a surface wrapping a plane
-// a compound curve - inherits from curve
-// a data structure representing a polyline - basically an ordered list of points
-// inherits curve and wraps the polyline data structure
-// basically a plane with two intervals
-// inherits surface
+VERB.geom.Plane = function( axis, origin ) {
+
+	VERB.geom.Surface.call(this);
+
+	this.axis = axis;
+	this.origin = origin;
+
+};
+
+
+
+VERB.geom.PlaneSurface = function( plane ) {
+
+	VERB.geom.Surface.call(this);
+
+	var _plane = plane;
+
+	this.point = function(u, v, callback) {
+
+	};
+
+	this.derivs = function(u, v, num_u, num_v, callback) {
+
+	};
+
+	this.point_sync = function(u, v) {
+
+	};
+
+	this.derivs_sync = function( u, v, num_u, num_v ) {
+
+	};
+
+};
+
+
+
+VERB.geom.PolylineCurve = function( points ){
+
+	// construct some sort of parameter mapping to subcurves
+
+	this.point_sync = function( u ) {
+		// return this.nurbs_engine.eval_sync( 'rational_curve_point', [ _degree, _knot_vector, _homo_control_points, u ] );
+	};
+
+	this.derivs_sync = function( u, num_derivs ) {
+		// return this.nurbs_engine.eval_sync( 'rational_curve_derivs', [ _degree, _knot_vector, _homo_control_points, u, num_derivs] );
+	};
+
+	this.point = function( u, callback ) {
+		// nurbs_engine.eval( 'rational_curve_point', [ _degree, _knot_vector, _homo_control_points, u ], callback ); 
+	};
+
+	this.derivs = function( u, num_derivs, callback ) {
+		// this.nurbs_engine.eval( 'rational_curve_derivs', [ _degree, _knot_vector, _homo_control_points, u, num_derivs  ], callback ); 
+	};
+
+	this.points = function( num_samples, callback ) {
+		// TODO: here we would use the worker to generate all of the points
+		// wait for callback
+	};
+
+}
+VERB.geom.Polyline = function(points) {
+
+	if (points){
+		this.points = points;
+	} else {
+		this.points = [];
+	}
+
+	this.as_nurbs_curve = function(){
+		// build from points
+	}
+
+}
+VERB.geom.PolylineCurve = function( polyline ){
+
+	_degree = 1;
+	_control_points = polyline.points.slice(0);
+
+	this.point_sync = function( u ) {
+		return this.nurbs_engine.eval_sync( 'rational_curve_point', [ _degree, _knot_vector, _homo_control_points, u ] );
+	};
+
+	this.derivs_sync = function( u, num_derivs ) {
+		return this.nurbs_engine.eval_sync( 'rational_curve_derivs', [ _degree, _knot_vector, _homo_control_points, u, num_derivs] );
+	};
+
+	this.point = function( u, callback ) {
+		nurbs_engine.eval( 'rational_curve_point', [ _degree, _knot_vector, _homo_control_points, u ], callback ); 
+	};
+
+	this.derivs = function( u, num_derivs, callback ) {
+		// this.nurbs_engine.eval( 'rational_curve_derivs', [ _degree, _knot_vector, _homo_control_points, u, num_derivs  ], callback ); 
+	};
+
+	this.points = function( num_samples, callback ) {
+		// TODO: here we would use the worker to generate all of the points
+		// wait for callback
+	};
+
+}.inherits( VERB.geom.Curve );
+
+
+
+
 
 function revolvedSurface(S, T, theta, m, Pj, wj, n, U, Pij, wij){
 
@@ -742,7 +988,7 @@ VERB.geom.Surface = function() {
 
 	VERB.geom.Geometry.call(this);
 
-}.inherits(VERB.geom.Geometry);
+};
 
 
 
@@ -815,6 +1061,97 @@ VERB.geom.Vector3.prototype = {
     );
   }
 };
+/**
+ * Generate the control points, weights, and knots of an arbitrary arc
+ * (Corresponds to Algorithm A7.1 from Piegl & Tiller)
+ *
+ * @param {Array} the center of the arc
+ * @param {Array} the xaxis of the arc
+ * @param {Array} orthogonal yaxis of the arc
+ * @param {Number} radius of the arc
+ * @param {Number} start angle of the arc, between 0 and 2pi
+ * @param {Number} end angle of the arc, between 0 and 2pi, greater than the start angle
+ * @return {Object} an object with the following properties: control_points, weights, knots, degree
+ * @api public
+ */
+
+VERB.eval.nurbs.get_arc = function( center, xaxis, yaxis, radius, start_angle, end_angle ) {
+
+	// if the end angle is less than the start angle, do a circle
+	if (end_angle < start_angle) end_angle = 2 * Math.PI + start_angle;
+
+	var theta = end_angle - start_angle
+		, narcs = 0;
+
+	// how many arcs?
+	if (theta <= Math.PI / 2) {
+		narcs = 1;
+	} else {
+		if (theta <= Math.PI){
+			narcs = 2;
+		} else if (theta <= 3 * Math.PI / 2){
+			narcs = 3;
+		} else {
+			narcs = 4;
+		}
+	}
+
+	var dtheta = theta / narcs
+		, n = 2 * narcs
+		. w1 = Math.cos( dtheta / 2) 
+		, P0 = numeric.add( center, numeric.mul( radius, Math.cos(start_angle), xaxis), numeric.mul( radius, Math.sin(start_angle), yaxis ) )
+		, T0 = numeric.sub( numeric.mul( Math.cos(start_angle), yaxis ), numeric.mul( Math.sin(start_angle), xaxis) )
+		, Pw = VERB.eval.nurbs.zeros_1d( narcs * 2 )
+		, index = 0
+		, angle = start_angle;
+
+	Pw[0] = P0;
+
+	for (var i = 1; i <= narcs; i++){
+
+		angle += dtheta;
+		var P2 = numeric.add( center, numeric.mul( radius, Math.cos(angle), xaxis), numeric.mul( radius, Math.sin(angle), yaxis ) )
+
+		Pw[index+2] = P2;
+
+		var T2 = numeric.sub( numeric.mul( Math.cos(angle), yaxis ), numeric.mul( Math.sin(angle), xaxis) )
+
+		var params = VERB.eval.geom.intersect_rays(P0, T0, P2, T2);
+		var P1 = numeric.add( P0, numeric.mul(T0, params[0]));
+
+		Pw[index+1] = numeric.mul(w1, P1);
+
+		index += 2;
+
+		if (i < narcs){
+			P0 = P2;
+			T0 = T2;
+		}
+	}
+
+	j = 2 * narcs + 1;
+
+	for (var i = 0; i < 3; i++){
+		U[i] = 0.0;
+		U[i+j] = 1.0;
+	}
+
+	switch (narcs){
+		case 1: break;
+		case 2: U[3] = U[4] = 0.5; break;
+		case 3: U[3] = U[4] = 1/3;
+						U[5] = U[6] = 2/3; break;
+		case 4: U[3] = U[4] = 0.25;
+						U[5] = U[6] = 0.5;
+						U[7] = U[8] = 0.75; break;
+	}
+
+	return {knots: U, control_points: Pw, degree: 2 };
+
+
+}
+
+
 /**
  * Intersect two NURBS surfaces
  *
@@ -1282,7 +1619,7 @@ VERB.eval.geom.get_tri_norm = function( points, tri ) {
 		, v = numeric.sub( v2, v0 )
 		, n = numeric.cross( u, v );
 
-	return numeric.mul( numeric.norm2( n ), n );
+	return numeric.mul( 1 / numeric.norm2( n ), n );
 
 };
 
@@ -1557,7 +1894,7 @@ VERB.eval.geom.intersect_segments = function( a0, a1, b0, b1, tol ) {
  * @param {Array} direction of ray 1, assumed normalized
  * @param {Array} origin for ray 1
  * @param {Array} direction of ray 1, assumed normalized
- * @return {Array} a 2d array specifying the intersections on u params of intersections on curve 1 and cruve 2
+ * @return {Array} a 2d array specifying the intersections on u params of intersections on curve 1 and curve 2
  * @api public
  */
 
@@ -1650,7 +1987,7 @@ VERB.eval.nurbs.sample_rational_curve_range_regularly = function( degree, knot_v
 
 VERB.eval.nurbs.sample_rational_curve_adaptively = function( degree, knot_vector, control_points, tol ) {
 
-	return VERB.eval.nurbs.rational_curve_adaptive_sample_range( degree, knot_vector, control_points, 0, 1.0, tol );
+	return VERB.eval.nurbs.sample_rational_curve_range_adaptively( degree, knot_vector, control_points, 0, 1.0, tol );
 
 }
 
@@ -1685,8 +2022,8 @@ VERB.eval.nurbs.sample_rational_curve_range_adaptively = function( degree, knot_
 		} else {
 
 			// recurse on the two halves
-			var left_pts = VERB.eval.nurbs.rational_curve_adaptive_sample_range( degree, knot_vector, control_points, start_u, mid_u, tol )
-				, right_pts = VERB.eval.nurbs.rational_curve_adaptive_sample_range( degree, knot_vector, control_points, mid_u, end_u, tol );
+			var left_pts = VERB.eval.nurbs.sample_rational_curve_range_adaptively( degree, knot_vector, control_points, start_u, mid_u, tol )
+				, right_pts = VERB.eval.nurbs.sample_rational_curve_range_adaptively( degree, knot_vector, control_points, mid_u, end_u, tol );
 
 			// concatenate the two		
 			return left_pts.slice(0, -1).concat(right_pts);
@@ -1714,12 +2051,12 @@ VERB.eval.nurbs.sample_rational_curve_range_adaptively = function( degree, knot_
  * @api public
  */
 
-VERB.eval.nurbs.are_three_points_are_flat = function( p1_arr, p2_arr, p3_arr, tol ) {
+VERB.eval.nurbs.three_points_are_flat = function( p1_arr, p2_arr, p3_arr, tol ) {
 
 	// convert to vectors, this is probably unnecessary
-	var p1 = new VERB.geom.Vector( p1_arr ),
-		p2 = new VERB.geom.Vector( p2_arr ),
-		p3 = new VERB.geom.Vector( p3_arr );
+	var p1 = new VERB.geom.Vector3( p1_arr ),
+		p2 = new VERB.geom.Vector3( p2_arr ),
+		p3 = new VERB.geom.Vector3( p3_arr );
 
 	// find the area of the triangle wihout using a square root
 	var norm = p2.minus( p1 ).cross( p3.minus( p1 ) ),
@@ -1732,7 +2069,7 @@ VERB.eval.nurbs.are_three_points_are_flat = function( p1_arr, p2_arr, p3_arr, to
 
 
 /**
- * Compute the derivatives at a point on a NURBS surface
+ * Insert a knot along a rational curve
  *
  * @param {Number} integer degree of surface in u direction
  * @param {Array} array of nondecreasing knot values in u direction

@@ -2,7 +2,8 @@ var should = require('should')
 	, VERB = require('../build/VERB.js');
 
 
-describe("VERB.eval.nurbs",function(){
+
+describe("nurbs",function(){
 
 	it('knot_span_given_n', function(){
 
@@ -176,8 +177,7 @@ describe("VERB.eval.nurbs",function(){
 		should.equal( p[0][1], 0 );
 		should.equal( p[1][0] / p[1][1], 1 );
 
-		
-
+	
 	});
 
 	it('surface_point_given_n_m', function(){
@@ -715,10 +715,236 @@ describe("VERB.eval.nurbs",function(){
 			
 });
 
+describe("VERB.eval.mesh.",function(){
+
+	it('get_tri_centroid should return origin for zeroed triangle', function(){
+
+		var points = [[0,0,0],[0,0,0],[0,0,0]]
+			, tri = [0,1,2]
+			, centroid = VERB.eval.mesh.get_tri_centroid( points, tri );
+
+		should.equal( 0, centroid[0] );
+		should.equal( 0, centroid[1] );
+		should.equal( 0, centroid[2] );
+
+	});
+
+	it('get_tri_centroid should return correct value', function(){
+
+		var points = [[5,10,2],[3,-4,5],[-10,-3, 10]]
+			, tri = [0,1,2]
+			, centroid = VERB.eval.mesh.get_tri_centroid( points, tri );
+
+		should.equal( -2/3, centroid[0] );
+		should.equal( 1, centroid[1] );
+		should.equal( 17/3, centroid[2] );
+
+	});
+
+	it('get_min_coordinate_on_axis should return correct value', function(){
+
+		var points = [[5,10,2],[3,-4,5],[-10,-3, 10]]
+			, tri = [0,1,2]
+			, a1 = VERB.eval.mesh.get_min_coordinate_on_axis( points, tri, 0 )
+			, a2 = VERB.eval.mesh.get_min_coordinate_on_axis( points, tri, 1 )
+			, a3 = VERB.eval.mesh.get_min_coordinate_on_axis( points, tri, 2 );
+
+		should.equal( -10, a1 );
+		should.equal( -4, a2 );
+		should.equal( 2, a3 );
+
+	});
+
+	it('sort_tris_on_longest_axis should return correct result with y axis regular array', function(){
+
+		//
+		//  0  -  1
+		//  | 0 / 3 \ 
+		//  2   --  3
+		//  | 1 \ 2 /
+		//  4  -  5
+		// 
+
+		var points = [ [0,0,0], [1,-0.2,0], [0, -1, 0 ], [1, -1.2, 0], [0, -2, 0], [1, -2.2, 0]]
+			, tris = [[0,2,1], [2,4,5], [2,5,3], [1,2,3]]
+			, tri_indices = [0,1,2,3]
+			, aabb = VERB.eval.mesh.make_mesh_aabb(points, tris, tri_indices)
+			, sort_tri_indices = VERB.eval.mesh.sort_tris_on_longest_axis( aabb, points, tris, tri_indices );
+
+		should.equal( 2, sort_tri_indices[0] );
+		should.equal( 1, sort_tri_indices[1] );
+		should.equal( 3, sort_tri_indices[2] );
+		should.equal( 0, sort_tri_indices[3] );
+
+	});
+
+	it('sort_tris_on_longest_axis should return correct result', function(){
+
+		// 0 \
+		// 1 \\     0
+		//     4    2
+		// 2 //     1
+		// 3 /      
+
+		var points = [ [0,10,0], [0,5,0], [0, 0, 0 ], [0, -5, 0], [0, -2, 0], [1, -2.2, 0]]
+			, tris = [[0,1,4], [2,3,4], [1,2,4]]
+			, tri_indices = [0,1,2]
+			, aabb = VERB.eval.mesh.make_mesh_aabb(points, tris, tri_indices)
+			, sort_tri_indices = VERB.eval.mesh.sort_tris_on_longest_axis( aabb, points, tris, tri_indices );
+
+		should.equal( 1, sort_tri_indices[0] );
+		should.equal( 2, sort_tri_indices[1] );
+		should.equal( 0, sort_tri_indices[2] );
+
+	});
+
+	it('make_mesh_aabb should return correct result for planar mesh', function(){
+
+		//
+		//  0  - 1
+		//  |  /  \
+		//  2   --  3
+		//  |  \   /
+		//  4  -  5
+		// 
+
+		var points = [ [0,0,0], [1,0,0], [0, -1, 0 ], [2, -1, 0], [0, -2, 0], [1, -2, 0] ]
+			, tris = [ [0,2,1], [1,2,3], [2,4,5], [2,5,3] ]
+			, tri_indices = [0,1,2,3]
+			, aabb = VERB.eval.mesh.make_mesh_aabb(points, tris, tri_indices);
+
+		should.equal( 2, aabb.max[0] );
+		should.equal( 0, aabb.min[0] );
+		should.equal( 0, aabb.max[1] );
+		should.equal( -2, aabb.min[1] );		
+		should.equal( 0, aabb.max[2] );
+		should.equal( 0, aabb.min[2] );
+
+	});
+
+	it('make_mesh_aabb should return correct result for non-planar mesh', function(){
+
+		//
+		//  0  - 1
+		//  |  /  \
+		//  2   --  3
+		//  |  \   /
+		//  4  -  5
+		// 
+
+		var points = [ [0,0,-5], [1,0,0], [0, -1, 0 ], [2, -1, 0], [0, -2, 0], [1, -2, 4] ]
+			, tris = [ [0,2,1], [1,2,3], [2,4,5], [2,5,3] ]
+			, tri_indices = [0,1,2,3]
+			, aabb = VERB.eval.mesh.make_mesh_aabb(points, tris, tri_indices);
+
+		should.equal( 2, aabb.max[0] );
+		should.equal( 0, aabb.min[0] );
+		should.equal( 0, aabb.max[1] );
+		should.equal( -2, aabb.min[1] );		
+		should.equal( 4, aabb.max[2] );
+		should.equal( -5, aabb.min[2] );
+
+	});
+
+	it('make_mesh_aabb_tree should have the correct structure', function(){
+
+		//
+		//  0  - 1
+		//  |  /  \
+		//  2   --  3
+		//  |  \   /
+		//  4  -  5
+		// 
+
+		var points = [ [0,0,0], [1,0,0], [0, -1, 0 ], [2, -1, 0], [0, -2, 0], [1, -2, 0] ]
+			, tris = [ [0,2,1], [1,2,3], [2,4,5], [2,5,3] ]
+			, tri_indices = [0,1,2,3]
+			, root = VERB.eval.mesh.make_mesh_aabb_tree( points, tris, tri_indices );
+
+		// root bb is correct
+		should.equal( 2, root.bounding_box.max[0] );
+		should.equal( 0, root.bounding_box.min[0] );
+		should.equal( 0, root.bounding_box.max[1] );
+		should.equal( -2, root.bounding_box.min[1] );		
+		should.equal( 0, root.bounding_box.max[2] );
+		should.equal( 0, root.bounding_box.min[2] );
+
+		// root is not a leaf
+		should.equal( 2, root.children.length);
+
+		// children should have 2 children, too
+		var child1 = root.children[0],
+			child2 = root.children[1];
+
+		should.equal( 2, child1.children.length );
+		should.equal( 2, child2.children.length );
+
+		// the children's children should be leaves
+		var child1child1 = child1.children[0],
+			child1child2 = child1.children[1],
+			child2child1 = child2.children[0],
+			child2child2 = child2.children[1];
+
+		should.equal( 0, child1child1.children.length );
+		should.equal( 0, child1child2.children.length );
+
+		should.equal( 0, child2child1.children.length );
+		should.equal( 0, child2child2.children.length );
+
+		// the grandchildren have the correct triangles in them
+		should.equal( 2, child1child1.triangle );
+		should.equal( 3, child1child2.triangle );
+
+		should.equal( 0, child2child1.triangle );
+		should.equal( 1, child2child2.triangle );
+
+	});
+
+
+	it('intersect_aabb_trees should have the correct result', function(){
+
+		//
+		//  0  - 1
+		//  |  /  \   
+		//  2   --  3
+		//  |  \   /
+		//  4  -  5
+		// 
+
+		var points1 = [ [0,0,0], [1,0,0], [0, -1, 0 ], [2, -1, 0], [0, -2, 0], [1, -2, 0] ]
+			, tris1 = [ [0,2,1], [1,2,3], [2,4,5], [2,5,3] ]
+			, tri_indices1 = [0,1,2,3]
+			, aabb1 = VERB.eval.mesh.make_mesh_aabb_tree( points1, tris1, tri_indices1 )
+
+			, points2 = [ [0.5,-2,0.5], [0.5,-2,-1], [1,0.5,-1 ] ]
+			, tris2 = [ [0,1,2] ]
+			, tri_indices2 = [0]
+			, aabb2 = VERB.eval.mesh.make_mesh_aabb_tree( points2, tris2, tri_indices2 )
+			, inter_result = VERB.eval.mesh.intersect_aabb_trees( points1, tris1, points2, tris2, aabb1, aabb2 );
+
+		// find all 4 triangle intersections
+		should.equal( 4, inter_result.length );
+
+		// find the specific intersections
+		should.equal( 2, inter_result[0][0] );
+		should.equal( 0, inter_result[0][1] );
+
+		should.equal( 3, inter_result[1][0] );
+		should.equal( 0, inter_result[1][1] );
+
+		should.equal( 0, inter_result[2][0] );
+		should.equal( 0, inter_result[2][1] );
+
+		should.equal( 1, inter_result[3][0] );
+		should.equal( 0, inter_result[3][1] );
+
+	});
+
+});
 
 describe("BoundingBox",function(){
 
-	it('BoundingBox init', function(){
+	it('init() should allow point arguments', function(){
 
 		var bb1 = new VERB.geom.BoundingBox( [5,5,5], [10,10,10]);
 
@@ -792,15 +1018,50 @@ describe("BoundingBox",function(){
 
 	it('BoundingBox.clear', function(){
 
-		// contains
-
 		var bb1 = new VERB.geom.BoundingBox( [5,5,5], [10,10,10] );
 		bb1.clear();
 		should.equal( bb1.initialized, false );
 
 	});
 
-	it('BoundingBox.clear', function(){
+	it('.get_axis_length() should return correct value', function(){
+
+		var bb1 = new VERB.geom.BoundingBox( [-1,2,3], [10,10,10] );
+		should.equal( bb1.get_axis_length(0), 11 );
+		should.equal( bb1.get_axis_length(1), 8 );
+		should.equal( bb1.get_axis_length(2), 7 );
+
+	});
+
+	it('.get_longest_axis() should return correct value', function(){
+
+		var bb1 = new VERB.geom.BoundingBox( [-1,2,3], [10,10,10] );
+		should.equal( bb1.get_longest_axis(0), 0 );
+
+	});
+
+	it('.get_axis_length() should return 0 when given out of bounds index', function(){
+
+		var bb1 = new VERB.geom.BoundingBox( [-1,2,3], [10,10,10] );
+		should.equal( bb1.get_axis_length(8), 0 );
+		should.equal( bb1.get_axis_length(-1), 0 );
+		should.equal( bb1.get_axis_length(4), 0 );
+		should.equal( bb1.get_axis_length(3), 0 );
+
+	});
+
+
+	it('.get_axis_length() should return 0 when given out of bounds index', function(){
+
+		var bb1 = new VERB.geom.BoundingBox( [-1,2,3], [10,10,10] );
+		should.equal( bb1.get_axis_length(8), 0 );
+		should.equal( bb1.get_axis_length(-1), 0 );
+		should.equal( bb1.get_axis_length(4), 0 );
+		should.equal( bb1.get_axis_length(3), 0 );
+
+	});
+
+	it('.clear() should set initialized to false', function(){
 
 		// contains
 
@@ -831,6 +1092,8 @@ describe("VERB.nurbs.get_arc",function(){
 	});
 
 });
+
+
 
 // describe("VERB.eval.geom.get_tri_centroid",function(){
 

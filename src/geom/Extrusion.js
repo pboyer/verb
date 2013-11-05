@@ -33,4 +33,4 @@ VERB.geom.Extrusion = function(profile, axis, length) {
 
 	};
 
-}.inherits( VERB.geom.Surface );
+};
