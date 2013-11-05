@@ -2,7 +2,7 @@ var should = require('should')
 	, VERB = require('../build/VERB.js');
 
 
-describe("VERB.nurbs",function(){
+describe("VERB.eval.nurbs",function(){
 
 	it('knot_span_given_n', function(){
 
@@ -715,6 +715,7 @@ describe("VERB.nurbs",function(){
 			
 });
 
+
 describe("BoundingBox",function(){
 
 	it('BoundingBox init', function(){
@@ -810,6 +811,104 @@ describe("BoundingBox",function(){
 	});
 
 });
+
+
+describe("VERB.nurbs.get_arc",function(){
+
+	it('returns correct result for arc from 0 to 45 deg', function(){
+
+		var center = [0,0,0]
+			, x = [1,0,0]
+			, y = [0,1,0]
+			, r = 1
+			, start = 0
+			, end = Math.PI/4;
+
+		var arc_components = VERB.eval.nurbs.get_arc(center, x, y, 1, start, end);
+
+		// should.equal( 4, arc_components );
+
+	});
+
+});
+
+// describe("VERB.eval.geom.get_tri_centroid",function(){
+
+// 	it('returns correct result for zeroed tri', function(){
+
+// 		var a = [0,0,0]
+// 			, b = [1,0,0]
+// 			, c = [0,1,0]
+// 			, r = 1
+// 			, start = 0
+// 			, end = Math.PI/4;
+
+// 		should.equal( 4, VERB.eval.nurbs.get_arc(center, x, y, 1, start, end) );
+
+// 	});
+
+// 	it('returns correct result for tri in xy plane', function(){
+
+// 		var a = [0,0,0]
+// 			, b = [1,0,0]
+// 			, c = [0,1,0]
+// 			, r = 1
+// 			, start = 0
+// 			, end = Math.PI/4;
+
+// 		should.equal( 4, VERB.eval.nurbs.get_arc(center, x, y, 1, start, end) );
+
+// 	});
+
+// 	it('returns correct result for tri in arbitrary plane', function(){
+
+// 		var a = [0,0,0]
+// 			, b = [1,0,0]
+// 			, c = [0,1,0]
+// 			, r = 1
+// 			, start = 0
+// 			, end = Math.PI/4;
+
+// 		should.equal( 4, VERB.eval.nurbs.get_arc(center, x, y, 1, start, end) );
+
+// 	});
+
+
+// });
+
+// describe("VERB.eval.geom.get_tri_norm",function(){
+
+// 	it('returns correct result for arc from 0 to 45 deg', function(){
+
+// 		var a = [0,0,0]
+// 			, b = [1,0,0]
+// 			, c = [0,1,0]
+// 			, r = 1
+// 			, start = 0
+// 			, end = Math.PI/4;
+
+// 		should.equal( 4, VERB.eval.nurbs.get_arc(center, x, y, 1, start, end) );
+
+// 	});
+
+// });
+
+// describe("VERB.eval.geom.intersect_tris",function(){
+
+// 	it('returns correct result for arc from 0 to 45 deg', function(){
+
+// 		var center = [0,0,0]
+// 			, x = [1,0,0]
+// 			, y = [0,1,0]
+// 			, r = 1
+// 			, start = 0
+// 			, end = Math.PI/4;
+
+// 		should.equal( 4, VERB.eval.nurbs.get_arc(center, x, y, 1, start, end) );
+
+// 	});
+
+// });
 
 // test me:
 
