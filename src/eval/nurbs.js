@@ -357,20 +357,20 @@ VERB.eval.geom.intersect_aabb_trees = function( points1, tris1, points2, tris2, 
 
   } else if (aabb_tree1.children.length === 0 && aabb_tree2.children.length != 0){
 
-  	return     VERB.eval.mesh.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1, aabb_tree2.children[0] )
-  		.concat( VERB.eval.mesh.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1, aabb_tree2.children[1] ) );
+  	return     VERB.eval.geom.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1, aabb_tree2.children[0] )
+  		.concat( VERB.eval.geom.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1, aabb_tree2.children[1] ) );
 
   } else if (aabb_tree1.children.length != 0 && aabb_tree2.children.length === 0){
 
-  	return     VERB.eval.mesh.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[0], aabb_tree2 )
-  		.concat( VERB.eval.mesh.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[1], aabb_tree2 ) );
+  	return     VERB.eval.geom.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[0], aabb_tree2 )
+  		.concat( VERB.eval.geom.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[1], aabb_tree2 ) );
 
   } else if (aabb_tree1.children.length != 0 && aabb_tree2.children.length != 0){
 
-  	return     VERB.eval.mesh.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[0], aabb_tree2.children[0] )
-  		.concat( VERB.eval.mesh.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[0], aabb_tree2.children[1] ) )
-  		.concat( VERB.eval.mesh.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[1], aabb_tree2.children[0] ) )
-  		.concat( VERB.eval.mesh.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[1], aabb_tree2.children[1] ) );
+  	return     VERB.eval.geom.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[0], aabb_tree2.children[0] )
+  		.concat( VERB.eval.geom.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[0], aabb_tree2.children[1] ) )
+  		.concat( VERB.eval.geom.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[1], aabb_tree2.children[0] ) )
+  		.concat( VERB.eval.geom.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[1], aabb_tree2.children[1] ) );
 
   }
 
@@ -387,7 +387,7 @@ VERB.eval.geom.intersect_aabb_trees = function( points1, tris1, points2, tris2, 
  * @api public
  */
 
-VERB.eval.mesh.get_aabb_tree_from_mesh = function( points, tris, tri_indices ) {
+VERB.eval.mesh.make_mesh_aabb_tree = function( points, tris, tri_indices ) {
 
 	// build bb
 	var aabb = { 	bounding_box: VERB.eval.mesh.make_mesh_aabb( points, tris, tri_indices ), 
@@ -423,7 +423,7 @@ VERB.eval.mesh.get_aabb_tree_from_mesh = function( points, tris, tri_indices ) {
  * @api public
  */
 
-VERB.eval.mesh.get_aabb_from_mesh = function( points, tris, tri_indices ) {
+VERB.eval.mesh.make_mesh_aabb = function( points, tris, tri_indices ) {
 
 	var bb = new VERB.geom.BoundingBox();
 
@@ -870,7 +870,7 @@ VERB.eval.geom.intersect_rays = function( a0, a, b0, b ) {
  * @api public
  */
 
-VERB.eval.nurbs.sample_rational_curve_regularly = function( degree, knot_vector, control_points, num_samples ) {
+VERB.eval.nurbs.rational_curve_regular_sample = function( degree, knot_vector, control_points, num_samples ) {
 
 	return VERB.eval.nurbs.rational_curve_regular_sample_range( degree, knot_vector, control_points, 0, 1.0, num_samples );
 
@@ -889,7 +889,7 @@ VERB.eval.nurbs.sample_rational_curve_regularly = function( degree, knot_vector,
  * @api public
  */
 
-VERB.eval.nurbs.sample_rational_curve_range_regularly = function( degree, knot_vector, control_points, start_u, end_u, num_samples ) {
+VERB.eval.nurbs.rational_curve_regular_sample_range = function( degree, knot_vector, control_points, start_u, end_u, num_samples ) {
 
 	if (num_samples < 1){
 		num_samples = 2;
@@ -922,9 +922,9 @@ VERB.eval.nurbs.sample_rational_curve_range_regularly = function( degree, knot_v
  * @api public
  */
 
-VERB.eval.nurbs.sample_rational_curve_adaptively = function( degree, knot_vector, control_points, tol ) {
+VERB.eval.nurbs.rational_curve_adaptive_sample = function( degree, knot_vector, control_points, tol ) {
 
-	return VERB.eval.nurbs.sample_rational_curve_range_adaptively( degree, knot_vector, control_points, 0, 1.0, tol );
+	return VERB.eval.nurbs.rational_curve_adaptive_sample_range( degree, knot_vector, control_points, 0, 1.0, tol );
 
 }
 
@@ -941,7 +941,7 @@ VERB.eval.nurbs.sample_rational_curve_adaptively = function( degree, knot_vector
  * @api public
  */
 
-VERB.eval.nurbs.sample_rational_curve_range_adaptively = function( degree, knot_vector, control_points, start_u, end_u, tol ) {
+VERB.eval.nurbs.rational_curve_adaptive_sample_range = function( degree, knot_vector, control_points, start_u, end_u, tol ) {
 
 	// sample curve at three pts
 	var p1 = VERB.eval.nurbs.rational_curve_point(degree, knot_vector, control_points, start_u),
@@ -959,8 +959,8 @@ VERB.eval.nurbs.sample_rational_curve_range_adaptively = function( degree, knot_
 		} else {
 
 			// recurse on the two halves
-			var left_pts = VERB.eval.nurbs.sample_rational_curve_range_adaptively( degree, knot_vector, control_points, start_u, mid_u, tol )
-				, right_pts = VERB.eval.nurbs.sample_rational_curve_range_adaptively( degree, knot_vector, control_points, mid_u, end_u, tol );
+			var left_pts = VERB.eval.nurbs.rational_curve_adaptive_sample_range( degree, knot_vector, control_points, start_u, mid_u, tol )
+				, right_pts = VERB.eval.nurbs.rational_curve_adaptive_sample_range( degree, knot_vector, control_points, mid_u, end_u, tol );
 
 			// concatenate the two		
 			return left_pts.slice(0, -1).concat(right_pts);

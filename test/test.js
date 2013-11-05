@@ -721,7 +721,7 @@ describe("VERB.eval.mesh.",function(){
 
 		var points = [[0,0,0],[0,0,0],[0,0,0]]
 			, tri = [0,1,2]
-			, centroid = VERB.eval.mesh.get_tri_centroid( points, tri );
+			, centroid = VERB.eval.geom.get_tri_centroid( points, tri );
 
 		should.equal( 0, centroid[0] );
 		should.equal( 0, centroid[1] );
@@ -733,7 +733,7 @@ describe("VERB.eval.mesh.",function(){
 
 		var points = [[5,10,2],[3,-4,5],[-10,-3, 10]]
 			, tri = [0,1,2]
-			, centroid = VERB.eval.mesh.get_tri_centroid( points, tri );
+			, centroid = VERB.eval.geom.get_tri_centroid( points, tri );
 
 		should.equal( -2/3, centroid[0] );
 		should.equal( 1, centroid[1] );
@@ -920,7 +920,7 @@ describe("VERB.eval.mesh.",function(){
 			, tris2 = [ [0,1,2] ]
 			, tri_indices2 = [0]
 			, aabb2 = VERB.eval.mesh.make_mesh_aabb_tree( points2, tris2, tri_indices2 )
-			, inter_result = VERB.eval.mesh.intersect_aabb_trees( points1, tris1, points2, tris2, aabb1, aabb2 );
+			, inter_result = VERB.eval.geom.intersect_aabb_trees( points1, tris1, points2, tris2, aabb1, aabb2 );
 
 		// find all 4 triangle intersections
 		should.equal( 4, inter_result.length );
