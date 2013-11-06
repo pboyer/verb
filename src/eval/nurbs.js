@@ -107,7 +107,7 @@ VERB.eval.nurbs.get_revolved = function(S, T, theta, m, Pj, wj){
 		}
 	}
 
-	return {knots: U, control_points: Pij, degree: 2, weights: Wij };
+	return {knots: U, control_points: Pij, degree: n, weights: Wij };
 
 }
 

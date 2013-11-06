@@ -1077,7 +1077,7 @@ describe("VERB.eval.geom.closest_point_on_ray",function(){
 	it('returns correct result for xaxis and 3d pt', function(){
 
 		var r = [1,0,0]
-			, o = [0,0,0]g
+			, o = [0,0,0]
 			, pt = [3,4,-1];
 
 		var proj = VERB.eval.geom.closest_point_on_ray(pt, o, r);
@@ -1193,7 +1193,27 @@ describe("VERB.eval.nurbs.get_revolved",function(){
 
 });
 
+describe("VERB.eval.nurbs.get_revolved",function(){
 
+	it('returns correct result for zaxis and line for cone', function(){
+
+		var axis = [1,0,0]
+			, center = [0,0,0]
+			, pt = [3,4,-1]
+			, angle = Math.PI/2
+			, prof_degree = 1
+			, prof_ctrl_pts = [[0,0,1,1], [1,0,0,1]]
+			, prof_knots = [0,1];
+
+		var rev_components = VERB.eval.nurbs.get_revolved(center, axis, angle, 1, prof_degree, prof_ctrl_pts, prof_weights);
+
+		var p = VERB.eval.nurbs.rational_surface_point( prof_degree, arc_components.knots[0], 2, arc_components.knots[1], VERB.eval.nurbs.homogenize_2d( rev_components.control_points, rev_components.weights), 0.5, 0.5);
+
+		// make some assertions about cone here
+
+	});
+
+});
 
 
 // describe("VERB.eval.geom.get_tri_norm",function(){
