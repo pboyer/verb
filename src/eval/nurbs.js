@@ -2,17 +2,30 @@
  * Generate the control points, weights, and knots of a revolved surface
  * (Corresponds to Algorithm A7.1 from Piegl & Tiller)
  *
- * @param {Array} the center of the arc
- * @param {Array} the xaxis of the arc
- * @param {Array} orthogonal yaxis of the arc
- * @param {Number} radius of the arc
- * @param {Number} start angle of the arc, between 0 and 2pi
- * @param {Number} end angle of the arc, between 0 and 2pi, greater than the start angle
+ * @param {Array} center of the rotation axis
+ * @param {Array} axis of the rotation axis
+ * @param {Number} angle to revolve around axis
+ * @param {Number} degree of the generatrix
+ * @param {Number} control points of the generatrix
+ * @param {Number} weights of the generatrix
  * @return {Object} an object with the following properties: control_points, weights, knots, degree
  * @api public
  */
 
-VERB.eval.nurbs.get_revolved = function(S, T, theta, m, Pj, wj, n, U, Pij, wij){
+// helper method
+
+function crossprod(u,v) {
+  return [u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
+}
+
+VERB.eval.nurbs.get_revolved = function(S, T, theta, m, Pj, wj){
+
+	// n is not used
+	// U are the knots
+	// Pij control points
+	// wij weights
+
+	var n, U, Pij, wij;
 
 	if (theta <= Math.PI / 2) {
 		narcs = 1;
@@ -44,9 +57,11 @@ VERB.eval.nurbs.get_revolved = function(S, T, theta, m, Pj, wj, n, U, Pij, wij){
 		, wm = Math.cos(dtheta/2.0)
 		, angle = 0.0
 		, sines = VERB.eval.nurbs.zeros_1d( narcs )
-		, cosines = VERB.eval.nurbs.zeros_1d( narcs );
+		, cosines = VERB.eval.nurbs.zeros_1d( narcs )
+		, Pij = VERB.eval.nurbs.zeros_2d( 2*narcs, m )
+		, wij = VERB.eval.nurbs.zeros_2d( 2*narcs, m );
 
-	for (var i = 1; i < narcs; i++){
+	for (var i = 1; i <= narcs; i++){
 		angle += dtheta;
 		cosines[i] = Math.cos(angle);
 		sines[i] = Math.sin(angle);
@@ -54,34 +69,45 @@ VERB.eval.nurbs.get_revolved = function(S, T, theta, m, Pj, wj, n, U, Pij, wij){
 
 	for (var j = 0; j <= m; j++){
 
-		PointToLine(S, T, Pj[j], 0);
-		X = Pj[j] - O;
-		r = VecNormalize(X);
-		VecCrossProduct(T,X,Y);
-		Pij[0][j] = P0 = Pj[j];
+		var O = VERB.eval.geom.closest_point_on_ray(Pj[j], S, T)
+			, X = numeric.sub( Pj[j], O )
+			, r = numeric.mul( 1 / numeric.norm2(X), X)
+			, Y = crossprod(T,X)
+
+		Pij[0][j] = Pj[j];
+		P0 = Pj[j];
 		wij[0][j] = wj[j];
-		T0 = Y;
-		index = 0;
-		angle = 0.0;
+
+		var T0 = Y
+			, index = 0
+			, angle = 0.0;
 
 		for (var i = 1; i <= narcs; i++){
 
-			P2 = O + r*cosines[i]*X + r * sines[i] * Y;
+			var P2 = numeric.add( O, numeric.mul( r, cosines[i], X), numeric.mul( r, sines[i], Y) );
+
 			Pij[index+2][j] = P2;
 			wij[index+2][j] = wj[j];
-			T2 = -sines[i] * X + cosines[i] * Y;
-			Intersect3DLines(P0, T0, P2, T2, Pij[index+1][j]);
+
+			var T2 = numeric.sub( numeric.mul( cosines[i], Y), numeric.mul(sines[i], X));
+
+			var params = VERB.eval.geom.intersect_rays(P0, numeric.mul( 1 / numeric.norm2(T0), T0), P2, numeric.mul( 1 / numeric.norm2(T2), T2));
+			Pij[index+1][j] = numeric.add( P0, numeric.mul(T0, params[0]));
+
 			wij[index+1][j] = wm * wj[j];
+
 			index += 2;
+
 			if (i < narcs)
 			{
 				P0 = P2;
 				T0 = T2;
 			}
+
 		}
-
-
 	}
+
+	return {knots: U, control_points: Pij, degree: 2, weights: Wij };
 
 }
 

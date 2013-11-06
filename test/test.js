@@ -1072,24 +1072,19 @@ describe("BoundingBox",function(){
 });
 
 
-describe("VERB.eval.nurbs.closest_point_on_line",function(){
+describe("VERB.eval.geom.closest_point_on_ray",function(){
 
 	it('returns correct result for xaxis and 3d pt', function(){
 
-		var center = [0,0,0]
-			, x = [1,0,0]
-			, y = [0,1,0]
-			, r = 1
-			, start = 0
-			, end = Math.PI/2;
+		var r = [1,0,0]
+			, o = [0,0,0]
+			, pt = [3,4,-1];
 
-		var arc_components = VERB.eval.nurbs.get_arc(center, x, y, 1, start, end);
+		var proj = VERB.eval.geom.closest_point_on_ray(pt, o, r);
 
-		var p = VERB.eval.nurbs.rational_curve_point( arc_components.degree, arc_components.knots, VERB.eval.nurbs.homogenize_1d( arc_components.control_points, arc_components.weights), 0.5);
-
-		should.equal( Math.abs( p[0] - Math.sqrt(2)/2 ) < VERB.EPSILON, true );
-		should.equal( Math.abs( p[1] - Math.sqrt(2)/2 ) < VERB.EPSILON, true );
-		should.equal( p[2], 0 );
+		should.equal( Math.abs( proj[0] - 3 ) < VERB.EPSILON, true );
+		should.equal( Math.abs( proj[1] ) < VERB.EPSILON, true );
+		should.equal( Math.abs( proj[2] ) < VERB.EPSILON, true );
 
 	});
 
@@ -1169,6 +1164,29 @@ describe("VERB.eval.nurbs.get_arc",function(){
 
 		should.equal( Math.abs( p[0] + 1) < VERB.EPSILON, true );
 		should.equal( Math.abs( p[1] ) < VERB.EPSILON, true );
+		should.equal( p[2], 0 );
+
+	});
+
+});
+
+describe("VERB.eval.nurbs.get_revolved",function(){
+
+	it('returns correct result for xaxis and 3d pt', function(){
+
+		var center = [0,0,0]
+			, x = [1,0,0]
+			, y = [0,1,0]
+			, r = 1
+			, start = 0
+			, end = Math.PI/2;
+
+		var arc_components = VERB.eval.nurbs.get_arc(center, x, y, 1, start, end);
+
+		var p = VERB.eval.nurbs.rational_curve_point( arc_components.degree, arc_components.knots, VERB.eval.nurbs.homogenize_1d( arc_components.control_points, arc_components.weights), 0.5);
+
+		should.equal( Math.abs( p[0] - Math.sqrt(2)/2 ) < VERB.EPSILON, true );
+		should.equal( Math.abs( p[1] - Math.sqrt(2)/2 ) < VERB.EPSILON, true );
 		should.equal( p[2], 0 );
 
 	});
