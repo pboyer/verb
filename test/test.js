@@ -1077,7 +1077,7 @@ describe("VERB.eval.geom.closest_point_on_ray",function(){
 	it('returns correct result for xaxis and 3d pt', function(){
 
 		var r = [1,0,0]
-			, o = [0,0,0]
+			, o = [0,0,0]g
 			, pt = [3,4,-1];
 
 		var proj = VERB.eval.geom.closest_point_on_ray(pt, o, r);
