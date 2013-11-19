@@ -1226,7 +1226,7 @@ describe("VERB.eval.nurbs.get_revolved_surface",function(){
 
 		should.equal( Math.abs( Math.sqrt(2)/4 - p[0]) < VERB.EPSILON, true );
 		should.equal( Math.abs( Math.sqrt(2)/4 - p[1]) < VERB.EPSILON, true );
-		should.equal( 0.5, p[2] );
+		should.equal( Math.abs( 0.5 - p[2]) < VERB.EPSILON, true );
 
 	});
 
@@ -1262,6 +1262,45 @@ describe("VERB.eval.nurbs.get_revolved_surface",function(){
 		should.equal( p[0] < VERB.EPSILON, true );
 		should.equal( Math.abs( 0.5 - p[1]) < VERB.EPSILON, true );
 		should.equal( Math.abs( 0.5 - p[2]) < VERB.EPSILON, true );
+
+	});
+
+});
+
+describe("VERB.eval.nurbs.get_extruded_surface",function(){
+
+	it('creates a plane on the diagonal from 1,0,0 to 0,1,0', function(){
+
+		var axis = [0,0,1]
+			, length = 5
+			, prof_degree = 1
+			, prof_ctrl_pts = [[0,1,0], [1,0,0]]
+			, prof_knots = [0,0,1,1]
+			, prof_weights = [1,1];
+
+		var comps = VERB.eval.nurbs.get_extruded_surface(axis, length, prof_knots, prof_degree, prof_ctrl_pts, prof_weights);
+
+		// the first row are the profile control pts
+		should.equal( 0, comps.control_points[0][0][0] );
+		should.equal( 1, comps.control_points[0][0][1] );
+		should.equal( 0, comps.control_points[0][0][2] );
+
+		should.equal( 1, comps.control_points[0][1][0] );
+		should.equal( 0, comps.control_points[0][1][1] );
+		should.equal( 0, comps.control_points[0][1][2] );
+
+		// sample at the center
+		var p = VERB.eval.nurbs.rational_surface_point( comps.degree_u,
+														comps.knot_vector_u, 
+														comps.degree_v,
+														comps.knot_vector_v, 
+														VERB.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														0.5, 
+														0.5);
+
+		should.equal( Math.abs( 0.5- p[0]) < VERB.EPSILON, true );
+		should.equal( Math.abs( 0.5 - p[1]) < VERB.EPSILON, true );
+		should.equal( Math.abs( 2.5 - p[2]) < VERB.EPSILON, true );
 
 	});
 

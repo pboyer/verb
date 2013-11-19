@@ -15,6 +15,46 @@ VERB.EPSILON = 1e-8;
 
 var router = new labor.Router(VERB.eval.nurbs);
 /**
+ * Generate the control points, weights, and knots of an extruded surface
+ *
+ * @param {Array} axis of the extrusion
+ * @param {Array} length of the extrusion
+ * @param {Number} degree of the profile
+ * @param {Number} control points of the profile
+ * @param {Number} weights of the profile
+ * @return {Object} an object with the following properties: control_points, weights, knots, degree
+ * @api public
+ */
+
+VERB.eval.nurbs.get_extruded_surface = function( axis, length, prof_knots, prof_degree, prof_control_points, prof_weights){
+
+	var control_points = VERB.eval.nurbs.zeros_2d( 2, prof_control_points.length )
+		, weights = VERB.eval.nurbs.zeros_2d( 2, prof_control_points.length );
+
+	// original control points
+	for (var j = 0; j < prof_control_points.length; j++){
+		control_points[0][j] = prof_control_points[j];
+		weights[0][j] = prof_weights[j];
+	}
+
+	// build translated control points
+	var translation = numeric.mul(axis, length);
+
+	for (var j = 0; j < prof_control_points.length; j++){
+		control_points[1][j] = numeric.add( translation, prof_control_points[j] );
+		weights[1][j] = prof_weights[j];
+	}
+
+	// return all parameters
+	return {"knot_vector_u": [0,0,1,1], 
+			"knot_vector_v": prof_knots, 
+			"control_points": control_points, 
+			"degree_u": 1, 
+			"degree_v": prof_degree, 
+			"weights": weights };
+}
+
+/**
  * Generate the control points, weights, and knots of a revolved surface
  * (Corresponds to Algorithm A7.1 from Piegl & Tiller)
  *

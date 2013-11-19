@@ -10,19 +10,26 @@
  * @api public
  */
 
-VERB.eval.nurbs.get_extruded_surface = function( axis, prof_knots, prof_degree, prof_control_points, prof_weights){
+VERB.eval.nurbs.get_extruded_surface = function( axis, length, prof_knots, prof_degree, prof_control_points, prof_weights){
 
 	var control_points = VERB.eval.nurbs.zeros_2d( 2, prof_control_points.length )
 		, weights = VERB.eval.nurbs.zeros_2d( 2, prof_control_points.length );
 
-	for (var i = 0; i < 2; i++){
-		for (var j = 0; j < prof_control_points.length; j++){
-			control_points[i][j] = prof_control_points[j];
-			weights[i][j] = prof_weights[j];
-		}
+	// original control points
+	for (var j = 0; j < prof_control_points.length; j++){
+		control_points[0][j] = prof_control_points[j];
+		weights[0][j] = prof_weights[j];
 	}
 
-	// store all of the parameters
+	// build translated control points
+	var translation = numeric.mul(axis, length);
+
+	for (var j = 0; j < prof_control_points.length; j++){
+		control_points[1][j] = numeric.add( translation, prof_control_points[j] );
+		weights[1][j] = prof_weights[j];
+	}
+
+	// return all parameters
 	return {"knot_vector_u": [0,0,1,1], 
 			"knot_vector_v": prof_knots, 
 			"control_points": control_points, 
