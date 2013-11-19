@@ -34,83 +34,106 @@ function crossprod(u,v) {
   return [u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
 }
 
-VERB.eval.nurbs.get_revolved = function(S, T, theta, m, Pj, wj){
+VERB.eval.nurbs.get_revolved_surface = function( center, axis, theta, prof_knots, prof_degree, prof_control_points, prof_weights){
 
-	// n is not used
-	// U are the knots
-	// Pij control points
-	// wij weights
+	var narcs, knots_u, control_points, weights;
 
-	var n, U, Pij, wij;
-
-	if (theta <= Math.PI / 2) {
+	if (theta <= Math.PI / 2) { // less than 90
 		narcs = 1;
+		knots_u = VERB.eval.nurbs.zeros_1d( 6 + 2 * (narcs-1) );
 	} else {
-		if (theta <= Math.PI){
+		if (theta <= Math.PI){  // between 90 and 180
 			narcs = 2;
-			U[3]= U[4] = 0.5;
-		} else if (theta <= 3 * Math.PI / 2){
+			knots_u = VERB.eval.nurbs.zeros_1d( 6 + 2 * (narcs-1) );
+			knots_u[3]= knots_u[4] = 0.5;
+		} else if (theta <= 3 * Math.PI / 2){ // between 180 and 270
 			narcs = 3;
-			U[3]= U[4] = 1/3;
-			U[5]= U[6] = 2/3;
-		} else {
+			knots_u = VERB.eval.nurbs.zeros_1d( 6 + 2 * (narcs-1) );
+			knots_u[3]= knots_u[4] = 1/3;
+			knots_u[5]= knots_u[6] = 2/3;
+		} else { // between 270 and 260
 			narcs = 4;
-			U[3]= U[4] = 1/3;
-			U[5]= U[6] = 2/3;
-			U[7]= U[8] = 2/3;
+			knots_u = VERB.eval.nurbs.zeros_1d( 6 + 2 * (narcs-1) );
+			knots_u[3]= knots_u[4] = 1/3;
+			knots_u[5]= knots_u[6] = 2/3;
+			knots_u[7]= knots_u[8] = 2/3;
 		}
 	}
 
-	var dtheta = theta/narcs
+	var dtheta = theta / narcs // divide the interval into several points
 		, j = 3 + 2 * (narcs-1);
 
+	// initialize the start and end knots
+	// keep in mind that we only return the knot vector for the 
+
 	for (var i = 0; i < 3; j++, i++){
-		U[i] = 0.0;
-		U[j] = 1.0;
+		knots_u[i] = 0.0;
+		knots_u[j] = 1.0;
 	}
 
-	var n = 2 * narcs
-		, wm = Math.cos(dtheta/2.0)
+	// do some initialization
+	var n = 2 * narcs 
+		, wm = Math.cos( dtheta/2.0 )
 		, angle = 0.0
-		, sines = VERB.eval.nurbs.zeros_1d( narcs )
-		, cosines = VERB.eval.nurbs.zeros_1d( narcs )
-		, Pij = VERB.eval.nurbs.zeros_2d( 2*narcs, m )
-		, wij = VERB.eval.nurbs.zeros_2d( 2*narcs, m );
+		, sines = VERB.eval.nurbs.zeros_1d( narcs + 1)
+		, cosines = VERB.eval.nurbs.zeros_1d( narcs + 1)
+		, control_points = VERB.eval.nurbs.zeros_2d( 2*narcs + 1, prof_control_points.length )
+		, weights = VERB.eval.nurbs.zeros_2d( 2*narcs + 1, prof_control_points.length );
 
+	// initialize the sines and cosines
 	for (var i = 1; i <= narcs; i++){
 		angle += dtheta;
 		cosines[i] = Math.cos(angle);
 		sines[i] = Math.sin(angle);
 	}
 
-	for (var j = 0; j <= m; j++){
+	// for each pt in the generatrix
+	// i.e. for each row of the 2d knot vectors
+	for (j = 0; j < prof_control_points.length; j++){
 
-		var O = VERB.eval.geom.closest_point_on_ray(Pj[j], S, T)
-			, X = numeric.sub( Pj[j], O )
-			, r = numeric.mul( 1 / numeric.norm2(X), X)
-			, Y = crossprod(T,X)
+		// get the closest point of the generatrix point on the axis
+		var O = VERB.eval.geom.closest_point_on_ray(prof_control_points[j], center, axis)
+			// X is the vector from the axis to generatrix control pt
+			, X = numeric.sub( prof_control_points[j], O )
+			// radius at that height
+			, r = numeric.norm2(X)
+			// Y is perpendicular to X and axis, and complete the coordinate system
+			, Y = crossprod(axis,X); 
 
-		Pij[0][j] = Pj[j];
-		P0 = Pj[j];
-		wij[0][j] = wj[j];
+		// the first row of control_points and weights is just the generatrix
+		control_points[0][j] = prof_control_points[j];
+		var P0 = prof_control_points[j];
+		weights[0][j] = prof_weights[j];
 
+		// store T0 as the Y vector
 		var T0 = Y
 			, index = 0
 			, angle = 0.0;
 
-		for (var i = 1; i <= narcs; i++){
+		// proceed around the circle
+		for (var i = 1; i <= narcs; i++){	
 
-			var P2 = numeric.add( O, numeric.mul( r, cosines[i], X), numeric.mul( r, sines[i], Y) );
+			// O + r * cos(theta) * X + r * sin(theta) * Y
+			// rotated generatrix pt
+			var P2 = r == 0 ? O : numeric.add( O, numeric.mul( r, cosines[i], X), numeric.mul( r, sines[i], Y) );
 
-			Pij[index+2][j] = P2;
-			wij[index+2][j] = wj[j];
+			control_points[index+2][j] = P2;
+			weights[index+2][j] = prof_weights[j];
 
+			// construct the vector tangent to the rotation
 			var T2 = numeric.sub( numeric.mul( cosines[i], Y), numeric.mul(sines[i], X));
 
-			var params = VERB.eval.geom.intersect_rays(P0, numeric.mul( 1 / numeric.norm2(T0), T0), P2, numeric.mul( 1 / numeric.norm2(T2), T2));
-			Pij[index+1][j] = numeric.add( P0, numeric.mul(T0, params[0]));
+			// construct the next control pt
+			if (r == 0){
+				control_points[index+1][j] = O;
+			} else {
+				var params = VERB.eval.geom.intersect_rays(P0, numeric.mul( 1 / numeric.norm2(T0), T0), P2, numeric.mul( 1 / numeric.norm2(T2), T2));
+				var P1 = numeric.add( P0, numeric.mul(T0, params[0]));
 
-			wij[index+1][j] = wm * wj[j];
+				control_points[index+1][j] = P1;
+			}
+
+			weights[index+1][j] = wm * prof_weights[j];
 
 			index += 2;
 
@@ -123,10 +146,15 @@ VERB.eval.nurbs.get_revolved = function(S, T, theta, m, Pj, wj){
 		}
 	}
 
-	return {knots: U, control_points: Pij, degree: 2, weights: Wij };
+	// store all of the parameters
+	return {"knot_vector_u": knots_u, 
+			"knot_vector_v": prof_knots, 
+			"control_points": control_points, 
+			"degree_u": 2, 
+			"degree_v": prof_degree, 
+			"weights": weights };
 
 }
-
 
 /**
  * Generate the control points, weights, and knots of an arbitrary arc
@@ -1323,7 +1351,7 @@ VERB.eval.nurbs.rational_surface_derivs = function( degree_u, knot_vector_u, deg
  * @param {Array} array of nondecreasing knot values in u direction
  * @param {Number} integer degree of surface in v direction
  * @param {Array} array of nondecreasing knot values in v direction
- * @param {Array} 3d array of control points, top to bottom is increasing u direction, left to right is increasing v direction,
+ * @param {Array} 3d array of control points (tensor), top to bottom is increasing u direction, left to right is increasing v direction,
  									and where each control point is an array of length (dim+1)
  * @param {Number} u parameter at which to evaluate the surface point
  * @param {Number} v parameter at which to evaluate the surface point
@@ -1632,7 +1660,7 @@ VERB.eval.nurbs.surface_derivs_given_n_m = function( n, degree_u, knot_vector_u,
  * @api public
  */
 
-VERB.eval.nurbs.surface_point = function( degree_u, knot_vector_u,  degree_v, knot_vector_v, control_points, u, v ) {
+VERB.eval.nurbs.surface_point = function( degree_u, knot_vector_u, degree_v, knot_vector_v, control_points, u, v ) {
 
 	var n = knot_vector_u.length - degree_u - 2
 		, m = knot_vector_v.length - degree_v - 2;

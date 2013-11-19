@@ -1170,46 +1170,98 @@ describe("VERB.eval.nurbs.get_arc",function(){
 
 });
 
-describe("VERB.eval.nurbs.get_revolved",function(){
+// describe("VERB.eval.nurbs.get_revolved",function(){
 
-	it('returns correct result for xaxis and 3d pt', function(){
+// 	it('returns correct result for xaxis and 3d pt', function(){
 
-		var center = [0,0,0]
-			, x = [1,0,0]
-			, y = [0,1,0]
-			, r = 1
-			, start = 0
-			, end = Math.PI/2;
+// 		var center = [0,0,0]
+// 			, x = [1,0,0]
+// 			, y = [0,1,0]
+// 			, r = 1
+// 			, start = 0
+// 			, end = Math.PI/2;
 
-		var arc_components = VERB.eval.nurbs.get_arc(center, x, y, 1, start, end);
+// 		var arc_components = VERB.eval.nurbs.get_arc(center, x, y, 1, start, end);
 
-		var p = VERB.eval.nurbs.rational_curve_point( arc_components.degree, arc_components.knots, VERB.eval.nurbs.homogenize_1d( arc_components.control_points, arc_components.weights), 0.5);
+// 		var p = VERB.eval.nurbs.rational_curve_point( arc_components.degree, arc_components.knots, VERB.eval.nurbs.homogenize_1d( arc_components.control_points, arc_components.weights), 0.5);
 
-		should.equal( Math.abs( p[0] - Math.sqrt(2)/2 ) < VERB.EPSILON, true );
-		should.equal( Math.abs( p[1] - Math.sqrt(2)/2 ) < VERB.EPSILON, true );
-		should.equal( p[2], 0 );
+// 		should.equal( Math.abs( p[0] - Math.sqrt(2)/2 ) < VERB.EPSILON, true );
+// 		should.equal( Math.abs( p[1] - Math.sqrt(2)/2 ) < VERB.EPSILON, true );
+// 		should.equal( p[2], 0 );
+
+// 	});
+
+// });
+
+describe("VERB.eval.nurbs.get_revolved_surface",function(){
+
+	it('creates a 90 degree cone with the given line for a profile', function(){
+
+		var axis = [0,0,1]
+			, center = [0,0,0]
+			, angle = Math.PI/2
+			, prof_degree = 1
+			, prof_ctrl_pts = [[0,0,1], [1,0,0]]
+			, prof_knots = [0,0,1,1]
+			, prof_weights = [1,1];
+
+		var comps = VERB.eval.nurbs.get_revolved_surface(center, axis, angle, prof_knots, prof_degree, prof_ctrl_pts, prof_weights);
+
+		// the first row are the profile control pts
+		should.equal( 0, comps.control_points[0][0][0] );
+		should.equal( 0, comps.control_points[0][0][1] );
+		should.equal( 1, comps.control_points[0][0][2] );
+
+		should.equal( 1, comps.control_points[0][1][0] );
+		should.equal( 0, comps.control_points[0][1][1] );
+		should.equal( 0, comps.control_points[0][1][2] );
+
+		var p = VERB.eval.nurbs.rational_surface_point( 2, 
+														comps.knot_vector_u, 
+														1, 
+														comps.knot_vector_v, 
+														VERB.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														0.5, 
+														0.5);
+
+		should.equal( Math.abs( Math.sqrt(2)/4 - p[0]) < VERB.EPSILON, true );
+		should.equal( Math.abs( Math.sqrt(2)/4 - p[1]) < VERB.EPSILON, true );
+		should.equal( 0.5, p[2] );
 
 	});
 
-});
+	it('creates a 180 degree cone with the given line for a profile', function(){
 
-describe("VERB.eval.nurbs.get_revolved",function(){
-
-	it('returns correct result for zaxis and line for cone', function(){
-
-		var axis = [1,0,0]
+		var axis = [0,0,1]
 			, center = [0,0,0]
-			, pt = [3,4,-1]
-			, angle = Math.PI/2
+			, angle = Math.PI
 			, prof_degree = 1
-			, prof_ctrl_pts = [[0,0,1,1], [1,0,0,1]]
-			, prof_knots = [0,1];
+			, prof_ctrl_pts = [[0,0,1], [1,0,0]]
+			, prof_knots = [0,0,1,1]
+			, prof_weights = [1,1];
 
-		var rev_components = VERB.eval.nurbs.get_revolved(center, axis, angle, 1, prof_degree, prof_ctrl_pts, prof_weights);
+		var comps = VERB.eval.nurbs.get_revolved_surface(center, axis, angle, prof_knots, prof_degree, prof_ctrl_pts, prof_weights);
 
-		var p = VERB.eval.nurbs.rational_surface_point( prof_degree, arc_components.knots[0], 2, arc_components.knots[1], VERB.eval.nurbs.homogenize_2d( rev_components.control_points, rev_components.weights), 0.5, 0.5);
+		// the first row are the profile control pts
+		should.equal( 0, comps.control_points[0][0][0] );
+		should.equal( 0, comps.control_points[0][0][1] );
+		should.equal( 1, comps.control_points[0][0][2] );
 
-		// make some assertions about cone here
+		should.equal( 1, comps.control_points[0][1][0] );
+		should.equal( 0, comps.control_points[0][1][1] );
+		should.equal( 0, comps.control_points[0][1][2] );
+
+		var p = VERB.eval.nurbs.rational_surface_point( 2, 
+														comps.knot_vector_u, 
+														1, 
+														comps.knot_vector_v, 
+														VERB.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														0.5, 
+														0.5);
+
+		should.equal( p[0] < VERB.EPSILON, true );
+		should.equal( Math.abs( 0.5 - p[1]) < VERB.EPSILON, true );
+		should.equal( Math.abs( 0.5 - p[2]) < VERB.EPSILON, true );
 
 	});
 
