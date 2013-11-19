@@ -1,4 +1,37 @@
 /**
+ * Generate the control points, weights, and knots of an extruded surface
+ *
+ * @param {Array} axis of the extrusion
+ * @param {Array} length of the extrusion
+ * @param {Number} degree of the profile
+ * @param {Number} control points of the profile
+ * @param {Number} weights of the profile
+ * @return {Object} an object with the following properties: control_points, weights, knots, degree
+ * @api public
+ */
+
+VERB.eval.nurbs.get_extruded_surface = function( axis, prof_knots, prof_degree, prof_control_points, prof_weights){
+
+	var control_points = VERB.eval.nurbs.zeros_2d( 2, prof_control_points.length )
+		, weights = VERB.eval.nurbs.zeros_2d( 2, prof_control_points.length );
+
+	for (var i = 0; i < 2; i++){
+		for (var j = 0; j < prof_control_points.length; j++){
+			control_points[i][j] = prof_control_points[j];
+			weights[i][j] = prof_weights[j];
+		}
+	}
+
+	// store all of the parameters
+	return {"knot_vector_u": [0,0,1,1], 
+			"knot_vector_v": prof_knots, 
+			"control_points": control_points, 
+			"degree_u": 1, 
+			"degree_v": prof_degree, 
+			"weights": weights };
+}
+
+/**
  * Generate the control points, weights, and knots of a revolved surface
  * (Corresponds to Algorithm A7.1 from Piegl & Tiller)
  *
