@@ -7,6 +7,9 @@ VERB.geom.Cylinder = function(axis, base, xaxis, height) {
 
 	this.as_nurbs_surface = function() {
 	  // construct nurbs surface
+
+	  // build 
+
 	}
 
 };

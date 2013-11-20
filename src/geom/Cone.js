@@ -6,7 +6,10 @@ VERB.geom.Cone = function(axis, base, top, radius) {
 	this.radius = radius;
 
 	this.as_nurbs_surface = function() {
+
+
+
     // construct nurbs surface
-  }
+  };
 
 };

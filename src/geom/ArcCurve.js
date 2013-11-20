@@ -1,10 +1,12 @@
 VERB.geom.ArcCurve = function( arc ) {
 
-	VERB.geom.Curve.call(this);
+	VERB.geom.NurbsCurve.call(this);
 
-	var _arc = arc;
+	this.GetProperties = function(){
 
-	//closest point
-	//
+		// get various properties
+		
 
-};
+	}
+
+}.inherits( VERB.geom.NurbsCurve ); 

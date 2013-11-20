@@ -20,27 +20,5 @@ VERB.geom.BezierCurve = function( degree, control_points ) {
 		return this;
 	};
 
-	this.point_sync = function( u ) {
-		return this.nurbs_engine.eval_sync( 'curve_point', [ _degree, _knot_vector, _control_points, u ] );
-	};
-
-	this.derivs_sync = function( u, num_derivs ) {
-		return this.nurbs_engine.eval_sync( 'curve_derivs', [ _degree, _knot_vector, _control_points, u, num_derivs] );
-	};
-
-	this.point = function( u, callback ) {
-		nurbs_engine.eval( 'curve_point', [ _degree, _knot_vector, _control_points, u ], callback ); 
-		return this;
-	};
-
-	this.derivs = function( u, num_derivs, callback ) {
-		this.nurbs_engine.eval( 'curve_derivs', [ _degree, _knot_vector, _control_points, u, num_derivs  ], callback ); 
-		return this;
-	};
-
-	this.points = function( num_samples, callback ) {
-
-	};
-
-};
+}.inherits( VERB.geom.NurbsCurve ); 
 

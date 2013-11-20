@@ -10,7 +10,7 @@ VERB.geom.Circle = function(center, xaxis, yaxis, radius) {
 	this.yaxis = yaxis;
 	this.radius = radius;
 
-	this.as_curve = function() {
+	this.AsNurbsCurve = function() {
 		// construct nurbs surface
 	}
 
