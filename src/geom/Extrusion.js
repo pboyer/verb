@@ -1,36 +1,23 @@
-VERB.geom.Extrusion = function(profile, axis, length) {
+VERB.geom.Extrusion = function(profile, axis, length ) 
 
-	VERB.geom.Surface.call(this);
+	this.set( "profile", profile );
+	this.set( "axis", axis );
+	this.set( "length", length );
 
-	this.axis = axis;
-	this.base = base;
-	this.top = top;
-	this.radius = radius;
+	this.nurbsRep = function() {
 
-	// construct nurbs representation
-
-	this.point = function(u, v, callback) {
-
-	};
-
-	this.derivs = function(u, v, num_u, num_v, callback) {
-
-	};
-
-	this.point_sync = function(u, v) {
+	  return this.nurbs_engine.eval_sync( 'get_extruded_surface', 
+										[ this.get("axis"), 
+									 	  this.get("length"), 
+										  this.get("profile").get("knots"), 
+										  this.get("profile").get("degree"), 
+										  this.get("profile").get("controlPoints"),
+										  this.get("profile").get("weights")] );
 
 	};
 
-	this.derivs_sync = function(u, v, num_u, num_v) {
+	var surface_props = this.nurbsRep();
 
-	};
+	VERB.geom.NurbsSurface.call(this, surface_props.degree, surface_props.control_points, surface_props.weight, surface_props.knots );
 
-	this.tesselate = function(){
-		
-	};
-
-	this.tesselate_sync = function(){
-
-	};
-
-};
+}.inherits(VERB.geom.NurbsSurface);

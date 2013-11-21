@@ -1,17 +1,23 @@
 VERB.geom.Circle = function(center, xaxis, yaxis, radius) {
 
-	VERB.geom.Geometry.call(this);
+	this.set( "center", center );
+	this.set( "xaxis", xaxis );
+	this.set( "yaxis", yaxis );
+	this.set( "radius", radius );
 
-	// other constructors
-	// 3 pts
+	this.nurbsRep = function(){
 
-	this.center = center;
-	this.xaxis = xaxis;
-	this.yaxis = yaxis;
-	this.radius = radius;
+		return this.nurbs_engine.eval_sync( 'get_arc', [ this.get("center"), 
+														 this.get("xaxis"), 
+														 this.get("yaxis"), 
+														 this.get("radius"), 
+														 0, 
+														 2 * Math.PI );
 
-	this.AsNurbsCurve = function() {
-		// construct nurbs surface
-	}
+	};
 
-};
+	var curve_props = this.nurbsRep();
+
+	VERB.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weight, curve_props.knots );
+
+}.inherits(VERB.geom.NurbsCurve);

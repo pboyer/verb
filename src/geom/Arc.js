@@ -1,21 +1,28 @@
 VERB.geom.Arc = function(center, xaxis, yaxis, radius, interval) {
 
-	// other constructors
-	// circle, interval
-	// circle, angle
-	// 3 pts
+	this.set( "center", center );
+	this.set( "xaxis", xaxis );
+	this.set( "yaxis", yaxis );
+	this.set( "radius", radius );
+	this.set( "interval", interval );
 
-	this.Center = center;
-	this.XAxis = xaxis;
-	this.YAxis = yaxis;
-	this.Radius = radius;
-	this.Interval = interval;
+	this.nurbsRep = function(){
 
-	this.AsNurbsCurve = function() {
-		
-		var curve_props = this.nurbs_engine.eval_sync( 'get_arc', [ this.Center, this.XAxis, this.YAxis, this.Radius, this.Interval.Min, this.Interval.Max ] );
-		return new VERB.geom.NurbsCurve(curve_props.degree, curve_props.control_points, curve_props.weight, curve_props.knots );
+		return this.nurbs_engine.eval_sync( 'get_arc', [ this.get("center"), 
+														 this.get("xaxis"), 
+														 this.get("yaxis"), 
+														 this.get("radius"), 
+														 this.get("interval").get("start"), 
+														 this.get("center").get("end")] );
 
 	};
 
-};
+	var curve_props = this.nurbsRep();
+
+	VERB.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weight, curve_props.knots );
+
+
+	// TODO: override closest point
+
+
+}.inherits(VERB.geom.NurbsCurve);

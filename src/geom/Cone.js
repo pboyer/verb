@@ -1,15 +1,23 @@
-VERB.geom.Cone = function(axis, base, top, radius) {
+VERB.geom.Cone = function(axis, base, height, radius ) {
 
-	this.axis = axis;
-	this.base = base;
-	this.top = top;
-	this.radius = radius;
+	this.set( "axis", axis );
+	this.set( "base", base );
+	this.set( "height", height );
+	this.set( "radius", radius );
 
-	this.as_nurbs_surface = function() {
+	this.nurbsRep = function(){
 
+		return this.nurbs_engine.eval_sync( 'get_cone_surface', [ this.get("center"), 
+																 this.get("xaxis"), 
+																 this.get("yaxis"), 
+																 this.get("radius"), 
+																 0, 
+																 2 * Math.PI );
 
+	};
 
-    // construct nurbs surface
-  };
+	var surface_props = this.nurbsRep();
 
-};
+	VERB.geom.NurbsSurface.call(this, surface_props.degree, surface_props.control_points, surface_props.weight, surface_props.knots );
+
+}.inherits(VERB.geom.NurbsSurface);

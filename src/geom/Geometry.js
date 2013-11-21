@@ -1,10 +1,10 @@
-VERB.geom.ActiveGeometry = function(propertyNameValuePairs) { 
+VERB.geom.Geometry = function() { 
 
-	VERB.geom.WatchableObject.call(this, propertyNameValuePairs);
+	VERB.geom.WatchableObject.call(this);
 
 	var id = VERB.core.uid();
 	this.GetUniqueId = function() {
 		return id;
 	};
 
-}.inherits(VERB.core.WatchableObject);
+}.inherits(VERB.core.WatchObject);

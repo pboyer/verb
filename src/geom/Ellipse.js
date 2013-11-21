@@ -11,4 +11,8 @@ VERB.geom.Ellipse = function(center, xaxis, yaxis, minorradius, majorradius) {
 	this.minorradius = minorradius;
 	this.majorradius = majorradius;
 
+	// not done....
+
+	// very similar to arc, just rotate first then use minor and major radius rather than radius
+
 };

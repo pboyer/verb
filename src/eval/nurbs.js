@@ -1,4 +1,52 @@
 /**
+ * Generate the control points, weights, and knots of a cylinder
+ *
+ * @param {Array} normalized axis of cone
+ * @param {Array} position of base of cone
+ * @param {Number} height from base to tip
+ * @param {Number} radius at the base of the cone
+ * @return {Object} an object with the following properties: control_points, weights, knots, degree
+ * @api public
+ */
+
+VERB.eval.nurbs.get_cylinder_surface = function( axis, base, height, radius ){
+
+	var perp_axis_orig = crossprod(axis, [Math.random(), Math.random(), Math.random() ])
+		, xaxis = numeric.mul( 1 / numeric.norm2( perp_axis_orig ), perp_axis_orig )
+		, yaxis = crossprod( axis, xaxis )
+		, angle = 2 * Math.PI
+		, circ = VERB.eval.nurbs.get_arc( base, xaxis, yaxis, radius, 0, 2 * Math.PI );
+
+	return VERB.eval.nurbs.get_extruded_surface( axis, height, circ.knots, circ.degree, circ.control_points, circ.weights );
+
+}
+
+/**
+ * Generate the control points, weights, and knots of a cone
+ *
+ * @param {Array} normalized axis of cone
+ * @param {Array} position of base of cone
+ * @param {Number} height from base to tip
+ * @param {Number} radius at the base of the cone
+ * @return {Object} an object with the following properties: control_points, weights, knots, degree
+ * @api public
+ */
+
+VERB.eval.nurbs.get_cone_surface = function( axis, base, height, radius ){
+
+	var perp_axis_orig = crossprod(axis, [Math.random(), Math.random(), Math.random() ])
+		, perp_axis = numeric.mul( 1 / numeric.norm2( perp_axis_orig ), perp_axis_orig )
+		, angle = 2 * Math.PI
+		, prof_degree = 1
+		, prof_ctrl_pts = [ numeric.add( base, numeric.mul( height, axis ) ), numeric.add( base, numeric.mul( radius, perp_axis ) )]
+		, prof_knots = [0,0,1,1]
+		, prof_weights = [1,1];
+
+	return VERB.eval.nurbs.get_revolved_surface(base, axis, angle, prof_knots, prof_degree, prof_ctrl_pts, prof_weights);
+
+}
+
+/**
  * Generate the control points, weights, and knots of an extruded surface
  *
  * @param {Array} axis of the extrusion

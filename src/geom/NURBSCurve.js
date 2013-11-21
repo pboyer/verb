@@ -53,10 +53,12 @@ VERB.geom.NurbsCurve = function( degree, control_points, weights, knots ) {
 		this.nurbs_engine.eval( 'rational_curve_derivs', [ _degree, _knot_vector, _homo_control_points, u, num_derivs  ], callback ); 
 	};
 
-	this.points = function( num_samples, callback ) {
-		// TODO: here we would use the worker to generate all of the points
-		// wait for callback
+	this.tesselate = function(){
+		
 	};
 
-}.inherits(VERB.geom.Curve);
+	this.tesselate_sync = function(){
 
+	};
+
+}.inherits( VERB.geom.Geometry );
