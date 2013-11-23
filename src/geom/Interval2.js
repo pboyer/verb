@@ -1,6 +1,8 @@
-VERB.geom.Inverval2 = function(minu, maxu, minv, maxv) {
+verb.geom.Inverval2 = function(minu, maxu, minv, maxv) {
 
-	this.set("uinterval", new VERB.geom.Interval(minu, maxu));
-	this.set("vinterval", new VERB.geom.Interval(minv, maxv));
+	this.setAll({ 
+		"uinterval": new verb.geom.Interval(minu, maxu),
+		"vinterval": new verb.geom.Interval(minv, maxv)
+	});
 
-}.inherits(VERB.core.WatchObject);
+}.inherits(verb.core.WatchObject);

@@ -1,4 +1,4 @@
-VERB.geom.Polyline = function(points) {
+verb.geom.Polyline = function(points) {
 
 	if (points){
 		this.points = points;
@@ -6,8 +6,4 @@ VERB.geom.Polyline = function(points) {
 		this.points = [];
 	}
 
-	this.as_nurbs_curve = function(){
-		// build from points
-	}
-
-}
+}.inherits(verb.geom.NurbsCurve);

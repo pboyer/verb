@@ -6,7 +6,7 @@
  * @api public
  */	
 
-VERB.geom.BoundingBox = function() {
+verb.geom.BoundingBox = function() {
 	this.initialized = false;
 	this.min = [0,0,0];
 	this.max = [0,0,0];
@@ -24,7 +24,7 @@ VERB.geom.BoundingBox = function() {
  * @api public
  */
 
-VERB.geom.BoundingBox.prototype.add_elements = function( point_array, callback ) 
+verb.geom.BoundingBox.prototype.add_elements = function( point_array, callback ) 
 {
 
 	var that = this; 
@@ -45,7 +45,7 @@ VERB.geom.BoundingBox.prototype.add_elements = function( point_array, callback )
  * @api public
  */
 
-VERB.geom.BoundingBox.prototype.add_elements_sync = function( point_array ) 
+verb.geom.BoundingBox.prototype.add_elements_sync = function( point_array ) 
 {
 	var that = this; 
 	_.each( point_array, function(elem) {
@@ -63,7 +63,7 @@ VERB.geom.BoundingBox.prototype.add_elements_sync = function( point_array )
  * @api public
  */
 
-VERB.geom.BoundingBox.prototype.add = function( point ) 
+verb.geom.BoundingBox.prototype.add = function( point ) 
 {
 	if ( !this.initialized )
 	{
@@ -118,14 +118,14 @@ VERB.geom.BoundingBox.prototype.add = function( point )
  * @api public
  */
 
-VERB.geom.BoundingBox.prototype.contains = function(point) {
+verb.geom.BoundingBox.prototype.contains = function(point) {
 
 	if ( !this.initialized )
 	{
 		return false;
 	}
 
-	return this.intersects( new VERB.geom.BoundingBox(point) );
+	return this.intersects( new verb.geom.BoundingBox(point) );
 
 }
 
@@ -135,7 +135,7 @@ VERB.geom.BoundingBox.prototype.contains = function(point) {
  * @api public
  */
 
-VERB.geom.BoundingBox.prototype.TOLERANCE = 1e-4;
+verb.geom.BoundingBox.prototype.TOLERANCE = 1e-4;
 
 /**
  * Determines if two intervals on the real number line intersect
@@ -148,9 +148,9 @@ VERB.geom.BoundingBox.prototype.TOLERANCE = 1e-4;
  * @api public
  */
 
-VERB.geom.BoundingBox.prototype.intervals_overlap = function( a1, a2, b1, b2 ) {
+verb.geom.BoundingBox.prototype.intervals_overlap = function( a1, a2, b1, b2 ) {
 
-	var tol = VERB.geom.BoundingBox.prototype.TOLERANCE
+	var tol = verb.geom.BoundingBox.prototype.TOLERANCE
 		, x1 = Math.min(a1, a2) - tol
 		, x2 = Math.max(a1, a2) + tol
 		, y1 = Math.min(b1, b2) - tol
@@ -175,7 +175,7 @@ VERB.geom.BoundingBox.prototype.intervals_overlap = function( a1, a2, b1, b2 ) {
  * @api public
  */
 
-VERB.geom.BoundingBox.prototype.intersects = function( bb ) {
+verb.geom.BoundingBox.prototype.intersects = function( bb ) {
 
 	if ( !this.initialized || !bb.initialized )
 	{
@@ -206,7 +206,7 @@ VERB.geom.BoundingBox.prototype.intersects = function( bb ) {
  * @api public
  */
 
-VERB.geom.BoundingBox.prototype.clear = function( bb ) {
+verb.geom.BoundingBox.prototype.clear = function( bb ) {
 
 	this.initialized = false;
 	return this;
@@ -220,7 +220,7 @@ VERB.geom.BoundingBox.prototype.clear = function( bb ) {
  * @api public
  */
 
-VERB.geom.BoundingBox.prototype.get_longest_axis = function( bb ) {
+verb.geom.BoundingBox.prototype.get_longest_axis = function( bb ) {
 
 	var axis_lengths = [ 	this.get_axis_length(0), 
 							this.get_axis_length(1), 
@@ -238,7 +238,7 @@ VERB.geom.BoundingBox.prototype.get_longest_axis = function( bb ) {
  * @api public
  */
 
-VERB.geom.BoundingBox.prototype.get_axis_length = function( i ) {
+verb.geom.BoundingBox.prototype.get_axis_length = function( i ) {
 
 	if (i < 0 || i > 2) return 0;
 
@@ -255,7 +255,7 @@ VERB.geom.BoundingBox.prototype.get_axis_length = function( i ) {
  * @api public
  */
 
-VERB.geom.BoundingBox.prototype.intersect = function( bb ) {
+verb.geom.BoundingBox.prototype.intersect = function( bb ) {
 
 	if ( !this.initialized )
 	{
@@ -279,7 +279,7 @@ VERB.geom.BoundingBox.prototype.intersect = function( bb ) {
 		, max_bb = [ xmax, ymax, zmax]
 		, min_bb = [ xmin, ymin, zmin];
 
-	return new VERB.geom.BoundingBox(min_bb, max_bb);
+	return new verb.geom.BoundingBox(min_bb, max_bb);
 
 }
 

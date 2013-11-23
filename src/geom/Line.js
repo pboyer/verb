@@ -1,17 +1,25 @@
-VERB.geom.Line = function(start, end) {
+verb.geom.Line = function(start, end) {
 
-	this.start = start;
-	this.end = end;
+	this.setAll({ 
+		"start": start,
+		"end": end
+	});
 
-	this.nurbsRep = function(){
+	var curve_props = this.nurbsRep();
 
-		return this.nurbs_engine.eval_sync( 'get_arc', [ this.get("center"), 
-														 this.get("xaxis"), 
-														 this.get("yaxis"), 
-														 this.get("radius"), 
-														 this.get("interval").get("start"), 
-														 this.get("center").get("end")] );
+	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weight, curve_props.knots );
 
+}.inherits(verb.geom.NurbsCurve);
+
+verb.geom.Line.prototype.nurbsRep = function(){
+
+	return {
+			knots: [0,0,1,1], 
+			control_points: [ this.get("start"), this.get("end") ],
+			weights: [1,1],
+			degree: 1
 	};
 
 };
+
+

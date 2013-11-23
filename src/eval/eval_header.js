@@ -7,10 +7,12 @@ else // node.js context
 	var labor = require('labor');
 }
 
-var VERB = VERB || {};
-VERB.eval = VERB.eval || {};
-VERB.eval.nurbs = VERB.eval.nurbs || {};
-VERB.eval.mesh = VERB.eval.mesh || {};
-VERB.EPSILON = 1e-8;
+var verb = verb || {};
+verb.eval = verb.eval || {};
+verb.eval.nurbs = verb.eval.nurbs || {};
+verb.eval.mesh = verb.eval.mesh || {};
+verb.geom = verb.geom || {};
+verb.EPSILON = 1e-8;
+verb.TOLERANCE = 1e-3;
 
-var router = new labor.Router(VERB.eval.nurbs);
+var router = new labor.Router(verb.eval.nurbs);

@@ -9,7 +9,14 @@ module.exports = function(grunt) {
     concat: {
       build: {
         files: {
-          'build/<%= pkg.name %>.js': ['src/VERB.js', 'src/core/*.js', 'src/geom/*.js', 'src/eval/nurbs.js' ],
+          'build/<%= pkg.name %>.js': [ 'src/verb.js', 
+                                        'src/core/*.js', 
+                                        'src/geom/base/Geometry.js', 
+                                        'src/geom/base/NurbsGeometry.js', 
+                                        'src/geom/base/NurbsCurve.js', 
+                                        'src/geom/base/NurbsSurface.js', 
+                                        'src/geom/*.js', 
+                                        'src/eval/nurbs.js' ],
           'build/<%= pkg.name %>_nurbs_eval.js': ['src/eval/eval_header.js', 'src/eval/nurbs.js']
         }
       }

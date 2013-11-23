@@ -3,13 +3,13 @@ verb.geom.NurbsCurve = function( degree, controlPoints, weights, knots ) {
 	this.setAll({
 		"controlPoints": controlPoints,
 		"weights": weights,
-		"knots": knots.slice(0),
+		"knots": knots ? knots.slice(0) : [],
 		"degree": degree
 	});
 
-	verb.geom.Geometry.call(this);
+	verb.geom.NurbsGeometry.call(this);
 
-}.inherits( verb.geom.Geometry );
+}.inherits( verb.geom.NurbsGeometry );
 
 
 verb.geom.NurbsCurve.prototype.homogenize = function(){

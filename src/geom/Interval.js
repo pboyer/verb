@@ -1,6 +1,8 @@
-VERB.geom.Inverval = function(min, max) {
+verb.geom.Interval = function(min, max) {
 
-	this.set( "min", min );
-	this.set( "max", max );
+	this.setAll({ 
+		"min": min,
+		"max": max 
+	});
 
-}.inherits(VERB.core.WatchObject);
+}.inherits(verb.core.WatchObject);

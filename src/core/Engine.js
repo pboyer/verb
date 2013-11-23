@@ -2,14 +2,14 @@
 // it also acknowledges whether there are web workers available 
 // in the broswer, if not, it defaults to blocking evaluation
 // also handles situations where the server is unavailable
-VERB.core.Engine = function(options) {
+verb.core.Engine = function(options) {
 
 	// private properties
 	var _use_pool = ( typeof Worker === 'function' ) && ( options.use_pool || options.use_pool === undefined );
 	var _num_threads = options.num_workers || 2;
 	var _tolerance = options.tolerance || 1e-4;
 	var _url = options.url || 'verb_nurbs_eval.js';
-	var _lib = options.library || VERB.eval.nurbs;
+	var _lib = options.library || verb.eval.nurbs;
 	var _error_handler = options.error_handler || ( function( message ) { console.warn( message ); } );
 	var _pool = undefined;
 
@@ -43,12 +43,12 @@ VERB.core.Engine = function(options) {
 			_pool.addWork( func, arguments_array, callback );
 		}	else {
 			var that = this;
-			_.defer( function() { callback( that.eval_sync(func, arguments_array ) ) } );
+			setTimeout( function() { callback( that.eval_sync(func, arguments_array ) ) }, 0);
 		}
 	}
 
 	this.eval_sync = function(func, arguments_array) {
-		return _library[func].apply(null, arguments_array);
+		return _lib[func].apply(null, arguments_array);
 	}
 
 	this.set_tolerance = function(tolerance) {

@@ -1,6 +1,6 @@
 if ( typeof exports != 'object' || exports === undefined )  // browser context
 {
-	var VERB = {}
+	var verb = {}
 		, numeric = window.numeric
 		, binomial = window.binomial
 		, labor = window.labor
@@ -8,26 +8,26 @@ if ( typeof exports != 'object' || exports === undefined )  // browser context
 }
 else // node.js context
 {
-	var VERB = module.exports = {}
+	var verb = module.exports = {}
 		, numeric = require('numeric')
 		, binomial = require('binomial')
 		, labor = require('labor')
 		, _ = require('underscore');
 }
 
-VERB.geom = {};
-VERB.core = {};
-VERB.eval = {};
+verb.geom = {};
+verb.core = {};
+verb.eval = {};
 
-VERB.eval.nurbs = VERB.eval.nurbs || {};
-VERB.eval.geom = VERB.eval.geom || {};
-VERB.eval.mesh = VERB.eval.mesh || {};
+verb.eval.nurbs = verb.eval.nurbs || {};
+verb.eval.geom = verb.eval.geom || {};
+verb.eval.mesh = verb.eval.mesh || {};
 
-VERB.EPSILON = 1e-8;
+verb.EPSILON = 1e-8;
 
-VERB.init = function() {
-	VERB.nurbs_engine = new VERB.core.Engine( VERB.eval.nurbs );
-	VERB.geom.NURBSGeometry.prototype.nurbs_engine = VERB.nurbs_engine;
+verb.init = function() {
+	verb.nurbsEngine = new verb.core.Engine( verb.eval.nurbs );
+	verb.geom.NurbsGeometry.prototype.nurbsEngine = verb.nurbsEngine;
 }
 
 if (typeof Object.create !== 'function') {

@@ -1,41 +1,30 @@
-VERB.geom.Ellipse = function(center, xaxis, yaxis, minorradius, majorradius) {
+verb.geom.Ellipse = function(center, xaxis, yaxis, xradius, yradius) {
 
-	VERB.geom.Geometry.call(this);
-
-	// other constructors
-	// 3 pts
-
-	this.center = center;
-	this.xaxis = xaxis;
-	this.yaxis = yaxis;
-	this.minorradius = minorradius;
-	this.majorradius = majorradius;
-
-
-	this.set( "center", center );
-	this.set( "xaxis", xaxis );
-	this.set( "yaxis", yaxis );
-	this.set( "radius", radius );
-
-	this.nurbsRep = function(){
-
-		return this.nurbs_engine.eval_sync( 'get_arc', [ this.get("center"), 
-														 this.get("xaxis"), 
-														 this.get("yaxis"), 
-														 this.get("radius"), 
-														 0, 
-														 2 * Math.PI );
-
-	};
+	this.setAll({
+		"center": center,
+		"xaxis": xaxis,
+		"yaxis": yaxis,
+		"xradius": xradius,
+		"yradius": yradius
+	});
 
 	var curve_props = this.nurbsRep();
 
-	VERB.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weight, curve_props.knots );
+	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weight, curve_props.knots );
 
+}.inherits(verb.geom.NurbsCurve);
 
-	// not done....
+verb.geom.Ellipse.prototype.nurbsRep = function(){
 
 	// very similar to arc, just rotate first then use minor and major radius rather than radius
+
+	return this.nurbsEngine.eval_sync( 'get_ellipse_arc', [ this.get("center"), 
+															 this.get("xaxis"), 
+															 this.get("yaxis"), 
+															 this.get("xradius"), 
+															 this.get("yradius"), 
+															 0, 
+															 2 * Math.PI ]);
 
 };
 

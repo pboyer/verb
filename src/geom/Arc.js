@@ -1,28 +1,30 @@
-VERB.geom.Arc = function(center, xaxis, yaxis, radius, interval) {
+verb.geom.Arc = function(center, xaxis, yaxis, radius, interval) {
 
-	this.set( "center", center );
-	this.set( "xaxis", xaxis );
-	this.set( "yaxis", yaxis );
-	this.set( "radius", radius );
-	this.set( "interval", interval );
-
-	this.nurbsRep = function(){
-
-		return this.nurbs_engine.eval_sync( 'get_arc', [ this.get("center"), 
-														 this.get("xaxis"), 
-														 this.get("yaxis"), 
-														 this.get("radius"), 
-														 this.get("interval").get("start"), 
-														 this.get("center").get("end")] );
-
-	};
+	this.setAll( {
+		"center": center,
+		"xaxis": xaxis,
+		"yaxis": yaxis,
+		"radius": radius,
+		"interval": interval 
+	});
 
 	var curve_props = this.nurbsRep();
 
-	VERB.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weight, curve_props.knots );
+	console.log( this.get('center') )
 
+	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weight, curve_props.knots );
 
-	// TODO: override closest point
+	this.watchAll( ['center', 'xaxis', 'yaxis', 'radius', 'interval'], this.update );
 
+}.inherits(verb.geom.NurbsCurve);
 
-}.inherits(VERB.geom.NurbsCurve);
+verb.geom.Arc.prototype.nurbsRep = function(){
+
+	return this.nurbsEngine.eval_sync( 'get_arc', [ this.get("center"), 
+													 this.get("xaxis"), 
+													 this.get("yaxis"), 
+													 this.get("radius"), 
+													 this.get("interval").get("min"), 
+													 this.get("interval").get("max")] );
+
+};

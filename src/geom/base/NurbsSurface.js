@@ -1,16 +1,17 @@
-verb.geom.NurbsSurface = function( degreeU, knotsU, degreeV, knotsV, control_points, weights ) {
+verb.geom.NurbsSurface = function( degreeU, knotsU, degreeV, knotsV, controlPoints, weights ) {
 
 	this.setAll({
 		"controlPoints": controlPoints,
 		"weights": weights,
-		"knotsU": knotsU.slice(0),
-		"knotsV": knotsV.slice(0),
-		"degree": degree
+		"knotsU": knotsU ? knotsU.slice(0) : [],
+		"knotsV": knotsV ? knotsV.slice(0) : [],
+		"degreeU": degreeU,
+		"degreeV": degreeV
 	});
 
-	verb.geom.Geometry.call(this);
+	verb.geom.NurbsGeometry.call(this);
 
-}.inherits( verb.geom.Geometry );
+}.inherits( verb.geom.NurbsGeometry );
 
 
 verb.geom.NurbsSurface.prototype.homogenize = function(){

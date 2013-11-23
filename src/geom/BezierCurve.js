@@ -1,4 +1,4 @@
-VERB.geom.BezierCurve = function( degree, control_points, weights) {
+verb.geom.BezierCurve = function( degree, control_points, weights) {
 
 	// a bezier can be represented exactly as a rational b-spline curve
 	// the form of the knot vector is [0,0,..,1,1] - the number of 0s is the degree + 1
@@ -20,7 +20,7 @@ VERB.geom.BezierCurve = function( degree, control_points, weights) {
 		}
 	}
 
-	VERB.geom.NurbsCurve.call(this, degree, control_points, weight, knots );
+	verb.geom.NurbsCurve.call(this, degree, control_points, weight, knots );
 
-}.inherits( VERB.geom.NurbsCurve ); 
+}.inherits( verb.geom.NurbsCurve ); 
 

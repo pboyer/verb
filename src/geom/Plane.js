@@ -1,6 +1,6 @@
-VERB.geom.Plane = function( axis, origin ) {
+verb.geom.Plane = function( axis, origin ) {
 
-	VERB.geom.Surface.call(this);
+	verb.geom.Surface.call(this);
 
 	this.axis = axis;
 	this.origin = origin;

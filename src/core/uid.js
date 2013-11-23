@@ -5,7 +5,7 @@
  * @api public
  */
 
-VERB.core.uid = (function(){
+verb.core.uid = (function(){
 	var id = 0;
 	return function() {
 		return id++;
