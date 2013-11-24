@@ -13,6 +13,8 @@ verb.geom.EllipseArc = function(center, xaxis, yaxis, xradius, yradius, interval
 
 	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weight, curve_props.knots );
 
+	this.watchAll( ['center', 'xaxis', 'yaxis', 'xradius', 'yradius', 'interval'], this.update );
+
 }.inherits(verb.geom.NurbsCurve);
 
 verb.geom.EllipseArc.prototype.nurbsRep = function(){

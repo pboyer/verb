@@ -11,6 +11,8 @@ verb.geom.Circle = function(center, xaxis, yaxis, radius) {
 
 	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weight, curve_props.knots );
 
+	this.watchAll( ['center', 'xaxis', 'yaxis', 'radius'], this.update );
+
 }.inherits(verb.geom.NurbsCurve);
 
 verb.geom.Circle.prototype.nurbsRep = function(){

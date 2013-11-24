@@ -9,6 +9,8 @@ verb.geom.Line = function(start, end) {
 
 	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weight, curve_props.knots );
 
+	this.watchAll(['start', 'end'], this.update );
+
 }.inherits(verb.geom.NurbsCurve);
 
 verb.geom.Line.prototype.nurbsRep = function(){

@@ -12,6 +12,8 @@ verb.geom.Ellipse = function(center, xaxis, yaxis, xradius, yradius) {
 
 	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weight, curve_props.knots );
 
+	this.watchAll( ['center', 'xaxis', 'yaxis', 'xradius', 'yradius'], this.update );
+
 }.inherits(verb.geom.NurbsCurve);
 
 verb.geom.Ellipse.prototype.nurbsRep = function(){
@@ -28,7 +30,7 @@ verb.geom.Ellipse.prototype.nurbsRep = function(){
 
 };
 
-// todo do polyline, plane, 4 point surface, revsurface, sphere, think about sweep
+// todo do polyline, plane, revsurface, sphere, think about sweep
 // make sure it all builds again, may need to reorder the build process
 
 // implement ellipse
