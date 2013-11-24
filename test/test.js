@@ -155,7 +155,6 @@ describe("verb.eval.nurbs.curve_point",function(){
 		should.equal( p2[0], 50 );
 		should.equal( p2[1], 50 );
 
-		
 
 	});
 
@@ -263,8 +262,6 @@ describe("verb.eval.nurbs.surface_point",function(){
 		should.equal( p[1], -30 );
 		should.equal( p[2], 0 );
 
-		
-
 	});
 
 	it('returns correct result for another simple surface', function(){
@@ -281,8 +278,6 @@ describe("verb.eval.nurbs.surface_point",function(){
 		should.equal( p[0], 0 );
 		should.equal( p[1], 0 );
 		should.equal( p[2], 50 );
-
-		
 
 	});
 
@@ -1147,6 +1142,7 @@ describe("BoundingBox.contains",function(){
 		should.equal( bb1.initialized, false );
 
 	});
+});
 
 describe("BoundingBox.get_axis_length",function(){
 
@@ -1762,9 +1758,9 @@ describe("verb.init",function(){
 
 });
 
-describe("Arc",function(){
+describe("Arc.constructor",function(){
 
-	it('can be created by its constructor and has correct properties', function(){
+	it('has correct properties', function(){
 
 		verb.init();
 		var arc = new verb.geom.Arc([0,0,0], [1,0,0], [0,1,0], 5, new verb.geom.Interval(0, Math.PI/ 2) );
@@ -1780,7 +1776,12 @@ describe("Arc",function(){
 
 	});
 
-	it('pointSync(0), pointSync(0.5), pointSync(1) create the expected result', function(){
+});
+
+
+describe("Arc.pointSync",function(){
+
+	it('returns expected results', function(){
 
 		verb.init();
 
@@ -1805,7 +1806,11 @@ describe("Arc",function(){
 		p3[2].should.be.approximately( 1, 0.001 );
 	});
 
-	it('point(0.5) creates the expected result', function(done){
+});
+
+describe("Arc.point",function(){
+
+	it('creates the expected result', function(done){
 
 		verb.init();
 		
@@ -1823,9 +1828,6 @@ describe("Arc",function(){
 
 	});
 
-
 });
 
-// get_tri_norm
-// aabb methods
-// knot insertion
+// TODO: knot insertion tests
