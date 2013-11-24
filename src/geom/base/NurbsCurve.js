@@ -37,25 +37,25 @@ verb.geom.NurbsCurve.prototype.update = function(){
 
 verb.geom.NurbsCurve.prototype.pointSync = function( u ) {
 
-	return this.nurbsEngine.eval_sync( 'rational_curve_point', [ this.get('degree'), this.get('knots'), this.get('homoControlPoints'), u ] );
+	return this.nurbsEngine.eval_sync( 'rational_curve_point', [ this.get('degree'), this.get('knots'), this.homogenize(), u ] );
 
 };
 
 verb.geom.NurbsCurve.prototype.point = function( u, callback ) {
 
-	this.nurbsEngine.eval( 'rational_curve_point', [ this.get('degree'), this.get('knots'), this.get('homoControlPoints'),  u ], callback ); 
+	this.nurbsEngine.eval( 'rational_curve_point', [ this.get('degree'), this.get('knots'), this.homogenize(),  u ], callback ); 
 
 };
 
 verb.geom.NurbsCurve.prototype.derivatives = function( u, num_derivs, callback ) {
 
-	this.nurbsEngine.eval( 'rational_curve_derivs', [ this.get('degree'), this.get('knots'), this.get('homoControlPoints'),  u, num_derivs  ], callback ); 
+	this.nurbsEngine.eval( 'rational_curve_derivs', [ this.get('degree'), this.get('knots'), this.homogenize(),  u, num_derivs  ], callback ); 
 
 };
 
 verb.geom.NurbsCurve.prototype.derivativesSync = function( u, num_derivs ) {
 
-	return this.nurbsEngine.eval_sync( 'rational_curve_derivs', [ this.get('degree'), this.get('knots'), this.get('homoControlPoints'),  u, num_derivs] );
+	return this.nurbsEngine.eval_sync( 'rational_curve_derivs', [ this.get('degree'), this.get('knots'), this.homogenize(),  u, num_derivs] );
 
 };
 
@@ -65,7 +65,7 @@ verb.geom.NurbsCurve.prototype.tesselate = function(tol){
 		tol = verb.TOLERANCE;
 	}
 
-	this.nurbsEngine.eval( 'rational_curve_adaptive_sample', [ this.get('degree'), this.get('knots'), this.get('homoControlPoints'), tol ], callback ); 
+	this.nurbsEngine.eval( 'rational_curve_adaptive_sample', [ this.get('degree'), this.get('knots'), this.homogenize(), tol ], callback ); 
 
 };
 
@@ -75,7 +75,7 @@ verb.geom.NurbsCurve.prototype.tesselateSync = function(){
 		tol = verb.TOLERANCE;
 	}
 
-	return this.nurbsEngine.eval_sync( 'rational_curve_adaptive_sample', [ this.get('degree'), this.get('knots'), this.get('homoControlPoints'), tol ] ); 
+	return this.nurbsEngine.eval_sync( 'rational_curve_adaptive_sample', [ this.get('degree'), this.get('knots'), this.homogenize(), tol ] ); 
 
 };
 

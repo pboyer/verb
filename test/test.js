@@ -1501,15 +1501,46 @@ describe("verb.init",function(){
 
 describe("Arc",function(){
 
-	it('can be created by its constructor', function(){
+	it('can be created by its constructor and has correct properties', function(){
 
 		verb.init();
-		var arc = new verb.geom.Arc([0,0,0], [1,0,0], [0,1,0], 5, new verb.geom.Interval(0, 0.5) );
+		var arc = new verb.geom.Arc([0,0,0], [1,0,0], [0,1,0], 5, new verb.geom.Interval(0, Math.PI/ 2) );
 
-		should.equal( arc === undefined, false );
-		should.equal( 5, arc.get('radius') );
+		should.exist( arc );
+
+		arc.get("radius").should.be.equal(5);
+		arc.get("center").should.eql([0,0,0]);
+		arc.get("xaxis").should.eql([1,0,0]);
+		arc.get("yaxis").should.eql([0,1,0]);
+		arc.get("interval").get('min').should.be.equal(0);
+		arc.get("interval").get('max').should.be.equal(Math.PI/2);
 
 	});
+
+	it('pointSync(0), pointSync(0.5), pointSync(1) create the expected result', function(){
+
+		verb.init();
+		var arc = new verb.geom.Arc([0,0,1], [1,0,0], [0,1,0], 1, new verb.geom.Interval(0, Math.PI/ 2) );
+		var p1 = arc.pointSync(0);
+		var p2 = arc.pointSync(0.5);
+		var p3 = arc.pointSync(1);
+
+		p1.should.be.instanceof(Array).and.have.lengthOf(3);
+		p1[0].should.be.approximately( 1, 0.001 );
+		p1[1].should.be.approximately( 0, 0.001 );
+		p1[2].should.be.approximately( 1, 0.001 );
+		
+		p2.should.be.instanceof(Array).and.have.lengthOf(3);
+		p2[0].should.be.approximately( Math.sqrt(2)/2, 0.001 );
+		p2[1].should.be.approximately( Math.sqrt(2)/2, 0.001 );
+		p2[2].should.be.approximately( 1, 0.001 );
+
+		p3.should.be.instanceof(Array).and.have.lengthOf(3);
+		p3[0].should.be.approximately( 0, 0.001 );
+		p3[1].should.be.approximately( 1, 0.001 );
+		p3[2].should.be.approximately( 1, 0.001 );
+	});
+
 
 });
 

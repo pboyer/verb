@@ -280,12 +280,6 @@ verb.geom.NurbsGeometry = function() {
 }.inherits( verb.geom.Geometry );
 verb.geom.NurbsCurve = function( degree, controlPoints, weights, knots ) {
 
-	console.log( 'calling NurbsCurve' );
-
-	console.log( degree );
-
-	console.log( "radius", this.get('radius') );
-
 	this.setAll({
 		"controlPoints": controlPoints,
 		"weights": weights,
@@ -323,25 +317,25 @@ verb.geom.NurbsCurve.prototype.update = function(){
 
 verb.geom.NurbsCurve.prototype.pointSync = function( u ) {
 
-	return this.nurbsEngine.eval_sync( 'rational_curve_point', [ this.get('degree'), this.get('knots'), this.get('homoControlPoints'), u ] );
+	return this.nurbsEngine.eval_sync( 'rational_curve_point', [ this.get('degree'), this.get('knots'), this.homogenize(), u ] );
 
 };
 
 verb.geom.NurbsCurve.prototype.point = function( u, callback ) {
 
-	this.nurbsEngine.eval( 'rational_curve_point', [ this.get('degree'), this.get('knots'), this.get('homoControlPoints'),  u ], callback ); 
+	this.nurbsEngine.eval( 'rational_curve_point', [ this.get('degree'), this.get('knots'), this.homogenize(),  u ], callback ); 
 
 };
 
 verb.geom.NurbsCurve.prototype.derivatives = function( u, num_derivs, callback ) {
 
-	this.nurbsEngine.eval( 'rational_curve_derivs', [ this.get('degree'), this.get('knots'), this.get('homoControlPoints'),  u, num_derivs  ], callback ); 
+	this.nurbsEngine.eval( 'rational_curve_derivs', [ this.get('degree'), this.get('knots'), this.homogenize(),  u, num_derivs  ], callback ); 
 
 };
 
 verb.geom.NurbsCurve.prototype.derivativesSync = function( u, num_derivs ) {
 
-	return this.nurbsEngine.eval_sync( 'rational_curve_derivs', [ this.get('degree'), this.get('knots'), this.get('homoControlPoints'),  u, num_derivs] );
+	return this.nurbsEngine.eval_sync( 'rational_curve_derivs', [ this.get('degree'), this.get('knots'), this.homogenize(),  u, num_derivs] );
 
 };
 
@@ -351,7 +345,7 @@ verb.geom.NurbsCurve.prototype.tesselate = function(tol){
 		tol = verb.TOLERANCE;
 	}
 
-	this.nurbsEngine.eval( 'rational_curve_adaptive_sample', [ this.get('degree'), this.get('knots'), this.get('homoControlPoints'), tol ], callback ); 
+	this.nurbsEngine.eval( 'rational_curve_adaptive_sample', [ this.get('degree'), this.get('knots'), this.homogenize(), tol ], callback ); 
 
 };
 
@@ -361,7 +355,7 @@ verb.geom.NurbsCurve.prototype.tesselateSync = function(){
 		tol = verb.TOLERANCE;
 	}
 
-	return this.nurbsEngine.eval_sync( 'rational_curve_adaptive_sample', [ this.get('degree'), this.get('knots'), this.get('homoControlPoints'), tol ] ); 
+	return this.nurbsEngine.eval_sync( 'rational_curve_adaptive_sample', [ this.get('degree'), this.get('knots'), this.homogenize(), tol ] ); 
 
 };
 
@@ -459,9 +453,7 @@ verb.geom.Arc = function(center, xaxis, yaxis, radius, interval) {
 
 	var curve_props = this.nurbsRep();
 
-	console.log( this.get('center') )
-
-	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weight, curve_props.knots );
+	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weights, curve_props.knots );
 
 	this.watchAll( ['center', 'xaxis', 'yaxis', 'radius', 'interval'], this.update );
 
@@ -806,7 +798,6 @@ verb.geom.Circle = function(center, xaxis, yaxis, radius) {
 
 }.inherits(verb.geom.NurbsCurve);
 
-
 verb.geom.Circle.prototype.nurbsRep = function(){
 
 	return this.nurbsEngine.eval_sync( 'get_arc', [  this.get("center"), 
@@ -1032,14 +1023,6 @@ verb.geom.Line.prototype.nurbsRep = function(){
 
 
 
-verb.geom.LineCurve = function( line ) {
-
-	verb.geom.NurbsCurve.call(this);
-
-	var _line = line;
-
-
-}.inherits( verb.geom.NurbsCurve ); 
 // a 4x4 matrix that can transform a vector
 // a data structure representing a winged edge mesh  - inherits from Geometry
 // a quad or tri
@@ -1498,7 +1481,7 @@ verb.eval.nurbs.get_arc = function( center, xaxis, yaxis, radius, start_angle, e
 		}
 	}
 
-	j = 2 * narcs + 1;
+	var j = 2 * narcs + 1;
 
 	for (var i = 0; i < 3; i++){
 		U[i] = 0.0;

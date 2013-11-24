@@ -13,7 +13,6 @@ verb.geom.Circle = function(center, xaxis, yaxis, radius) {
 
 }.inherits(verb.geom.NurbsCurve);
 
-
 verb.geom.Circle.prototype.nurbsRep = function(){
 
 	return this.nurbsEngine.eval_sync( 'get_arc', [  this.get("center"), 

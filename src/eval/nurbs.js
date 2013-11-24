@@ -323,7 +323,7 @@ verb.eval.nurbs.get_arc = function( center, xaxis, yaxis, radius, start_angle, e
 		}
 	}
 
-	j = 2 * narcs + 1;
+	var j = 2 * narcs + 1;
 
 	for (var i = 0; i < 3; i++){
 		U[i] = 0.0;

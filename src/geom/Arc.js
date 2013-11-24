@@ -10,9 +10,7 @@ verb.geom.Arc = function(center, xaxis, yaxis, radius, interval) {
 
 	var curve_props = this.nurbsRep();
 
-	console.log( this.get('center') )
-
-	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weight, curve_props.knots );
+	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weights, curve_props.knots );
 
 	this.watchAll( ['center', 'xaxis', 'yaxis', 'radius', 'interval'], this.update );
 
