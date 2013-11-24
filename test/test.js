@@ -1170,29 +1170,6 @@ describe("verb.eval.nurbs.get_arc",function(){
 
 });
 
-// describe("verb.eval.nurbs.get_revolved",function(){
-
-// 	it('returns correct result for xaxis and 3d pt', function(){
-
-// 		var center = [0,0,0]
-// 			, x = [1,0,0]
-// 			, y = [0,1,0]
-// 			, r = 1
-// 			, start = 0
-// 			, end = Math.PI/2;
-
-// 		var arc_components = verb.eval.nurbs.get_arc(center, x, y, 1, start, end);
-
-// 		var p = verb.eval.nurbs.rational_curve_point( arc_components.degree, arc_components.knots, verb.eval.nurbs.homogenize_1d( arc_components.control_points, arc_components.weights), 0.5);
-
-// 		should.equal( Math.abs( p[0] - Math.sqrt(2)/2 ) < verb.EPSILON, true );
-// 		should.equal( Math.abs( p[1] - Math.sqrt(2)/2 ) < verb.EPSILON, true );
-// 		should.equal( p[2], 0 );
-
-// 	});
-
-// });
-
 describe("verb.eval.nurbs.get_revolved_surface",function(){
 
 	it('creates a 90 degree cone with the given line for a profile', function(){
@@ -1265,11 +1242,47 @@ describe("verb.eval.nurbs.get_revolved_surface",function(){
 
 	});
 
+
+	it('creates a 360 degree cone with the given line for a profile', function(){
+
+		var axis = [0,0,1]
+			, center = [0,0,0]
+			, angle = Math.PI * 2
+			, prof_degree = 1
+			, prof_ctrl_pts = [[0,0,1], [1,0,0]]
+			, prof_knots = [0,0,1,1]
+			, prof_weights = [1,1];
+
+		var comps = verb.eval.nurbs.get_revolved_surface(center, axis, angle, prof_knots, prof_degree, prof_ctrl_pts, prof_weights);
+
+		// the first row are the profile control pts
+		should.equal( 0, comps.control_points[0][0][0] );
+		should.equal( 0, comps.control_points[0][0][1] );
+		should.equal( 1, comps.control_points[0][0][2] );
+
+		should.equal( 1, comps.control_points[0][1][0] );
+		should.equal( 0, comps.control_points[0][1][1] );
+		should.equal( 0, comps.control_points[0][1][2] );
+
+		var p = verb.eval.nurbs.rational_surface_point( 2, 
+														comps.knot_vector_u, 
+														1, 
+														comps.knot_vector_v, 
+														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														0.5, 
+														0.5);
+
+		p[0].should.be.approximately(-0.5, verb.EPSILON );
+		p[1].should.be.approximately(0, verb.EPSILON );
+		p[2].should.be.approximately(0.5, verb.EPSILON );
+
+	});
+
 });
 
 describe("verb.eval.nurbs.get_extruded_surface",function(){
 
-	it('creates a plane on the diagonal from 1,0,0 to 0,1,0', function(){
+	it('can extrude a line into a plane', function(){
 
 		var axis = [0,0,1]
 			, length = 5
@@ -1347,25 +1360,18 @@ describe("verb.eval.nurbs.get_extruded_surface",function(){
 
 describe("verb.eval.nurbs.get_cylinder_surface",function(){
 
-	it('creates a plane on the diagonal from 1,0,0 to 0,1,0', function(){
+	it('can create a cylinder', function(){
 
 		var axis = [0,0,1]
-			, length = 5
-			, prof_degree = 1
-			, prof_ctrl_pts = [[0,1,0], [1,0,0]]
-			, prof_knots = [0,0,1,1]
-			, prof_weights = [1,1];
+			, xaxis = [1,0,0]
+			, base = [0,0,0]
+			, height = 5
+			, radius = 5;
 
-		var comps = verb.eval.nurbs.get_extruded_surface(axis, length, prof_knots, prof_degree, prof_ctrl_pts, prof_weights);
+		var comps = verb.eval.nurbs.get_cylinder_surface(axis, xaxis, base, height, radius);
 
-		// the first row are the profile control pts
-		should.equal( 0, comps.control_points[0][0][0] );
-		should.equal( 1, comps.control_points[0][0][1] );
-		should.equal( 0, comps.control_points[0][0][2] );
-
-		should.equal( 1, comps.control_points[0][1][0] );
-		should.equal( 0, comps.control_points[0][1][1] );
-		should.equal( 0, comps.control_points[0][1][2] );
+		comps.degree_u.should.equal(1);
+		comps.degree_v.should.equal(2);
 
 		// sample at the center
 		var p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
@@ -1376,9 +1382,45 @@ describe("verb.eval.nurbs.get_cylinder_surface",function(){
 														0.5, 
 														0.5);
 
-		p[0].should.be.approximately(0.5, verb.EPSILON);
-		should.equal( Math.abs( 0.5 - p[1]) < verb.EPSILON, true );
-		should.equal( Math.abs( 2.5 - p[2]) < verb.EPSILON, true );
+		p[0].should.be.approximately(-radius, verb.EPSILON);
+		p[1].should.be.approximately(0, verb.EPSILON);
+		p[2].should.be.approximately(radius/2, verb.EPSILON);
+
+		p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
+														comps.knot_vector_u, 
+														comps.degree_v,
+														comps.knot_vector_v, 
+														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														0, 
+														0);
+
+		p[0].should.be.approximately(radius, verb.EPSILON);
+		p[1].should.be.approximately(0, verb.EPSILON);
+		p[2].should.be.approximately(0, verb.EPSILON);
+
+		p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
+														comps.knot_vector_u, 
+														comps.degree_v,
+														comps.knot_vector_v, 
+														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														1, 
+														0);
+
+		p[0].should.be.approximately(radius, verb.EPSILON);
+		p[1].should.be.approximately(0, verb.EPSILON);
+		p[2].should.be.approximately(height, verb.EPSILON);
+
+		p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
+														comps.knot_vector_u, 
+														comps.degree_v,
+														comps.knot_vector_v, 
+														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														0, 
+														1);
+		
+		p[0].should.be.approximately(radius, verb.EPSILON);
+		p[1].should.be.approximately(0, verb.EPSILON);
+		p[2].should.be.approximately(0, verb.EPSILON);
 
 	});
 
@@ -1386,40 +1428,68 @@ describe("verb.eval.nurbs.get_cylinder_surface",function(){
 
 describe("verb.eval.nurbs.get_cone_surface",function(){
 
-	// it('creates a plane on the diagonal from 1,0,0 to 0,1,0', function(){
+	it('can create a cone', function(){
 
-	// 	var axis = [0,0,1]
-	// 		, length = 5
-	// 		, prof_degree = 1
-	// 		, prof_ctrl_pts = [[0,1,0], [1,0,0]]
-	// 		, prof_knots = [0,0,1,1]
-	// 		, prof_weights = [1,1];
+		var axis = [0,0,1]
+			, xaxis = [1,0,0]
+			, base = [0,0,0]
+			, height = 5
+			, radius = 10;
 
-	// 	var comps = verb.eval.nurbs.get_extruded_surface(axis, length, prof_knots, prof_degree, prof_ctrl_pts, prof_weights);
+		var comps = verb.eval.nurbs.get_cone_surface(axis, xaxis, base, height, radius);
 
-	// 	// the first row are the profile control pts
-	// 	should.equal( 0, comps.control_points[0][0][0] );
-	// 	should.equal( 1, comps.control_points[0][0][1] );
-	// 	should.equal( 0, comps.control_points[0][0][2] );
+		comps.degree_u.should.equal(2);
+		comps.degree_v.should.equal(1);
 
-	// 	should.equal( 1, comps.control_points[0][1][0] );
-	// 	should.equal( 0, comps.control_points[0][1][1] );
-	// 	should.equal( 0, comps.control_points[0][1][2] );
+		// sample at the center
+		var p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
+														comps.knot_vector_u, 
+														comps.degree_v,
+														comps.knot_vector_v, 
+														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														0.5, 
+														0.5);
 
-	// 	// sample at the center
-	// 	var p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
-	// 													comps.knot_vector_u, 
-	// 													comps.degree_v,
-	// 													comps.knot_vector_v, 
-	// 													verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
-	// 													0.5, 
-	// 													0.5);
+		p[0].should.be.approximately(-radius/2, verb.EPSILON);
+		p[1].should.be.approximately(0, verb.EPSILON);
+		p[2].should.be.approximately(height/2, verb.EPSILON);
 
-	// 	should.equal( Math.abs( 0.5- p[0]) < verb.EPSILON, true );
-	// 	should.equal( Math.abs( 0.5 - p[1]) < verb.EPSILON, true );
-	// 	should.equal( Math.abs( 2.5 - p[2]) < verb.EPSILON, true );
+		p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
+														comps.knot_vector_u, 
+														comps.degree_v,
+														comps.knot_vector_v, 
+														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														0, 
+														0);
 
-	// });
+		p[0].should.be.approximately(0, verb.EPSILON);
+		p[1].should.be.approximately(0, verb.EPSILON);
+		p[2].should.be.approximately(height, verb.EPSILON);
+
+		p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
+														comps.knot_vector_u, 
+														comps.degree_v,
+														comps.knot_vector_v, 
+														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														1, 
+														0);
+
+		p[0].should.be.approximately(0, verb.EPSILON);
+		p[1].should.be.approximately(0, verb.EPSILON);
+		p[2].should.be.approximately(height, verb.EPSILON);
+
+		p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
+														comps.knot_vector_u, 
+														comps.degree_v,
+														comps.knot_vector_v, 
+														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														0, 
+														1);
+		
+		p[0].should.be.approximately(radius, verb.EPSILON);
+		p[1].should.be.approximately(0, verb.EPSILON);
+		p[2].should.be.approximately(0, verb.EPSILON);
+	});
 
 });
 
@@ -1515,7 +1585,6 @@ describe("verb.eval.nurbs.get_4pt_surface",function(){
 	});
 
 });
-
 
 describe("WatchObject",function(){
 
