@@ -26,19 +26,18 @@ verb.eval.nurbs.get_4pt_surface = function( p1, p2, p3, p4 ){
 /**
  * Generate the control points, weights, and knots of a cylinder
  *
- * @param {Array} normalized axis of cone
- * @param {Array} position of base of cone
- * @param {Number} height from base to tip
- * @param {Number} radius at the base of the cone
+ * @param {Array} normalized axis of cylinder
+ * @param {Array} xaxis in plane of cylinder
+ * @param {Array} position of base of cylinder
+ * @param {Number} height from base to top
+ * @param {Number} radius of the cylinder
  * @return {Object} an object with the following properties: control_points, weights, knots_u, knots_v, degree_u, degree_v
  * @api public
  */
 
-verb.eval.nurbs.get_cylinder_surface = function( axis, base, height, radius ){
+verb.eval.nurbs.get_cylinder_surface = function( axis, xaxis, base, height, radius ){
 
-	var perp_axis_orig = crossprod(axis, [Math.random(), Math.random(), Math.random() ])
-		, xaxis = numeric.mul( 1 / numeric.norm2( perp_axis_orig ), perp_axis_orig )
-		, yaxis = crossprod( axis, xaxis )
+	var yaxis = crossprod( axis, xaxis )
 		, angle = 2 * Math.PI
 		, circ = verb.eval.nurbs.get_arc( base, xaxis, yaxis, radius, 0, 2 * Math.PI );
 
@@ -57,13 +56,11 @@ verb.eval.nurbs.get_cylinder_surface = function( axis, base, height, radius ){
  * @api public
  */
 
-verb.eval.nurbs.get_cone_surface = function( axis, base, height, radius ){
+verb.eval.nurbs.get_cone_surface = function( axis, xaxis, base, height, radius ){
 
-	var perp_axis_orig = crossprod(axis, [Math.random(), Math.random(), Math.random() ])
-		, perp_axis = numeric.mul( 1 / numeric.norm2( perp_axis_orig ), perp_axis_orig )
-		, angle = 2 * Math.PI
+	var angle = 2 * Math.PI
 		, prof_degree = 1
-		, prof_ctrl_pts = [ numeric.add( base, numeric.mul( height, axis ) ), numeric.add( base, numeric.mul( radius, perp_axis ) )]
+		, prof_ctrl_pts = [ numeric.add( base, numeric.mul( height, axis ) ), numeric.add( base, numeric.mul( radius, xaxis ) )]
 		, prof_knots = [0,0,1,1]
 		, prof_weights = [1,1];
 
@@ -148,12 +145,12 @@ verb.eval.nurbs.get_revolved_surface = function( center, axis, theta, prof_knots
 			knots_u = verb.eval.nurbs.zeros_1d( 6 + 2 * (narcs-1) );
 			knots_u[3]= knots_u[4] = 1/3;
 			knots_u[5]= knots_u[6] = 2/3;
-		} else { // between 270 and 260
+		} else { // between 270 and 360
 			narcs = 4;
 			knots_u = verb.eval.nurbs.zeros_1d( 6 + 2 * (narcs-1) );
-			knots_u[3]= knots_u[4] = 1/3;
-			knots_u[5]= knots_u[6] = 2/3;
-			knots_u[7]= knots_u[8] = 2/3;
+			knots_u[3]= knots_u[4] = 1/4;
+			knots_u[5]= knots_u[6] = 1/2;
+			knots_u[7]= knots_u[8] = 3/4;
 		}
 	}
 
@@ -196,6 +193,11 @@ verb.eval.nurbs.get_revolved_surface = function( center, axis, theta, prof_knots
 			, r = numeric.norm2(X)
 			// Y is perpendicular to X and axis, and complete the coordinate system
 			, Y = crossprod(axis,X); 
+
+		if ( r > verb.EPSILON ){
+			X = numeric.mul( 1 / r, X);
+			Y = numeric.mul( 1 / r, Y);
+		}
 
 		// the first row of control_points and weights is just the generatrix
 		control_points[0][j] = prof_control_points[j];

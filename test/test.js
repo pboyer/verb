@@ -2,10 +2,9 @@ var should = require('should')
 	, verb = require('../build/verb.js');
 
 
+describe("verb.eval.nurbs.knot_span_given_n",function(){
 
-describe("nurbs",function(){
-
-	it('knot_span_given_n', function(){
+	it('returns correct result', function(){
 
 		var n = 7
 			, degree = 2
@@ -22,7 +21,11 @@ describe("nurbs",function(){
 
 	});
 
-	it('knot_span', function(){
+});
+
+describe("verb.eval.nurbs.knot_span",function(){
+
+	it('returns correct result for degree 2 curve', function(){
 
 		var degree = 2
 			, knot_vector = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5];
@@ -37,7 +40,11 @@ describe("nurbs",function(){
 
 	});
 
-	it('basis_functions, basis_functions_given_knot_span_index', function(){
+});
+
+describe("verb.eval.nurbs.basis_functions, basis_functions_given_knot_span_index",function(){
+
+	it('return correct results', function(){
 
 		var degree = 2
 			, span = 4
@@ -57,7 +64,11 @@ describe("nurbs",function(){
 
 	});
 
-	it('deriv_basis_functions_given_n_i', function(){
+});
+
+describe("verb.eval.nurbs.deriv_basis_functions_given_n_i",function(){
+
+	it('returns correct results', function(){
 
 		// This needs to be tested better
 		var degree = 2
@@ -85,7 +96,11 @@ describe("nurbs",function(){
 
 	});
 
-	it('curve_point', function(){
+});
+
+describe("verb.eval.nurbs.curve_point",function(){
+
+	it('returns correct result for simple curve', function(){
 
 		var degree = 2
 			, n = 6
@@ -108,17 +123,21 @@ describe("nurbs",function(){
 		should.equal( p_end[1], 80 );
 
 	});
+});
 
-	it('are_valid_relations', function(){
+describe("verb.eval.nurbs.are_valid_relations",function(){
+
+	it('returns correct result for two cases', function(){
 
 		should.equal( false, verb.eval.nurbs.are_valid_relations( 0, 0, 0 ) );
 		should.equal( true, verb.eval.nurbs.are_valid_relations( 2, 2, 5 ) );
 
-		
-
 	});
+});
 
-	it('curve_point', function(){
+describe("verb.eval.nurbs.curve_point",function(){
+
+	it('returns correct result for simple curve', function(){
 
 		var degree = 3
 			, n = 4
@@ -140,7 +159,11 @@ describe("nurbs",function(){
 
 	});
 
-	it('curve_derivs_given_n', function(){
+});
+
+describe("verb.eval.nurbs.curve_derivs_given_n",function(){
+
+	it('returns correct result for simple curve', function(){
 
 		// This needs to be tested better
 		var degree = 3
@@ -156,13 +179,13 @@ describe("nurbs",function(){
 		should.equal( p[0][1], 0 );
 		should.equal( p[1][0] / p[1][1], 1 );
 
-		// add more derivatives here
-
-		
-
 	});
 
-	it('curve_derivs', function(){
+});
+
+describe("verb.eval.nurbs.curve_derivs",function(){
+
+	it('returns correct result for simple surface', function(){
 
 		// This needs to be tested better
 		var degree = 3
@@ -180,7 +203,11 @@ describe("nurbs",function(){
 	
 	});
 
-	it('surface_point_given_n_m', function(){
+});
+
+describe("verb.eval.nurbs.surface_point_given_n_m",function(){
+
+	it('returns correct result for simple surface', function(){
 
 		// This needs to be tested better
 		var degree_u = 3
@@ -206,11 +233,13 @@ describe("nurbs",function(){
 		should.equal( p[1], -30 );
 		should.equal( p[2], 0 );
 
-		
-
 	});
 
-	it('surface_point', function(){
+});
+
+describe("verb.eval.nurbs.surface_point",function(){
+
+	it('returns correct result for simple surface', function(){
 
 		// This needs to be tested better
 		var degree_u = 3
@@ -238,7 +267,7 @@ describe("nurbs",function(){
 
 	});
 
-	it('surface_point 2', function(){
+	it('returns correct result for another simple surface', function(){
 
 		var degree_u = 1
 			, degree_v = 3
@@ -257,7 +286,11 @@ describe("nurbs",function(){
 
 	});
 
-	it('surface_derivs_given_n_m', function(){
+});
+
+describe("verb.eval.nurbs.surface_derivs_given_n_m",function(){
+
+	it('returns correct derivatives for simple surface', function(){
 
 		var degree_u = 3
 			, degree_v = 3
@@ -294,11 +327,12 @@ describe("nurbs",function(){
 		should.equal( p[1][1][1] , 0 );
 		should.equal( p[1][1][2] , 0 );
 
-		
-
 	});
-	
-	it('surface_derivs', function(){
+});
+
+describe("verb.eval.nurbs.surface_derivs",function(){
+
+	it('returns correct derivatives for simple surface', function(){
 
 		var degree_u = 3
 			, degree_v = 3
@@ -335,13 +369,14 @@ describe("nurbs",function(){
 		should.equal( p[1][1][1] , 0 );
 		should.equal( p[1][1][2] , 0 );
 
-		
-
 	});
 
-	it('homogenize_1d', function(){
+});
 
-		// 2d
+describe("verb.eval.nurbs.homogenize_1d",function(){
+
+	it('returns correct results', function(){
+
 		var weights = [1, 2, 3, 4]
 			, control_points = [ [10, 0], [20, 10], [30, 20], [50, 50] ]
 			, homo_control_points = verb.eval.nurbs.homogenize_1d( control_points, weights);
@@ -353,7 +388,6 @@ describe("nurbs",function(){
 			should.equal( homo_control_points[i][2], weights[i] );
 		}
 
-		// 3d
 		weights = [1, 2, 3, 4];
 		control_points = [ [10, 0, 4], [20, 10, 3], [30, 20, 0], [50, 50, 10] ];
 		homo_control_points = verb.eval.nurbs.homogenize_1d( control_points, weights);
@@ -366,9 +400,11 @@ describe("nurbs",function(){
 			should.equal( homo_control_points[i][3], weights[i] );
 		}
 
-		
-
 	});
+
+});
+
+describe("verb.eval.nurbs.homogenize_2d",function(){
 
 	it('homogenize_2d', function(){
 
@@ -394,11 +430,13 @@ describe("nurbs",function(){
 			}
 		}
 
-		
-
 	});
 
-	it('dehomogenize', function(){
+});
+
+describe("verb.eval.nurbs.dehomogenize",function(){
+
+	it('returns correct result', function(){
 
 		var weights = [ 	[ 1, 	-2, 3, 	5 	],
 											[ 2, 	1, 	5, 	2 	],
@@ -424,11 +462,13 @@ describe("nurbs",function(){
 			}
 		}
 
-		
-
 	});
 
-	it('rational_curve_point', function(){
+});
+
+describe("verb.eval.nurbs.rational_curve_point",function(){
+
+	it('returns correct result for quarter circle', function(){
 
 		// this represents a single quarter arc, using a rational bezier curve
 		var degree = 2
@@ -451,11 +491,13 @@ describe("nurbs",function(){
 		should.equal( p[0], 0 );
 		should.equal( p[1], 1 );
 
-		
-
 	});
 
-	it('rational_surface_point', function(){
+});
+
+describe("verb.eval.nurbs.rational_curve_point",function(){
+
+	it('returns correct result for cylinder patch', function(){
 
 		// quarter cylinder patch
 		var degree_u = 1
@@ -484,8 +526,11 @@ describe("nurbs",function(){
 		should.equal( p[2], 1 );
 
 	});
+});
 
-	it('separate_homo_derivs_1d', function(){
+describe("verb.eval.nurbs.separate_homo_derivs_1d",function(){
+
+	it('returns expected results', function(){
 
 		var CK = [ [1, 1, 0, 1], [1, 1, 1, 1], [2, 0, 2, 2] ]
 			, ders = verb.eval.nurbs.separate_homo_derivs_1d( CK )
@@ -505,11 +550,13 @@ describe("nurbs",function(){
 
 		}
 
-		
-
 	});
 
-	it('separate_homo_derivs_2d', function(){
+});
+
+describe("verb.eval.nurbs.separate_homo_derivs_2d",function(){
+
+	it('returns expected results', function(){
 
 		var SKL = [ [ [1, 1, 0, 1], 	[1, 1, 1, 1], [2, 0, 2, 2] ],
 								[ [-1, 1, 0, 1], 	[-1, 1, 1, 1], [-2, 0, 2, 2] ] ]
@@ -532,12 +579,14 @@ describe("nurbs",function(){
 				should.equal( SKL[i][j][3], wders[i][j] );
 			}
 		}
-
-		
-
+	
 	});
 
-	it('rational_curve_derivs', function(){
+});
+
+describe("verb.eval.nurbs.rational_curve_derivs",function(){
+
+	it('returns expected results', function(){
 
 		// this represents a single quarter arc, using a rational bezier curve
 		var degree = 2
@@ -568,11 +617,13 @@ describe("nurbs",function(){
 		should.equal( p[2][0], 1 );
 		should.equal( p[2][1], -1 );
 
-		
-
 	});
 
-	it('rational_surface_derivs', function(){
+});
+
+describe("verb.eval.nurbs.rational_surface_derivs",function(){
+
+	it('returns expected results', function(){
 
 		// quarter cylinder patch, axis aligned with x axis, radius: 1
 		var degree_u = 1
@@ -612,8 +663,11 @@ describe("nurbs",function(){
 		should.equal( p[1][0][2], 0 );
 
 	});
+});
 
-	it('curve_knot_insert', function(){
+describe("verb.eval.nurbs.curve_knot_insert",function(){
+
+	it('returns expected results', function(){
 
 		// this represents a single quarter arc, using a rational bezier curve
 		var degree = 2
@@ -626,7 +680,11 @@ describe("nurbs",function(){
 
 	});
 
-	it('three_points_are_flat should identify flat line by returning true', function(){
+});
+
+describe("verb.eval.geom.three_points_are_flat",function(){
+
+	it('should identify flat line by returning true', function(){
 
 		// this represents a single quarter arc, using a rational bezier curve
 		var p1 = [0,0,0],
@@ -637,7 +695,11 @@ describe("nurbs",function(){
 
 	});
 
-	it('rational_curve_point can make a line', function(){
+});
+
+describe("verb.eval.nurbs.rational_curve_point",function(){
+
+	it('returns correct results for a line', function(){
 
 		var degree = 1
 			, knot_vector = [0, 0, 1, 1]
@@ -657,7 +719,11 @@ describe("nurbs",function(){
 
 	});
 
-	it('rational_curve_adaptive_sample returns two end points for a line', function(){
+});
+
+describe("verb.eval.nurbs.rational_curve_adaptive_sample",function(){
+
+	it('returns two end points for a line', function(){
 
 		var degree = 1
 			, knot_vector = [0, 0, 1, 1]
@@ -671,8 +737,11 @@ describe("nurbs",function(){
 
 	});
 
+});
 
-	it('rational_curve_adaptive_sample makes more points for an arc', function(){
+describe("verb.eval.nurbs.rational_curve_adaptive_sample",function(){
+
+	it('makes more points for an arc', function(){
 
 		var degree = 2
 			, knot_vector = [0, 0, 0, 1, 1, 1 ]
@@ -698,7 +767,11 @@ describe("nurbs",function(){
 
 	});
 
-	it('rational_curve_regular_sample should return 10 samples when asked to', function(){
+});
+
+describe("verb.eval.nurbs.rational_curve_regular_sample",function(){
+
+	it('should return 10 samples when asked to', function(){
 
 		var degree = 2
 			, knot_vector = [0, 0, 0, 1, 1, 1 ]
@@ -715,9 +788,9 @@ describe("nurbs",function(){
 			
 });
 
-describe("verb.eval.mesh.",function(){
+describe("verb.eval.mesh.get_tri_centroid",function(){
 
-	it('get_tri_centroid should return origin for zeroed triangle', function(){
+	it('should return origin for zeroed triangle', function(){
 
 		var points = [[0,0,0],[0,0,0],[0,0,0]]
 			, tri = [0,1,2]
@@ -729,7 +802,11 @@ describe("verb.eval.mesh.",function(){
 
 	});
 
-	it('get_tri_centroid should return correct value', function(){
+});
+
+describe("verb.eval.mesh.get_tri_centroid",function(){
+
+	it('should return correct value', function(){
 
 		var points = [[5,10,2],[3,-4,5],[-10,-3, 10]]
 			, tri = [0,1,2]
@@ -741,7 +818,11 @@ describe("verb.eval.mesh.",function(){
 
 	});
 
-	it('get_min_coordinate_on_axis should return correct value', function(){
+});
+
+describe("verb.eval.mesh.get_min_coordinate_on_axis",function(){
+
+	it('should return correct value', function(){
 
 		var points = [[5,10,2],[3,-4,5],[-10,-3, 10]]
 			, tri = [0,1,2]
@@ -755,7 +836,11 @@ describe("verb.eval.mesh.",function(){
 
 	});
 
-	it('sort_tris_on_longest_axis should return correct result with y axis regular array', function(){
+});
+
+describe("verb.eval.mesh.sort_tris_on_longest_axis",function(){
+
+	it('should return correct result with y axis regular array', function(){
 
 		//
 		//  0  -  1
@@ -778,7 +863,11 @@ describe("verb.eval.mesh.",function(){
 
 	});
 
-	it('sort_tris_on_longest_axis should return correct result', function(){
+});
+
+describe("verb.eval.mesh.sort_tris_on_longest_axis",function(){
+
+	it('should return correct result', function(){
 
 		// 0 \
 		// 1 \\     0
@@ -798,7 +887,11 @@ describe("verb.eval.mesh.",function(){
 
 	});
 
-	it('make_mesh_aabb should return correct result for planar mesh', function(){
+});
+
+describe("verb.eval.mesh.make_mesh_aabb",function(){
+
+	it('should return correct result for planar mesh', function(){
 
 		//
 		//  0  - 1
@@ -821,6 +914,10 @@ describe("verb.eval.mesh.",function(){
 		should.equal( 0, aabb.min[2] );
 
 	});
+
+});
+
+describe("verb.eval.mesh.make_mesh_aabb",function(){
 
 	it('make_mesh_aabb should return correct result for non-planar mesh', function(){
 
@@ -845,6 +942,10 @@ describe("verb.eval.mesh.",function(){
 		should.equal( -5, aabb.min[2] );
 
 	});
+
+});
+
+describe("verb.eval.mesh.make_mesh_aabb_tree",function(){
 
 	it('make_mesh_aabb_tree should have the correct structure', function(){
 
@@ -900,6 +1001,9 @@ describe("verb.eval.mesh.",function(){
 
 	});
 
+});
+
+describe("verb.eval.mesh.intersect_aabb_trees",function(){
 
 	it('intersect_aabb_trees should have the correct result', function(){
 
@@ -942,9 +1046,9 @@ describe("verb.eval.mesh.",function(){
 
 });
 
-describe("BoundingBox",function(){
+describe("BoundingBox.init() ",function(){
 
-	it('init() should allow point arguments', function(){
+	it('should allow point arguments', function(){
 
 		var bb1 = new verb.geom.BoundingBox( [5,5,5], [10,10,10]);
 
@@ -958,7 +1062,11 @@ describe("BoundingBox",function(){
 	
 	});
 
-	it('BoundingBox.intersects', function(){
+});
+
+describe("BoundingBox.intersects",function(){
+
+	it('returns expected results', function(){
 
 		var bb1 = new verb.geom.BoundingBox( [5,5,5], [10,10,10])
 			, bb2 = new verb.geom.BoundingBox( [0,0,0], [10,10,10])
@@ -970,7 +1078,11 @@ describe("BoundingBox",function(){
 
 	});
 
-	it('BoundingBox.intersect', function(){
+});
+
+describe("BoundingBox.intersect",function(){
+
+	it('returns expected results', function(){
 
 		// initialize a bounding box
 		var bb1 = new verb.geom.BoundingBox( [5,5,5], [10,10,10])
@@ -994,7 +1106,11 @@ describe("BoundingBox",function(){
 	
 	});
 
-	it('BoundingBox.intervals_overlap', function(){
+});
+
+describe("BoundingBox.intervals_overlap",function(){
+
+	it('returns expected results', function(){
 
 		should.equal( verb.geom.BoundingBox.prototype.intervals_overlap( 0, 1, 0, 10 ), true );
 		should.equal( verb.geom.BoundingBox.prototype.intervals_overlap( 0, 1, 1, 10 ), true );
@@ -1003,7 +1119,11 @@ describe("BoundingBox",function(){
 
 	});
 
-	it('BoundingBox.contains', function(){
+});
+
+describe("BoundingBox.contains",function(){
+
+	it('returns expected results', function(){
 
 		var bb4 = new verb.geom.BoundingBox( [0,0,0], [1,1,1] )
 			, bb5 = new verb.geom.BoundingBox();
@@ -1016,6 +1136,10 @@ describe("BoundingBox",function(){
 
 	});
 
+});
+
+describe("BoundingBox.contains",function(){
+
 	it('BoundingBox.clear', function(){
 
 		var bb1 = new verb.geom.BoundingBox( [5,5,5], [10,10,10] );
@@ -1024,7 +1148,9 @@ describe("BoundingBox",function(){
 
 	});
 
-	it('.get_axis_length() should return correct value', function(){
+describe("BoundingBox.get_axis_length",function(){
+
+	it('should return correct value', function(){
 
 		var bb1 = new verb.geom.BoundingBox( [-1,2,3], [10,10,10] );
 		should.equal( bb1.get_axis_length(0), 11 );
@@ -1033,14 +1159,22 @@ describe("BoundingBox",function(){
 
 	});
 
-	it('.get_longest_axis() should return correct value', function(){
+});
+
+describe("BoundingBox.get_longest_axis",function(){
+
+	it('should return correct value', function(){
 
 		var bb1 = new verb.geom.BoundingBox( [-1,2,3], [10,10,10] );
 		should.equal( bb1.get_longest_axis(0), 0 );
 
 	});
 
-	it('.get_axis_length() should return 0 when given out of bounds index', function(){
+});
+
+describe("BoundingBox.get_axis_length",function(){
+
+	it('should return 0 when given out of bounds index', function(){
 
 		var bb1 = new verb.geom.BoundingBox( [-1,2,3], [10,10,10] );
 		should.equal( bb1.get_axis_length(8), 0 );
@@ -1050,8 +1184,11 @@ describe("BoundingBox",function(){
 
 	});
 
+});
 
-	it('.get_axis_length() should return 0 when given out of bounds index', function(){
+describe("BoundingBox.get_axis_length",function(){
+
+	it('should return 0 when given out of bounds index', function(){
 
 		var bb1 = new verb.geom.BoundingBox( [-1,2,3], [10,10,10] );
 		should.equal( bb1.get_axis_length(8), 0 );
@@ -1061,7 +1198,11 @@ describe("BoundingBox",function(){
 
 	});
 
-	it('.clear() should set initialized to false', function(){
+});
+
+describe("BoundingBox.clear",function(){
+
+	it('should set initialized to false', function(){
 
 		var bb1 = new verb.geom.BoundingBox( [5,5,5], [10,10,10] );
 		bb1.clear();
@@ -1070,7 +1211,6 @@ describe("BoundingBox",function(){
 	});
 
 });
-
 
 describe("verb.eval.geom.closest_point_on_ray",function(){
 
