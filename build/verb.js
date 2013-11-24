@@ -474,7 +474,7 @@ verb.geom.BezierCurve = function( degree, control_points, weights) {
 
 	// a bezier can be represented exactly as a rational b-spline curve
 	// the form of the knot vector is [0,0,..,1,1] - the number of 0s is the degree + 1
-	// IOW, the cubic bezier has this knot vector [0,0,0,0,1,1,1,1]
+	// e.g. the cubic bezier has this knot vector [0,0,0,0,1,1,1,1]
 
 	// build the knots
 	var knots = [];
@@ -955,18 +955,17 @@ verb.geom.Extrusion.prototype.nurbsRep = function() {
 verb.geom.FourPointSurface = function(p1, p2, p3, p4) {
 
 	this.setAll( {
-		"center": center,
-		"xaxis": xaxis,
-		"yaxis": yaxis,
-		"radius": radius,
-		"interval": interval 
+		"p1": center,
+		"p2": xaxis,
+		"p3": yaxis,
+		"p4": radius
 	});
 
 	var curve_props = this.nurbsRep();
 
 	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weight, curve_props.knots );
 
-	this.watchAll( ['center', 'xaxis', 'yaxis', 'radius', 'interval'], this.update );
+	this.watchAll( ['p1', 'p2', 'p3', 'p4'], this.update );
 
 }.inherits(verb.geom.NurbsCurve);
 
@@ -988,7 +987,7 @@ verb.geom.Interval = function(min, max) {
 
 }.inherits(verb.core.WatchObject);
 
-verb.geom.Inverval2 = function(minu, maxu, minv, maxv) {
+verb.geom.Interval2 = function(minu, maxu, minv, maxv) {
 
 	this.setAll({ 
 		"uinterval": new verb.geom.Interval(minu, maxu),
@@ -1159,19 +1158,22 @@ verb.geom.Vector3.prototype = {
 /**
  * Generate the control points, weights, and knots of a surface define by 3 points
  *
- * @param {Array} first point in clockwise form
- * @param {Array} second point in clockwise form
- * @param {Array} third point in clockwise form
- * @param {Array} forth point in clockwise form
+ * @param {Array} first point in counter-clockwise form
+ * @param {Array} second point in counter-clockwise form
+ * @param {Array} third point in counter-clockwise form
+ * @param {Array} forth point in counter-clockwise form
  * @return {Object} an object with the following properties: control_points, weights, knots_u, knots_v, degree_u, degree_v
  * @api public
  */
+
+  // * @param {Array} 3d array of control points, where rows are the u dir, and columns run along the positive v direction, 
+ 	// 								and where each control point is an array of length (dim)  
 
 verb.eval.nurbs.get_4pt_surface = function( p1, p2, p3, p4 ){
 
 	return {"knot_vector_u": [0,0,1,1], 
 			"knot_vector_v": [0,0,1,1], 
-			"control_points": [ [p1, p2], [p3, p4] ], 
+			"control_points": [ [p1, p4], [p2, p3] ], 
 			"degree_u": 1, 
 			"degree_v": 1,
 			"weights": [ [1, 1], [1, 1] ] };
@@ -2912,7 +2914,7 @@ verb.eval.nurbs.surface_derivs_given_n_m = function( n, degree_u, knot_vector_u,
  * @api public
  */
 
-verb.eval.nurbs.surface_point = function( degree_u, knot_vector_u, degree_v, knot_vector_v, control_points, u, v ) {
+verb.eval.nurbs.surface_point = function( degree_u, knot_vector_u, degree_v, knot_vector_v, control_points, u, v) {
 
 	var n = knot_vector_u.length - degree_u - 2
 		, m = knot_vector_v.length - degree_v - 2;
@@ -2953,19 +2955,20 @@ verb.eval.nurbs.surface_point_given_n_m = function( n, degree_u, knot_vector_u, 
 		, v_basis_vals = verb.eval.nurbs.basis_functions_given_knot_span_index( knot_span_index_v, v, degree_v, knot_vector_v )
 		, uind = knot_span_index_u - degree_u
 		, vind = knot_span_index_v
-		, position = verb.eval.nurbs.zeros_1d( control_points[0][0].length )
-		, temp = verb.eval.nurbs.zeros_1d( control_points[0][0].length )
+		, position = verb.eval.nurbs.zeros_1d( dim )
+		, temp = verb.eval.nurbs.zeros_1d( dim )
 		, l = 0
 		, k = 0;
 
 	for (l = 0; l <= degree_v; l++) {	
 
-		temp = verb.eval.nurbs.zeros_1d( control_points[0][0].length );
+		temp = verb.eval.nurbs.zeros_1d( dim );
 		vind = knot_span_index_v - degree_v + l;
 
 		for (k = 0; k <= degree_u; k++) {	
 			temp = numeric.add( temp, numeric.mul( u_basis_vals[k], control_points[uind+k][vind]) );
 		}
+
 		position = numeric.add( position, numeric.mul(v_basis_vals[l], temp) );
 	}
 

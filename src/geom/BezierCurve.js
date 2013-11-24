@@ -2,7 +2,7 @@ verb.geom.BezierCurve = function( degree, control_points, weights) {
 
 	// a bezier can be represented exactly as a rational b-spline curve
 	// the form of the knot vector is [0,0,..,1,1] - the number of 0s is the degree + 1
-	// IOW, the cubic bezier has this knot vector [0,0,0,0,1,1,1,1]
+	// e.g. the cubic bezier has this knot vector [0,0,0,0,1,1,1,1]
 
 	// build the knots
 	var knots = [];

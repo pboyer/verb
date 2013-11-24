@@ -1,8 +1,8 @@
 {
   "name": "verb",
-  "version": "0.2.1",
+  "version": "0.1.0",
   "author": "pboyer <peter.b.boyer@gmail.com>",
-  "description": "A small library for NURBS evaluation optionally using Web Workers.",
+  "description": "A small NURBS library.",
   "repository": {
     "type": "git",
     "url": "https://github.com/pboyer/verb.git"
