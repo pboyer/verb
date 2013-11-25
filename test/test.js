@@ -728,19 +728,31 @@ describe("verb.eval.nurbs.rational_curve_adaptive_sample",function(){
 		var p = verb.eval.nurbs.rational_curve_adaptive_sample( degree, knot_vector, verb.eval.nurbs.homogenize_1d( control_points, weights), 1e-5);	
 		
 		should.equal(p[0][0], 0);
-		should.equal(p[1][0], 1);
+		should.equal(p[1][0], 10);
 
 	});
 
-});
+	it('returns all the control points for a degree 1 curve', function(){
 
-describe("verb.eval.nurbs.rational_curve_adaptive_sample",function(){
+		var degree = 1
+			, knot_vector = [0, 0, 0.25, 0.5, 0.75, 1, 1]
+			, control_points = [ [0, 0, 0], [10, 10, 0], [14, 20, 0], [10, 32, 4], [12, 16, 22] ]
+			, weights = [1, 1, 1, 1, 1, 1];
+
+		var p = verb.eval.nurbs.rational_curve_adaptive_sample( degree, knot_vector, verb.eval.nurbs.homogenize_1d( control_points, weights), 1e-5);	
+		
+		p.should.be.instanceof(Array).and.have.lengthOf(5);
+		p[0].should.be.instanceof(Array).and.have.lengthOf(3);
+		p[0].should.eql([0,0,0]);
+		p[4].should.eql([12,16,22]);
+
+	});
 
 	it('makes more points for an arc', function(){
 
 		var degree = 2
 			, knot_vector = [0, 0, 0, 1, 1, 1 ]
-			, weights = [1, 1, 2]
+			, weights = [1, Math.sqrt(2) / 2, 1]
 			, control_points = [ [1, 0, 0], [1, 1, 0], [0, 1, 0] ];
 
 		var p = verb.eval.nurbs.rational_curve_adaptive_sample( degree, knot_vector, verb.eval.nurbs.homogenize_1d( control_points, weights), 1e-8);	
@@ -753,10 +765,10 @@ describe("verb.eval.nurbs.rational_curve_adaptive_sample",function(){
 			prev = p[i][0];
 		}
 
-		should.notEqual(p.length, 0);
-		should.notEqual(p2.length, 0);
-		should.notEqual(p.length, p2.length);
-
+		p.should.be.instanceof(Array).and.not.have.lengthOf(0);
+		p2.should.be.instanceof(Array).and.not.have.lengthOf(0);
+		p.should.be.instanceof(Array).and.not.have.lengthOf(p2.length);
+		
 		should.equal(p[p.length-1][0], 1.0);
 		should.equal(p2[p2.length-1][0], 1.0);
 

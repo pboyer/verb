@@ -1205,6 +1205,11 @@ verb.eval.nurbs.rational_curve_regular_sample_range = function( degree, knot_vec
 
 verb.eval.nurbs.rational_curve_adaptive_sample = function( degree, knot_vector, control_points, tol ) {
 
+	// if degree is 1, just return the dehomogenized control points
+	if (degree === 1){
+		return control_points.map( verb.eval.nurbs.dehomogenize );
+	}
+
 	return verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knot_vector, control_points, 0, 1.0, tol );
 
 }

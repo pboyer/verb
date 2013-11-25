@@ -796,6 +796,8 @@ verb.geom.Circle = function(center, xaxis, yaxis, radius) {
 
 	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weight, curve_props.knots );
 
+	this.watchAll( ['center', 'xaxis', 'yaxis', 'radius'], this.update );
+
 }.inherits(verb.geom.NurbsCurve);
 
 verb.geom.Circle.prototype.nurbsRep = function(){
@@ -811,10 +813,11 @@ verb.geom.Circle.prototype.nurbsRep = function(){
 
 
 
-verb.geom.Cone = function(axis, base, height, radius ) {
+verb.geom.Cone = function(axis, xaxis, base, height, radius ) {
 
 	this.setAll({
 		"axis": axis,
+		"xaxis": xaxis,
 		"base": base,
 		"height": height,
 		"radius": radius 
@@ -823,23 +826,25 @@ verb.geom.Cone = function(axis, base, height, radius ) {
 	var surface_props = this.nurbsRep();
 
 	verb.geom.NurbsSurface.call(this, surface_props.degree, surface_props.control_points, surface_props.weight, surface_props.knots );
+
+	this.watchAll( ['axis', 'xaxis', 'base', 'height', 'radius'], this.update );
 
 }.inherits(verb.geom.NurbsSurface);
 
 verb.geom.Cone.prototype.nurbsRep = function(){
 
 	return this.nurbsEngine.eval_sync( 'get_cone_surface', [ this.get("axis"), 
+															 this.get("xaxis"), 
 															 this.get("base"), 
 															 this.get("height"), 
-															 this.get("radius"), 
-															 0, 
-															 2 * Math.PI ]);
+															 this.get("radius") ]);
 
 };
-verb.geom.Cylinder = function(axis, base, height, radius) {
+verb.geom.Cylinder = function(axis, xaxis, base, height, radius ) {
 
 	this.setAll({
 		"axis": axis,
+		"xaxis": xaxis,
 		"base": base,
 		"height": height,
 		"radius": radius 
@@ -848,6 +853,8 @@ verb.geom.Cylinder = function(axis, base, height, radius) {
 	var surface_props = this.nurbsRep();
 
 	verb.geom.NurbsSurface.call(this, surface_props.degree, surface_props.control_points, surface_props.weight, surface_props.knots );
+
+	this.watchAll( ['axis', 'xaxis', 'base', 'height', 'radius'], this.update );
 
 }.inherits(verb.geom.NurbsSurface);
 
@@ -855,6 +862,7 @@ verb.geom.Cylinder.prototype.nurbsRep = function() {
 
   return this.nurbsEngine.eval_sync( 'get_cylinder_surface', 
 						  												 [ this.get("axis"), 
+						  												 	 this.get("xaxis"), 
 						  													 this.get("base"), 
 																				 this.get("height"), 
 																				 this.get("radius") ]);
@@ -874,6 +882,8 @@ verb.geom.Ellipse = function(center, xaxis, yaxis, xradius, yradius) {
 
 	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weight, curve_props.knots );
 
+	this.watchAll( ['center', 'xaxis', 'yaxis', 'xradius', 'yradius'], this.update );
+
 }.inherits(verb.geom.NurbsCurve);
 
 verb.geom.Ellipse.prototype.nurbsRep = function(){
@@ -890,7 +900,7 @@ verb.geom.Ellipse.prototype.nurbsRep = function(){
 
 };
 
-// todo do polyline, plane, 4 point surface, revsurface, sphere, think about sweep
+// todo do polyline, plane, revsurface, sphere, think about sweep
 // make sure it all builds again, may need to reorder the build process
 
 // implement ellipse
@@ -912,6 +922,8 @@ verb.geom.EllipseArc = function(center, xaxis, yaxis, xradius, yradius, interval
 	var curve_props = this.nurbsRep();
 
 	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weight, curve_props.knots );
+
+	this.watchAll( ['center', 'xaxis', 'yaxis', 'xradius', 'yradius', 'interval'], this.update );
 
 }.inherits(verb.geom.NurbsCurve);
 
@@ -939,6 +951,9 @@ verb.geom.Extrusion = function(profile, axis, length ) {
 
 	verb.geom.NurbsSurface.call(this, surface_props.degree, surface_props.control_points, surface_props.weight, surface_props.knots );
 
+	this.watchAll( ['axis', 'length' ], this.update );
+	profile.watchAll( ['knots', 'degree', 'controlPoints', 'weights'], this.update );
+
 }.inherits(verb.geom.NurbsSurface);
 
 verb.geom.Extrusion.prototype.nurbsRep = function() {
@@ -952,6 +967,9 @@ verb.geom.Extrusion.prototype.nurbsRep = function() {
 									  this.get("profile").get("weights")] );
 
 };
+
+
+
 verb.geom.FourPointSurface = function(p1, p2, p3, p4) {
 
 	this.setAll( {
@@ -1007,6 +1025,8 @@ verb.geom.Line = function(start, end) {
 
 	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weight, curve_props.knots );
 
+	this.watchAll(['start', 'end'], this.update );
+
 }.inherits(verb.geom.NurbsCurve);
 
 verb.geom.Line.prototype.nurbsRep = function(){
@@ -1026,17 +1046,36 @@ verb.geom.Line.prototype.nurbsRep = function(){
 // a data structure representing a winged edge mesh  - inherits from Geometry
 // a quad or tri
 // point on a mesh
-verb.geom.Plane = function( axis, origin ) {
+verb.geom.PlanarSurface = function( base, uaxis, vaxis, ulength, vlength ) {
 
-	verb.geom.Surface.call(this);
+	this.setAll({
+		"base": center,
+		"uaxis": xaxis,
+		"vaxis": yaxis,
+		"ulength": xradius,
+		"vlength": yradius
+	});
 
-	this.axis = axis;
-	this.origin = origin;
+	var surface_props = this.nurbsRep();
+
+	verb.geom.NurbsSurface.call(this, surface_props.degree, surface_props.control_points, surface_props.weight, surface_props.knots );
+
+	this.watchAll( ['base', 'uaxis', 'vaxis', 'ulength', 'vlength'], this.update );
+
+}.inherits(verb.geom.NurbsSurface);
+
+verb.geom.Cone.prototype.nurbsRep = function(){
+
+	var p1 = this.get('base')
+		, uedge = numeric.mul( this.get('uaxis'), this.get('ulength'))
+		, vedge = numeric.mul( this.get('vaxis'), this.get('vlength'))
+		, p2 = numeric.add( base, uedge )
+		, p3 = numeric.add( base, vedge, uedge )
+		, p4 = numeric.add( base, vedge );
+
+	return this.nurbsEngine.eval_sync( 'get_4pt_surface', [ p1, p2, p3, p4 ]);
 
 };
-
-
-
 verb.geom.PolylineCurve = function( points ){
 
 	// construct some sort of parameter mapping to subcurves
@@ -2361,6 +2400,11 @@ verb.eval.nurbs.rational_curve_regular_sample_range = function( degree, knot_vec
  */
 
 verb.eval.nurbs.rational_curve_adaptive_sample = function( degree, knot_vector, control_points, tol ) {
+
+	// if degree is 1, just return the dehomogenized control points
+	if (degree === 1){
+		return control_points.map( verb.eval.nurbs.dehomogenize );
+	}
 
 	return verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knot_vector, control_points, 0, 1.0, tol );
 
