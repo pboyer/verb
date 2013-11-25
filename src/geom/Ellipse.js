@@ -18,8 +18,6 @@ verb.geom.Ellipse = function(center, xaxis, yaxis, xradius, yradius) {
 
 verb.geom.Ellipse.prototype.nurbsRep = function(){
 
-	// very similar to arc, just rotate first then use minor and major radius rather than radius
-
 	return this.nurbsEngine.eval_sync( 'get_ellipse_arc', [ this.get("center"), 
 															 this.get("xaxis"), 
 															 this.get("yaxis"), 
@@ -30,9 +28,6 @@ verb.geom.Ellipse.prototype.nurbsRep = function(){
 
 };
 
-// implement ellipse
 // implement tesselation stuff, proper mesh datatypes
-
 // todo sweep
-
 // prepare demo

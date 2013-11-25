@@ -1,3 +1,53 @@
+/**
+ * Generate the control points, weights, and knots of an elliptical arc
+ *
+ * @param {Array} the center
+ * @param {Array} the xaxis
+ * @param {Array} orthogonal yaxis
+ * @param {Number} xradius of the ellipse arc
+ * @param {Number} yradius of the ellipse arc
+ * @param {Number} start angle of the ellipse arc, between 0 and 2pi, where 0 points at the xaxis
+ * @param {Number} end angle of the arc, between 0 and 2pi, greater than the start angle
+ * @return {Object} an object with the following properties: control_points, weights, knots, degree
+ * @api public
+ */
+
+verb.eval.nurbs.get_sweep_surface = function( profile_knots, profile_degree, profile_control_points, profile_weights, rail_knots, rail_degree, knots_control_points, knots_weights ) {
+
+	// for each point on rail, move all of the points
+	var homo_rail = verb.eval.nurbs.homogenize_1d( rail_control_points, rail_weights )
+		, rail_start = verb.eval.nurbs.rational_curve_point( rail_degree, rail_knots, homo_rail, 0 )
+		, span = 1.0 / rail_control_points.length
+		, control_points = []
+		, weights = [];
+
+	for (var i = 0; i < rail_control_points; i++ ){
+
+		// evaluate the point on the curve, subtracting it from the first point
+		var rail_point = verb.eval.nurbs.rational_curve_point( rail_degree, rail_knots, homo_rail, i * span )
+			, rail_offset = verb.sub( rail_point, rail_start )
+			, row_control_points = []
+			, row_weights = [];
+
+		for (var j = 0; j < profile_control_points; j++ ){
+
+			row_control_points.push( numeric.add(rail_offset, profile_control_points[j] ) );
+			row_weights.push( profile_control_points[j] * rail_control_points[i] );
+
+		}
+
+		control_points.add( row_control_points);
+		weights.add( row_weights );
+	}
+
+	return {"knots_u": rail_knots, 
+			"knots_v": profile_knots,
+			"control_points": control_points, 
+			"degree_u": rail_degree, 
+			"degree_v": profile_degree, 
+			"weights": weights };
+
+}
 
 /**
  * Generate the control points, weights, and knots of an elliptical arc
