@@ -17,6 +17,30 @@ verb.TOLERANCE = 1e-3;
 
 var router = new labor.Router(verb.eval.nurbs);
 /**
+ * Generate the control points, weights, and knots of a sphere
+ *
+ * @param {Array} the center of the sphere
+ * @param {Array} normalized axis of sphere
+ * @param {Array} vector perpendicular to axis of sphere, starting the rotation of the sphere
+ * @param {Number} radius of the sphere
+ * @return {Object} an object with the following properties: control_points, weights, knot_vector_u, knot_vector_v, degree_u, degree_v
+ * @api public
+ */
+
+verb.eval.nurbs.get_sphere_surface = function( center, axis, xaxis, radius ){
+
+	var arc = verb.eval.nurbs.get_arc(center, [1,0,0], [0,1,0], 0, Math.PI );
+
+
+	console.log(arc.control_points);
+
+
+	return verb.eval.nurbs.get_revolved_surface( center, axis, 2 * Math.PI, arc.knot_vector, arc.degree, arc.control_points, arc.weights );
+
+}
+
+
+/**
  * Generate the control points, weights, and knots of a polyline curve
  *
  * @param {Array} array of points in curve

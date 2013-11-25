@@ -1302,6 +1302,25 @@ describe("verb.eval.nurbs.get_arc",function(){
 		var center = [0,0,0]
 			, x = [1,0,0]
 			, y = [0,1,0]
+			, r = 5
+			, start = 0
+			, end = Math.PI;
+
+		var arc_components = verb.eval.nurbs.get_arc(center, x, y, r, start, end);
+
+		var p = verb.eval.nurbs.rational_curve_point( arc_components.degree, arc_components.knots, verb.eval.nurbs.homogenize_1d( arc_components.control_points, arc_components.weights), 0.5);
+
+		p[0].should.be.approximately( 0, verb.EPSILON );
+		p[1].should.be.approximately( 5 , verb.EPSILON);
+		p[2].should.be.approximately( 0, verb.EPSILON );
+
+	});
+
+	it('returns correct result for unit circle', function(){
+
+		var center = [0,0,0]
+			, x = [1,0,0]
+			, y = [0,1,0]
 			, r = 1
 			, start = 0
 			, end = Math.PI * 2;
@@ -1749,6 +1768,44 @@ describe("verb.eval.nurbs.get_4pt_surface",function(){
 		p[0].should.be.approximately(1, verb.EPSILON );
 		p[1].should.be.approximately(0, verb.EPSILON );
 		p[2].should.be.approximately(0, verb.EPSILON );
+
+	});
+
+});
+
+describe("verb.eval.nurbs.get_sphere_surface",function(){
+
+	it('can create a unit sphere', function(){
+
+		var center = [0,0,0]
+			, axis = [0,0,1]
+			, xaxis = [1,0,0]
+			, radius = 1;
+
+		var comps = verb.eval.nurbs.get_sphere_surface(center, axis, xaxis, radius);
+
+		// comps.degree_u.should.equal(2);
+		// comps.degree_v.should.equal(2);
+
+		// console.log(comps.control_points);
+
+		// comps.knot_vector_u.should.eql([0,0,1,1]);
+		// comps.knot_vector_u.should.eql([0,0,1,1]);
+		// comps.weights.should.eql([ [1,1], [1, 1] ]);
+		// comps.control_points.should.eql([ [p1, p4], [p2, p3] ]);
+
+		// sample at the center
+		// var p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
+		// 												comps.knot_vector_u, 
+		// 												comps.degree_v,
+		// 												comps.knot_vector_v, 
+		// 												verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+		// 												0.5, 
+		// 												0.5);
+
+		// p[0].should.be.approximately(0.5, verb.EPSILON );
+		// p[1].should.be.approximately(0.5, verb.EPSILON );
+		// p[2].should.be.approximately(0.5, verb.EPSILON );
 
 	});
 

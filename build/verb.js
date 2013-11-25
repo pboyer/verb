@@ -1102,39 +1102,81 @@ verb.geom.PolylineCurve = function( points ){
 	};
 
 }
-verb.geom.Polyline = function(points) {
+verb.geom.Polyline = function( points ) {
 
+	this.setAll( {
+		"control_points": points ? points.slice(0) : []
+	});
 
+	var curve_props = this.nurbsRep();
+
+	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weights, curve_props.knots );
 
 }.inherits(verb.geom.NurbsCurve);
 
 verb.geom.Polyline.prototype.nurbsRep = function(){
 
-	
-
-
-
-
-
-
-
-
-	return this.nurbsEngine.eval_sync( 'get_cone_surface', [ this.get("axis"), 
-																												 this.get("xaxis"), 
-																												 this.get("base"), 
-																												 this.get("height"), 
-																												 this.get("radius") ]);
+	return this.nurbsEngine.eval_sync( 'get_polyline_surface', [ this.get("control_points") ]);
 
 };
+verb.geom.RevolvedSurface = function( center, axis, angle, profile ) {
 
+	this.setAll({
+		"center": center,
+		"axis": axis,
+		"angle": angle,
+		"profile": profile
+	});
 
-// a data structure representing a sphere
+	var surface_props = this.nurbsRep();
 
-// center and radius
+	verb.geom.NurbsSurface.call(this, surface_props.degree, surface_props.control_points, surface_props.weight, surface_props.knots );
 
-// converted to nurbs surface as a revolved surface
+	this.watchAll( ['center', 'axis', 'angle', 'profile'], this.update );
 
+}.inherits(verb.geom.NurbsSurface);
 
+verb.geom.RevolvedSurface.prototype.nurbsRep = function(){
+
+	  return this.nurbsEngine.eval_sync( 'get_revolved_surface', 
+									[ this.get("center"), 
+									  this.get("axis"), 
+									  this.get("angle"), 
+									  this.get("profile").get("knots"), 
+									  this.get("profile").get("degree"), 
+									  this.get("profile").get("controlPoints"),
+									  this.get("profile").get("weights")] );
+
+};
+verb.geom.Sphere = function( center, axis, angle, profile ) {
+
+	this.setAll({
+		"center": center,
+		"axis": axis,
+		"angle": angle,
+		"profile": profile
+	});
+
+	var surface_props = this.nurbsRep();
+
+	verb.geom.NurbsSurface.call(this, surface_props.degree, surface_props.control_points, surface_props.weight, surface_props.knots );
+
+	this.watchAll( ['center', 'axis', 'angle', 'profile'], this.update );
+
+}.inherits(verb.geom.NurbsSurface);
+
+verb.geom.RevolvedSurface.prototype.nurbsRep = function(){
+
+	  return this.nurbsEngine.eval_sync( 'get_revolved_surface', 
+									[ this.get("center"), 
+									  this.get("axis"), 
+									  this.get("angle"), 
+									  this.get("profile").get("knots"), 
+									  this.get("profile").get("degree"), 
+									  this.get("profile").get("controlPoints"),
+									  this.get("profile").get("weights")] );
+
+};
 // 
 verb.geom.Vector3 = function(x, y, z) {
 
@@ -1203,6 +1245,30 @@ verb.geom.Vector3.prototype = {
     );
   }
 };
+/**
+ * Generate the control points, weights, and knots of a sphere
+ *
+ * @param {Array} the center of the sphere
+ * @param {Array} normalized axis of sphere
+ * @param {Array} vector perpendicular to axis of sphere, starting the rotation of the sphere
+ * @param {Number} radius of the sphere
+ * @return {Object} an object with the following properties: control_points, weights, knot_vector_u, knot_vector_v, degree_u, degree_v
+ * @api public
+ */
+
+verb.eval.nurbs.get_sphere_surface = function( center, axis, xaxis, radius ){
+
+	var arc = verb.eval.nurbs.get_arc(center, [1,0,0], [0,1,0], 0, Math.PI );
+
+
+	console.log(arc.control_points);
+
+
+	return verb.eval.nurbs.get_revolved_surface( center, axis, 2 * Math.PI, arc.knot_vector, arc.degree, arc.control_points, arc.weights );
+
+}
+
+
 /**
  * Generate the control points, weights, and knots of a polyline curve
  *
