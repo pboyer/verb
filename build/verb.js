@@ -1081,19 +1081,19 @@ verb.geom.PolylineCurve = function( points ){
 	// construct some sort of parameter mapping to subcurves
 
 	this.point_sync = function( u ) {
-		// return this.nurbsEngine.eval_sync( 'rational_curve_point', [ _degree, _knot_vector, _homo_control_points, u ] );
+		// return this.nurbsEngine.eval_sync( 'rational_curve_point', [ _degree, _knots, _homo_control_points, u ] );
 	};
 
 	this.derivs_sync = function( u, num_derivs ) {
-		// return this.nurbsEngine.eval_sync( 'rational_curve_derivs', [ _degree, _knot_vector, _homo_control_points, u, num_derivs] );
+		// return this.nurbsEngine.eval_sync( 'rational_curve_derivs', [ _degree, _knots, _homo_control_points, u, num_derivs] );
 	};
 
 	this.point = function( u, callback ) {
-		// nurbsEngine.eval( 'rational_curve_point', [ _degree, _knot_vector, _homo_control_points, u ], callback ); 
+		// nurbsEngine.eval( 'rational_curve_point', [ _degree, _knots, _homo_control_points, u ], callback ); 
 	};
 
 	this.derivs = function( u, num_derivs, callback ) {
-		// this.nurbsEngine.eval( 'rational_curve_derivs', [ _degree, _knot_vector, _homo_control_points, u, num_derivs  ], callback ); 
+		// this.nurbsEngine.eval( 'rational_curve_derivs', [ _degree, _knots, _homo_control_points, u, num_derivs  ], callback ); 
 	};
 
 	this.points = function( num_samples, callback ) {
@@ -1252,19 +1252,15 @@ verb.geom.Vector3.prototype = {
  * @param {Array} normalized axis of sphere
  * @param {Array} vector perpendicular to axis of sphere, starting the rotation of the sphere
  * @param {Number} radius of the sphere
- * @return {Object} an object with the following properties: control_points, weights, knot_vector_u, knot_vector_v, degree_u, degree_v
+ * @return {Object} an object with the following properties: control_points, weights, knots_u, knots_v, degree_u, degree_v
  * @api public
  */
 
 verb.eval.nurbs.get_sphere_surface = function( center, axis, xaxis, radius ){
 
-	var arc = verb.eval.nurbs.get_arc(center, [1,0,0], [0,1,0], 0, Math.PI );
+	var arc = verb.eval.nurbs.get_arc(center, numeric.mul(axis, -1), xaxis, radius, 0, Math.PI );
 
-
-	console.log(arc.control_points);
-
-
-	return verb.eval.nurbs.get_revolved_surface( center, axis, 2 * Math.PI, arc.knot_vector, arc.degree, arc.control_points, arc.weights );
+	return verb.eval.nurbs.get_revolved_surface( center, axis, 2 * Math.PI, arc.knots, arc.degree, arc.control_points, arc.weights );
 
 }
 
@@ -1273,7 +1269,7 @@ verb.eval.nurbs.get_sphere_surface = function( center, axis, xaxis, radius ){
  * Generate the control points, weights, and knots of a polyline curve
  *
  * @param {Array} array of points in curve
- * @return {Object} an object with the following properties: control_points, weights, knot_vector, degree
+ * @return {Object} an object with the following properties: control_points, weights, knots, degree
  * @api public
  */
 
@@ -1297,7 +1293,7 @@ verb.eval.nurbs.get_polyline_curve = function( pts ){
 	}
 
 	return {
-			"knot_vector": knots, 
+			"knots": knots, 
 			"control_points": pts.slice(0), 
 			"degree": 1,
 			"weights": weights 
@@ -1312,14 +1308,14 @@ verb.eval.nurbs.get_polyline_curve = function( pts ){
  * @param {Array} second point in counter-clockwise form
  * @param {Array} third point in counter-clockwise form
  * @param {Array} forth point in counter-clockwise form
- * @return {Object} an object with the following properties: control_points, weights, knot_vector_u, knot_vector_v, degree_u, degree_v
+ * @return {Object} an object with the following properties: control_points, weights, knots_u, knots_v, degree_u, degree_v
  * @api public
  */
 
 verb.eval.nurbs.get_4pt_surface = function( p1, p2, p3, p4 ){
 
-	return {"knot_vector_u": [0,0,1,1], 
-			"knot_vector_v": [0,0,1,1], 
+	return {"knots_u": [0,0,1,1], 
+			"knots_v": [0,0,1,1], 
 			"control_points": [ [p1, p4], [p2, p3] ], 
 			"degree_u": 1, 
 			"degree_v": 1,
@@ -1404,8 +1400,8 @@ verb.eval.nurbs.get_extruded_surface = function( axis, length, prof_knots, prof_
 	}
 
 	// return all parameters
-	return {"knot_vector_u": [0,0,1,1], 
-			"knot_vector_v": prof_knots, 
+	return {"knots_u": [0,0,1,1], 
+			"knots_v": prof_knots, 
 			"control_points": control_points, 
 			"degree_u": 1, 
 			"degree_v": prof_degree, 
@@ -1550,8 +1546,8 @@ verb.eval.nurbs.get_revolved_surface = function( center, axis, theta, prof_knots
 	}
 
 	// store all of the parameters
-	return {"knot_vector_u": knots_u, 
-			"knot_vector_v": prof_knots, 
+	return {"knots_u": knots_u, 
+			"knots_v": prof_knots, 
 			"control_points": control_points, 
 			"degree_u": 2, 
 			"degree_v": prof_degree, 
@@ -2140,7 +2136,7 @@ verb.eval.geom.get_tri_norm = function( points, tri ) {
  * @api public
  */
 
-verb.eval.mesh.tesselate_rational_surface_naive = function( degree_u, knot_vector_u, degree_v, knot_vector_v, homo_control_points, divs_u, divs_v ) {
+verb.eval.mesh.tesselate_rational_surface_naive = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, divs_u, divs_v ) {
 
 	if ( divs_u < 1 ) {
 		divs_u = 1;
@@ -2164,7 +2160,7 @@ verb.eval.mesh.tesselate_rational_surface_naive = function( degree_u, knot_vecto
 				pt_v = j * span_v;
 
 			uvs.push( [pt_u, pt_v] );
-			points.push( verb.eval.nurbs.rational_surface_point( degree_u, knot_vector_u,  degree_v, knot_vector_v, homo_control_points, pt_u, pt_v ) );
+			points.push( verb.eval.nurbs.rational_surface_point( degree_u, knots_u,  degree_v, knots_v, homo_control_points, pt_u, pt_v ) );
 
 		}
 	}
@@ -2223,12 +2219,12 @@ verb.eval.mesh.tesselate_rational_surface_naive = function( degree_u, knot_vecto
  * @api public
  */
 
-verb.eval.nurbs.rational_curve_curve_bb_intersect_refine = function( degree1, knot_vector1, control_points1, degree2, knot_vector2, control_points2, start_params ) {
+verb.eval.nurbs.rational_curve_curve_bb_intersect_refine = function( degree1, knots1, control_points1, degree2, knots2, control_points2, start_params ) {
 
 	var objective = function(x) { 
 
-		var p1 = verb.eval.nurbs.rational_curve_point(degree1, knot_vector1, control_points1, x[0])
-			, p2 = verb.eval.nurbs.rational_curve_point(degree2, knot_vector2, control_points2, x[1])
+		var p1 = verb.eval.nurbs.rational_curve_point(degree1, knots1, control_points1, x[0])
+			, p2 = verb.eval.nurbs.rational_curve_point(degree2, knots2, control_points2, x[1])
 			, p1_p2 = numeric.sub(p1, p2);
 
 		return numeric.dot(p1_p2, p1_p2);
@@ -2257,11 +2253,11 @@ verb.eval.nurbs.rational_curve_curve_bb_intersect_refine = function( degree1, kn
  * @api public
  */
 
-verb.eval.nurbs.intersect_rational_curves_by_aabb = function( degree1, knot_vector1, control_points1, degree2, knot_vector2, control_points2, sample_tol, tol ) {
+verb.eval.nurbs.intersect_rational_curves_by_aabb = function( degree1, knots1, control_points1, degree2, knots2, control_points2, sample_tol, tol ) {
 
 	// sample the two curves adaptively
-	var up1 = verb.eval.nurbs.parametric_polyline_polyline_bb_intersect( degree1, knot_vector1, control_points1, sample_tol )
-		, up2 = verb.eval.nurbs.parametric_polyline_polyline_bb_intersect( degree1, knot_vector1, control_points1, sample_tol )
+	var up1 = verb.eval.nurbs.parametric_polyline_polyline_bb_intersect( degree1, knots1, control_points1, sample_tol )
+		, up2 = verb.eval.nurbs.parametric_polyline_polyline_bb_intersect( degree1, knots1, control_points1, sample_tol )
 		, u1 = _.map(up1, function(el) { return el[0]; })
 		, u2 = _.map(up2, function(el) { return el[0]; })
 		, p1 = _.map(up1, function(el) { return el.slice(1) })
@@ -2455,9 +2451,9 @@ verb.eval.geom.intersect_rays = function( a0, a, b0, b ) {
  * @api public
  */
 
-verb.eval.nurbs.rational_curve_regular_sample = function( degree, knot_vector, control_points, num_samples ) {
+verb.eval.nurbs.rational_curve_regular_sample = function( degree, knots, control_points, num_samples ) {
 
-	return verb.eval.nurbs.rational_curve_regular_sample_range( degree, knot_vector, control_points, 0, 1.0, num_samples );
+	return verb.eval.nurbs.rational_curve_regular_sample_range( degree, knots, control_points, 0, 1.0, num_samples );
 
 }
 
@@ -2474,7 +2470,7 @@ verb.eval.nurbs.rational_curve_regular_sample = function( degree, knot_vector, c
  * @api public
  */
 
-verb.eval.nurbs.rational_curve_regular_sample_range = function( degree, knot_vector, control_points, start_u, end_u, num_samples ) {
+verb.eval.nurbs.rational_curve_regular_sample_range = function( degree, knots, control_points, start_u, end_u, num_samples ) {
 
 	if (num_samples < 1){
 		num_samples = 2;
@@ -2487,7 +2483,7 @@ verb.eval.nurbs.rational_curve_regular_sample_range = function( degree, knot_vec
 	for (var i = 0; i < num_samples; i++){
 
 		u = start_u + span * i;
-		p.push( [u].concat( verb.eval.nurbs.rational_curve_point(degree, knot_vector, control_points, u) ) );
+		p.push( [u].concat( verb.eval.nurbs.rational_curve_point(degree, knots, control_points, u) ) );
 
 	}
 
@@ -2507,14 +2503,14 @@ verb.eval.nurbs.rational_curve_regular_sample_range = function( degree, knot_vec
  * @api public
  */
 
-verb.eval.nurbs.rational_curve_adaptive_sample = function( degree, knot_vector, control_points, tol ) {
+verb.eval.nurbs.rational_curve_adaptive_sample = function( degree, knots, control_points, tol ) {
 
 	// if degree is 1, just return the dehomogenized control points
 	if (degree === 1){
 		return control_points.map( verb.eval.nurbs.dehomogenize );
 	}
 
-	return verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knot_vector, control_points, 0, 1.0, tol );
+	return verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knots, control_points, 0, 1.0, tol );
 
 }
 
@@ -2531,14 +2527,14 @@ verb.eval.nurbs.rational_curve_adaptive_sample = function( degree, knot_vector, 
  * @api public
  */
 
-verb.eval.nurbs.rational_curve_adaptive_sample_range = function( degree, knot_vector, control_points, start_u, end_u, tol ) {
+verb.eval.nurbs.rational_curve_adaptive_sample_range = function( degree, knots, control_points, start_u, end_u, tol ) {
 
 	// sample curve at three pts
-	var p1 = verb.eval.nurbs.rational_curve_point(degree, knot_vector, control_points, start_u),
-		p3 = verb.eval.nurbs.rational_curve_point(degree, knot_vector, control_points, end_u),
+	var p1 = verb.eval.nurbs.rational_curve_point(degree, knots, control_points, start_u),
+		p3 = verb.eval.nurbs.rational_curve_point(degree, knots, control_points, end_u),
 		t = 0.45 + 0.1 * Math.random(),
 		mid_u = start_u + (end_u - start_u) * t,
-		p2 = verb.eval.nurbs.rational_curve_point(degree, knot_vector, control_points, mid_u);
+		p2 = verb.eval.nurbs.rational_curve_point(degree, knots, control_points, mid_u);
 
 		// the if three points are "flat", return the two end pts
 		if ( verb.eval.nurbs.three_points_are_flat( p1, p2, p3, tol ) ) {
@@ -2549,8 +2545,8 @@ verb.eval.nurbs.rational_curve_adaptive_sample_range = function( degree, knot_ve
 		} else {
 
 			// recurse on the two halves
-			var left_pts = verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knot_vector, control_points, start_u, mid_u, tol )
-				, right_pts = verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knot_vector, control_points, mid_u, end_u, tol );
+			var left_pts = verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knots, control_points, start_u, mid_u, tol )
+				, right_pts = verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knots, control_points, mid_u, end_u, tol );
 
 			// concatenate the two		
 			return left_pts.slice(0, -1).concat(right_pts);
@@ -2708,9 +2704,9 @@ verb.eval.nurbs.curve_knot_insert = function( degree, knots, control_points, u, 
  * @api public
  */
 
-verb.eval.nurbs.rational_surface_derivs = function( degree_u, knot_vector_u, degree_v, knot_vector_v, homo_control_points, num_derivs, u, v) {
+verb.eval.nurbs.rational_surface_derivs = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, num_derivs, u, v) {
 
-	var SKL_homo = verb.eval.nurbs.surface_derivs( degree_u, knot_vector_u, degree_v, knot_vector_v, homo_control_points, num_derivs, u, v )
+	var SKL_homo = verb.eval.nurbs.surface_derivs( degree_u, knots_u, degree_v, knots_v, homo_control_points, num_derivs, u, v )
 		, ders = verb.eval.nurbs.separate_homo_derivs_2d( SKL_homo )
 		, Aders = ders[0]
 		, wders = ders[1]
@@ -2767,9 +2763,9 @@ verb.eval.nurbs.rational_surface_derivs = function( degree_u, knot_vector_u, deg
  * @api public
  */
 
-verb.eval.nurbs.rational_surface_point = function( degree_u, knot_vector_u,  degree_v, knot_vector_v, homo_control_points, u, v ) {
+verb.eval.nurbs.rational_surface_point = function( degree_u, knots_u,  degree_v, knots_v, homo_control_points, u, v ) {
 
-	return verb.eval.nurbs.dehomogenize( verb.eval.nurbs.surface_point( degree_u, knot_vector_u,  degree_v, knot_vector_v, homo_control_points, u, v ) );
+	return verb.eval.nurbs.dehomogenize( verb.eval.nurbs.surface_point( degree_u, knots_u,  degree_v, knots_v, homo_control_points, u, v ) );
 
 };
 
@@ -2784,11 +2780,11 @@ verb.eval.nurbs.rational_surface_point = function( degree_u, knot_vector_u,  deg
  * @api public
  */
 
-verb.eval.nurbs.rational_curve_derivs = function( degree, knot_vector, homo_control_points, u, num_derivs ) {
+verb.eval.nurbs.rational_curve_derivs = function( degree, knots, homo_control_points, u, num_derivs ) {
 
 	// compute the derivatives of the control points
 	// separate derivative array into two
-	var ders = verb.eval.nurbs.separate_homo_derivs_1d( verb.eval.nurbs.curve_derivs( degree, knot_vector, homo_control_points, u, num_derivs ) )
+	var ders = verb.eval.nurbs.separate_homo_derivs_1d( verb.eval.nurbs.curve_derivs( degree, knots, homo_control_points, u, num_derivs ) )
 		, Aders = ders[0]
 		, wders = ders[1]
 		, k = 0
@@ -2868,9 +2864,9 @@ verb.eval.nurbs.separate_homo_derivs_2d = function( SKL ) {
  * @api public
  */
 
-verb.eval.nurbs.rational_curve_point = function( degree, knot_vector, homo_control_points, u) {
+verb.eval.nurbs.rational_curve_point = function( degree, knots, homo_control_points, u) {
 
-	return verb.eval.nurbs.dehomogenize( verb.eval.nurbs.curve_point( degree, knot_vector, homo_control_points, u) );
+	return verb.eval.nurbs.dehomogenize( verb.eval.nurbs.curve_point( degree, knots, homo_control_points, u) );
 
 };
 
@@ -2980,12 +2976,12 @@ verb.eval.nurbs.homogenize_2d = function( control_points, weights) {
  * @api public
  */
 
-verb.eval.nurbs.surface_derivs = function( degree_u, knot_vector_u, degree_v, knot_vector_v, control_points, num_derivatives, u, v ) {
+verb.eval.nurbs.surface_derivs = function( degree_u, knots_u, degree_v, knots_v, control_points, num_derivatives, u, v ) {
 
-	var n = knot_vector_u.length - degree_u - 2
-		, m = knot_vector_v.length - degree_v - 2;
+	var n = knots_u.length - degree_u - 2
+		, m = knots_v.length - degree_v - 2;
 
-	return verb.eval.nurbs.surface_derivs_given_n_m( n, degree_u, knot_vector_u, m, degree_v, knot_vector_v, control_points, num_derivatives, u, v );
+	return verb.eval.nurbs.surface_derivs_given_n_m( n, degree_u, knots_u, m, degree_v, knots_v, control_points, num_derivatives, u, v );
 
 };
 
@@ -2993,10 +2989,10 @@ verb.eval.nurbs.surface_derivs = function( degree_u, knot_vector_u, degree_v, kn
  * Compute the derivatives on a non-uniform, non-rational B spline surface 
  * (corresponds to algorithm 3.6 from The NURBS book, Piegl & Tiller 2nd edition)
  *
- * @param {Number} integer number of basis functions in u dir - 1 = knot_vector_u.length - degree_u - 2
+ * @param {Number} integer number of basis functions in u dir - 1 = knots_u.length - degree_u - 2
  * @param {Number} integer degree of surface in u direction
  * @param {Array} array of nondecreasing knot values in u direction
- * @param {Number} integer number of basis functions in v dir - 1 = knot_vector_u.length - degree_u - 2
+ * @param {Number} integer number of basis functions in v dir - 1 = knots_u.length - degree_u - 2
  * @param {Number} integer degree of surface in v direction
  * @param {Array} array of nondecreasing knot values in v direction
  * @param {Array} 3d array of control points, where rows are the u dir, and columns run along the positive v direction, 
@@ -3007,10 +3003,10 @@ verb.eval.nurbs.surface_derivs = function( degree_u, knot_vector_u, degree_v, kn
  * @api public
  */
 
-verb.eval.nurbs.surface_derivs_given_n_m = function( n, degree_u, knot_vector_u, m, degree_v, knot_vector_v, control_points, num_derivatives, u, v ) {
+verb.eval.nurbs.surface_derivs_given_n_m = function( n, degree_u, knots_u, m, degree_v, knots_v, control_points, num_derivatives, u, v ) {
 
-	if ( verb.eval.nurbs.are_valid_relations(degree_u, control_points.length, knot_vector_u.length ) === false ||
-		verb.eval.nurbs.are_valid_relations(degree_v, control_points[0].length, knot_vector_v.length ) === false ) {
+	if ( verb.eval.nurbs.are_valid_relations(degree_u, control_points.length, knots_u.length ) === false ||
+		verb.eval.nurbs.are_valid_relations(degree_v, control_points[0].length, knots_v.length ) === false ) {
 		console.error('Invalid relations between control points, knot vector, and n');
 		return null;
 	}
@@ -3019,10 +3015,10 @@ verb.eval.nurbs.surface_derivs_given_n_m = function( n, degree_u, knot_vector_u,
 		, du = Math.min(num_derivatives, degree_u)
 		, dv = Math.min(num_derivatives, degree_v)
 		, SKL = verb.eval.nurbs.zeros_3d( du+1, dv+1, dim )
-		, knot_span_index_u = verb.eval.nurbs.knot_span_given_n( n, degree_u, u, knot_vector_u )
-		, knot_span_index_v = verb.eval.nurbs.knot_span_given_n( m, degree_v, v, knot_vector_v )
-		, uders = verb.eval.nurbs.deriv_basis_functions_given_n_i( knot_span_index_u, u, degree_u, n, knot_vector_u )  
-		, vders = verb.eval.nurbs.deriv_basis_functions_given_n_i( knot_span_index_v, v, degree_v, m, knot_vector_v )
+		, knot_span_index_u = verb.eval.nurbs.knot_span_given_n( n, degree_u, u, knots_u )
+		, knot_span_index_v = verb.eval.nurbs.knot_span_given_n( m, degree_v, v, knots_v )
+		, uders = verb.eval.nurbs.deriv_basis_functions_given_n_i( knot_span_index_u, u, degree_u, n, knots_u )  
+		, vders = verb.eval.nurbs.deriv_basis_functions_given_n_i( knot_span_index_v, v, degree_v, m, knots_v )
 		, temp = verb.eval.nurbs.zeros_2d( degree_v+1, dim )
 		, k = 0
 		, s = 0
@@ -3068,12 +3064,12 @@ verb.eval.nurbs.surface_derivs_given_n_m = function( n, degree_u, knot_vector_u,
  * @api public
  */
 
-verb.eval.nurbs.surface_point = function( degree_u, knot_vector_u, degree_v, knot_vector_v, control_points, u, v) {
+verb.eval.nurbs.surface_point = function( degree_u, knots_u, degree_v, knots_v, control_points, u, v) {
 
-	var n = knot_vector_u.length - degree_u - 2
-		, m = knot_vector_v.length - degree_v - 2;
+	var n = knots_u.length - degree_u - 2
+		, m = knots_v.length - degree_v - 2;
 
-	return 	verb.eval.nurbs.surface_point_given_n_m( n, degree_u, knot_vector_u, m, degree_v, knot_vector_v, control_points, u, v );
+	return 	verb.eval.nurbs.surface_point_given_n_m( n, degree_u, knots_u, m, degree_v, knots_v, control_points, u, v );
 
 }
 
@@ -3081,7 +3077,7 @@ verb.eval.nurbs.surface_point = function( degree_u, knot_vector_u, degree_v, kno
  * Compute a point on a non-uniform, non-rational B spline surface
  * (corresponds to algorithm 3.5 from The NURBS book, Piegl & Tiller 2nd edition)
  *
- * @param {Number} integer number of basis functions in u dir - 1 = knot_vector_u.length - degree_u - 2
+ * @param {Number} integer number of basis functions in u dir - 1 = knots_u.length - degree_u - 2
  * @param {Number} integer degree of surface in u direction
  * @param {Array} array of nondecreasing knot values in u direction
  * @param {Number} integer degree of surface in v direction
@@ -3094,19 +3090,19 @@ verb.eval.nurbs.surface_point = function( degree_u, knot_vector_u, degree_v, kno
  * @api public
  */
 
-verb.eval.nurbs.surface_point_given_n_m = function( n, degree_u, knot_vector_u, m, degree_v, knot_vector_v, control_points, u, v ) {
+verb.eval.nurbs.surface_point_given_n_m = function( n, degree_u, knots_u, m, degree_v, knots_v, control_points, u, v ) {
 
-	if ( verb.eval.nurbs.are_valid_relations(degree_u, control_points.length, knot_vector_u.length ) === false ||
-		verb.eval.nurbs.are_valid_relations(degree_v, control_points[0].length, knot_vector_v.length ) === false ) {
+	if ( verb.eval.nurbs.are_valid_relations(degree_u, control_points.length, knots_u.length ) === false ||
+		verb.eval.nurbs.are_valid_relations(degree_v, control_points[0].length, knots_v.length ) === false ) {
 		console.error('Invalid relations between control points, knot vector, and n');
 		return null;
 	}
 
 	var dim = control_points[0][0].length
-		, knot_span_index_u = verb.eval.nurbs.knot_span_given_n( n, degree_u, u, knot_vector_u )
-		, knot_span_index_v = verb.eval.nurbs.knot_span_given_n( m, degree_v, v, knot_vector_v )
-		, u_basis_vals = verb.eval.nurbs.basis_functions_given_knot_span_index( knot_span_index_u, u, degree_u, knot_vector_u )
-		, v_basis_vals = verb.eval.nurbs.basis_functions_given_knot_span_index( knot_span_index_v, v, degree_v, knot_vector_v )
+		, knot_span_index_u = verb.eval.nurbs.knot_span_given_n( n, degree_u, u, knots_u )
+		, knot_span_index_v = verb.eval.nurbs.knot_span_given_n( m, degree_v, v, knots_v )
+		, u_basis_vals = verb.eval.nurbs.basis_functions_given_knot_span_index( knot_span_index_u, u, degree_u, knots_u )
+		, v_basis_vals = verb.eval.nurbs.basis_functions_given_knot_span_index( knot_span_index_v, v, degree_v, knots_v )
 		, uind = knot_span_index_u - degree_u
 		, vind = knot_span_index_v
 		, position = verb.eval.nurbs.zeros_1d( dim )
@@ -3140,10 +3136,10 @@ verb.eval.nurbs.surface_point_given_n_m = function( n, degree_u, knot_vector_u, 
  * @api public
  */
 
-verb.eval.nurbs.curve_derivs = function( degree, knot_vector, control_points, u, num_derivs ) {
+verb.eval.nurbs.curve_derivs = function( degree, knots, control_points, u, num_derivs ) {
 
-	var n = knot_vector.length - degree - 2;
-	return verb.eval.nurbs.curve_derivs_given_n( n, degree, knot_vector, control_points, u, num_derivs );
+	var n = knots.length - degree - 2;
+	return verb.eval.nurbs.curve_derivs_given_n( n, degree, knots, control_points, u, num_derivs );
 
 }		
 
@@ -3151,7 +3147,7 @@ verb.eval.nurbs.curve_derivs = function( degree, knot_vector, control_points, u,
  * Determine the derivatives of a non-uniform, non-rational B-spline curve at a given parameter
  * (corresponds to algorithm 3.1 from The NURBS book, Piegl & Tiller 2nd edition)
  *
- * @param {Number} integer number of basis functions - 1 = knot_vector.length - degree - 2
+ * @param {Number} integer number of basis functions - 1 = knots.length - degree - 2
  * @param {Number} integer degree of curve
  * @param {Array} array of nondecreasing knot values
  * @param {Array} 2d array of control points, where each control point is an array of length (dim)  
@@ -3160,9 +3156,9 @@ verb.eval.nurbs.curve_derivs = function( degree, knot_vector, control_points, u,
  * @api public
  */
 
-verb.eval.nurbs.curve_derivs_given_n = function( n, degree, knot_vector, control_points, u, num_derivatives ) {
+verb.eval.nurbs.curve_derivs_given_n = function( n, degree, knots, control_points, u, num_derivatives ) {
 
-	if ( verb.eval.nurbs.are_valid_relations(degree, control_points.length, knot_vector.length ) === false ) {
+	if ( verb.eval.nurbs.are_valid_relations(degree, control_points.length, knots.length ) === false ) {
 		console.error('Invalid relations between control points, knot vector, and n');
 		return null;
 	}
@@ -3170,8 +3166,8 @@ verb.eval.nurbs.curve_derivs_given_n = function( n, degree, knot_vector, control
 	var dim = control_points[0].length
 		, du = Math.min(num_derivatives, degree)
 		, CK = verb.eval.nurbs.zeros_2d( du+1, dim )
-		, knot_span_index = verb.eval.nurbs.knot_span_given_n( n, degree, u, knot_vector )
-		, nders = verb.eval.nurbs.deriv_basis_functions_given_n_i( knot_span_index, u, degree, du, knot_vector )
+		, knot_span_index = verb.eval.nurbs.knot_span_given_n( n, degree, u, knots )
+		, nders = verb.eval.nurbs.deriv_basis_functions_given_n_i( knot_span_index, u, degree, du, knots )
 		, k = 0
 		, j = 0;
 
@@ -3195,9 +3191,9 @@ verb.eval.nurbs.curve_derivs_given_n = function( n, degree, knot_vector, control
  * @api public
  */
 
-verb.eval.nurbs.are_valid_relations = function( degree, num_control_points, knot_vector_length ) {
+verb.eval.nurbs.are_valid_relations = function( degree, num_control_points, knots_length ) {
 
-	return ( num_control_points + degree + 1 - knot_vector_length ) === 0 ? true : false;
+	return ( num_control_points + degree + 1 - knots_length ) === 0 ? true : false;
 
 }		
 
@@ -3212,10 +3208,10 @@ verb.eval.nurbs.are_valid_relations = function( degree, num_control_points, knot
  * @api public
  */
 
-verb.eval.nurbs.curve_point = function( degree, knot_vector, control_points, u) {
+verb.eval.nurbs.curve_point = function( degree, knots, control_points, u) {
 
-	var n = knot_vector.length - degree - 2;
-	return verb.eval.nurbs.curve_point_given_n( n, degree, knot_vector, control_points, u);
+	var n = knots.length - degree - 2;
+	return verb.eval.nurbs.curve_point_given_n( n, degree, knots, control_points, u);
 
 }		
 
@@ -3223,7 +3219,7 @@ verb.eval.nurbs.curve_point = function( degree, knot_vector, control_points, u) 
  * Compute a point on a non-uniform, non-rational b-spline curve
  * (corresponds to algorithm 3.1 from The NURBS book, Piegl & Tiller 2nd edition)
  *
- * @param {Number} integer number of basis functions - 1 = knot_vector.length - degree - 2
+ * @param {Number} integer number of basis functions - 1 = knots.length - degree - 2
  * @param {Number} integer degree of curve
  * @param {Array} array of nondecreasing knot values
  * @param {Array} 2d array of control points, where each control point is an array of length (dim)  
@@ -3232,15 +3228,15 @@ verb.eval.nurbs.curve_point = function( degree, knot_vector, control_points, u) 
  * @api public
  */
 
-verb.eval.nurbs.curve_point_given_n = function( n, degree, knot_vector, control_points, u) {
+verb.eval.nurbs.curve_point_given_n = function( n, degree, knots, control_points, u) {
 
-	if ( verb.eval.nurbs.are_valid_relations(degree, control_points.length, knot_vector.length ) === false ) {
+	if ( verb.eval.nurbs.are_valid_relations(degree, control_points.length, knots.length ) === false ) {
 		console.error('Invalid relations between control points, knot vector, and n');
 		return null;
 	}
 
-	var knot_span_index = verb.eval.nurbs.knot_span_given_n( n, degree, u, knot_vector )
-		, basis_values = verb.eval.nurbs.basis_functions_given_knot_span_index( knot_span_index, u, degree, knot_vector ) 
+	var knot_span_index = verb.eval.nurbs.knot_span_given_n( n, degree, u, knots )
+		, basis_values = verb.eval.nurbs.basis_functions_given_knot_span_index( knot_span_index, u, degree, knots ) 
 		, position = verb.eval.nurbs.zeros_1d( control_points[0].length );
 
 		for (var j = 0; j <= degree; j++ )	{
@@ -3339,13 +3335,13 @@ verb.eval.nurbs.zeros_3d = function(rows, cols, dim) {
  * @api public
  */
 
-verb.eval.nurbs.deriv_basis_functions = function( u, degree, knot_vector )
+verb.eval.nurbs.deriv_basis_functions = function( u, degree, knots )
 {
-	var knot_span_index = verb.eval.nurbs.knot_span( degree, u, knot_vector )
-		, m = knot_vector.length - 1
+	var knot_span_index = verb.eval.nurbs.knot_span( degree, u, knots )
+		, m = knots.length - 1
 		, n = m - degree - 1;
 
-	return verb.eval.nurbs.deriv_basis_functions_given_n_i( knot_span_index, u, degree, n, knot_vector );
+	return verb.eval.nurbs.deriv_basis_functions_given_n_i( knot_span_index, u, degree, n, knots );
 }	
 
 /**
@@ -3355,13 +3351,13 @@ verb.eval.nurbs.deriv_basis_functions = function( u, degree, knot_vector )
  * @param {Number} integer knot span index
  * @param {Number} float parameter
  * @param {Number} integer degree
- * @param {Number} integer number of basis functions - 1 = knot_vector.length - degree - 2
+ * @param {Number} integer number of basis functions - 1 = knots.length - degree - 2
  * @param {Array} array of nondecreasing knot values
  * @return {Array} 2d array of basis and derivative values of size (n+1, p+1) The nth row is the nth derivative and the first row is made up of the basis function values.
  * @api public
  */
 
-verb.eval.nurbs.deriv_basis_functions_given_n_i = function( knot_span_index, u, p, n, knot_vector )
+verb.eval.nurbs.deriv_basis_functions_given_n_i = function( knot_span_index, u, p, n, knots )
 {
 	var ndu = verb.eval.nurbs.zeros_2d(p+1, p+1)
 		, left = new Array( p + 1 )
@@ -3375,8 +3371,8 @@ verb.eval.nurbs.deriv_basis_functions_given_n_i = function( knot_span_index, u, 
 
 	for(j = 1; j <= p; j++) {
 
-		left[j] = u - knot_vector[knot_span_index+1-j];
-		right[j] = knot_vector[knot_span_index+j] - u;
+		left[j] = u - knots[knot_span_index+1-j];
+		right[j] = knots[knot_span_index+j] - u;
 		saved = 0.0;
 
 		for (r = 0; r < j; r++) {
@@ -3475,10 +3471,10 @@ verb.eval.nurbs.deriv_basis_functions_given_n_i = function( knot_span_index, u, 
  * @api public
  */
 
-verb.eval.nurbs.basis_functions = function( u, degree, knot_vector )
+verb.eval.nurbs.basis_functions = function( u, degree, knots )
 {
-	var knot_span_index = verb.eval.nurbs.knot_span(u, degree, knot_vector);
-	return verb.eval.nurbs.basis_functions_given_knot_span_index( knot_span_index, u, degree, knot_vector );
+	var knot_span_index = verb.eval.nurbs.knot_span(u, degree, knots);
+	return verb.eval.nurbs.basis_functions_given_knot_span_index( knot_span_index, u, degree, knots );
 };
 
 /**
@@ -3493,7 +3489,7 @@ verb.eval.nurbs.basis_functions = function( u, degree, knot_vector )
  * @api public
  */
 
-verb.eval.nurbs.basis_functions_given_knot_span_index = function( knot_span_index, u, degree, knot_vector )
+verb.eval.nurbs.basis_functions_given_knot_span_index = function( knot_span_index, u, degree, knots )
 {
 	var basis_functions = new Array( degree + 1 )
 		, left = new Array( degree + 1 )
@@ -3505,8 +3501,8 @@ verb.eval.nurbs.basis_functions_given_knot_span_index = function( knot_span_inde
 
 	for(var j = 1; j <= degree; j++) {
 
-		left[j] = u - knot_vector[knot_span_index+1-j];
-		right[j] = knot_vector[knot_span_index+j] - u;
+		left[j] = u - knots[knot_span_index+1-j];
+		right[j] = knots[knot_span_index+j] - u;
 		saved = 0.0;
 
 		for (var r = 0; r < j; r++) {
@@ -3534,21 +3530,21 @@ verb.eval.nurbs.basis_functions_given_knot_span_index = function( knot_span_inde
  * @api public
  */
 
-verb.eval.nurbs.knot_span = function( degree, u, knot_vector )
+verb.eval.nurbs.knot_span = function( degree, u, knots )
 {
 
-	var m = knot_vector.length - 1
+	var m = knots.length - 1
 		, n = m - degree - 1;
 
-	return verb.eval.nurbs.knot_span_given_n(n, degree, u, knot_vector);
+	return verb.eval.nurbs.knot_span_given_n(n, degree, u, knots);
 
 };
 
 /**
- * Find the span on the knot vector knot_vector of the given parameter
+ * Find the span on the knot vector knots of the given parameter
  * (corresponds to algorithm 2.1 from The NURBS book, Piegl & Tiller 2nd edition)
  *
- * @param {Number} integer number of basis functions - 1 = knot_vector.length - degree - 2
+ * @param {Number} integer number of basis functions - 1 = knots.length - degree - 2
  * @param {Number} integer degree of function
  * @param {Number} float parameter
  * @param {Array} array of nondecreasing knot values
@@ -3556,14 +3552,14 @@ verb.eval.nurbs.knot_span = function( degree, u, knot_vector )
  * @api public
  */
 
-verb.eval.nurbs.knot_span_given_n = function( n, degree, u, knot_vector )
+verb.eval.nurbs.knot_span_given_n = function( n, degree, u, knots )
 {
-	if ( u >= knot_vector[n+1] )
+	if ( u >= knots[n+1] )
 	{
 		return n;
 	}
 
-	if ( u < knot_vector[degree] )
+	if ( u < knots[degree] )
 	{
 		return degree;
 	}
@@ -3572,9 +3568,9 @@ verb.eval.nurbs.knot_span_given_n = function( n, degree, u, knot_vector )
 		, high = n+1
 		, mid = Math.floor( (low + high) / 2 );
 
-	while( u < knot_vector[ mid ] || u >= knot_vector[ mid + 1 ] )
+	while( u < knots[ mid ] || u >= knots[ mid + 1 ] )
 	{
-		if ( u < knot_vector[ mid ] )
+		if ( u < knots[ mid ] )
 		{
 			high = mid;
 		}

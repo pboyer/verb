@@ -8,16 +8,16 @@ describe("verb.eval.nurbs.knot_span_given_n",function(){
 
 		var n = 7
 			, degree = 2
-			, knot_vector = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5];
+			, knots = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5];
 
-		should.equal( 4, verb.eval.nurbs.knot_span_given_n( n, degree, 2.5, knot_vector ) );
-		should.equal( 3, verb.eval.nurbs.knot_span_given_n( n, degree, 1, knot_vector ) );
-		should.equal( 3, verb.eval.nurbs.knot_span_given_n( n, degree, 1.5, knot_vector ) );
-		should.equal( 7, verb.eval.nurbs.knot_span_given_n( n, degree, 4.9, knot_vector ) );
-		should.equal( 7, verb.eval.nurbs.knot_span_given_n( n, degree, 10, knot_vector ) );
-		should.equal( 7, verb.eval.nurbs.knot_span_given_n( n, degree, 5, knot_vector ) );
-		should.equal( 2, verb.eval.nurbs.knot_span_given_n( n, degree, 0, knot_vector ) );
-		should.equal( 2, verb.eval.nurbs.knot_span_given_n( n, degree, -1, knot_vector ) );
+		should.equal( 4, verb.eval.nurbs.knot_span_given_n( n, degree, 2.5, knots ) );
+		should.equal( 3, verb.eval.nurbs.knot_span_given_n( n, degree, 1, knots ) );
+		should.equal( 3, verb.eval.nurbs.knot_span_given_n( n, degree, 1.5, knots ) );
+		should.equal( 7, verb.eval.nurbs.knot_span_given_n( n, degree, 4.9, knots ) );
+		should.equal( 7, verb.eval.nurbs.knot_span_given_n( n, degree, 10, knots ) );
+		should.equal( 7, verb.eval.nurbs.knot_span_given_n( n, degree, 5, knots ) );
+		should.equal( 2, verb.eval.nurbs.knot_span_given_n( n, degree, 0, knots ) );
+		should.equal( 2, verb.eval.nurbs.knot_span_given_n( n, degree, -1, knots ) );
 
 	});
 
@@ -28,15 +28,15 @@ describe("verb.eval.nurbs.knot_span",function(){
 	it('returns correct result for degree 2 curve', function(){
 
 		var degree = 2
-			, knot_vector = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5];
+			, knots = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5];
 
-		should.equal( 4, verb.eval.nurbs.knot_span( degree, 2.5, knot_vector ) );
-		should.equal( 3, verb.eval.nurbs.knot_span( degree, 1, knot_vector ) );
-		should.equal( 3, verb.eval.nurbs.knot_span( degree, 1.5, knot_vector ) );
-		should.equal( 7, verb.eval.nurbs.knot_span( degree, 4.9, knot_vector ) );
-		should.equal( 7, verb.eval.nurbs.knot_span( degree, 10, knot_vector ) ); // above span
-		should.equal( 7, verb.eval.nurbs.knot_span( degree, 5, knot_vector ) ); // top of span
-		should.equal( 2, verb.eval.nurbs.knot_span( degree, 0, knot_vector ) ); // bottom span
+		should.equal( 4, verb.eval.nurbs.knot_span( degree, 2.5, knots ) );
+		should.equal( 3, verb.eval.nurbs.knot_span( degree, 1, knots ) );
+		should.equal( 3, verb.eval.nurbs.knot_span( degree, 1.5, knots ) );
+		should.equal( 7, verb.eval.nurbs.knot_span( degree, 4.9, knots ) );
+		should.equal( 7, verb.eval.nurbs.knot_span( degree, 10, knots ) ); // above span
+		should.equal( 7, verb.eval.nurbs.knot_span( degree, 5, knots ) ); // top of span
+		should.equal( 2, verb.eval.nurbs.knot_span( degree, 0, knots ) ); // bottom span
 
 	});
 
@@ -48,15 +48,15 @@ describe("verb.eval.nurbs.basis_functions, basis_functions_given_knot_span_index
 
 		var degree = 2
 			, span = 4
-			, knot_vector = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5];
+			, knots = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5];
 
-		var N1 = verb.eval.nurbs.basis_functions_given_knot_span_index( 4, 2.5, degree, knot_vector );
+		var N1 = verb.eval.nurbs.basis_functions_given_knot_span_index( 4, 2.5, degree, knots );
 		should.equal( 3, N1.length );
 		should.equal( 0.125, N1[0] );
 		should.equal( 0.75, N1[1] );
 		should.equal( 0.125, N1[2] );
 
-		var N2 = verb.eval.nurbs.basis_functions( 2.5, degree, knot_vector );
+		var N2 = verb.eval.nurbs.basis_functions( 2.5, degree, knots );
 		should.equal( 3, N2.length );
 		should.equal( 0.125, N2[0] );
 		should.equal( 0.75, N2[1] );
@@ -74,9 +74,9 @@ describe("verb.eval.nurbs.deriv_basis_functions_given_n_i",function(){
 		var degree = 2
 			, n = 7
 			, span = 4
-			, knot_vector = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5];
+			, knots = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5];
 
-		var N1 = verb.eval.nurbs.deriv_basis_functions_given_n_i( span, 2.5, degree, n, knot_vector );
+		var N1 = verb.eval.nurbs.deriv_basis_functions_given_n_i( span, 2.5, degree, n, knots );
 		// weights
 		should.equal( 0.125, N1[0][0] );
 		should.equal( 0.75, N1[0][1] );
@@ -104,20 +104,20 @@ describe("verb.eval.nurbs.curve_point",function(){
 
 		var degree = 2
 			, n = 6
-			, knot_vector = [0, 0, 0, 1, 2, 3, 4, 5, 5, 5]
+			, knots = [0, 0, 0, 1, 2, 3, 4, 5, 5, 5]
 			, control_points = [ [10, 0], [20, 10], [30, 20], [40, 30], [50, 40], [60, 30], [70, 80]];
 
-		var p = verb.eval.nurbs.curve_point_given_n( n, degree, knot_vector, control_points, 2.5);
+		var p = verb.eval.nurbs.curve_point_given_n( n, degree, knots, control_points, 2.5);
 
 		should.equal( p[0], 40 );
 		should.equal( p[1], 30 );
 
-		var p_start = verb.eval.nurbs.curve_point_given_n( n, degree, knot_vector, control_points, 0);
+		var p_start = verb.eval.nurbs.curve_point_given_n( n, degree, knots, control_points, 0);
 
 		should.equal( p_start[0], 10 );
 		should.equal( p_start[1], 0 );
 
-		var p_end = verb.eval.nurbs.curve_point_given_n( n, degree, knot_vector, control_points, 5);
+		var p_end = verb.eval.nurbs.curve_point_given_n( n, degree, knots, control_points, 5);
 
 		should.equal( p_end[0], 70 );
 		should.equal( p_end[1], 80 );
@@ -142,15 +142,15 @@ describe("verb.eval.nurbs.curve_point",function(){
 		var degree = 3
 			, n = 4
 			, u = 0
-			, knot_vector = [0, 0, 0, 0, 1, 1, 1, 1]
+			, knots = [0, 0, 0, 0, 1, 1, 1, 1]
 			, control_points = [ [10, 0], [20, 10], [30, 20], [50, 50] ];
 
-		var p = verb.eval.nurbs.curve_point( degree, knot_vector, control_points, u);
+		var p = verb.eval.nurbs.curve_point( degree, knots, control_points, u);
 
 		should.equal( p[0], 10 );
 		should.equal( p[1], 0 );
 
-		var p2 = verb.eval.nurbs.curve_point( degree, knot_vector, control_points, 1.0);
+		var p2 = verb.eval.nurbs.curve_point( degree, knots, control_points, 1.0);
 
 		should.equal( p2[0], 50 );
 		should.equal( p2[1], 50 );
@@ -168,11 +168,11 @@ describe("verb.eval.nurbs.curve_derivs_given_n",function(){
 		var degree = 3
 			, n = 3
 			, u = 0
-			, knot_vector = [0, 0, 0, 0, 1, 1, 1, 1]
+			, knots = [0, 0, 0, 0, 1, 1, 1, 1]
 			, control_points = [ [10, 0], [20, 10], [30, 20], [50, 50] ]
 			, num_derivs = 2;
 
-		var p = verb.eval.nurbs.curve_derivs_given_n( n, degree, knot_vector, control_points, u, num_derivs ) ;
+		var p = verb.eval.nurbs.curve_derivs_given_n( n, degree, knots, control_points, u, num_derivs ) ;
 
 		should.equal( p[0][0], 10 );
 		should.equal( p[0][1], 0 );
@@ -189,11 +189,11 @@ describe("verb.eval.nurbs.curve_derivs",function(){
 		// This needs to be tested better
 		var degree = 3
 			, u = 0
-			, knot_vector = [0, 0, 0, 0, 1, 1, 1, 1]
+			, knots = [0, 0, 0, 0, 1, 1, 1, 1]
 			, control_points = [ [10, 0], [20, 10], [30, 20], [50, 50] ]
 			, num_derivs = 2;
 
-		var p = verb.eval.nurbs.curve_derivs( degree, knot_vector, control_points, u, num_derivs ) ;
+		var p = verb.eval.nurbs.curve_derivs( degree, knots, control_points, u, num_derivs ) ;
 
 		should.equal( p[0][0], 10 );
 		should.equal( p[0][1], 0 );
@@ -211,8 +211,8 @@ describe("verb.eval.nurbs.surface_point_given_n_m",function(){
 		// This needs to be tested better
 		var degree_u = 3
 			, degree_v = 3
-			, knot_vector_u = [0, 0, 0, 0, 1, 1, 1, 1]
-			, knot_vector_v =	[0, 0, 0, 0, 1, 1, 1, 1]
+			, knots_u = [0, 0, 0, 0, 1, 1, 1, 1]
+			, knots_v =	[0, 0, 0, 0, 1, 1, 1, 1]
 			, control_points = [ 	[ [0, 0, 50], 		[10, 0, 0], 		[20, 0, 0], 		[30, 0, 0] 		],
 														[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] 	],
 														[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] 	],
@@ -220,13 +220,13 @@ describe("verb.eval.nurbs.surface_point_given_n_m",function(){
 			, n = 3
 			, m = 3;
 
-		var p = verb.eval.nurbs.surface_point_given_n_m( n, degree_u, knot_vector_u, m, degree_v, knot_vector_v, control_points, 0, 0 );
+		var p = verb.eval.nurbs.surface_point_given_n_m( n, degree_u, knots_u, m, degree_v, knots_v, control_points, 0, 0 );
 		
 		should.equal( p[0], 0 );
 		should.equal( p[1], 0 );
 		should.equal( p[2], 50 );
 
-		p = verb.eval.nurbs.surface_point_given_n_m( n, degree_u, knot_vector_u, m, degree_v, knot_vector_v, control_points, 1, 1 );
+		p = verb.eval.nurbs.surface_point_given_n_m( n, degree_u, knots_u, m, degree_v, knots_v, control_points, 1, 1 );
 
 		should.equal( p[0], 30 );
 		should.equal( p[1], -30 );
@@ -243,20 +243,20 @@ describe("verb.eval.nurbs.surface_point",function(){
 		// This needs to be tested better
 		var degree_u = 3
 			, degree_v = 3
-			, knot_vector_u = [0, 0, 0, 0, 1, 1, 1, 1]
-			, knot_vector_v =	[0, 0, 0, 0, 1, 1, 1, 1]
+			, knots_u = [0, 0, 0, 0, 1, 1, 1, 1]
+			, knots_v =	[0, 0, 0, 0, 1, 1, 1, 1]
 			, control_points = [ 	[ [0, 0, 50], 		[10, 0, 0], 		[20, 0, 0], 		[30, 0, 0] 		],
 														[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] 	],
 														[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] 	],
 														[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ];
 
-		var p = verb.eval.nurbs.surface_point( degree_u, knot_vector_u, degree_v, knot_vector_v, control_points, 0, 0 );
+		var p = verb.eval.nurbs.surface_point( degree_u, knots_u, degree_v, knots_v, control_points, 0, 0 );
 
 		should.equal( p[0], 0 );
 		should.equal( p[1], 0 );
 		should.equal( p[2], 50 );
 
-		p = verb.eval.nurbs.surface_point( degree_u, knot_vector_u, degree_v, knot_vector_v, control_points, 1, 1 );
+		p = verb.eval.nurbs.surface_point( degree_u, knots_u, degree_v, knots_v, control_points, 1, 1 );
 
 		should.equal( p[0], 30 );
 		should.equal( p[1], -30 );
@@ -268,12 +268,12 @@ describe("verb.eval.nurbs.surface_point",function(){
 
 		var degree_u = 1
 			, degree_v = 3
-			, knot_vector_u = [0, 0, 1, 1 ]
-			, knot_vector_v =	[0, 0, 0, 0, 1, 1, 1, 1]
+			, knots_u = [0, 0, 1, 1 ]
+			, knots_v =	[0, 0, 0, 0, 1, 1, 1, 1]
 			, control_points = [ 	[ [0, 0, 50], 		[10, 0, 0], 		[20, 0, 0], 		[30, 0, 0] 		],
 														[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] 	] ];
 
-		var p = verb.eval.nurbs.surface_point( degree_u, knot_vector_u, degree_v, knot_vector_v, control_points, 0, 0 );
+		var p = verb.eval.nurbs.surface_point( degree_u, knots_u, degree_v, knots_v, control_points, 0, 0 );
 
 		should.equal( p[0], 0 );
 		should.equal( p[1], 0 );
@@ -291,8 +291,8 @@ describe("verb.eval.nurbs.surface_derivs_given_n_m",function(){
 			, degree_v = 3
 			, u = 0.0
 			, v = 0.0
-			, knot_vector_u = [0, 0, 0, 0, 1, 1, 1, 1]
-			, knot_vector_v =	[0, 0, 0, 0, 1, 1, 1, 1]
+			, knots_u = [0, 0, 0, 0, 1, 1, 1, 1]
+			, knots_v =	[0, 0, 0, 0, 1, 1, 1, 1]
 			, control_points = [ 	[ [0, 0, 0], 		[10, 10, 0], 		[20, 10, 0], 		[30, 0, 0] 		],
 														[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] 	],
 														[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] 	],
@@ -301,7 +301,7 @@ describe("verb.eval.nurbs.surface_derivs_given_n_m",function(){
 			, m = 3
 			, num_derivatives = 1;
 
-		var p = verb.eval.nurbs.surface_derivs_given_n_m( n, degree_u, knot_vector_u, m, degree_v, knot_vector_v, control_points, num_derivatives, 0, 0 );
+		var p = verb.eval.nurbs.surface_derivs_given_n_m( n, degree_u, knots_u, m, degree_v, knots_v, control_points, num_derivatives, 0, 0 );
 
 		// 0th derivative with respect to u & v
 		should.equal( p[0][0][0], 0 );
@@ -333,8 +333,8 @@ describe("verb.eval.nurbs.surface_derivs",function(){
 			, degree_v = 3
 			, u = 0.0
 			, v = 0.0
-			, knot_vector_u = [0, 0, 0, 0, 1, 1, 1, 1]
-			, knot_vector_v =	[0, 0, 0, 0, 1, 1, 1, 1]
+			, knots_u = [0, 0, 0, 0, 1, 1, 1, 1]
+			, knots_v =	[0, 0, 0, 0, 1, 1, 1, 1]
 			, control_points = [ 	[ [0, 0, 0], 		[10, 10, 0], 		[20, 10, 0], 		[30, 0, 0] 		],
 														[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] 	],
 														[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] 	],
@@ -343,7 +343,7 @@ describe("verb.eval.nurbs.surface_derivs",function(){
 			, m = 3
 			, num_derivatives = 1;
 
-		var p = verb.eval.nurbs.surface_derivs( degree_u, knot_vector_u, degree_v, knot_vector_v, control_points, num_derivatives, 0, 0 );
+		var p = verb.eval.nurbs.surface_derivs( degree_u, knots_u, degree_v, knots_v, control_points, num_derivatives, 0, 0 );
 
 		// 0th derivative with respect to u & v
 		should.equal( p[0][0][0], 0 );
@@ -467,21 +467,21 @@ describe("verb.eval.nurbs.rational_curve_point",function(){
 
 		// this represents a single quarter arc, using a rational bezier curve
 		var degree = 2
-			, knot_vector = [0, 0, 0, 1, 1, 1 ]
+			, knots = [0, 0, 0, 1, 1, 1 ]
 			, weights = [1, 1, 2]
 			, control_points = [ [1, 0], [1,1], [0,1] ];
 
-		var p = verb.eval.nurbs.rational_curve_point( degree, knot_vector, verb.eval.nurbs.homogenize_1d( control_points, weights) , 0);
+		var p = verb.eval.nurbs.rational_curve_point( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights) , 0);
 
 		should.equal( p[0], 1 );
 		should.equal( p[1], 0 );
 
-		p = verb.eval.nurbs.rational_curve_point( degree, knot_vector, verb.eval.nurbs.homogenize_1d( control_points, weights) , 0.5);
+		p = verb.eval.nurbs.rational_curve_point( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights) , 0.5);
 
 		should.equal( p[0], 0.6 );
 		should.equal( p[1], 0.8 );
 
-		p = verb.eval.nurbs.rational_curve_point( degree, knot_vector, verb.eval.nurbs.homogenize_1d( control_points, weights) , 1);
+		p = verb.eval.nurbs.rational_curve_point( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights) , 1);
 
 		should.equal( p[0], 0 );
 		should.equal( p[1], 1 );
@@ -497,24 +497,24 @@ describe("verb.eval.nurbs.rational_curve_point",function(){
 		// quarter cylinder patch
 		var degree_u = 1
 			, degree_v = 2
-			, knot_vector_u = [0, 0, 1, 1 ]
-			, knot_vector_v = [0, 0, 0, 1, 1, 1 ]
+			, knots_u = [0, 0, 1, 1 ]
+			, knots_v = [0, 0, 0, 1, 1, 1 ]
 			, homo_control_points = [ [ [1, 1, 0, 1], 	[1, 1, 1, 1], [2, 0, 2, 2] ],
 													 		  [ [-1, 1, 0, 1], 	[-1, 1, 1, 1], [-2, 0, 2, 2] ] ];
 
-		var p = verb.eval.nurbs.rational_surface_point( degree_u, knot_vector_u,  degree_v, knot_vector_v, homo_control_points, 0, 0 );
+		var p = verb.eval.nurbs.rational_surface_point( degree_u, knots_u,  degree_v, knots_v, homo_control_points, 0, 0 );
 
 		should.equal( p[0], 1 );
 		should.equal( p[1], 1 );
 		should.equal( p[2], 0 );
 
-		p = verb.eval.nurbs.rational_surface_point( degree_u, knot_vector_u,  degree_v, knot_vector_v, homo_control_points, 0.5, 0.5 );
+		p = verb.eval.nurbs.rational_surface_point( degree_u, knots_u,  degree_v, knots_v, homo_control_points, 0.5, 0.5 );
 
 		should.equal( p[0], 0 );
 		should.equal( p[1], 0.6 );
 		should.equal( p[2], 0.8 );
 
-		p = verb.eval.nurbs.rational_surface_point( degree_u, knot_vector_u,  degree_v, knot_vector_v, homo_control_points, 1, 1 );
+		p = verb.eval.nurbs.rational_surface_point( degree_u, knots_u,  degree_v, knots_v, homo_control_points, 1, 1 );
 
 		should.equal( p[0], -1 );
 		should.equal( p[1], 0 );
@@ -585,11 +585,11 @@ describe("verb.eval.nurbs.rational_curve_derivs",function(){
 
 		// this represents a single quarter arc, using a rational bezier curve
 		var degree = 2
-			, knot_vector = [0, 0, 0, 1, 1, 1 ]
+			, knots = [0, 0, 0, 1, 1, 1 ]
 			, weights = [1, 1, 2]
 			, control_points = [ [1, 0], [1,1], [0,1] ];
 
-		var p = verb.eval.nurbs.rational_curve_derivs( degree, knot_vector, verb.eval.nurbs.homogenize_1d( control_points, weights), 0, 2);
+		var p = verb.eval.nurbs.rational_curve_derivs( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights), 0, 2);
 
 		should.equal( p[0][0], 1 );
 		should.equal( p[0][1], 0 );
@@ -600,7 +600,7 @@ describe("verb.eval.nurbs.rational_curve_derivs",function(){
 		should.equal( p[2][0], -4 );
 		should.equal( p[2][1], 0 );
 
-		p = verb.eval.nurbs.rational_curve_derivs( degree, knot_vector, verb.eval.nurbs.homogenize_1d( control_points, weights), 1, 2);
+		p = verb.eval.nurbs.rational_curve_derivs( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights), 1, 2);
 
 		should.equal( p[0][0], 0 );
 		should.equal( p[0][1], 1 );
@@ -623,13 +623,13 @@ describe("verb.eval.nurbs.rational_surface_derivs",function(){
 		// quarter cylinder patch, axis aligned with x axis, radius: 1
 		var degree_u = 1
 			, degree_v = 2
-			, knot_vector_u = [0, 0, 1, 1 ]
-			, knot_vector_v = [0, 0, 0, 1, 1, 1 ]
+			, knots_u = [0, 0, 1, 1 ]
+			, knots_v = [0, 0, 0, 1, 1, 1 ]
 			, homo_control_points = [ [ [1, 1, 0, 1], 	[1, 1, 1, 1], [2, 0, 2, 2] ],
 													 		  [ [-1, 1, 0, 1], 	[-1, 1, 1, 1], [-2, 0, 2, 2] ] ]
 			, num_derivatives = 1;
 
-		var p = verb.eval.nurbs.rational_surface_derivs( degree_u, knot_vector_u, degree_v, knot_vector_v, homo_control_points, num_derivatives, 0, 0);
+		var p = verb.eval.nurbs.rational_surface_derivs( degree_u, knots_u, degree_v, knots_v, homo_control_points, num_derivatives, 0, 0);
 
 		should.equal( p[0][0][0], 1 );
 		should.equal( p[0][0][1], 1 );
@@ -643,7 +643,7 @@ describe("verb.eval.nurbs.rational_surface_derivs",function(){
 		should.equal( p[1][0][1], 0 );
 		should.equal( p[1][0][2], 0 );
 
-		p = verb.eval.nurbs.rational_surface_derivs( degree_u, knot_vector_u, degree_v, knot_vector_v, homo_control_points, num_derivatives, 1, 1);
+		p = verb.eval.nurbs.rational_surface_derivs( degree_u, knots_u, degree_v, knots_v, homo_control_points, num_derivatives, 1, 1);
 
 		should.equal( p[0][0][0], -1 );
 		should.equal( p[0][0][1], 0 );
@@ -667,10 +667,10 @@ describe("verb.eval.nurbs.curve_knot_insert",function(){
 		// this represents a single quarter arc, using a rational bezier curve
 		var degree = 2
 			, u = 0.5
-			, knot_vector = [0, 0, 0, 1, 1, 1 ]
+			, knots = [0, 0, 0, 1, 1, 1 ]
 			, control_points = [ [1, 0], [1,1], [0,1] ];
 
-		var p = verb.eval.nurbs.curve_knot_insert( degree, knot_vector, control_points, u, 0, 1 );
+		var p = verb.eval.nurbs.curve_knot_insert( degree, knots, control_points, u, 0, 1 );
 		// should.equal(0, 1);
 
 	});
@@ -697,16 +697,16 @@ describe("verb.eval.nurbs.rational_curve_point",function(){
 	it('returns correct results for a line', function(){
 
 		var degree = 1
-			, knot_vector = [0, 0, 1, 1]
+			, knots = [0, 0, 1, 1]
 			, control_points = [ [0, 0, 0], [10, 0, 0] ]
 			, weights = [1, 1]
 			, u1 = 0.0
 			, u2 = 0.5
 			, u3 = 1.0;
 
-		var p1 = verb.eval.nurbs.rational_curve_point( degree, knot_vector, verb.eval.nurbs.homogenize_1d( control_points, weights), u1);
-		var p2 = verb.eval.nurbs.rational_curve_point( degree, knot_vector, verb.eval.nurbs.homogenize_1d( control_points, weights), u2);
-		var p3 = verb.eval.nurbs.rational_curve_point( degree, knot_vector, verb.eval.nurbs.homogenize_1d( control_points, weights), u3);
+		var p1 = verb.eval.nurbs.rational_curve_point( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights), u1);
+		var p2 = verb.eval.nurbs.rational_curve_point( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights), u2);
+		var p3 = verb.eval.nurbs.rational_curve_point( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights), u3);
 		
 		should.equal(p1[0], 0);
 		should.equal(p2[0], 5);
@@ -721,11 +721,11 @@ describe("verb.eval.nurbs.rational_curve_adaptive_sample",function(){
 	it('returns two end points for a line', function(){
 
 		var degree = 1
-			, knot_vector = [0, 0, 1, 1]
+			, knots = [0, 0, 1, 1]
 			, control_points = [ [0, 0, 0], [10, 0, 0] ]
 			, weights = [1, 1];
 
-		var p = verb.eval.nurbs.rational_curve_adaptive_sample( degree, knot_vector, verb.eval.nurbs.homogenize_1d( control_points, weights), 1e-5);	
+		var p = verb.eval.nurbs.rational_curve_adaptive_sample( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights), 1e-5);	
 		
 		should.equal(p[0][0], 0);
 		should.equal(p[1][0], 10);
@@ -735,11 +735,11 @@ describe("verb.eval.nurbs.rational_curve_adaptive_sample",function(){
 	it('returns all the control points for a degree 1 curve', function(){
 
 		var degree = 1
-			, knot_vector = [0, 0, 0.25, 0.5, 0.75, 1, 1]
+			, knots = [0, 0, 0.25, 0.5, 0.75, 1, 1]
 			, control_points = [ [0, 0, 0], [10, 10, 0], [14, 20, 0], [10, 32, 4], [12, 16, 22] ]
 			, weights = [1, 1, 1, 1, 1];
 
-		var p = verb.eval.nurbs.rational_curve_adaptive_sample( degree, knot_vector, verb.eval.nurbs.homogenize_1d( control_points, weights), 1e-5);	
+		var p = verb.eval.nurbs.rational_curve_adaptive_sample( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights), 1e-5);	
 		
 		p.should.be.instanceof(Array).and.have.lengthOf(5);
 		p[0].should.be.instanceof(Array).and.have.lengthOf(3);
@@ -751,12 +751,12 @@ describe("verb.eval.nurbs.rational_curve_adaptive_sample",function(){
 	it('makes more points for an arc', function(){
 
 		var degree = 2
-			, knot_vector = [0, 0, 0, 1, 1, 1 ]
+			, knots = [0, 0, 0, 1, 1, 1 ]
 			, weights = [1, Math.sqrt(2) / 2, 1]
 			, control_points = [ [1, 0, 0], [1, 1, 0], [0, 1, 0] ];
 
-		var p = verb.eval.nurbs.rational_curve_adaptive_sample( degree, knot_vector, verb.eval.nurbs.homogenize_1d( control_points, weights), 1e-8);	
-		var p2 = verb.eval.nurbs.rational_curve_adaptive_sample( degree, knot_vector, verb.eval.nurbs.homogenize_1d( control_points, weights), 1e-4);	
+		var p = verb.eval.nurbs.rational_curve_adaptive_sample( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights), 1e-8);	
+		var p2 = verb.eval.nurbs.rational_curve_adaptive_sample( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights), 1e-4);	
 		
 		var prev = - 1e-8;
 		for (var i = 0; i < p.length; i++){
@@ -781,12 +781,12 @@ describe("verb.eval.nurbs.rational_curve_regular_sample",function(){
 	it('should return 10 samples when asked to', function(){
 
 		var degree = 2
-			, knot_vector = [0, 0, 0, 1, 1, 1 ]
+			, knots = [0, 0, 0, 1, 1, 1 ]
 			, weights = [1, 1, 2]
 			, control_points = [ [1, 0, 0], [1, 1, 0], [0, 1, 0] ]
 			, numSamples = 10;
 
-		var p = verb.eval.nurbs.rational_curve_regular_sample( degree, knot_vector, verb.eval.nurbs.homogenize_1d( control_points, weights), numSamples);	
+		var p = verb.eval.nurbs.rational_curve_regular_sample( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights), numSamples);	
 
 		should.equal(p.length, 10);
 		should.equal(p[0][0], 0);
@@ -1361,9 +1361,9 @@ describe("verb.eval.nurbs.get_revolved_surface",function(){
 		should.equal( 0, comps.control_points[0][1][2] );
 
 		var p = verb.eval.nurbs.rational_surface_point( 2, 
-														comps.knot_vector_u, 
+														comps.knots_u, 
 														1, 
-														comps.knot_vector_v, 
+														comps.knots_v, 
 														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
 														0.5, 
 														0.5);
@@ -1396,9 +1396,9 @@ describe("verb.eval.nurbs.get_revolved_surface",function(){
 		should.equal( 0, comps.control_points[0][1][2] );
 
 		var p = verb.eval.nurbs.rational_surface_point( 2, 
-														comps.knot_vector_u, 
+														comps.knots_u, 
 														1, 
-														comps.knot_vector_v, 
+														comps.knots_v, 
 														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
 														0.5, 
 														0.5);
@@ -1432,9 +1432,9 @@ describe("verb.eval.nurbs.get_revolved_surface",function(){
 		should.equal( 0, comps.control_points[0][1][2] );
 
 		var p = verb.eval.nurbs.rational_surface_point( 2, 
-														comps.knot_vector_u, 
+														comps.knots_u, 
 														1, 
-														comps.knot_vector_v, 
+														comps.knots_v, 
 														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
 														0.5, 
 														0.5);
@@ -1471,9 +1471,9 @@ describe("verb.eval.nurbs.get_extruded_surface",function(){
 
 		// sample at the center
 		var p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
-														comps.knot_vector_u, 
+														comps.knots_u, 
 														comps.degree_v,
-														comps.knot_vector_v, 
+														comps.knots_v, 
 														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
 														0.5, 
 														0.5);
@@ -1510,9 +1510,9 @@ describe("verb.eval.nurbs.get_extruded_surface",function(){
 
 		// sample at the center
 		var p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
-														comps.knot_vector_u, 
+														comps.knots_u, 
 														comps.degree_v,
-														comps.knot_vector_v, 
+														comps.knots_v, 
 														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
 														0.5, 
 														0.5);
@@ -1542,9 +1542,9 @@ describe("verb.eval.nurbs.get_cylinder_surface",function(){
 
 		// sample at the center
 		var p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
-														comps.knot_vector_u, 
+														comps.knots_u, 
 														comps.degree_v,
-														comps.knot_vector_v, 
+														comps.knots_v, 
 														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
 														0.5, 
 														0.5);
@@ -1554,9 +1554,9 @@ describe("verb.eval.nurbs.get_cylinder_surface",function(){
 		p[2].should.be.approximately(radius/2, verb.EPSILON);
 
 		p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
-														comps.knot_vector_u, 
+														comps.knots_u, 
 														comps.degree_v,
-														comps.knot_vector_v, 
+														comps.knots_v, 
 														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
 														0, 
 														0);
@@ -1566,9 +1566,9 @@ describe("verb.eval.nurbs.get_cylinder_surface",function(){
 		p[2].should.be.approximately(0, verb.EPSILON);
 
 		p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
-														comps.knot_vector_u, 
+														comps.knots_u, 
 														comps.degree_v,
-														comps.knot_vector_v, 
+														comps.knots_v, 
 														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
 														1, 
 														0);
@@ -1578,9 +1578,9 @@ describe("verb.eval.nurbs.get_cylinder_surface",function(){
 		p[2].should.be.approximately(height, verb.EPSILON);
 
 		p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
-														comps.knot_vector_u, 
+														comps.knots_u, 
 														comps.degree_v,
-														comps.knot_vector_v, 
+														comps.knots_v, 
 														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
 														0, 
 														1);
@@ -1598,14 +1598,14 @@ describe("verb.eval.nurbs.get_polyline_curve",function(){
 	it('can create a polyline with correct structure', function(){
 
 		var degree = 1
-			, knot_vector = [0, 0, 0.25, 0.5, 0.75, 1, 1]
+			, knots = [0, 0, 0.25, 0.5, 0.75, 1, 1]
 			, control_points = [ [0, 0, 0], [10, 10, 0], [14, 20, 0], [10, 32, 4], [12, 16, 22] ]
 			, weights = [1, 1, 1, 1, 1];
 
 		var comps = verb.eval.nurbs.get_polyline_curve( control_points );
 
 		comps.degree.should.equal(degree);
-		comps.knot_vector.should.eql(knot_vector);
+		comps.knots.should.eql(knots);
 		comps.control_points.should.eql(control_points);
 		comps.weights.should.eql(weights);
 
@@ -1630,9 +1630,9 @@ describe("verb.eval.nurbs.get_cone_surface",function(){
 
 		// sample at the center
 		var p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
-														comps.knot_vector_u, 
+														comps.knots_u, 
 														comps.degree_v,
-														comps.knot_vector_v, 
+														comps.knots_v, 
 														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
 														0.5, 
 														0.5);
@@ -1642,9 +1642,9 @@ describe("verb.eval.nurbs.get_cone_surface",function(){
 		p[2].should.be.approximately(height/2, verb.EPSILON);
 
 		p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
-														comps.knot_vector_u, 
+														comps.knots_u, 
 														comps.degree_v,
-														comps.knot_vector_v, 
+														comps.knots_v, 
 														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
 														0, 
 														0);
@@ -1654,9 +1654,9 @@ describe("verb.eval.nurbs.get_cone_surface",function(){
 		p[2].should.be.approximately(height, verb.EPSILON);
 
 		p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
-														comps.knot_vector_u, 
+														comps.knots_u, 
 														comps.degree_v,
-														comps.knot_vector_v, 
+														comps.knots_v, 
 														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
 														1, 
 														0);
@@ -1666,9 +1666,9 @@ describe("verb.eval.nurbs.get_cone_surface",function(){
 		p[2].should.be.approximately(height, verb.EPSILON);
 
 		p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
-														comps.knot_vector_u, 
+														comps.knots_u, 
 														comps.degree_v,
-														comps.knot_vector_v, 
+														comps.knots_v, 
 														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
 														0, 
 														1);
@@ -1694,16 +1694,16 @@ describe("verb.eval.nurbs.get_4pt_surface",function(){
 
 		comps.degree_u.should.equal(1);
 		comps.degree_v.should.equal(1);
-		comps.knot_vector_u.should.eql([0,0,1,1]);
-		comps.knot_vector_u.should.eql([0,0,1,1]);
+		comps.knots_u.should.eql([0,0,1,1]);
+		comps.knots_u.should.eql([0,0,1,1]);
 		comps.weights.should.eql([ [1,1], [1, 1] ]);
 		comps.control_points.should.eql([ [p1, p4], [p2, p3] ]);
 
 		// sample at the center
 		var p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
-														comps.knot_vector_u, 
+														comps.knots_u, 
 														comps.degree_v,
-														comps.knot_vector_v, 
+														comps.knots_v, 
 														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
 														0.5, 
 														0.5);
@@ -1725,16 +1725,16 @@ describe("verb.eval.nurbs.get_4pt_surface",function(){
 
 		comps.degree_u.should.equal(1);
 		comps.degree_v.should.equal(1);
-		comps.knot_vector_u.should.eql([0,0,1,1]);
-		comps.knot_vector_u.should.eql([0,0,1,1]);
+		comps.knots_u.should.eql([0,0,1,1]);
+		comps.knots_u.should.eql([0,0,1,1]);
 		comps.weights.should.eql([ [1,1], [1, 1] ]);
 		comps.control_points.should.eql([ [p1, p4], [p2, p3] ]);
 
 		// sample at the center
 		var p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
-														comps.knot_vector_u, 
+														comps.knots_u, 
 														comps.degree_v,
-														comps.knot_vector_v, 
+														comps.knots_v, 
 														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
 														0.5, 
 														0.5);
@@ -1745,9 +1745,9 @@ describe("verb.eval.nurbs.get_4pt_surface",function(){
 
 		// bottom left
 		p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
-														comps.knot_vector_u, 
+														comps.knots_u, 
 														comps.degree_v,
-														comps.knot_vector_v, 
+														comps.knots_v, 
 														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
 														0, 
 														0);
@@ -1758,9 +1758,9 @@ describe("verb.eval.nurbs.get_4pt_surface",function(){
 
 		// bottom right
 		p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
-														comps.knot_vector_u, 
+														comps.knots_u, 
 														comps.degree_v,
-														comps.knot_vector_v, 
+														comps.knots_v, 
 														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
 														1, 
 														0);
@@ -1784,28 +1784,23 @@ describe("verb.eval.nurbs.get_sphere_surface",function(){
 
 		var comps = verb.eval.nurbs.get_sphere_surface(center, axis, xaxis, radius);
 
-		// comps.degree_u.should.equal(2);
-		// comps.degree_v.should.equal(2);
+		comps.degree_u.should.equal(2);
+		comps.degree_v.should.equal(2);
 
-		// console.log(comps.control_points);
-
-		// comps.knot_vector_u.should.eql([0,0,1,1]);
-		// comps.knot_vector_u.should.eql([0,0,1,1]);
-		// comps.weights.should.eql([ [1,1], [1, 1] ]);
-		// comps.control_points.should.eql([ [p1, p4], [p2, p3] ]);
+		console.log(comps)
 
 		// sample at the center
-		// var p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
-		// 												comps.knot_vector_u, 
-		// 												comps.degree_v,
-		// 												comps.knot_vector_v, 
-		// 												verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
-		// 												0.5, 
-		// 												0.5);
+		var p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
+														comps.knots_u, 
+														comps.degree_v,
+														comps.knots_v, 
+														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														0.5, 
+														0.5);
 
-		// p[0].should.be.approximately(0.5, verb.EPSILON );
-		// p[1].should.be.approximately(0.5, verb.EPSILON );
-		// p[2].should.be.approximately(0.5, verb.EPSILON );
+		p[0].should.be.approximately(-1, verb.EPSILON );
+		p[1].should.be.approximately(0, verb.EPSILON );
+		p[2].should.be.approximately(0, verb.EPSILON );
 
 	});
 
