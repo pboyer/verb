@@ -1936,26 +1936,38 @@ describe("verb.eval.nurbs.get_ellipse_arc",function(){
 		p[1].should.be.approximately( ymid, verb.EPSILON );
 		p[2].should.be.approximately( 0, verb.EPSILON );
 
+		p = verb.eval.nurbs.rational_curve_point( ellipse.degree, ellipse.knots, verb.eval.nurbs.homogenize_1d( ellipse.control_points, ellipse.weights), 1);
+
+		p[0].should.be.approximately( 0, verb.EPSILON );
+		p[1].should.be.approximately( ry, verb.EPSILON );
+		p[2].should.be.approximately( 0, verb.EPSILON );
+
+		p = verb.eval.nurbs.rational_curve_point( ellipse.degree, ellipse.knots, verb.eval.nurbs.homogenize_1d( ellipse.control_points, ellipse.weights), 0);
+
+		p[0].should.be.approximately( rx, verb.EPSILON );
+		p[1].should.be.approximately( 0, verb.EPSILON );
+		p[2].should.be.approximately( 0, verb.EPSILON );
+
 	});
 
-	// it('returns correct result for unit arc from 0 to 45 deg', function(){
+	it('returns correct result for unit arc from 0 to 45 deg', function(){
 
-	// 	var center = [0,0,0]
-	// 		, x = [1,0,0]
-	// 		, y = [0,1,0]
-	// 		, r = 1
-	// 		, start = 0
-	// 		, end = Math.PI/4;
+		var center = [0,0,0]
+			, x = [1,0,0]
+			, y = [0,1,0]
+			, r = 1
+			, start = 0
+			, end = Math.PI/4;
 
-	// 	var arc_components = verb.eval.nurbs.get_arc(center, x, y, 1, start, end);
+		var arc_components = verb.eval.nurbs.get_arc(center, x, y, 1, start, end);
 
-	// 	var p = verb.eval.nurbs.rational_curve_point( arc_components.degree, arc_components.knots, verb.eval.nurbs.homogenize_1d( arc_components.control_points, arc_components.weights), 1);
+		var p = verb.eval.nurbs.rational_curve_point( arc_components.degree, arc_components.knots, verb.eval.nurbs.homogenize_1d( arc_components.control_points, arc_components.weights), 1);
 
-	// 	should.equal( Math.abs( p[0] - Math.sqrt(2)/2 ) < verb.EPSILON, true );
-	// 	should.equal( Math.abs( p[1] - Math.sqrt(2)/2 ) < verb.EPSILON, true );
-	// 	should.equal( p[2], 0 );
+		should.equal( Math.abs( p[0] - Math.sqrt(2)/2 ) < verb.EPSILON, true );
+		should.equal( Math.abs( p[1] - Math.sqrt(2)/2 ) < verb.EPSILON, true );
+		should.equal( p[2], 0 );
 
-	// });
+	});
 
 	// it('returns correct result for unit arc from 45 to 135 deg', function(){
 
