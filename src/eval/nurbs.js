@@ -12,7 +12,7 @@
  * @api public
  */
 
-verb.eval.nurbs.get_sweep_surface = function( profile_knots, profile_degree, profile_control_points, profile_weights, rail_knots, rail_degree, knots_control_points, knots_weights ) {
+verb.eval.nurbs.get_sweep1_surface = function( profile_knots, profile_degree, profile_control_points, profile_weights, rail_knots, rail_degree, knots_control_points, knots_weights ) {
 
 	// for each point on rail, move all of the points
 	var homo_rail = verb.eval.nurbs.homogenize_1d( rail_control_points, rail_weights )
