@@ -16,6 +16,101 @@ verb.EPSILON = 1e-8;
 verb.TOLERANCE = 1e-3;
 
 var router = new labor.Router(verb.eval.nurbs);
+
+/**
+ * Generate the control points, weights, and knots of an elliptical arc
+ *
+ * @param {Array} the center
+ * @param {Array} the xaxis
+ * @param {Array} orthogonal yaxis
+ * @param {Number} xradius of the ellipse arc
+ * @param {Number} yradius of the ellipse arc
+ * @param {Number} start angle of the ellipse arc, between 0 and 2pi, where 0 points at the xaxis
+ * @param {Number} end angle of the arc, between 0 and 2pi, greater than the start angle
+ * @return {Object} an object with the following properties: control_points, weights, knots, degree
+ * @api public
+ */
+
+verb.eval.nurbs.get_ellipse_arc = function( center, xaxis, yaxis, xradius, yradius, start_angle, end_angle ) {
+
+	// if the end angle is less than the start angle, do a circle
+	if (end_angle < start_angle) end_angle = 2 * Math.PI + start_angle;
+
+	var theta = end_angle - start_angle
+		, narcs = 0;
+
+	// how many arcs?
+	if (theta <= Math.PI / 2) {
+		narcs = 1;
+	} else {
+		if (theta <= Math.PI){
+			narcs = 2;
+		} else if (theta <= 3 * Math.PI / 2){
+			narcs = 3;
+		} else {
+			narcs = 4;
+		}
+	}
+
+	var dtheta = theta / narcs
+		, n = 2 * narcs
+		, w1 = Math.cos( dtheta / 2) 
+		, P0 = numeric.add( center, numeric.mul( xradius, Math.cos(start_angle), xaxis), numeric.mul( yradius, Math.sin(start_angle), yaxis ) )
+		, T0 = numeric.sub( numeric.mul( Math.cos(start_angle), yaxis ), numeric.mul( Math.sin(start_angle), xaxis) )
+		, Pw = verb.eval.nurbs.zeros_1d( narcs * 2 )
+		, U = verb.eval.nurbs.zeros_1d( 2 * narcs + 3 )
+		, index = 0
+		, angle = start_angle
+		, W = verb.eval.nurbs.zeros_1d( narcs * 2 );
+
+	Pw[0] = P0;
+	W[0] = 1;
+
+	for (var i = 1; i <= narcs; i++){
+
+		angle += dtheta;
+		var P2 = numeric.add( center, numeric.mul( xradius, Math.cos(angle), xaxis), numeric.mul( yradius, Math.sin(angle), yaxis ) )
+
+		W[index+2] = 1;
+		Pw[index+2] = P2;
+
+		var T2 = numeric.sub( numeric.mul( Math.cos(angle), yaxis ), numeric.mul( Math.sin(angle), xaxis) )
+
+		var params = verb.eval.geom.intersect_rays(P0, numeric.mul( 1 / numeric.norm2(T0), T0), P2, numeric.mul( 1 / numeric.norm2(T2), T2));
+		var P1 = numeric.add( P0, numeric.mul(T0, params[0]));
+
+		W[index+1] = w1;
+		Pw[index+1] = P1;
+
+		index += 2;
+
+		if (i < narcs){
+			P0 = P2;
+			T0 = T2;
+		}
+	}
+
+	var j = 2 * narcs + 1;
+
+	for (var i = 0; i < 3; i++){
+		U[i] = 0.0;
+		U[i+j] = 1.0;
+	}
+
+	switch (narcs){
+		case 1: break;
+		case 2: U[3] = U[4] = 0.5; break;
+		case 3: U[3] = U[4] = 1/3;
+						U[5] = U[6] = 2/3; break;
+		case 4: U[3] = U[4] = 0.25;
+						U[5] = U[6] = 0.5;
+						U[7] = U[8] = 0.75; break;
+	}
+
+	return {knots: U, control_points: Pw, degree: 2, weights: W };
+
+}
+
 /**
  * Generate the control points, weights, and knots of a sphere
  *

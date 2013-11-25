@@ -900,11 +900,10 @@ verb.geom.Ellipse.prototype.nurbsRep = function(){
 
 };
 
-// todo do polyline, plane, revsurface, sphere, think about sweep
-// make sure it all builds again, may need to reorder the build process
-
 // implement ellipse
 // implement tesselation stuff, proper mesh datatypes
+
+// todo sweep
 
 // prepare demo
 
@@ -1076,32 +1075,6 @@ verb.geom.Cone.prototype.nurbsRep = function(){
 	return this.nurbsEngine.eval_sync( 'get_4pt_surface', [ p1, p2, p3, p4 ]);
 
 };
-verb.geom.PolylineCurve = function( points ){
-
-	// construct some sort of parameter mapping to subcurves
-
-	this.point_sync = function( u ) {
-		// return this.nurbsEngine.eval_sync( 'rational_curve_point', [ _degree, _knots, _homo_control_points, u ] );
-	};
-
-	this.derivs_sync = function( u, num_derivs ) {
-		// return this.nurbsEngine.eval_sync( 'rational_curve_derivs', [ _degree, _knots, _homo_control_points, u, num_derivs] );
-	};
-
-	this.point = function( u, callback ) {
-		// nurbsEngine.eval( 'rational_curve_point', [ _degree, _knots, _homo_control_points, u ], callback ); 
-	};
-
-	this.derivs = function( u, num_derivs, callback ) {
-		// this.nurbsEngine.eval( 'rational_curve_derivs', [ _degree, _knots, _homo_control_points, u, num_derivs  ], callback ); 
-	};
-
-	this.points = function( num_samples, callback ) {
-		// TODO: here we would use the worker to generate all of the points
-		// wait for callback
-	};
-
-}
 verb.geom.Polyline = function( points ) {
 
 	this.setAll( {
@@ -1148,33 +1121,28 @@ verb.geom.RevolvedSurface.prototype.nurbsRep = function(){
 									  this.get("profile").get("weights")] );
 
 };
-verb.geom.Sphere = function( center, axis, angle, profile ) {
+verb.geom.Sphere = function( center, radius ) {
 
 	this.setAll({
 		"center": center,
-		"axis": axis,
-		"angle": angle,
-		"profile": profile
+		"radius": radius
 	});
 
 	var surface_props = this.nurbsRep();
 
 	verb.geom.NurbsSurface.call(this, surface_props.degree, surface_props.control_points, surface_props.weight, surface_props.knots );
 
-	this.watchAll( ['center', 'axis', 'angle', 'profile'], this.update );
+	this.watchAll( ['center', 'radius'], this.update );
 
 }.inherits(verb.geom.NurbsSurface);
 
-verb.geom.RevolvedSurface.prototype.nurbsRep = function(){
+verb.geom.Sphere.prototype.nurbsRep = function(){
 
-	  return this.nurbsEngine.eval_sync( 'get_revolved_surface', 
-									[ this.get("center"), 
-									  this.get("axis"), 
-									  this.get("angle"), 
-									  this.get("profile").get("knots"), 
-									  this.get("profile").get("degree"), 
-									  this.get("profile").get("controlPoints"),
-									  this.get("profile").get("weights")] );
+  return this.nurbsEngine.eval_sync( 'get_sphere_surface', 
+										[ this.get("center"), 
+										  [0,0,1],
+										  [1,0,0],
+										  this.get("radius")] );
 
 };
 // 
@@ -1245,6 +1213,101 @@ verb.geom.Vector3.prototype = {
     );
   }
 };
+
+/**
+ * Generate the control points, weights, and knots of an elliptical arc
+ *
+ * @param {Array} the center
+ * @param {Array} the xaxis
+ * @param {Array} orthogonal yaxis
+ * @param {Number} xradius of the ellipse arc
+ * @param {Number} yradius of the ellipse arc
+ * @param {Number} start angle of the ellipse arc, between 0 and 2pi, where 0 points at the xaxis
+ * @param {Number} end angle of the arc, between 0 and 2pi, greater than the start angle
+ * @return {Object} an object with the following properties: control_points, weights, knots, degree
+ * @api public
+ */
+
+verb.eval.nurbs.get_ellipse_arc = function( center, xaxis, yaxis, xradius, yradius, start_angle, end_angle ) {
+
+	// if the end angle is less than the start angle, do a circle
+	if (end_angle < start_angle) end_angle = 2 * Math.PI + start_angle;
+
+	var theta = end_angle - start_angle
+		, narcs = 0;
+
+	// how many arcs?
+	if (theta <= Math.PI / 2) {
+		narcs = 1;
+	} else {
+		if (theta <= Math.PI){
+			narcs = 2;
+		} else if (theta <= 3 * Math.PI / 2){
+			narcs = 3;
+		} else {
+			narcs = 4;
+		}
+	}
+
+	var dtheta = theta / narcs
+		, n = 2 * narcs
+		, w1 = Math.cos( dtheta / 2) 
+		, P0 = numeric.add( center, numeric.mul( xradius, Math.cos(start_angle), xaxis), numeric.mul( yradius, Math.sin(start_angle), yaxis ) )
+		, T0 = numeric.sub( numeric.mul( Math.cos(start_angle), yaxis ), numeric.mul( Math.sin(start_angle), xaxis) )
+		, Pw = verb.eval.nurbs.zeros_1d( narcs * 2 )
+		, U = verb.eval.nurbs.zeros_1d( 2 * narcs + 3 )
+		, index = 0
+		, angle = start_angle
+		, W = verb.eval.nurbs.zeros_1d( narcs * 2 );
+
+	Pw[0] = P0;
+	W[0] = 1;
+
+	for (var i = 1; i <= narcs; i++){
+
+		angle += dtheta;
+		var P2 = numeric.add( center, numeric.mul( xradius, Math.cos(angle), xaxis), numeric.mul( yradius, Math.sin(angle), yaxis ) )
+
+		W[index+2] = 1;
+		Pw[index+2] = P2;
+
+		var T2 = numeric.sub( numeric.mul( Math.cos(angle), yaxis ), numeric.mul( Math.sin(angle), xaxis) )
+
+		var params = verb.eval.geom.intersect_rays(P0, numeric.mul( 1 / numeric.norm2(T0), T0), P2, numeric.mul( 1 / numeric.norm2(T2), T2));
+		var P1 = numeric.add( P0, numeric.mul(T0, params[0]));
+
+		W[index+1] = w1;
+		Pw[index+1] = P1;
+
+		index += 2;
+
+		if (i < narcs){
+			P0 = P2;
+			T0 = T2;
+		}
+	}
+
+	var j = 2 * narcs + 1;
+
+	for (var i = 0; i < 3; i++){
+		U[i] = 0.0;
+		U[i+j] = 1.0;
+	}
+
+	switch (narcs){
+		case 1: break;
+		case 2: U[3] = U[4] = 0.5; break;
+		case 3: U[3] = U[4] = 1/3;
+						U[5] = U[6] = 2/3; break;
+		case 4: U[3] = U[4] = 0.25;
+						U[5] = U[6] = 0.5;
+						U[7] = U[8] = 0.75; break;
+	}
+
+	return {knots: U, control_points: Pw, degree: 2, weights: W };
+
+}
+
 /**
  * Generate the control points, weights, and knots of a sphere
  *
