@@ -1787,8 +1787,6 @@ describe("verb.eval.nurbs.get_sphere_surface",function(){
 		comps.degree_u.should.equal(2);
 		comps.degree_v.should.equal(2);
 
-		console.log(comps)
-
 		// sample at the center
 		var p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
 														comps.knots_u, 
