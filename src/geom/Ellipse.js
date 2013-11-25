@@ -30,10 +30,9 @@ verb.geom.Ellipse.prototype.nurbsRep = function(){
 
 };
 
-// todo do polyline, plane, revsurface, sphere, think about sweep
-// make sure it all builds again, may need to reorder the build process
-
 // implement ellipse
 // implement tesselation stuff, proper mesh datatypes
+
+// todo sweep
 
 // prepare demo
