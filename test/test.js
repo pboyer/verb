@@ -737,7 +737,7 @@ describe("verb.eval.nurbs.rational_curve_adaptive_sample",function(){
 		var degree = 1
 			, knot_vector = [0, 0, 0.25, 0.5, 0.75, 1, 1]
 			, control_points = [ [0, 0, 0], [10, 10, 0], [14, 20, 0], [10, 32, 4], [12, 16, 22] ]
-			, weights = [1, 1, 1, 1, 1, 1];
+			, weights = [1, 1, 1, 1, 1];
 
 		var p = verb.eval.nurbs.rational_curve_adaptive_sample( degree, knot_vector, verb.eval.nurbs.homogenize_1d( control_points, weights), 1e-5);	
 		
@@ -768,7 +768,7 @@ describe("verb.eval.nurbs.rational_curve_adaptive_sample",function(){
 		p.should.be.instanceof(Array).and.not.have.lengthOf(0);
 		p2.should.be.instanceof(Array).and.not.have.lengthOf(0);
 		p.should.be.instanceof(Array).and.not.have.lengthOf(p2.length);
-		
+
 		should.equal(p[p.length-1][0], 1.0);
 		should.equal(p2[p2.length-1][0], 1.0);
 
@@ -1569,6 +1569,26 @@ describe("verb.eval.nurbs.get_cylinder_surface",function(){
 		p[0].should.be.approximately(radius, verb.EPSILON);
 		p[1].should.be.approximately(0, verb.EPSILON);
 		p[2].should.be.approximately(0, verb.EPSILON);
+
+	});
+
+});
+
+describe("verb.eval.nurbs.get_polyline_curve",function(){
+
+	it('can create a polyline with correct structure', function(){
+
+		var degree = 1
+			, knot_vector = [0, 0, 0.25, 0.5, 0.75, 1, 1]
+			, control_points = [ [0, 0, 0], [10, 10, 0], [14, 20, 0], [10, 32, 4], [12, 16, 22] ]
+			, weights = [1, 1, 1, 1, 1];
+
+		var comps = verb.eval.nurbs.get_polyline_curve( control_points );
+
+		comps.degree.should.equal(degree);
+		comps.knot_vector.should.eql(knot_vector);
+		comps.control_points.should.eql(control_points);
+		comps.weights.should.eql(weights);
 
 	});
 

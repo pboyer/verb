@@ -1104,19 +1104,28 @@ verb.geom.PolylineCurve = function( points ){
 }
 verb.geom.Polyline = function(points) {
 
-	if (points){
-		this.points = points;
-	} else {
-		this.points = [];
-	}
+
 
 }.inherits(verb.geom.NurbsCurve);
-verb.geom.PolylineCurve = function( polyline ){
 
-	_degree = 1;
-	_control_points = polyline.points.slice(0);
+verb.geom.Polyline.prototype.nurbsRep = function(){
 
-}.inherits( verb.geom.NurbsCurve );
+	
+
+
+
+
+
+
+
+
+	return this.nurbsEngine.eval_sync( 'get_cone_surface', [ this.get("axis"), 
+																												 this.get("xaxis"), 
+																												 this.get("base"), 
+																												 this.get("height"), 
+																												 this.get("radius") ]);
+
+};
 
 
 // a data structure representing a sphere
@@ -1195,18 +1204,51 @@ verb.geom.Vector3.prototype = {
   }
 };
 /**
+ * Generate the control points, weights, and knots of a polyline curve
+ *
+ * @param {Array} array of points in curve
+ * @return {Object} an object with the following properties: control_points, weights, knot_vector, degree
+ * @api public
+ */
+
+verb.eval.nurbs.get_polyline_curve = function( pts ){
+
+	var num_spans = pts.length - 1
+		, span = 1.0 / num_spans
+		, knots = [0,0];
+
+	for (var i = 1; i < num_spans; i++){
+		knots.push(i * span);
+	}
+
+	knots.push(1);
+	knots.push(1);
+
+	var weights = [];
+
+	for (var i = 0; i < pts.length; i++){
+		weights.push(1);
+	}
+
+	return {
+			"knot_vector": knots, 
+			"control_points": pts.slice(0), 
+			"degree": 1,
+			"weights": weights 
+		};
+			
+}
+
+/**
  * Generate the control points, weights, and knots of a surface define by 3 points
  *
  * @param {Array} first point in counter-clockwise form
  * @param {Array} second point in counter-clockwise form
  * @param {Array} third point in counter-clockwise form
  * @param {Array} forth point in counter-clockwise form
- * @return {Object} an object with the following properties: control_points, weights, knots_u, knots_v, degree_u, degree_v
+ * @return {Object} an object with the following properties: control_points, weights, knot_vector_u, knot_vector_v, degree_u, degree_v
  * @api public
  */
-
-  // * @param {Array} 3d array of control points, where rows are the u dir, and columns run along the positive v direction, 
- 	// 								and where each control point is an array of length (dim)  
 
 verb.eval.nurbs.get_4pt_surface = function( p1, p2, p3, p4 ){
 
