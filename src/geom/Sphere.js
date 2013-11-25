@@ -1,29 +1,24 @@
-verb.geom.Sphere = function( center, axis, angle, profile ) {
+verb.geom.Sphere = function( center, radius ) {
 
 	this.setAll({
 		"center": center,
-		"axis": axis,
-		"angle": angle,
-		"profile": profile
+		"radius": radius
 	});
 
 	var surface_props = this.nurbsRep();
 
 	verb.geom.NurbsSurface.call(this, surface_props.degree, surface_props.control_points, surface_props.weight, surface_props.knots );
 
-	this.watchAll( ['center', 'axis', 'angle', 'profile'], this.update );
+	this.watchAll( ['center', 'radius'], this.update );
 
 }.inherits(verb.geom.NurbsSurface);
 
-verb.geom.RevolvedSurface.prototype.nurbsRep = function(){
+verb.geom.Sphere.prototype.nurbsRep = function(){
 
-	  return this.nurbsEngine.eval_sync( 'get_revolved_surface', 
-									[ this.get("center"), 
-									  this.get("axis"), 
-									  this.get("angle"), 
-									  this.get("profile").get("knots"), 
-									  this.get("profile").get("degree"), 
-									  this.get("profile").get("controlPoints"),
-									  this.get("profile").get("weights")] );
+  return this.nurbsEngine.eval_sync( 'get_sphere_surface', 
+										[ this.get("center"), 
+										  [0,0,1],
+										  [1,0,0],
+										  this.get("radius")] );
 
 };
