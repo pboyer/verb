@@ -1,3 +1,13 @@
+/**
+ * Constructor for a NurbsCurve
+ *
+ * @param {Number} The degree of the curve
+ * @param {Array} Array of arrays representing the control points
+ * @param {Array} Array of numbers representing the control point weights
+ * @param {Array} Array of numbers representing the knot structure
+ * @api public
+ */
+
 verb.geom.NurbsCurve = function( degree, controlPoints, weights, knots ) {
 
 	this.setAll({
@@ -12,11 +22,24 @@ verb.geom.NurbsCurve = function( degree, controlPoints, weights, knots ) {
 }.inherits( verb.geom.NurbsGeometry );
 
 
+/**
+ * Obtain the homogeneous representation of the control points
+ *
+ * @api public
+ */
+
 verb.geom.NurbsCurve.prototype.homogenize = function(){
 
 	return verb.eval.nurbs.homogenize_1d( this.get('controlPoints'), this.get('weights') );
 
 };
+
+/**
+ * If this is a subtype of the NurbsCurve, this method will update the Nurbs representation
+ * of the curve from those parameters.  This destroys any manual changes to the Nurbs rep.
+ *
+ * @api public
+ */
 
 verb.geom.NurbsCurve.prototype.update = function(){
 
@@ -35,11 +58,27 @@ verb.geom.NurbsCurve.prototype.update = function(){
 
 };
 
+/**
+ * Sample a point at the given parameter
+ * @param {Number} The parameter to sample the curve
+ *
+ * @returns {Array} The position at the given parameter
+ * @api public
+ */
+
 verb.geom.NurbsCurve.prototype.pointSync = function( u ) {
 
 	return this.nurbsEngine.eval_sync( 'rational_curve_point', [ this.get('degree'), this.get('knots'), this.homogenize(), u ] );
 
 };
+
+/**
+ * Sample a point at the given parameter asynchronously
+ * @param {Number} The parameter to sample the curve
+ * @param {Function} A callback to call when complete
+ *
+ * @api public
+ */
 
 verb.geom.NurbsCurve.prototype.point = function( u, callback ) {
 

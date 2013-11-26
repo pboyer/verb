@@ -25,5 +25,3 @@ verb.geom.Circle.prototype.nurbsRep = function(){
 																									 2 * Math.PI ]);
 
 };
-
-
