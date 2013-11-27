@@ -23,6 +23,118 @@ verb.geom.NurbsCurve = function( degree, controlPoints, weights, knots ) {
 
 
 /**
+ * Sample a point at the given parameter 
+ *
+ * @param {Number} The parameter to sample the curve
+ * @param {Function} Optional callback to do it async
+ *
+ * @return {Array} An array if called synchronously, otherwise nothing
+ * @api public
+ */
+
+verb.geom.NurbsCurve.prototype.point = function( u, callback ) {
+
+	if (callback){
+		this.nurbsEngine.eval( 'rational_curve_point', [ this.get('degree'), this.get('knots'), this.homogenize(),  u ], callback ); 
+		return;
+	}
+
+	return this.nurbsEngine.eval_sync( 'rational_curve_point', [ this.get('degree'), this.get('knots'), this.homogenize(), u ] );
+
+};
+
+/**
+ * Get derivatives at a given parameter
+ *
+ * @param {Number} The parameter to sample the curve
+ * @param {Number} The number of derivatives to obtain
+ * @param {Number} The callback, if you want this async
+ *
+ * @return {Array} An array if called synchronously, otherwise nothing
+ * @api public
+ */
+
+verb.geom.NurbsCurve.prototype.derivatives = function( u, num_derivs, callback ) {
+
+	if (callback){
+		this.nurbsEngine.eval( 'rational_curve_derivs', [ this.get('degree'), this.get('knots'), this.homogenize(),  u, num_derivs  ], callback ); 
+		return;
+	}
+
+	return this.nurbsEngine.eval_sync( 'rational_curve_derivs', [ this.get('degree'), this.get('knots'), this.homogenize(),  u, num_derivs] );
+
+};
+
+/**
+ * Tesselate a curve at a given tolerance
+ *
+ * @param {Number} The parameter to sample the curve
+ * @param {Number} The number of derivatives to obtain
+ * @param {Number} The callback, if you want this async
+ *
+ * @return {Array} An array if called synchronously, otherwise nothing
+ * @api public
+ */
+
+verb.geom.NurbsCurve.prototype.tesselate = function(callback){
+
+	if (callback){
+		return this.nurbsEngine.eval( 'rational_curve_adaptive_sample', [ this.get('degree'), this.get('knots'), this.homogenize(), verb.TOLERANCE ], callback ); 
+	}
+
+	return this.nurbsEngine.eval_sync( 'rational_curve_adaptive_sample', [ this.get('degree'), this.get('knots'), this.homogenize(), verb.TOLERANCE ] ); 
+
+};
+
+/**
+ * Transform a curve with the given matrix.
+ *
+ * @param {Array} 4d array representing the transform
+ *
+ * @return {Array} An array if called synchronously, otherwise nothing
+ * @api public
+ */
+
+verb.geom.NurbsCurve.prototype.transform = function( mat ){
+
+	var pts = this.get("controlPoints");
+
+	for (var i = 0; i < pts.length; i++){
+		var homoPt = pts[1].push(1);
+		pts[i] = numeric.mul( mat, homoPt ).slice( 0, homoPt.length-2 );
+	}
+
+	this.set('controlPoints', pts);
+
+	return this;
+
+};
+
+/**
+ * Obtain a copy of the curve
+ *
+ * @param {Array} 4d array representing the transform
+ *
+ * @return {Array} An array if called synchronously, otherwise nothing
+ * @api public
+ */
+
+verb.geom.NurbsCurve.prototype.clone = function(){
+
+	// copy the control points
+	var pts = this.get("controlPoints");
+
+	var pts_copy = [];
+
+	for (var i = 0; i < pts.length; i++){
+		pts_copy.push( pts[i].slice(0) );
+	}
+
+	return new verb.geom.NurbsCurve( this.get('degree'), pts_copy, this.get('weights').slice(0), this.get('knots').slice );
+
+};
+
+/**
  * Obtain the homogeneous representation of the control points
  *
  * @api public
@@ -57,64 +169,3 @@ verb.geom.NurbsCurve.prototype.update = function(){
 	});
 
 };
-
-/**
- * Sample a point at the given parameter
- * @param {Number} The parameter to sample the curve
- *
- * @returns {Array} The position at the given parameter
- * @api public
- */
-
-verb.geom.NurbsCurve.prototype.pointSync = function( u ) {
-
-	return this.nurbsEngine.eval_sync( 'rational_curve_point', [ this.get('degree'), this.get('knots'), this.homogenize(), u ] );
-
-};
-
-/**
- * Sample a point at the given parameter asynchronously
- * @param {Number} The parameter to sample the curve
- * @param {Function} A callback to call when complete
- *
- * @api public
- */
-
-verb.geom.NurbsCurve.prototype.point = function( u, callback ) {
-
-	this.nurbsEngine.eval( 'rational_curve_point', [ this.get('degree'), this.get('knots'), this.homogenize(),  u ], callback ); 
-
-};
-
-verb.geom.NurbsCurve.prototype.derivatives = function( u, num_derivs, callback ) {
-
-	this.nurbsEngine.eval( 'rational_curve_derivs', [ this.get('degree'), this.get('knots'), this.homogenize(),  u, num_derivs  ], callback ); 
-
-};
-
-verb.geom.NurbsCurve.prototype.derivativesSync = function( u, num_derivs ) {
-
-	return this.nurbsEngine.eval_sync( 'rational_curve_derivs', [ this.get('degree'), this.get('knots'), this.homogenize(),  u, num_derivs] );
-
-};
-
-verb.geom.NurbsCurve.prototype.tesselate = function(tol){
-
-	if (tol === undefined){
-		tol = verb.TOLERANCE;
-	}
-
-	this.nurbsEngine.eval( 'rational_curve_adaptive_sample', [ this.get('degree'), this.get('knots'), this.homogenize(), tol ], callback ); 
-
-};
-
-verb.geom.NurbsCurve.prototype.tesselateSync = function(){
-
-	if (tol === undefined){
-		tol = verb.TOLERANCE;
-	}
-
-	return this.nurbsEngine.eval_sync( 'rational_curve_adaptive_sample', [ this.get('degree'), this.get('knots'), this.homogenize(), tol ] ); 
-
-};
-
