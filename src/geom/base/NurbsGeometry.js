@@ -5,6 +5,3 @@ verb.geom.NurbsGeometry = function() {
 }.inherits( verb.geom.Geometry );
 
 
-// transform - apply the transform to every control point
-
-

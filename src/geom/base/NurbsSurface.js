@@ -27,6 +27,17 @@ verb.geom.NurbsSurface = function( degreeU, knotsU, degreeV, knotsV, controlPoin
 }.inherits( verb.geom.NurbsGeometry );
 
 
+/**
+ * Sample a point at the given u, v parameter 
+ *
+ * @param {Number} The u parameter at which to sample
+ * @param {Number} The v parameter at which to sample
+ * @param {Function} Optional callback to do it async
+ *
+ * @return {Array} An array if called synchronously, otherwise nothing
+ * @api public
+ */
+
 verb.geom.NurbsSurface.prototype.point = function( u, v, callback ) {
 
 	if (callback) {
@@ -38,6 +49,18 @@ verb.geom.NurbsSurface.prototype.point = function( u, v, callback ) {
 										[ 	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), u, v ] );
 
 };
+
+/**
+ * Get derivatives at a given u, v parameter
+ *
+ * @param {Number} The u parameter to sample the curve
+ * @param {Number} The v parameter to sample the curve
+ * @param {Number} The number of derivatives to obtain
+ * @param {Number} The callback, if you want this async
+ *
+ * @return {Array} An array if called synchronously, otherwise nothing
+ * @api public
+ */
 
 verb.geom.NurbsSurface.prototype.derivatives = function( u, v, num_derivs, callback ) {
 
@@ -51,6 +74,16 @@ verb.geom.NurbsSurface.prototype.derivatives = function( u, v, num_derivs, callb
 
 };
 
+/**
+ * Tesselate the surface
+ *
+ * @param {Number} The number of divisions in the u direction
+ * @param {Number} The number of divisions in the v direction
+ *
+ * @return {Array} An array if called synchronously, otherwise nothing
+ * @api public
+ */
+
 verb.geom.NurbsSurface.prototype.tesselate = function(udivs, vdivs){
 
 	if (callback) {
@@ -62,7 +95,6 @@ verb.geom.NurbsSurface.prototype.tesselate = function(udivs, vdivs){
 		[	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), udivs, vdivs ] ); 
 
 };
-
 
 /**
  * Obtain the homogeneous representation of the control points
