@@ -1861,16 +1861,16 @@ describe("Arc.constructor",function(){
 });
 
 
-describe("Arc.pointSync",function(){
+describe("Arc.point",function(){
 
 	it('returns expected results', function(){
 
 		verb.init();
 
 		var arc = new verb.geom.Arc([0,0,1], [1,0,0], [0,1,0], 1, new verb.geom.Interval(0, Math.PI/ 2) );
-		var p1 = arc.pointSync(0);
-		var p2 = arc.pointSync(0.5);
-		var p3 = arc.pointSync(1);
+		var p1 = arc.point(0);
+		var p2 = arc.point(0.5);
+		var p3 = arc.point(1);
 
 		p1.should.be.instanceof(Array).and.have.lengthOf(3);
 		p1[0].should.be.approximately( 1, 0.001 );
@@ -1888,11 +1888,7 @@ describe("Arc.pointSync",function(){
 		p3[2].should.be.approximately( 1, 0.001 );
 	});
 
-});
-
-describe("Arc.point",function(){
-
-	it('creates the expected result', function(done){
+	it('creates the expected result when given a callback', function(done){
 
 		verb.init();
 		

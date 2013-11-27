@@ -21,10 +21,10 @@
     "numeric": "1.2.6"
   },
   "devDependencies": {
-    "grunt-simple-mocha": "0.3.2",
-    "mocha": "1.8.1",
+    "grunt-simple-mocha": "0.4.0",
+    "mocha": "1.14.0",
     "should": "2.1.0",
-    "grunt": "0.4.0",
+    "grunt": "0.4.2",
     "grunt-contrib-uglify": "0.1.1",
     "grunt-contrib-concat": "0.1.2"
   },

@@ -1396,16 +1396,13 @@ verb.eval.nurbs.rational_curve_adaptive_sample_range = function( degree, knots, 
  * @api public
  */
 
-verb.eval.nurbs.three_points_are_flat = function( p1_arr, p2_arr, p3_arr, tol ) {
+verb.eval.nurbs.three_points_are_flat = function( p1, p2, p3, tol ) {
 
-	// convert to vectors, this is probably unnecessary
-	var p1 = new verb.geom.Vector3( p1_arr ),
-		p2 = new verb.geom.Vector3( p2_arr ),
-		p3 = new verb.geom.Vector3( p3_arr );
-
-	// find the area of the triangle wihout using a square root
-	var norm = p2.minus( p1 ).cross( p3.minus( p1 ) ),
-			area = norm.dot( norm );
+	// find the area of the triangle without using a square root
+	var p2mp1 = numeric.sub( p2, p1 )
+		, p3mp1 = numeric.sub( p3, p1 )
+		, norm = crossprod( p2mp1, p3mp1 )
+		, area = numeric.dot( norm, norm );
 
 	return area < tol;
 
