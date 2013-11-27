@@ -137,6 +137,7 @@ verb.geom.NurbsCurve.prototype.clone = function(){
 /**
  * Obtain the homogeneous representation of the control points
  *
+ * @returns {Array} 2d array of homogenized control points
  * @api public
  */
 
