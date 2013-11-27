@@ -97,6 +97,65 @@ verb.geom.NurbsSurface.prototype.tesselate = function(udivs, vdivs){
 };
 
 /**
+ * Transform a curve with the given matrix.
+ *
+ * @param {Array} 4d array representing the transform
+ *
+ * @return {Array} An array if called synchronously, otherwise nothing
+ * @api public
+ */
+
+verb.geom.NurbsSurface.prototype.transform = function( mat ){
+
+	var pts = this.get("controlPoints");
+
+	for (var i = 0; i < pts.length; i++){
+		for (var j = 0; j < pts[i].length; j++){
+			var homoPt = pts[1].push(1);
+			pts[i] = numeric.mul( mat, homoPt ).slice( 0, homoPt.length-2 );
+		}
+	}
+
+	this.set('controlPoints', pts);
+
+	return this;
+
+};
+
+/**
+ * Obtain a copy of the curve
+ *
+ * @param {Array} 4d array representing the transform
+ *
+ * @return {Array} An array if called synchronously, otherwise nothing
+ * @api public
+ */
+
+verb.geom.NurbsSurface.prototype.clone = function(){
+
+	// copy the control points
+	var pts = this.get("controlPoints");
+	var pts_copy = [];
+
+	for (var i = 0; i < pts.length; i++){
+		pts_copy.push([]);
+		for (var j = 0; j < pts[i].length; j++){
+			pts_copy[i].push( pts[i][j].slice( 0 ) );
+		}
+	}
+
+	// copy the weights
+	var weights = this.get("weights");
+	var weights_copy = [];
+
+	for (var i = 0; i < weights.length; i++){
+		weights_copy.push( weights[i].slice( 0 ) );
+	}
+
+	return new verb.geom.NurbsSurface( this.get('degreeU'), this.get('knotsU').slice(0), this.get('degreeV'), this.get('knotsV').slice(0), pts_copy, weights_copy );
+
+};
+/**
  * Obtain the homogeneous representation of the control points
  *
  * @returns {Array} 3d array of homogenized control points
