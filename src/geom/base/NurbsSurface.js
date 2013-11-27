@@ -152,9 +152,11 @@ verb.geom.NurbsSurface.prototype.clone = function(){
 		weights_copy.push( weights[i].slice( 0 ) );
 	}
 
-	return new verb.geom.NurbsSurface( this.get('degreeU'), this.get('knotsU').slice(0), this.get('degreeV'), this.get('knotsV').slice(0), pts_copy, weights_copy );
+	return new verb.geom.NurbsSurface( this.get('degreeU'), this.get('knotsU').slice(0), 
+		this.get('degreeV'), this.get('knotsV').slice(0), pts_copy, weights_copy );
 
 };
+
 /**
  * Obtain the homogeneous representation of the control points
  *
