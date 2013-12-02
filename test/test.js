@@ -2134,6 +2134,31 @@ describe("FourPointSurface.point",function(){
 
 });
 
+describe("FourPointSurface.derivatives",function(){
+
+	it('gives nice result', function(){
+
+		verb.init();
+
+		var p1 = [0,0,1]
+			, p2 = [1,0,0]
+			, p3 = [1,1,1]
+			, p4 = [0,1,0];
+
+		var srf = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
+
+		should.exist(srf);
+
+		var p = srf.derivatives(0.5, 0.5, 1);
+
+		p[0][0].should.eql([0.5,0.5,0.5]);
+		p[0][1].should.eql([0,1,0]);
+		p[1][0].should.eql([1,0,0]);
+
+	});
+
+});
+
 describe("FourPointSurface.tesselate",function(){
 
 	it('gives mesh result', function(){
@@ -2154,6 +2179,10 @@ describe("FourPointSurface.tesselate",function(){
 		p.uvs.length.should.be.equal(441);
 		p.points.length.should.be.equal(441);
 		p.faces.length.should.be.equal(800);
+
+		p.points.map(function(e){ e.length.should.be.equal(3); });
+		p.uvs.map(function(e){ e.length.should.be.equal(2); });
+		p.faces.map(function(e){ e.length.should.be.equal(3); });
 
 
 	});
