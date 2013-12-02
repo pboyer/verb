@@ -24,7 +24,7 @@ verb.eval.geom = verb.eval.geom || {};
 verb.eval.mesh = verb.eval.mesh || {};
 
 verb.EPSILON = 1e-8;
-verb.TOLERANCE = 1e-5;
+verb.TOLERANCE = 1e-3;
 
 verb.init = function() {
 	verb.nurbsEngine = new verb.core.Engine( verb.eval.nurbs );

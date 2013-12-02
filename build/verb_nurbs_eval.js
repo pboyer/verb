@@ -1384,16 +1384,12 @@ verb.eval.nurbs.rational_curve_adaptive_sample_range = function( degree, knots, 
 		mid_u = start_u + (end_u - start_u) * t,
 		p2 = verb.eval.nurbs.rational_curve_point(degree, knots, control_points, mid_u);
 
-		// the if three points are "flat", return the two end pts
-		if ( verb.eval.nurbs.three_points_are_flat( p1, p2, p3, tol ) ) {
+		// if the two end control points are coincident, the three point test will always return 0, let's split the curve
+		var diff = numeric.sub( p1, p3);
+		var diff2 = numeric.sub( p1, p2);
 
-			if (include_u){
-				return [ 	[ start_u ].concat(p1) , [end_u].concat(p3) ];
-			} else {
-				return [ 	p1, p3 ];
-			}
-
-		} else {
+		// the first condition checks if the curve makes up a loop, if so, we will need to continue evaluation
+		if ( ( numeric.dot( diff, diff ) < tol && numeric.dot( diff2, diff2 ) > tol ) || !verb.eval.nurbs.three_points_are_flat( p1, p2, p3, tol ) ) {
 
 			// recurse on the two halves
 			var left_pts = verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knots, control_points, start_u, mid_u, tol, include_u )
@@ -1401,6 +1397,14 @@ verb.eval.nurbs.rational_curve_adaptive_sample_range = function( degree, knots, 
 
 			// concatenate the two		
 			return left_pts.slice(0, -1).concat(right_pts);
+
+		} else {
+
+			if (include_u){
+				return [ 	[ start_u ].concat(p1) , [end_u].concat(p3) ];
+			} else {
+				return [ 	p1, p3 ];
+			}
 
 		}
 }
