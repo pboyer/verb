@@ -2,7 +2,6 @@ var should = require('should')
 	, verb = require('../build/verb.js');
 
 
-
 describe("Array.flatten",function(){
 
 	it('returns a flattened version of a nested array', function(){
