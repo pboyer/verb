@@ -297,6 +297,8 @@ verb.core.uid = (function(){
 
 verb.geom.Geometry = function() { 
 
+	verb.core.WatchObject.call(this);
+
 	var id = verb.core.uid();
 	
 	this.uniqueId = function() {
@@ -330,14 +332,14 @@ verb.geom.NurbsGeometry = function() {
 
 verb.geom.NurbsCurve = function( degree, controlPoints, weights, knots ) {
 
+	verb.geom.NurbsGeometry.call(this);
+
 	this.setAll({
 		"controlPoints": controlPoints,
 		"weights": weights,
 		"knots": knots ? knots.slice(0) : [],
 		"degree": degree
 	});
-
-	verb.geom.NurbsGeometry.call(this);
 
 }.inherits( verb.geom.NurbsGeometry );
 
@@ -486,7 +488,7 @@ verb.geom.NurbsCurve.prototype.update = function(){
 		"controlPoints": curve_props.control_points,
 		"weights": curve_props.weights,
 		"knots": curve_props.knots,
-		"degree": degree
+		"degree": curve_props.degree
 	});
 
 };
@@ -506,6 +508,8 @@ verb.geom.NurbsCurve.prototype.update = function(){
 
 verb.geom.NurbsSurface = function( degreeU, knotsU, degreeV, knotsV, controlPoints, weights ) {
 
+	verb.geom.NurbsGeometry.call(this);
+	
 	this.setAll({
 		"controlPoints": controlPoints,
 		"weights": weights,
@@ -514,8 +518,6 @@ verb.geom.NurbsSurface = function( degreeU, knotsU, degreeV, knotsV, controlPoin
 		"degreeU": degreeU,
 		"degreeV": degreeV
 	});
-
-	verb.geom.NurbsGeometry.call(this);
 
 }.inherits( verb.geom.NurbsGeometry );
 
@@ -690,6 +692,8 @@ verb.geom.NurbsSurface.prototype.update = function(){
 };
 verb.geom.Arc = function(center, xaxis, yaxis, radius, interval) {
 
+	verb.geom.NurbsCurve.call(this);
+
 	this.setAll( {
 		"center": center,
 		"xaxis": xaxis,
@@ -698,10 +702,7 @@ verb.geom.Arc = function(center, xaxis, yaxis, radius, interval) {
 		"interval": interval 
 	});
 
-	var curve_props = this.nurbsRep();
-
-	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weights, curve_props.knots );
-
+	this.update();
 	this.watchAll( ['center', 'xaxis', 'yaxis', 'radius', 'interval'], this.update );
 
 }.inherits(verb.geom.NurbsCurve);
@@ -717,29 +718,45 @@ verb.geom.Arc.prototype.nurbsRep = function(){
 
 };
 
-verb.geom.BezierCurve = function( control_points, weights) {
+verb.geom.BezierCurve = function( control_points, weights ) {
 
+	verb.geom.NurbsCurve.call(this);
+	
+	this.setAll( {
+		"controlPoints": control_points ? control_points.slice(0) : [],
+		"weights": weights ? weights.slice(0) : undefined
+	});
+
+	this.update();
+
+}.inherits( verb.geom.NurbsCurve ); 
+
+verb.geom.BezierCurve.prototype.nurbsRep = function(){
+
+	var control_points = this.get('controlPoints');
+	var weights = this.get('weights');
 	var degree = control_points.length - 1;
 
 	var knots = [];
 	for (var i = 0; i < degree + 1; i++){ knots.push(0); }
 	for (var i = 0; i < degree + 1; i++){ knots.push(1); }
 
-	// build the control points
-	var ctrlPoints = control_points.slice(0);
-
 	// if weights aren't provided, build uniform weights
 	if (weights === undefined){
 		weights = [];
-		for (var i = 0; i < ctrlPoints.length; i++){
+		for (var i = 0; i < control_points.length; i++){
 			weights.push(1);
 		}
 	}
 
-	verb.geom.NurbsCurve.call(this, degree, ctrlPoints, weights, knots );
+	return {
+		degree: degree,
+		knots: knots, 
+		control_points: control_points,
+		weights: weights
+	};
 
-}.inherits( verb.geom.NurbsCurve ); 
-
+};
 
 /**
  * BoundngBox Constructor
@@ -1029,6 +1046,8 @@ verb.geom.BoundingBox.prototype.intersect = function( bb ) {
 
 verb.geom.Circle = function(center, xaxis, yaxis, radius) {
 
+	verb.geom.NurbsCurve.call(this);
+	
 	this.setAll({
 		"center": center,
 		"xaxis": xaxis,
@@ -1036,9 +1055,7 @@ verb.geom.Circle = function(center, xaxis, yaxis, radius) {
 		"radius": radius 
 	});
 
-	var curve_props = this.nurbsRep();
-
-	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weights, curve_props.knots );
+	this.update();
 
 	this.watchAll( ['center', 'xaxis', 'yaxis', 'radius'], this.update );
 
@@ -1056,6 +1073,8 @@ verb.geom.Circle.prototype.nurbsRep = function(){
 };
 
 verb.geom.Cone = function(axis, xaxis, base, height, radius ) {
+
+	verb.geom.NurbsSurface.call(this);
 
 	this.setAll({
 		"axis": axis,
@@ -1112,6 +1131,8 @@ verb.geom.Cylinder.prototype.nurbsRep = function() {
 };
 verb.geom.Ellipse = function(center, xaxis, yaxis, xradius, yradius) {
 
+	verb.geom.NurbsCurve.call(this);
+
 	this.setAll({
 		"center": center,
 		"xaxis": xaxis,
@@ -1120,9 +1141,7 @@ verb.geom.Ellipse = function(center, xaxis, yaxis, xradius, yradius) {
 		"yradius": yradius
 	});
 
-	var curve_props = this.nurbsRep();
-
-	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weights, curve_props.knots );
+	this.update();
 
 	this.watchAll( ['center', 'xaxis', 'yaxis', 'xradius', 'yradius'], this.update );
 
@@ -1142,6 +1161,8 @@ verb.geom.Ellipse.prototype.nurbsRep = function(){
 
 verb.geom.EllipseArc = function(center, xaxis, yaxis, xradius, yradius, interval) {
 
+	verb.geom.NurbsCurve.call(this);
+	
 	this.setAll({
 		"center": center,
 		"xaxis": xaxis,
@@ -1151,9 +1172,7 @@ verb.geom.EllipseArc = function(center, xaxis, yaxis, xradius, yradius, interval
 		"interval": interval
 	});
 
-	var curve_props = this.nurbsRep();
-
-	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weights, curve_props.knots );
+	this.update();
 
 	this.watchAll( ['center', 'xaxis', 'yaxis', 'xradius', 'yradius', 'interval'], this.update );
 
@@ -1173,15 +1192,15 @@ verb.geom.EllipseArc.prototype.nurbsRep = function(){
 
 verb.geom.Extrusion = function(profile, axis, length ) {
 
+	verb.geom.NurbsSurface.call(this);
+
 	this.setAll({ 
 		  "profile": profile,
 		  "axis": axis,
 	      "length": length 
 	  });
 
-	var surface_props = this.nurbsRep();
-
-	verb.geom.NurbsSurface.call(this, surface_props.degree_u, surface_props.knots_u, surface_props.degree_v, surface_props.knots_v, surface_props.control_points, surface_props.weights );
+	this.update();
 
 	this.watchAll( ['axis', 'length' ], this.update );
 	profile.watchAll( ['knots', 'degree', 'controlPoints', 'weights'], this.update );
@@ -1204,6 +1223,8 @@ verb.geom.Extrusion.prototype.nurbsRep = function() {
 
 verb.geom.FourPointSurface = function(p1, p2, p3, p4) {
 
+	verb.geom.NurbsSurface.call(this);
+
 	this.setAll( {
 		"p1": p1,
 		"p2": p2,
@@ -1211,9 +1232,7 @@ verb.geom.FourPointSurface = function(p1, p2, p3, p4) {
 		"p4": p4
 	});
 
-	var surface_props = this.nurbsRep();
-
-	verb.geom.NurbsSurface.call(this, surface_props.degree_u, surface_props.knots_u, surface_props.degree_v, surface_props.knots_v, surface_props.control_points, surface_props.weights );
+	this.update();
 
 	this.watchAll( ['p1', 'p2', 'p3', 'p4'], this.update );
 
@@ -1230,6 +1249,8 @@ verb.geom.FourPointSurface.prototype.nurbsRep = function(){
 
 verb.geom.Interval = function(min, max) {
 
+	verb.core.WatchObject.call(this);
+	
 	this.setAll({ 
 		"min": min,
 		"max": max 
@@ -1239,6 +1260,8 @@ verb.geom.Interval = function(min, max) {
 
 verb.geom.Interval2 = function(minu, maxu, minv, maxv) {
 
+	verb.core.WatchObject.call(this);
+	
 	this.setAll({ 
 		"uinterval": new verb.geom.Interval(minu, maxu),
 		"vinterval": new verb.geom.Interval(minv, maxv)
@@ -1248,14 +1271,14 @@ verb.geom.Interval2 = function(minu, maxu, minv, maxv) {
 
 verb.geom.Line = function(start, end) {
 
+	verb.geom.NurbsCurve.call(this);
+
 	this.setAll({ 
 		"start": start,
 		"end": end
 	});
 
-	var curve_props = this.nurbsRep();
-
-	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weights, curve_props.knots );
+	this.update();
 
 	this.watchAll(['start', 'end'], this.update );
 
@@ -1282,6 +1305,8 @@ verb.geom.Line.prototype.nurbsRep = function(){
 // point on a mesh
 verb.geom.PlanarSurface = function( base, uaxis, vaxis, ulength, vlength ) {
 
+	verb.geom.NurbsSurface.call(this);
+
 	this.setAll({
 		"base": base,
 		"uaxis": uaxis,
@@ -1290,9 +1315,7 @@ verb.geom.PlanarSurface = function( base, uaxis, vaxis, ulength, vlength ) {
 		"vlength": vlength
 	});
 
-	var surface_props = this.nurbsRep();
-
-	verb.geom.NurbsSurface.call(this, surface_props.degree_u, surface_props.knots_u, surface_props.degree_v, surface_props.knots_v, surface_props.control_points, surface_props.weights );
+	this.update();
 
 	this.watchAll( ['base', 'uaxis', 'vaxis', 'ulength', 'vlength'], this.update );
 
@@ -1312,13 +1335,13 @@ verb.geom.PlanarSurface.prototype.nurbsRep = function(){
 };
 verb.geom.PolyLine = function( points ) {
 
+	verb.geom.NurbsCurve.call(this);
+
 	this.setAll( {
 		"control_points": points ? points.slice(0) : []
 	});
 
-	var curve_props = this.nurbsRep();
-
-	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weights, curve_props.knots );
+	this.update();
 
 }.inherits(verb.geom.NurbsCurve);
 
@@ -1329,6 +1352,8 @@ verb.geom.PolyLine.prototype.nurbsRep = function(){
 };
 verb.geom.RevolvedSurface = function( center, axis, angle, profile ) {
 
+	verb.geom.NurbsSurface.call(this);
+
 	this.setAll({
 		"center": center,
 		"axis": axis,
@@ -1336,9 +1361,7 @@ verb.geom.RevolvedSurface = function( center, axis, angle, profile ) {
 		"profile": profile
 	});
 
-	var surface_props = this.nurbsRep();
-
-	verb.geom.NurbsSurface.call(this, surface_props.degree_u, surface_props.knots_u, surface_props.degree_v, surface_props.knots_v, surface_props.control_points, surface_props.weights );
+	this.update();
 
 	this.watchAll( ['center', 'axis', 'angle', 'profile'], this.update );
 
@@ -1358,15 +1381,14 @@ verb.geom.RevolvedSurface.prototype.nurbsRep = function(){
 };
 verb.geom.Sphere = function( center, radius ) {
 
+	verb.geom.NurbsSurface.call(this);
+
 	this.setAll({
 		"center": center,
 		"radius": radius
 	});
 
-	var surface_props = this.nurbsRep();
-
-	verb.geom.NurbsSurface.call(this, surface_props.degree_u, surface_props.knots_u, surface_props.degree_v, surface_props.knots_v, surface_props.control_points, surface_props.weights );
-
+	this.update();
 	this.watchAll( ['center', 'radius'], this.update );
 
 }.inherits(verb.geom.NurbsSurface);
@@ -1382,21 +1404,21 @@ verb.geom.Sphere.prototype.nurbsRep = function(){
 };
 verb.geom.SweepOneRail = function( rail, profile ) {
 
+	verb.geom.NurbsSurface.call(this);
+
 	this.setAll({
 		"rail": rail,
 		"profile": profile
 	});
 
-	var surface_props = this.nurbsRep();
-
-	verb.geom.NurbsSurface.call(this, surface_props.degree_u, surface_props.knots_u, surface_props.degree_v, surface_props.knots_v, surface_props.control_points, surface_props.weights );
+	this.update();
 
 	this.watchAll( ['rail', 'profile'], this.update );
 
 }.inherits(verb.geom.NurbsSurface);
 
 verb.geom.SweepOneRail.prototype.nurbsRep = function(){
-
+	
   return this.nurbsEngine.eval_sync( 'get_sweep1_surface', 
 										[ this.get("profile").get("knots"), 
 										  this.get("profile").get("degree"),
@@ -1422,7 +1444,7 @@ verb.geom.SweepOneRail.prototype.nurbsRep = function(){
  * @api public
  */
 
-verb.eval.nurbs.get_sweep1_surface = function( profile_knots, profile_degree, profile_control_points, profile_weights, rail_knots, rail_degree, knots_control_points, knots_weights ) {
+verb.eval.nurbs.get_sweep1_surface = function( profile_knots, profile_degree, profile_control_points, profile_weights, rail_knots, rail_degree, rail_control_points, rail_weights ) {
 
 	// for each point on rail, move all of the points
 	var homo_rail = verb.eval.nurbs.homogenize_1d( rail_control_points, rail_weights )
@@ -1431,23 +1453,24 @@ verb.eval.nurbs.get_sweep1_surface = function( profile_knots, profile_degree, pr
 		, control_points = []
 		, weights = [];
 
-	for (var i = 0; i < rail_control_points; i++ ){
+
+	for (var i = 0; i < rail_control_points.length; i++ ){
 
 		// evaluate the point on the curve, subtracting it from the first point
 		var rail_point = verb.eval.nurbs.rational_curve_point( rail_degree, rail_knots, homo_rail, i * span )
-			, rail_offset = verb.sub( rail_point, rail_start )
+			, rail_offset = numeric.sub( rail_point, rail_start )
 			, row_control_points = []
 			, row_weights = [];
 
-		for (var j = 0; j < profile_control_points; j++ ){
+		for (var j = 0; j < profile_control_points.length; j++ ){
 
 			row_control_points.push( numeric.add(rail_offset, profile_control_points[j] ) );
 			row_weights.push( profile_control_points[j] * rail_control_points[i] );
 
 		}
 
-		control_points.add( row_control_points);
-		weights.add( row_weights );
+		control_points.push( row_control_points);
+		weights.push( row_weights );
 	}
 
 	return {"knots_u": rail_knots, 

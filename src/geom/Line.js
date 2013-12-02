@@ -1,13 +1,13 @@
 verb.geom.Line = function(start, end) {
 
+	verb.geom.NurbsCurve.call(this);
+
 	this.setAll({ 
 		"start": start,
 		"end": end
 	});
 
-	var curve_props = this.nurbsRep();
-
-	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weights, curve_props.knots );
+	this.update();
 
 	this.watchAll(['start', 'end'], this.update );
 

@@ -3440,8 +3440,133 @@ describe("Sphere.tesselate",function(){
 
 
 	});
+});
+
+describe("SweepOneRail.constructor",function(){
+
+	it('can create an instance', function(){
+
+		verb.init();
+		
+		var p1 = [0,0,0]
+			, p2 = [1,0,1]
+			, p3 = [2,0,-1]
+			, p4 = [3,0,0];
+
+		var rail = new verb.geom.BezierCurve( [p1, p2, p3, p4] )
+			, profile = new verb.geom.Line( [0,1,0], [0,-1,0]  );
+
+			console.log( rail.get('controlPoints') );
+
+		// var srf = new verb.geom.SweepOneRail( rail, profile );
+
+		// should.exist(srf);
+
+	});
+
+});
+
+// describe("SweepOneRail.point",function(){
+
+// 	it('evaluates correctly for middle of surface', function(){
+
+// 		verb.init();
+
+// 		var p1 = [0,0,0]
+// 			, p2 = [1,0,1]
+// 			, p3 = [2,0,-1]
+// 			, p4 = [3,0,0];
+
+// 		var rail = new verb.geom.BezierCurve( [p1, p2, p3, p4] )
+// 			, profile = new verb.geom.Line( [0,1,0], [0,-1,0]  )
+
+// 		var srf = new verb.geom.SweepOneRail( rail, profile );
+
+// 		should.exist(srf);
+
+// 		var p = srf.point(0.5,0.5);
+
+// 		p[0].should.be.approximately(-radius, verb.EPSILON );
+// 		p[1].should.be.approximately(0, verb.EPSILON );
+// 		p[2].should.be.approximately(0, verb.EPSILON );
+
+// 	});
+
+// });
+
+// describe("SweepOneRail.derivatives",function(){
+
+// 	it('gives expected result for middle of surface', function(){
+
+// 		verb.init();
+
+// 		var p1 = [0,0,0]
+// 			, p2 = [1,0,1]
+// 			, p3 = [2,0,-1]
+// 			, p4 = [3,0,0];
+
+// 		var rail = new verb.geom.BezierCurve( [p1, p2, p3, p4] )
+// 			, profile = new verb.geom.Line( [0,1,0], [0,-1,0]  )
+
+// 		var srf = new verb.geom.SweepOneRail( rail, profile );
+
+// 		should.exist(srf);
+
+// 		var p = srf.derivatives(0.5, 0.5, 1);
+
+// 		p[0][0][0].should.be.approximately(-radius, verb.EPSILON );
+// 		p[0][0][1].should.be.approximately(0, verb.EPSILON );
+// 		p[0][0][2].should.be.approximately(0, verb.EPSILON );
+
+// 		p[0][1] = numeric.normalized( p[0][1] );
+
+// 		p[0][1][0].should.be.approximately(0, verb.EPSILON );
+// 		p[0][1][1].should.be.approximately(0, verb.EPSILON );
+// 		p[0][1][2].should.be.approximately(1, verb.EPSILON );
+
+// 	  p[1][0] = numeric.normalized( p[1][0] );
+
+// 		p[1][0][0].should.be.approximately(0, verb.EPSILON );
+// 		p[1][0][1].should.be.approximately(-1, verb.EPSILON );
+// 		p[1][0][2].should.be.approximately(0, verb.EPSILON );
+
+// 	});
+
+// });
+
+
+// describe("SweepOneRail.tesselate",function(){
+
+// 	it('gives mesh result', function(){
+
+// 		verb.init();
+
+// 		var p1 = [0,0,0]
+// 			, p2 = [1,0,1]
+// 			, p3 = [2,0,-1]
+// 			, p4 = [3,0,0];
+
+// 		var rail = new verb.geom.BezierCurve( [p1, p2, p3, p4] )
+// 			, profile = new verb.geom.Line( [0,1,0], [0,-1,0]  )
+
+// 		var srf = new verb.geom.SweepOneRail( rail, profile );
+
+// 		should.exist(srf);
+
+// 		var p = srf.tesselate(20,20);
+
+// 		p.uvs.length.should.be.equal(441);
+// 		p.points.length.should.be.equal(441);
+// 		p.faces.length.should.be.equal(800);
+
+// 		p.points.map(function(e){ e.length.should.be.equal(3); });
+// 		p.uvs.map(function(e){ e.length.should.be.equal(2); });
+// 		p.faces.map(function(e){ e.length.should.be.equal(3); });
+
+
+// 	});
 
 	
 
-});
+// });
 

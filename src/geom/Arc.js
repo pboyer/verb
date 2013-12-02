@@ -1,5 +1,7 @@
 verb.geom.Arc = function(center, xaxis, yaxis, radius, interval) {
 
+	verb.geom.NurbsCurve.call(this);
+
 	this.setAll( {
 		"center": center,
 		"xaxis": xaxis,
@@ -8,10 +10,7 @@ verb.geom.Arc = function(center, xaxis, yaxis, radius, interval) {
 		"interval": interval 
 	});
 
-	var curve_props = this.nurbsRep();
-
-	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weights, curve_props.knots );
-
+	this.update();
 	this.watchAll( ['center', 'xaxis', 'yaxis', 'radius', 'interval'], this.update );
 
 }.inherits(verb.geom.NurbsCurve);

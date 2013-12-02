@@ -6,6 +6,8 @@
 
 verb.geom.Geometry = function() { 
 
+	verb.core.WatchObject.call(this);
+
 	var id = verb.core.uid();
 	
 	this.uniqueId = function() {

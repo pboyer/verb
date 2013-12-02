@@ -12,7 +12,7 @@
  * @api public
  */
 
-verb.eval.nurbs.get_sweep1_surface = function( profile_knots, profile_degree, profile_control_points, profile_weights, rail_knots, rail_degree, knots_control_points, knots_weights ) {
+verb.eval.nurbs.get_sweep1_surface = function( profile_knots, profile_degree, profile_control_points, profile_weights, rail_knots, rail_degree, rail_control_points, rail_weights ) {
 
 	// for each point on rail, move all of the points
 	var homo_rail = verb.eval.nurbs.homogenize_1d( rail_control_points, rail_weights )
@@ -21,23 +21,24 @@ verb.eval.nurbs.get_sweep1_surface = function( profile_knots, profile_degree, pr
 		, control_points = []
 		, weights = [];
 
-	for (var i = 0; i < rail_control_points; i++ ){
+
+	for (var i = 0; i < rail_control_points.length; i++ ){
 
 		// evaluate the point on the curve, subtracting it from the first point
 		var rail_point = verb.eval.nurbs.rational_curve_point( rail_degree, rail_knots, homo_rail, i * span )
-			, rail_offset = verb.sub( rail_point, rail_start )
+			, rail_offset = numeric.sub( rail_point, rail_start )
 			, row_control_points = []
 			, row_weights = [];
 
-		for (var j = 0; j < profile_control_points; j++ ){
+		for (var j = 0; j < profile_control_points.length; j++ ){
 
 			row_control_points.push( numeric.add(rail_offset, profile_control_points[j] ) );
 			row_weights.push( profile_control_points[j] * rail_control_points[i] );
 
 		}
 
-		control_points.add( row_control_points);
-		weights.add( row_weights );
+		control_points.push( row_control_points);
+		weights.push( row_weights );
 	}
 
 	return {"knots_u": rail_knots, 

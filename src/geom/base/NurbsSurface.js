@@ -13,6 +13,8 @@
 
 verb.geom.NurbsSurface = function( degreeU, knotsU, degreeV, knotsV, controlPoints, weights ) {
 
+	verb.geom.NurbsGeometry.call(this);
+	
 	this.setAll({
 		"controlPoints": controlPoints,
 		"weights": weights,
@@ -21,8 +23,6 @@ verb.geom.NurbsSurface = function( degreeU, knotsU, degreeV, knotsV, controlPoin
 		"degreeU": degreeU,
 		"degreeV": degreeV
 	});
-
-	verb.geom.NurbsGeometry.call(this);
 
 }.inherits( verb.geom.NurbsGeometry );
 

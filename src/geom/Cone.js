@@ -1,5 +1,7 @@
 verb.geom.Cone = function(axis, xaxis, base, height, radius ) {
 
+	verb.geom.NurbsSurface.call(this);
+
 	this.setAll({
 		"axis": axis,
 		"xaxis": xaxis,

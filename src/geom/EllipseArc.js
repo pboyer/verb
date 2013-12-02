@@ -1,5 +1,7 @@
 verb.geom.EllipseArc = function(center, xaxis, yaxis, xradius, yradius, interval) {
 
+	verb.geom.NurbsCurve.call(this);
+	
 	this.setAll({
 		"center": center,
 		"xaxis": xaxis,
@@ -9,9 +11,7 @@ verb.geom.EllipseArc = function(center, xaxis, yaxis, xradius, yradius, interval
 		"interval": interval
 	});
 
-	var curve_props = this.nurbsRep();
-
-	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weights, curve_props.knots );
+	this.update();
 
 	this.watchAll( ['center', 'xaxis', 'yaxis', 'xradius', 'yradius', 'interval'], this.update );
 

@@ -1,5 +1,7 @@
 verb.geom.RevolvedSurface = function( center, axis, angle, profile ) {
 
+	verb.geom.NurbsSurface.call(this);
+
 	this.setAll({
 		"center": center,
 		"axis": axis,
@@ -7,9 +9,7 @@ verb.geom.RevolvedSurface = function( center, axis, angle, profile ) {
 		"profile": profile
 	});
 
-	var surface_props = this.nurbsRep();
-
-	verb.geom.NurbsSurface.call(this, surface_props.degree_u, surface_props.knots_u, surface_props.degree_v, surface_props.knots_v, surface_props.control_points, surface_props.weights );
+	this.update();
 
 	this.watchAll( ['center', 'axis', 'angle', 'profile'], this.update );
 

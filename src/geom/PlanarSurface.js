@@ -1,5 +1,7 @@
 verb.geom.PlanarSurface = function( base, uaxis, vaxis, ulength, vlength ) {
 
+	verb.geom.NurbsSurface.call(this);
+
 	this.setAll({
 		"base": base,
 		"uaxis": uaxis,
@@ -8,9 +10,7 @@ verb.geom.PlanarSurface = function( base, uaxis, vaxis, ulength, vlength ) {
 		"vlength": vlength
 	});
 
-	var surface_props = this.nurbsRep();
-
-	verb.geom.NurbsSurface.call(this, surface_props.degree_u, surface_props.knots_u, surface_props.degree_v, surface_props.knots_v, surface_props.control_points, surface_props.weights );
+	this.update();
 
 	this.watchAll( ['base', 'uaxis', 'vaxis', 'ulength', 'vlength'], this.update );
 

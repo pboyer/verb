@@ -1,5 +1,7 @@
 verb.geom.FourPointSurface = function(p1, p2, p3, p4) {
 
+	verb.geom.NurbsSurface.call(this);
+
 	this.setAll( {
 		"p1": p1,
 		"p2": p2,
@@ -7,9 +9,7 @@ verb.geom.FourPointSurface = function(p1, p2, p3, p4) {
 		"p4": p4
 	});
 
-	var surface_props = this.nurbsRep();
-
-	verb.geom.NurbsSurface.call(this, surface_props.degree_u, surface_props.knots_u, surface_props.degree_v, surface_props.knots_v, surface_props.control_points, surface_props.weights );
+	this.update();
 
 	this.watchAll( ['p1', 'p2', 'p3', 'p4'], this.update );
 

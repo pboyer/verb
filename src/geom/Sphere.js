@@ -1,14 +1,13 @@
 verb.geom.Sphere = function( center, radius ) {
 
+	verb.geom.NurbsSurface.call(this);
+
 	this.setAll({
 		"center": center,
 		"radius": radius
 	});
 
-	var surface_props = this.nurbsRep();
-
-	verb.geom.NurbsSurface.call(this, surface_props.degree_u, surface_props.knots_u, surface_props.degree_v, surface_props.knots_v, surface_props.control_points, surface_props.weights );
-
+	this.update();
 	this.watchAll( ['center', 'radius'], this.update );
 
 }.inherits(verb.geom.NurbsSurface);

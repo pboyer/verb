@@ -10,14 +10,14 @@
 
 verb.geom.NurbsCurve = function( degree, controlPoints, weights, knots ) {
 
+	verb.geom.NurbsGeometry.call(this);
+
 	this.setAll({
 		"controlPoints": controlPoints,
 		"weights": weights,
 		"knots": knots ? knots.slice(0) : [],
 		"degree": degree
 	});
-
-	verb.geom.NurbsGeometry.call(this);
 
 }.inherits( verb.geom.NurbsGeometry );
 
@@ -166,7 +166,7 @@ verb.geom.NurbsCurve.prototype.update = function(){
 		"controlPoints": curve_props.control_points,
 		"weights": curve_props.weights,
 		"knots": curve_props.knots,
-		"degree": degree
+		"degree": curve_props.degree
 	});
 
 };

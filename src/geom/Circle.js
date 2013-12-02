@@ -1,5 +1,7 @@
 verb.geom.Circle = function(center, xaxis, yaxis, radius) {
 
+	verb.geom.NurbsCurve.call(this);
+	
 	this.setAll({
 		"center": center,
 		"xaxis": xaxis,
@@ -7,9 +9,7 @@ verb.geom.Circle = function(center, xaxis, yaxis, radius) {
 		"radius": radius 
 	});
 
-	var curve_props = this.nurbsRep();
-
-	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weights, curve_props.knots );
+	this.update();
 
 	this.watchAll( ['center', 'xaxis', 'yaxis', 'radius'], this.update );
 
