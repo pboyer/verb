@@ -25,6 +25,6 @@ verb.geom.EllipseArc.prototype.nurbsRep = function(){
 															 this.get("xradius"), 
 															 this.get("yradius"), 
 															 this.get("interval").get("min"), 
-													 		 this.get("center").get("max")] );
+													 		 this.get("interval").get("max")] );
 
 };

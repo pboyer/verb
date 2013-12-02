@@ -2548,6 +2548,86 @@ describe("Ellipse.tesselate",function(){
 
 });
 
+describe("EllipseArc.constructor",function(){
+
+	it('can create an instance', function(){
+
+		verb.init();
+
+		var c = new verb.geom.EllipseArc([0,0,0], [1,0,0], [0,1,0], 5, 10, new verb.geom.Interval(0, Math.PI));
+
+		should.exist(c);
+
+	});
+
+});
+
+describe("EllipseArc.point",function(){
+
+	it('evaluates correctly', function(){
+
+		verb.init();
+
+		var c = new verb.geom.EllipseArc([0,0,0], [1,0,0], [0,1,0], 5, 10, new verb.geom.Interval(0, Math.PI));
+
+		should.exist(c);
+
+		var p = c.point(0.5);
+
+		p[0].should.be.approximately(0, verb.TOLERANCE );
+		p[1].should.be.approximately(10, verb.TOLERANCE );
+		p[2].should.be.approximately(0, verb.TOLERANCE );
+
+	});
+
+});
+
+describe("EllipseArc.derivatives",function(){
+
+	it('gives correct result', function(){
+
+		verb.init();
+
+		var c = new verb.geom.EllipseArc([0,0,0], [1,0,0], [0,1,0], 5, 10, new verb.geom.Interval(0, Math.PI));
+
+		should.exist(c);
+
+		var p = c.derivatives(0.5, 1);
+
+		p[0][0].should.be.approximately(0, verb.TOLERANCE );
+		p[0][1].should.be.approximately(10, verb.TOLERANCE );
+		p[0][2].should.be.approximately(0, verb.TOLERANCE );
+
+		// normalize the derivative
+		p[1] = numeric.div( p[1], numeric.norm2(p[1]) );
+
+		p[1][0].should.be.approximately(-1, verb.TOLERANCE );
+		p[1][1].should.be.approximately(0, verb.TOLERANCE );
+		p[1][2].should.be.approximately(0, verb.TOLERANCE );
+
+	});
+
+});
+
+describe("EllipseArc.tesselate",function(){
+
+	it('gives correct result', function(){
+
+		verb.init();
+
+		var c = new verb.geom.EllipseArc([0,0,0], [1,0,0], [0,1,0], 5, 10, new verb.geom.Interval(0, Math.PI));
+
+		should.exist(c);
+
+		var pts = c.tesselate();
+
+		pts.length.should.be.greaterThan(2);
+		pts.map( function(e){  e.length.should.be.equal(3); });
+
+	});
+
+});
+
 
 
 
