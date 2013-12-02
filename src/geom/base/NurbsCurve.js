@@ -108,7 +108,7 @@ verb.geom.NurbsCurve.prototype.transform = function( mat ){
 
 	return this;
 
-};
+}; 
 
 /**
  * Obtain a copy of the curve

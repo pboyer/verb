@@ -24,6 +24,7 @@ verb.eval.geom = verb.eval.geom || {};
 verb.eval.mesh = verb.eval.mesh || {};
 
 verb.EPSILON = 1e-8;
+verb.TOLERANCE = 1e-5;
 
 verb.init = function() {
 	verb.nurbsEngine = new verb.core.Engine( verb.eval.nurbs );
@@ -50,3 +51,21 @@ Function.method('inherits', function (parent) {
     this.prototype.constructor = parent; 
     return this;
 });
+
+Array.prototype.flatten = function(){
+
+	if (this.length == 0) return [];
+
+	var merged = [];
+
+	for (var i = 0; i < this.length; i++){
+		if (this[i] instanceof Array){
+			merged = merged.concat( this[i].flatten() );
+		} else {
+			merged = merged.concat( this[i] );
+		}
+	}
+
+	return merged;
+
+}

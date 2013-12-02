@@ -24,6 +24,7 @@ verb.eval.geom = verb.eval.geom || {};
 verb.eval.mesh = verb.eval.mesh || {};
 
 verb.EPSILON = 1e-8;
+verb.TOLERANCE = 1e-5;
 
 verb.init = function() {
 	verb.nurbsEngine = new verb.core.Engine( verb.eval.nurbs );
@@ -51,6 +52,23 @@ Function.method('inherits', function (parent) {
     return this;
 });
 
+Array.prototype.flatten = function(){
+
+	if (this.length == 0) return [];
+
+	var merged = [];
+
+	for (var i = 0; i < this.length; i++){
+		if (this[i] instanceof Array){
+			merged = merged.concat( this[i].flatten() );
+		} else {
+			merged = merged.concat( this[i] );
+		}
+	}
+
+	return merged;
+
+}
 // engine nurbs handles nurbs eval requests
 // it also acknowledges whether there are web workers available 
 // in the broswer, if not, it defaults to blocking evaluation
@@ -404,7 +422,7 @@ verb.geom.NurbsCurve.prototype.transform = function( mat ){
 
 	return this;
 
-};
+}; 
 
 /**
  * Obtain a copy of the curve
@@ -1041,7 +1059,7 @@ verb.geom.Cone = function(axis, xaxis, base, height, radius ) {
 
 	var surface_props = this.nurbsRep();
 
-	verb.geom.NurbsSurface.call(this, surface_props.degree, surface_props.control_points, surface_props.weight, surface_props.knots );
+	verb.geom.NurbsSurface.call(this, surface_props.degree_u, surface_props.knots_u, surface_props.degree_v, surface_props.knots_v, surface_props.control_points, surface_props.weights );
 
 	this.watchAll( ['axis', 'xaxis', 'base', 'height', 'radius'], this.update );
 
@@ -1068,7 +1086,7 @@ verb.geom.Cylinder = function(axis, xaxis, base, height, radius ) {
 
 	var surface_props = this.nurbsRep();
 
-	verb.geom.NurbsSurface.call(this, surface_props.degree, surface_props.control_points, surface_props.weight, surface_props.knots );
+	verb.geom.NurbsSurface.call(this, surface_props.degree_u, surface_props.knots_u, surface_props.degree_v, surface_props.knots_v, surface_props.control_points, surface_props.weights );
 
 	this.watchAll( ['axis', 'xaxis', 'base', 'height', 'radius'], this.update );
 
@@ -1160,7 +1178,7 @@ verb.geom.Extrusion = function(profile, axis, length ) {
 
 	var surface_props = this.nurbsRep();
 
-	verb.geom.NurbsSurface.call(this, surface_props.degree, surface_props.control_points, surface_props.weight, surface_props.knots );
+	verb.geom.NurbsSurface.call(this, surface_props.degree_u, surface_props.knots_u, surface_props.degree_v, surface_props.knots_v, surface_props.control_points, surface_props.weights );
 
 	this.watchAll( ['axis', 'length' ], this.update );
 	profile.watchAll( ['knots', 'degree', 'controlPoints', 'weights'], this.update );
@@ -1184,19 +1202,19 @@ verb.geom.Extrusion.prototype.nurbsRep = function() {
 verb.geom.FourPointSurface = function(p1, p2, p3, p4) {
 
 	this.setAll( {
-		"p1": center,
-		"p2": xaxis,
-		"p3": yaxis,
-		"p4": radius
+		"p1": p1,
+		"p2": p2,
+		"p3": p3,
+		"p4": p4
 	});
 
-	var curve_props = this.nurbsRep();
+	var surface_props = this.nurbsRep();
 
-	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weight, curve_props.knots );
+	verb.geom.NurbsSurface.call(this, surface_props.degree_u, surface_props.knots_u, surface_props.degree_v, surface_props.knots_v, surface_props.control_points, surface_props.weights );
 
 	this.watchAll( ['p1', 'p2', 'p3', 'p4'], this.update );
 
-}.inherits(verb.geom.NurbsCurve);
+}.inherits(verb.geom.NurbsSurface);
 
 verb.geom.FourPointSurface.prototype.nurbsRep = function(){
 
@@ -1271,7 +1289,7 @@ verb.geom.PlanarSurface = function( base, uaxis, vaxis, ulength, vlength ) {
 
 	var surface_props = this.nurbsRep();
 
-	verb.geom.NurbsSurface.call(this, surface_props.degree, surface_props.control_points, surface_props.weight, surface_props.knots );
+	verb.geom.NurbsSurface.call(this, surface_props.degree_u, surface_props.knots_u, surface_props.degree_v, surface_props.knots_v, surface_props.control_points, surface_props.weights );
 
 	this.watchAll( ['base', 'uaxis', 'vaxis', 'ulength', 'vlength'], this.update );
 
@@ -1317,7 +1335,7 @@ verb.geom.RevolvedSurface = function( center, axis, angle, profile ) {
 
 	var surface_props = this.nurbsRep();
 
-	verb.geom.NurbsSurface.call(this, surface_props.degree, surface_props.control_points, surface_props.weight, surface_props.knots );
+	verb.geom.NurbsSurface.call(this, surface_props.degree_u, surface_props.knots_u, surface_props.degree_v, surface_props.knots_v, surface_props.control_points, surface_props.weights );
 
 	this.watchAll( ['center', 'axis', 'angle', 'profile'], this.update );
 
@@ -1344,7 +1362,7 @@ verb.geom.Sphere = function( center, radius ) {
 
 	var surface_props = this.nurbsRep();
 
-	verb.geom.NurbsSurface.call(this, surface_props.degree, surface_props.control_points, surface_props.weight, surface_props.knots );
+	verb.geom.NurbsSurface.call(this, surface_props.degree_u, surface_props.knots_u, surface_props.degree_v, surface_props.knots_v, surface_props.control_points, surface_props.weights );
 
 	this.watchAll( ['center', 'radius'], this.update );
 
@@ -1368,7 +1386,7 @@ verb.geom.SweepOneRail = function( rail, profile ) {
 
 	var surface_props = this.nurbsRep();
 
-	verb.geom.NurbsSurface.call(this, surface_props.degree, surface_props.control_points, surface_props.weight, surface_props.knots );
+	verb.geom.NurbsSurface.call(this, surface_props.degree_u, surface_props.knots_u, surface_props.degree_v, surface_props.knots_v, surface_props.control_points, surface_props.weights );
 
 	this.watchAll( ['rail', 'profile'], this.update );
 
@@ -2662,9 +2680,9 @@ verb.eval.geom.intersect_rays = function( a0, a, b0, b ) {
  * @api public
  */
 
-verb.eval.nurbs.rational_curve_regular_sample = function( degree, knots, control_points, num_samples ) {
+verb.eval.nurbs.rational_curve_regular_sample = function( degree, knots, control_points, num_samples, include_u ) {
 
-	return verb.eval.nurbs.rational_curve_regular_sample_range( degree, knots, control_points, 0, 1.0, num_samples );
+	return verb.eval.nurbs.rational_curve_regular_sample_range( degree, knots, control_points, 0, 1.0, num_samples, include_u);
 
 }
 
@@ -2677,11 +2695,12 @@ verb.eval.nurbs.rational_curve_regular_sample = function( degree, knots, control
  * @param {Number} start parameter for sampling
  * @param {Number} end parameter for sampling
  * @param {Number} integer number of samples
+ * @param {Boolean} whether to prefix the point with the parameter
  * @return {Array} an dictionary of parameter - point pairs
  * @api public
  */
 
-verb.eval.nurbs.rational_curve_regular_sample_range = function( degree, knots, control_points, start_u, end_u, num_samples ) {
+verb.eval.nurbs.rational_curve_regular_sample_range = function( degree, knots, control_points, start_u, end_u, num_samples, include_u ) {
 
 	if (num_samples < 1){
 		num_samples = 2;
@@ -2694,8 +2713,12 @@ verb.eval.nurbs.rational_curve_regular_sample_range = function( degree, knots, c
 	for (var i = 0; i < num_samples; i++){
 
 		u = start_u + span * i;
-		p.push( [u].concat( verb.eval.nurbs.rational_curve_point(degree, knots, control_points, u) ) );
-
+		if ( include_u ){
+			p.push( [u].concat( verb.eval.nurbs.rational_curve_point(degree, knots, control_points, u) ) );
+		} else {
+			p.push( verb.eval.nurbs.rational_curve_point(degree, knots, control_points, u) );
+		}
+	
 	}
 
 	return p;
@@ -2710,18 +2733,19 @@ verb.eval.nurbs.rational_curve_regular_sample_range = function( degree, knots, c
  * @param {Array} 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
  									and form (wi*pi, wi) 
  * @param {Number} tolerance for the adaptive scheme
+ * @param {Boolean} whether to prefix the point with the parameter
  * @return {Array} an array of dim + 1 length where the first element is the param where it was sampled and the remaining the pt
  * @api public
  */
 
-verb.eval.nurbs.rational_curve_adaptive_sample = function( degree, knots, control_points, tol ) {
+verb.eval.nurbs.rational_curve_adaptive_sample = function( degree, knots, control_points, tol, include_u ) {
 
 	// if degree is 1, just return the dehomogenized control points
 	if (degree === 1){
 		return control_points.map( verb.eval.nurbs.dehomogenize );
 	}
 
-	return verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knots, control_points, 0, 1.0, tol );
+	return verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knots, control_points, 0, 1.0, tol, include_u );
 
 }
 
@@ -2734,11 +2758,12 @@ verb.eval.nurbs.rational_curve_adaptive_sample = function( degree, knots, contro
  									and form (wi*pi, wi) 
  * @param {Number} start parameter for sampling
  * @param {Number} end parameter for sampling
+ * @param {Boolean} whether to prefix the point with the parameter
  * @return {Array} an array of dim + 1 length where the first element is the param where it was sampled and the remaining the pt
  * @api public
  */
 
-verb.eval.nurbs.rational_curve_adaptive_sample_range = function( degree, knots, control_points, start_u, end_u, tol ) {
+verb.eval.nurbs.rational_curve_adaptive_sample_range = function( degree, knots, control_points, start_u, end_u, tol, include_u ) {
 
 	// sample curve at three pts
 	var p1 = verb.eval.nurbs.rational_curve_point(degree, knots, control_points, start_u),
@@ -2750,14 +2775,17 @@ verb.eval.nurbs.rational_curve_adaptive_sample_range = function( degree, knots, 
 		// the if three points are "flat", return the two end pts
 		if ( verb.eval.nurbs.three_points_are_flat( p1, p2, p3, tol ) ) {
 
-			return [ 	[start_u, p1[0], p1[1], p1[2]], 
-								[ end_u, p3[0], p3[1], p3[2] ] ];
+			if (include_u){
+				return [ 	[ start_u ].concat(p1) , [end_u].concat(p3) ];
+			} else {
+				return [ 	p1, p3 ];
+			}
 
 		} else {
 
 			// recurse on the two halves
-			var left_pts = verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knots, control_points, start_u, mid_u, tol )
-				, right_pts = verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knots, control_points, mid_u, end_u, tol );
+			var left_pts = verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knots, control_points, start_u, mid_u, tol, include_u )
+				, right_pts = verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knots, control_points, mid_u, end_u, tol, include_u );
 
 			// concatenate the two		
 			return left_pts.slice(0, -1).concat(right_pts);

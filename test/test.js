@@ -2,6 +2,37 @@ var should = require('should')
 	, verb = require('../build/verb.js');
 
 
+
+describe("Array.flatten",function(){
+
+	it('returns a flattened version of a nested array', function(){
+
+		var arr = [ [1,2] , 1, [1, 2, 3, 4], [1, [1,2]]];
+		var flattened = arr.flatten();
+
+		flattened.should.eql([1,2,1,1,2,3,4,1,1,2]);
+
+	});
+
+	it('returns an empty array when asked to flatten an empty array', function(){
+
+		var arr = [];
+		var flattened = arr.flatten();
+
+		flattened.should.eql([]);
+
+	});
+
+	it('returns a 1d array when asked to flatten a 1d array', function(){
+
+		var arr = [1,2,3,4];
+		var flattened = arr.flatten();
+
+		flattened.should.eql([1,2,3,4]);
+
+	});
+});
+
 describe("verb.eval.nurbs.knot_span_given_n",function(){
 
 	it('returns correct result', function(){
@@ -730,6 +761,8 @@ describe("verb.eval.nurbs.rational_curve_adaptive_sample",function(){
 		should.equal(p[0][0], 0);
 		should.equal(p[1][0], 10);
 
+		p.map( function(e){  e.length.should.be.equal(3); });
+
 	});
 
 	it('returns all the control points for a degree 1 curve', function(){
@@ -746,6 +779,8 @@ describe("verb.eval.nurbs.rational_curve_adaptive_sample",function(){
 		p[0].should.eql([0,0,0]);
 		p[4].should.eql([12,16,22]);
 
+		p.map( function(e){  e.length.should.be.equal(3); });
+
 	});
 
 	it('makes more points for an arc', function(){
@@ -755,13 +790,13 @@ describe("verb.eval.nurbs.rational_curve_adaptive_sample",function(){
 			, weights = [1, Math.sqrt(2) / 2, 1]
 			, control_points = [ [1, 0, 0], [1, 1, 0], [0, 1, 0] ];
 
-		var p = verb.eval.nurbs.rational_curve_adaptive_sample( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights), 1e-8);	
-		var p2 = verb.eval.nurbs.rational_curve_adaptive_sample( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights), 1e-4);	
+		var p = verb.eval.nurbs.rational_curve_adaptive_sample( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights), 1e-8, true);	
+		var p2 = verb.eval.nurbs.rational_curve_adaptive_sample( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights), 1e-4, true);	
 		
 		var prev = - 1e-8;
 		for (var i = 0; i < p.length; i++){
 			p[i][0].should.be.above(prev);
-			p[i][0].should.be.within(-1e-8,1 + 1e-8);
+			p[i][0].should.be.within(-1e-8, 1 + 1e-8);
 			prev = p[i][0];
 		}
 
@@ -771,6 +806,9 @@ describe("verb.eval.nurbs.rational_curve_adaptive_sample",function(){
 
 		should.equal(p[p.length-1][0], 1.0);
 		should.equal(p2[p2.length-1][0], 1.0);
+
+		p.map( function(e){  e.length.should.be.equal(4); });
+		p2.map( function(e){  e.length.should.be.equal(4); });
 
 	});
 
@@ -789,7 +827,8 @@ describe("verb.eval.nurbs.rational_curve_regular_sample",function(){
 		var p = verb.eval.nurbs.rational_curve_regular_sample( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights), numSamples);	
 
 		should.equal(p.length, 10);
-		should.equal(p[0][0], 0);
+
+		p.map( function(e){  e.length.should.be.equal(3); });
 
 	});
 			
@@ -1804,109 +1843,6 @@ describe("verb.eval.nurbs.get_sphere_surface",function(){
 
 });
 
-describe("WatchObject",function(){
-
-	it('can be created by its constructor', function(){
-
-		var wo = new verb.core.WatchObject();
-		should.exist(wo);
-
-	});
-
-});
-
-describe("Interval",function(){
-
-	it('can be created by its constructor', function(){
-
-		var interval = new verb.geom.Interval( 0, 0.5);
-		should.exist(interval)
-		interval.get("min").should.equal( 0 );
-		interval.get("max").should.equal( 0.5 );
-
-	});
-
-});
-
-describe("verb.init",function(){
-
-	it('sets the nurbsEngine property for NurbsGeometry', function(){
-
-		verb.init();
-
-		verb.geom.NurbsGeometry.prototype.nurbsEngine.should.be.instanceof(verb.core.Engine);
-
-	});
-
-});
-
-describe("Arc.constructor",function(){
-
-	it('has correct properties', function(){
-
-		verb.init();
-		var arc = new verb.geom.Arc([0,0,0], [1,0,0], [0,1,0], 5, new verb.geom.Interval(0, Math.PI/ 2) );
-
-		should.exist( arc );
-
-		arc.get("radius").should.be.equal(5);
-		arc.get("center").should.eql([0,0,0]);
-		arc.get("xaxis").should.eql([1,0,0]);
-		arc.get("yaxis").should.eql([0,1,0]);
-		arc.get("interval").get('min').should.be.equal(0);
-		arc.get("interval").get('max').should.be.equal(Math.PI/2);
-
-	});
-
-});
-
-
-describe("Arc.point",function(){
-
-	it('returns expected results', function(){
-
-		verb.init();
-
-		var arc = new verb.geom.Arc([0,0,1], [1,0,0], [0,1,0], 1, new verb.geom.Interval(0, Math.PI/ 2) );
-		var p1 = arc.point(0);
-		var p2 = arc.point(0.5);
-		var p3 = arc.point(1);
-
-		p1.should.be.instanceof(Array).and.have.lengthOf(3);
-		p1[0].should.be.approximately( 1, 0.001 );
-		p1[1].should.be.approximately( 0, 0.001 );
-		p1[2].should.be.approximately( 1, 0.001 );
-		
-		p2.should.be.instanceof(Array).and.have.lengthOf(3);
-		p2[0].should.be.approximately( Math.sqrt(2)/2, 0.001 );
-		p2[1].should.be.approximately( Math.sqrt(2)/2, 0.001 );
-		p2[2].should.be.approximately( 1, 0.001 );
-
-		p3.should.be.instanceof(Array).and.have.lengthOf(3);
-		p3[0].should.be.approximately( 0, 0.001 );
-		p3[1].should.be.approximately( 1, 0.001 );
-		p3[2].should.be.approximately( 1, 0.001 );
-	});
-
-	it('creates the expected result when given a callback', function(done){
-
-		verb.init();
-		
-		var arc = new verb.geom.Arc([0,0,1], [1,0,0], [0,1,0], 1, new verb.geom.Interval(0, Math.PI/ 2) );
-		
-		arc.point(0.5, function(res){	 
-
-			res.should.be.instanceof(Array).and.have.lengthOf(3);
-			res[0].should.be.approximately( Math.sqrt(2)/2, 0.001 );
-			res[1].should.be.approximately( Math.sqrt(2)/2, 0.001 );
-			res[2].should.be.approximately( 1, 0.001 );
-
-			done();
-		});
-
-	});
-
-});
 
 describe("verb.eval.nurbs.get_ellipse_arc",function(){
 
@@ -2034,4 +1970,169 @@ describe("verb.eval.nurbs.get_ellipse_arc",function(){
 
 });
 
-// TODO: knot insertion tests
+describe("WatchObject",function(){
+
+	it('can be created by its constructor', function(){
+
+		var wo = new verb.core.WatchObject();
+		should.exist(wo);
+
+	});
+
+});
+
+describe("Interval",function(){
+
+	it('can be created by its constructor', function(){
+
+		var interval = new verb.geom.Interval( 0, 0.5);
+		should.exist(interval)
+		interval.get("min").should.equal( 0 );
+		interval.get("max").should.equal( 0.5 );
+
+	});
+
+});
+
+describe("verb.init",function(){
+
+	it('sets the nurbsEngine property for NurbsGeometry', function(){
+
+		verb.init();
+
+		verb.geom.NurbsGeometry.prototype.nurbsEngine.should.be.instanceof(verb.core.Engine);
+
+	});
+
+});
+
+describe("Arc.constructor",function(){
+
+	it('has correct properties', function(){
+
+		verb.init();
+		var arc = new verb.geom.Arc([0,0,0], [1,0,0], [0,1,0], 5, new verb.geom.Interval(0, Math.PI/ 2) );
+
+		should.exist( arc );
+
+		arc.get("radius").should.be.equal(5);
+		arc.get("center").should.eql([0,0,0]);
+		arc.get("xaxis").should.eql([1,0,0]);
+		arc.get("yaxis").should.eql([0,1,0]);
+		arc.get("interval").get('min').should.be.equal(0);
+		arc.get("interval").get('max').should.be.equal(Math.PI/2);
+
+	});
+
+});
+
+describe("Arc.point",function(){
+
+	it('returns expected results', function(){
+
+		verb.init();
+
+		var arc = new verb.geom.Arc([0,0,1], [1,0,0], [0,1,0], 1, new verb.geom.Interval(0, Math.PI/ 2) );
+		var p1 = arc.point(0);
+		var p2 = arc.point(0.5);
+		var p3 = arc.point(1);
+
+		p1.should.be.instanceof(Array).and.have.lengthOf(3);
+		p1[0].should.be.approximately( 1, 0.001 );
+		p1[1].should.be.approximately( 0, 0.001 );
+		p1[2].should.be.approximately( 1, 0.001 );
+		
+		p2.should.be.instanceof(Array).and.have.lengthOf(3);
+		p2[0].should.be.approximately( Math.sqrt(2)/2, 0.001 );
+		p2[1].should.be.approximately( Math.sqrt(2)/2, 0.001 );
+		p2[2].should.be.approximately( 1, 0.001 );
+
+		p3.should.be.instanceof(Array).and.have.lengthOf(3);
+		p3[0].should.be.approximately( 0, 0.001 );
+		p3[1].should.be.approximately( 1, 0.001 );
+		p3[2].should.be.approximately( 1, 0.001 );
+	});
+
+	it('creates the expected result when given a callback', function(done){
+
+		verb.init();
+		
+		var arc = new verb.geom.Arc([0,0,1], [1,0,0], [0,1,0], 1, new verb.geom.Interval(0, Math.PI/ 2) );
+		
+		arc.point(0.5, function(res){	 
+
+			res.should.be.instanceof(Array).and.have.lengthOf(3);
+			res[0].should.be.approximately( Math.sqrt(2)/2, 0.001 );
+			res[1].should.be.approximately( Math.sqrt(2)/2, 0.001 );
+			res[2].should.be.approximately( 1, 0.001 );
+
+			done();
+		});
+
+	});
+
+});
+
+describe("Arc.tesselate",function(){
+
+	it('should return a list of vertices', function(){
+
+		verb.init();
+
+		var arc = new verb.geom.Arc([0,0,1], [1,0,0], [0,1,0], 1, new verb.geom.Interval(0, Math.PI/ 2) );
+		var pts = arc.tesselate();
+
+		pts.length.should.be.greaterThan(2);
+
+		pts.map( function(e){  e.length.should.be.equal(3); });
+
+	});
+
+});
+
+describe("FourPointSurface.constructor",function(){
+
+	it('can create an instance', function(){
+
+		verb.init();
+
+		var p1 = [0,0,1]
+			, p2 = [1,0,0]
+			, p3 = [1,1,1]
+			, p4 = [0,1,0];
+
+		var srf = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
+
+		should.exist(srf);
+
+	});
+
+});
+
+describe("FourPointSurface.point",function(){
+
+	it('evaluates correctly for hypar', function(){
+
+		verb.init();
+
+		var p1 = [0,0,1]
+			, p2 = [1,0,0]
+			, p3 = [1,1,1]
+			, p4 = [0,1,0];
+
+		var srf = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
+
+		should.exist(srf);
+
+		var p = srf.point(0.5,0.5);
+
+		p[0].should.be.approximately(0.5, verb.EPSILON );
+		p[1].should.be.approximately(0.5, verb.EPSILON );
+		p[2].should.be.approximately(0.5, verb.EPSILON );
+
+	});
+
+});
+
+
+

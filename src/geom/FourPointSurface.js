@@ -1,19 +1,19 @@
 verb.geom.FourPointSurface = function(p1, p2, p3, p4) {
 
 	this.setAll( {
-		"p1": center,
-		"p2": xaxis,
-		"p3": yaxis,
-		"p4": radius
+		"p1": p1,
+		"p2": p2,
+		"p3": p3,
+		"p4": p4
 	});
 
-	var curve_props = this.nurbsRep();
+	var surface_props = this.nurbsRep();
 
-	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weight, curve_props.knots );
+	verb.geom.NurbsSurface.call(this, surface_props.degree_u, surface_props.knots_u, surface_props.degree_v, surface_props.knots_v, surface_props.control_points, surface_props.weights );
 
 	this.watchAll( ['p1', 'p2', 'p3', 'p4'], this.update );
 
-}.inherits(verb.geom.NurbsCurve);
+}.inherits(verb.geom.NurbsSurface);
 
 verb.geom.FourPointSurface.prototype.nurbsRep = function(){
 

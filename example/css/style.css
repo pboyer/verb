@@ -1,0 +1,36 @@
+body {
+  font: 14px/20px 'Helvetica Neue Light', HelveticaNeue-Light, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 50px 50px 200px 50px;
+}
+
+pre, code, textarea {
+  font: 12px/20px Monaco, monospace;
+  border: 1px solid #CCC;
+  border-radius: 3px;
+  background: #F9F9F9;
+  padding: 0 3px;
+  color: #555;
+}
+
+pre, textarea {
+  padding: 10px;
+  width: 100%;
+}
+textarea {
+  height: 200px;
+}
+textarea:focus {
+  outline: none;
+}
+
+h1, h2 { font: bold 50px/50px 'Helvetica Neue', Helvetica, Arial; }
+h2 { font-size: 30px; margin: 100px 0 0 0; }
+a { color: inherit; }
+.viewer { width: 200px; height: 200px; background-color: #EEE; }
+#combined .viewer { width: 150px; height: 150px; }
+table { border-collapse: collapse; margin: 0 auto; }
+td { padding: 5px; text-align: center; }
+td code { background: none; border: none; color: inherit; }
+canvas { cursor: move; }

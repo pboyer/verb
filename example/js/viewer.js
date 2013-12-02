@@ -6,10 +6,16 @@ CSG.prototype.setColor = function(r, g, b) {
 };
 
 // Convert from CSG solid to GL.Mesh object
-CSG.prototype.toMesh = function() {
+verb.geom.NurbsSurface.prototype.toMesh = function() {
+
   var mesh = new GL.Mesh({ normals: true, colors: true });
+
+  var s = this.tesselate();
+
   var indexer = new GL.Indexer();
+
   this.toPolygons().map(function(polygon) {
+
     var indices = polygon.vertices.map(function(vertex) {
       vertex.color = polygon.shared || [1, 1, 1];
       return indexer.add(vertex);
@@ -17,13 +23,19 @@ CSG.prototype.toMesh = function() {
     for (var i = 2; i < indices.length; i++) {
       mesh.triangles.push([indices[0], indices[i - 1], indices[i]]);
     }
+
   });
+
+
+
   mesh.vertices = indexer.unique.map(function(v) { return [v.pos.x, v.pos.y, v.pos.z]; });
   mesh.normals = indexer.unique.map(function(v) { return [v.normal.x, v.normal.y, v.normal.z]; });
   mesh.colors = indexer.unique.map(function(v) { return v.color; });
   mesh.computeWireframe();
+
   return mesh;
 };
+
 
 var angleX = 20;
 var angleY = 20;
@@ -34,13 +46,14 @@ Viewer.lineOverlay = false;
 
 // A viewer is a WebGL canvas that lets the user view a mesh. The user can
 // tumble it around by dragging the mouse.
-function Viewer(csg, width, height, depth) {
+function Viewer(ele, width, height, depth) {
   viewers.push(this);
 
   // Get a new WebGL canvas
   var gl = GL.create();
   this.gl = gl;
-  this.mesh = csg.toMesh();
+
+  this.mesh = ele.toMesh();
 
   // Set up the viewport
   gl.canvas.width = width;

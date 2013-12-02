@@ -1273,9 +1273,9 @@ verb.eval.geom.intersect_rays = function( a0, a, b0, b ) {
  * @api public
  */
 
-verb.eval.nurbs.rational_curve_regular_sample = function( degree, knots, control_points, num_samples ) {
+verb.eval.nurbs.rational_curve_regular_sample = function( degree, knots, control_points, num_samples, include_u ) {
 
-	return verb.eval.nurbs.rational_curve_regular_sample_range( degree, knots, control_points, 0, 1.0, num_samples );
+	return verb.eval.nurbs.rational_curve_regular_sample_range( degree, knots, control_points, 0, 1.0, num_samples, include_u);
 
 }
 
@@ -1288,11 +1288,12 @@ verb.eval.nurbs.rational_curve_regular_sample = function( degree, knots, control
  * @param {Number} start parameter for sampling
  * @param {Number} end parameter for sampling
  * @param {Number} integer number of samples
+ * @param {Boolean} whether to prefix the point with the parameter
  * @return {Array} an dictionary of parameter - point pairs
  * @api public
  */
 
-verb.eval.nurbs.rational_curve_regular_sample_range = function( degree, knots, control_points, start_u, end_u, num_samples ) {
+verb.eval.nurbs.rational_curve_regular_sample_range = function( degree, knots, control_points, start_u, end_u, num_samples, include_u ) {
 
 	if (num_samples < 1){
 		num_samples = 2;
@@ -1305,8 +1306,12 @@ verb.eval.nurbs.rational_curve_regular_sample_range = function( degree, knots, c
 	for (var i = 0; i < num_samples; i++){
 
 		u = start_u + span * i;
-		p.push( [u].concat( verb.eval.nurbs.rational_curve_point(degree, knots, control_points, u) ) );
-
+		if ( include_u ){
+			p.push( [u].concat( verb.eval.nurbs.rational_curve_point(degree, knots, control_points, u) ) );
+		} else {
+			p.push( verb.eval.nurbs.rational_curve_point(degree, knots, control_points, u) );
+		}
+	
 	}
 
 	return p;
@@ -1321,18 +1326,19 @@ verb.eval.nurbs.rational_curve_regular_sample_range = function( degree, knots, c
  * @param {Array} 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
  									and form (wi*pi, wi) 
  * @param {Number} tolerance for the adaptive scheme
+ * @param {Boolean} whether to prefix the point with the parameter
  * @return {Array} an array of dim + 1 length where the first element is the param where it was sampled and the remaining the pt
  * @api public
  */
 
-verb.eval.nurbs.rational_curve_adaptive_sample = function( degree, knots, control_points, tol ) {
+verb.eval.nurbs.rational_curve_adaptive_sample = function( degree, knots, control_points, tol, include_u ) {
 
 	// if degree is 1, just return the dehomogenized control points
 	if (degree === 1){
 		return control_points.map( verb.eval.nurbs.dehomogenize );
 	}
 
-	return verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knots, control_points, 0, 1.0, tol );
+	return verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knots, control_points, 0, 1.0, tol, include_u );
 
 }
 
@@ -1345,11 +1351,12 @@ verb.eval.nurbs.rational_curve_adaptive_sample = function( degree, knots, contro
  									and form (wi*pi, wi) 
  * @param {Number} start parameter for sampling
  * @param {Number} end parameter for sampling
+ * @param {Boolean} whether to prefix the point with the parameter
  * @return {Array} an array of dim + 1 length where the first element is the param where it was sampled and the remaining the pt
  * @api public
  */
 
-verb.eval.nurbs.rational_curve_adaptive_sample_range = function( degree, knots, control_points, start_u, end_u, tol ) {
+verb.eval.nurbs.rational_curve_adaptive_sample_range = function( degree, knots, control_points, start_u, end_u, tol, include_u ) {
 
 	// sample curve at three pts
 	var p1 = verb.eval.nurbs.rational_curve_point(degree, knots, control_points, start_u),
@@ -1361,14 +1368,17 @@ verb.eval.nurbs.rational_curve_adaptive_sample_range = function( degree, knots, 
 		// the if three points are "flat", return the two end pts
 		if ( verb.eval.nurbs.three_points_are_flat( p1, p2, p3, tol ) ) {
 
-			return [ 	[start_u, p1[0], p1[1], p1[2]], 
-								[ end_u, p3[0], p3[1], p3[2] ] ];
+			if (include_u){
+				return [ 	[ start_u ].concat(p1) , [end_u].concat(p3) ];
+			} else {
+				return [ 	p1, p3 ];
+			}
 
 		} else {
 
 			// recurse on the two halves
-			var left_pts = verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knots, control_points, start_u, mid_u, tol )
-				, right_pts = verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knots, control_points, mid_u, end_u, tol );
+			var left_pts = verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knots, control_points, start_u, mid_u, tol, include_u )
+				, right_pts = verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knots, control_points, mid_u, end_u, tol, include_u );
 
 			// concatenate the two		
 			return left_pts.slice(0, -1).concat(right_pts);
