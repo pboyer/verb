@@ -2803,7 +2803,7 @@ describe("Cone.constructor",function(){
 
 describe("Cone.point",function(){
 
-	it('evaluates correctly for hypar', function(){
+	it('evaluates correctly for middle of surface', function(){
 
 		verb.init();
 
@@ -2829,7 +2829,7 @@ describe("Cone.point",function(){
 
 describe("Cone.derivatives",function(){
 
-	it('gives nice result', function(){
+	it('gives expected result for middle of surface', function(){
 
 		verb.init();
 
@@ -2877,6 +2877,120 @@ describe("Cone.tesselate",function(){
 			, radius = 3;
 
 		var srf = new verb.geom.Cone( axis, xaxis, base, height, radius );
+
+		should.exist(srf);
+
+		var p = srf.tesselate(20,20);
+
+		p.uvs.length.should.be.equal(441);
+		p.points.length.should.be.equal(441);
+		p.faces.length.should.be.equal(800);
+
+		p.points.map(function(e){ e.length.should.be.equal(3); });
+		p.uvs.map(function(e){ e.length.should.be.equal(2); });
+		p.faces.map(function(e){ e.length.should.be.equal(3); });
+
+
+	});
+
+});
+
+describe("Cylinder.constructor",function(){
+
+	it('can create an instance', function(){
+
+		verb.init();
+
+		var axis = [0,0,1]
+			, xaxis = [1,0,0]
+			, base = [0,0,0]
+			, height = 5
+			, radius = 3;
+
+		var srf = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
+
+		should.exist(srf);
+
+	});
+
+});
+
+describe("Cylinder.point",function(){
+
+	it('evaluates correctly for middle of surface', function(){
+
+		verb.init();
+
+		var axis = [0,0,1]
+			, xaxis = [1,0,0]
+			, base = [0,0,0]
+			, height = 5
+			, radius = 3;
+
+		var srf = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
+
+		should.exist(srf);
+
+		var p = srf.point(0.5,0.5);
+
+		p[0].should.be.approximately(-3, verb.EPSILON );
+		p[1].should.be.approximately(0, verb.EPSILON );
+		p[2].should.be.approximately(2.5, verb.EPSILON );
+
+	});
+
+});
+
+describe("Cylinder.derivatives",function(){
+
+	it('gives expected result for middle of surface', function(){
+
+		verb.init();
+
+		var axis = [0,0,1]
+			, xaxis = [1,0,0]
+			, base = [0,0,0]
+			, height = 5
+			, radius = 3;
+
+		var srf = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
+
+		should.exist(srf);
+
+		var p = srf.derivatives(0.5, 0.5, 1);
+
+		p[0][0][0].should.be.approximately(-3, verb.EPSILON );
+		p[0][0][1].should.be.approximately(0, verb.EPSILON );
+		p[0][0][2].should.be.approximately(2.5, verb.EPSILON );
+
+		p[1][0][0].should.be.approximately(0, verb.EPSILON );
+		p[1][0][1].should.be.approximately(0, verb.EPSILON );
+		p[1][0][2].should.be.approximately(5, verb.EPSILON );
+
+		p[0][1] = numeric.div( p[0][1], numeric.norm2(p[0][1]) );
+
+		p[0][1][0].should.be.approximately(0, verb.EPSILON );
+		p[0][1][1].should.be.approximately(-1, verb.EPSILON );
+		p[0][1][2].should.be.approximately(0, verb.EPSILON );
+
+	});
+
+});
+
+
+describe("Cylinder.tesselate",function(){
+
+	it('gives mesh result', function(){
+
+		verb.init();
+
+		var axis = [0,0,1]
+			, xaxis = [1,0,0]
+			, base = [0,0,0]
+			, height = 5
+			, radius = 3;
+
+		var srf = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
 
 		should.exist(srf);
 

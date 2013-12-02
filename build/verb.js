@@ -2766,7 +2766,7 @@ verb.eval.nurbs.rational_curve_adaptive_sample_range = function( degree, knots, 
 	// sample curve at three pts
 	var p1 = verb.eval.nurbs.rational_curve_point(degree, knots, control_points, start_u),
 		p3 = verb.eval.nurbs.rational_curve_point(degree, knots, control_points, end_u),
-		t = 0.45 + 0.1 * Math.random(),
+		t = 0.5 + 0.2 * Math.random(),
 		mid_u = start_u + (end_u - start_u) * t,
 		p2 = verb.eval.nurbs.rational_curve_point(degree, knots, control_points, mid_u);
 
