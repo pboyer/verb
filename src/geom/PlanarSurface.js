@@ -16,7 +16,7 @@ verb.geom.PlanarSurface = function( base, uaxis, vaxis, ulength, vlength ) {
 
 }.inherits(verb.geom.NurbsSurface);
 
-verb.geom.Cone.prototype.nurbsRep = function(){
+verb.geom.PlanarSurface.prototype.nurbsRep = function(){
 
 	var p1 = this.get('base')
 		, uedge = numeric.mul( this.get('uaxis'), this.get('ulength'))
