@@ -571,14 +571,14 @@ verb.geom.NurbsSurface.prototype.derivatives = function( u, v, num_derivs, callb
  * @api public
  */
 
-verb.geom.NurbsSurface.prototype.tesselate = function(udivs, vdivs){
+verb.geom.NurbsSurface.prototype.tesselate = function(udivs, vdivs, callback){
 
 	if (callback) {
 		return this.nurbsEngine.eval( 'tesselate_rational_surface_naive', 
 			[	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), udivs, vdivs ], callback ); 
 	}
 
-	return this.nurbsEngine.eval( 'tesselate_rational_surface_naive', 
+	return this.nurbsEngine.eval_sync( 'tesselate_rational_surface_naive', 
 		[	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), udivs, vdivs ] ); 
 
 };
@@ -2365,7 +2365,8 @@ verb.eval.geom.get_tri_norm = function( points, tri ) {
  * @api public
  */
 
-verb.eval.mesh.tesselate_rational_surface_naive = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, divs_u, divs_v ) {
+verb.eval.nurbs.tesselate_rational_surface_naive = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, divs_u, divs_v ) {
+
 
 	if ( divs_u < 1 ) {
 		divs_u = 1;

@@ -2134,5 +2134,31 @@ describe("FourPointSurface.point",function(){
 
 });
 
+describe("FourPointSurface.tesselate",function(){
+
+	it('gives mesh result', function(){
+
+		verb.init();
+
+		var p1 = [0,0,1]
+			, p2 = [1,0,0]
+			, p3 = [1,1,1]
+			, p4 = [0,1,0];
+
+		var srf = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
+
+		should.exist(srf);
+
+		var p = srf.tesselate(20,20);
+
+		p.uvs.length.should.be.equal(441);
+		p.points.length.should.be.equal(441);
+		p.faces.length.should.be.equal(800);
+
+
+	});
+
+});
+
 
 

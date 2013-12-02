@@ -84,14 +84,14 @@ verb.geom.NurbsSurface.prototype.derivatives = function( u, v, num_derivs, callb
  * @api public
  */
 
-verb.geom.NurbsSurface.prototype.tesselate = function(udivs, vdivs){
+verb.geom.NurbsSurface.prototype.tesselate = function(udivs, vdivs, callback){
 
 	if (callback) {
 		return this.nurbsEngine.eval( 'tesselate_rational_surface_naive', 
 			[	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), udivs, vdivs ], callback ); 
 	}
 
-	return this.nurbsEngine.eval( 'tesselate_rational_surface_naive', 
+	return this.nurbsEngine.eval_sync( 'tesselate_rational_surface_naive', 
 		[	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), udivs, vdivs ] ); 
 
 };
