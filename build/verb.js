@@ -711,7 +711,9 @@ verb.geom.Arc.prototype.nurbsRep = function(){
 
 };
 
-verb.geom.BezierCurve = function( degree, control_points, weights) {
+verb.geom.BezierCurve = function( control_points, weights) {
+
+	var degree = control_points.length - 1;
 
 	var knots = [];
 	for (var i = 0; i < degree + 1; i++){ knots.push(0); }
@@ -728,7 +730,7 @@ verb.geom.BezierCurve = function( degree, control_points, weights) {
 		}
 	}
 
-	verb.geom.NurbsCurve.call(this, degree, control_points, weight, knots );
+	verb.geom.NurbsCurve.call(this, degree, ctrlPoints, weights, knots );
 
 }.inherits( verb.geom.NurbsCurve ); 
 
@@ -1131,11 +1133,6 @@ verb.geom.Ellipse.prototype.nurbsRep = function(){
 															 2 * Math.PI ]);
 
 };
-
-// update tests for change in api
-// implement tesselation stuff, proper mesh datatypes
-// test for sweep
-// prepare demo
 
 verb.geom.EllipseArc = function(center, xaxis, yaxis, xradius, yradius, interval) {
 

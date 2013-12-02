@@ -27,8 +27,3 @@ verb.geom.Ellipse.prototype.nurbsRep = function(){
 															 2 * Math.PI ]);
 
 };
-
-// update tests for change in api
-// implement tesselation stuff, proper mesh datatypes
-// test for sweep
-// prepare demo

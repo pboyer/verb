@@ -1,4 +1,6 @@
-verb.geom.BezierCurve = function( degree, control_points, weights) {
+verb.geom.BezierCurve = function( control_points, weights) {
+
+	var degree = control_points.length - 1;
 
 	var knots = [];
 	for (var i = 0; i < degree + 1; i++){ knots.push(0); }
@@ -15,7 +17,7 @@ verb.geom.BezierCurve = function( degree, control_points, weights) {
 		}
 	}
 
-	verb.geom.NurbsCurve.call(this, degree, control_points, weight, knots );
+	verb.geom.NurbsCurve.call(this, degree, ctrlPoints, weights, knots );
 
 }.inherits( verb.geom.NurbsCurve ); 
 

@@ -2267,18 +2267,107 @@ describe("Line.tesselate",function(){
 
 		var p = c.tesselate();
 
-		// p.uvs.length.should.be.equal(441);
-		// p.points.length.should.be.equal(441);
-		// p.faces.length.should.be.equal(800);
-
-		// p.points.map(function(e){ e.length.should.be.equal(3); });
-		// p.uvs.map(function(e){ e.length.should.be.equal(2); });
-		// p.faces.map(function(e){ e.length.should.be.equal(3); });
-
+		p.length.should.be.equal(2);
+		p[0].length.should.be.equal(3);
+		p[1].length.should.be.equal(3);
 
 	});
 
 });
+
+describe("BezierCurve.constructor",function(){
+
+	it('can create an instance', function(){
+
+		verb.init();
+
+		var p1 = [0,0,0]
+			, p2 = [1,0,1]
+			, p3 = [2,0,-1]
+			, p4 = [3,0,0];
+
+		var c = new verb.geom.BezierCurve( [p1, p2, p3, p4] );
+
+		should.exist(c);
+
+	});
+
+});
+
+describe("BezierCurve.point",function(){
+
+	it('evaluates correctly', function(){
+
+		verb.init();
+
+		var p1 = [0,0,0]
+			, p2 = [1,0,1]
+			, p3 = [2,0,-1]
+			, p4 = [3,0,0];
+
+		var c = new verb.geom.BezierCurve( [p1, p2, p3, p4] );
+
+		should.exist(c);
+
+		var p = c.point(0.5);
+
+		p.should.eql([1.5,0,0]);
+
+	});
+
+});
+
+describe("BezierCurve.derivatives",function(){
+
+	it('gives nice result', function(){
+
+		verb.init();
+
+
+		var p1 = [0,0,0]
+			, p2 = [1,0,1]
+			, p3 = [2,0,-1]
+			, p4 = [3,0,0];
+
+		var c = new verb.geom.BezierCurve( [p1, p2, p3, p4] );
+
+		should.exist(c);
+
+		var p = c.derivatives(0.5, 1);
+
+		p[0].should.eql([1.5,0,0]);
+		p[1].should.eql([3, 0, -1.5]);
+
+	});
+
+});
+
+describe("BezierCurve.tesselate",function(){
+
+	it('gives mesh result', function(){
+
+		verb.init();
+
+		var p1 = [0,0,0]
+			, p2 = [1,0,1]
+			, p3 = [2,0,-1]
+			, p4 = [3,0,0];
+
+		var c = new verb.geom.BezierCurve( [p1, p2, p3, p4] );
+
+		should.exist(c);
+
+		var pts = c.tesselate();
+
+		pts.length.should.be.greaterThan(2);
+
+		pts.map( function(e){  e.length.should.be.equal(3); });
+
+	});
+
+});
+
+
 
 
 
