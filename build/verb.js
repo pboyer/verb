@@ -69,6 +69,12 @@ Array.prototype.flatten = function(){
 	return merged;
 
 }
+
+numeric.normalized = function(arr){
+
+	return numeric.div( arr, numeric.norm2(arr) );
+
+}
 // engine nurbs handles nurbs eval requests
 // it also acknowledges whether there are web workers available 
 // in the broswer, if not, it defaults to blocking evaluation

@@ -69,3 +69,9 @@ Array.prototype.flatten = function(){
 	return merged;
 
 }
+
+numeric.normalized = function(arr){
+
+	return numeric.div( arr, numeric.norm2(arr) );
+
+}
