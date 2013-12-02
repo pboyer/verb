@@ -3561,7 +3561,27 @@ describe("SweepOneRail.tesselate",function(){
 
 	});
 
-	
 
 });
+
+// test for intersection
+
+describe("verb.intersect.curveCurve",function(){
+
+	it('gives result for valid two lines', function(){
+
+		verb.init();
+
+		var l1 = new verb.geom.Line( [1,0,0], [-1,0,0]  )
+			, l2 = new verb.geom.Line( [0,1,0], [0,-1,0]  )
+
+		var a = verb.intersect.curveCurve(l1, l2);
+		
+
+
+	});
+
+
+});
+
 

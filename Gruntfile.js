@@ -16,6 +16,7 @@ module.exports = function(grunt) {
                                         'src/geom/base/NurbsCurve.js', 
                                         'src/geom/base/NurbsSurface.js', 
                                         'src/geom/*.js', 
+                                        'src/intersect/*.js', 
                                         'src/eval/nurbs.js' ],
           'build/<%= pkg.name %>_nurbs_eval.js': ['src/eval/eval_header.js', 'src/eval/nurbs.js']
         }

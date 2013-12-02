@@ -16,11 +16,13 @@ else // node.js context
 }
 
 verb.geom = {};
+verb.intersect = verb.intersect || {};
 verb.core = {};
 verb.eval = {};
 
 verb.eval.nurbs = verb.eval.nurbs || {};
 verb.eval.geom = verb.eval.geom || {};
+
 verb.eval.mesh = verb.eval.mesh || {};
 
 verb.EPSILON = 1e-8;

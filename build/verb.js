@@ -16,11 +16,13 @@ else // node.js context
 }
 
 verb.geom = {};
+verb.intersect = verb.intersect || {};
 verb.core = {};
 verb.eval = {};
 
 verb.eval.nurbs = verb.eval.nurbs || {};
 verb.eval.geom = verb.eval.geom || {};
+
 verb.eval.mesh = verb.eval.mesh || {};
 
 verb.EPSILON = 1e-8;
@@ -115,6 +117,11 @@ verb.core.Engine = function(options) {
 
 	this.eval = function(func, arguments_array, callback )
 	{
+
+		if (!callback){
+			return this.eval_sync(func, arguments_array);
+		}
+
 		// if we are to use the pool we must init it 
 		if ( _use_pool && ( _pool || ( _pool === undefined && init_pool() ) ) ) {
 			_pool.addWork( func, arguments_array, callback );
@@ -1430,6 +1437,20 @@ verb.geom.SweepOneRail.prototype.nurbsRep = function(){
 										  this.get("rail").get("weights")] );
 
 };
+
+
+
+verb.intersect.curveCurve = function( curve1, curve2, callback ){
+
+	if (curve1 instanceof verb.geom.NurbsCurve && curve2 instanceof verb.geom.NurbsCurve ){
+
+		return verb.nurbsEngine.eval( 'intersect_rational_curves_by_aabb', 
+							[ 	curve1.get('degree'), curve1.get('knots'), curve1.homogenize(), curve2.get('degree'), curve2.get('knots'), curve2.homogenize(), verb.TOLERANCE ], callback );
+
+
+	}
+
+}
 /**
  * Generate the control points, weights, and knots of an elliptical arc
  *
@@ -2512,14 +2533,14 @@ verb.eval.nurbs.rational_curve_curve_bb_intersect_refine = function( degree1, kn
 verb.eval.nurbs.intersect_rational_curves_by_aabb = function( degree1, knots1, control_points1, degree2, knots2, control_points2, sample_tol, tol ) {
 
 	// sample the two curves adaptively
-	var up1 = verb.eval.nurbs.parametric_polyline_polyline_bb_intersect( degree1, knots1, control_points1, sample_tol )
-		, up2 = verb.eval.nurbs.parametric_polyline_polyline_bb_intersect( degree1, knots1, control_points1, sample_tol )
+	var up1 = verb.eval.nurbs.rational_curve_adaptive_sample( degree1, knots1, control_points1, sample_tol )
+		, up2 = verb.eval.nurbs.rational_curve_adaptive_sample( degree1, knots1, control_points1, sample_tol )
 		, u1 = _.map(up1, function(el) { return el[0]; })
 		, u2 = _.map(up2, function(el) { return el[0]; })
 		, p1 = _.map(up1, function(el) { return el.slice(1) })
 		, p2 = _.map(up2, function(el) { return el.slice(1) });
 
-	return verb.eval.nurbs.parametric_polyline_polyline_bb_intersect( p1, p2, u1, u2, tol );
+	return verb.eval.nurbs.intersect_parametric_polylines_by_aabb( p1, p2, u1, u2, tol );
 
 }
 

@@ -40,9 +40,9 @@ verb.core.Engine = function(options) {
 	{
 
 		if (!callback){
-			return eval_sync(func, arguments_array);
+			return this.eval_sync(func, arguments_array);
 		}
-		
+
 		// if we are to use the pool we must init it 
 		if ( _use_pool && ( _pool || ( _pool === undefined && init_pool() ) ) ) {
 			_pool.addWork( func, arguments_array, callback );

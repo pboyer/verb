@@ -1098,14 +1098,14 @@ verb.eval.nurbs.rational_curve_curve_bb_intersect_refine = function( degree1, kn
 verb.eval.nurbs.intersect_rational_curves_by_aabb = function( degree1, knots1, control_points1, degree2, knots2, control_points2, sample_tol, tol ) {
 
 	// sample the two curves adaptively
-	var up1 = verb.eval.nurbs.parametric_polyline_polyline_bb_intersect( degree1, knots1, control_points1, sample_tol )
-		, up2 = verb.eval.nurbs.parametric_polyline_polyline_bb_intersect( degree1, knots1, control_points1, sample_tol )
+	var up1 = verb.eval.nurbs.rational_curve_adaptive_sample( degree1, knots1, control_points1, sample_tol )
+		, up2 = verb.eval.nurbs.rational_curve_adaptive_sample( degree1, knots1, control_points1, sample_tol )
 		, u1 = _.map(up1, function(el) { return el[0]; })
 		, u2 = _.map(up2, function(el) { return el[0]; })
 		, p1 = _.map(up1, function(el) { return el.slice(1) })
 		, p2 = _.map(up2, function(el) { return el.slice(1) });
 
-	return verb.eval.nurbs.parametric_polyline_polyline_bb_intersect( p1, p2, u1, u2, tol );
+	return verb.eval.nurbs.intersect_parametric_polylines_by_aabb( p1, p2, u1, u2, tol );
 
 }
 
