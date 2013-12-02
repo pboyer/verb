@@ -1277,11 +1277,11 @@ verb.geom.Line.prototype.nurbsRep = function(){
 verb.geom.PlanarSurface = function( base, uaxis, vaxis, ulength, vlength ) {
 
 	this.setAll({
-		"base": center,
-		"uaxis": xaxis,
-		"vaxis": yaxis,
-		"ulength": xradius,
-		"vlength": yradius
+		"base": base,
+		"uaxis": uaxis,
+		"vaxis": vaxis,
+		"ulength": ulength,
+		"vlength": vlength
 	});
 
 	var surface_props = this.nurbsRep();
@@ -1297,9 +1297,9 @@ verb.geom.PlanarSurface.prototype.nurbsRep = function(){
 	var p1 = this.get('base')
 		, uedge = numeric.mul( this.get('uaxis'), this.get('ulength'))
 		, vedge = numeric.mul( this.get('vaxis'), this.get('vlength'))
-		, p2 = numeric.add( base, uedge )
-		, p3 = numeric.add( base, vedge, uedge )
-		, p4 = numeric.add( base, vedge );
+		, p2 = numeric.add( p1, uedge )
+		, p3 = numeric.add( p1, vedge, uedge )
+		, p4 = numeric.add( p1, vedge );
 
 	return this.nurbsEngine.eval_sync( 'get_4pt_surface', [ p1, p2, p3, p4 ]);
 

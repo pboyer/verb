@@ -3113,6 +3113,115 @@ describe("Extrusion.tesselate",function(){
 
 });
 
+describe("PlanarSurface.constructor",function(){
+
+	it('can create an instance', function(){
+
+		verb.init();
+
+		var base = [0,0,0]
+			, uaxis = [1,0,0]
+			, vaxis = [0,1,0]
+			, ulength = 10
+			, vlength = 4;
+
+		var srf = new verb.geom.PlanarSurface( base, uaxis, vaxis, ulength, vlength );
+
+		should.exist(srf);
+
+	});
+
+});
+
+describe("PlanarSurface.point",function(){
+
+	it('evaluates correctly for middle of surface', function(){
+
+		verb.init();
+
+		var base = [0,0,0]
+			, uaxis = [1,0,0]
+			, vaxis = [0,1,0]
+			, ulength = 10
+			, vlength = 4;
+
+		var srf = new verb.geom.PlanarSurface( base, uaxis, vaxis, ulength, vlength );
+
+		should.exist(srf);
+
+		var p = srf.point(0.5,0.5);
+
+		p[0].should.be.approximately(5, verb.EPSILON );
+		p[1].should.be.approximately(2, verb.EPSILON );
+		p[2].should.be.approximately(0, verb.EPSILON );
+
+	});
+
+});
+
+describe("PlanarSurface.derivatives",function(){
+
+	it('gives expected result for middle of surface', function(){
+
+		verb.init();
+
+		var base = [0,0,0]
+			, uaxis = [1,0,0]
+			, vaxis = [0,1,0]
+			, ulength = 10
+			, vlength = 4;
+
+		var srf = new verb.geom.PlanarSurface( base, uaxis, vaxis, ulength, vlength );
+
+		should.exist(srf);
+
+		var p = srf.derivatives(0.5, 0.5, 1);
+
+		p[0][0][0].should.be.approximately(5, verb.EPSILON );
+		p[0][0][1].should.be.approximately(2, verb.EPSILON );
+		p[0][0][2].should.be.approximately(0, verb.EPSILON );
+
+		p[0][1][0].should.be.approximately(0, verb.EPSILON );
+		p[0][1][1].should.be.approximately(4, verb.EPSILON );
+		p[0][1][2].should.be.approximately(0, verb.EPSILON );
+
+		p[1][0][0].should.be.approximately(10, verb.EPSILON );
+		p[1][0][1].should.be.approximately(0, verb.EPSILON );
+		p[1][0][2].should.be.approximately(0, verb.EPSILON );
+
+	});
+
+});
 
 
+describe("PlanarSurface.tesselate",function(){
+
+	it('gives mesh result', function(){
+
+		verb.init();
+
+		var base = [0,0,0]
+			, uaxis = [1,0,0]
+			, vaxis = [0,1,0]
+			, ulength = 10
+			, vlength = 4;
+
+		var srf = new verb.geom.PlanarSurface( base, uaxis, vaxis, ulength, vlength );
+
+		should.exist(srf);
+
+		var p = srf.tesselate(20,20);
+
+		p.uvs.length.should.be.equal(441);
+		p.points.length.should.be.equal(441);
+		p.faces.length.should.be.equal(800);
+
+		p.points.map(function(e){ e.length.should.be.equal(3); });
+		p.uvs.map(function(e){ e.length.should.be.equal(2); });
+		p.faces.map(function(e){ e.length.should.be.equal(3); });
+
+
+	});
+
+});
 
