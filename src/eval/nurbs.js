@@ -33,7 +33,7 @@ verb.eval.nurbs.get_sweep1_surface = function( profile_knots, profile_degree, pr
 		for (var j = 0; j < profile_control_points.length; j++ ){
 
 			row_control_points.push( numeric.add(rail_offset, profile_control_points[j] ) );
-			row_weights.push( profile_control_points[j] * rail_control_points[i] );
+			row_weights.push( profile_weights[j] * rail_weights[i] );
 
 		}
 
