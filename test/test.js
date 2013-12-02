@@ -3334,6 +3334,114 @@ describe("RevolvedSurface.tesselate",function(){
 
 	});
 
+
+
 });
 
+
+describe("Sphere.constructor",function(){
+
+	it('can create an instance', function(){
+
+		verb.init();
+
+		var center = [0,0,0]
+			, radius = 5;
+
+		var srf = new verb.geom.Sphere( center, radius );
+
+		should.exist(srf);
+
+	});
+
+});
+
+describe("Sphere.point",function(){
+
+	it('evaluates correctly for middle of surface', function(){
+
+		verb.init();
+
+		var center = [0,0,0]
+			, radius = 5;
+
+		var srf = new verb.geom.Sphere( center, radius );
+
+		should.exist(srf);
+
+		var p = srf.point(0.5,0.5);
+
+		p[0].should.be.approximately(-radius, verb.EPSILON );
+		p[1].should.be.approximately(0, verb.EPSILON );
+		p[2].should.be.approximately(0, verb.EPSILON );
+
+	});
+
+});
+
+describe("Sphere.derivatives",function(){
+
+	it('gives expected result for middle of surface', function(){
+
+		verb.init();
+
+		var center = [0,0,0]
+			, radius = 5;
+
+		var srf = new verb.geom.Sphere( center, radius );
+
+		should.exist(srf);
+
+		var p = srf.derivatives(0.5, 0.5, 1);
+
+		p[0][0][0].should.be.approximately(-radius, verb.EPSILON );
+		p[0][0][1].should.be.approximately(0, verb.EPSILON );
+		p[0][0][2].should.be.approximately(0, verb.EPSILON );
+
+		p[0][1] = numeric.normalized( p[0][1] );
+
+		p[0][1][0].should.be.approximately(0, verb.EPSILON );
+		p[0][1][1].should.be.approximately(0, verb.EPSILON );
+		p[0][1][2].should.be.approximately(1, verb.EPSILON );
+
+	  p[1][0] = numeric.normalized( p[1][0] );
+
+		p[1][0][0].should.be.approximately(0, verb.EPSILON );
+		p[1][0][1].should.be.approximately(-1, verb.EPSILON );
+		p[1][0][2].should.be.approximately(0, verb.EPSILON );
+
+	});
+
+});
+
+
+describe("Sphere.tesselate",function(){
+
+	it('gives mesh result', function(){
+
+		verb.init();
+
+		var center = [0,0,0]
+			, radius = 5;
+
+		var srf = new verb.geom.Sphere( center, radius );
+
+		should.exist(srf);
+
+		var p = srf.tesselate(20,20);
+
+		p.uvs.length.should.be.equal(441);
+		p.points.length.should.be.equal(441);
+		p.faces.length.should.be.equal(800);
+
+		p.points.map(function(e){ e.length.should.be.equal(3); });
+		p.uvs.map(function(e){ e.length.should.be.equal(2); });
+		p.faces.map(function(e){ e.length.should.be.equal(3); });
+
+
+	});
+
+	
+
+});
 
