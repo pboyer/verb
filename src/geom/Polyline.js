@@ -1,4 +1,4 @@
-verb.geom.Polyline = function( points ) {
+verb.geom.PolyLine = function( points ) {
 
 	this.setAll( {
 		"control_points": points ? points.slice(0) : []
@@ -10,8 +10,8 @@ verb.geom.Polyline = function( points ) {
 
 }.inherits(verb.geom.NurbsCurve);
 
-verb.geom.Polyline.prototype.nurbsRep = function(){
+verb.geom.PolyLine.prototype.nurbsRep = function(){
 
-	return this.nurbsEngine.eval_sync( 'get_polyline_surface', [ this.get("control_points") ]);
+	return this.nurbsEngine.eval_sync( 'get_polyline_curve', [ this.get("control_points") ]);
 
 };

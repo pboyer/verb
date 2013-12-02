@@ -2628,6 +2628,82 @@ describe("EllipseArc.tesselate",function(){
 
 });
 
+describe("PolyLine.constructor",function(){
+
+	it('can create an instance', function(){
+
+		verb.init();
+
+		var c = new verb.geom.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
+
+		should.exist(c);
+
+	});
+
+});
+
+describe("PolyLine.point",function(){
+
+	it('evaluates correctly', function(){
+
+		verb.init();
+
+		var c = new verb.geom.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
+
+		should.exist(c);
+
+		var p = c.point(0.5);
+
+		p.should.eql( [1,0,0] );
+
+	});
+
+});
+
+describe("PolyLine.derivatives",function(){
+
+	it('gives correct result', function(){
+
+		verb.init();
+
+		var c = new verb.geom.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
+
+		should.exist(c);
+
+		var p = c.derivatives(0.5, 1);
+
+		p[0].should.eql( [1,0,0] );
+
+		// normalize the derivative
+		p[1] = numeric.div( p[1], numeric.norm2(p[1]) );
+
+		p[1][0].should.be.approximately(-Math.sqrt(2) / 2, verb.TOLERANCE );
+		p[1][1].should.be.approximately(Math.sqrt(2) / 2, verb.TOLERANCE );
+		p[1][2].should.be.approximately(0, verb.TOLERANCE );
+
+	});
+
+});
+
+describe("PolyLine.tesselate",function(){
+
+	it('gives correct result', function(){
+
+		verb.init();
+
+		var c = new verb.geom.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
+
+		should.exist(c);
+
+		var pts = c.tesselate();
+
+		pts.length.should.be.equal(3);
+		pts.map( function(e){  e.length.should.be.equal(3); });
+
+	});
+
+});
+
 
 
 
