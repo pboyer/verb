@@ -2190,4 +2190,95 @@ describe("FourPointSurface.tesselate",function(){
 });
 
 
+describe("Line.constructor",function(){
+
+	it('can create an instance', function(){
+
+		verb.init();
+
+		var p1 = [0,0,1]
+			, p2 = [1,0,0];
+
+		var c = new verb.geom.Line( p1, p2 );
+
+		should.exist(c);
+
+	});
+
+});
+
+describe("Line.point",function(){
+
+	it('evaluates correctly', function(){
+
+		verb.init();
+
+		var p1 = [0,0,0]
+			, p2 = [1,1,1];
+
+		var c = new verb.geom.Line( p1, p2 );
+
+		should.exist(c);
+
+		var p = c.point(0.5);
+
+		p[0].should.be.approximately(0.5, verb.EPSILON );
+		p[1].should.be.approximately(0.5, verb.EPSILON );
+		p[2].should.be.approximately(0.5, verb.EPSILON );
+
+	});
+
+});
+
+describe("Line.derivatives",function(){
+
+	it('gives nice result', function(){
+
+		verb.init();
+
+		var p1 = [0,0,0]
+			, p2 = [1,1,1];
+
+		var c = new verb.geom.Line( p1, p2 );
+
+		should.exist(c);
+
+		var p = c.derivatives(0.5, 1);
+
+		p[0].should.eql([0.5,0.5,0.5]);
+		p[1].should.eql([1,1,1]);
+
+	});
+
+});
+
+describe("Line.tesselate",function(){
+
+	it('gives mesh result', function(){
+
+		verb.init();
+
+		var p1 = [0,0,0]
+			, p2 = [1,1,1];
+
+		var c = new verb.geom.Line( p1, p2 );
+
+		should.exist(c);
+
+		var p = c.tesselate();
+
+		// p.uvs.length.should.be.equal(441);
+		// p.points.length.should.be.equal(441);
+		// p.faces.length.should.be.equal(800);
+
+		// p.points.map(function(e){ e.length.should.be.equal(3); });
+		// p.uvs.map(function(e){ e.length.should.be.equal(2); });
+		// p.faces.map(function(e){ e.length.should.be.equal(3); });
+
+
+	});
+
+});
+
+
 

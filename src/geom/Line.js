@@ -7,7 +7,7 @@ verb.geom.Line = function(start, end) {
 
 	var curve_props = this.nurbsRep();
 
-	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weight, curve_props.knots );
+	verb.geom.NurbsCurve.call(this, curve_props.degree, curve_props.control_points, curve_props.weights, curve_props.knots );
 
 	this.watchAll(['start', 'end'], this.update );
 
