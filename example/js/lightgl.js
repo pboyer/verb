@@ -42,6 +42,7 @@ var GL = {
   Indexer: Indexer,
   Buffer: Buffer,
   Mesh: Mesh,
+  Curve: Curve,
   HitTest: HitTest,
   Raytracer: Raytracer,
   Shader: Shader,
@@ -962,6 +963,44 @@ Buffer.prototype = {
     gl.bufferData(this.target, new this.type(data), type || gl.STATIC_DRAW);
   }
 };
+
+
+
+function Curve(options) {
+  options = options || {};
+  this.vertexBuffers = {};
+  this.indexBuffers = {};
+  this.addVertexBuffer('lines', 'gl_Vertex');
+  if (options.colors) this.addVertexBuffer('colors', 'gl_Color');
+}
+
+Curve.prototype = {
+
+  // ### .addVertexBuffer(name, attribute)
+  // 
+  // Add a new vertex buffer with a list as a property called `name` on this object
+  // and map it to the attribute called `attribute` in all shaders that draw this mesh.
+  addVertexBuffer: function(name, attribute) {
+    var buffer = this.vertexBuffers[attribute] = new Buffer(gl.ARRAY_BUFFER, Float32Array);
+    buffer.name = name;
+    this[name] = [];
+  },
+
+  // ### .compile()
+  // 
+  // Upload all attached buffers to the GPU in preparation for rendering. This
+  // doesn't need to be called every frame, only needs to be done when the data
+  // changes.
+  compile: function() {
+    for (var attribute in this.vertexBuffers) {
+      var buffer = this.vertexBuffers[attribute];
+      buffer.data = this[buffer.name];
+      buffer.compile();
+    }
+  },
+
+};
+
 
 // ### new GL.Mesh([options])
 // 

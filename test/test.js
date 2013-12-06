@@ -2173,7 +2173,7 @@ describe("FourPointSurface.tesselate",function(){
 
 		should.exist(srf);
 
-		var p = srf.tesselate(20,20);
+		var p = srf.tesselate();
 
 		p.uvs.length.should.be.equal(441);
 		p.points.length.should.be.equal(441);
@@ -2879,7 +2879,7 @@ describe("Cone.tesselate",function(){
 
 		should.exist(srf);
 
-		var p = srf.tesselate(20,20);
+		var p = srf.tesselate();
 
 		p.uvs.length.should.be.equal(441);
 		p.points.length.should.be.equal(441);
@@ -2993,7 +2993,7 @@ describe("Cylinder.tesselate",function(){
 
 		should.exist(srf);
 
-		var p = srf.tesselate(20,20);
+		var p = srf.tesselate();
 
 		p.uvs.length.should.be.equal(441);
 		p.points.length.should.be.equal(441);
@@ -3097,7 +3097,7 @@ describe("Extrusion.tesselate",function(){
 
 		should.exist(srf);
 
-		var p = srf.tesselate(20,20);
+		var p = srf.tesselate();
 
 		p.uvs.length.should.be.equal(441);
 		p.points.length.should.be.equal(441);
@@ -3209,7 +3209,7 @@ describe("PlanarSurface.tesselate",function(){
 
 		should.exist(srf);
 
-		var p = srf.tesselate(20,20);
+		var p = srf.tesselate();
 
 		p.uvs.length.should.be.equal(441);
 		p.points.length.should.be.equal(441);
@@ -3320,7 +3320,7 @@ describe("RevolvedSurface.tesselate",function(){
 
 		should.exist(srf);
 
-		var p = srf.tesselate(20,20);
+		var p = srf.tesselate();
 
 		p.uvs.length.should.be.equal(441);
 		p.points.length.should.be.equal(441);
@@ -3427,7 +3427,7 @@ describe("Sphere.tesselate",function(){
 
 		should.exist(srf);
 
-		var p = srf.tesselate(20,20);
+		var p = srf.tesselate();
 
 		p.uvs.length.should.be.equal(441);
 		p.points.length.should.be.equal(441);
@@ -3548,7 +3548,7 @@ describe("SweepOneRail.tesselate",function(){
 
 		should.exist(srf);
 
-		var p = srf.tesselate(20,20);
+		var p = srf.tesselate();
 
 		p.uvs.length.should.be.equal(441);
 		p.points.length.should.be.equal(441);

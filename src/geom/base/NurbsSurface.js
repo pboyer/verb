@@ -14,7 +14,7 @@
 verb.geom.NurbsSurface = function( degreeU, knotsU, degreeV, knotsV, controlPoints, weights ) {
 
 	verb.geom.NurbsGeometry.call(this);
-	
+
 	this.setAll({
 		"controlPoints": controlPoints,
 		"weights": weights,
@@ -40,13 +40,8 @@ verb.geom.NurbsSurface = function( degreeU, knotsU, degreeV, knotsV, controlPoin
 
 verb.geom.NurbsSurface.prototype.point = function( u, v, callback ) {
 
-	if (callback) {
-		return this.nurbsEngine.eval( 'rational_surface_point', 
+	return this.nurbsEngine.eval( 'rational_surface_point', 
 							[ 	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), u, v ], callback );
-	}
-
-	return this.nurbsEngine.eval_sync( 'rational_surface_point', 
-										[ 	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), u, v ] );
 
 };
 
@@ -64,35 +59,34 @@ verb.geom.NurbsSurface.prototype.point = function( u, v, callback ) {
 
 verb.geom.NurbsSurface.prototype.derivatives = function( u, v, num_derivs, callback ) {
 
-	if (callback) {
-		return this.nurbsEngine.eval( 'rational_surface_derivs', 
+	return this.nurbsEngine.eval( 'rational_surface_derivs', 
 			[	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), num_derivs, u, v ], callback ); 
-	}
-
-	return this.nurbsEngine.eval_sync( 'rational_surface_derivs', 
-		[	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), num_derivs, u, v ] );
 
 };
 
 /**
  * Tesselate the surface
  *
- * @param {Number} The number of divisions in the u direction
- * @param {Number} The number of divisions in the v direction
+ * @param {Object} Tesselate the surface, given an options object includings a vdivs and udivs property
  *
  * @return {Array} An array if called synchronously, otherwise nothing
  * @api public
  */
 
-verb.geom.NurbsSurface.prototype.tesselate = function(udivs, vdivs, callback){
+verb.geom.NurbsSurface.prototype.tesselate = function(options, callback){
 
-	if (callback) {
-		return this.nurbsEngine.eval( 'tesselate_rational_surface_naive', 
-			[	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), udivs, vdivs ], callback ); 
+	var minDivsV = 20
+		, minDivsU = 20;
+
+	if (options){
+		minDivsV = optons.minDivsV || minDivsV;
+		minDivsU = optons.minDivsU || minDivsU;
 	}
 
-	return this.nurbsEngine.eval_sync( 'tesselate_rational_surface_naive', 
-		[	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), udivs, vdivs ] ); 
+	// naive surface tesselation, for now
+	return this.nurbsEngine.eval( 'tesselate_rational_surface_naive', 
+			[	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), 
+			minDivsU, minDivsV ], callback ); 
 
 };
 

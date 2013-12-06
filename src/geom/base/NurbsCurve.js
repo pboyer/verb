@@ -34,12 +34,7 @@ verb.geom.NurbsCurve = function( degree, controlPoints, weights, knots ) {
 
 verb.geom.NurbsCurve.prototype.point = function( u, callback ) {
 
-	if (callback){
-		this.nurbsEngine.eval( 'rational_curve_point', [ this.get('degree'), this.get('knots'), this.homogenize(),  u ], callback ); 
-		return;
-	}
-
-	return this.nurbsEngine.eval_sync( 'rational_curve_point', [ this.get('degree'), this.get('knots'), this.homogenize(), u ] );
+	return this.nurbsEngine.eval( 'rational_curve_point', [ this.get('degree'), this.get('knots'), this.homogenize(),  u ], callback ); 
 
 };
 
@@ -56,12 +51,7 @@ verb.geom.NurbsCurve.prototype.point = function( u, callback ) {
 
 verb.geom.NurbsCurve.prototype.derivatives = function( u, num_derivs, callback ) {
 
-	if (callback){
-		this.nurbsEngine.eval( 'rational_curve_derivs', [ this.get('degree'), this.get('knots'), this.homogenize(),  u, num_derivs  ], callback ); 
-		return;
-	}
-
-	return this.nurbsEngine.eval_sync( 'rational_curve_derivs', [ this.get('degree'), this.get('knots'), this.homogenize(),  u, num_derivs] );
+	return this.nurbsEngine.eval( 'rational_curve_derivs', [ this.get('degree'), this.get('knots'), this.homogenize(),  u, num_derivs  ], callback ); 
 
 };
 
@@ -76,13 +66,12 @@ verb.geom.NurbsCurve.prototype.derivatives = function( u, num_derivs, callback )
  * @api public
  */
 
-verb.geom.NurbsCurve.prototype.tesselate = function(callback){
+verb.geom.NurbsCurve.prototype.tesselate = function(options, callback){
 
-	if (callback){
-		return this.nurbsEngine.eval( 'rational_curve_adaptive_sample', [ this.get('degree'), this.get('knots'), this.homogenize(), verb.TOLERANCE ], callback ); 
-	}
+	var options = options || {};
+	options.tolerance = options.tolerance || verb.EPSILON;
 
-	return this.nurbsEngine.eval_sync( 'rational_curve_adaptive_sample', [ this.get('degree'), this.get('knots'), this.homogenize(), verb.TOLERANCE ] ); 
+	return this.nurbsEngine.eval( 'rational_curve_adaptive_sample', [ this.get('degree'), this.get('knots'), this.homogenize(), options.tolerance ], callback ); 
 
 };
 

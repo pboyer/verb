@@ -1,3 +1,1445 @@
+if ( typeof exports != 'object' || exports === undefined )  // browser context
+{
+	var verb = {}
+		, numeric = window.numeric
+		, binomial = window.choose
+		, labor = window.labor
+		, _ = window.underscore;
+}
+else // node.js context
+{
+	var verb = module.exports = {}
+		, numeric = require('numeric')
+		, binomial = require('binomial')
+		, labor = require('labor')
+		, _ = require('underscore');
+}
+
+verb.geom = {};
+verb.intersect = verb.intersect || {};
+verb.core = {};
+verb.eval = {};
+
+verb.eval.nurbs = verb.eval.nurbs || {};
+verb.eval.geom = verb.eval.geom || {};
+
+verb.eval.mesh = verb.eval.mesh || {};
+
+verb.EPSILON = 1e-8;
+verb.TOLERANCE = 1e-3;
+
+verb.init = function() {
+	verb.nurbsEngine = new verb.core.Engine( verb.eval.nurbs );
+	verb.geom.NurbsGeometry.prototype.nurbsEngine = verb.nurbsEngine;
+}
+
+if (typeof Object.create !== 'function') {
+    Object.create = function (o) {
+        function F() {}
+        F.prototype = o;
+        return new F();
+    };
+}
+
+Function.prototype.method = function (name, func) {
+    this.prototype[name] = func;
+    return this;
+};
+
+Function.method('inherits', function (parent) {
+    this.prototype = new parent();
+    var d = {}, 
+        p = this.prototype;
+    this.prototype.constructor = parent; 
+    return this;
+});
+
+Array.prototype.flatten = function(){
+
+	if (this.length == 0) return [];
+
+	var merged = [];
+
+	for (var i = 0; i < this.length; i++){
+		if (this[i] instanceof Array){
+			merged = merged.concat( this[i].flatten() );
+		} else {
+			merged = merged.concat( this[i] );
+		}
+	}
+
+	return merged;
+
+}
+
+numeric.normalized = function(arr){
+
+	return numeric.div( arr, numeric.norm2(arr) );
+
+}
+
+numeric.cross = function(u, v){
+
+	return [u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
+
+}
+// engine nurbs handles nurbs eval requests
+// it also acknowledges whether there are web workers available 
+// in the broswer, if not, it defaults to blocking evaluation
+// also handles situations where the server is unavailable
+verb.core.Engine = function(options) {
+
+	// private properties
+	var _use_pool = ( typeof Worker === 'function' ) && ( options.use_pool || options.use_pool === undefined );
+	var _num_threads = options.num_workers || 2;
+	var _tolerance = options.tolerance || 1e-4;
+	var _url = options.url || 'verb_nurbs_eval.js';
+	var _lib = options.library || verb.eval.nurbs;
+	var _error_handler = options.error_handler || ( function( message ) { console.warn( message ); } );
+	var _pool = undefined;
+
+	// private methods
+	var init_pool = function() {
+
+		try {
+			_pool = new labor.Pool(_url, _num_threads );
+			_pool.start();
+		} catch (err) {
+			_error_handler( 'Failed to initialize labor.Pool.' );
+			return false;
+		}
+		return true;
+
+	};
+
+	// privleged methods
+	this.start = function() {
+		// initialize pool
+		if ( _use_pool )
+		{
+			init_pool();
+		}
+	};
+
+	this.eval = function(func, arguments_array, callback )
+	{
+
+		if (!callback){
+			return this.eval_sync(func, arguments_array);
+		}
+
+		// if we are to use the pool we must init it 
+		if ( _use_pool && ( _pool || ( _pool === undefined && init_pool() ) ) ) {
+			_pool.addWork( func, arguments_array, callback );
+		}	else {
+			var that = this;
+			setTimeout( function() { callback( that.eval_sync(func, arguments_array ) ) }, 0);
+		}
+	}
+
+	this.eval_sync = function(func, arguments_array) {
+		return _lib[func].apply(null, arguments_array);
+	}
+
+	this.set_tolerance = function(tolerance) {
+		// TODO: send message to worker pool in labor.js
+		_tolerance = tolerance;
+	}
+
+	this.set_use_pool = function( use_pool ) {
+
+		if ( use_pool && _pool === undefined && init_pool() ) {
+			_use_pool = use_pool;
+			return true;
+		} else if ( !use_pool ) {
+			_pool = null;
+			delete _pool;
+			return true;
+		} else {
+			return false;
+		}
+		
+	}
+
+	this.set_error_handler = function( handler ) {
+		_error_handler = handler;
+	}
+
+	this.set_num_threads = function( num_threads ) {
+		_num_threads = num_threads;
+		// TODO: implement add or remove workers in labor.js
+	}
+
+};
+
+
+// A simple class that allows clients to register
+// a callback to be updated when a property is changed
+verb.core.WatchObject = function() {
+
+	// name -> { id -> callback }
+	var watchers = { "change" : {} };
+
+	// name -> value
+	var properties = {};
+
+	// counter for watch ids
+	var watcherId = 0;
+
+	var that = this;
+
+	// report a property change to the watchers
+	var report = function(name, updateObject){
+
+		for (ele in watchers[name]){
+			watchers[ele]( updateObject );
+		}
+
+		for (ele in watchers["change"]){
+			watchers[ele]( updateObject );
+		}
+
+	};
+
+	// get the value of a property name
+	this.get = function( name ){
+
+		return properties[name];
+
+	};
+
+	// set the value of a property and update watchers
+	this.set = function( name, value ){
+
+		var old = properties[name];
+		properties[name] = value;
+
+		report({name: name, old: old, "new": value, target: that, type: "full"});
+
+	};
+
+	// set a number of properties given an object containing all of the properties
+	this.setAll = function( propertyNameValuePairs ){
+
+		var oldVals = {};
+
+		for ( propName in propertyNameValuePairs ){
+			oldVals[propName] = properties[propName];
+			properties[propName] = propertyNameValuePairs[propName];
+		}
+
+		report({old: oldVals, "new": propertyNameValuePairs, target: that, type: "multi"});
+
+	};
+
+	// set an index of array property and update watchers
+	this.setAt = function( name, index, value ){
+
+		var oldArr = properties[name];
+
+		if (oldArr === undefined || oldArr.length >= index || index < 0){
+			return;
+		}
+
+		var old = properties[name][index];
+		properties[name][index] = value;
+
+		report( {name: name, index: index, old: old, "new": value, target: that, type: "index"} );
+
+	};
+
+	// start watching a particular property.  use "name" to receive all 
+	// updates
+	this.watch = function( name, callback ){
+
+		if ( watchers[name] === undefined || !callback ){
+			return;
+		}
+
+		var id = watcherId++;
+		watchers[name][watcherId] = callback;
+
+		return watcherId++;
+	};
+
+	// start watching a list of properties
+	this.watchAll = function( names, callback ){
+
+		var watcherIds = [];
+
+		for (var i = 0; i < names.length; i++){
+			watcherIds.push( this.watch( names[i], callback ) );
+		}
+
+		return watcherIds;
+
+	};
+
+	// stop watching a particular property, given a propertyName
+	// and watcherId
+	this.ignore = function( name, watcherId ){
+	
+		if ( watchers[name] === undefined 
+			|| watchers[name][watcherId] === undefined){
+			return;
+		}
+
+		watchers[name][watcherId] = undefined;
+
+	};
+
+};
+/**
+ * Generate a unique id.
+ *
+ * @return {Number} The id
+ * @api public
+ */
+
+verb.core.uid = (function(){
+	var id = 0;
+	return function() {
+		return id++;
+	};
+})();
+/**
+ * Constructor for Geometry
+ *
+ * @api public
+ */
+
+verb.geom.Geometry = function() { 
+
+	verb.core.WatchObject.call(this);
+
+	var id = verb.core.uid();
+	
+	this.uniqueId = function() {
+		return id;
+	};
+
+}.inherits(verb.core.WatchObject);
+/**
+ * Constructor for NurbsGeometry
+ *
+ * @api public
+ */
+
+verb.geom.NurbsGeometry = function() {
+
+	verb.geom.Geometry.call(this);
+
+}.inherits( verb.geom.Geometry );
+
+
+
+/**
+ * Constructor for a NurbsCurve
+ *
+ * @param {Number} The degree of the curve
+ * @param {Array} Array of arrays representing the control points
+ * @param {Array} Array of numbers representing the control point weights
+ * @param {Array} Array of numbers representing the knot structure
+ * @api public
+ */
+
+verb.geom.NurbsCurve = function( degree, controlPoints, weights, knots ) {
+
+	verb.geom.NurbsGeometry.call(this);
+
+	this.setAll({
+		"controlPoints": controlPoints,
+		"weights": weights,
+		"knots": knots ? knots.slice(0) : [],
+		"degree": degree
+	});
+
+}.inherits( verb.geom.NurbsGeometry );
+
+
+/**
+ * Sample a point at the given parameter 
+ *
+ * @param {Number} The parameter to sample the curve
+ * @param {Function} Optional callback to do it async
+ *
+ * @return {Array} An array if called synchronously, otherwise nothing
+ * @api public
+ */
+
+verb.geom.NurbsCurve.prototype.point = function( u, callback ) {
+
+	return this.nurbsEngine.eval( 'rational_curve_point', [ this.get('degree'), this.get('knots'), this.homogenize(),  u ], callback ); 
+
+};
+
+/**
+ * Get derivatives at a given parameter
+ *
+ * @param {Number} The parameter to sample the curve
+ * @param {Number} The number of derivatives to obtain
+ * @param {Number} The callback, if you want this async
+ *
+ * @return {Array} An array if called synchronously, otherwise nothing
+ * @api public
+ */
+
+verb.geom.NurbsCurve.prototype.derivatives = function( u, num_derivs, callback ) {
+
+	return this.nurbsEngine.eval( 'rational_curve_derivs', [ this.get('degree'), this.get('knots'), this.homogenize(),  u, num_derivs  ], callback ); 
+
+};
+
+/**
+ * Tesselate a curve at a given tolerance
+ *
+ * @param {Number} The parameter to sample the curve
+ * @param {Number} The number of derivatives to obtain
+ * @param {Number} The callback, if you want this async
+ *
+ * @return {Array} An array if called synchronously, otherwise nothing
+ * @api public
+ */
+
+verb.geom.NurbsCurve.prototype.tesselate = function(options, callback){
+
+	var options = options || {};
+	options.tolerance = options.tolerance || verb.EPSILON;
+
+	return this.nurbsEngine.eval( 'rational_curve_adaptive_sample', [ this.get('degree'), this.get('knots'), this.homogenize(), options.tolerance ], callback ); 
+
+};
+
+/**
+ * Transform a curve with the given matrix.
+ *
+ * @param {Array} 4d array representing the transform
+ *
+ * @return {Array} An array if called synchronously, otherwise nothing
+ * @api public
+ */
+
+verb.geom.NurbsCurve.prototype.transform = function( mat ){
+
+	var pts = this.get("controlPoints");
+
+	for (var i = 0; i < pts.length; i++){
+		var homoPt = pts[1].push(1);
+		pts[i] = numeric.mul( mat, homoPt ).slice( 0, homoPt.length-2 );
+	}
+
+	this.set('controlPoints', pts);
+
+	return this;
+
+}; 
+
+/**
+ * Obtain a copy of the curve
+ *
+ * @param {Array} 4d array representing the transform
+ *
+ * @return {Array} An array if called synchronously, otherwise nothing
+ * @api public
+ */
+
+verb.geom.NurbsCurve.prototype.clone = function(){
+
+	// copy the control points
+	var pts = this.get("controlPoints");
+
+	var pts_copy = [];
+
+	for (var i = 0; i < pts.length; i++){
+		pts_copy.push( pts[i].slice(0) );
+	}
+
+	return new verb.geom.NurbsCurve( this.get('degree'), pts_copy, this.get('weights').slice(0), this.get('knots').slice );
+
+};
+
+/**
+ * Obtain the homogeneous representation of the control points
+ *
+ * @returns {Array} 2d array of homogenized control points
+ * @api public
+ */
+
+verb.geom.NurbsCurve.prototype.homogenize = function(){
+
+	return verb.eval.nurbs.homogenize_1d( this.get('controlPoints'), this.get('weights') );
+
+};
+
+/**
+ * If this is a subtype of the NurbsCurve, this method will update the Nurbs representation
+ * of the curve from those parameters.  This destroys any manual changes to the Nurbs rep.
+ *
+ * @api public
+ */
+
+verb.geom.NurbsCurve.prototype.update = function(){
+
+	if ( !this.nurbsRep ){
+		return;
+	}
+
+	var curve_props = this.nurbsRep();
+
+	this.setAll({
+		"controlPoints": curve_props.control_points,
+		"weights": curve_props.weights,
+		"knots": curve_props.knots,
+		"degree": curve_props.degree
+	});
+
+};
+
+/**
+ * Constructor for a NurbsCurve
+ *
+ * @param {Number} The degree of the surface in the u direction
+ * @param {Array} Array of numbers representing the knot positions in the u direction
+ * @param {Number} The degree of the surface in the v direction
+ * @param {Array} Array of numbers representing the knot positions in the v direction
+ * @param {Array} 3d array representing the unweighted control points
+ * @param {Array} 2d array representing the surface weight structure
+ *
+ * @api public
+ */
+
+verb.geom.NurbsSurface = function( degreeU, knotsU, degreeV, knotsV, controlPoints, weights ) {
+
+	verb.geom.NurbsGeometry.call(this);
+
+	this.setAll({
+		"controlPoints": controlPoints,
+		"weights": weights,
+		"knotsU": knotsU ? knotsU.slice(0) : [],
+		"knotsV": knotsV ? knotsV.slice(0) : [],
+		"degreeU": degreeU,
+		"degreeV": degreeV
+	});
+
+}.inherits( verb.geom.NurbsGeometry );
+
+
+/**
+ * Sample a point at the given u, v parameter 
+ *
+ * @param {Number} The u parameter at which to sample
+ * @param {Number} The v parameter at which to sample
+ * @param {Function} Optional callback to do it async
+ *
+ * @return {Array} An array if called synchronously, otherwise nothing
+ * @api public
+ */
+
+verb.geom.NurbsSurface.prototype.point = function( u, v, callback ) {
+
+	return this.nurbsEngine.eval( 'rational_surface_point', 
+							[ 	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), u, v ], callback );
+
+};
+
+/**
+ * Get derivatives at a given u, v parameter
+ *
+ * @param {Number} The u parameter to sample the curve
+ * @param {Number} The v parameter to sample the curve
+ * @param {Number} The number of derivatives to obtain
+ * @param {Number} The callback, if you want this async
+ *
+ * @return {Array} An array if called synchronously, otherwise nothing
+ * @api public
+ */
+
+verb.geom.NurbsSurface.prototype.derivatives = function( u, v, num_derivs, callback ) {
+
+	return this.nurbsEngine.eval( 'rational_surface_derivs', 
+			[	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), num_derivs, u, v ], callback ); 
+
+};
+
+/**
+ * Tesselate the surface
+ *
+ * @param {Object} Tesselate the surface, given an options object includings a vdivs and udivs property
+ *
+ * @return {Array} An array if called synchronously, otherwise nothing
+ * @api public
+ */
+
+verb.geom.NurbsSurface.prototype.tesselate = function(options, callback){
+
+	var minDivsV = 20
+		, minDivsU = 20;
+
+	if (options){
+		minDivsV = optons.minDivsV || minDivsV;
+		minDivsU = optons.minDivsU || minDivsU;
+	}
+
+	// naive surface tesselation, for now
+	return this.nurbsEngine.eval( 'tesselate_rational_surface_naive', 
+			[	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), 
+			minDivsU, minDivsV ], callback ); 
+
+};
+
+/**
+ * Transform a curve with the given matrix.
+ *
+ * @param {Array} 4d array representing the transform
+ *
+ * @return {Array} An array if called synchronously, otherwise nothing
+ * @api public
+ */
+
+verb.geom.NurbsSurface.prototype.transform = function( mat ){
+
+	var pts = this.get("controlPoints");
+
+	for (var i = 0; i < pts.length; i++){
+		for (var j = 0; j < pts[i].length; j++){
+			var homoPt = pts[1].push(1);
+			pts[i] = numeric.mul( mat, homoPt ).slice( 0, homoPt.length-2 );
+		}
+	}
+
+	this.set('controlPoints', pts);
+
+	return this;
+
+};
+
+/**
+ * Obtain a copy of the curve
+ *
+ * @param {Array} 4d array representing the transform
+ *
+ * @return {Array} An array if called synchronously, otherwise nothing
+ * @api public
+ */
+
+verb.geom.NurbsSurface.prototype.clone = function(){
+
+	// copy the control points
+	var pts = this.get("controlPoints");
+	var pts_copy = [];
+
+	for (var i = 0; i < pts.length; i++){
+		pts_copy.push([]);
+		for (var j = 0; j < pts[i].length; j++){
+			pts_copy[i].push( pts[i][j].slice( 0 ) );
+		}
+	}
+
+	// copy the weights
+	var weights = this.get("weights");
+	var weights_copy = [];
+
+	for (var i = 0; i < weights.length; i++){
+		weights_copy.push( weights[i].slice( 0 ) );
+	}
+
+	return new verb.geom.NurbsSurface( this.get('degreeU'), this.get('knotsU').slice(0), 
+		this.get('degreeV'), this.get('knotsV').slice(0), pts_copy, weights_copy );
+
+};
+
+/**
+ * Obtain the homogeneous representation of the control points
+ *
+ * @returns {Array} 3d array of homogenized control points
+ * @api public
+ */
+
+verb.geom.NurbsSurface.prototype.homogenize = function(){
+
+	return verb.eval.nurbs.homogenize_2d( this.get('controlPoints'), this.get('weights') );
+
+};
+
+/**
+ * If this is a subtype of the NurbsSurface, this method will update the Nurbs representation
+ * of the curve from those parameters.  This destroys any manual changes to the Nurbs rep.
+ *
+ * @api public
+ */
+
+verb.geom.NurbsSurface.prototype.update = function(){
+
+	if ( !this.nurbsRep ){
+		return;
+	}
+
+	var curve_props = this.nurbsRep();
+
+	this.setAll({
+		"controlPoints": curve_props.control_points,
+		"weights": curve_props.weights,
+		"knotsU": curve_props.knots_u,
+		"knotsV": curve_props.knots_v,
+		"degreeU": curve_props.degree_u,
+		"degreeV": curve_props.degree_v
+	});
+
+};
+verb.geom.Arc = function(center, xaxis, yaxis, radius, interval) {
+
+	verb.geom.NurbsCurve.call(this);
+
+	this.setAll( {
+		"center": center,
+		"xaxis": xaxis,
+		"yaxis": yaxis,
+		"radius": radius,
+		"interval": interval 
+	});
+
+	this.update();
+	this.watchAll( ['center', 'xaxis', 'yaxis', 'radius', 'interval'], this.update );
+
+}.inherits(verb.geom.NurbsCurve);
+
+verb.geom.Arc.prototype.nurbsRep = function(){
+
+	return this.nurbsEngine.eval_sync( 'get_arc', [ this.get("center"), 
+													 this.get("xaxis"), 
+													 this.get("yaxis"), 
+													 this.get("radius"), 
+													 this.get("interval").get("min"), 
+													 this.get("interval").get("max")] );
+
+};
+
+verb.geom.BezierCurve = function( control_points, weights ) {
+
+	verb.geom.NurbsCurve.call(this);
+	
+	this.setAll( {
+		"controlPoints": control_points ? control_points.slice(0) : [],
+		"weights": weights ? weights.slice(0) : undefined
+	});
+
+	this.update();
+
+}.inherits( verb.geom.NurbsCurve ); 
+
+verb.geom.BezierCurve.prototype.nurbsRep = function(){
+
+	var control_points = this.get('controlPoints');
+	var weights = this.get('weights');
+	var degree = control_points.length - 1;
+
+	var knots = [];
+	for (var i = 0; i < degree + 1; i++){ knots.push(0); }
+	for (var i = 0; i < degree + 1; i++){ knots.push(1); }
+
+	// if weights aren't provided, build uniform weights
+	if (weights === undefined){
+		weights = [];
+		for (var i = 0; i < control_points.length; i++){
+			weights.push(1);
+		}
+	}
+
+	return {
+		degree: degree,
+		knots: knots, 
+		control_points: control_points,
+		weights: weights
+	};
+
+};
+
+/**
+ * BoundngBox Constructor
+ *
+ * @param {Array} Points to add, if desired.  Otherwise, will not be initialized until add is called.
+ * @return {Object} Newly formed BoundingBox object
+ * @api public
+ */	
+
+verb.geom.BoundingBox = function() {
+	this.initialized = false;
+	this.min = [0,0,0];
+	this.max = [0,0,0];
+
+ 	var pt_args = Array.prototype.slice.call( arguments, 0);
+ 	this.add_elements_sync(pt_args);
+}	
+
+/**
+ * Asynchronously add an array of points to the bounding box
+ *
+ * @param {Array} An array of length-3 array of numbers 
+ * @param {Function} Function to call when all of the points in array have been added.  The only parameter to this
+ * callback is this bounding box.
+ * @api public
+ */
+
+verb.geom.BoundingBox.prototype.add_elements = function( point_array, callback ) 
+{
+
+	var that = this; 
+	_.defer(function() {
+		_.each( point_array, function(elem, index) {
+			that.add(elem);
+		});
+		callback(that);
+	});
+
+};
+
+/**
+ * Synchronously add an array of points to the bounding box
+ *
+ * @param {Array} An array of length-3 array of numbers 
+ * @return {Object} This BoundingBox for chaining
+ * @api public
+ */
+
+verb.geom.BoundingBox.prototype.add_elements_sync = function( point_array ) 
+{
+	var that = this; 
+	_.each( point_array, function(elem) {
+		that.add(elem);
+	});
+	return this;
+};
+
+/** 
+ * Adds a point to the bounding box, expanding the bounding box if the point is outside of it.
+ * If the bounding box is not initialized, this method has that side effect.
+ *
+ * @param {Array} A length-3 array of numbers 
+ * @return {Object} This BoundingBox for chaining
+ * @api public
+ */
+
+verb.geom.BoundingBox.prototype.add = function( point ) 
+{
+	if ( !this.initialized )
+	{
+		this.min = point.slice(0);
+		this.max = point.slice(0);
+		this.initialized = true;
+		return this;
+	}
+
+	if (point[0] > this.max[0] )
+	{
+		this.max[0] = point[0];
+	}
+
+	if (point[1] > this.max[1] )
+	{
+		this.max[1] = point[1];
+	}
+
+	if (point[2] > this.max[2] )
+	{
+		this.max[2] = point[2];
+	}
+
+	if (point[0] < this.min[0] )
+	{
+		this.min[0] = point[0];
+	}
+
+	if (point[1] < this.min[1] )
+	{
+		this.min[1] = point[1];
+	}
+
+	if (point[2] < this.min[2] )
+	{
+		this.min[2] = point[2];
+	}
+
+	return this;
+
+};
+
+/**
+ * Determines if two intervals on the real number line intersect
+ *
+ * @param {Number} Beginning of first interval
+ * @param {Number} End of first interval
+ * @param {Number} Beginning of second interval
+ * @param {Number} End of second interval
+ * @return {Boolean} true if the two intervals overlap, otherwise false
+ * @api public
+ */
+
+verb.geom.BoundingBox.prototype.contains = function(point) {
+
+	if ( !this.initialized )
+	{
+		return false;
+	}
+
+	return this.intersects( new verb.geom.BoundingBox(point) );
+
+}
+
+/**
+ * Defines the tolerance for bounding box operations
+ *
+ * @api public
+ */
+
+verb.geom.BoundingBox.prototype.TOLERANCE = 1e-4;
+
+/**
+ * Determines if two intervals on the real number line intersect
+ *
+ * @param {Number} Beginning of first interval
+ * @param {Number} End of first interval
+ * @param {Number} Beginning of second interval
+ * @param {Number} End of second interval
+ * @return {Boolean} true if the two intervals overlap, otherwise false
+ * @api public
+ */
+
+verb.geom.BoundingBox.prototype.intervals_overlap = function( a1, a2, b1, b2 ) {
+
+	var tol = verb.geom.BoundingBox.prototype.TOLERANCE
+		, x1 = Math.min(a1, a2) - tol
+		, x2 = Math.max(a1, a2) + tol
+		, y1 = Math.min(b1, b2) - tol
+		, y2 = Math.max(b1, b2) + tol;
+
+	if ( (x1 >= y1 && x1 <= y2) || (x2 >= y1 && x2 <= y2) || (y1 >= x1 && y1 <= x2) || (y2 >= x1 && y2 <= x2) )
+	{
+		return true;
+	}
+	else 
+	{
+		return false;
+	}
+
+}
+
+/**
+ * Determines if this bounding box intersects with another
+ *
+ * @param {Object} BoundingBox to check for intersection with this one
+ * @return {Boolean} true if the two bounding boxes intersect, otherwise false
+ * @api public
+ */
+
+verb.geom.BoundingBox.prototype.intersects = function( bb ) {
+
+	if ( !this.initialized || !bb.initialized )
+	{
+		return false;
+	}
+
+	var a1 = this.min
+		, a2 = this.max
+		, b1 = bb.min
+		, b2 = bb.max;
+
+	if ( this.intervals_overlap(a1[0], a2[0], b1[0], b2[0]) 
+			&& this.intervals_overlap(a1[1], a2[1], b1[1], b2[1]) 
+			&& this.intervals_overlap(a1[2], a2[2], b1[2], b2[2] ) )
+	{
+		return true;
+	}
+
+	return false;
+
+};
+
+/**
+ * Clear the bounding box, leaving it in an uninitialized state.  Call add, add_elements in order to 
+ * initialize
+ *
+ * @return {Object} this BoundingBox for chaining
+ * @api public
+ */
+
+verb.geom.BoundingBox.prototype.clear = function( bb ) {
+
+	this.initialized = false;
+	return this;
+
+};
+
+/**
+ * Get longest axis of bounding box
+ *
+ * @return {Number} Index of longest axis
+ * @api public
+ */
+
+verb.geom.BoundingBox.prototype.get_longest_axis = function( bb ) {
+
+	var axis_lengths = [ 	this.get_axis_length(0), 
+							this.get_axis_length(1), 
+							this.get_axis_length(2)];
+
+	return axis_lengths.indexOf(Math.max.apply(Math, axis_lengths));
+
+};
+
+/**
+ * Get length of given axis. 
+ *
+ * @param {Number} Index of axis to inspect (between 0 and 2)
+ * @return {Number} Length of the given axis.  If axis is out of bounds, returns 0.
+ * @api public
+ */
+
+verb.geom.BoundingBox.prototype.get_axis_length = function( i ) {
+
+	if (i < 0 || i > 2) return 0;
+
+	return Math.abs( this.min[i] - this.max[i] );
+
+};
+
+/**
+ * Compute the boolean intersection of this with another axis-aligned bounding box.  If the two
+ * bounding boxes do not intersect, returns null.
+ *
+ * @param {Object} BoundingBox to intersect with
+ * @return {Object} The bounding box formed by the intersection or null if there is no intersection.
+ * @api public
+ */
+
+verb.geom.BoundingBox.prototype.intersect = function( bb ) {
+
+	if ( !this.initialized )
+	{
+		return null;
+	}
+
+	var a1 = this.min
+		, a2 = this.max
+		, b1 = bb.min
+		, b2 = bb.max;
+
+	if ( !this.intersects(bb) )
+		return null;
+
+	var xmax = Math.min( a2[0], b2[0] )
+		, xmin = Math.max( a1[0], b1[0] )
+		, ymax = Math.min( a2[1], b2[1] )
+		, ymin = Math.max( a1[1], b1[1] )
+		, zmax = Math.min( a2[2], b2[2] )
+		, zmin = Math.max( a1[2], b1[2] )
+		, max_bb = [ xmax, ymax, zmax]
+		, min_bb = [ xmin, ymin, zmin];
+
+	return new verb.geom.BoundingBox(min_bb, max_bb);
+
+}
+
+
+verb.geom.Circle = function(center, xaxis, yaxis, radius) {
+
+	verb.geom.NurbsCurve.call(this);
+	
+	this.setAll({
+		"center": center,
+		"xaxis": xaxis,
+		"yaxis": yaxis,
+		"radius": radius 
+	});
+
+	this.update();
+
+	this.watchAll( ['center', 'xaxis', 'yaxis', 'radius'], this.update );
+
+}.inherits(verb.geom.NurbsCurve);
+
+verb.geom.Circle.prototype.nurbsRep = function(){
+
+	return this.nurbsEngine.eval_sync( 'get_arc', [  this.get("center"), 
+																									 this.get("xaxis"), 
+																									 this.get("yaxis"), 
+																									 this.get("radius"), 
+																									 0, 
+																									 2 * Math.PI ]);
+
+};
+
+verb.geom.Cone = function(axis, xaxis, base, height, radius ) {
+
+	verb.geom.NurbsSurface.call(this);
+
+	this.setAll({
+		"axis": axis,
+		"xaxis": xaxis,
+		"base": base,
+		"height": height,
+		"radius": radius 
+	});
+
+	var surface_props = this.nurbsRep();
+
+	verb.geom.NurbsSurface.call(this, surface_props.degree_u, surface_props.knots_u, surface_props.degree_v, surface_props.knots_v, surface_props.control_points, surface_props.weights );
+
+	this.watchAll( ['axis', 'xaxis', 'base', 'height', 'radius'], this.update );
+
+}.inherits(verb.geom.NurbsSurface);
+
+verb.geom.Cone.prototype.nurbsRep = function(){
+
+	return this.nurbsEngine.eval_sync( 'get_cone_surface', [ this.get("axis"), 
+															 this.get("xaxis"), 
+															 this.get("base"), 
+															 this.get("height"), 
+															 this.get("radius") ]);
+
+};
+verb.geom.Cylinder = function(axis, xaxis, base, height, radius ) {
+
+	this.setAll({
+		"axis": axis,
+		"xaxis": xaxis,
+		"base": base,
+		"height": height,
+		"radius": radius 
+	});
+
+	var surface_props = this.nurbsRep();
+
+	verb.geom.NurbsSurface.call(this, surface_props.degree_u, surface_props.knots_u, surface_props.degree_v, surface_props.knots_v, surface_props.control_points, surface_props.weights );
+
+	this.watchAll( ['axis', 'xaxis', 'base', 'height', 'radius'], this.update );
+
+}.inherits(verb.geom.NurbsSurface);
+
+verb.geom.Cylinder.prototype.nurbsRep = function() {
+
+  return this.nurbsEngine.eval_sync( 'get_cylinder_surface', 
+						  												 [ this.get("axis"), 
+						  												 	 this.get("xaxis"), 
+						  													 this.get("base"), 
+																				 this.get("height"), 
+																				 this.get("radius") ]);
+
+};
+verb.geom.Ellipse = function(center, xaxis, yaxis, xradius, yradius) {
+
+	verb.geom.NurbsCurve.call(this);
+
+	this.setAll({
+		"center": center,
+		"xaxis": xaxis,
+		"yaxis": yaxis,
+		"xradius": xradius,
+		"yradius": yradius
+	});
+
+	this.update();
+
+	this.watchAll( ['center', 'xaxis', 'yaxis', 'xradius', 'yradius'], this.update );
+
+}.inherits(verb.geom.NurbsCurve);
+
+verb.geom.Ellipse.prototype.nurbsRep = function(){
+
+	return this.nurbsEngine.eval_sync( 'get_ellipse_arc', [ this.get("center"), 
+															 this.get("xaxis"), 
+															 this.get("yaxis"), 
+															 this.get("xradius"), 
+															 this.get("yradius"), 
+															 0, 
+															 2 * Math.PI ]);
+
+};
+
+verb.geom.EllipseArc = function(center, xaxis, yaxis, xradius, yradius, interval) {
+
+	verb.geom.NurbsCurve.call(this);
+	
+	this.setAll({
+		"center": center,
+		"xaxis": xaxis,
+		"yaxis": yaxis,
+		"xradius": xradius,
+		"yradius": yradius,
+		"interval": interval
+	});
+
+	this.update();
+
+	this.watchAll( ['center', 'xaxis', 'yaxis', 'xradius', 'yradius', 'interval'], this.update );
+
+}.inherits(verb.geom.NurbsCurve);
+
+verb.geom.EllipseArc.prototype.nurbsRep = function(){
+
+	return this.nurbsEngine.eval_sync( 'get_ellipse_arc', [ this.get("center"), 
+															 this.get("xaxis"), 
+															 this.get("yaxis"), 
+															 this.get("xradius"), 
+															 this.get("yradius"), 
+															 this.get("interval").get("min"), 
+													 		 this.get("interval").get("max")] );
+
+};
+
+verb.geom.Extrusion = function(profile, axis, length ) {
+
+	verb.geom.NurbsSurface.call(this);
+
+	this.setAll({ 
+		  "profile": profile,
+		  "axis": axis,
+	      "length": length 
+	  });
+
+	this.update();
+
+	this.watchAll( ['axis', 'length' ], this.update );
+	profile.watchAll( ['knots', 'degree', 'controlPoints', 'weights'], this.update );
+
+}.inherits(verb.geom.NurbsSurface);
+
+verb.geom.Extrusion.prototype.nurbsRep = function() {
+
+  return this.nurbsEngine.eval_sync( 'get_extruded_surface', 
+									[ this.get("axis"), 
+								 	  this.get("length"), 
+									  this.get("profile").get("knots"), 
+									  this.get("profile").get("degree"), 
+									  this.get("profile").get("controlPoints"),
+									  this.get("profile").get("weights")] );
+
+};
+
+
+
+verb.geom.FourPointSurface = function(p1, p2, p3, p4) {
+
+	verb.geom.NurbsSurface.call(this);
+
+	this.setAll( {
+		"p1": p1,
+		"p2": p2,
+		"p3": p3,
+		"p4": p4
+	});
+
+	this.update();
+
+	this.watchAll( ['p1', 'p2', 'p3', 'p4'], this.update );
+
+}.inherits(verb.geom.NurbsSurface);
+
+verb.geom.FourPointSurface.prototype.nurbsRep = function(){
+
+	return this.nurbsEngine.eval_sync( 'get_4pt_surface', [ this.get("p1"), 
+															 this.get("p2"), 
+															 this.get("p3"), 
+															 this.get("p4") ]);
+
+};
+
+verb.geom.Interval = function(min, max) {
+
+	verb.core.WatchObject.call(this);
+	
+	this.setAll({ 
+		"min": min,
+		"max": max 
+	});
+
+}.inherits(verb.core.WatchObject);
+
+verb.geom.Interval2 = function(minu, maxu, minv, maxv) {
+
+	verb.core.WatchObject.call(this);
+	
+	this.setAll({ 
+		"uinterval": new verb.geom.Interval(minu, maxu),
+		"vinterval": new verb.geom.Interval(minv, maxv)
+	});
+
+}.inherits(verb.core.WatchObject);
+
+verb.geom.Line = function(start, end) {
+
+	verb.geom.NurbsCurve.call(this);
+
+	this.setAll({ 
+		"start": start,
+		"end": end
+	});
+
+	this.update();
+
+	this.watchAll(['start', 'end'], this.update );
+
+}.inherits(verb.geom.NurbsCurve);
+
+verb.geom.Line.prototype.nurbsRep = function(){
+
+	return {
+			knots: [0,0,1,1], 
+			control_points: [ this.get("start"), this.get("end") ],
+			weights: [1,1],
+			degree: 1
+	};
+
+};
+
+
+
+// a data structure representing a winged edge mesh  - inherits from Geometry
+
+
+
+// a quad or tri
+// point on a mesh
+verb.geom.PlanarSurface = function( base, uaxis, vaxis, ulength, vlength ) {
+
+	verb.geom.NurbsSurface.call(this);
+
+	this.setAll({
+		"base": base,
+		"uaxis": uaxis,
+		"vaxis": vaxis,
+		"ulength": ulength,
+		"vlength": vlength
+	});
+
+	this.update();
+
+	this.watchAll( ['base', 'uaxis', 'vaxis', 'ulength', 'vlength'], this.update );
+
+}.inherits(verb.geom.NurbsSurface);
+
+verb.geom.PlanarSurface.prototype.nurbsRep = function(){
+
+	var p1 = this.get('base')
+		, uedge = numeric.mul( this.get('uaxis'), this.get('ulength'))
+		, vedge = numeric.mul( this.get('vaxis'), this.get('vlength'))
+		, p2 = numeric.add( p1, uedge )
+		, p3 = numeric.add( p1, vedge, uedge )
+		, p4 = numeric.add( p1, vedge );
+
+	return this.nurbsEngine.eval_sync( 'get_4pt_surface', [ p1, p2, p3, p4 ]);
+
+};
+verb.geom.PolyLine = function( points ) {
+
+	verb.geom.NurbsCurve.call(this);
+
+	this.setAll( {
+		"control_points": points ? points.slice(0) : []
+	});
+
+	this.update();
+
+}.inherits(verb.geom.NurbsCurve);
+
+verb.geom.PolyLine.prototype.nurbsRep = function(){
+
+	return this.nurbsEngine.eval_sync( 'get_polyline_curve', [ this.get("control_points") ]);
+
+};
+verb.geom.RevolvedSurface = function( center, axis, angle, profile ) {
+
+	verb.geom.NurbsSurface.call(this);
+
+	this.setAll({
+		"center": center,
+		"axis": axis,
+		"angle": angle,
+		"profile": profile
+	});
+
+	this.update();
+
+	this.watchAll( ['center', 'axis', 'angle', 'profile'], this.update );
+
+}.inherits(verb.geom.NurbsSurface);
+
+verb.geom.RevolvedSurface.prototype.nurbsRep = function(){
+
+	  return this.nurbsEngine.eval_sync( 'get_revolved_surface', 
+									[ this.get("center"), 
+									  this.get("axis"), 
+									  this.get("angle"), 
+									  this.get("profile").get("knots"), 
+									  this.get("profile").get("degree"), 
+									  this.get("profile").get("controlPoints"),
+									  this.get("profile").get("weights")] );
+
+};
+verb.geom.Sphere = function( center, radius ) {
+
+	verb.geom.NurbsSurface.call(this);
+
+	this.setAll({
+		"center": center,
+		"radius": radius
+	});
+
+	this.update();
+	this.watchAll( ['center', 'radius'], this.update );
+
+}.inherits(verb.geom.NurbsSurface);
+
+verb.geom.Sphere.prototype.nurbsRep = function(){
+
+  return this.nurbsEngine.eval_sync( 'get_sphere_surface', 
+										[ this.get("center"), 
+										  [0,0,1],
+										  [1,0,0],
+										  this.get("radius")] );
+
+};
+verb.geom.SweepOneRail = function( rail, profile ) {
+
+	verb.geom.NurbsSurface.call(this);
+
+	this.setAll({
+		"rail": rail,
+		"profile": profile
+	});
+
+	this.update();
+
+	this.watchAll( ['rail', 'profile'], this.update );
+
+}.inherits(verb.geom.NurbsSurface);
+
+verb.geom.SweepOneRail.prototype.nurbsRep = function(){
+	
+  return this.nurbsEngine.eval_sync( 'get_sweep1_surface', 
+										[ this.get("profile").get("knots"), 
+										  this.get("profile").get("degree"),
+										  this.get("profile").get("controlPoints"),
+										  this.get("profile").get("weights"),
+										  this.get("rail").get("knots"),
+										  this.get("rail").get("degree"),
+										  this.get("rail").get("controlPoints"),
+										  this.get("rail").get("weights")] );
+
+};
+
+
+
+verb.intersect.curveCurve = function( curve1, curve2, callback ){
+
+	if (curve1 instanceof verb.geom.NurbsCurve && curve2 instanceof verb.geom.NurbsCurve ){
+
+		return verb.nurbsEngine.eval( 'intersect_rational_curves_by_aabb', 
+							[ 	curve1.get('degree'), curve1.get('knots'), curve1.homogenize(), curve2.get('degree'), curve2.get('knots'), curve2.homogenize(), verb.TOLERANCE ], callback );
+
+
+	}
+
+}
 /**
  * Generate the control points, weights, and knots of an elliptical arc
  *

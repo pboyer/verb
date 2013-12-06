@@ -1,41 +1,32 @@
-// Set the color of all polygons in this solid
-CSG.prototype.setColor = function(r, g, b) {
-  this.toPolygons().map(function(polygon) {
-    polygon.shared = [r, g, b];
-  });
+verb.geom.NurbsCurve.prototype.toGlType = function() {
+  
+  var s = this.tesselate();
+
+  var crv = new GL.Curve({ colors: true });
+  crv.lines = s;
+  crv.compile();
+
+  return crv;
+
 };
 
-// Convert from CSG solid to GL.Mesh object
-verb.geom.NurbsSurface.prototype.toMesh = function() {
+verb.geom.NurbsSurface.prototype.toGlType = function() {
 
-  var mesh = new GL.Mesh({ normals: true, colors: true });
+  var mesh = new GL.Mesh({ colors: true, normals: true });
 
   var s = this.tesselate();
 
-  var indexer = new GL.Indexer();
+  mesh.triangles = s.faces;
+  mesh.vertices = s.points;
 
-  this.toPolygons().map(function(polygon) {
+  mesh.colors = mesh.vertices.map(function(v) { return [1,0,0,1] });
+  mesh.normals = s.normals;
 
-    var indices = polygon.vertices.map(function(vertex) {
-      vertex.color = polygon.shared || [1, 1, 1];
-      return indexer.add(vertex);
-    });
-    for (var i = 2; i < indices.length; i++) {
-      mesh.triangles.push([indices[0], indices[i - 1], indices[i]]);
-    }
-
-  });
-
-
-
-  mesh.vertices = indexer.unique.map(function(v) { return [v.pos.x, v.pos.y, v.pos.z]; });
-  mesh.normals = indexer.unique.map(function(v) { return [v.normal.x, v.normal.y, v.normal.z]; });
-  mesh.colors = indexer.unique.map(function(v) { return v.color; });
   mesh.computeWireframe();
 
   return mesh;
-};
 
+};
 
 var angleX = 20;
 var angleY = 20;
@@ -47,28 +38,30 @@ Viewer.lineOverlay = false;
 // A viewer is a WebGL canvas that lets the user view a mesh. The user can
 // tumble it around by dragging the mouse.
 function Viewer(ele, width, height, depth) {
+
   viewers.push(this);
 
   // Get a new WebGL canvas
   var gl = GL.create();
   this.gl = gl;
 
-  this.mesh = ele.toMesh();
+  // make the mesh
+  this.mesh = ele.toGlType();
 
   // Set up the viewport
   gl.canvas.width = width;
   gl.canvas.height = height;
   gl.viewport(0, 0, width, height);
-  gl.matrixMode(gl.PROJECTION);
+  gl.matrixMode( gl.PROJECTION );
   gl.loadIdentity();
   gl.perspective(45, width / height, 0.1, 100);
-  gl.matrixMode(gl.MODELVIEW);
+  gl.matrixMode( gl.MODELVIEW );
 
   // Set up WebGL state
   gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
   gl.clearColor(0.93, 0.93, 0.93, 1);
   gl.enable(gl.DEPTH_TEST);
-  gl.enable(gl.CULL_FACE);
+  gl.disable(gl.CULL_FACE);
   gl.polygonOffset(1, 1);
 
   // Black shader for wireframe
@@ -120,6 +113,7 @@ function Viewer(ele, width, height, depth) {
 
   var that = this;
   gl.ondraw = function() {
+
     gl.makeCurrent();
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -128,21 +122,31 @@ function Viewer(ele, width, height, depth) {
     gl.rotate(angleX, 1, 0, 0);
     gl.rotate(angleY, 0, 1, 0);
 
-    if (!Viewer.lineOverlay) gl.enable(gl.POLYGON_OFFSET_FILL);
-    that.lightingShader.draw(that.mesh, gl.TRIANGLES);
-    if (!Viewer.lineOverlay) gl.disable(gl.POLYGON_OFFSET_FILL);
+    if (that.mesh instanceof GL.Mesh){
+      if (!Viewer.lineOverlay) gl.enable(gl.POLYGON_OFFSET_FILL);
+      that.lightingShader.draw(that.mesh, gl.TRIANGLES);
+      if (!Viewer.lineOverlay) gl.disable(gl.POLYGON_OFFSET_FILL);
 
-    if (Viewer.lineOverlay) gl.disable(gl.DEPTH_TEST);
-    gl.enable(gl.BLEND);
-    that.blackShader.draw(that.mesh, gl.LINES);
-    gl.disable(gl.BLEND);
-    if (Viewer.lineOverlay) gl.enable(gl.DEPTH_TEST);
+      if (Viewer.lineOverlay) gl.disable(gl.DEPTH_TEST);
+      gl.enable(gl.BLEND);
+      that.blackShader.draw(that.mesh, gl.LINES);
+      gl.disable(gl.BLEND);
+      if (Viewer.lineOverlay) gl.enable(gl.DEPTH_TEST);
+    } else {
+      // gl.enable(gl.BLEND);
+      that.blackShader.draw(that.mesh, gl.LINE_STRIP);
+      // gl.disable(gl.BLEND);
+    }
+
   };
 
   gl.ondraw();
 }
 
 var nextID = 0;
+
 function addViewer(viewer) {
-  document.getElementById(nextID++).appendChild(viewer.gl.canvas);
+  var ele = document.getElementById(nextID++);
+
+  ele.insertBefore(viewer.gl.canvas, ele.firstChild);
 }

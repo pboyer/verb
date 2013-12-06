@@ -2,7 +2,7 @@ if ( typeof exports != 'object' || exports === undefined )  // browser context
 {
 	var verb = {}
 		, numeric = window.numeric
-		, binomial = window.binomial
+		, binomial = window.choose
 		, labor = window.labor
 		, _ = window.underscore;
 }
@@ -75,5 +75,11 @@ Array.prototype.flatten = function(){
 numeric.normalized = function(arr){
 
 	return numeric.div( arr, numeric.norm2(arr) );
+
+}
+
+numeric.cross = function(u, v){
+
+	return [u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
 
 }

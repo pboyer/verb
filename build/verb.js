@@ -2,7 +2,7 @@ if ( typeof exports != 'object' || exports === undefined )  // browser context
 {
 	var verb = {}
 		, numeric = window.numeric
-		, binomial = window.binomial
+		, binomial = window.choose
 		, labor = window.labor
 		, _ = window.underscore;
 }
@@ -75,6 +75,12 @@ Array.prototype.flatten = function(){
 numeric.normalized = function(arr){
 
 	return numeric.div( arr, numeric.norm2(arr) );
+
+}
+
+numeric.cross = function(u, v){
+
+	return [u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
 
 }
 // engine nurbs handles nurbs eval requests
@@ -363,12 +369,7 @@ verb.geom.NurbsCurve = function( degree, controlPoints, weights, knots ) {
 
 verb.geom.NurbsCurve.prototype.point = function( u, callback ) {
 
-	if (callback){
-		this.nurbsEngine.eval( 'rational_curve_point', [ this.get('degree'), this.get('knots'), this.homogenize(),  u ], callback ); 
-		return;
-	}
-
-	return this.nurbsEngine.eval_sync( 'rational_curve_point', [ this.get('degree'), this.get('knots'), this.homogenize(), u ] );
+	return this.nurbsEngine.eval( 'rational_curve_point', [ this.get('degree'), this.get('knots'), this.homogenize(),  u ], callback ); 
 
 };
 
@@ -385,12 +386,7 @@ verb.geom.NurbsCurve.prototype.point = function( u, callback ) {
 
 verb.geom.NurbsCurve.prototype.derivatives = function( u, num_derivs, callback ) {
 
-	if (callback){
-		this.nurbsEngine.eval( 'rational_curve_derivs', [ this.get('degree'), this.get('knots'), this.homogenize(),  u, num_derivs  ], callback ); 
-		return;
-	}
-
-	return this.nurbsEngine.eval_sync( 'rational_curve_derivs', [ this.get('degree'), this.get('knots'), this.homogenize(),  u, num_derivs] );
+	return this.nurbsEngine.eval( 'rational_curve_derivs', [ this.get('degree'), this.get('knots'), this.homogenize(),  u, num_derivs  ], callback ); 
 
 };
 
@@ -405,13 +401,12 @@ verb.geom.NurbsCurve.prototype.derivatives = function( u, num_derivs, callback )
  * @api public
  */
 
-verb.geom.NurbsCurve.prototype.tesselate = function(callback){
+verb.geom.NurbsCurve.prototype.tesselate = function(options, callback){
 
-	if (callback){
-		return this.nurbsEngine.eval( 'rational_curve_adaptive_sample', [ this.get('degree'), this.get('knots'), this.homogenize(), verb.TOLERANCE ], callback ); 
-	}
+	var options = options || {};
+	options.tolerance = options.tolerance || verb.EPSILON;
 
-	return this.nurbsEngine.eval_sync( 'rational_curve_adaptive_sample', [ this.get('degree'), this.get('knots'), this.homogenize(), verb.TOLERANCE ] ); 
+	return this.nurbsEngine.eval( 'rational_curve_adaptive_sample', [ this.get('degree'), this.get('knots'), this.homogenize(), options.tolerance ], callback ); 
 
 };
 
@@ -516,7 +511,7 @@ verb.geom.NurbsCurve.prototype.update = function(){
 verb.geom.NurbsSurface = function( degreeU, knotsU, degreeV, knotsV, controlPoints, weights ) {
 
 	verb.geom.NurbsGeometry.call(this);
-	
+
 	this.setAll({
 		"controlPoints": controlPoints,
 		"weights": weights,
@@ -542,13 +537,8 @@ verb.geom.NurbsSurface = function( degreeU, knotsU, degreeV, knotsV, controlPoin
 
 verb.geom.NurbsSurface.prototype.point = function( u, v, callback ) {
 
-	if (callback) {
-		return this.nurbsEngine.eval( 'rational_surface_point', 
+	return this.nurbsEngine.eval( 'rational_surface_point', 
 							[ 	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), u, v ], callback );
-	}
-
-	return this.nurbsEngine.eval_sync( 'rational_surface_point', 
-										[ 	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), u, v ] );
 
 };
 
@@ -566,35 +556,34 @@ verb.geom.NurbsSurface.prototype.point = function( u, v, callback ) {
 
 verb.geom.NurbsSurface.prototype.derivatives = function( u, v, num_derivs, callback ) {
 
-	if (callback) {
-		return this.nurbsEngine.eval( 'rational_surface_derivs', 
+	return this.nurbsEngine.eval( 'rational_surface_derivs', 
 			[	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), num_derivs, u, v ], callback ); 
-	}
-
-	return this.nurbsEngine.eval_sync( 'rational_surface_derivs', 
-		[	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), num_derivs, u, v ] );
 
 };
 
 /**
  * Tesselate the surface
  *
- * @param {Number} The number of divisions in the u direction
- * @param {Number} The number of divisions in the v direction
+ * @param {Object} Tesselate the surface, given an options object includings a vdivs and udivs property
  *
  * @return {Array} An array if called synchronously, otherwise nothing
  * @api public
  */
 
-verb.geom.NurbsSurface.prototype.tesselate = function(udivs, vdivs, callback){
+verb.geom.NurbsSurface.prototype.tesselate = function(options, callback){
 
-	if (callback) {
-		return this.nurbsEngine.eval( 'tesselate_rational_surface_naive', 
-			[	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), udivs, vdivs ], callback ); 
+	var minDivsV = 20
+		, minDivsU = 20;
+
+	if (options){
+		minDivsV = optons.minDivsV || minDivsV;
+		minDivsU = optons.minDivsU || minDivsU;
 	}
 
-	return this.nurbsEngine.eval_sync( 'tesselate_rational_surface_naive', 
-		[	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), udivs, vdivs ] ); 
+	// naive surface tesselation, for now
+	return this.nurbsEngine.eval( 'tesselate_rational_surface_naive', 
+			[	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), 
+			minDivsU, minDivsV ], callback ); 
 
 };
 
@@ -1473,7 +1462,6 @@ verb.eval.nurbs.get_sweep1_surface = function( profile_knots, profile_degree, pr
 		, span = 1.0 / rail_control_points.length
 		, control_points = []
 		, weights = [];
-
 
 	for (var i = 0; i < rail_control_points.length; i++ ){
 
@@ -2428,6 +2416,7 @@ verb.eval.nurbs.tesselate_rational_surface_naive = function( degree_u, knots_u, 
   
   var points = [];
   var uvs = [];
+  var normals = [];
 
   // generate all points
 	for (var i = 0; i < divs_u + 1; i++) {
@@ -2437,7 +2426,16 @@ verb.eval.nurbs.tesselate_rational_surface_naive = function( degree_u, knots_u, 
 				pt_v = j * span_v;
 
 			uvs.push( [pt_u, pt_v] );
-			points.push( verb.eval.nurbs.rational_surface_point( degree_u, knots_u,  degree_v, knots_v, homo_control_points, pt_u, pt_v ) );
+
+			var derivs = verb.eval.nurbs.rational_surface_derivs( degree_u, knots_u, degree_v, knots_v, homo_control_points, 1, pt_u, pt_v );
+			var pt = derivs[0][0];
+
+			points.push( pt );
+
+			var normal = numeric.normalized( numeric.cross( derivs[1][0], derivs[0][1] ) );
+			normals.push( normal );
+
+			// points.push( verb.eval.nurbs.rational_surface_point( degree_u, knots_u,  degree_v, knots_v, homo_control_points, pt_u, pt_v ) );
 
 		}
 	}
@@ -2475,7 +2473,7 @@ verb.eval.nurbs.tesselate_rational_surface_naive = function( degree_u, knots_u, 
 		}
 	}
 
-	return { points: points, faces : faces, uvs: uvs};
+	return { points: points, faces : faces, uvs: uvs, normals: normals };
 
 }
 
