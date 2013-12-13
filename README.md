@@ -1,5 +1,5 @@
 #verb
-##A NURBS Library for the Web
+###A NURBS Library for the Web
 
 verb is a JavaScript library for creating and manipulating <a href="http://en.wikipedia.org/wiki/Non-uniform_rational_B-spline">NURBS</a> surfaces and curves in the browser or <a href="http://nodejs.org/">node.js</a>.  It provides a <a href="geometry.html">rich set of geometric types like sweeps, extrusions, revolves, beziers, and other common curves and surfaces</a> in a <a href="js/verb.min.js">17kb-minified package</a>.
 
