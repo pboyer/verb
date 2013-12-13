@@ -1,33 +1,3 @@
-verb.geom.NurbsCurve.prototype.toGlType = function() {
-  
-  var s = this.tesselate();
-
-  var crv = new GL.Curve({ colors: true });
-  crv.lines = s;
-  crv.compile();
-
-  return crv;
-
-};
-
-verb.geom.NurbsSurface.prototype.toGlType = function() {
-
-  var mesh = new GL.Mesh({ colors: true, normals: true });
-
-  var s = this.tesselate();
-
-  mesh.triangles = s.faces;
-  mesh.vertices = s.points;
-
-  mesh.colors = mesh.vertices.map(function(v) { return [1,0,0,1] });
-  mesh.normals = s.normals;
-
-  mesh.computeWireframe();
-
-  return mesh;
-
-};
-
 var angleX = 20;
 var angleY = 20;
 var viewers = [];
@@ -37,7 +7,7 @@ Viewer.lineOverlay = false;
 
 // A viewer is a WebGL canvas that lets the user view a mesh. The user can
 // tumble it around by dragging the mouse.
-function Viewer(ele, width, height, depth) {
+function Viewer(ele, width, height, depth, async) {
 
   viewers.push(this);
 
@@ -46,7 +16,7 @@ function Viewer(ele, width, height, depth) {
   this.gl = gl;
 
   // make the mesh
-  this.mesh = ele.toGlType();
+  this.mesh = ele.toGlType(this.gl);
 
   // Set up the viewport
   gl.canvas.width = width;
@@ -81,7 +51,7 @@ function Viewer(ele, width, height, depth) {
     varying vec3 normal;\
     varying vec3 light;\
     void main() {\
-      const vec3 lightDir = vec3(1.0, 2.0, 3.0) / 3.741657386773941;\
+      const vec3 lightDir = vec3(-0.56, -0.56, -0.56);\
       light = (gl_ModelViewMatrix * vec4(lightDir, 0.0)).xyz;\
       color = gl_Color.rgb;\
       normal = gl_NormalMatrix * gl_Normal;\
@@ -95,9 +65,11 @@ function Viewer(ele, width, height, depth) {
       vec3 n = normalize(normal);\
       float diffuse = max(0.0, dot(light, n));\
       float specular = pow(max(0.0, -reflect(light, n).z), 32.0) * sqrt(diffuse);\
-      gl_FragColor = vec4(mix(color * (0.3 + 0.7 * diffuse), vec3(1.0), specular), 1.0);\
+      gl_FragColor = vec4(mix(color * (0.6 + 0.4 * diffuse), vec3(1.0), specular), 1.0);\
     }\
   ');
+
+  var that = this;
 
   gl.onmousemove = function(e) {
     if (e.dragging) {
@@ -111,7 +83,7 @@ function Viewer(ele, width, height, depth) {
     }
   };
 
-  var that = this;
+  
   gl.ondraw = function() {
 
     gl.makeCurrent();
@@ -123,30 +95,34 @@ function Viewer(ele, width, height, depth) {
     gl.rotate(angleY, 0, 1, 0);
 
     if (that.mesh instanceof GL.Mesh){
+
       if (!Viewer.lineOverlay) gl.enable(gl.POLYGON_OFFSET_FILL);
-      that.lightingShader.draw(that.mesh, gl.TRIANGLES);
+
+      that.lightingShader.draw( that.mesh, gl.TRIANGLES );
+
       if (!Viewer.lineOverlay) gl.disable(gl.POLYGON_OFFSET_FILL);
 
       if (Viewer.lineOverlay) gl.disable(gl.DEPTH_TEST);
       gl.enable(gl.BLEND);
-      that.blackShader.draw(that.mesh, gl.LINES);
+      that.blackShader.draw( that.mesh, gl.LINES);
       gl.disable(gl.BLEND);
       if (Viewer.lineOverlay) gl.enable(gl.DEPTH_TEST);
+
     } else {
-      // gl.enable(gl.BLEND);
+
       that.blackShader.draw(that.mesh, gl.LINE_STRIP);
-      // gl.disable(gl.BLEND);
+
     }
 
   };
 
   gl.ondraw();
+
 }
 
 var nextID = 0;
 
 function addViewer(viewer) {
   var ele = document.getElementById(nextID++);
-
   ele.insertBefore(viewer.gl.canvas, ele.firstChild);
 }

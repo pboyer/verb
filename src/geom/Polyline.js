@@ -1,3 +1,10 @@
+// ###new PolyLine( points ) 
+//
+// Constructor for a PolyLine
+//
+// **params**
+// + *Array*, Array of length-3 arrays representing the points
+//
 verb.geom.PolyLine = function( points ) {
 
 	verb.geom.NurbsCurve.call(this);
@@ -10,8 +17,11 @@ verb.geom.PolyLine = function( points ) {
 
 }.inherits(verb.geom.NurbsCurve);
 
+// #### nurbsRep()
+//
+// Construct the Nurbs representation
 verb.geom.PolyLine.prototype.nurbsRep = function(){
 
-	return this.nurbsEngine.eval_sync( 'get_polyline_curve', [ this.get("control_points") ]);
+	return this.nurbsEngine.eval( 'get_polyline_curve', [ this.get("control_points") ]);
 
 };

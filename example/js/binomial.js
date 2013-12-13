@@ -1,17 +1,17 @@
 if ( typeof exports != 'object' || exports === undefined )  // browser context
 {
-	var choose = {};
+	var binomial = {};
 }
 else // node.js context
 {
-	var choose = module.exports = {};
+	var binomial = module.exports = {};
 }
 
-(function( choose, undefined ) {
+(function( binomial, undefined ) {
 
 	var memo = new Array(50);
 
-	choose.get = function(n, k) {
+	binomial.get = function(n, k) {
 
 		if (k === 0) {
 			return 1;
@@ -51,7 +51,7 @@ else // node.js context
 
 	};
 
-	choose.get_no_memo = function(n, k) {
+	binomial.get_no_memo = function(n, k) {
 
 		if (k === 0) {
 			return 1;
@@ -107,4 +107,4 @@ else // node.js context
 
 	};
 
-})(choose);
+})(binomial);

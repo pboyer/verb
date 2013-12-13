@@ -118,6 +118,3 @@ geom.push( new verb.geom.SweepOneRail( rail, profile ) );
 geom.map(function(g){
 	addViewer(new Viewer( g, 300, 300, 2 ) );
 });
-
-
-// FIX polyline stride bug

@@ -3565,7 +3565,6 @@ describe("SweepOneRail.tesselate",function(){
 });
 
 // test for intersection
-
 describe("verb.intersect.curveCurve",function(){
 
 	it('gives result for valid two lines', function(){
@@ -3577,7 +3576,7 @@ describe("verb.intersect.curveCurve",function(){
 
 		var a = verb.intersect.curveCurve(l1, l2);
 		
-
+		console.log(a)
 
 	});
 

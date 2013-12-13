@@ -1,3 +1,13 @@
+// ###new Circle(center, xaxis, yaxis, xradius, yradius)
+//
+// Constructor for Circle
+//
+// **params**
+// + *Array*, Length 3 array representing the center of the circle
+// + *Array*, Length 3 array representing the xaxis
+// + *Array*, Length 3 array representing the perpendicular yaxis
+// + *Number*, Radius
+
 verb.geom.Circle = function(center, xaxis, yaxis, radius) {
 
 	verb.geom.NurbsCurve.call(this);
@@ -15,9 +25,12 @@ verb.geom.Circle = function(center, xaxis, yaxis, radius) {
 
 }.inherits(verb.geom.NurbsCurve);
 
+// #### nurbsRep()
+//
+// Construct the Nurbs representation
 verb.geom.Circle.prototype.nurbsRep = function(){
 
-	return this.nurbsEngine.eval_sync( 'get_arc', [  this.get("center"), 
+	return this.nurbsEngine.eval( 'get_arc', [  this.get("center"), 
 																									 this.get("xaxis"), 
 																									 this.get("yaxis"), 
 																									 this.get("radius"), 

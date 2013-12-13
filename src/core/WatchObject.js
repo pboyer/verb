@@ -1,5 +1,11 @@
-// A simple class that allows clients to register
-// a callback to be updated when a property is changed
+// ###new WatchObject()
+//
+// Constructor for WatchObject
+//
+// WatchObject is a simple type with observable properties.  You can register callbacks for
+// when these properties change
+//
+
 verb.core.WatchObject = function() {
 
 	// name -> { id -> callback }
@@ -16,34 +22,65 @@ verb.core.WatchObject = function() {
 	// report a property change to the watchers
 	var report = function(name, updateObject){
 
-		for (ele in watchers[name]){
-			watchers[ele]( updateObject );
-		}
+		if (typeof name === "string"){
 
-		for (ele in watchers["change"]){
-			watchers[ele]( updateObject );
+			for (ele in watchers[name]){
+				watchers[name][ele]( updateObject );
+			}
+
+			for (ele in watchers["change"]){
+				watchers["change"][ele]( updateObject );
+			}
+			
+		} else {
+			for (n in name){
+				report( n, updateObject );
+			}
 		}
 
 	};
 
-	// get the value of a property name
+	// ####eval(func, arguments_array, callback )
+	//
+	// Get the value of a property name. 
+	//
+	// **params**
+	// + *String*, The name of the property
+	//
+	// **returns** 
+	// + *Unknown*, The value of the property
+	//
 	this.get = function( name ){
 
 		return properties[name];
 
 	};
 
-	// set the value of a property and update watchers
+	// ####set( name, value )
+	//
+	// Set the value of a property and update watchers.  Initializes the value if it doesn't already exist
+	//
+	// **params**
+	// + *String*, The name of the property
+	// + *Unknown*, The new value for the property
 	this.set = function( name, value ){
 
 		var old = properties[name];
-		properties[name] = value;
 
-		report({name: name, old: old, "new": value, target: that, type: "full"});
+		properties[name] = value;
+		watchers[name] = watchers[name] || {};
+
+		report( name, {name: name, old: old, "new": value, target: that, type: "full"});
 
 	};
 
-	// set a number of properties given an object containing all of the properties
+
+	// ####setAll( propertyNameValuePairs )
+	//
+	// Set the value of a collection of properties simultaneously
+	//
+	// **params**
+	// + *Object*, An object literal mapping from property names to new values
 	this.setAll = function( propertyNameValuePairs ){
 
 		var oldVals = {};
@@ -51,13 +88,23 @@ verb.core.WatchObject = function() {
 		for ( propName in propertyNameValuePairs ){
 			oldVals[propName] = properties[propName];
 			properties[propName] = propertyNameValuePairs[propName];
+			watchers[propName] = watchers[propName] || {};
 		}
 
-		report({old: oldVals, "new": propertyNameValuePairs, target: that, type: "multi"});
+		report( propertyNameValuePairs, { old: oldVals, "new": propertyNameValuePairs, target: that, type: "multi" } );
 
 	};
 
-	// set an index of array property and update watchers
+	// ####setAt( name, index, value  )
+	//
+	// Set the value of an array property at a particular index.  Update watchers
+	// indicating that it is an "index" type update.
+	//
+	// **params**
+	// + *String*, The name of the property
+	// + *Number*, The index at which to change the value
+	// + *Unknown*, The new value for the index
+
 	this.setAt = function( name, index, value ){
 
 		var oldArr = properties[name];
@@ -69,15 +116,25 @@ verb.core.WatchObject = function() {
 		var old = properties[name][index];
 		properties[name][index] = value;
 
-		report( {name: name, index: index, old: old, "new": value, target: that, type: "index"} );
+		report( name, {name: name, index: index, old: old, "new": value, target: that, type: "index"} );
 
 	};
 
-	// start watching a particular property.  use "name" to receive all 
-	// updates
+	// ####watch( name, callback )
+	//
+	// Start watching a particular property.  Use "change" as the name to receive all 
+	// updates from this object
+	//
+	// **params**
+	// + *String*, The name of the property
+	// + *Function*, The callback
+	//
+	// **returns** 
+	// + *Number*, A watcher id which can be used to unregister the callback
+	//
 	this.watch = function( name, callback ){
 
-		if ( watchers[name] === undefined || !callback ){
+		if ( properties[name] === undefined || !callback ){
 			return;
 		}
 
@@ -87,7 +144,17 @@ verb.core.WatchObject = function() {
 		return watcherId++;
 	};
 
-	// start watching a list of properties
+	// ####watchAll( names, callback )
+	//
+	// Start watching multiple properties
+	//
+	// **params**
+	// + *Array*, Array of property names
+	// + *Function*, The callback
+	//
+	// **returns** 
+	// + *Array*, An array of watcher ids which can be used to unregister the callbacks
+	//
 	this.watchAll = function( names, callback ){
 
 		var watcherIds = [];
@@ -100,8 +167,14 @@ verb.core.WatchObject = function() {
 
 	};
 
-	// stop watching a particular property, given a propertyName
-	// and watcherId
+	// ####watchAll( names, callback )
+	//
+	// Stop watching a property
+	//
+	// **params**
+	// + *String*, Property name
+	// + *Number*, Watcher id to remove
+
 	this.ignore = function( name, watcherId ){
 	
 		if ( watchers[name] === undefined 

@@ -1,3 +1,14 @@
+// ###new PlanarSurface( base, uaxis, vaxis, ulength, vlength )
+//
+// Constructor for PlanarSurface
+//
+// **params**
+// + *Array*, Length 3 array representing the base point
+// + *Array*, Length 3 array representing the uaxis, defines the one axis of the planar surface
+// + *Array*, Length 3 array representing the vaxis, defines the one second axis of the planar surface
+// + *Number*, Length in the u direction 
+// + *Number*, Length in the v direction
+//
 verb.geom.PlanarSurface = function( base, uaxis, vaxis, ulength, vlength ) {
 
 	verb.geom.NurbsSurface.call(this);
@@ -16,6 +27,9 @@ verb.geom.PlanarSurface = function( base, uaxis, vaxis, ulength, vlength ) {
 
 }.inherits(verb.geom.NurbsSurface);
 
+// #### nurbsRep()
+//
+// Construct the Nurbs representation
 verb.geom.PlanarSurface.prototype.nurbsRep = function(){
 
 	var p1 = this.get('base')
@@ -25,6 +39,6 @@ verb.geom.PlanarSurface.prototype.nurbsRep = function(){
 		, p3 = numeric.add( p1, vedge, uedge )
 		, p4 = numeric.add( p1, vedge );
 
-	return this.nurbsEngine.eval_sync( 'get_4pt_surface', [ p1, p2, p3, p4 ]);
+	return this.nurbsEngine.eval( 'get_4pt_surface', [ p1, p2, p3, p4 ]);
 
 };

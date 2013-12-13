@@ -1,12 +1,12 @@
-/**
- * Constructor for a NurbsCurve
- *
- * @param {Number} The degree of the curve
- * @param {Array} Array of arrays representing the control points
- * @param {Array} Array of numbers representing the control point weights
- * @param {Array} Array of numbers representing the knot structure
- * @api public
- */
+// ###new NurbsSurface( degree, controlPoints, weights, knots )
+//
+// Constructor for a NurbsCurve
+//
+// **params**
+// + *Number*, The degree of the curve
+// + *Array*, Array of arrays representing the control points
+// + *Array*, Array of numbers representing the control point weights
+// + *Array*, Array of numbers representing the knot structure
 
 verb.geom.NurbsCurve = function( degree, controlPoints, weights, knots ) {
 
@@ -21,16 +21,17 @@ verb.geom.NurbsCurve = function( degree, controlPoints, weights, knots ) {
 
 }.inherits( verb.geom.NurbsGeometry );
 
-
-/**
- * Sample a point at the given parameter 
- *
- * @param {Number} The parameter to sample the curve
- * @param {Function} Optional callback to do it async
- *
- * @return {Array} An array if called synchronously, otherwise nothing
- * @api public
- */
+//
+// ####point( u [, callback] )
+//
+// Sample a point at the given parameter 
+//
+// **params**
+// + *Number*, The parameter to sample the curve
+// + *Function*, Optional callback to do it async
+//
+// **returns**
+// + *Array*, An array if called synchronously, otherwise nothing
 
 verb.geom.NurbsCurve.prototype.point = function( u, callback ) {
 
@@ -38,16 +39,18 @@ verb.geom.NurbsCurve.prototype.point = function( u, callback ) {
 
 };
 
-/**
- * Get derivatives at a given parameter
- *
- * @param {Number} The parameter to sample the curve
- * @param {Number} The number of derivatives to obtain
- * @param {Number} The callback, if you want this async
- *
- * @return {Array} An array if called synchronously, otherwise nothing
- * @api public
- */
+//
+// ####derivatives( u, num_derivs [, callback] )
+//
+// Get derivatives at a given parameter
+//
+// **params**
+// + *Number*, The parameter to sample the curve
+// + *Number*, The number of derivatives to obtain
+// + *Number*, The callback, if you want this async
+//
+// **returns**
+// + *Array*, An array if called synchronously, otherwise nothing
 
 verb.geom.NurbsCurve.prototype.derivatives = function( u, num_derivs, callback ) {
 
@@ -55,16 +58,18 @@ verb.geom.NurbsCurve.prototype.derivatives = function( u, num_derivs, callback )
 
 };
 
-/**
- * Tesselate a curve at a given tolerance
- *
- * @param {Number} The parameter to sample the curve
- * @param {Number} The number of derivatives to obtain
- * @param {Number} The callback, if you want this async
- *
- * @return {Array} An array if called synchronously, otherwise nothing
- * @api public
- */
+//
+// ####tesselate(options [, callback] )
+//
+// Tesselate a curve at a given tolerance
+//
+// **params**
+// + *Number*, The parameter to sample the curve
+// + *Number*, The number of derivatives to obtain
+// + *Number*, The callback, if you want this async
+//
+// **returns**
+// + *Array*, An array if called synchronously, otherwise nothing
 
 verb.geom.NurbsCurve.prototype.tesselate = function(options, callback){
 
@@ -75,14 +80,16 @@ verb.geom.NurbsCurve.prototype.tesselate = function(options, callback){
 
 };
 
-/**
- * Transform a curve with the given matrix.
- *
- * @param {Array} 4d array representing the transform
- *
- * @return {Array} An array if called synchronously, otherwise nothing
- * @api public
- */
+//
+// ####transform( mat )
+//
+// Transform a curve with the given matrix.
+//
+// **params**
+// + *Array*, 4d array representing the transform
+//
+// **returns**
+// + *Array*, An array if called synchronously, otherwise nothing
 
 verb.geom.NurbsCurve.prototype.transform = function( mat ){
 
@@ -99,14 +106,16 @@ verb.geom.NurbsCurve.prototype.transform = function( mat ){
 
 }; 
 
-/**
- * Obtain a copy of the curve
- *
- * @param {Array} 4d array representing the transform
- *
- * @return {Array} An array if called synchronously, otherwise nothing
- * @api public
- */
+//
+// ####clone()
+//
+// Obtain a copy of the curve
+//
+// **params**
+// + *Array*, 4d array representing the transform
+//
+// **returns**
+// + *Array*, An array if called synchronously, otherwise nothing
 
 verb.geom.NurbsCurve.prototype.clone = function(){
 
@@ -123,12 +132,13 @@ verb.geom.NurbsCurve.prototype.clone = function(){
 
 };
 
-/**
- * Obtain the homogeneous representation of the control points
- *
- * @returns {Array} 2d array of homogenized control points
- * @api public
- */
+//
+// ####homogenize()
+//
+// Obtain the homogeneous representation of the control points
+//
+// **returns**
+// + *Array*, 2d array of homogenized control points
 
 verb.geom.NurbsCurve.prototype.homogenize = function(){
 
@@ -136,13 +146,12 @@ verb.geom.NurbsCurve.prototype.homogenize = function(){
 
 };
 
-/**
- * If this is a subtype of the NurbsCurve, this method will update the Nurbs representation
- * of the curve from those parameters.  This destroys any manual changes to the Nurbs rep.
- *
- * @api public
- */
 
+//
+// ####update()
+//
+// If this is a subtype of the NurbsCurve, this method will update the Nurbs representation
+// of the curve from those parameters.  This destroys any manual changes to the Nurbs rep.
 verb.geom.NurbsCurve.prototype.update = function(){
 
 	if ( !this.nurbsRep ){

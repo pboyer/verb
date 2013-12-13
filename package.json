@@ -22,6 +22,7 @@
   },
   "devDependencies": {
     "grunt-simple-mocha": "0.4.0",
+    "grunt-docco": "0.3.0",
     "mocha": "1.14.0",
     "should": "2.1.0",
     "grunt": "0.4.2",

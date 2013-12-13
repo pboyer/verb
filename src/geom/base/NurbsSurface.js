@@ -1,15 +1,15 @@
-/**
- * Constructor for a NurbsCurve
- *
- * @param {Number} The degree of the surface in the u direction
- * @param {Array} Array of numbers representing the knot positions in the u direction
- * @param {Number} The degree of the surface in the v direction
- * @param {Array} Array of numbers representing the knot positions in the v direction
- * @param {Array} 3d array representing the unweighted control points
- * @param {Array} 2d array representing the surface weight structure
- *
- * @api public
- */
+// ###new NurbsSurface( degreeU, knotsU, degreeV, knotsV, controlPoints, weights )
+//
+// Constructor for a NurbsSurface
+//
+// **params**
+// + *Number*, The degree of the surface in the u direction
+// + *Array*, Array of numbers representing the knot positions in the u direction
+// + *Number*, The degree of the surface in the v direction
+// + *Array*, Array of numbers representing the knot positions in the v direction
+// + *Array*, 3d array representing the unweighted control points
+// + *Array*, 2d array representing the surface weight structure
+//
 
 verb.geom.NurbsSurface = function( degreeU, knotsU, degreeV, knotsV, controlPoints, weights ) {
 
@@ -26,17 +26,18 @@ verb.geom.NurbsSurface = function( degreeU, knotsU, degreeV, knotsV, controlPoin
 
 }.inherits( verb.geom.NurbsGeometry );
 
-
-/**
- * Sample a point at the given u, v parameter 
- *
- * @param {Number} The u parameter at which to sample
- * @param {Number} The v parameter at which to sample
- * @param {Function} Optional callback to do it async
- *
- * @return {Array} An array if called synchronously, otherwise nothing
- * @api public
- */
+//
+// ####point( u, v [, callback] )
+//
+// Sample a point at the given u, v parameter 
+//
+// **params**
+// + *Number*, The u parameter at which to sample
+// + *Number*, The v parameter at which to sample
+// + *Function*, Optional callback to do it async
+//
+// **returns**
+// + *Array*, An array if called synchronously, otherwise nothing
 
 verb.geom.NurbsSurface.prototype.point = function( u, v, callback ) {
 
@@ -45,17 +46,19 @@ verb.geom.NurbsSurface.prototype.point = function( u, v, callback ) {
 
 };
 
-/**
- * Get derivatives at a given u, v parameter
- *
- * @param {Number} The u parameter to sample the curve
- * @param {Number} The v parameter to sample the curve
- * @param {Number} The number of derivatives to obtain
- * @param {Number} The callback, if you want this async
- *
- * @return {Array} An array if called synchronously, otherwise nothing
- * @api public
- */
+//
+// ####derivatives( u, v, num_derivs [, callback] )
+//
+// Get derivatives at a given u, v parameter
+//
+// **params**
+// + *Number*, The u parameter to sample the curve
+// + *Number*, The v parameter to sample the curve
+// + *Number*, The number of derivatives to obtain
+// + *Number*, The callback, if you want this async
+//
+// **returns**
+// + *Array*, An array if called synchronously, otherwise nothing
 
 verb.geom.NurbsSurface.prototype.derivatives = function( u, v, num_derivs, callback ) {
 
@@ -64,14 +67,16 @@ verb.geom.NurbsSurface.prototype.derivatives = function( u, v, num_derivs, callb
 
 };
 
-/**
- * Tesselate the surface
- *
- * @param {Object} Tesselate the surface, given an options object includings a vdivs and udivs property
- *
- * @return {Array} An array if called synchronously, otherwise nothing
- * @api public
- */
+//
+// ####tesselate(options [, callback] )
+//
+// Tesselate the surface
+//
+// **params**
+// + *Object*, Tesselate the surface, given an options object includings a vdivs and udivs property
+//
+// **returns**
+// + *Array*, An array if called synchronously, otherwise nothing
 
 verb.geom.NurbsSurface.prototype.tesselate = function(options, callback){
 
@@ -79,8 +84,8 @@ verb.geom.NurbsSurface.prototype.tesselate = function(options, callback){
 		, minDivsU = 20;
 
 	if (options){
-		minDivsV = optons.minDivsV || minDivsV;
-		minDivsU = optons.minDivsU || minDivsU;
+		minDivsV = options.minDivsV || minDivsV;
+		minDivsU = options.minDivsU || minDivsU;
 	}
 
 	// naive surface tesselation, for now
@@ -90,14 +95,16 @@ verb.geom.NurbsSurface.prototype.tesselate = function(options, callback){
 
 };
 
-/**
- * Transform a curve with the given matrix.
- *
- * @param {Array} 4d array representing the transform
- *
- * @return {Array} An array if called synchronously, otherwise nothing
- * @api public
- */
+//
+// ####transform( mat )
+//
+// Transform a curve with the given matrix.
+//
+// **params**
+// + *Array*, 4d array representing the transform
+//
+// **returns**
+// + *Array*, An array if called synchronously, otherwise nothing
 
 verb.geom.NurbsSurface.prototype.transform = function( mat ){
 
@@ -116,14 +123,16 @@ verb.geom.NurbsSurface.prototype.transform = function( mat ){
 
 };
 
-/**
- * Obtain a copy of the curve
- *
- * @param {Array} 4d array representing the transform
- *
- * @return {Array} An array if called synchronously, otherwise nothing
- * @api public
- */
+//
+// ####clone()
+//
+// Obtain a copy of the curve
+//
+// **params**
+// + *Array*, 4d array representing the transform
+//
+// **returns**
+// + *Array*, An array if called synchronously, otherwise nothing
 
 verb.geom.NurbsSurface.prototype.clone = function(){
 
@@ -151,12 +160,13 @@ verb.geom.NurbsSurface.prototype.clone = function(){
 
 };
 
-/**
- * Obtain the homogeneous representation of the control points
- *
- * @returns {Array} 3d array of homogenized control points
- * @api public
- */
+//
+// ####homogenize()
+//
+// Obtain the homogeneous representation of the control points
+//
+// **returns**
+// + *Array*, 3d array of homogenized control points
 
 verb.geom.NurbsSurface.prototype.homogenize = function(){
 
@@ -164,12 +174,12 @@ verb.geom.NurbsSurface.prototype.homogenize = function(){
 
 };
 
-/**
- * If this is a subtype of the NurbsSurface, this method will update the Nurbs representation
- * of the curve from those parameters.  This destroys any manual changes to the Nurbs rep.
- *
- * @api public
- */
+//
+// ####update()
+//
+// If this is a subtype of the NurbsSurface, this method will update the Nurbs representation
+// of the curve from those parameters.  This destroys any manual changes to the Nurbs rep.
+//
 
 verb.geom.NurbsSurface.prototype.update = function(){
 

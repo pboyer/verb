@@ -1701,15 +1701,23 @@ Shader.prototype = {
     // Create and enable attribute pointers as necessary.
     var length = 0;
     for (var attribute in vertexBuffers) {
+
       var buffer = vertexBuffers[attribute];
+
+      // console.log(buffer);
+
       var location = this.attributes[attribute] ||
         gl.getAttribLocation(this.program, attribute.replace(/^(gl_.*)$/, LIGHTGL_PREFIX + '$1'));
+
       if (location == -1 || !buffer.buffer) continue;
+
       this.attributes[attribute] = location;
+      
       gl.bindBuffer(gl.ARRAY_BUFFER, buffer.buffer);
       gl.enableVertexAttribArray(location);
       gl.vertexAttribPointer(location, buffer.buffer.spacing, gl.FLOAT, false, 0, 0);
       length = buffer.buffer.length / buffer.buffer.spacing;
+
     }
 
     // Disable unused attribute pointers.
@@ -1722,6 +1730,8 @@ Shader.prototype = {
     // Draw the geometry.
     if (length && (!indexBuffer || indexBuffer.buffer)) {
       if (indexBuffer) {
+        // console.log(indexBuffer);
+
         gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, indexBuffer.buffer);
         gl.drawElements(mode, indexBuffer.buffer.length, gl.UNSIGNED_SHORT, 0);
       } else {

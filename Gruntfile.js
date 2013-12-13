@@ -17,8 +17,8 @@ module.exports = function(grunt) {
                                         'src/geom/base/NurbsSurface.js', 
                                         'src/geom/*.js', 
                                         'src/intersect/*.js', 
-                                        'src/eval/nurbs.js' ],
-          'build/<%= pkg.name %>_nurbs_eval.js': ['src/eval/eval_header.js', 'src/eval/nurbs.js']
+                                        'src/eval/eval.js' ],
+          'build/<%= pkg.name %>Eval.js': ['src/eval/header.js', 'src/eval/eval.js']
         }
       }
     },
@@ -31,7 +31,7 @@ module.exports = function(grunt) {
       build: {
         files: {
           'build/<%= pkg.name %>.min.js': ['build/<%= pkg.name %>.js'],
-          'build/<%= pkg.name %>_nurbs_eval.min.js': ['build/<%= pkg.name %>_nurbs_eval.js']
+          'build/<%= pkg.name %>Eval.min.js': ['build/<%= pkg.name %>Eval.js']
         }
       }
     },
@@ -46,6 +46,16 @@ module.exports = function(grunt) {
           reporter: 'tap'
         },
       }
+    },
+
+    // docs
+    docco: {
+      debug: {
+        src: ['build/verb.js'],
+        options: {
+          output: 'docs/'
+        }
+      }
     }
 
   });
@@ -53,8 +63,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-simple-mocha');
+  grunt.loadNpmTasks('grunt-docco');
 
-  var build_steps = ['concat', 'uglify'];
+  var build_steps = ['concat', 'uglify', 'docco'];
   grunt.registerTask('default', build_steps );
   grunt.registerTask('build', build_steps);
   grunt.registerTask('test', ['concat', 'simplemocha']);

@@ -1,3 +1,14 @@
+// ###new Cylinder(center, xaxis, yaxis, xradius, yradius)
+//
+// Constructor for Cylinder
+//
+// **params**
+// + *Array*, Length 3 array representing the axis of the cylinder
+// + *Array*, Length 3 array representing the x axis, perpendicular to the axis
+// + *Array*, Length 3 array representing the base of the cylinder
+// + *Number*, Height of the cylinder
+// + *Number*, Radius of the cylinder
+
 verb.geom.Cylinder = function(axis, xaxis, base, height, radius ) {
 
 	this.setAll({
@@ -16,9 +27,12 @@ verb.geom.Cylinder = function(axis, xaxis, base, height, radius ) {
 
 }.inherits(verb.geom.NurbsSurface);
 
+// #### nurbsRep()
+//
+// Construct the Nurbs representation
 verb.geom.Cylinder.prototype.nurbsRep = function() {
 
-  return this.nurbsEngine.eval_sync( 'get_cylinder_surface', 
+  return this.nurbsEngine.eval( 'get_cylinder_surface', 
 						  												 [ this.get("axis"), 
 						  												 	 this.get("xaxis"), 
 						  													 this.get("base"), 

@@ -1,9 +1,8 @@
-/**
- * Constructor for Geometry
- *
- * @api public
- */
-
+// ###new NurbsGeometry()
+//
+// Constructor for Geometry
+//
+// Geometry is the base class for all Geometry types
 verb.geom.Geometry = function() { 
 
 	verb.core.WatchObject.call(this);

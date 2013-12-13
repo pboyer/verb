@@ -1,3 +1,14 @@
+// ###new Cone(axis, xaxis, base, height, radius )
+//
+// Constructor for Cone
+//
+// **params**
+// + *Array*, Length 3 array representing the axis of the cone
+// + *Array*, Length 3 array representing the x axis, perpendicular to the axis
+// + *Array*, Length 3 array representing the base of the cone
+// + *Number*, Height of the cone
+// + *Number*, Radius of the cone
+
 verb.geom.Cone = function(axis, xaxis, base, height, radius ) {
 
 	verb.geom.NurbsSurface.call(this);
@@ -18,9 +29,12 @@ verb.geom.Cone = function(axis, xaxis, base, height, radius ) {
 
 }.inherits(verb.geom.NurbsSurface);
 
+// #### nurbsRep()
+//
+// Construct the Nurbs representation
 verb.geom.Cone.prototype.nurbsRep = function(){
 
-	return this.nurbsEngine.eval_sync( 'get_cone_surface', [ this.get("axis"), 
+	return this.nurbsEngine.eval( 'get_cone_surface', [ this.get("axis"), 
 															 this.get("xaxis"), 
 															 this.get("base"), 
 															 this.get("height"), 

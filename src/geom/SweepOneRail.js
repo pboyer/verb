@@ -1,3 +1,11 @@
+// ###new SweepOneRail( rail, profile )
+//
+// Constructor for a SweepOneRail
+//
+// **params**
+// + *NurbsCurve*, The path to sweep on
+// + *NurbsCurve*, The profile to sweep
+//
 verb.geom.SweepOneRail = function( rail, profile ) {
 
 	verb.geom.NurbsSurface.call(this);
@@ -13,9 +21,12 @@ verb.geom.SweepOneRail = function( rail, profile ) {
 
 }.inherits(verb.geom.NurbsSurface);
 
+// #### nurbsRep()
+//
+// Construct the Nurbs representation
 verb.geom.SweepOneRail.prototype.nurbsRep = function(){
 	
-  return this.nurbsEngine.eval_sync( 'get_sweep1_surface', 
+  return this.nurbsEngine.eval( 'get_sweep1_surface', 
 										[ this.get("profile").get("knots"), 
 										  this.get("profile").get("degree"),
 										  this.get("profile").get("controlPoints"),

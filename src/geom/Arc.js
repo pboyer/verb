@@ -1,3 +1,14 @@
+// ###new Arc(center, xaxis, yaxis, radius, interval) 
+//
+// Constructor for Arc
+//
+// **params**
+// + *Array*, Length 3 array representing the center of the arc
+// + *Array*, Length 3 array representing the xaxis
+// + *Array*, Length 3 array representing the perpendicular yaxis
+// + *Number*, Radius of the arc
+// + *Interval*, Interval object representing the interval of the arc
+
 verb.geom.Arc = function(center, xaxis, yaxis, radius, interval) {
 
 	verb.geom.NurbsCurve.call(this);
@@ -15,9 +26,12 @@ verb.geom.Arc = function(center, xaxis, yaxis, radius, interval) {
 
 }.inherits(verb.geom.NurbsCurve);
 
+// #### nurbsRep()
+//
+// Construct the Nurbs representation
 verb.geom.Arc.prototype.nurbsRep = function(){
 
-	return this.nurbsEngine.eval_sync( 'get_arc', [ this.get("center"), 
+	return this.nurbsEngine.eval( 'get_arc', [ this.get("center"), 
 													 this.get("xaxis"), 
 													 this.get("yaxis"), 
 													 this.get("radius"), 

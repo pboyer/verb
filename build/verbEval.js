@@ -1,17 +1,53 @@
-/**
- * Generate the control points, weights, and knots of an elliptical arc
- *
- * @param {Array} the center
- * @param {Array} the xaxis
- * @param {Array} orthogonal yaxis
- * @param {Number} xradius of the ellipse arc
- * @param {Number} yradius of the ellipse arc
- * @param {Number} start angle of the ellipse arc, between 0 and 2pi, where 0 points at the xaxis
- * @param {Number} end angle of the arc, between 0 and 2pi, greater than the start angle
- * @return {Object} an object with the following properties: control_points, weights, knots, degree
- * @api public
- */
+if ( typeof exports != 'object' || exports === undefined )  // browser context
+{
+	importScripts('labor.js');  
+	importScripts('binomial.js');  
+	importScripts('numeric-1.2.6.min.js');  
+}
+else // node.js context
+{
+	var labor = require('labor');
+}
 
+var verb = verb || {};
+verb.eval = verb.eval || {};
+verb.eval.nurbs = verb.eval.nurbs || {};
+verb.eval.mesh = verb.eval.mesh || {};
+verb.eval.geom = verb.eval.geom || {};
+verb.geom = verb.geom || {};
+verb.EPSILON = 1e-8;
+verb.TOLERANCE = 1e-3;
+
+var router = new labor.Router(verb.eval.nurbs);
+
+numeric.normalized = function(arr){
+	return numeric.div( arr, numeric.norm2(arr) );
+}
+
+numeric.cross = function(u, v){
+	return [u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
+}
+
+
+// ###verb.eval
+// This defines verb's core geometry library which is called by the current Engine.
+//
+// ####get_sweep1_surface( profile_knots, profile_degree, profile_control_points, profile_weights, rail_knots, rail_degree, rail_control_points, rail_weights )
+//
+// Generate the control points, weights, and knots of an elliptical arc
+//
+// **params**
+// + *Array*, the center
+// + *Array*, the xaxis
+// + *Array*, orthogonal yaxis
+// + *Number*, xradius of the ellipse arc
+// + *Number*, yradius of the ellipse arc
+// + *Number*, start angle of the ellipse arc, between 0 and 2pi, where 0 points at the xaxis
+// + *Number*, end angle of the arc, between 0 and 2pi, greater than the start angle
+// 
+// **returns** 
+// + *Object*, an object with the following properties: control_points, weights, knots, degree
+//
 verb.eval.nurbs.get_sweep1_surface = function( profile_knots, profile_degree, profile_control_points, profile_weights, rail_knots, rail_degree, rail_control_points, rail_weights ) {
 
 	// for each point on rail, move all of the points
@@ -49,19 +85,23 @@ verb.eval.nurbs.get_sweep1_surface = function( profile_knots, profile_degree, pr
 
 }
 
-/**
- * Generate the control points, weights, and knots of an elliptical arc
- *
- * @param {Array} the center
- * @param {Array} the xaxis
- * @param {Array} orthogonal yaxis
- * @param {Number} xradius of the ellipse arc
- * @param {Number} yradius of the ellipse arc
- * @param {Number} start angle of the ellipse arc, between 0 and 2pi, where 0 points at the xaxis
- * @param {Number} end angle of the arc, between 0 and 2pi, greater than the start angle
- * @return {Object} an object with the following properties: control_points, weights, knots, degree
- * @api public
- */
+//
+// ####get_ellipse_arc( center, xaxis, yaxis, xradius, yradius, start_angle, end_angle )
+//
+// Generate the control points, weights, and knots of an elliptical arc
+//
+// **params**
+// + *Array*, the center
+// + *Array*, the xaxis
+// + *Array*, orthogonal yaxis
+// + *Number*, xradius of the ellipse arc
+// + *Number*, yradius of the ellipse arc
+// + *Number*, start angle of the ellipse arc, between 0 and 2pi, where 0 points at the xaxis
+// + *Number*, end angle of the arc, between 0 and 2pi, greater than the start angle
+// 
+// **returns** 
+// + *Object*, an object with the following properties: control_points, weights, knots, degree
+//
 
 verb.eval.nurbs.get_ellipse_arc = function( center, xaxis, yaxis, xradius, yradius, start_angle, end_angle ) {
 
@@ -90,7 +130,7 @@ verb.eval.nurbs.get_ellipse_arc = function( center, xaxis, yaxis, xradius, yradi
 		, P0 = numeric.add( center, numeric.mul( xradius, Math.cos(start_angle), xaxis), numeric.mul( yradius, Math.sin(start_angle), yaxis ) )
 		, T0 = numeric.sub( numeric.mul( Math.cos(start_angle), yaxis ), numeric.mul( Math.sin(start_angle), xaxis) )
 		, Pw = verb.eval.nurbs.zeros_1d( narcs * 2 )
-		, U = verb.eval.nurbs.zeros_1d( 2 * narcs + 3 )
+		, U = verb.eval.nurbs.zeros_1d( 2 *narcs + 3 )
 		, index = 0
 		, angle = start_angle
 		, W = verb.eval.nurbs.zeros_1d( narcs * 2 );
@@ -122,7 +162,7 @@ verb.eval.nurbs.get_ellipse_arc = function( center, xaxis, yaxis, xradius, yradi
 		}
 	}
 
-	var j = 2 * narcs + 1;
+	var j = 2 *  narcs + 1;
 
 	for (var i = 0; i < 3; i++){
 		U[i] = 0.0;
@@ -143,16 +183,20 @@ verb.eval.nurbs.get_ellipse_arc = function( center, xaxis, yaxis, xradius, yradi
 
 }
 
-/**
- * Generate the control points, weights, and knots of a sphere
- *
- * @param {Array} the center of the sphere
- * @param {Array} normalized axis of sphere
- * @param {Array} vector perpendicular to axis of sphere, starting the rotation of the sphere
- * @param {Number} radius of the sphere
- * @return {Object} an object with the following properties: control_points, weights, knots_u, knots_v, degree_u, degree_v
- * @api public
- */
+//
+// ####get_sphere_surface( center, axis, xaxis, radius )
+//
+// Generate the control points, weights, and knots of a sphere
+//
+// **params**
+// + *Array*, the center of the sphere
+// + *Array*, normalized axis of sphere
+// + *Array*, vector perpendicular to axis of sphere, starting the rotation of the sphere
+// + *Number*, radius of the sphere
+// 
+// **returns** 
+// + *Object*, an object with the following properties: control_points, weights, knots_u, knots_v, degree_u, degree_v
+//
 
 verb.eval.nurbs.get_sphere_surface = function( center, axis, xaxis, radius ){
 
@@ -163,13 +207,17 @@ verb.eval.nurbs.get_sphere_surface = function( center, axis, xaxis, radius ){
 }
 
 
-/**
- * Generate the control points, weights, and knots of a polyline curve
- *
- * @param {Array} array of points in curve
- * @return {Object} an object with the following properties: control_points, weights, knots, degree
- * @api public
- */
+//
+// ####get_polyline_curve( pts )
+//
+// Generate the control points, weights, and knots of a polyline curve
+//
+// **params**
+// + *Array*, array of points in curve
+// 
+// **returns** 
+// + *Object*, an object with the following properties: control_points, weights, knots, degree
+//
 
 verb.eval.nurbs.get_polyline_curve = function( pts ){
 
@@ -199,16 +247,20 @@ verb.eval.nurbs.get_polyline_curve = function( pts ){
 			
 }
 
-/**
- * Generate the control points, weights, and knots of a surface define by 3 points
- *
- * @param {Array} first point in counter-clockwise form
- * @param {Array} second point in counter-clockwise form
- * @param {Array} third point in counter-clockwise form
- * @param {Array} forth point in counter-clockwise form
- * @return {Object} an object with the following properties: control_points, weights, knots_u, knots_v, degree_u, degree_v
- * @api public
- */
+//
+// ####get_4pt_surface( p1, p2, p3, p4 )
+//
+// Generate the control points, weights, and knots of a surface define by 3 points
+//
+// **params**
+// + *Array*, first point in counter-clockwise form
+// + *Array*, second point in counter-clockwise form
+// + *Array*, third point in counter-clockwise form
+// + *Array*, forth point in counter-clockwise form
+// 
+// **returns** 
+// + *Object*, an object with the following properties: control_points, weights, knots_u, knots_v, degree_u, degree_v
+//
 
 verb.eval.nurbs.get_4pt_surface = function( p1, p2, p3, p4 ){
 
@@ -221,17 +273,21 @@ verb.eval.nurbs.get_4pt_surface = function( p1, p2, p3, p4 ){
 			
 }
 
-/**
- * Generate the control points, weights, and knots of a cylinder
- *
- * @param {Array} normalized axis of cylinder
- * @param {Array} xaxis in plane of cylinder
- * @param {Array} position of base of cylinder
- * @param {Number} height from base to top
- * @param {Number} radius of the cylinder
- * @return {Object} an object with the following properties: control_points, weights, knots_u, knots_v, degree_u, degree_v
- * @api public
- */
+//
+// ####get_cylinder_surface( axis, xaxis, base, height, radius )
+//
+// Generate the control points, weights, and knots of a cylinder
+//
+// **params**
+// + *Array*, normalized axis of cylinder
+// + *Array*, xaxis in plane of cylinder
+// + *Array*, position of base of cylinder
+// + *Number*, height from base to top
+// + *Number*, radius of the cylinder
+// 
+// **returns** 
+// + *Object*, an object with the following properties: control_points, weights, knots_u, knots_v, degree_u, degree_v
+//
 
 verb.eval.nurbs.get_cylinder_surface = function( axis, xaxis, base, height, radius ){
 
@@ -243,16 +299,20 @@ verb.eval.nurbs.get_cylinder_surface = function( axis, xaxis, base, height, radi
 
 }
 
-/**
- * Generate the control points, weights, and knots of a cone
- *
- * @param {Array} normalized axis of cone
- * @param {Array} position of base of cone
- * @param {Number} height from base to tip
- * @param {Number} radius at the base of the cone
- * @return {Object} an object with the following properties: control_points, weights, knots, degree
- * @api public
- */
+//
+// ####get_cone_surface( axis, xaxis, base, height, radius )
+//
+// Generate the control points, weights, and knots of a cone
+//
+// **params**
+// + *Array*, normalized axis of cone
+// + *Array*, position of base of cone
+// + *Number*, height from base to tip
+// + *Number*, radius at the base of the cone
+// 
+// **returns** 
+// + *Object*, an object with the following properties: control_points, weights, knots, degree
+//
 
 verb.eval.nurbs.get_cone_surface = function( axis, xaxis, base, height, radius ){
 
@@ -266,17 +326,21 @@ verb.eval.nurbs.get_cone_surface = function( axis, xaxis, base, height, radius )
 
 }
 
-/**
- * Generate the control points, weights, and knots of an extruded surface
- *
- * @param {Array} axis of the extrusion
- * @param {Array} length of the extrusion
- * @param {Number} degree of the profile
- * @param {Number} control points of the profile
- * @param {Number} weights of the profile
- * @return {Object} an object with the following properties: control_points, weights, knots, degree
- * @api public
- */
+//
+// ####get_extruded_surface( axis, length, prof_knots, prof_degree, prof_control_points, prof_weights)
+//
+// Generate the control points, weights, and knots of an extruded surface
+//
+// **params**
+// + *Array*, axis of the extrusion
+// + *Array*, length of the extrusion
+// + *Number*, degree of the profile
+// + *Number*, control points of the profile
+// + *Number*, weights of the profile
+// 
+// **returns** 
+// + *Object*, an object with the following properties: control_points, weights, knots, degree
+//
 
 verb.eval.nurbs.get_extruded_surface = function( axis, length, prof_knots, prof_degree, prof_control_points, prof_weights){
 
@@ -306,19 +370,23 @@ verb.eval.nurbs.get_extruded_surface = function( axis, length, prof_knots, prof_
 			"weights": weights };
 }
 
-/**
- * Generate the control points, weights, and knots of a revolved surface
- * (Corresponds to Algorithm A7.1 from Piegl & Tiller)
- *
- * @param {Array} center of the rotation axis
- * @param {Array} axis of the rotation axis
- * @param {Number} angle to revolve around axis
- * @param {Number} degree of the generatrix
- * @param {Number} control points of the generatrix
- * @param {Number} weights of the generatrix
- * @return {Object} an object with the following properties: control_points, weights, knots, degree
- * @api public
- */
+//
+// ####get_revolved_surface( center, axis, theta, prof_knots, prof_degree, prof_control_points, prof_weights)
+//
+// Generate the control points, weights, and knots of a revolved surface
+// (Corresponds to Algorithm A7.1 from Piegl & Tiller)
+//
+// **params**
+// + *Array*, center of the rotation axis
+// + *Array*, axis of the rotation axis
+// + *Number*, angle to revolve around axis
+// + *Number*, degree of the generatrix
+// + *Number*, control points of the generatrix
+// + *Number*, weights of the generatrix
+// 
+// **returns** 
+// + *Object*, an object with the following properties: control_points, weights, knots, degree
+//
 
 // helper method
 
@@ -332,7 +400,7 @@ verb.eval.nurbs.get_revolved_surface = function( center, axis, theta, prof_knots
 
 	if (theta <= Math.PI / 2) { // less than 90
 		narcs = 1;
-		knots_u = verb.eval.nurbs.zeros_1d( 6 + 2 * (narcs-1) );
+		knots_u = verb.eval.nurbs.zeros_1d( 6 + 2  * (narcs-1) );
 	} else {
 		if (theta <= Math.PI){  // between 90 and 180
 			narcs = 2;
@@ -453,19 +521,23 @@ verb.eval.nurbs.get_revolved_surface = function( center, axis, theta, prof_knots
 
 }
 
-/**
- * Generate the control points, weights, and knots of an arbitrary arc
- * (Corresponds to Algorithm A7.1 from Piegl & Tiller)
- *
- * @param {Array} the center of the arc
- * @param {Array} the xaxis of the arc
- * @param {Array} orthogonal yaxis of the arc
- * @param {Number} radius of the arc
- * @param {Number} start angle of the arc, between 0 and 2pi
- * @param {Number} end angle of the arc, between 0 and 2pi, greater than the start angle
- * @return {Object} an object with the following properties: control_points, weights, knots, degree
- * @api public
- */
+//
+// ####get_arc( center, xaxis, yaxis, radius, start_angle, end_angle )
+//
+// Generate the control points, weights, and knots of an arbitrary arc
+// (Corresponds to Algorithm A7.1 from Piegl & Tiller)
+//
+// **params**
+// + *Array*, the center of the arc
+// + *Array*, the xaxis of the arc
+// + *Array*, orthogonal yaxis of the arc
+// + *Number*, radius of the arc
+// + *Number*, start angle of the arc, between 0 and 2pi
+// + *Number*, end angle of the arc, between 0 and 2pi, greater than the start angle
+// 
+// **returns** 
+// + *Object*, an object with the following properties: control_points, weights, knots, degree
+//
 
 verb.eval.nurbs.get_arc = function( center, xaxis, yaxis, radius, start_angle, end_angle ) {
 
@@ -473,20 +545,15 @@ verb.eval.nurbs.get_arc = function( center, xaxis, yaxis, radius, start_angle, e
 
 }
 
-/**
- * Intersect two NURBS surfaces
- *
- * @param {Number} integer degree of surface in u direction
- * @param {Array} array of nondecreasing knot values in u direction
- * @param {Number} integer degree of surface in v direction
- * @param {Array} array of nondecreasing knot values in v direction
- * @param {Array} 3d array of control points, top to bottom is increasing u direction, left to right is increasing v direction,
- 									and where each control point is an array of length (dim+1)
- * @param {Number} u parameter at which to evaluate the surface point
- * @param {Number} v parameter at which to evaluate the surface point
- * @return {Array} a point represented by an array of length (dim)
- * @api public
- */
+//
+// ####intersect_rational_surfaces( not, sure, yet )
+//
+// Intersect two NURBS surfaces
+//
+// **params**
+// 
+// **returns** 
+//
 
 verb.eval.nurbs.intersect_rational_surfaces = function( not, sure, yet ) {
 
@@ -496,20 +563,24 @@ verb.eval.nurbs.intersect_rational_surfaces = function( not, sure, yet ) {
 
 }
 
-/**
- * Intersect two meshes via aabb intersection
- *
- * @param {Number} integer degree of surface in u direction
- * @param {Array} array of nondecreasing knot values in u direction
- * @param {Number} integer degree of surface in v direction
- * @param {Array} array of nondecreasing knot values in v direction
- * @param {Array} 3d array of control points, top to bottom is increasing u direction, left to right is increasing v direction,
- 									and where each control point is an array of length (dim+1)
- * @param {Number} u parameter at which to evaluate the surface point
- * @param {Number} v parameter at which to evaluate the surface point
- * @return {Array} a point represented by an array of length (dim)
- * @api public
- */
+//
+// ####intersect_meshes( vertices1, triangles1, uvs1, aabb1, vertices2, triangles2, uvs2, aabb2)
+//
+// Intersect two meshes
+//
+// **params**
+// + *Number*, integer degree of surface in u direction
+// + *Array*, array of nondecreasing knot values in u direction
+// + *Number*, integer degree of surface in v direction
+// + *Array*, array of nondecreasing knot values in v direction
+// + *Array*, 3d array of control points, top to bottom is increasing u direction, left to right is increasing v direction,
+// and where each control point is an array of length (dim+1)
+// + *Number*, u parameter at which to evaluate the surface point
+// + *Number*, v parameter at which to evaluate the surface point
+// 
+// **returns** 
+// + *Array*, a point represented by an array of length (dim)
+//
 
 verb.eval.mesh.intersect_meshes = function( vertices1, triangles1, uvs1, aabb1, vertices2, triangles2, uvs2, aabb2) {
 
@@ -525,20 +596,24 @@ verb.eval.mesh.intersect_meshes = function( vertices1, triangles1, uvs1, aabb1, 
 
 }
 
-/**
- * Intersect two meshes via aabb intersection
- *
- * @param {Number} integer degree of surface in u direction
- * @param {Array} array of nondecreasing knot values in u direction
- * @param {Number} integer degree of surface in v direction
- * @param {Array} array of nondecreasing knot values in v direction
- * @param {Array} 3d array of control points, top to bottom is increasing u direction, left to right is increasing v direction,
- 									and where each control point is an array of length (dim+1)
- * @param {Number} u parameter at which to evaluate the surface point
- * @param {Number} v parameter at which to evaluate the surface point
- * @return {Array} a point represented by an array of length (dim)
- * @api public
- */
+//
+// ####intersect_meshes_by_aabb( points1, tris1, uvs1, points2, tris2, uvs2 )
+//
+// Intersect two meshes via aabb intersection
+//
+// **params**
+// + *Number*, integer degree of surface in u direction
+// + *Array*, array of nondecreasing knot values in u direction
+// + *Number*, integer degree of surface in v direction
+// + *Array*, array of nondecreasing knot values in v direction
+// + *Array*, 3d array of control points, top to bottom is increasing u direction, left to right is increasing v direction,
+// and where each control point is an array of length (dim+1)
+// + *Number*, u parameter at which to evaluate the surface point
+// + *Number*, v parameter at which to evaluate the surface point
+// 
+// **returns** 
+// + *Array*, a point represented by an array of length (dim)
+//
 
 verb.eval.mesh.intersect_meshes_by_aabb = function( points1, tris1, uvs1, points2, tris2, uvs2 ) {
 
@@ -557,20 +632,23 @@ verb.eval.mesh.intersect_meshes_by_aabb = function( points1, tris1, uvs1, points
 
 }
 
-/**
- * Intersect two triangles
- *
- * @param {Array} array of length 3 arrays of numbers representing the points of mesh1
- * @param {Array} array of length 3 arrays of number representing the triangles of mesh1
- * @param {Array} array of length 3 arrays of numbers representing the points of mesh2
- * @param {Array} array of length 3 arrays of number representing the triangles of mesh2
- * @return {Array} a point represented by an array of length (dim)
- * @api public
- */
+//
+// ####intersect_tris( points1, tri1, uvs1, points2, tri2, uvs2 )
+//
+// Intersect two triangles
+//
+// **params**
+// + *Array*, array of length 3 arrays of numbers representing the points of mesh1
+// + *Array*, array of length 3 arrays of number representing the triangles of mesh1
+// + *Array*, array of length 3 arrays of numbers representing the points of mesh2
+// + *Array*, array of length 3 arrays of number representing the triangles of mesh2
+// 
+// **returns** 
+// + *Array*, a point represented by an array of length (dim)
+//
 
 verb.eval.geom.intersect_tris = function( points1, tri1, uvs1, points2, tri2, uvs2 ) {
 
-	// unpack the input
   var seg1a = [ points1[ tr1[0] ], points1[ tr1[1] ] ]
   	, seg1b = [ points1[ tr1[1] ], points1[ tr1[2] ] ]
   	, seg1c = [ points1[ tr1[2] ], points1[ tr1[0] ] ]
@@ -640,21 +718,26 @@ verb.eval.geom.intersect_tris = function( points1, tri1, uvs1, points2, tri2, uv
 
 }
 
-/**
- *  Intersect ray/segment with triangle (from http://geomalgorithms.com/a06-_intersect-2.html)
- *
- *  If intersecting a ray, the param needs to be between 0 and 1 and the caller is responsible
- *  for making that check
- *
- * @param {Array} array of length 3 representing first point of the segment
- * @param {Array} array of length 3 representing second point of the segment
- * @param {Array} array of length 3 arrays representing the points of the triangle
- * @param {Array} array of length 3 containing int indices in the array of points, this allows passing a full mesh
- * @return {Object} an object with an "intersects" property that is true or false and if true, a 
- 			"s" property giving the param on u, and "t" is the property on v, a "point" property
- 			where the intersection took place, and "p" property representing the parameter along the segment
- * @api public
- */
+//
+// ####intersect_segment_with_tri(  p1, p0, points, tri )
+//
+//  Intersect ray/segment with triangle (from http://geomalgorithms.com/a06-_intersect-2.html)
+//
+//  If intersecting a ray, the param needs to be between 0 and 1 and the caller is responsible
+//  for making that check
+//
+// **params**
+// + *Array*, array of length 3 representing first point of the segment
+// + *Array*, array of length 3 representing second point of the segment
+// + *Array*, array of length 3 arrays representing the points of the triangle
+// + *Array*, array of length 3 containing int indices in the array of points, this allows passing a full mesh
+// 
+// **returns** 
+// + *Object*, an object with an "intersects" property that is true or false and if true, a 
+// "" property giving the param on u, and "t" is the property on v, a "point" property
+// where the intersection took place, and "p" property representing the parameter along the segment
+
+//
 
 verb.eval.geom.intersect_segment_with_tri = function( p1, p0, points, tri ) {
 
@@ -685,26 +768,32 @@ verb.eval.geom.intersect_segment_with_tri = function( p1, p0, points, tri ) {
 
 }
 
-/**
- *  Intersect ray/segment with plane (from http://geomalgorithms.com/a06-_intersect-2.html)
- *
- *  If intersecting a ray, the param needs to be between 0 and 1 and the caller is responsible
- *  for making that check
- *
- * @param {Array} array of length 3 representing first point of the segment
- * @param {Array} array of length 3 representing second point of the segment
- * @param {Array} array of length 3 representing an origin point on the plane
- * @param {Array} array of length 3 representing the normal of the plane
- * @return {Object} an object with an "intersects" property that is true or false and if true, a 
- 			"param" property giving the intersection parameter on the ray/segment.  
- * @api public
- */
+//
+// ####intersect_segment_with_plane( p0, p1, v0, n )
+//
+//  Intersect ray/segment with plane (from http://geomalgorithms.com/a06-_intersect-2.html)
+//
+//  If intersecting a ray, the param needs to be between 0 and 1 and the caller is responsible
+//  for making that check
+//
+// **params**
+// + *Array*, array of length 3 representing first point of the segment
+// + *Array*, array of length 3 representing second point of the segment
+// + *Array*, array of length 3 representing an origin point on the plane
+// + *Array*, array of length 3 representing the normal of the plane
+// 
+// **returns** 
+// + *Object*, an object with an "intersects" property that is true or false and if true, a 
+// "aram" property giving the intersection parameter on the ray/segment.  
+
+//
 
 verb.eval.geom.intersect_segment_with_plane = function( p0, p1, v0, n ) {
 
 	var denom = numeric.dot( n, numeric.sub(p0,p1) );
 
-	if ( abs( denom ) < EPSILON ) { // parallel case
+	// parallel case
+	if ( abs( denom ) < EPSILON ) { 
    	return null;
  	}
 
@@ -714,18 +803,22 @@ verb.eval.geom.intersect_segment_with_plane = function( p0, p1, v0, n ) {
 
 }
 
-/**
- *  Intersect two aabb trees - a recursive function
- *
- * @param {Array} array of length 3 arrays of numbers representing the points of mesh1
- * @param {Array} array of length 3 arrays of number representing the triangles of mesh1
- * @param {Array} array of length 3 arrays of numbers representing the points of mesh2
- * @param {Array} array of length 3 arrays of number representing the triangles of mesh2
- * @param {Object} nested object representing the aabb tree of the first mesh
- * @param {Object} nested object representing the aabb tree of the second mesh
- * @return {Array} a list of pairs of triangle indices for mesh1 and mesh2 that are intersecting
- * @api public
- */
+//
+// ####intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1, aabb_tree2 )
+//
+//  Intersect two aabb trees - a recursive function
+//
+// **params**
+// + *Array*, array of length 3 arrays of numbers representing the points of mesh1
+// + *Array*, array of length 3 arrays of number representing the triangles of mesh1
+// + *Array*, array of length 3 arrays of numbers representing the points of mesh2
+// + *Array*, array of length 3 arrays of number representing the triangles of mesh2
+// + *Object*, nested object representing the aabb tree of the first mesh
+// + *Object*, nested object representing the aabb tree of the second mesh
+// 
+// **returns** 
+// + *Array*, a list of pairs of triangle indices for mesh1 and mesh2 that are intersecting
+//
 
 verb.eval.geom.intersect_aabb_trees = function( points1, tris1, points2, tris2, aabb_tree1, aabb_tree2 ) {
 
@@ -760,16 +853,19 @@ verb.eval.geom.intersect_aabb_trees = function( points1, tris1, points2, tris2, 
 
 }
 
-
-/**
- * Make tree of axis aligned bounding boxes 
- *
- * @param {Array} array of length 3 arrays of numbers representing the points
- * @param {Array} array of length 3 arrays of number representing the triangles
- * @param {Array} array of numbers representing the relevant triangles to use to form aabb
- * @return {Array} a point represented by an array of length (dim)
- * @api public
- */
+//
+// ####make_mesh_aabb_tree( points, tris, tri_indices )
+//
+// Make tree of axis aligned bounding boxes 
+//
+// **params**
+// + *Array*, array of length 3 arrays of numbers representing the points
+// + *Array*, array of length 3 arrays of number representing the triangles
+// + *Array*, array of numbers representing the relevant triangles to use to form aabb
+// 
+// **returns** 
+// + *Array*, a point represented by an array of length (dim)
+//
 
 verb.eval.mesh.make_mesh_aabb_tree = function( points, tris, tri_indices ) {
 
@@ -797,15 +893,20 @@ verb.eval.mesh.make_mesh_aabb_tree = function( points, tris, tri_indices ) {
 
 }
 
-/**
- * Form axis-aligned bounding box from triangles of mesh
- *
- * @param {Array} array of length 3 arrays of numbers representing the points
- * @param {Array} array of length 3 arrays of number representing the triangles
- * @param {Array} array of numbers representing the relevant triangles
- * @return {Array} a point represented by an array of length (dim)
- * @api public
- */
+
+//
+// ####make_mesh_aabb( points, tris, tri_indices )
+//
+// Form axis-aligned bounding box from triangles of mesh
+//
+// **params**
+// + *Array*, array of length 3 arrays of numbers representing the points
+// + *Array*, array of length 3 arrays of number representing the triangles
+// + *Array*, array of numbers representing the relevant triangles
+// 
+// **returns** 
+// + *Array*, a point represented by an array of length (dim)
+//
 
 verb.eval.mesh.make_mesh_aabb = function( points, tris, tri_indices ) {
 
@@ -825,33 +926,28 @@ verb.eval.mesh.make_mesh_aabb = function( points, tris, tri_indices ) {
 
 }
 
-/**
- * Sort triangles on longest axis
- *
- * @param {Number} integer degree of surface in u direction
- * @param {Array} array of nondecreasing knot values in u direction
- * @param {Number} integer degree of surface in v direction
- * @param {Array} array of nondecreasing knot values in v direction
- * @return {Array} a point represented by an array of length (dim)
- * @api public
- */
+//
+// ####sort_tris_on_longest_axis( container_bb, points, tris, tri_indices )
+//
+// Sort triangles on longest axis
+//
+// **params**
+// + *Number*, integer degree of surface in u direction
+// + *Array*, array of nondecreasing knot values in u direction
+// + *Number*, integer degree of surface in v direction
+// + *Array*, array of nondecreasing knot values in v direction
+// 
+// **returns** 
+// + *Array*, a point represented by an array of length (dim)
+//
 
 verb.eval.mesh.sort_tris_on_longest_axis = function( container_bb, points, tris, tri_indices ) {
 
-	// get longest axis of bb
 	var long_axis = container_bb.get_longest_axis();
 
-	// map position on longest axis to index in tri_indices
 	var axis_position_map = [];
 	for (var i = tri_indices.length - 1; i >= 0; i--) {
 
-		// centroid-centered
-
-		// var tri_i = tri_indices[i], 
-		// 	tri_centroid = verb.eval.geom.get_tri_centroid( points, tris[ tri_i ] );
-		// axis_position_map.push( [ tri_centroid[long_axis], tri_i ] );
-
-		// min position
 		var tri_i = tri_indices[i],
 			tri_min = verb.eval.mesh.get_min_coordinate_on_axis( points, tris[ tri_i ], long_axis );
 
@@ -859,10 +955,8 @@ verb.eval.mesh.sort_tris_on_longest_axis = function( container_bb, points, tris,
 
 	}
 
-	// sort by axis position
 	axis_position_map.sort(function(a,b) { return a[0] > b[0] } );
 
-	// box up the tri_indices in sorted_order
 	var sorted_tri_indices = [];
 	for (var i = 0, l = axis_position_map.length; i < l; i++) {
 		sorted_tri_indices.push( axis_position_map[i][1] );
@@ -872,20 +966,23 @@ verb.eval.mesh.sort_tris_on_longest_axis = function( container_bb, points, tris,
 
 }
 
-/**
- * Get min coordinate on axis
- *
- * @param {Array} array of length 3 arrays of numbers representing the points
- * @param {Array} length 3 array of point indices for the triangle
- * @return {Number} a point represented by an array of length 3
- * @api public
- */
+//
+// ####get_min_coordinate_on_axis( points, tri, axis )
+//
+// Get min coordinate on axis
+//
+// **params**
+// + *Array*, array of length 3 arrays of numbers representing the points
+// + *Array*, length 3 array of point indices for the triangle
+// 
+// **returns** 
+// + *Number*, a point represented by an array of length 3
+//
 
 verb.eval.mesh.get_min_coordinate_on_axis = function( points, tri, axis ) {
 
 	var axis_coords = [];
 
-	// for each vertex
 	for (var i = 0; i < 3; i++){
 		axis_coords.push( points[ tri[i] ][ axis ] );
 	}
@@ -893,22 +990,24 @@ verb.eval.mesh.get_min_coordinate_on_axis = function( points, tri, axis ) {
 	return Math.min.apply(Math, axis_coords);
 };
 
-/**
- * Get triangle centroid
- *
- * @param {Array} array of length 3 arrays of numbers representing the points
- * @param {Array} length 3 array of point indices for the triangle
- * @return {Array} a point represented by an array of length 3
- * @api public
- */
+//
+// ####get_tri_centroid( points, tri )
+//
+// Get triangle centroid
+//
+// **params**
+// + *Array*, array of length 3 arrays of numbers representing the points
+// + *Array*, length 3 array of point indices for the triangle
+// 
+// **returns** 
+// + *Array*, a point represented by an array of length 3
+//
 
 verb.eval.geom.get_tri_centroid = function( points, tri ) {
 
 	var centroid = [0,0,0];
 
-	// for each vertex
 	for (var i = 0; i < 3; i++){
-		// for each point index
 		for (var j = 0; j < 3; j++){
 			centroid[j] += points[ tri[i] ][j];
 		}
@@ -922,14 +1021,18 @@ verb.eval.geom.get_tri_centroid = function( points, tri ) {
 
 };
 
-/**
- * Get triangle normal
- *
- * @param {Array} array of length 3 arrays of numbers representing the points
- * @param {Array} length 3 array of point indices for the triangle
- * @return {Array} a normal vector represented by an array of length 3
- * @api public
- */
+//
+// ####get_tri_norm( points, tri )
+//
+// Get triangle normal
+//
+// **params**
+// + *Array*, array of length 3 arrays of numbers representing the points
+// + *Array*, length 3 array of point indices for the triangle
+// 
+// **returns** 
+// + *Array*, a normal vector represented by an array of length 3
+//
 
 verb.eval.geom.get_tri_norm = function( points, tri ) {
 
@@ -944,19 +1047,22 @@ verb.eval.geom.get_tri_norm = function( points, tri ) {
 
 };
 
-/**
- * Tesselate an untrimmed nurbs surface
- *
- * @param {Number} integer degree of surface in u direction
- * @param {Array} array of nondecreasing knot values in u direction
- * @param {Number} integer degree of surface in v direction
- * @param {Array} array of nondecreasing knot values in v direction
- * @param {Array} 3d array of control points, top to bottom is increasing u direction, left to right is increasing v direction,
- 									and where each control point is an array of length (dim+1)
- * @return {Array} first element of array is an array of positions, second element are 3-tuple of triangle windings, third element is the 
-                   uvs
- * @api public
- */
+//
+// ####tesselate_rational_surface_naive( degree_u, knots_u, degree_v, knots_v, homo_control_points, divs_u, divs_v )
+//
+// Tesselate a nurbs surface
+//
+// **params**
+// + *Number*, integer degree of surface in u direction
+// + *Array*, array of nondecreasing knot values in u direction
+// + *Number*, integer degree of surface in v direction
+// + *Array*, array of nondecreasing knot values in v direction
+// + *Array*, 3d array of control points, top to bottom is increasing u direction, left to right is increasing v direction,
+// and where each control point is an array of length (dim+1)
+// 
+// **returns** 
+// + *Array*, first element of array is an array of positions, second element are 3-tuple of triangle windings, third element is the 
+                  // uvs
 
 verb.eval.nurbs.tesselate_rational_surface_naive = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, divs_u, divs_v ) {
 
@@ -976,7 +1082,6 @@ verb.eval.nurbs.tesselate_rational_surface_naive = function( degree_u, knots_u, 
   var uvs = [];
   var normals = [];
 
-  // generate all points
 	for (var i = 0; i < divs_u + 1; i++) {
 		for (var j = 0; j < divs_v + 1; j++) {
 
@@ -993,28 +1098,11 @@ verb.eval.nurbs.tesselate_rational_surface_naive = function( degree_u, knots_u, 
 			var normal = numeric.cross(  derivs[0][1], derivs[1][0] );
 			normals.push( normal );
 
-			// points.push( verb.eval.nurbs.rational_surface_point( degree_u, knots_u,  degree_v, knots_v, homo_control_points, pt_u, pt_v ) );
-
 		}
 	}
 
-  //  u dir
-  //  |
-  //  v 
-  //
-  //  v dir -->
-  //
-	//  a ---- d 
-	//  | \    |
-	//  |  \   |
- 	//  |   \  |
-	//  |    \ | 
-	//	b ---- c 
-  //
+  	var faces = [];
 
-  var faces = [];
-
-  // generate all faces
 	for (var i = 0; i < divs_u ; i++) {
 		for (var j = 0; j < divs_v ; j++) {
 
@@ -1035,22 +1123,26 @@ verb.eval.nurbs.tesselate_rational_surface_naive = function( degree_u, knots_u, 
 
 }
 
-/**
- * Refine an intersection pair for two curves given an initial guess.  This is an unconstrained minimization,
- * so the caller is responsible for providing a very good initial guess.
- *
- * @param {Number} integer degree of curve1
- * @param {Array} array of nondecreasing knot values for curve 1
- * @param {Array} 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
- 									and form (wi*pi, wi) for curve 1
- * @param {Number} integer degree of curve2
- * @param {Array} array of nondecreasing knot values for curve 2
- * @param {Array} 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
- 									and form (wi*pi, wi) for curve 2
- * @param {Array} length 2 array with first param guess in first position and second param guess in second position
- * @return {Array} a length 3 array containing the [ distance * distance, u1, u2 ]
- * @api public
- */
+//
+// ####rational_curve_curve_bb_intersect_refine( degree1, knots1, control_points1, degree2, knots2, control_points2, start_params )
+//
+// Refine an intersection pair for two curves given an initial guess.  This is an unconstrained minimization,
+// so the caller is responsible for providing a very good initial guess.
+//
+// **params**
+// + *Number*, integer degree of curve1
+// + *Array*, array of nondecreasing knot values for curve 1
+// + *Array*, 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
+ 									// and form (wi*pi, wi) for curve 1
+// + *Number*, integer degree of curve2
+// + *Array*, array of nondecreasing knot values for curve 2
+// + *Array*, 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
+ 									// and form (wi*pi, wi) for curve 2
+// + *Array*, length 2 array with first param guess in first position and second param guess in second position
+// 
+// **returns** 
+// + *Array*, a length 3 array containing the [ distance// distance, u1, u2 ]
+//
 
 verb.eval.nurbs.rational_curve_curve_bb_intersect_refine = function( degree1, knots1, control_points1, degree2, knots2, control_points2, start_params ) {
 
@@ -1061,7 +1153,6 @@ verb.eval.nurbs.rational_curve_curve_bb_intersect_refine = function( degree1, kn
 			, p1_p2 = numeric.sub(p1, p2);
 
 		return numeric.dot(p1_p2, p1_p2);
-
 	}
 
 	var sol_obj = numeric.uncmin( objective, start_params);
@@ -1070,45 +1161,50 @@ verb.eval.nurbs.rational_curve_curve_bb_intersect_refine = function( degree1, kn
 
 }
 
-/**
- * Intersect two NURBS curves
- *
- * @param {Number} integer degree of curve1
- * @param {Array} array of nondecreasing knot values for curve 1
- * @param {Array} 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
- 									and form (wi*pi, wi) for curve 1
- * @param {Number} integer degree of curve2
- * @param {Array} array of nondecreasing knot values for curve 2
- * @param {Array} 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
- 									and form (wi*pi, wi) for curve 2
- * @param {Number} tolerance for the intersection
- * @return {Array} a 2d array specifying the intersections on u params of intersections on curve 1 and cruve 2
- * @api public
- */
+//
+// ####intersect_rational_curves_by_aabb( degree1, knots1, control_points1, degree2, knots2, control_points2, sample_tol, tol )
+//
+// Intersect two NURBS curves
+//
+// **params**
+// + *Number*, integer degree of curve1
+// + *Array*, array of nondecreasing knot values for curve 1
+// + *Array*, 2d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi) for curve 1
+// + *Number*, integer degree of curve2
+// + *Array*, array of nondecreasing knot values for curve 2
+// + *Array*, 2d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi) for curve 2
+// + *Number*, tolerance for the intersection
+// 
+// **returns** 
+// + *Array*, a 2d array specifying the intersections on u params of intersections on curve 1 and cruve 2
+//
 
 verb.eval.nurbs.intersect_rational_curves_by_aabb = function( degree1, knots1, control_points1, degree2, knots2, control_points2, sample_tol, tol ) {
 
-	// sample the two curves adaptively
 	var up1 = verb.eval.nurbs.rational_curve_adaptive_sample( degree1, knots1, control_points1, sample_tol )
 		, up2 = verb.eval.nurbs.rational_curve_adaptive_sample( degree1, knots1, control_points1, sample_tol )
-		, u1 = _.map(up1, function(el) { return el[0]; })
-		, u2 = _.map(up2, function(el) { return el[0]; })
-		, p1 = _.map(up1, function(el) { return el.slice(1) })
-		, p2 = _.map(up2, function(el) { return el.slice(1) });
+		, u1 = up1.map( function(el) { return el[0]; })
+		, u2 = up2.map( function(el) { return el[0]; })
+		, p1 = up1.map( function(el) { return el.slice(1) })
+		, p2 = up2.map( function(el) { return el.slice(1) });
 
 	return verb.eval.nurbs.intersect_parametric_polylines_by_aabb( p1, p2, u1, u2, tol );
 
 }
 
-/**
- * Intersect two polyline curves, keeping track of parameterization on each
- *
- * @param {Array} array of [parameter point] values for curve 1
- * @param {Array} array of [parameter point] values for curve 2
- * @param {Number} tolerance for the intersection
- * @return {Array} a 2d array specifying the intersections on u params of intersections on curve 1 and cruve 2
- * @api public
- */
+//
+// ####intersect_parametric_polylines_by_aabb( p1, p2, u1, u2, tol )
+//
+// Intersect two polyline curves, keeping track of parameterization on each
+//
+// **params**
+// + *Array*, array of [parameter point] values for curve 1
+// + *Array*, array of [parameter point] values for curve 2
+// + *Number*, tolerance for the intersection
+// 
+// **returns** 
+// + *Array*, a 2d array specifying the intersections on u params of intersections on curve 1 and cruve 2
+//
 
 verb.eval.nurbs.intersect_parametric_polylines_by_aabb = function( p1, p2, u1, u2, tol ) {
 
@@ -1123,7 +1219,6 @@ verb.eval.nurbs.intersect_parametric_polylines_by_aabb = function( p1, p2, u1, u
 
 			if ( inter != null ){
 
-				// replace with interpolant
 			 	inter[0][0] = inter[0][0] * ( u1[1]-u1[0] ) + u1[0];
 			 	inter[1][0] = inter[1][0] * ( u2[1]-u2[0] ) + u2[0];
 
@@ -1177,17 +1272,21 @@ verb.eval.nurbs.intersect_parametric_polylines_by_aabb = function( p1, p2, u1, u
 
 }
 
-/**
- * Find the closest parameter on two rays, see http://geomalgorithms.com/a07-_distance.html
- *
- * @param {Array} first point on a
- * @param {Array} second point on a
- * @param {Array} first point on b
- * @param {Array} second point on b
- * @param {Number} tolerance for the intersection
- * @return {Array} a 2d array specifying the intersections on u params of intersections on curve 1 and cruve 2
- * @api public
- */
+//
+// ####intersect_segments( a0, a1, b0, b1, tol )
+//
+// Find the closest parameter on two rays, see http://geomalgorithms.com/a07-_distance.html
+//
+// **params**
+// + *Array*, first point on a
+// + *Array*, second point on a
+// + *Array*, first point on b
+// + *Array*, second point on b
+// + *Number*, tolerance for the intersection
+// 
+// **returns** 
+// + *Array*, a 2d array specifying the intersections on u params of intersections on curve 1 and cruve 2
+//
 
 verb.eval.geom.intersect_segments = function( a0, a1, b0, b1, tol ) {
 
@@ -1218,15 +1317,19 @@ verb.eval.geom.intersect_segments = function( a0, a1, b0, b1, tol ) {
 
  }
 
-/**
- * Find the closest point on a ray
- *
- * @param {Array} point to project
- * @param {Array} origin for ray
- * @param {Array} direction of ray 1, assumed normalized
- * @return {Array} [param, pt]
- * @api public
- */
+//
+// ####closest_point_on_ray( pt, o, r )
+//
+// Find the closest point on a ray
+//
+// **params**
+// + *Array*, point to project
+// + *Array*, origin for ray
+// + *Array*, direction of ray 1, assumed normalized
+// 
+// **returns** 
+// + *Array*, [param, pt]
+//
 
 verb.eval.geom.closest_point_on_ray = function( pt, o, r ) {
 
@@ -1238,16 +1341,20 @@ verb.eval.geom.closest_point_on_ray = function( pt, o, r ) {
 
  }
 
-/**
- * Find the closest parameter on two rays, see http://geomalgorithms.com/a07-_distance.html
- *
- * @param {Array} origin for ray 1
- * @param {Array} direction of ray 1, assumed normalized
- * @param {Array} origin for ray 1
- * @param {Array} direction of ray 1, assumed normalized
- * @return {Array} a 2d array specifying the intersections on u params of intersections on curve 1 and curve 2
- * @api public
- */
+//
+// ####intersect_rays( a0, a, b0, b )
+//
+// Find the closest parameter on two rays, see http://geomalgorithms.com/a07-_distance.html
+//
+// **params**
+// + *Array*, origin for ray 1
+// + *Array*, direction of ray 1, assumed normalized
+// + *Array*, origin for ray 1
+// + *Array*, direction of ray 1, assumed normalized
+// 
+// **returns** 
+// + *Array*, a 2d array specifying the intersections on u params of intersections on curve 1 and curve 2
+//
 
 verb.eval.geom.intersect_rays = function( a0, a, b0, b ) {
 
@@ -1260,7 +1367,8 @@ verb.eval.geom.intersect_rays = function( a0, a, b0, b ) {
 		   dbb = numeric.dot( b, b ),
 		   div = daa*dbb - dab*dab;
 
-   if ( Math.abs( div ) < verb.EPSILON ) { // parallel case
+	// parallel case
+   if ( Math.abs( div ) < verb.EPSILON ) { 
 	   return null;
    }
 
@@ -1273,16 +1381,20 @@ verb.eval.geom.intersect_rays = function( a0, a, b0, b ) {
  }
 
 
-/**
- * Sample a NURBS curve assuming parameterization 0 to 1, corresponds to http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf
- *
- * @param {Number} integer degree
- * @param {Array} array of nondecreasing knot values 
- * @param {Array} 1d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi) 
- * @param {Number} integer number of samples
- * @return {Array} an dictionary of parameter - point pairs
- * @api public
- */
+//
+// ####rational_curve_regular_sample( degree, knots, control_points, num_samples [, include_u] )
+//
+// Sample a NURBS curve assuming parameterization 0 to 1, corresponds to http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf
+//
+// **params**
+// + *Number*, integer degree
+// + *Array*, array of nondecreasing knot values 
+// + *Array*, 1d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi) 
+// + *Number*, integer number of samples
+// 
+// **returns** 
+// + *Array*, an dictionary of parameter - point pairs
+//
 
 verb.eval.nurbs.rational_curve_regular_sample = function( degree, knots, control_points, num_samples, include_u ) {
 
@@ -1290,19 +1402,23 @@ verb.eval.nurbs.rational_curve_regular_sample = function( degree, knots, control
 
 }
 
-/**
- * Sample a NURBS curve assuming parameterization 0 to 1, corresponds to http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf
- *
- * @param {Number} integer degree
- * @param {Array} array of nondecreasing knot values 
- * @param {Array} 1d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi) 
- * @param {Number} start parameter for sampling
- * @param {Number} end parameter for sampling
- * @param {Number} integer number of samples
- * @param {Boolean} whether to prefix the point with the parameter
- * @return {Array} an dictionary of parameter - point pairs
- * @api public
- */
+//
+// ####rational_curve_regular_sample_range( degree, knots, control_points, start_u, end_u, num_samples, include_u )
+//
+// Sample a NURBS curve assuming parameterization 0 to 1, corresponds to http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf
+//
+// **params**
+// + *Number*, integer degree
+// + *Array*, array of nondecreasing knot values 
+// + *Array*, 1d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi) 
+// + *Number*, start parameter for sampling
+// + *Number*, end parameter for sampling
+// + *Number*, integer number of samples
+// + *Boolean*, whether to prefix the point with the parameter
+// 
+// **returns** 
+// + *Array*, an dictionary of parameter - point pairs
+//
 
 verb.eval.nurbs.rational_curve_regular_sample_range = function( degree, knots, control_points, start_u, end_u, num_samples, include_u ) {
 
@@ -1329,18 +1445,22 @@ verb.eval.nurbs.rational_curve_regular_sample_range = function( degree, knots, c
 
 }
 
-/**
- * Sample a NURBS curve assuming parameterization 0 to 1, corresponds to http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf
- *
- * @param {Number} integer degree
- * @param {Array} array of nondecreasing knot values 
- * @param {Array} 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
- 									and form (wi*pi, wi) 
- * @param {Number} tolerance for the adaptive scheme
- * @param {Boolean} whether to prefix the point with the parameter
- * @return {Array} an array of dim + 1 length where the first element is the param where it was sampled and the remaining the pt
- * @api public
- */
+//
+// ####rational_curve_adaptive_sample( degree, knots, control_points, tol, include_u )
+//
+// Sample a NURBS curve assuming parameterization 0 to 1, corresponds to http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf
+//
+// **params**
+// + *Number*, integer degree
+// + *Array*, array of nondecreasing knot values 
+// + *Array*, 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
+// and form (wi*pi, wi) 
+// + *Number*, tolerance for the adaptive scheme
+// + *Boolean*, whether to prefix the point with the parameter
+// 
+// **returns** 
+// + *Array*, an array of dim + 1 length where the first element is the param where it was sampled and the remaining the pt
+//
 
 verb.eval.nurbs.rational_curve_adaptive_sample = function( degree, knots, control_points, tol, include_u ) {
 
@@ -1353,19 +1473,23 @@ verb.eval.nurbs.rational_curve_adaptive_sample = function( degree, knots, contro
 
 }
 
-/**
- * Sample a NURBS curve at 3 points, facilitating adaptive sampling
- *
- * @param {Number} integer degree
- * @param {Array} array of nondecreasing knot values 
- * @param {Array} 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
- 									and form (wi*pi, wi) 
- * @param {Number} start parameter for sampling
- * @param {Number} end parameter for sampling
- * @param {Boolean} whether to prefix the point with the parameter
- * @return {Array} an array of dim + 1 length where the first element is the param where it was sampled and the remaining the pt
- * @api public
- */
+//
+// ####rational_curve_adaptive_sample_range( degree, knots, control_points, start_u, end_u, tol, include_u )
+//
+// Sample a NURBS curve at 3 points, facilitating adaptive sampling
+//
+// **params**
+// + *Number*, integer degree
+// + *Array*, array of nondecreasing knot values 
+// + *Array*, 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
+// and form (wi*pi, wi) 
+// + *Number*, start parameter for sampling
+// + *Number*, end parameter for sampling
+// + *Boolean*, whether to prefix the point with the parameter
+// 
+// **returns** 
+// + *Array*, an array of dim + 1 length where the first element is the param where it was sampled and the remaining the pt
+//
 
 verb.eval.nurbs.rational_curve_adaptive_sample_range = function( degree, knots, control_points, start_u, end_u, tol, include_u ) {
 
@@ -1401,27 +1525,33 @@ verb.eval.nurbs.rational_curve_adaptive_sample_range = function( degree, knots, 
 		}
 }
 
-/**
- * Determine if three points form a straight line within a given tolerance for their 2 * squared area
- *
- *          * p2
- *         / \
- *        /   \
- *       /     \ 
- *      /       \
- *  p1 * -------- * p3
- *
- * The area metric is 2 * the squared norm of the cross product of two edges, requiring no square roots and no divisions
- *
- * @param {Array} p1
- * @param {Array} p2
- * @param {Array} p3
- * @param {Number} The tolerance for whether the three points form a line
- * @return {Boolean} Whether the triangle passes the test
- * @api public
- */
 
+
+//
+// ####three_points_are_flat( p1, p2, p3, tol )
+//
+// Determine if three points form a straight line within a given tolerance for their 2 * squared area
+//
+//          * p2
+//         / \
+//        /   \
+//       /     \ 
+//      /       \
+//     * p1 ---- * p3
+//
+// The area metric is 2 * the squared norm of the cross product of two edges, requiring no square roots and no divisions
+//
+// **params**
+// + *Array*, p1
+// + *Array*, p2
+// + *Array*, p3
+// + *Number*, The tolerance for whether the three points form a line
+//
+// **returns** 
+// + *Number*, Whether the triangle passes the test
+//
 verb.eval.nurbs.three_points_are_flat = function( p1, p2, p3, tol ) {
+
 
 	// find the area of the triangle without using a square root
 	var p2mp1 = numeric.sub( p2, p1 )
@@ -1433,23 +1563,24 @@ verb.eval.nurbs.three_points_are_flat = function( p1, p2, p3, tol ) {
 
 }
 
-
-
-/**
- * Insert a knot along a rational curve
- *
- * @param {Number} integer degree of surface in u direction
- * @param {Array} array of nondecreasing knot values in u direction
- * @param {Number} integer degree of surface in v direction
- * @param {Array} array of nondecreasing knot values in v direction
- * @param {Array} 3d array of control points, where rows are the u dir, and columns run along the positive v direction, 
- 									and where each control point is an array of length (dim)  
- * @param {Number} u parameter at which to evaluate the derivatives
- * @param {Number} v parameter at which to evaluate the derivatives
- * @param {Array} 1d array of control point weights 
- * @return {Array} a point represented by an array of length (dim)
- * @api public
- */
+//
+// ####curve_knot_insert( degree, knots, control_points, u, s, r )
+//
+// Insert a knot along a rational curve
+//
+// **params**
+// + *Number*, integer degree of surface in u direction
+// + *Array*, array of nondecreasing knot values in u direction
+// + *Number*, integer degree of surface in v direction
+// + *Array*, array of nondecreasing knot values in v direction
+// + *Array*, 3d array of control points, where rows are the u dir, and columns run along the positive v direction, and where each control point is an array of length (dim)  
+// + *Number*, u parameter at which to evaluate the derivatives
+// + *Number*, v parameter at which to evaluate the derivatives
+// + *Array*, 1d array of control point weights 
+// 
+// **returns** 
+// + *Array*, a point represented by an array of length (dim)
+//
 
 verb.eval.nurbs.curve_knot_insert = function( degree, knots, control_points, u, s, r ) {
 
@@ -1532,21 +1663,25 @@ verb.eval.nurbs.curve_knot_insert = function( degree, knots, control_points, u, 
 
 }
 
-/**
- * Compute the derivatives at a point on a NURBS surface
- *
- * @param {Number} integer degree of surface in u direction
- * @param {Array} array of nondecreasing knot values in u direction
- * @param {Number} integer degree of surface in v direction
- * @param {Array} array of nondecreasing knot values in v direction
- * @param {Array} 3d array of control points, where rows are the u dir, and columns run along the positive v direction, 
- 									and where each control point is an array of length (dim)  
- * @param {Number} u parameter at which to evaluate the derivatives
- * @param {Number} v parameter at which to evaluate the derivatives
- * @param {Array} 1d array of control point weights 
- * @return {Array} a point represented by an array of length (dim)
- * @api public
- */
+//
+// ####rational_surface_derivs( degree_u, knots_u, degree_v, knots_v, homo_control_points, num_derivs, u, v)
+//
+// Compute the derivatives at a point on a NURBS surface
+//
+// **params**
+// + *Number*, integer degree of surface in u direction
+// + *Array*, array of nondecreasing knot values in u direction
+// + *Number*, integer degree of surface in v direction
+// + *Array*, array of nondecreasing knot values in v direction
+// + *Array*, 3d array of control points, where rows are the u dir, and columns run along the positive v direction, 
+// and where each control point is an array of length (dim)  
+// + *Number*, u parameter at which to evaluate the derivatives
+// + *Number*, v parameter at which to evaluate the derivatives
+// + *Array*, 1d array of control point weights 
+// 
+// **returns** 
+// + *Array*, a point represented by an array of length (dim)
+//
 
 verb.eval.nurbs.rational_surface_derivs = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, num_derivs, u, v) {
 
@@ -1592,20 +1727,24 @@ verb.eval.nurbs.rational_surface_derivs = function( degree_u, knots_u, degree_v,
 
 }
 
-/**
- * Compute a point on a NURBS surface
- *
- * @param {Number} integer degree of surface in u direction
- * @param {Array} array of nondecreasing knot values in u direction
- * @param {Number} integer degree of surface in v direction
- * @param {Array} array of nondecreasing knot values in v direction
- * @param {Array} 3d array of control points (tensor), top to bottom is increasing u direction, left to right is increasing v direction,
- 									and where each control point is an array of length (dim+1)
- * @param {Number} u parameter at which to evaluate the surface point
- * @param {Number} v parameter at which to evaluate the surface point
- * @return {Array} a point represented by an array of length (dim)
- * @api public
- */
+//
+// ####rational_surface_point( degree_u, knots_u,  degree_v, knots_v, homo_control_points, u, v )
+//
+// Compute a point on a NURBS surface
+//
+// **params**
+// + *Number*, integer degree of surface in u direction
+// + *Array*, array of nondecreasing knot values in u direction
+// + *Number*, integer degree of surface in v direction
+// + *Array*, array of nondecreasing knot values in v direction
+// + *Array*, 3d array of control points (tensor), top to bottom is increasing u direction, left to right is increasing v direction,
+// and where each control point is an array of length (dim+1)
+// + *Number*, u parameter at which to evaluate the surface point
+// + *Number*, v parameter at which to evaluate the surface point
+// 
+// **returns** 
+// + *Array*, a point represented by an array of length (dim)
+//
 
 verb.eval.nurbs.rational_surface_point = function( degree_u, knots_u,  degree_v, knots_v, homo_control_points, u, v ) {
 
@@ -1613,16 +1752,20 @@ verb.eval.nurbs.rational_surface_point = function( degree_u, knots_u,  degree_v,
 
 };
 
-/**
- * Determine the derivatives of a NURBS curve at a given parameter
- *
- * @param {Number} integer degree of curve
- * @param {Array} array of nondecreasing knot values
- * @param {Array} 2d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi)
- * @param {Number} parameter on the curve at which the point is to be evaluated
- * @return {Array} a point represented by an array of length (dim)
- * @api public
- */
+//
+// ####rational_curve_derivs( degree, knots, homo_control_points, u, num_derivs )
+//
+// Determine the derivatives of a NURBS curve at a given parameter
+//
+// **params**
+// + *Number*, integer degree of curve
+// + *Array*, array of nondecreasing knot values
+// + *Array*, 2d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi)
+// + *Number*, parameter on the curve at which the point is to be evaluated
+// 
+// **returns** 
+// + *Array*, a point represented by an array of length (dim)
+//
 
 verb.eval.nurbs.rational_curve_derivs = function( degree, knots, homo_control_points, u, num_derivs ) {
 
@@ -1648,13 +1791,18 @@ verb.eval.nurbs.rational_curve_derivs = function( degree, knots, homo_control_po
 
 };	
 
-/**
- * Separate the array of derivatives into the A(u) component and w(u), i.e. the weight and everything else without dehomogenization
- *
- * @param {Array} 1d array of homogeneous derivatives
- * @return {Array} an array with Aders and wders as element 0 and 1, respectively
- * @api public
- */
+
+//
+// ####separate_homo_derivs_1d( ck )
+//
+// Separate the array of derivatives into the A(u) component and w(u), i.e. the weight and everything else without dehomogenization
+//
+// **params**
+// + *Array*, 1d array of homogeneous derivatives
+// 
+// **returns** 
+// + *Array*, an array with Aders and wders as element 0 and 1, respectively
+//
 
 verb.eval.nurbs.separate_homo_derivs_1d = function( CK ) {
 
@@ -1672,13 +1820,17 @@ verb.eval.nurbs.separate_homo_derivs_1d = function( CK ) {
 
 };
 
-/**
- * Separate the array of derivatives into the A(u) component and w(u), i.e. the weight and everything else without dehomogenization
- *
- * @param {Array} 2d array of homogeneous derivatives
- * @return {Array} an array with Aders and wders as element 0 and 1, respectively
- * @api public
- */
+//
+// ####separate_homo_derivs_2d( skl )
+//
+// Separate the array of derivatives into the A(u) component and w(u), i.e. the weight and everything else without dehomogenization
+//
+// **params**
+// + *Array*, 2d array of homogeneous derivatives
+// 
+// **returns** 
+// + *Array*, an array with Aders and wders as element 0 and 1, respectively
+//
 
 verb.eval.nurbs.separate_homo_derivs_2d = function( SKL ) {
 
@@ -1696,17 +1848,21 @@ verb.eval.nurbs.separate_homo_derivs_2d = function( SKL ) {
 };
 
 
-/**
- * Compute a point on a NURBS curve
- *
- * @param {Number} integer degree of curve
- * @param {Array} array of nondecreasing knot values
- * @param {Array} 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
- 									and form (wi*pi, wi)
- * @param {Number} parameter on the curve at which the point is to be evaluated
- * @return {Array} a point represented by an array of length (dim)
- * @api public
- */
+//
+// ####rational_curve_point( degree, knots, homo_control_points, u)
+//
+// Compute a point on a NURBS curve
+//
+// **params**
+// + *Number*, integer degree of curve
+// + *Array*, array of nondecreasing knot values
+// + *Array*, 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
+// and form (wi*pi, wi)
+// + *Number*, parameter on the curve at which the point is to be evaluated
+// 
+// **returns** 
+// + *Array*, a point represented by an array of length (dim)
+//
 
 verb.eval.nurbs.rational_curve_point = function( degree, knots, homo_control_points, u) {
 
@@ -1714,13 +1870,17 @@ verb.eval.nurbs.rational_curve_point = function( degree, knots, homo_control_poi
 
 };
 
-/**
- * Dehomogenize a point 
- *
- * @param {Array} a point represented by an array (wi*pi, wi) with length (dim+1)
- * @return {Array} a point represented by an array pi with length (dim)
- * @api public
- */
+//
+// ####dehomogenize( homo_point )
+//
+// Dehomogenize a point 
+//
+// **params**
+// + *Array*, a point represented by an array (wi*pi, wi) with length (dim+1)
+// 
+// **returns** 
+// + *Array*, a point represented by an array pi with length (dim)
+//
 
 verb.eval.nurbs.dehomogenize = function( homo_point ) {
 
@@ -1735,16 +1895,21 @@ verb.eval.nurbs.dehomogenize = function( homo_point ) {
 
 };
 
-/**
- * Transform a 1d array of points into their homogeneous equivalents
- *
- * @param {Array} 1d array of control points, (actually a 2d array of size (m x dim) )
- * @param {Array} array of control point weights, the same size as the array of control points (m x 1)
- * @return {Array} 1d array of control points where each point is (wi*pi, wi) where wi 
- 									 is the ith control point weight and pi is the ith control point, 
- 									 hence the dimension of the point is dim + 1
- * @api public
- */
+//
+// ####homogenize_1d( control_points, weights) 
+//
+// Transform a 1d array of points into their homogeneous equivalents
+//
+// **params**
+// + *Array*, 1d array of control points, (actually a 2d array of size (m x dim) )
+// + *Array*, array of control point weights, the same size as the array of control points (m x 1)
+// 
+// **returns** 
+// + *Array*, 1d array of control points where each point is (wi*pi, wi) where wi 
+// i the ith control point weight and pi is the ith control point, 
+// hence the dimension of the point is dim + 1
+
+//
 
 verb.eval.nurbs.homogenize_1d = function( control_points, weights) {
 
@@ -1775,16 +1940,19 @@ verb.eval.nurbs.homogenize_1d = function( control_points, weights) {
 
 };
 
-/**
- * Transform a 2d array of points into their homogeneous equivalents
- *
- * @param {Array} 2d array of control points, (actually a 3d array of size m x n x dim)
- * @param {Array} array of control point weights, the same size as the control points array (m x n x 1)
- * @return {Array} 1d array of control points where each point is (wi*pi, wi) where wi 
- 									 is the ith control point weight and pi is the ith control point, the size is 
- 									 (m x n x dim+1)
- * @api public
- */
+//
+// ####homogenize_2d( control_points, weights) 
+//
+// **params**
+// + *Array*, 2d array of control points, (actually a 3d array of size m x n x dim)
+// + *Array*, array of control point weights, the same size as the control points array (m x n x 1)
+// 
+// **returns** 
+// + *Array*, 1d array of control points where each point is (wi*pi, wi) where wi 
+// i the ith control point weight and pi is the ith control point, the size is 
+// (m x n x dim+1)
+
+//
 
 verb.eval.nurbs.homogenize_2d = function( control_points, weights) {
 
@@ -1805,20 +1973,24 @@ verb.eval.nurbs.homogenize_2d = function( control_points, weights) {
 
 };
 
-/**
- * Compute the derivatives on a non-uniform, non-rational B spline surface
- *
- * @param {Number} integer degree of surface in u direction
- * @param {Array} array of nondecreasing knot values in u direction
- * @param {Number} integer degree of surface in v direction
- * @param {Array} array of nondecreasing knot values in v direction
- * @param {Array} 3d array of control points, where rows are the u dir, and columns run along the positive v direction, 
- 									and where each control point is an array of length (dim)  
- * @param {Number} u parameter at which to evaluate the derivatives
- * @param {Number} v parameter at which to evaluate the derivatives
- * @return {Array} a point represented by an array of length (dim)
- * @api public
- */
+//
+// ####surface_derivs( degree_u, knots_u, degree_v, knots_v, control_points, num_derivatives, u, v )
+//
+// Compute the derivatives on a non-uniform, non-rational B spline surface
+//
+// **params**
+// + *Number*, integer degree of surface in u direction
+// + *Array*, array of nondecreasing knot values in u direction
+// + *Number*, integer degree of surface in v direction
+// + *Array*, array of nondecreasing knot values in v direction
+// + *Array*, 3d array of control points, where rows are the u dir, and columns run along the positive v direction, 
+// and where each control point is an array of length (dim)  
+// + *Number*, u parameter at which to evaluate the derivatives
+// + *Number*, v parameter at which to evaluate the derivatives
+// 
+// **returns** 
+// + *Array*, a point represented by an array of length (dim)
+//
 
 verb.eval.nurbs.surface_derivs = function( degree_u, knots_u, degree_v, knots_v, control_points, num_derivatives, u, v ) {
 
@@ -1829,23 +2001,27 @@ verb.eval.nurbs.surface_derivs = function( degree_u, knots_u, degree_v, knots_v,
 
 };
 
-/**
- * Compute the derivatives on a non-uniform, non-rational B spline surface 
- * (corresponds to algorithm 3.6 from The NURBS book, Piegl & Tiller 2nd edition)
- *
- * @param {Number} integer number of basis functions in u dir - 1 = knots_u.length - degree_u - 2
- * @param {Number} integer degree of surface in u direction
- * @param {Array} array of nondecreasing knot values in u direction
- * @param {Number} integer number of basis functions in v dir - 1 = knots_u.length - degree_u - 2
- * @param {Number} integer degree of surface in v direction
- * @param {Array} array of nondecreasing knot values in v direction
- * @param {Array} 3d array of control points, where rows are the u dir, and columns run along the positive v direction, 
- 									and where each control point is an array of length (dim)  
- * @param {Number} u parameter at which to evaluate the derivatives
- * @param {Number} v parameter at which to evaluate the derivatives
- * @return {Array} a point represented by an array of length (dim)
- * @api public
- */
+//
+// ####surface_derivs_given_n_m( n, degree_u, knots_u, m, degree_v, knots_v, control_points, num_derivatives, u, v )
+//
+// Compute the derivatives on a non-uniform, non-rational B spline surface 
+// (corresponds to algorithm 3.6 from The NURBS book, Piegl & Tiller 2nd edition)
+//
+// **params**
+// + *Number*, integer number of basis functions in u dir - 1 = knots_u.length - degree_u - 2
+// + *Number*, integer degree of surface in u direction
+// + *Array*, array of nondecreasing knot values in u direction
+// + *Number*, integer number of basis functions in v dir - 1 = knots_u.length - degree_u - 2
+// + *Number*, integer degree of surface in v direction
+// + *Array*, array of nondecreasing knot values in v direction
+// + *Array*, 3d array of control points, where rows are the u dir, and columns run along the positive v direction, 
+// and where each control point is an array of length (dim)  
+// + *Number*, u parameter at which to evaluate the derivatives
+// + *Number*, v parameter at which to evaluate the derivatives
+// 
+// **returns** 
+// + *Array*, a point represented by an array of length (dim)
+//
 
 verb.eval.nurbs.surface_derivs_given_n_m = function( n, degree_u, knots_u, m, degree_v, knots_v, control_points, num_derivatives, u, v ) {
 
@@ -1893,20 +2069,24 @@ verb.eval.nurbs.surface_derivs_given_n_m = function( n, degree_u, knots_u, m, de
 	return SKL;
 }
 
-/**
- * Compute a point on a non-uniform, non-rational B-spline surface
- *
- * @param {Number} integer degree of surface in u direction
- * @param {Array} array of nondecreasing knot values in u direction
- * @param {Number} integer degree of surface in v direction
- * @param {Array} array of nondecreasing knot values in v direction
- * @param {Array} 3d array of control points, where rows are the u dir, and columns run along the positive v direction, 
- 									and where each control point is an array of length (dim)  
- * @param {Number} u parameter at which to evaluate the surface point
- * @param {Number} v parameter at which to evaluate the surface point
- * @return {Array} a point represented by an array of length (dim)
- * @api public
- */
+//
+// ####surface_point( degree_u, knots_u, degree_v, knots_v, control_points, u, v)
+//
+// Compute a point on a non-uniform, non-rational B-spline surface
+//
+// **params**
+// + *Number*, integer degree of surface in u direction
+// + *Array*, array of nondecreasing knot values in u direction
+// + *Number*, integer degree of surface in v direction
+// + *Array*, array of nondecreasing knot values in v direction
+// + *Array*, 3d array of control points, where rows are the u dir, and columns run along the positive v direction, 
+// and where each control point is an array of length (dim)  
+// + *Number*, u parameter at which to evaluate the surface point
+// + *Number*, v parameter at which to evaluate the surface point
+// 
+// **returns** 
+// + *Array*, a point represented by an array of length (dim)
+//
 
 verb.eval.nurbs.surface_point = function( degree_u, knots_u, degree_v, knots_v, control_points, u, v) {
 
@@ -1917,22 +2097,26 @@ verb.eval.nurbs.surface_point = function( degree_u, knots_u, degree_v, knots_v, 
 
 }
 
-/**
- * Compute a point on a non-uniform, non-rational B spline surface
- * (corresponds to algorithm 3.5 from The NURBS book, Piegl & Tiller 2nd edition)
- *
- * @param {Number} integer number of basis functions in u dir - 1 = knots_u.length - degree_u - 2
- * @param {Number} integer degree of surface in u direction
- * @param {Array} array of nondecreasing knot values in u direction
- * @param {Number} integer degree of surface in v direction
- * @param {Array} array of nondecreasing knot values in v direction
- * @param {Array} 3d array of control points, where rows are the u dir, and columns run along the positive v direction, 
- 									and where each control point is an array of length (dim)  
- * @param {Number} u parameter at which to evaluate the surface point
- * @param {Number} v parameter at which to evaluate the surface point
- * @return {Array} a point represented by an array of length (dim)
- * @api public
- */
+//
+// ####surface_point_given_n_m( n, degree_u, knots_u, m, degree_v, knots_v, control_points, u, v )
+//
+// Compute a point on a non-uniform, non-rational B spline surface
+// (corresponds to algorithm 3.5 from The NURBS book, Piegl & Tiller 2nd edition)
+//
+// **params**
+// + *Number*, integer number of basis functions in u dir - 1 = knots_u.length - degree_u - 2
+// + *Number*, integer degree of surface in u direction
+// + *Array*, array of nondecreasing knot values in u direction
+// + *Number*, integer degree of surface in v direction
+// + *Array*, array of nondecreasing knot values in v direction
+// + *Array*, 3d array of control points, where rows are the u dir, and columns run along the positive v direction, 
+// and where each control point is an array of length (dim)  
+// + *Number*, u parameter at which to evaluate the surface point
+// + *Number*, v parameter at which to evaluate the surface point
+// 
+// **returns** 
+// + *Array*, a point represented by an array of length (dim)
+//
 
 verb.eval.nurbs.surface_point_given_n_m = function( n, degree_u, knots_u, m, degree_v, knots_v, control_points, u, v ) {
 
@@ -1969,16 +2153,20 @@ verb.eval.nurbs.surface_point_given_n_m = function( n, degree_u, knots_u, m, deg
 	return position;
 }
 
-/**
- * Determine the derivatives of a non-uniform, non-rational B-spline curve at a given parameter
- *
- * @param {Number} integer degree of curve
- * @param {Array} array of nondecreasing knot values
- * @param {Array} 2d array of control points, where each control point is an array of length (dim)  
- * @param {Number} parameter on the curve at which the point is to be evaluated
- * @return {Array} a point represented by an array of length (dim)
- * @api public
- */
+//
+// ####curve_derivs( degree, knots, control_points, u, num_derivs )
+//
+// Determine the derivatives of a non-uniform, non-rational B-spline curve at a given parameter
+//
+// **params**
+// + *Number*, integer degree of curve
+// + *Array*, array of nondecreasing knot values
+// + *Array*, 2d array of control points, where each control point is an array of length (dim)  
+// + *Number*, parameter on the curve at which the point is to be evaluated
+// 
+// **returns** 
+// + *Array*, a point represented by an array of length (dim)
+//
 
 verb.eval.nurbs.curve_derivs = function( degree, knots, control_points, u, num_derivs ) {
 
@@ -1987,18 +2175,22 @@ verb.eval.nurbs.curve_derivs = function( degree, knots, control_points, u, num_d
 
 }		
 
-/**
- * Determine the derivatives of a non-uniform, non-rational B-spline curve at a given parameter
- * (corresponds to algorithm 3.1 from The NURBS book, Piegl & Tiller 2nd edition)
- *
- * @param {Number} integer number of basis functions - 1 = knots.length - degree - 2
- * @param {Number} integer degree of curve
- * @param {Array} array of nondecreasing knot values
- * @param {Array} 2d array of control points, where each control point is an array of length (dim)  
- * @param {Number} parameter on the curve at which the point is to be evaluated
- * @return {Array} a point represented by an array of length (dim)
- * @api public
- */
+//
+// ####curve_derivs_given_n( n, degree, knots, control_points, u, num_derivatives )
+//
+// Determine the derivatives of a non-uniform, non-rational B-spline curve at a given parameter
+// (corresponds to algorithm 3.1 from The NURBS book, Piegl & Tiller 2nd edition)
+//
+// **params**
+// + *Number*, integer number of basis functions - 1 = knots.length - degree - 2
+// + *Number*, integer degree of curve
+// + *Array*, array of nondecreasing knot values
+// + *Array*, 2d array of control points, where each control point is an array of length (dim)  
+// + *Number*, parameter on the curve at which the point is to be evaluated
+// 
+// **returns** 
+// + *Array*, a point represented by an array of length (dim)
+//
 
 verb.eval.nurbs.curve_derivs_given_n = function( n, degree, knots, control_points, u, num_derivatives ) {
 
@@ -2024,16 +2216,20 @@ verb.eval.nurbs.curve_derivs_given_n = function( n, degree, knots, control_point
 
 }		
 
-/**
- * Confirm the relations between degree (p), number of control points(n+1), and the number of knots (m+1)
- * via The NURBS Book (section 3.2, Second Edition)
- *
- * @param {Number} integer degree
- * @param {Number} integer number of control points
- * @param {Number} integer length of the knot vector (including duplicate knots)
- * @return {Boolean} whether the values are correct
- * @api public
- */
+//
+// ####are_valid_relations( degree, num_control_points, knots_length )
+//
+// Confirm the relations between degree (p), number of control points(n+1), and the number of knots (m+1)
+// via The NURBS Book (section 3.2, Second Edition)
+//
+// **params**
+// + *Number*, integer degree
+// + *Number*, integer number of control points
+// + *Number*, integer length of the knot vector (including duplicate knots)
+// 
+// **returns** 
+// + *Boolean*, whether the values are correct
+//
 
 verb.eval.nurbs.are_valid_relations = function( degree, num_control_points, knots_length ) {
 
@@ -2041,16 +2237,20 @@ verb.eval.nurbs.are_valid_relations = function( degree, num_control_points, knot
 
 }		
 
-/**
- * Compute a point on a non-uniform, non-rational b-spline curve
- *
- * @param {Number} integer degree of curve
- * @param {Array} array of nondecreasing knot values
- * @param {Array} 2d array of control points, where each control point is an array of length (dim)  
- * @param {Number} parameter on the curve at which the point is to be evaluated
- * @return {Array} a point represented by an array of length (dim)
- * @api public
- */
+//
+// ####curve_point( degree, knots, control_points, u)
+//
+// Compute a point on a non-uniform, non-rational b-spline curve
+//
+// **params**
+// + *Number*, integer degree of curve
+// + *Array*, array of nondecreasing knot values
+// + *Array*, 2d array of control points, where each control point is an array of length (dim)  
+// + *Number*, parameter on the curve at which the point is to be evaluated
+// 
+// **returns** 
+// + *Array*, a point represented by an array of length (dim)
+//
 
 verb.eval.nurbs.curve_point = function( degree, knots, control_points, u) {
 
@@ -2059,18 +2259,22 @@ verb.eval.nurbs.curve_point = function( degree, knots, control_points, u) {
 
 }		
 
-/**
- * Compute a point on a non-uniform, non-rational b-spline curve
- * (corresponds to algorithm 3.1 from The NURBS book, Piegl & Tiller 2nd edition)
- *
- * @param {Number} integer number of basis functions - 1 = knots.length - degree - 2
- * @param {Number} integer degree of curve
- * @param {Array} array of nondecreasing knot values
- * @param {Array} 2d array of control points, where each control point is an array of length (dim)  
- * @param {Number} parameter on the curve at which the point is to be evaluated
- * @return {Array} a point represented by an array of length (dim)
- * @api public
- */
+//
+// ####curve_point_given_n( n, degree, knots, control_points, u)
+//
+// Compute a point on a non-uniform, non-rational b-spline curve
+// (corresponds to algorithm 3.1 from The NURBS book, Piegl & Tiller 2nd edition)
+//
+// **params**
+// + *Number*, integer number of basis functions - 1 = knots.length - degree - 2
+// + *Number*, integer degree of curve
+// + *Array*, array of nondecreasing knot values
+// + *Array*, 2d array of control points, where each control point is an array of length (dim)  
+// + *Number*, parameter on the curve at which the point is to be evaluated
+// 
+// **returns** 
+// + *Array*, a point represented by an array of length (dim)
+//
 
 verb.eval.nurbs.curve_point_given_n = function( n, degree, knots, control_points, u) {
 
@@ -2090,13 +2294,17 @@ verb.eval.nurbs.curve_point_given_n = function( n, degree, knots, control_points
 		return position;
 }	
 
-/**
- * Generate a 1d array of zeros
- *
- * @param {Number} integer number of rows
- * @return {Array} 1d array of given size
- * @api public
- */
+//
+// ####zeros_1d(size)
+//
+// Generate a 1d array of zeros
+//
+// **params**
+// + *Number*, integer number of rows
+// 
+// **returns** 
+// + *Array*, 1d array of given size
+//
 
 verb.eval.nurbs.zeros_1d = function(size) {
   size = size > 0 ? size : 0;
@@ -2110,14 +2318,18 @@ verb.eval.nurbs.zeros_1d = function(size) {
   return arr;
 }
 
-/**
- * Generate a 2D array of zeros
- *
- * @param {Number} integer number of rows
- * @param {Number} integer number of columns
- * @return {Array} 2d array of given size
- * @api public
- */
+//
+// ####zeros_2d(rows, cols)
+//
+// Generate a 2D array of zeros
+//
+// **params**
+// + *Number*, integer number of rows
+// + *Number*, integer number of columns
+// 
+// **returns** 
+// + *Array*, 2d array of given size
+//
 
 verb.eval.nurbs.zeros_2d = function(rows, cols) {
   cols = cols > 0 ? cols : 0;
@@ -2139,15 +2351,19 @@ verb.eval.nurbs.zeros_2d = function(rows, cols) {
   return arr;
 }
 
-/**
- * Generate a 3D array of zeros
- *
- * @param {Number} integer number of rows
- * @param {Number} integer number of columns
- * @param {Number} integer depth (i.e. dimension of arrays in 2d matrix)
- * @return {Array} 3d array of given size
- * @api public
- */
+//
+// ####zeros_3d(rows, cols, dim)
+//
+// Generate a 3D array of zeros
+//
+// **params**
+// + *Number*, integer number of rows
+// + *Number*, integer number of columns
+// + *Number*, integer depth (i.e. dimension of arrays in 2d matrix)
+// 
+// **returns** 
+// + *Array*, 3d array of given size
+//
 
 verb.eval.nurbs.zeros_3d = function(rows, cols, dim) {
   cols = cols > 0 ? cols : 0;
@@ -2169,15 +2385,19 @@ verb.eval.nurbs.zeros_3d = function(rows, cols, dim) {
   return arr;
 }
 
-/**
- * Compute the non-vanishing basis functions and their derivatives
- *
- * @param {Number} float parameter
- * @param {Number} integer degree
- * @param {Array} array of nondecreasing knot values
- * @return {Array} 2d array of basis and derivative values of size (n+1, p+1) The nth row is the nth derivative and the first row is made up of the basis function values.
- * @api public
- */
+//
+// ####deriv_basis_functions( u, degree, knots )
+//
+// Compute the non-vanishing basis functions and their derivatives
+//
+// **params**
+// + *Number*, float parameter
+// + *Number*, integer degree
+// + *Array*, array of nondecreasing knot values
+// 
+// **returns** 
+// + *Array*, 2d array of basis and derivative values of size (n+1, p+1) The nth row is the nth derivative and the first row is made up of the basis function values.
+//
 
 verb.eval.nurbs.deriv_basis_functions = function( u, degree, knots )
 {
@@ -2188,18 +2408,22 @@ verb.eval.nurbs.deriv_basis_functions = function( u, degree, knots )
 	return verb.eval.nurbs.deriv_basis_functions_given_n_i( knot_span_index, u, degree, n, knots );
 }	
 
-/**
- * Compute the non-vanishing basis functions and their derivatives
- * (corresponds to algorithm 2.3 from The NURBS book, Piegl & Tiller 2nd edition)
- *
- * @param {Number} integer knot span index
- * @param {Number} float parameter
- * @param {Number} integer degree
- * @param {Number} integer number of basis functions - 1 = knots.length - degree - 2
- * @param {Array} array of nondecreasing knot values
- * @return {Array} 2d array of basis and derivative values of size (n+1, p+1) The nth row is the nth derivative and the first row is made up of the basis function values.
- * @api public
- */
+//
+// ####deriv_basis_functions_given_n_i( knot_span_index, u, p, n, knots )
+//
+// Compute the non-vanishing basis functions and their derivatives
+// (corresponds to algorithm 2.3 from The NURBS book, Piegl & Tiller 2nd edition)
+//
+// **params**
+// + *Number*, integer knot span index
+// + *Number*, float parameter
+// + *Number*, integer degree
+// + *Number*, integer number of basis functions - 1 = knots.length - degree - 2
+// + *Array*, array of nondecreasing knot values
+// 
+// **returns** 
+// + *Array*, 2d array of basis and derivative values of size (n+1, p+1) The nth row is the nth derivative and the first row is made up of the basis function values.
+//
 
 verb.eval.nurbs.deriv_basis_functions_given_n_i = function( knot_span_index, u, p, n, knots )
 {
@@ -2305,15 +2529,19 @@ verb.eval.nurbs.deriv_basis_functions_given_n_i = function( knot_span_index, u, 
 
 };
 
-/**
- * Compute the non-vanishing basis functions
- *
- * @param {Number} float parameter
- * @param {Number} integer degree of function
- * @param {Array} array of nondecreasing knot values
- * @return {Array} list of non-vanishing basis functions
- * @api public
- */
+//
+// ####basis_functions( u, degree, knots )
+//
+// Compute the non-vanishing basis functions
+//
+// **params**
+// + *Number*, float parameter
+// + *Number*, integer degree of function
+// + *Array*, array of nondecreasing knot values
+// 
+// **returns** 
+// + *Array*, list of non-vanishing basis functions
+//
 
 verb.eval.nurbs.basis_functions = function( u, degree, knots )
 {
@@ -2321,17 +2549,21 @@ verb.eval.nurbs.basis_functions = function( u, degree, knots )
 	return verb.eval.nurbs.basis_functions_given_knot_span_index( knot_span_index, u, degree, knots );
 };
 
-/**
- * Compute the non-vanishing basis functions
- * (corresponds to algorithm 2.2 from The NURBS book, Piegl & Tiller 2nd edition)
- *
- * @param {Number} integer knot span index
- * @param {Number} float parameter
- * @param {Number} integer degree of function
- * @param {Array} array of nondecreasing knot values
- * @return {Array} list of non-vanishing basis functions
- * @api public
- */
+//
+// ####basis_functions_given_knot_span_index( knot_span_index, u, degree, knots )
+//
+// Compute the non-vanishing basis functions
+// (corresponds to algorithm 2.2 from The NURBS book, Piegl & Tiller 2nd edition)
+//
+// **params**
+// + *Number*, integer knot span index
+// + *Number*, float parameter
+// + *Number*, integer degree of function
+// + *Array*, array of nondecreasing knot values
+// 
+// **returns** 
+// + *Array*, list of non-vanishing basis functions
+//
 
 verb.eval.nurbs.basis_functions_given_knot_span_index = function( knot_span_index, u, degree, knots )
 {
@@ -2364,15 +2596,19 @@ verb.eval.nurbs.basis_functions_given_knot_span_index = function( knot_span_inde
 };
 
 
-/**
- * Find the span on the knot vector without supplying n
- *
- * @param {Number} integer degree of function
- * @param {Number} float parameter
- * @param {Array} array of nondecreasing knot values
- * @return {Number} the index of the knot span
- * @api public
- */
+//
+// ####knot_span( degree, u, knots )
+//
+// Find the span on the knot vector without supplying n
+//
+// **params**
+// + *Number*, integer degree of function
+// + *Number*, float parameter
+// + *Array*, array of nondecreasing knot values
+// 
+// **returns** 
+// + *Number*, the index of the knot span
+//
 
 verb.eval.nurbs.knot_span = function( degree, u, knots )
 {
@@ -2384,17 +2620,21 @@ verb.eval.nurbs.knot_span = function( degree, u, knots )
 
 };
 
-/**
- * Find the span on the knot vector knots of the given parameter
- * (corresponds to algorithm 2.1 from The NURBS book, Piegl & Tiller 2nd edition)
- *
- * @param {Number} integer number of basis functions - 1 = knots.length - degree - 2
- * @param {Number} integer degree of function
- * @param {Number} float parameter
- * @param {Array} array of nondecreasing knot values
- * @return {Number} the index of the knot span
- * @api public
- */
+//
+// ####knot_span_given_n( n, degree, u, knots )
+//
+// Find the span on the knot vector knots of the given parameter
+// (corresponds to algorithm 2.1 from The NURBS book, Piegl & Tiller 2nd edition)
+//
+// **params**
+// + *Number*, integer number of basis functions - 1 = knots.length - degree - 2
+// + *Number*, integer degree of function
+// + *Number*, float parameter
+// + *Array*, array of nondecreasing knot values
+// 
+// **returns** 
+// + *Number*, the index of the knot span
+//
 
 verb.eval.nurbs.knot_span_given_n = function( n, degree, u, knots )
 {

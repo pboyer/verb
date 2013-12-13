@@ -1,3 +1,11 @@
+// ###new BezierCurve( control_points [, weights] )
+//
+// Constructor for BezierCurve
+//
+// **params**
+// + *Array*, Array of Length 3 arrays representing the control pts of the bezier curve
+// + *Array*, Array of numbers representing the weights of the bezier curve, omit if you don't want this to be a rational curve
+
 verb.geom.BezierCurve = function( control_points, weights ) {
 
 	verb.geom.NurbsCurve.call(this);
@@ -11,6 +19,10 @@ verb.geom.BezierCurve = function( control_points, weights ) {
 
 }.inherits( verb.geom.NurbsCurve ); 
 
+
+// #### nurbsRep()
+//
+// Construct the Nurbs representation
 verb.geom.BezierCurve.prototype.nurbsRep = function(){
 
 	var control_points = this.get('controlPoints');

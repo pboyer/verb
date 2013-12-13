@@ -1,6 +1,8 @@
 if ( typeof exports != 'object' || exports === undefined )  // browser context
 {
 	importScripts('labor.js');  
+	importScripts('binomial.js');  
+	importScripts('numeric-1.2.6.min.js');  
 }
 else // node.js context
 {
@@ -11,11 +13,20 @@ var verb = verb || {};
 verb.eval = verb.eval || {};
 verb.eval.nurbs = verb.eval.nurbs || {};
 verb.eval.mesh = verb.eval.mesh || {};
+verb.eval.geom = verb.eval.geom || {};
 verb.geom = verb.geom || {};
 verb.EPSILON = 1e-8;
 verb.TOLERANCE = 1e-3;
 
 var router = new labor.Router(verb.eval.nurbs);
+
+numeric.normalized = function(arr){
+	return numeric.div( arr, numeric.norm2(arr) );
+}
+
+numeric.cross = function(u, v){
+	return [u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
+}
 /**
  * Generate the control points, weights, and knots of an elliptical arc
  *
@@ -1008,7 +1019,7 @@ verb.eval.nurbs.tesselate_rational_surface_naive = function( degree_u, knots_u, 
 
 			points.push( pt );
 
-			var normal = numeric.normalized( numeric.cross( derivs[1][0], derivs[0][1] ) );
+			var normal = numeric.cross(  derivs[0][1], derivs[1][0] );
 			normals.push( normal );
 
 			// points.push( verb.eval.nurbs.rational_surface_point( degree_u, knots_u,  degree_v, knots_v, homo_control_points, pt_u, pt_v ) );

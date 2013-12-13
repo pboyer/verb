@@ -2,7 +2,7 @@ if ( typeof exports != 'object' || exports === undefined )  // browser context
 {
 	var verb = {}
 		, numeric = window.numeric
-		, binomial = window.choose
+		, binomial = window.binomial
 		, labor = window.labor
 		, _ = window.underscore;
 }
@@ -34,11 +34,13 @@ verb.init = function() {
 }
 
 if (typeof Object.create !== 'function') {
+
     Object.create = function (o) {
         function F() {}
         F.prototype = o;
         return new F();
     };
+    
 }
 
 Function.prototype.method = function (name, func) {
@@ -93,7 +95,7 @@ verb.core.Engine = function(options) {
 	var _use_pool = ( typeof Worker === 'function' ) && ( options.use_pool || options.use_pool === undefined );
 	var _num_threads = options.num_workers || 2;
 	var _tolerance = options.tolerance || 1e-4;
-	var _url = options.url || 'verb_nurbs_eval.js';
+	var _url = options.url || 'js/verbEval.js';
 	var _lib = options.library || verb.eval.nurbs;
 	var _error_handler = options.error_handler || ( function( message ) { console.warn( message ); } );
 	var _pool = undefined;
@@ -105,7 +107,7 @@ verb.core.Engine = function(options) {
 			_pool = new labor.Pool(_url, _num_threads );
 			_pool.start();
 		} catch (err) {
-			_error_handler( 'Failed to initialize labor.Pool.' );
+			_error_handler( 'Failed to initialize labor.Pool: ' + err );
 			return false;
 		}
 		return true;
@@ -191,12 +193,20 @@ verb.core.WatchObject = function() {
 	// report a property change to the watchers
 	var report = function(name, updateObject){
 
-		for (ele in watchers[name]){
-			watchers[ele]( updateObject );
-		}
+		if (typeof name === "string"){
 
-		for (ele in watchers["change"]){
-			watchers[ele]( updateObject );
+			for (ele in watchers[name]){
+				watchers[name][ele]( updateObject );
+			}
+
+			for (ele in watchers["change"]){
+				watchers["change"][ele]( updateObject );
+			}
+			
+		} else {
+			for (n in name){
+				report( n, updateObject );
+			}
 		}
 
 	};
@@ -212,9 +222,11 @@ verb.core.WatchObject = function() {
 	this.set = function( name, value ){
 
 		var old = properties[name];
-		properties[name] = value;
 
-		report({name: name, old: old, "new": value, target: that, type: "full"});
+		properties[name] = value;
+		watchers[name] = watchers[name] || {};
+
+		report( name, {name: name, old: old, "new": value, target: that, type: "full"});
 
 	};
 
@@ -226,9 +238,10 @@ verb.core.WatchObject = function() {
 		for ( propName in propertyNameValuePairs ){
 			oldVals[propName] = properties[propName];
 			properties[propName] = propertyNameValuePairs[propName];
+			watchers[propName] = watchers[propName] || {};
 		}
 
-		report({old: oldVals, "new": propertyNameValuePairs, target: that, type: "multi"});
+		report( propertyNameValuePairs, { old: oldVals, "new": propertyNameValuePairs, target: that, type: "multi" } );
 
 	};
 
@@ -244,15 +257,15 @@ verb.core.WatchObject = function() {
 		var old = properties[name][index];
 		properties[name][index] = value;
 
-		report( {name: name, index: index, old: old, "new": value, target: that, type: "index"} );
+		report( name, {name: name, index: index, old: old, "new": value, target: that, type: "index"} );
 
 	};
 
-	// start watching a particular property.  use "name" to receive all 
+	// start watching a particular property.  use "change" to receive all 
 	// updates
 	this.watch = function( name, callback ){
 
-		if ( watchers[name] === undefined || !callback ){
+		if ( properties[name] === undefined || !callback ){
 			return;
 		}
 
@@ -576,8 +589,8 @@ verb.geom.NurbsSurface.prototype.tesselate = function(options, callback){
 		, minDivsU = 20;
 
 	if (options){
-		minDivsV = optons.minDivsV || minDivsV;
-		minDivsU = optons.minDivsU || minDivsU;
+		minDivsV = options.minDivsV || minDivsV;
+		minDivsU = options.minDivsU || minDivsU;
 	}
 
 	// naive surface tesselation, for now

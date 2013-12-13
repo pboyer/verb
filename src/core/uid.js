@@ -1,9 +1,9 @@
-/**
- * Generate a unique id.
- *
- * @return {Number} The id
- * @api public
- */
+// ####uid()
+// 
+// Generate a unique id.
+//
+// **returns**
+// + *Number*, The id
 
 verb.core.uid = (function(){
 	var id = 0;

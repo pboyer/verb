@@ -1,10 +1,9 @@
-/**
- * BoundngBox Constructor
- *
- * @param {Array} Points to add, if desired.  Otherwise, will not be initialized until add is called.
- * @return {Object} Newly formed BoundingBox object
- * @api public
- */	
+// ###new BoundingBox([ points ])
+// 
+// BoundingBox Constructor
+//
+// **params**
+// + *Array*, Points to add, if desired.  Otherwise, will not be initialized until add is called.
 
 verb.geom.BoundingBox = function() {
 	this.initialized = false;
@@ -15,14 +14,15 @@ verb.geom.BoundingBox = function() {
  	this.add_elements_sync(pt_args);
 }	
 
-/**
- * Asynchronously add an array of points to the bounding box
- *
- * @param {Array} An array of length-3 array of numbers 
- * @param {Function} Function to call when all of the points in array have been added.  The only parameter to this
- * callback is this bounding box.
- * @api public
- */
+// ####add_elements( point_array, callback ) 
+//
+// Asynchronously add an array of points to the bounding box
+//
+// **params**
+// + *Array*, An array of length-3 array of numbers 
+// + *Function*, Function to call when all of the points in array have been added.  The only parameter to this
+// callback is this bounding box.
+//
 
 verb.geom.BoundingBox.prototype.add_elements = function( point_array, callback ) 
 {
@@ -37,13 +37,16 @@ verb.geom.BoundingBox.prototype.add_elements = function( point_array, callback )
 
 };
 
-/**
- * Synchronously add an array of points to the bounding box
- *
- * @param {Array} An array of length-3 array of numbers 
- * @return {Object} This BoundingBox for chaining
- * @api public
- */
+// ####add_elements_sync( point_array ) 
+//
+// Synchronously add an array of points to the bounding box
+//
+// **params**
+// + *Array*, An array of length-3 array of numbers 
+//
+// **returns**
+// + *Object*, This BoundingBox for chaining
+//
 
 verb.geom.BoundingBox.prototype.add_elements_sync = function( point_array ) 
 {
@@ -53,15 +56,18 @@ verb.geom.BoundingBox.prototype.add_elements_sync = function( point_array )
 	});
 	return this;
 };
-
-/** 
- * Adds a point to the bounding box, expanding the bounding box if the point is outside of it.
- * If the bounding box is not initialized, this method has that side effect.
- *
- * @param {Array} A length-3 array of numbers 
- * @return {Object} This BoundingBox for chaining
- * @api public
- */
+ 
+// ####add( point ) 
+//
+// Adds a point to the bounding box, expanding the bounding box if the point is outside of it.
+// If the bounding box is not initialized, this method has that side effect.
+//
+// **params**
+// + *Array*, A length-3 array of numbers 
+//
+// **returns**
+// + *Object*, This BoundingBox for chaining
+//
 
 verb.geom.BoundingBox.prototype.add = function( point ) 
 {
@@ -107,16 +113,19 @@ verb.geom.BoundingBox.prototype.add = function( point )
 
 };
 
-/**
- * Determines if two intervals on the real number line intersect
- *
- * @param {Number} Beginning of first interval
- * @param {Number} End of first interval
- * @param {Number} Beginning of second interval
- * @param {Number} End of second interval
- * @return {Boolean} true if the two intervals overlap, otherwise false
- * @api public
- */
+// ####contains( point ) 
+//
+// Determines if two intervals on the real number line intersect
+//
+// **params**
+// + *Number*, Beginning of first interval
+// + *Number*, End of first interval
+// + *Number*, Beginning of second interval
+// + *Number*, End of second interval
+//
+// **returns**
+// + *Boolean*, true if the two intervals overlap, otherwise false
+//
 
 verb.geom.BoundingBox.prototype.contains = function(point) {
 
@@ -129,24 +138,26 @@ verb.geom.BoundingBox.prototype.contains = function(point) {
 
 }
 
-/**
- * Defines the tolerance for bounding box operations
- *
- * @api public
- */
+// #### TOLERANCE
+//
+// Defines the tolerance for bounding box operations
 
 verb.geom.BoundingBox.prototype.TOLERANCE = 1e-4;
 
-/**
- * Determines if two intervals on the real number line intersect
- *
- * @param {Number} Beginning of first interval
- * @param {Number} End of first interval
- * @param {Number} Beginning of second interval
- * @param {Number} End of second interval
- * @return {Boolean} true if the two intervals overlap, otherwise false
- * @api public
- */
+
+// ####intervals_overlap( a1, a2, b1, b2 )
+//
+// Determines if two intervals on the real number line intersect
+//
+// **params**
+// + *Number*, Beginning of first interval
+// + *Number*, End of first interval
+// + *Number*, Beginning of second interval
+// + *Number*, End of second interval
+//
+// **returns**
+// + *Boolean*, true if the two intervals overlap, otherwise false
+//
 
 verb.geom.BoundingBox.prototype.intervals_overlap = function( a1, a2, b1, b2 ) {
 
@@ -167,13 +178,16 @@ verb.geom.BoundingBox.prototype.intervals_overlap = function( a1, a2, b1, b2 ) {
 
 }
 
-/**
- * Determines if this bounding box intersects with another
- *
- * @param {Object} BoundingBox to check for intersection with this one
- * @return {Boolean} true if the two bounding boxes intersect, otherwise false
- * @api public
- */
+// ####intersects( bb )
+//
+// Determines if this bounding box intersects with another
+//
+// **params**
+// + *Object*, BoundingBox to check for intersection with this one
+//
+// **returns**
+// + *Boolean*, true if the two bounding boxes intersect, otherwise false
+//
 
 verb.geom.BoundingBox.prototype.intersects = function( bb ) {
 
@@ -198,13 +212,14 @@ verb.geom.BoundingBox.prototype.intersects = function( bb ) {
 
 };
 
-/**
- * Clear the bounding box, leaving it in an uninitialized state.  Call add, add_elements in order to 
- * initialize
- *
- * @return {Object} this BoundingBox for chaining
- * @api public
- */
+// ####clear( bb )
+//
+// Clear the bounding box, leaving it in an uninitialized state.  Call add, add_elements in order to 
+// initialize
+//
+// **returns**
+// + *Object*, this BoundingBox for chaining
+//
 
 verb.geom.BoundingBox.prototype.clear = function( bb ) {
 
@@ -213,12 +228,13 @@ verb.geom.BoundingBox.prototype.clear = function( bb ) {
 
 };
 
-/**
- * Get longest axis of bounding box
- *
- * @return {Number} Index of longest axis
- * @api public
- */
+// ####get_longest_axis( bb )
+//
+// Get longest axis of bounding box
+//
+// **returns**
+// + *Number*, Index of longest axis
+//
 
 verb.geom.BoundingBox.prototype.get_longest_axis = function( bb ) {
 
@@ -230,13 +246,16 @@ verb.geom.BoundingBox.prototype.get_longest_axis = function( bb ) {
 
 };
 
-/**
- * Get length of given axis. 
- *
- * @param {Number} Index of axis to inspect (between 0 and 2)
- * @return {Number} Length of the given axis.  If axis is out of bounds, returns 0.
- * @api public
- */
+// ####get_axis_length( i )
+//
+// Get length of given axis. 
+//
+// **params**
+// + *Number*, Index of axis to inspect (between 0 and 2)
+//
+// **returns**
+// + *Number*, Length of the given axis.  If axis is out of bounds, returns 0.
+//
 
 verb.geom.BoundingBox.prototype.get_axis_length = function( i ) {
 
@@ -246,14 +265,17 @@ verb.geom.BoundingBox.prototype.get_axis_length = function( i ) {
 
 };
 
-/**
- * Compute the boolean intersection of this with another axis-aligned bounding box.  If the two
- * bounding boxes do not intersect, returns null.
- *
- * @param {Object} BoundingBox to intersect with
- * @return {Object} The bounding box formed by the intersection or null if there is no intersection.
- * @api public
- */
+// ####intersect( bb )
+//
+// Compute the boolean intersection of this with another axis-aligned bounding box.  If the two
+// bounding boxes do not intersect, returns null.
+//
+// **params**
+// + *Object*, BoundingBox to intersect with
+//
+// **returns**
+// + *Object*, The bounding box formed by the intersection or null if there is no intersection.
+//
 
 verb.geom.BoundingBox.prototype.intersect = function( bb ) {
 
