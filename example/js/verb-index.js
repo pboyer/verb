@@ -15,6 +15,8 @@ var degreeU = 3
 				  [1, 1, 1, 1], 
 				  [1, 1, 1, 1] ];
 
+setControlPoints(Date.now(), controlPoints)
+
  
 var srf = new verb.geom.NurbsSurface( degreeU, knotsU, degreeV, knotsV, controlPoints, weights);
 
@@ -34,12 +36,8 @@ var id = srf.watch('controlPoints', function(update){
 
 });
 
-// regularly update the control points property of the surface
-setInterval(function(){
-
-  var controlPoints = srf.get('controlPoints');
-
-  var date = Date.now() / 15000;
+function setControlPoints(timestamp, controlPoints){
+  var date = timestamp / 15000;
   var L = 0.23;
 
   for (var i = 0; i < controlPoints.length; i++){
@@ -49,11 +47,44 @@ setInterval(function(){
       controlPoints[i][j][2] = 0.3 * Math.cos( (controlPoints[i][j][0] + date) / L ) * Math.sin( (controlPoints[i][j][1] + date) / L  )
     }
   }
+}
+
+var update = function(timestamp){
+
+  var controlPoints = srf.get('controlPoints');
+
+  setControlPoints(timestamp, controlPoints);
 
   // automatically retesselates
-	srf.set('controlPoints', controlPoints );
+  srf.set('controlPoints', controlPoints );
 
-}, 60);
+  window.requestAnimationFrame(update);
+
+}
+
+// regularly update the control points property of the surface
+window.requestAnimationFrame(update);
+
+// // regularly update the control points property of the surface
+// setInterval(function(){
+
+//   var controlPoints = srf.get('controlPoints');
+
+//   var date = Date.now() / 15000;
+//   var L = 0.23;
+
+//   for (var i = 0; i < controlPoints.length; i++){
+//     for (var j = 0; j < controlPoints[1].length; j++){
+
+//       // nice!
+//       controlPoints[i][j][2] = 0.3 * Math.cos( (controlPoints[i][j][0] + date) / L ) * Math.sin( (controlPoints[i][j][1] + date) / L  )
+//     }
+//   }
+
+//   // automatically retesselates
+// 	srf.set('controlPoints', controlPoints );
+
+// }, 60);
 
 
 var geom = [];
