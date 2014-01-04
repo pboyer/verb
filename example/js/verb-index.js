@@ -65,28 +65,6 @@ var update = function(timestamp){
 // regularly update the control points property of the surface
 window.requestAnimationFrame(update);
 
-// // regularly update the control points property of the surface
-// setInterval(function(){
-
-//   var controlPoints = srf.get('controlPoints');
-
-//   var date = Date.now() / 15000;
-//   var L = 0.23;
-
-//   for (var i = 0; i < controlPoints.length; i++){
-//     for (var j = 0; j < controlPoints[1].length; j++){
-
-//       // nice!
-//       controlPoints[i][j][2] = 0.3 * Math.cos( (controlPoints[i][j][0] + date) / L ) * Math.sin( (controlPoints[i][j][1] + date) / L  )
-//     }
-//   }
-
-//   // automatically retesselates
-// 	srf.set('controlPoints', controlPoints );
-
-// }, 60);
-
-
 var geom = [];
 
 // extrusion
@@ -190,7 +168,7 @@ function TitleViewer(ele, width, height, depth) {
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.loadIdentity();
-    gl.lookAt(0, 0.8, 0.8, 0.375, -0.375, 0, 0, 0, 1);
+    gl.lookAt(0, 0.4, 0.6, 0.375, -0.375, 0, 0, 0, 1);
 
     if ( that.mesh instanceof GL.Mesh) {
 

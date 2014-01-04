@@ -1,5 +1,5 @@
 body {
-  font: 14px/20px 'Helvetica Neue Light', HelveticaNeue-Light, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-family: 'Open Sans', sans-serif;
   margin: 0 auto;
 }
 
@@ -20,7 +20,7 @@ pre, code {
 
 pre { padding: 10px; }
 
-h1, h2 { font: bold 50px/50px 'Helvetica Neue', Helvetica, Arial; }
+h1, h2 { font-size: 50px; font-weight: bold; }
 h2 { font-size: 30px; margin: 100px 0 0 0; }
 a { color: inherit; }
 .viewer { float: left; width: 300px; height: 420px; background: #EEE; padding: 10px; margin: 10px; }

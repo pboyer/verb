@@ -26,9 +26,10 @@
 		<div class="container" id="title">
 			<div id="titlecontainer">
 
-				<h1><img src="assets/v2.png" style="height: 64px; padding-right: 10px; display: inline-block">verb</h1>
+				<h1><img src="assets/v2.png" style="height: 64px; padding-right: 10px; display: inline-block">verb<span style="font-size: 12px; padding-left: 5px">0.1.0</span></h1>
 				<h2>A NURBS Library for the Web</h2>
-				<p><a href="https://github.com/pboyer/verb" style="padding-right: 10px">Source code</a> <a href="docs/verb.html">Documentation</a></p>
+
+				<p><a href="geometry.html" style="padding-right: 10px">Examples</a><a href="https://github.com/pboyer/verb" style="padding-right: 10px">Source code</a> <a href="docs/verb.html">Documentation</a></p>
 
 			</div>
 		</div>
@@ -39,7 +40,7 @@
 	
 			<p>
 
-			verb is a JavaScript library for creating and manipulating <a href="http://en.wikipedia.org/wiki/Non-uniform_rational_B-spline">NURBS</a> surfaces and curves in the browser or <a href="http://nodejs.org/">node.js</a>.  It provides a <a href="geometry.html">rich set of geometric types like sweeps, extrusions, revolves, beziers, and other common curves and surfaces</a> in a <a href="js/verb.min.js">17kb-minified package</a>.
+			<strong>verb</strong> is a JavaScript library for creating and manipulating <a href="http://en.wikipedia.org/wiki/Non-uniform_rational_B-spline">NURBS</a> surfaces and curves in the browser or <a href="http://nodejs.org/">node.js</a>.  It provides a <a href="geometry.html">rich set of geometric types like sweeps, extrusions, revolves, beziers, and other common curves and surfaces</a> in a <a href="js/verb.min.js">17kb-minified package</a>.
 
 			</p>
 
@@ -80,19 +81,19 @@ var numDerivs = 1
 	, u = 0.5;
 
 // synchronously evaluate the point at 0.5
-var point = l.point( u );
+var point = curve.point( u );
 
 // synchronously evaluate first derivative of the curve at 0.5
-var derivs = l.derivatives( u, numDerivs );</pre>
+var derivs = curve.derivatives( u, numDerivs );</pre>
 
 			<h4>Tesselation</h4>
 
-			<p>verb supplies naive and adaptive tesselation routines for curves and surfaces at arbitrary tolerance.</p>
+			<p>A NURBS curve or surface is a mathematic function that can be evaluated.  In order to visualize it, you must tesselize it into a sequence of lines or collection of triangles.  verb supplies naive and adaptive tesselation routines for curves and surfaces at arbitrary tolerance.</p>
 
 			<pre>
-var l = new verb.geom.NurbsSurface(  );
+var surface = new verb.geom.NurbsSurface(  );
 
-l.tesselate( tesselationOptions, function(tesselation){
+surface.tesselate( tesselationOptions, function(tesselation){
 	...
 });</pre>
 
@@ -116,10 +117,10 @@ l.tesselate( tesselationOptions, function(tesselation){
 
 			<pre>var curve = new verb.geom.BezierCurve( [p1, p2, p3, p4] );
 
-// tesselate the curve synchronously
+// tesselate the curve synchronously with default options
 var pointsSync = curve.tesselate();
 
-// tesselate the curve asynchronously in a background thread
+// tesselate the curve asynchronously (again, default options) in a background thread
 curve.tesselate({}, function(points){
 	...
 });</pre>

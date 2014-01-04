@@ -19,7 +19,7 @@ var makeGLMeshFromTesselation = function(gl, s){
   mesh.triangles = s.faces;
   mesh.vertices = s.points;
 
-  mesh.colors = mesh.vertices.map(function(v) { return [0.95,0.95,0.85,1] });
+  mesh.colors = mesh.vertices.map(function(v) { return [0.95,0.95,0.90,1] });
   mesh.normals = s.normals;
 
   mesh.computeWireframe();
