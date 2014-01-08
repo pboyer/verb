@@ -38,6 +38,7 @@ function Viewer(ele, width, height, depth, async) {
   this.blackShader = new GL.Shader('\
     void main() {\
       gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\
+      gl_PointSize = 5.0;\
     }\
   ', '\
     void main() {\
@@ -56,6 +57,7 @@ function Viewer(ele, width, height, depth, async) {
       color = gl_Color.rgb;\
       normal = gl_NormalMatrix * gl_Normal;\
       gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\
+      gl_PointSize = 5.0;\
     }\
   ', '\
     varying vec3 color;\

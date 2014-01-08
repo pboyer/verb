@@ -56,6 +56,7 @@ Function.method('inherits', function (parent) {
     return this;
 });
 
+
 Array.prototype.flatten = function(){
 
 	if (this.length == 0) return [];

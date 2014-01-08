@@ -25,13 +25,66 @@ var width = document.getElementById("header").offsetWidth;
 var v = new TitleViewer( srf, width, 500, 0.8 );
 var ele = document.getElementById("header").appendChild(v.gl.canvas);
  
+ Array.prototype.flattenOnce = function(){
+
+  if (this.length == 0) return [];
+
+  var merged = [];
+
+  for (var i = 0; i < this.length; i++){
+    merged = merged.concat( this[i] );
+  }
+
+  return merged;
+
+}
+
+var makeLineNetwork = function(arr){
+
+  var pts = [];
+
+  for (var i = 0; i < arr.length; i++) {
+    for (var j = 0; j < arr[i].length-1; j++) {
+
+      pts.push( arr[i][j] );
+      pts.push( arr[i][j+1] );
+
+    }
+  }
+
+  for (var i = 0; i < arr.length-1; i++) {
+    for (var j = 0; j < arr[i].length; j++) {
+
+      pts.push( arr[i][j] );
+      pts.push( arr[i+1][j] );
+
+    }
+  }
+
+  return pts;
+
+}
+
 // if control points changes, retesselate
 var id = srf.watch('controlPoints', function(update){
 
   srf.toGlType(v.gl, function(mesh){
+
+    var pts = srf.get('controlPoints').flattenOnce();
+
+    v.points = makeGLCurveFromTesselation( v.gl, pts );
+    v.points.compile();
+
+    var pts2 = srf.get('controlPoints');
+
+    v.lines = makeGLCurveFromTesselation( v.gl, makeLineNetwork(pts2) );
+    v.lines.compile();
+
     v.mesh = mesh;
     mesh.compile();
+
     v.gl.ondraw();
+
   });
 
 });
@@ -64,6 +117,7 @@ var update = function(timestamp){
 
 // regularly update the control points property of the surface
 window.requestAnimationFrame(update);
+
 
 var geom = [];
 
@@ -127,8 +181,34 @@ function TitleViewer(ele, width, height, depth) {
   gl.disable(gl.CULL_FACE);
   gl.polygonOffset(1, 1);
 
+
+  // Black shader for wireframe
+  this.opaqueBlackShader = new GL.Shader('\
+    uniform float pointSize;\
+    void main() {\
+      gl_PointSize = 3.0;\
+      gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\
+    }\
+  ', '\
+    void main() {\
+      gl_FragColor = vec4(0.0, 0.0, 0.0, 0.3);\
+    }\
+  ');
+
+  this.blueShader = new GL.Shader('\
+    uniform float pointSize;\
+    void main() {\
+      gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\
+    }\
+  ', '\
+    void main() {\
+      gl_FragColor = vec4(0.0, 0.0, 1.0, 0.15);\
+    }\
+  ');
+
   // Black shader for wireframe
   this.blackShader = new GL.Shader('\
+    uniform float pointSize;\
     void main() {\
       gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;\
     }\
@@ -137,6 +217,8 @@ function TitleViewer(ele, width, height, depth) {
       gl_FragColor = vec4(0.0, 0.0, 0.0, 0.1);\
     }\
   ');
+
+  this.blackShader.uniforms({ pointSize: 5.0 });
 
   // Shader with diffuse and specular lighting
   this.lightingShader = new GL.Shader('\
@@ -168,7 +250,7 @@ function TitleViewer(ele, width, height, depth) {
 
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
     gl.loadIdentity();
-    gl.lookAt(0, 0.4, 0.6, 0.375, -0.375, 0, 0, 0, 1);
+    gl.lookAt(0, 0.8, 0.8, 0.375, -0.375, 0, 0, 0, 1);
 
     if ( that.mesh instanceof GL.Mesh) {
 
@@ -176,12 +258,28 @@ function TitleViewer(ele, width, height, depth) {
       that.lightingShader.draw(that.mesh, gl.TRIANGLES);
       if (!TitleViewer.lineOverlay) gl.disable(gl.POLYGON_OFFSET_FILL);
 
+      // draw control points
+      gl.disable(gl.DEPTH_TEST);
+      gl.enable(gl.BLEND);
+      
+      if ( that.points ) that.opaqueBlackShader.draw( that.points, gl.POINTS );
+      if ( that.lines ) that.blueShader.draw( that.lines, gl.LINES );
+
+      gl.disable(gl.BLEND);
+      gl.enable(gl.DEPTH_TEST);
+
+      // 
       if (TitleViewer.lineOverlay) gl.disable(gl.DEPTH_TEST);
       gl.enable(gl.BLEND);
       that.blackShader.draw(that.mesh, gl.LINES);
       gl.disable(gl.BLEND);
       if (TitleViewer.lineOverlay) gl.enable(gl.DEPTH_TEST);
-    }
+
+
+
+    } 
+
+
 
   };
 

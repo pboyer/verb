@@ -147,7 +147,7 @@ function buildViewer(gl, mesh){
 
     } else {
 
-      that.blackShader.draw( mesh, gl.LINE_STRIP);
+      that.blackShader.draw( mesh, gl.POINTS );
 
     }
 

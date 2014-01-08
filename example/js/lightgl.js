@@ -160,7 +160,7 @@ function addImmediateMode() {
     mode: -1,
     coord: [0, 0, 0, 0],
     color: [1, 1, 1, 1],
-    pointSize: 1,
+    pointSize: 5,
     shader: new Shader('\
       uniform float pointSize;\
       varying vec4 color;\
@@ -1577,6 +1577,7 @@ function Shader(vertexSource, fragmentSource) {
     return shader;
   }
   this.program = gl.createProgram();
+
   gl.attachShader(this.program, compileSource(gl.VERTEX_SHADER, vertexSource));
   gl.attachShader(this.program, compileSource(gl.FRAGMENT_SHADER, fragmentSource));
   gl.linkProgram(this.program);
