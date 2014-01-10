@@ -1159,8 +1159,6 @@ verb.eval.nurbs.intersect_rational_curves_by_aabb = function( degree1, knots1, h
 		, p1 = up1.map( function(el) { return el.slice(1) })
 		, p2 = up2.map( function(el) { return el.slice(1) });
 
-	console.log( u1, u2, p1, p2 );
-
 	return verb.eval.nurbs.intersect_parametric_polylines_by_aabb( p1, p2, u1, u2, tol );
 
 }
@@ -1190,7 +1188,7 @@ verb.eval.nurbs.intersect_parametric_polylines_by_aabb = function( p1, p2, u1, u
 
 	if (p1.length === 2 && p2.length === 2 ){
 
-			var inter = verb.eval.geom.segment_segment_intersect(p1[0],p1[1], p2[0], p2[1], tol);
+			var inter = verb.eval.geom.intersect_segments(p1[0],p1[1], p2[0], p2[1], tol);
 
 			if ( inter != null ){
 
@@ -1268,21 +1266,21 @@ verb.eval.geom.intersect_segments = function( a0, a1, b0, b1, tol ) {
 	// get axis and length of segments
 	var a1ma0 = numeric.sub(a1, a0),
 			aN = Math.sqrt( numeric.dot(a1ma0, a1ma0) ),
-			a = numeric.mul( 1/ aN, a1ma0 )
+			a = numeric.mul( 1/ aN, a1ma0 ),
 			b1mb0 = numeric.sub(b1, b0),
 			bN = Math.sqrt( numeric.dot(b1mb0, b1mb0) ),
-			a = numeric.mul( 1 / bN, a1ma0 )
-			int_params = ray_ray_intersect(a0, a, b0, b);
+			b = numeric.mul( 1 / bN, b1mb0 ),
+			int_params = verb.eval.geom.intersect_rays(a0, a, b0, b);
 
 	if ( int_params != null ) {
 
-		var u1 = Math.min( Math.max( 0, int_params[0] / a ), 1.0),
-				u2 = Math.min( Math.max( 0, int_params[1] / b ), 1.0),
+		var u1 = Math.min( Math.max( 0, int_params[0] / aN ), 1.0),
+				u2 = Math.min( Math.max( 0, int_params[1] / bN ), 1.0),
 				int_a = numeric.add( numeric.mul( u1, a1ma0 ), a0 ),
 				int_b = numeric.add( numeric.mul( u2, b1mb0 ), b0 ),
 				dist = numeric.norm2Squared( numeric.sub(int_a, int_b) );
 
-		if (  dist < tolerance*tolerance ) {
+		if (  dist < tol*tol ) {
 			return [ [u1].concat(int_a), [u2].concat(int_b) ] ;
 		} 
 

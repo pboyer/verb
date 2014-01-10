@@ -3571,10 +3571,10 @@ describe("verb.eval.nurbs.intersect_rational_curves_by_aabb",function(){
 
 		var degree1 = 1,
 				knots1 = [0,0,1,1],
-				control_points1 = [[0,0,0,1], [1,0,0,1]],
+				control_points1 = [[0,0,0,1], [2,0,0,1]],
 				degree2 = 1,
 				knots2 = [0,0,1,1],
-				control_points2 = [[0.5,0.5,0,1], [0.5,-0.5,0,1]]
+				control_points2 = [[0.5,0.5,0,1], [0.5,-1.5,0,1]]
 				sample_tol = verb.EPSILON,
 				tol = 0.001;
 
@@ -3587,7 +3587,7 @@ describe("verb.eval.nurbs.intersect_rational_curves_by_aabb",function(){
 																																	sample_tol, 
 																																	tol );
 
-		console.log(res);
+		
 
 
 	});
