@@ -963,7 +963,12 @@ verb.geom.BoundingBox = function() {
 	this.max = [0,0,0];
 
  	var pt_args = Array.prototype.slice.call( arguments, 0);
- 	this.add_elements_sync(pt_args);
+ 	if (pt_args.length === 1 && pt_args[0] instanceof Array){
+ 		this.add_elements_sync(pt_args[0]);
+ 	} else {
+ 		this.add_elements_sync(pt_args);
+ 	}
+ 	
 }	
 
 // ####add_elements( point_array, callback ) 
@@ -1079,14 +1084,14 @@ verb.geom.BoundingBox.prototype.add = function( point )
 // + *Boolean*, true if the two intervals overlap, otherwise false
 //
 
-verb.geom.BoundingBox.prototype.contains = function(point) {
+verb.geom.BoundingBox.prototype.contains = function(point, tol) {
 
 	if ( !this.initialized )
 	{
 		return false;
 	}
 
-	return this.intersects( new verb.geom.BoundingBox(point) );
+	return this.intersects( new verb.geom.BoundingBox(point), tol );
 
 }
 
@@ -1111,9 +1116,9 @@ verb.geom.BoundingBox.prototype.TOLERANCE = 1e-4;
 // + *Boolean*, true if the two intervals overlap, otherwise false
 //
 
-verb.geom.BoundingBox.prototype.intervals_overlap = function( a1, a2, b1, b2 ) {
+verb.geom.BoundingBox.prototype.intervals_overlap = function( a1, a2, b1, b2, tol ) {
 
-	var tol = verb.geom.BoundingBox.prototype.TOLERANCE
+	var tol = tol || verb.geom.BoundingBox.prototype.TOLERANCE
 		, x1 = Math.min(a1, a2) - tol
 		, x2 = Math.max(a1, a2) + tol
 		, y1 = Math.min(b1, b2) - tol
@@ -1141,7 +1146,7 @@ verb.geom.BoundingBox.prototype.intervals_overlap = function( a1, a2, b1, b2 ) {
 // + *Boolean*, true if the two bounding boxes intersect, otherwise false
 //
 
-verb.geom.BoundingBox.prototype.intersects = function( bb ) {
+verb.geom.BoundingBox.prototype.intersects = function( bb, tol ) {
 
 	if ( !this.initialized || !bb.initialized )
 	{
@@ -1153,9 +1158,9 @@ verb.geom.BoundingBox.prototype.intersects = function( bb ) {
 		, b1 = bb.min
 		, b2 = bb.max;
 
-	if ( this.intervals_overlap(a1[0], a2[0], b1[0], b2[0]) 
-			&& this.intervals_overlap(a1[1], a2[1], b1[1], b2[1]) 
-			&& this.intervals_overlap(a1[2], a2[2], b1[2], b2[2] ) )
+	if ( this.intervals_overlap(a1[0], a2[0], b1[0], b2[0], tol ) 
+			&& this.intervals_overlap(a1[1], a2[1], b1[1], b2[1], tol ) 
+			&& this.intervals_overlap(a1[2], a2[2], b1[2], b2[2], tol ) )
 	{
 		return true;
 	}
@@ -1229,7 +1234,7 @@ verb.geom.BoundingBox.prototype.get_axis_length = function( i ) {
 // + *Object*, The bounding box formed by the intersection or null if there is no intersection.
 //
 
-verb.geom.BoundingBox.prototype.intersect = function( bb ) {
+verb.geom.BoundingBox.prototype.intersect = function( bb, tol ) {
 
 	if ( !this.initialized )
 	{
@@ -1241,7 +1246,7 @@ verb.geom.BoundingBox.prototype.intersect = function( bb ) {
 		, b1 = bb.min
 		, b2 = bb.max;
 
-	if ( !this.intersects(bb) )
+	if ( !this.intersects( bb, tol ) )
 		return null;
 
 	var xmax = Math.min( a2[0], b2[0] )
@@ -3020,11 +3025,11 @@ verb.eval.nurbs.intersect_rational_curves_by_aabb = function( degree1, knots1, h
 verb.eval.nurbs.intersect_parametric_polylines_by_aabb = function( p1, p2, u1, u2, tol ) {
 
 	var bb1 = new verb.geom.BoundingBox(p1)
-		, bb2 = new verb.geom.BoundingBox(p2)
+		, bb2 = new verb.geom.BoundingBox(p2);
 
-	if ( !bb1.intersects(bb2) ) {
-		console.log('no good')
-		return;
+	if ( !bb1.intersects(bb2, tol) ) {
+		console.log('no good');
+		return [];
 	}
 
 	if (p1.length === 2 && p2.length === 2 ){

@@ -1184,10 +1184,7 @@ verb.eval.nurbs.intersect_parametric_polylines_by_aabb = function( p1, p2, u1, u
 	var bb1 = new verb.geom.BoundingBox(p1)
 		, bb2 = new verb.geom.BoundingBox(p2);
 
-	verb.geom.
-
-	if ( !bb1.intersects(bb2) ) {
-		console.log('no good');
+	if ( !bb1.intersects(bb2, tol) ) {
 		return [];
 	}
 

@@ -1211,11 +1211,11 @@ verb.eval.nurbs.intersect_rational_curves_by_aabb = function( degree1, knots1, h
 verb.eval.nurbs.intersect_parametric_polylines_by_aabb = function( p1, p2, u1, u2, tol ) {
 
 	var bb1 = new verb.geom.BoundingBox(p1)
-		, bb2 = new verb.geom.BoundingBox(p2)
+		, bb2 = new verb.geom.BoundingBox(p2);
 
-	if ( !bb1.intersects(bb2) ) {
-		console.log('no good')
-		return;
+	if ( !bb1.intersects(bb2, tol) ) {
+		console.log('no good');
+		return [];
 	}
 
 	if (p1.length === 2 && p2.length === 2 ){

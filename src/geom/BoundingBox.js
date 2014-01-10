@@ -11,7 +11,12 @@ verb.geom.BoundingBox = function() {
 	this.max = [0,0,0];
 
  	var pt_args = Array.prototype.slice.call( arguments, 0);
- 	this.add_elements_sync(pt_args);
+
+ 	if (pt_args.length === 1 && pt_args[0] instanceof Array && pt_args[0][0] instanceof Array ){
+ 		this.add_elements_sync(pt_args[0]);
+ 	} else {
+ 		this.add_elements_sync(pt_args);
+ 	}
 }	
 
 // ####add_elements( point_array, callback ) 
