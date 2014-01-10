@@ -3565,18 +3565,30 @@ describe("SweepOneRail.tesselate",function(){
 });
 
 // test for intersection
-describe("verb.intersect.curveCurve",function(){
+describe("verb.eval.nurbs.intersect_rational_curves_by_aabb",function(){
 
-	it('gives result for valid two lines', function(){
+	it('gives valid result for two lines', function(){
 
-		verb.init();
+		var degree1 = 1,
+				knots1 = [0,0,1,1],
+				control_points1 = [[0,0,0,1], [1,0,0,1]],
+				degree2 = 1,
+				knots2 = [0,0,1,1],
+				control_points2 = [[0.5,0.5,0,1], [0.5,-0.5,0,1]]
+				sample_tol = verb.EPSILON,
+				tol = 0.001;
 
-		var l1 = new verb.geom.Line( [1,0,0], [-1,0,0]  )
-			, l2 = new verb.geom.Line( [0,1,0], [0,-1,0]  )
+		var res = verb.eval.nurbs.intersect_rational_curves_by_aabb( 	degree1, 
+																																	knots1, 
+																																	control_points1, 
+																																	degree2, 
+																																	knots2, 
+																																	control_points2, 
+																																	sample_tol, 
+																																	tol );
 
-		var a = verb.intersect.curveCurve(l1, l2);
-		
-		console.log(a)
+		console.log(res);
+
 
 	});
 

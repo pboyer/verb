@@ -1133,7 +1133,7 @@ verb.eval.nurbs.rational_curve_curve_bb_intersect_refine = function( degree1, kn
 }
 
 //
-// ####intersect_rational_curves_by_aabb( degree1, knots1, control_points1, degree2, knots2, control_points2, sample_tol, tol )
+// ####intersect_rational_curves_by_aabb( degree1, knots1, homo_control_points1, degree2, knots2, homo_control_points2, sample_tol, tol )
 //
 // Intersect two NURBS curves
 //
@@ -1150,14 +1150,16 @@ verb.eval.nurbs.rational_curve_curve_bb_intersect_refine = function( degree1, kn
 // + *Array*, a 2d array specifying the intersections on u params of intersections on curve 1 and cruve 2
 //
 
-verb.eval.nurbs.intersect_rational_curves_by_aabb = function( degree1, knots1, control_points1, degree2, knots2, control_points2, sample_tol, tol ) {
+verb.eval.nurbs.intersect_rational_curves_by_aabb = function( degree1, knots1, homo_control_points1, degree2, knots2, homo_control_points2, sample_tol, tol ) {
 
-	var up1 = verb.eval.nurbs.rational_curve_adaptive_sample( degree1, knots1, control_points1, sample_tol )
-		, up2 = verb.eval.nurbs.rational_curve_adaptive_sample( degree1, knots1, control_points1, sample_tol )
+	var up1 = verb.eval.nurbs.rational_curve_adaptive_sample( degree1, knots1, homo_control_points1, sample_tol, true)
+		, up2 = verb.eval.nurbs.rational_curve_adaptive_sample( degree2, knots2, homo_control_points2, sample_tol, true)
 		, u1 = up1.map( function(el) { return el[0]; })
 		, u2 = up2.map( function(el) { return el[0]; })
 		, p1 = up1.map( function(el) { return el.slice(1) })
 		, p2 = up2.map( function(el) { return el.slice(1) });
+
+	console.log( u1, u2, p1, p2 );
 
 	return verb.eval.nurbs.intersect_parametric_polylines_by_aabb( p1, p2, u1, u2, tol );
 
@@ -1169,7 +1171,7 @@ verb.eval.nurbs.intersect_rational_curves_by_aabb = function( degree1, knots1, c
 // Intersect two polyline curves, keeping track of parameterization on each
 //
 // **params**
-// + *Array*, array of [parameter point] values for curve 1
+// + *Array*, array of point values for curve 1
 // + *Array*, array of [parameter point] values for curve 2
 // + *Number*, tolerance for the intersection
 // 
@@ -1180,9 +1182,14 @@ verb.eval.nurbs.intersect_rational_curves_by_aabb = function( degree1, knots1, c
 verb.eval.nurbs.intersect_parametric_polylines_by_aabb = function( p1, p2, u1, u2, tol ) {
 
 	var bb1 = new verb.geom.BoundingBox(p1)
-		, bb2 = new verb.geom.BoundingBox(p2)
+		, bb2 = new verb.geom.BoundingBox(p2);
 
-	if ( !bb1.intersects(bb2) ) return;
+	verb.geom.
+
+	if ( !bb1.intersects(bb2) ) {
+		console.log('no good');
+		return [];
+	}
 
 	if (p1.length === 2 && p2.length === 2 ){
 
@@ -1364,7 +1371,7 @@ verb.eval.geom.intersect_rays = function( a0, a, b0, b ) {
 // + *Number*, integer number of samples
 // 
 // **returns** 
-// + *Array*, an dictionary of parameter - point pairs
+// + *Array*, an array of points, prepended by the point param
 //
 
 verb.eval.nurbs.rational_curve_regular_sample = function( degree, knots, control_points, num_samples, include_u ) {
@@ -1436,8 +1443,15 @@ verb.eval.nurbs.rational_curve_regular_sample_range = function( degree, knots, c
 verb.eval.nurbs.rational_curve_adaptive_sample = function( degree, knots, control_points, tol, include_u ) {
 
 	// if degree is 1, just return the dehomogenized control points
-	if (degree === 1){
-		return control_points.map( verb.eval.nurbs.dehomogenize );
+	if (degree === 1){ 
+		if ( !include_u ) {
+			return control_points.map( verb.eval.nurbs.dehomogenize );
+		} else {
+			// the first element of each array is the parameter
+			return control_points.map(function(x, i){
+				return [ knots[i+1] ].concat( verb.eval.nurbs.dehomogenize( x ) );
+			});
+		}
 	}
 
 	return verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knots, control_points, 0, 1.0, tol, include_u );
