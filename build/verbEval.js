@@ -1188,8 +1188,6 @@ verb.eval.nurbs.intersect_rational_curves_by_aabb = function( degree1, knots1, h
 		, p1 = up1.map( function(el) { return el.slice(1) })
 		, p2 = up2.map( function(el) { return el.slice(1) });
 
-	console.log( u1, u2, p1, p2 );
-
 	return verb.eval.nurbs.intersect_parametric_polylines_by_aabb( p1, p2, u1, u2, tol );
 
 }
@@ -1201,7 +1199,9 @@ verb.eval.nurbs.intersect_rational_curves_by_aabb = function( degree1, knots1, h
 //
 // **params**
 // + *Array*, array of point values for curve 1
-// + *Array*, array of [parameter point] values for curve 2
+// + *Array*, array of parameter values for curve 1, same length as first arg
+// + *Array*, array of point values for curve 2
+// + *Array*, array of parameter values for curve 2, same length as third arg
 // + *Number*, tolerance for the intersection
 // 
 // **returns** 
@@ -1226,6 +1226,7 @@ verb.eval.nurbs.intersect_parametric_polylines_by_aabb = function( p1, p2, u1, u
 			 	inter[0][0] = inter[0][0] * ( u1[1]-u1[0] ) + u1[0];
 			 	inter[1][0] = inter[1][0] * ( u2[1]-u2[0] ) + u2[0];
 
+
 			 	return inter;
 
 			} 
@@ -1234,41 +1235,42 @@ verb.eval.nurbs.intersect_parametric_polylines_by_aabb = function( p1, p2, u1, u
 
 		var p2_mid = Math.ceil( p2.length / 2 ),
 				p2_a = p2.slice( 0, p2_mid ),
-				u2_a = u2.slice(0, p2_mid ),
-				p2_b = p2.slice( p2_mid-1 )
-				u2_b = p2.slice( p2_mid-1 );
+				p2_b = p2.slice( p2_mid-1 ),
+				u2_a = u2.slice( 0, p2_mid ),
+				u2_b = u2.slice( p2_mid-1 );
 
-		return 	 verb.eval.nurbs.parametric_polyline_polyline_bb_intersect(p1, p2_a, u1, u2_a, tol)
-		.concat( verb.eval.nurbs.parametric_polyline_polyline_bb_intersect(p1, p2_b, u1, u2_b, tol) );
+		return 	 verb.eval.nurbs.intersect_parametric_polylines_by_aabb(p1, p2_a, u1, u2_a, tol)
+		.concat( verb.eval.nurbs.intersect_parametric_polylines_by_aabb(p1, p2_b, u1, u2_b, tol) );
 
 	} else if (p2.length === 2) {
 
 		var p1_mid = Math.ceil( p1.length / 2 ),
 				p1_a = p1.slice( 0, p1_mid ),
-				u1_a = u1.slice(0, p1_mid ),
-				p1_b = p1.slice( p1_mid-1 )
-				u1_b = p1.slice( p1_mid-1 );
+				p1_b = p1.slice( p1_mid-1 ),
+				u1_a = u1.slice( 0, p1_mid ),
+				u1_b = u1.slice( p1_mid-1 );
 
-		return 		 verb.eval.nurbs.parametric_polyline_polyline_bb_intersect(p2, p1_a, u2, p1_a, tol)
-			.concat( verb.eval.nurbs.parametric_polyline_polyline_bb_intersect(p2, p1_b, u2, u1_b, tol) );
+		return 		 verb.eval.nurbs.intersect_parametric_polylines_by_aabb(p1_a, p2, u1_a, u2, tol)
+			.concat( verb.eval.nurbs.intersect_parametric_polylines_by_aabb(p1_b, p2, u1_b, u2, tol) );
 
 	} else {
 
 		var p1_mid = Math.ceil( p1.length / 2 ),
 				p1_a = p1.slice( 0, p1_mid ),
-				u1_a = u1.slice(0, p1_mid ),
 				p1_b = p1.slice( p1_mid-1 ),
-				u1_b = p1.slice( p1_mid-1 ),
+				u1_a = u1.slice( 0, p1_mid ),
+				u1_b = u1.slice( p1_mid-1 ),
+
 				p2_mid = Math.ceil( p2.length / 2 ),
 				p2_a = p2.slice( 0, p2_mid ),
-				u2_a = u2.slice(0, p2_mid ),
 				p2_b = p2.slice( p2_mid-1 ),
-				u2_b = p2.slice( p2_mid-1 );
+				u2_a = u2.slice( 0, p2_mid ),
+				u2_b = u2.slice( p2_mid-1 );
 
-		return 		 verb.eval.nurbs.parametric_polyline_polyline_bb_intersect(p1_a, p2_a, u1_a, p2_a, tol)
-			.concat( verb.eval.nurbs.parametric_polyline_polyline_bb_intersect(p1_a, p2_b, u1_a, u2_b, tol) )
-			.concat( verb.eval.nurbs.parametric_polyline_polyline_bb_intersect(p1_b, p2_a, u1_b, u2_a, tol) )
-			.concat( verb.eval.nurbs.parametric_polyline_polyline_bb_intersect(p1_b, p2_b, u1_b, u2_b, tol) );
+		return 		 verb.eval.nurbs.intersect_parametric_polylines_by_aabb(p1_a, p2_a, u1_a, u2_a, tol)
+			.concat( verb.eval.nurbs.intersect_parametric_polylines_by_aabb(p1_a, p2_b, u1_a, u2_b, tol) )
+			.concat( verb.eval.nurbs.intersect_parametric_polylines_by_aabb(p1_b, p2_a, u1_b, u2_a, tol) )
+			.concat( verb.eval.nurbs.intersect_parametric_polylines_by_aabb(p1_b, p2_b, u1_b, u2_b, tol) );
 
 	}
 
@@ -1303,7 +1305,6 @@ verb.eval.geom.intersect_segments = function( a0, a1, b0, b1, tol ) {
 			b = numeric.mul( 1 / bN, b1mb0 ),
 			int_params = verb.eval.geom.intersect_rays(a0, a, b0, b);
 
-	console.log(a, b, int_params)
 	if ( int_params != null ) {
 
 		var u1 = Math.min( Math.max( 0, int_params[0] / aN ), 1.0),
@@ -1311,8 +1312,6 @@ verb.eval.geom.intersect_segments = function( a0, a1, b0, b1, tol ) {
 				int_a = numeric.add( numeric.mul( u1, a1ma0 ), a0 ),
 				int_b = numeric.add( numeric.mul( u2, b1mb0 ), b0 ),
 				dist = numeric.norm2Squared( numeric.sub(int_a, int_b) );
-
-			console.log(u1, u2);
 
 		if (  dist < tol*tol ) {
 			return [ [u1].concat(int_a), [u2].concat(int_b) ] ;
