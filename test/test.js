@@ -3587,14 +3587,7 @@ describe("verb.eval.nurbs.intersect_rational_curves_by_aabb",function(){
 																																	tol );
 
 		res[0][0].should.be.approximately(0.25, verb.TOLERANCE );
-		res[0][1].should.be.approximately(0.5, verb.TOLERANCE );
-		res[0][2].should.be.approximately(0, verb.TOLERANCE );
-		res[0][3].should.be.approximately(0, verb.TOLERANCE );
-
-		res[1][0].should.be.approximately(0.25, verb.TOLERANCE );
-		res[1][1].should.be.approximately(0.5, verb.TOLERANCE );
-		res[1][2].should.be.approximately(0, verb.TOLERANCE );
-		res[1][3].should.be.approximately(0, verb.TOLERANCE );
+		res[0][1].should.be.approximately(0.25, verb.TOLERANCE );
 
 	});
 
@@ -3620,14 +3613,7 @@ describe("verb.eval.nurbs.intersect_rational_curves_by_aabb",function(){
 		var match_tol = 0.01;
 
 		res[0][0].should.be.approximately(0.296, match_tol );
-		res[0][1].should.be.approximately(0.59, match_tol );
-		res[0][2].should.be.approximately(0, match_tol );
-		res[0][3].should.be.approximately(0, match_tol );
-
-		res[1][0].should.be.approximately(0.36, match_tol );
-		res[1][1].should.be.approximately(0.59, match_tol );
-		res[1][2].should.be.approximately(0, match_tol );
-		res[1][3].should.be.approximately(0, match_tol );
+		res[0][1].should.be.approximately(0.36, match_tol );
 
 	});
 
@@ -3654,14 +3640,7 @@ describe("verb.eval.nurbs.intersect_rational_curves_by_aabb",function(){
 		var match_tol = 0.01;
 
 		res[0][0].should.be.approximately(0.36, match_tol );
-		res[0][1].should.be.approximately(0.59, match_tol );
-		res[0][2].should.be.approximately(0, match_tol );
-		res[0][3].should.be.approximately(0, match_tol );
-
-		res[1][0].should.be.approximately(0.29, match_tol );
-		res[1][1].should.be.approximately(0.59, match_tol );
-		res[1][2].should.be.approximately(0, match_tol );
-		res[1][3].should.be.approximately(0, match_tol );
+		res[0][1].should.be.approximately(0.29, match_tol );
 
 	});
 
@@ -3687,21 +3666,14 @@ describe("verb.eval.nurbs.intersect_rational_curves_by_aabb",function(){
 		var match_tol = 0.01;
 
 		res[0][0].should.be.approximately(0.41, match_tol );
-		res[0][1].should.be.approximately(0.58, match_tol );
-		res[0][2].should.be.approximately(0.04, match_tol );
-		res[0][3].should.be.approximately(0, match_tol );
-
-		res[1][0].should.be.approximately(0.33, match_tol );
-		res[1][1].should.be.approximately(0.58, match_tol );
-		res[1][2].should.be.approximately(0.04, match_tol );
-		res[1][3].should.be.approximately(0, match_tol );
+		res[0][1].should.be.approximately(0.33, match_tol );
 
 	});
 
 
 });
 
-describe("verb.eval.nurbs.rational_curve_curve_bb_intersect_refine",function(){
+describe("verb.eval.nurbs.refine_rational_curve_intersection",function(){
 
 	it('gives valid result for two lines', function(){
 
@@ -3713,11 +3685,10 @@ describe("verb.eval.nurbs.rational_curve_curve_bb_intersect_refine",function(){
 				control_points2 = [[0.5,0.5,0,1], [0.5,-1.5,0,1]],
 				start_params = [0.26, 0.24 ];
 
-		var res = verb.eval.nurbs.rational_curve_curve_bb_intersect_refine( degree1, knots1, control_points1, degree2, knots2, control_points2, start_params );
+		var res = verb.eval.nurbs.refine_rational_curve_intersection( degree1, knots1, control_points1, degree2, knots2, control_points2, start_params );
 
-		res[0].should.be.approximately(0, verb.TOLERANCE );
+		res[0].should.be.approximately(0.25, verb.TOLERANCE );
 		res[1].should.be.approximately(0.25, verb.TOLERANCE );
-		res[2].should.be.approximately(0.25, verb.TOLERANCE );
 
 	});
 
@@ -3731,12 +3702,10 @@ describe("verb.eval.nurbs.rational_curve_curve_bb_intersect_refine",function(){
 				control_points2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]]
 				start_params = [0.29, 0.36 ];
 
-		var res = verb.eval.nurbs.rational_curve_curve_bb_intersect_refine( degree1, knots1, control_points1, degree2, knots2, control_points2, start_params );
+		var res = verb.eval.nurbs.refine_rational_curve_intersection( degree1, knots1, control_points1, degree2, knots2, control_points2, start_params );
 
-		res[0].should.be.approximately(0, verb.TOLERANCE );
-		res[1].should.be.approximately(0.2964101616038012, verb.TOLERANCE );
-		res[2].should.be.approximately(0.3660254038069307, verb.TOLERANCE );
-
+		res[0].should.be.approximately(0.2964101616038012, verb.TOLERANCE );
+		res[1].should.be.approximately(0.3660254038069307, verb.TOLERANCE );
 
 	});
 
@@ -3750,7 +3719,7 @@ describe("verb.eval.nurbs.rational_curve_curve_bb_intersect_refine",function(){
 				control_points2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]],
 				start_params = [ 0.36, 0.29 ];
 
-		var res = verb.eval.nurbs.rational_curve_curve_bb_intersect_refine( 	degree2, 
+		var res = verb.eval.nurbs.refine_rational_curve_intersection( 	degree2, 
 																																	knots2, 
 																																	control_points2, 
 																																	degree1, 
@@ -3758,9 +3727,8 @@ describe("verb.eval.nurbs.rational_curve_curve_bb_intersect_refine",function(){
 																																	control_points1, 
 																																	start_params );
 
-		res[0].should.be.approximately(0, verb.TOLERANCE );
-		res[1].should.be.approximately(0.3660254038069307, verb.TOLERANCE );
-		res[2].should.be.approximately(0.2964101616038012, verb.TOLERANCE );
+		res[0].should.be.approximately(0.3660254038069307, verb.TOLERANCE );
+		res[1].should.be.approximately(0.2964101616038012, verb.TOLERANCE );
 
 	});
 
@@ -3774,17 +3742,271 @@ describe("verb.eval.nurbs.rational_curve_curve_bb_intersect_refine",function(){
 				control_points2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]],
 				start_params = [ 0.41, 0.33 ];
 
-		var res = verb.eval.nurbs.rational_curve_curve_bb_intersect_refine( degree1, knots1, control_points1, degree2, knots2, control_points2, start_params );
+		var res = verb.eval.nurbs.refine_rational_curve_intersection( degree1, knots1, control_points1, degree2, knots2, control_points2, start_params );
 
-		res[0].should.be.approximately(0, verb.TOLERANCE );
-		res[1].should.be.approximately(0.416208132514572, verb.TOLERANCE );
-		res[2].should.be.approximately(0.3374987853196129, verb.TOLERANCE );
+		
+		res[0].should.be.approximately(0.416208132514572, verb.TOLERANCE );
+		res[1].should.be.approximately(0.3374987853196129, verb.TOLERANCE );
 
 	});
 
-	// more tests for complex curves
+});
+
+describe("verb.eval.nurbs.intersect_rational_curves_by_aabb_refine",function(){
+
+	it('gives valid result for two planar lines', function(){
+
+		var degree1 = 1,
+				knots1 = [0,0,1,1],
+				control_points1 = [[0,0,0,1], [2,0,0,1]],
+				degree2 = 1,
+				knots2 = [0,0,1,1],
+				control_points2 = [[0.5,0.5,0,1], [0.5,-1.5,0,1]]
+				sample_tol = 1e-6,
+				tol = 0.0001;
+
+		var res = verb.eval.nurbs.intersect_rational_curves_by_aabb_refine( 	degree1, 
+																																	knots1, 
+																																	control_points1, 
+																																	degree2, 
+																																	knots2, 
+																																	control_points2, 
+																																	sample_tol, 
+																																	tol );
+
+		res[0][0].should.be.approximately(0.25, verb.TOLERANCE );
+		res[0][1].should.be.approximately(0.25, verb.TOLERANCE );
+
+	});
+
+	it('gives valid result for  planar degree 2 bezier and planar line', function(){
+
+		var degree1 = 1,
+				knots1 = [0,0,1,1],
+				control_points1 = [[0,0,0,1], [2,0,0,1]],
+				degree2 = 2,
+				knots2 = [0,0,0,1,1,1],
+				control_points2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]]
+				sample_tol = 1e-6,
+				tol = 0.0001;
+
+		var res = verb.eval.nurbs.intersect_rational_curves_by_aabb_refine( 	degree1, 
+																																	knots1, 
+																																	control_points1, 
+																																	degree2, 
+																																	knots2, 
+																																	control_points2, 
+																																	sample_tol, 
+																																	tol );
+
+		res[0][0].should.be.approximately(0.2964101616038012, verb.TOLERANCE );
+		res[0][1].should.be.approximately(0.3660254038069307, verb.TOLERANCE );
+
+	});
+
+	it('gives valid result for planar line and planar degree 2 bezier as second arg', function(){
+
+		var degree1 = 1,
+				knots1 = [0,0,1,1],
+				control_points1 = [[0,0,0,1], [2,0,0,1]],
+				degree2 = 2,
+				knots2 = [0,0,0,1,1,1],
+				control_points2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]]
+				sample_tol = 1e-6,
+				tol = 0.0001;
+
+		var res = verb.eval.nurbs.intersect_rational_curves_by_aabb_refine( 	degree2, 
+																																	knots2, 
+																																	control_points2, 
+																																	degree1, 
+																																	knots1, 
+																																	control_points1, 
+																																	sample_tol, 
+																																	tol );
+
+		res[0][0].should.be.approximately(0.3660254038069307, verb.TOLERANCE );
+		res[0][1].should.be.approximately(0.2964101616038012, verb.TOLERANCE );
+
+	});
+
+	it('gives valid result for 2 planar degree 2 beziers', function(){
+
+		var degree1 = 2,
+				knots1 = [0,0,0,1,1,1],
+				control_points1 = [[0,0,0,1], [0.5,0.1,0,1],  [2,0,0,1]],
+				degree2 = 2,
+				knots2 = [0,0,0,1,1,1],
+				control_points2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]]
+				sample_tol = 1e-6,
+				tol = 0.0001;
+
+		var res = verb.eval.nurbs.intersect_rational_curves_by_aabb_refine( 	degree1, 
+																																	knots1, 
+																																	control_points1, 
+																																	degree2, 
+																																	knots2, 
+																																	control_points2, 
+																																	sample_tol, 
+																																	tol );
+		var match_tol = 0.01;
+
+		res[0][0].should.be.approximately(0.416208132514572, verb.TOLERANCE );
+		res[0][1].should.be.approximately(0.3374987853196129, verb.TOLERANCE );
+
+	});
+
 
 });
 
+describe("verb.intersect.curveCurve",function(){
+
+	it('gives valid result for 2 planar degree 2 beziers', function(){
+
+		verb.init();
+
+		// build a bezier curve
+		var p1 = [0,0,0]
+			, p2 = [1,0,1]
+			, p3 = [2,0,1]
+			, p4 = [3,0,0];
+
+		var curve1 = new verb.geom.BezierCurve( [p1, p2, p3, p4] );
+
+		// build another
+		var c1 = [-5,0,3]
+			, c2 = [1,0,0]
+			, c3 = [2,0,0]
+			, c4 = [3,0,1];
+
+		var curve2 = new verb.geom.BezierCurve( [c1, c2, c3, c4] );
+
+		// make sync work
+		var res = verb.intersect.curveCurve( curve1, curve2 );
+
+		res.length.should.be.equal(2);
+		res[0].length.should.be.equal(3);
+		res[1].length.should.be.equal(3);
+
+		res[0][0].should.be.approximately(0.23545561131691756, verb.TOLERANCE);
+		res[0][1].should.be.approximately(0.4756848757799639, verb.TOLERANCE);
+
+		res[1][0].should.be.approximately(0.7756197831105017, verb.TOLERANCE);
+		res[1][1].should.be.approximately(0.7908648647054176, verb.TOLERANCE);
+
+
+	});
+
+});
+
+describe("verb.eval.nurbs.intersect_rational_curve_surface_by_aabb",function(){
+
+	it('gives valid result for planar surface and line', function(){
+
+		// verb.init();
+
+		// // build planar surface in the xy plane
+		// var homo_control_points_srf = [ [ [0,0,0,1], [10,0,0,1] ], [[0,10,0,1], [10,10,0,1] ] ]
+		// 	, degree_u  = 1
+		// 	, degree_v = 1
+		// 	, knots_u = [0,0,1,1]
+		// 	, knots_v = [0,0,1,1];
+
+		// // line from [5,5,5] to [5,5,-5]
+		// var degree_crv = 1
+		// 	, knots_crv = [0,0,1,1]
+		// 	, homo_control_points_crv = [ [5,5,5,1], [5,5,-5,1] ];
+
+		// var sample_tol = 1e-6
+		// 	, tol = 0.0001
+		// 	, divs_u = 2
+		// 	, divs_v = 2;
+
+		// var res =  verb.eval.nurbs.intersect_rational_curve_surface_by_aabb( 	degree_u, 
+		// 																																			knots_u, 
+		// 																																			degree_v, 
+		// 																																			knots_v, 
+		// 																																			homo_control_points_srf, 
+
+		// 																																			degree_crv, 
+		// 																																			knots_crv, 
+		// 																																			homo_control_points_crv, 
+
+		// 																																			sample_tol, 
+		// 																																			tol, 
+		// 																																			divs_u, 
+		// 																																			divs_v );
+
+		// res.length.should.be.equal(1);
+		// res[0].p.approximately(0.5, verb.TOLERANCE);
+		// res[0].uv[0].approximately(0.5, verb.TOLERANCE);
+		// res[0].uv[1].approximately(0.5, verb.TOLERANCE);
+
+	});
+
+});
+
+describe("verb.eval.geom.intersect_segment_with_tri",function(){
+
+	it('gives correct result for intersecting axis aligned segment and triangle ', function(){
+
+		// line from [5,5,5] to [5,5,-5]
+		var p0 = [ 5,5,5 ]
+			, p1 = [ 5,5,-10 ]
+			, points = [ [0,0,0], [10,0,0], [5,10,1] ]
+			, tri = [ 0, 1, 2 ];
+
+		var res = verb.eval.geom.intersect_segment_with_tri( p0, p1, points, tri );
+
+		res.p.should.be.approximately(0.3, verb.TOLERANCE);
+		res.s.should.be.approximately(0.25, verb.TOLERANCE);
+		res.t.should.be.approximately(0.5, verb.TOLERANCE);
+
+		var p_srf = numeric.add( 	points[0], 
+															numeric.mul( res.s, numeric.sub(points[1], points[0])), 
+															numeric.mul( res.t, numeric.sub(points[2], points[0])) );
+
+		numeric.norm2( numeric.sub( res.point, p_srf ) ).should.be.approximately(0, verb.TOLERANCE );
+
+	});
+
+	it('gives correct result for intersecting axis aligned segment and planar triangle ', function(){
+
+		// line from [5,5,5] to [5,5,-5]
+		var p0 = [ 5,5,5 ]
+			, p1 = [ 5,5,-10 ]
+			, points = [ [0,0,0], [10,0,0], [5,10,0] ]
+			, tri = [ 0, 1, 2 ];
+
+		var res = verb.eval.geom.intersect_segment_with_tri( p0, p1, points, tri );
+
+		res.p.should.be.approximately(0.333333333333, verb.TOLERANCE);
+		res.s.should.be.approximately(0.25, verb.TOLERANCE);
+		res.t.should.be.approximately(0.5, verb.TOLERANCE);
+
+		var p_srf = numeric.add( 	points[0], 
+															numeric.mul( res.s, numeric.sub(points[1], points[0])), 
+															numeric.mul( res.t, numeric.sub(points[2], points[0])) );
+
+		numeric.norm2( numeric.sub( res.point, p_srf ) ).should.be.approximately(0, verb.TOLERANCE );
+
+	});
+
+	it('gives null for non-intersecting segment and triangle', function(){
+
+		// line from [5,5,5] to [5,5,-5]
+		var p0 = [ 5,5,5 ]
+			, p1 = [ 5,5,4 ]
+
+			// planar triangle
+			, points = [ [0,0,0], [10,0,0], [5,10,0] ]
+			, tri = [ 0, 1, 2 ];
+
+		var res = verb.eval.geom.intersect_segment_with_tri( p0, p1, points, tri );
+
+		(null === res).should.be.true;
+
+	});
+
+});
 
 

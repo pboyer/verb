@@ -690,6 +690,177 @@ verb.eval.geom.intersect_tris = function( points1, tri1, uvs1, points2, tri2, uv
 }
 
 //
+// ####intersect_rational_curve_surface_by_aabb( degree_u, knots_u, degree_v, knots_v, homo_control_points, degree_crv, knots_crv, homo_control_points_crv, sample_tol, tol )
+//
+// Approximate the intersection of two nurbs surface by axis-aligned bounding box intersection.
+//
+// **params**
+// + *Number*, integer degree of crv1
+// + *Array*, array of nondecreasing knot values for crv 1
+// + *Array*, 2d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi) for crv 1
+// + *Number*, integer degree of crv2
+// + *Array*, array of nondecreasing knot values for crv 2
+// + *Array*, 2d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi) for crv 2
+// + *Number*, tolerance for the intersection
+// 
+// **returns** 
+// + *Array*, array of parameter pairs representing the intersection of the two parameteric polylines
+//
+
+function range(num){
+	var arr = new Array(num);
+	return arr.map(function (_, i) {return i;});
+}
+
+verb.eval.nurbs.intersect_rational_curve_surface_by_aabb = function( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, sample_tol, tol, divs_u, divs_v ) {
+
+	// tesselate the curve
+	var crv = verb.eval.nurbs.rational_curve_adaptive_sample( degree_crv, knots_crv, homo_control_points_crv, sample_tol, true)
+
+	// tesselate the surface
+		, mesh = verb.eval.nurbs.tesselate_rational_surface_naive( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, divs_u, divs_v )
+
+	// separate parameters from points in the polyline (params are the first index in the array)
+		, u1 = crv.map( function(el) { return el[0]; })
+		, p1 = crv.map( function(el) { return el.slice(1) });
+
+	// perform intersection
+
+	return verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( p1, u1, mesh, _.range(mesh.faces.length), tol );
+
+}
+
+//
+// ####intersect_parametric_polyline_mesh_by_aabb( crv_points, crv_param_points, mesh, tol )
+//
+// Approximate the intersection of a polyline and mesh while maintaining parameter information
+//
+// **params**
+// + *Array*, array of point values for curve 1
+// + *Array*, array of parameter values for curve 1, same length as first arg
+// + *Array*, array of point values for curve 2
+// + *Array*, array of parameter values for curve 2, same length as third arg
+// + *Number*, tolerance for the intersection
+// 
+// **returns** 
+// + *Array*, array of intersection objects, each holding:
+// 	- a "point" property where intersections took place
+// 	- a "p" the parameter on the polyline
+//	- a "uv" the parameter on the mesh
+// 	- a "face" the index of the face where the intersection took place
+//
+
+function firstHalf(arr){
+
+	if (arr.length === 0) return [];
+
+	var len = Math.ceil( arr.length / 2 );
+	return arr.slice( 0, len );
+
+}
+
+function secondHalf(arr){
+
+	if (arr.length === 0) return [];
+
+	var len = Math.ceil( arr.length / 2 );
+	return arr.slice( len-1 );
+	
+}
+
+verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb = function( crv_points, crv_param_points, mesh, included_faces, tol ) {
+
+	// check if two bounding boxes intersect
+	var pl_bb = new verb.geom.BoundingBox( crv_points )
+		, mesh_bb = verb.eval.mesh.make_mesh_aabb( mesh.points, mesh.faces, included_faces );
+
+	// if bounding boxes do not intersect, return none
+	if ( !pl_bb.intersects( mesh_bb, tol ) ) {
+
+		
+		return [];
+	}
+
+	if ( crv_points.length === 2 && included_faces.length === 1 ){
+
+			// console.log('done')
+
+			// intersect segment and triangle
+			var inter = verb.eval.geom.intersect_segment_with_tri( crv_points[0], crv_points[1], mesh.points, mesh.faces[ included_faces[0] ] );
+
+			if ( inter.intersects === true ){
+
+				// map the parameters of the segment to the parametric space of the entire polyline
+			 	var p = inter.p * ( crv_param_points[1]-crv_param_points[0] ) + crv_param_points[0];
+
+			 	// map the parameters of the triangle to the entire parametric space of the triangle
+			 	var index_v0 = mesh.faces[ included_faces ][0]
+			 		, index_v1 = mesh.faces[ included_faces ][1]
+			 		, index_v2 = mesh.faces[ included_faces ][2]
+			 		, uv_v0 = mesh.uvs[ index_v0 ]
+			 		, uv_v1 = mesh.uvs[ index_v1 ]
+			 		, uv_v2 = mesh.uvs[ index_v2 ]
+			 		, uv_s_diff = numeric.sub( uv_v1, uv_v0 )
+			 		, uv_t_diff = numeric.sub( uv_v2, uv_v0 )
+			 		, uv = numeric.add( uv_v0, numeric.mul( inter.s, uv_s_diff ), numeric.mul( inter.t, uv_t_diff ) );
+
+			 	// a pair representing the param on the polyline and the param on the mesh
+			 	return [ { point: inter.point, p: inter.p, uv: uv, face: included_faces[0] } ]; 
+
+			}
+
+	} else if ( included_faces.length === 1 ) {
+
+		// console.log('split crv')
+
+		// divide polyline in half
+		var crv_points_a = firstHalf( crv_points )
+			, crv_points_b = secondHalf( crv_points )
+			, crv_param_points_a = firstHalf( crv_param_points )
+			, crv_param_points_b = secondHalf( crv_param_points );
+
+		return 	 verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points_a, crv_param_points_a, mesh, included_faces, tol )
+		.concat( verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points_b, crv_param_points_b, mesh, included_faces, tol ) );
+
+	} else if ( crv_points.length === 2 ) {
+
+		// console.log('split mesh')
+
+		// divide mesh in "half" by first sorting
+		var sorted_included_faces = verb.eval.mesh.sort_tris_on_longest_axis( mesh_bb, mesh.points, mesh.faces, included_faces )
+			, included_faces_a = firstHalf( sorted_included_faces )
+			, included_faces_b = secondHalf( sorted_included_faces );
+
+		return 		 verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points, crv_param_points, mesh, included_faces_a, tol )
+			.concat( verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points, crv_param_points, mesh, included_faces_b, tol ));
+
+	} else {
+
+		// console.log('split both')
+
+		// divide polyline in half
+		var crv_points_a = firstHalf( crv_points )
+			, crv_points_b = secondHalf( crv_points )
+			, crv_param_points_a = firstHalf( crv_param_points )
+			, crv_param_points_b = secondHalf( crv_param_points );
+
+		// divide mesh in "half"
+		var sorted_included_faces = verb.eval.mesh.sort_tris_on_longest_axis( mesh_bb, mesh.points, mesh.faces, included_faces )
+			, included_faces_a = firstHalf( sorted_included_faces )
+			, included_faces_b = secondHalf( sorted_included_faces );
+
+		return 	 	 verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points_a, crv_param_points_a, mesh, included_faces_a, tol )
+			.concat( verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points_a, crv_param_points_a, mesh, included_faces_b, tol ) )
+			.concat( verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points_b, crv_param_points_b, mesh, included_faces_a, tol ) )
+			.concat( verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points_b, crv_param_points_b, mesh, included_faces_b, tol ) );
+
+	}
+
+	return [];
+
+}
+
+//
 // ####intersect_segment_with_tri(  p1, p0, points, tri )
 //
 //  Intersect ray/segment with triangle (from http://geomalgorithms.com/a06-_intersect-2.html)
@@ -705,37 +876,56 @@ verb.eval.geom.intersect_tris = function( points1, tri1, uvs1, points2, tri2, uv
 // 
 // **returns** 
 // + *Object*, an object with an "intersects" property that is true or false and if true, a 
-// "" property giving the param on u, and "t" is the property on v, a "point" property
+// "s" property giving the param on u, and "t" is the property on v, where u is the 
+// axis from v0 to v1, and v is v0 to v1, a "point" property
 // where the intersection took place, and "p" property representing the parameter along the segment
-
 //
 
-verb.eval.geom.intersect_segment_with_tri = function( p1, p0, points, tri ) {
+verb.eval.geom.intersect_segment_with_tri = function( p0, p1, points, tri ) {
 
 	var v0 = points[ tri[0] ]
 		, v1 = points[ tri[1] ]
 		, v2 = points[ tri[2] ]
 		, u = numeric.sub( v1, v0 )
 		, v = numeric.sub( v2, v0 )
-		, udotv = numeric.dot(u,v)
-		, udotu = numeric.dot(u,u)
-		, vdotv = numeric.dot(v,v)
-		, denom = udotv * udotv - udotu * vdotv
-		, s = ((udotv * numeric.dot(u,v)) - (vdotv * numeric.dot(w,u))) / denom
-		, t = ((udotv * numeric.dot(w,u)) - (udotu * numeric.dot(w,v))) / denom;
+		, n = numeric.cross( u, v );
 
-	if (s > 1.0 + EPSILON || t > 1.0 + EPSILON || t < -EPSILON || s < -EPSILON || s + t > 1.0 + EPSILON){
+	var dir = numeric.sub( p1, p0 )
+		, w0 = numeric.sub( p0, v0 )
+		, a = -numeric.dot( n, w0 )
+		, b = numeric.dot( n, dir )
+
+	// is ray is parallel to triangle plane?
+	if ( Math.abs( b ) < verb.EPSILON ){ 
 		return null;
 	}
 
-	var pt = numeric.add( v0, numeric.add( numeric.mul( s, u ), numeric.mul( t, v ) ) )
-		, p1mp0 = numeric.sub(p1, p0)
-		, p1mp0norm = numeric.dot( p1mp0, p1mp0 )
-		, ptmp0 = numeric.sub(pt, p0)
-		, ptmp0norm = numeric.dot( ptmp0, ptmp0 )
-		, p = ptmp0norm / p1mp0norm;
+	var r = a / b;
 
-	return { point: pt, s: s, t: t, param: p };
+	// segment goes away from triangle or is beyond segment
+	if ( r < 0 || r > 1 ){
+		return null;
+	}
+
+	// get proposed intersection
+	var pt = numeric.add( p0, numeric.mul( r, dir ) );
+
+	// is I inside T?
+	var uv = numeric.dot(u,v)
+		, uu = numeric.dot(u,u)
+		, vv = numeric.dot(v,v)
+		, w = numeric.sub( pt, v0 )
+		, wu = numeric.dot( w, u )
+		, wv = numeric.dot( w, v )
+		, denom = uv * uv - uu * vv
+		, s = ( uv * wv - vv * wu ) / denom
+		, t = ( uv * wu - uu * wv ) / denom;
+
+	if (s > 1.0 + verb.EPSILON || t > 1.0 + verb.EPSILON || t < -verb.EPSILON || s < -verb.EPSILON || s + t > 1.0 + verb.EPSILON){
+		return null;
+	}
+
+	return { point: pt, s: s, t: t, p: r };
 
 }
 
@@ -863,7 +1053,6 @@ verb.eval.mesh.make_mesh_aabb_tree = function( points, tris, tri_indices ) {
 	return aabb;
 
 }
-
 
 //
 // ####make_mesh_aabb( points, tris, tri_indices )
@@ -1095,6 +1284,35 @@ verb.eval.nurbs.tesselate_rational_surface_naive = function( degree_u, knots_u, 
 }
 
 //
+// ####intersect_rational_curves_by_aabb_refine( degree1, knots1, homo_control_points1, degree2, knots2, homo_control_points2, sample_tol, tol )
+//
+// Approximate the intersection of two nurbs surface by axis-aligned bounding box intersection and then refine all solutions.
+//
+// **params**
+// + *Number*, integer degree of curve1
+// + *Array*, array of nondecreasing knot values for curve 1
+// + *Array*, 2d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi) for curve 1
+// + *Number*, integer degree of curve2
+// + *Array*, array of nondecreasing knot values for curve 2
+// + *Array*, 2d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi) for curve 2
+// + *Number*, tolerance for the intersection
+// 
+// **returns** 
+// + *Array*, a 2d array specifying the intersections on u params of intersections on curve 1 and cruve 2
+//
+
+verb.eval.nurbs.intersect_rational_curves_by_aabb_refine = function( degree1, knots1, homo_control_points1, degree2, knots2, homo_control_points2, sample_tol, tol ) {
+
+	var ints = verb.eval.nurbs.intersect_rational_curves_by_aabb( degree1, knots1, homo_control_points1, degree2, knots2, homo_control_points2, sample_tol, tol );
+
+	return ints.map(function(start_params){
+		return verb.eval.nurbs.refine_rational_curve_intersection( degree1, knots1, homo_control_points1, degree2, knots2, homo_control_points2, start_params )
+	});
+
+}
+
+
+//
 // ####rational_curve_curve_bb_intersect_refine( degree1, knots1, control_points1, degree2, knots2, control_points2, start_params )
 //
 // Refine an intersection pair for two curves given an initial guess.  This is an unconstrained minimization,
@@ -1115,7 +1333,7 @@ verb.eval.nurbs.tesselate_rational_surface_naive = function( degree_u, knots_u, 
 // + *Array*, a length 3 array containing the [ distance// distance, u1, u2 ]
 //
 
-verb.eval.nurbs.rational_curve_curve_bb_intersect_refine = function( degree1, knots1, control_points1, degree2, knots2, control_points2, start_params ) {
+verb.eval.nurbs.refine_rational_curve_intersection = function( degree1, knots1, control_points1, degree2, knots2, control_points2, start_params ) {
 
 	var objective = function(x) { 
 
@@ -1127,15 +1345,14 @@ verb.eval.nurbs.rational_curve_curve_bb_intersect_refine = function( degree1, kn
 	}
 
 	var sol_obj = numeric.uncmin( objective, start_params);
-
-	return [sol_obj.f].concat( sol_obj.solution );
+	return sol_obj.solution.concat( sol_obj.f );
 
 }
 
 //
 // ####intersect_rational_curves_by_aabb( degree1, knots1, homo_control_points1, degree2, knots2, homo_control_points2, sample_tol, tol )
 //
-// Intersect two NURBS curves
+// Approximate the intersection of two nurbs surface by axis-aligned bounding box intersection.
 //
 // **params**
 // + *Number*, integer degree of curve1
@@ -1147,7 +1364,7 @@ verb.eval.nurbs.rational_curve_curve_bb_intersect_refine = function( degree1, kn
 // + *Number*, tolerance for the intersection
 // 
 // **returns** 
-// + *Array*, a 2d array specifying the intersections on u params of intersections on curve 1 and cruve 2
+// + *Array*, array of parameter pairs representing the intersection of the two parameteric polylines
 //
 
 verb.eval.nurbs.intersect_rational_curves_by_aabb = function( degree1, knots1, homo_control_points1, degree2, knots2, homo_control_points2, sample_tol, tol ) {
@@ -1176,7 +1393,7 @@ verb.eval.nurbs.intersect_rational_curves_by_aabb = function( degree1, knots1, h
 // + *Number*, tolerance for the intersection
 // 
 // **returns** 
-// + *Array*, a 2d array specifying the intersections on u params of intersections on curve 1 and cruve 2
+// + *Array*, array of parameter pairs representing the intersection of the two parameteric polylines
 //
 
 verb.eval.nurbs.intersect_parametric_polylines_by_aabb = function( p1, p2, u1, u2, tol ) {
@@ -1194,11 +1411,11 @@ verb.eval.nurbs.intersect_parametric_polylines_by_aabb = function( p1, p2, u1, u
 
 			if ( inter != null ){
 
+				// map the parameters of the segment to the parametric space of the entire polyline
 			 	inter[0][0] = inter[0][0] * ( u1[1]-u1[0] ) + u1[0];
 			 	inter[1][0] = inter[1][0] * ( u2[1]-u2[0] ) + u2[0];
 
-
-			 	return inter;
+			 	return [ [ inter[0][0], inter[1][0] ] ];
 
 			} 
 
