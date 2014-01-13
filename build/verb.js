@@ -2542,11 +2542,6 @@ verb.eval.geom.intersect_tris = function( points1, tri1, uvs1, points2, tri2, uv
 // + *Array*, array of parameter pairs representing the intersection of the two parameteric polylines
 //
 
-function range(num){
-	var arr = new Array(num);
-	return arr.map(function (_, i) {return i;});
-}
-
 verb.eval.nurbs.intersect_rational_curve_surface_by_aabb = function( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, sample_tol, tol, divs_u, divs_v ) {
 
 	// tesselate the curve
@@ -2557,11 +2552,13 @@ verb.eval.nurbs.intersect_rational_curve_surface_by_aabb = function( degree_u, k
 
 	// separate parameters from points in the polyline (params are the first index in the array)
 		, u1 = crv.map( function(el) { return el[0]; })
-		, p1 = crv.map( function(el) { return el.slice(1) });
+		, p1 = crv.map( function(el) { return el.slice(1) })
 
 	// perform intersection
+		, res = verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( p1, u1, mesh, _.range(mesh.faces.length), tol );
 
-	return verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( p1, u1, mesh, _.range(mesh.faces.length), tol );
+	return res;
+
 
 }
 
@@ -2585,23 +2582,9 @@ verb.eval.nurbs.intersect_rational_curve_surface_by_aabb = function( degree_u, k
 // 	- a "face" the index of the face where the intersection took place
 //
 
-function firstHalf(arr){
-
-	if (arr.length === 0) return [];
-
-	var len = Math.ceil( arr.length / 2 );
-	return arr.slice( 0, len );
-
-}
-
-function secondHalf(arr){
-
-	if (arr.length === 0) return [];
-
-	var len = Math.ceil( arr.length / 2 );
-	return arr.slice( len-1 );
-	
-}
+function left(arr){if (arr.length === 0) return [];var len = Math.ceil( arr.length / 2 ); return arr.slice( 0, len );}
+function right(arr){if (arr.length === 0) return [];var len = Math.ceil( arr.length / 2 );return arr.slice( len );}
+function rightWithPivot(arr){if (arr.length === 0) return [];var len = Math.ceil( arr.length / 2 );return arr.slice( len-1 );}
 
 verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb = function( crv_points, crv_param_points, mesh, included_faces, tol ) {
 
@@ -2611,19 +2594,15 @@ verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb = function( crv_point
 
 	// if bounding boxes do not intersect, return none
 	if ( !pl_bb.intersects( mesh_bb, tol ) ) {
-
-		
 		return [];
 	}
 
 	if ( crv_points.length === 2 && included_faces.length === 1 ){
 
-			// console.log('done')
-
 			// intersect segment and triangle
 			var inter = verb.eval.geom.intersect_segment_with_tri( crv_points[0], crv_points[1], mesh.points, mesh.faces[ included_faces[0] ] );
 
-			if ( inter.intersects === true ){
+			if ( inter != null ){
 
 				// map the parameters of the segment to the parametric space of the entire polyline
 			 	var p = inter.p * ( crv_param_points[1]-crv_param_points[0] ) + crv_param_points[0];
@@ -2640,49 +2619,43 @@ verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb = function( crv_point
 			 		, uv = numeric.add( uv_v0, numeric.mul( inter.s, uv_s_diff ), numeric.mul( inter.t, uv_t_diff ) );
 
 			 	// a pair representing the param on the polyline and the param on the mesh
-			 	return [ { point: inter.point, p: inter.p, uv: uv, face: included_faces[0] } ]; 
+			 	return [ { point: inter.point, p: p, uv: uv, face: included_faces[0] } ]; 
 
 			}
 
 	} else if ( included_faces.length === 1 ) {
 
-		// console.log('split crv')
-
-		// divide polyline in half
-		var crv_points_a = firstHalf( crv_points )
-			, crv_points_b = secondHalf( crv_points )
-			, crv_param_points_a = firstHalf( crv_param_points )
-			, crv_param_points_b = secondHalf( crv_param_points );
+		// divide polyline in half, rightside includes the pivot
+		var crv_points_a = left( crv_points )
+			, crv_points_b = rightWithPivot( crv_points )
+			, crv_param_points_a = left( crv_param_points )
+			, crv_param_points_b = rightWithPivot( crv_param_points );
 
 		return 	 verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points_a, crv_param_points_a, mesh, included_faces, tol )
 		.concat( verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points_b, crv_param_points_b, mesh, included_faces, tol ) );
 
 	} else if ( crv_points.length === 2 ) {
 
-		// console.log('split mesh')
-
 		// divide mesh in "half" by first sorting
 		var sorted_included_faces = verb.eval.mesh.sort_tris_on_longest_axis( mesh_bb, mesh.points, mesh.faces, included_faces )
-			, included_faces_a = firstHalf( sorted_included_faces )
-			, included_faces_b = secondHalf( sorted_included_faces );
+			, included_faces_a = left( sorted_included_faces )
+			, included_faces_b = right( sorted_included_faces );
 
 		return 		 verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points, crv_param_points, mesh, included_faces_a, tol )
 			.concat( verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points, crv_param_points, mesh, included_faces_b, tol ));
 
 	} else {
 
-		// console.log('split both')
-
-		// divide polyline in half
-		var crv_points_a = firstHalf( crv_points )
-			, crv_points_b = secondHalf( crv_points )
-			, crv_param_points_a = firstHalf( crv_param_points )
-			, crv_param_points_b = secondHalf( crv_param_points );
-
 		// divide mesh in "half"
 		var sorted_included_faces = verb.eval.mesh.sort_tris_on_longest_axis( mesh_bb, mesh.points, mesh.faces, included_faces )
-			, included_faces_a = firstHalf( sorted_included_faces )
-			, included_faces_b = secondHalf( sorted_included_faces );
+			, included_faces_a = left( sorted_included_faces )
+			, included_faces_b = right( sorted_included_faces );
+
+		// divide polyline in half, rightside includes the pivot
+		var crv_points_a = left( crv_points )
+			, crv_points_b = rightWithPivot( crv_points )
+			, crv_param_points_a = left( crv_param_points )
+			, crv_param_points_b = rightWithPivot( crv_param_points );
 
 		return 	 	 verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points_a, crv_param_points_a, mesh, included_faces_a, tol )
 			.concat( verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points_a, crv_param_points_a, mesh, included_faces_b, tol ) )
@@ -2907,15 +2880,11 @@ verb.eval.mesh.make_mesh_aabb = function( points, tris, tri_indices ) {
 
 	var bb = new verb.geom.BoundingBox();
 
-	for (var i = tri_indices.length - 1; i >= 0; i--) {
-		
-		var tri_i = tri_indices[i];
-
-		bb.add( points[ tris[ tri_i ][0] ] );
-		bb.add( points[ tris[ tri_i ][1] ] );
-		bb.add( points[ tris[ tri_i ][2] ] );
-
-	};
+	tri_indices.forEach(function(x){
+		bb.add( points[ tris[ x ][0] ] );
+		bb.add( points[ tris[ x ][1] ] );
+		bb.add( points[ tris[ x ][2] ] );
+	});
 
 	return bb;
 
@@ -3543,9 +3512,12 @@ verb.eval.nurbs.rational_curve_adaptive_sample_range = function( degree, knots, 
 		// the first condition checks if the curve makes up a loop, if so, we will need to continue evaluation
 		if ( ( numeric.dot( diff, diff ) < tol && numeric.dot( diff2, diff2 ) > tol ) || !verb.eval.nurbs.three_points_are_flat( p1, p2, p3, tol ) ) {
 
+			// get the exact middle
+			var exact_mid_u = start_u + (end_u - start_u) * 0.5;
+
 			// recurse on the two halves
-			var left_pts = verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knots, control_points, start_u, mid_u, tol, include_u )
-				, right_pts = verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knots, control_points, mid_u, end_u, tol, include_u );
+			var left_pts = verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knots, control_points, start_u, exact_mid_u, tol, include_u )
+				, right_pts = verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knots, control_points, exact_mid_u, end_u, tol, include_u );
 
 			// concatenate the two		
 			return left_pts.slice(0, -1).concat(right_pts);

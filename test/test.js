@@ -3902,48 +3902,180 @@ describe("verb.eval.nurbs.intersect_rational_curve_surface_by_aabb",function(){
 
 	it('gives valid result for planar surface and line', function(){
 
-		// verb.init();
+		// build planar surface in the xy plane
+		var homo_control_points_srf = [ [ [0,0,0,1], [20,0,0,1] ], [[0,10,0,1], [20,10,0,1] ] ]
+			, degree_u  = 1
+			, degree_v = 1
+			, knots_u = [0,0,1,1]
+			, knots_v = [0,0,1,1];
 
-		// // build planar surface in the xy plane
-		// var homo_control_points_srf = [ [ [0,0,0,1], [10,0,0,1] ], [[0,10,0,1], [10,10,0,1] ] ]
-		// 	, degree_u  = 1
-		// 	, degree_v = 1
-		// 	, knots_u = [0,0,1,1]
-		// 	, knots_v = [0,0,1,1];
+		// line from [5,5,5] to [5,5,-5]
+		var degree_crv = 1
+			, knots_crv = [0,0,1,1]
+			, homo_control_points_crv = [ [5.2,5.2,5,1], [5.2,5.2,-10,1] ];
 
-		// // line from [5,5,5] to [5,5,-5]
-		// var degree_crv = 1
-		// 	, knots_crv = [0,0,1,1]
-		// 	, homo_control_points_crv = [ [5,5,5,1], [5,5,-5,1] ];
+		var sample_tol = 1e-6
+			, tol = 0.00001
+			, divs_u = 3
+			, divs_v = 3;
 
-		// var sample_tol = 1e-6
-		// 	, tol = 0.0001
-		// 	, divs_u = 2
-		// 	, divs_v = 2;
+		var res =  verb.eval.nurbs.intersect_rational_curve_surface_by_aabb( 	degree_u, 
+																																					knots_u, 
+																																					degree_v, 
+																																					knots_v, 
+																																					homo_control_points_srf, 
 
-		// var res =  verb.eval.nurbs.intersect_rational_curve_surface_by_aabb( 	degree_u, 
-		// 																																			knots_u, 
-		// 																																			degree_v, 
-		// 																																			knots_v, 
-		// 																																			homo_control_points_srf, 
+																																					degree_crv, 
+																																					knots_crv, 
+																																					homo_control_points_crv, 
 
-		// 																																			degree_crv, 
-		// 																																			knots_crv, 
-		// 																																			homo_control_points_crv, 
+																																					sample_tol, 
+																																					tol, 
+																																					divs_u, 
+																																					divs_v );
 
-		// 																																			sample_tol, 
-		// 																																			tol, 
-		// 																																			divs_u, 
-		// 																																			divs_v );
-
-		// res.length.should.be.equal(1);
-		// res[0].p.approximately(0.5, verb.TOLERANCE);
-		// res[0].uv[0].approximately(0.5, verb.TOLERANCE);
-		// res[0].uv[1].approximately(0.5, verb.TOLERANCE);
+		res.length.should.be.equal( 1 );
+		res[0].p.should.be.approximately( 1/3, verb.TOLERANCE );
+		res[0].uv[0].should.be.approximately( 0.52, verb.TOLERANCE );
+		res[0].uv[1].should.be.approximately( 0.26, verb.TOLERANCE );
 
 	});
 
+	it('gives valid result for planar surface and degree 1 nurbs', function(){
+
+		// build planar surface in the xy plane
+		var homo_control_points_srf = [ [ [0,0,0,1], [20,0,0,1] ], [[0,10,0,1], [20,10,0,1] ] ]
+			, degree_u  = 1
+			, degree_v = 1
+			, knots_u = [0,0,1,1]
+			, knots_v = [0,0,1,1];
+
+		// line from [5,5,5] to [5,5,-5]
+		var degree_crv = 1
+			, knots_crv = [0,0,0.5,1,1]
+			, homo_control_points_crv = [ [5.2,5.2,5,1], [5.2,5.2,-2.5,1], [5.2,5.2,-10,1] ];
+
+		var sample_tol = 1e-6
+			, tol = 0.00001
+			, divs_u = 2
+			, divs_v = 2;
+
+		var res =  verb.eval.nurbs.intersect_rational_curve_surface_by_aabb( 	degree_u, 
+																																					knots_u, 
+																																					degree_v, 
+																																					knots_v, 
+																																					homo_control_points_srf, 
+
+																																					degree_crv, 
+																																					knots_crv, 
+																																					homo_control_points_crv, 
+
+																																					sample_tol, 
+																																					tol, 
+																																					divs_u, 
+																																					divs_v );
+
+		res.length.should.be.equal( 1 );
+		res[0].p.should.be.approximately( 1/3, verb.TOLERANCE );
+		res[0].uv[0].should.be.approximately( 0.52, verb.TOLERANCE );
+		res[0].uv[1].should.be.approximately( 0.26, verb.TOLERANCE );
+
+	});
+
+	it('gives valid result for planar surface and degree 2 bezier', function(){
+
+		// build planar surface in the xy plane
+		var homo_control_points_srf = [ [ [0,0,0,1], [0,10,0,1] ], [[20,0,0,1], [20,10,0,1] ] ]
+			, degree_u  = 1
+			, degree_v = 1
+			, knots_u = [0,0,1,1]
+			, knots_v = [0,0,1,1];
+
+		verb.init();
+		
+		var base = [0,0,0]
+			, uaxis = [1,0,0]
+			, vaxis = [0,1,0]
+			, ulength = 10
+			, vlength = 4;
+
+		// line from [5,5,5] to [5,5,-5]
+		var degree_crv = 2
+			, knots_crv = [0,0,0,1,1,1]
+			, homo_control_points_crv = [ [5.2,5.2,5,1], [5.4,4.8,0,1], [5.2,5.2,-5,1] ];
+
+		var sample_tol = 1e-6
+			, tol = 0.001
+			, divs_u = 3
+			, divs_v = 3;
+
+		var res =  verb.eval.nurbs.intersect_rational_curve_surface_by_aabb( 	degree_u, 
+																																					knots_u, 
+																																					degree_v, 
+																																					knots_v, 
+																																					homo_control_points_srf, 
+
+																																					degree_crv, 
+																																					knots_crv, 
+																																					homo_control_points_crv, 
+
+																																					sample_tol, 
+																																					tol, 
+																																					divs_u, 
+																																					divs_v );
+
+		// p mysteriously ends up being equal to 1 - this is incorrect
+		// 
+
+		// res.length.should.be.equal( 1 );
+		// res[0].p.should.be.approximately( 0.6558, verb.TOLERANCE );
+		// res[0].uv[0].should.be.approximately( 0.5490824026293191, verb.TOLERANCE );
+		// res[0].uv[1].should.be.approximately( 0.26, verb.TOLERANCE );
+
+	});
+
+	it('gives valid result for non-intersecting planar surface and line', function(){
+
+		// build planar surface in the xy plane
+		var homo_control_points_srf = [ [ [0,0,0,1], [20,0,0,1] ], [[0,10,0,1], [20,10,0,1] ] ]
+			, degree_u  = 1
+			, degree_v = 1
+			, knots_u = [0,0,1,1]
+			, knots_v = [0,0,1,1];
+
+		// line from [5,5,5] to [5,5,-5]
+		var degree_crv = 1
+			, knots_crv = [0,0,1,1]
+			, homo_control_points_crv = [ [5.2,5.2,5,1], [5.2,5.2,2,1] ];
+
+		var sample_tol = 1e-6
+			, tol = 0.00001
+			, divs_u = 3
+			, divs_v = 3;
+
+		var res =  verb.eval.nurbs.intersect_rational_curve_surface_by_aabb( 	degree_u, 
+																																					knots_u, 
+																																					degree_v, 
+																																					knots_v, 
+																																					homo_control_points_srf, 
+
+																																					degree_crv, 
+																																					knots_crv, 
+																																					homo_control_points_crv, 
+
+																																					sample_tol, 
+																																					tol, 
+																																					divs_u, 
+																																					divs_v );
+
+		res.length.should.be.equal( 0 );
+
+	});
+
+
 });
+
+
 
 describe("verb.eval.geom.intersect_segment_with_tri",function(){
 
