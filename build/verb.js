@@ -2524,6 +2524,45 @@ verb.eval.geom.intersect_tris = function( points1, tri1, uvs1, points2, tri2, uv
 
 }
 
+
+//
+// ####refine_rational_curve_surface_intersection( degree1, knots1, control_points1, degree2, knots2, control_points2, start_params )
+//
+// Refine an intersection pair for a surface and curve given an initial guess.  This is an unconstrained minimization,
+// so the caller is responsible for providing a very good initial guess.
+//
+// **params**
+// + *Number*, integer degree of curve1
+// + *Array*, array of nondecreasing knot values for curve 1
+// + *Array*, 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
+ 									// and form (wi*pi, wi) for curve 1
+// + *Number*, integer degree of curve2
+// + *Array*, array of nondecreasing knot values for curve 2
+// + *Array*, 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
+ 									// and form (wi*pi, wi) for curve 2
+// + *Array*, length 3 array with first param guess in first position and second param guess in second position
+// 
+// **returns** 
+// + *Array*, a length 3 array containing the [ u_crv, u_srf, v_srf, final_distance ]
+//
+
+verb.eval.nurbs.refine_rational_curve_surface_intersection = function( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, start_params ) {
+
+
+	var objective = function(x) { 
+
+		var p1 = verb.eval.nurbs.rational_curve_point(degree_crv, knots_crv, homo_control_points_crv, x[0])
+			, p2 = verb.eval.nurbs.rational_surface_point( degree_u, knots_u,  degree_v, knots_v, homo_control_points_srf, x[1], x[2] )
+			, p1_p2 = numeric.sub(p1, p2);
+
+		return numeric.dot(p1_p2, p1_p2);
+	}
+
+	var sol_obj = numeric.uncmin( objective, start_params);
+	return sol_obj.solution.concat( sol_obj.f );
+
+}
+
 //
 // ####intersect_rational_curve_surface_by_aabb( degree_u, knots_u, degree_v, knots_v, homo_control_points, degree_crv, knots_crv, homo_control_points_crv, sample_tol, tol )
 //
@@ -2563,7 +2602,26 @@ verb.eval.nurbs.intersect_rational_curve_surface_by_aabb = function( degree_u, k
 
 }
 
-// helper method
+// array helper methods TODO: relocate
+
+verb.left = function(arr){ 
+	if (arr.length === 0) return [];
+	var len = Math.ceil( arr.length / 2 ); 
+	return arr.slice( 0, len );
+}
+
+verb.right = function(arr){
+	if (arr.length === 0) return [];
+	var len = Math.ceil( arr.length / 2 );
+	return arr.slice( len );
+}
+
+verb.rightWithPivot = function(arr){
+	if (arr.length === 0) return [];
+	var len = Math.ceil( arr.length / 2 );
+	return arr.slice( len-1 );
+}
+
 verb.unique = function( arr, comparator ){
 
 	if (arr.length === 0) return [];
@@ -2613,9 +2671,7 @@ verb.unique = function( arr, comparator ){
 // 	- a "face" the index of the face where the intersection took place
 //
 
-verb.left = function(arr){if (arr.length === 0) return [];var len = Math.ceil( arr.length / 2 ); return arr.slice( 0, len );}
-verb.right = function(arr){if (arr.length === 0) return [];var len = Math.ceil( arr.length / 2 );return arr.slice( len );}
-verb.rightWithPivot = function(arr){if (arr.length === 0) return [];var len = Math.ceil( arr.length / 2 );return arr.slice( len-1 );}
+
 
 verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb = function( crv_points, crv_param_points, mesh, included_faces, tol ) {
 

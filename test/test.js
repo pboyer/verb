@@ -4131,3 +4131,29 @@ describe("verb.eval.geom.intersect_segment_with_tri",function(){
 });
 
 
+describe("verb.eval.nurbs.refine_rational_curve_surface_intersection",function(){
+
+	it('gives valid result for planar surface and degree 2 bezier', function(){
+
+		var homo_control_points_srf = [ [ [0,0,0,1], [0,10,0,1] ], [[20,0,0,1], [20,10,0,1] ] ]
+			, degree_u  = 1
+			, degree_v = 1
+			, knots_u = [0,0,1,1]
+			, knots_v = [0,0,1,1];
+
+		var degree_crv = 2
+			, knots_crv = [0,0,0,1,1,1]
+			, homo_control_points_crv = [ [5.2,5.2,5,1], [5.4,4.8,0,1], [5.2,5.2,-5,1] ];
+
+		var start_params = [ 0.45, 0.25, 0.55 ];
+
+		var res = verb.eval.nurbs.refine_rational_curve_surface_intersection( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, start_params );
+
+		res[0].should.be.approximately(0.5, verb.TOLERANCE);
+		res[1].should.be.approximately(0.265, verb.TOLERANCE);
+		res[2].should.be.approximately(0.5, verb.TOLERANCE);
+
+	});
+
+});
+
