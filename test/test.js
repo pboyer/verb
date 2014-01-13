@@ -3991,14 +3991,6 @@ describe("verb.eval.nurbs.intersect_rational_curve_surface_by_aabb",function(){
 			, knots_u = [0,0,1,1]
 			, knots_v = [0,0,1,1];
 
-		verb.init();
-		
-		var base = [0,0,0]
-			, uaxis = [1,0,0]
-			, vaxis = [0,1,0]
-			, ulength = 10
-			, vlength = 4;
-
 		// line from [5,5,5] to [5,5,-5]
 		var degree_crv = 2
 			, knots_crv = [0,0,0,1,1,1]
@@ -4024,13 +4016,10 @@ describe("verb.eval.nurbs.intersect_rational_curve_surface_by_aabb",function(){
 																																					divs_u, 
 																																					divs_v );
 
-		// p mysteriously ends up being equal to 1 - this is incorrect
-		// 
-
-		// res.length.should.be.equal( 1 );
-		// res[0].p.should.be.approximately( 0.6558, verb.TOLERANCE );
-		// res[0].uv[0].should.be.approximately( 0.5490824026293191, verb.TOLERANCE );
-		// res[0].uv[1].should.be.approximately( 0.26, verb.TOLERANCE );
+		res.length.should.be.equal( 1 );
+		res[0].p.should.be.approximately( 0.5, verb.TOLERANCE );
+		res[0].uv[0].should.be.approximately( 0.265, verb.TOLERANCE );
+		res[0].uv[1].should.be.approximately( 0.5, verb.TOLERANCE );
 
 	});
 

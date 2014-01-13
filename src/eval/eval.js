@@ -722,10 +722,60 @@ verb.eval.nurbs.intersect_rational_curve_surface_by_aabb = function( degree_u, k
 	// perform intersection
 		, res = verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( p1, u1, mesh, _.range(mesh.faces.length), tol );
 
-	return res;
-
+	return verb.unique( res, function(a, b){
+		return numeric.norm2( numeric.sub( a.point, b.point ) ) < tol;
+	});
 
 }
+
+// array helper methods TODO: relocate
+
+verb.left = function(arr){ 
+	if (arr.length === 0) return [];
+	var len = Math.ceil( arr.length / 2 ); 
+	return arr.slice( 0, len );
+}
+
+verb.right = function(arr){
+	if (arr.length === 0) return [];
+	var len = Math.ceil( arr.length / 2 );
+	return arr.slice( len );
+}
+
+verb.rightWithPivot = function(arr){
+	if (arr.length === 0) return [];
+	var len = Math.ceil( arr.length / 2 );
+	return arr.slice( len-1 );
+}
+
+verb.unique = function( arr, comparator ){
+
+	if (arr.length === 0) return [];
+
+	var uniques = [ arr.pop() ];
+
+	for (var i = 0; i < arr.length; i++ ){
+
+		var ele = arr.pop();
+		var isUnique = true;
+
+		for (var j = 0; j < uniques.length; j++ ){
+			if ( comparator( ele, uniques[i] ) ){
+				isUnique = false;
+				break;
+			}
+		}
+
+		if ( isUnique ){
+			uniques.push( ele );
+		}
+
+	}
+
+	return uniques;
+
+}
+
 
 //
 // ####intersect_parametric_polyline_mesh_by_aabb( crv_points, crv_param_points, mesh, tol )
@@ -747,9 +797,7 @@ verb.eval.nurbs.intersect_rational_curve_surface_by_aabb = function( degree_u, k
 // 	- a "face" the index of the face where the intersection took place
 //
 
-function left(arr){if (arr.length === 0) return [];var len = Math.ceil( arr.length / 2 ); return arr.slice( 0, len );}
-function right(arr){if (arr.length === 0) return [];var len = Math.ceil( arr.length / 2 );return arr.slice( len );}
-function rightWithPivot(arr){if (arr.length === 0) return [];var len = Math.ceil( arr.length / 2 );return arr.slice( len-1 );}
+
 
 verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb = function( crv_points, crv_param_points, mesh, included_faces, tol ) {
 
@@ -791,10 +839,10 @@ verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb = function( crv_point
 	} else if ( included_faces.length === 1 ) {
 
 		// divide polyline in half, rightside includes the pivot
-		var crv_points_a = left( crv_points )
-			, crv_points_b = rightWithPivot( crv_points )
-			, crv_param_points_a = left( crv_param_points )
-			, crv_param_points_b = rightWithPivot( crv_param_points );
+		var crv_points_a = verb.left( crv_points )
+			, crv_points_b = verb.rightWithPivot( crv_points )
+			, crv_param_points_a = verb.left( crv_param_points )
+			, crv_param_points_b = verb.rightWithPivot( crv_param_points );
 
 		return 	 verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points_a, crv_param_points_a, mesh, included_faces, tol )
 		.concat( verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points_b, crv_param_points_b, mesh, included_faces, tol ) );
@@ -803,8 +851,8 @@ verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb = function( crv_point
 
 		// divide mesh in "half" by first sorting
 		var sorted_included_faces = verb.eval.mesh.sort_tris_on_longest_axis( mesh_bb, mesh.points, mesh.faces, included_faces )
-			, included_faces_a = left( sorted_included_faces )
-			, included_faces_b = right( sorted_included_faces );
+			, included_faces_a = verb.left( sorted_included_faces )
+			, included_faces_b = verb.right( sorted_included_faces );
 
 		return 		 verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points, crv_param_points, mesh, included_faces_a, tol )
 			.concat( verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points, crv_param_points, mesh, included_faces_b, tol ));
@@ -813,14 +861,14 @@ verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb = function( crv_point
 
 		// divide mesh in "half"
 		var sorted_included_faces = verb.eval.mesh.sort_tris_on_longest_axis( mesh_bb, mesh.points, mesh.faces, included_faces )
-			, included_faces_a = left( sorted_included_faces )
-			, included_faces_b = right( sorted_included_faces );
+			, included_faces_a = verb.left( sorted_included_faces )
+			, included_faces_b = verb.right( sorted_included_faces );
 
 		// divide polyline in half, rightside includes the pivot
-		var crv_points_a = left( crv_points )
-			, crv_points_b = rightWithPivot( crv_points )
-			, crv_param_points_a = left( crv_param_points )
-			, crv_param_points_b = rightWithPivot( crv_param_points );
+		var crv_points_a = verb.left( crv_points )
+			, crv_points_b = verb.rightWithPivot( crv_points )
+			, crv_param_points_a = verb.left( crv_param_points )
+			, crv_param_points_b = verb.rightWithPivot( crv_param_points );
 
 		return 	 	 verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points_a, crv_param_points_a, mesh, included_faces_a, tol )
 			.concat( verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points_a, crv_param_points_a, mesh, included_faces_b, tol ) )
