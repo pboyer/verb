@@ -4064,8 +4064,6 @@ describe("verb.eval.nurbs.intersect_rational_curve_surface_by_aabb",function(){
 
 });
 
-
-
 describe("verb.eval.geom.intersect_segment_with_tri",function(){
 
 	it('gives correct result for intersecting axis aligned segment and triangle ', function(){
