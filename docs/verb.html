@@ -5,7 +5,7 @@
   <title>verb.js</title>
   <meta http-equiv="content-type" content="text/html; charset=UTF-8">
   <meta name="viewport" content="width=device-width, target-densitydpi=160dpi, initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
-  <link rel="stylesheet" media="all" href="docco.css" />
+  <link rel="stylesheet" media="all" href="docco_custom.css" />
 </head>
 <body>
   <div id="container">
@@ -3141,7 +3141,25 @@ verb.intersect.curveCurve = <span class="function"><span class="keyword">functio
 							[ 	curve1.get(<span class="string">'degree'</span>), curve1.get(<span class="string">'knots'</span>), curve1.homogenize(), 
 							curve2.get(<span class="string">'degree'</span>), curve2.get(<span class="string">'knots'</span>), 
 							curve2.homogenize(), verb.TOLERANCE, verb.TOLERANCE ], callback );
-}</pre></div></div>
+}
+verb.intersect.curveSurface = <span class="function"><span class="keyword">function</span><span class="params">( curve, surface, options, callback )</span>{</span>
+
+	options = options || { tolerance: verb.TOLERANCE, sampleTolerance: verb.TOLERANCE, uDivs: <span class="number">20</span>, vDivs: <span class="number">20</span> };
+
+	<span class="keyword">return</span> verb.nurbsEngine.eval( <span class="string">'intersect_rational_curve_surface_by_aabb_refine'</span>, 
+																[ surface.get(<span class="string">'degreeU'</span>), 
+																	surface.get(<span class="string">'knotsU'</span>), 
+																	surface.get(<span class="string">'degreeV'</span>), 
+																	surface.get(<span class="string">'knotsV'</span>), 
+																	surface.homogenize(), 
+																	curve.get(<span class="string">'degree'</span>), 
+																	curve.get(<span class="string">'knots'</span>), 
+																	curve.homogenize(), 
+																	options.sampleTolerance, 
+																	options.tolerance, 
+																	options.uDivs,
+																	options.vDivs ], callback );
+};</pre></div></div>
             
         </li>
         
@@ -4033,93 +4051,6 @@ rotated generatrix pt</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-141">&#182;</a>
               </div>
-              <h4 id="intersect_rational_surfaces-not-sure-yet-">intersect_rational_surfaces( not, sure, yet )</h4>
-<p>Intersect two NURBS surfaces</p>
-<p><strong>params</strong></p>
-<p><strong>returns</strong> </p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>verb.eval.nurbs.intersect_rational_surfaces = <span class="function"><span class="keyword">function</span><span class="params">( not, sure, yet )</span> {</span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-142">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-142">&#182;</a>
-              </div>
-              <p>tesselate two nurbs surfaces
-verb.eval.mesh.intersect_meshes_by_aabb
-refine the curves using the two surfaces</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>}</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-143">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-143">&#182;</a>
-              </div>
-              <h4 id="intersect_meshes-vertices1-triangles1-uvs1-aabb1-vertices2-triangles2-uvs2-aabb2-">intersect_meshes( vertices1, triangles1, uvs1, aabb1, vertices2, triangles2, uvs2, aabb2)</h4>
-<p>Intersect two meshes</p>
-<p><strong>params</strong></p>
-<ul>
-<li><em>Number</em>, integer degree of surface in u direction</li>
-<li><em>Array</em>, array of nondecreasing knot values in u direction</li>
-<li><em>Number</em>, integer degree of surface in v direction</li>
-<li><em>Array</em>, array of nondecreasing knot values in v direction</li>
-<li><em>Array</em>, 3d array of control points, top to bottom is increasing u direction, left to right is increasing v direction,
-and where each control point is an array of length (dim+1)</li>
-<li><em>Number</em>, u parameter at which to evaluate the surface point</li>
-<li><em>Number</em>, v parameter at which to evaluate the surface point</li>
-</ul>
-<p><strong>returns</strong> </p>
-<ul>
-<li><em>Array</em>, a point represented by an array of length (dim)</li>
-</ul>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>verb.eval.mesh.intersect_meshes = <span class="function"><span class="keyword">function</span><span class="params">( vertices1, triangles1, uvs1, aabb1, vertices2, triangles2, uvs2, aabb2)</span> {</span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-144">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-144">&#182;</a>
-              </div>
-              <p>tesselate two nurbs surfaces</p>
-<p>call subroutine to:
-put polygons into kd trees
-intersect polygons via kd trees
-build up curves
-return poly line curves for further refinement</p>
-<p>return collection of lists of points with parameter values</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>}</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-145">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-145">&#182;</a>
-              </div>
               <h4 id="intersect_meshes_by_aabb-points1-tris1-uvs1-points2-tris2-uvs2-">intersect_meshes_by_aabb( points1, tris1, uvs1, points2, tris2, uvs2 )</h4>
 <p>Intersect two meshes via aabb intersection</p>
 <p><strong>params</strong></p>
@@ -4145,11 +4076,11 @@ and where each control point is an array of length (dim+1)</li>
         </li>
         
         
-        <li id="section-146">
+        <li id="section-142">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-146">&#182;</a>
+                <a class="pilcrow" href="#section-142">&#182;</a>
               </div>
               <p>build aabb for each mesh</p>
 
@@ -4163,11 +4094,11 @@ and where each control point is an array of length (dim+1)</li>
         </li>
         
         
-        <li id="section-147">
+        <li id="section-143">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-147">&#182;</a>
+                <a class="pilcrow" href="#section-143">&#182;</a>
               </div>
               <p>intersect and get the pairs of triangle intersctions</p>
 
@@ -4178,14 +4109,15 @@ and where each control point is an array of length (dim+1)</li>
         </li>
         
         
-        <li id="section-148">
+        <li id="section-144">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-148">&#182;</a>
+                <a class="pilcrow" href="#section-144">&#182;</a>
               </div>
               <p>get the segments of the intersection crv with uvs</p>
 <p>sort the intersection segments</p>
+<p>TODO</p>
 
             </div>
             
@@ -4194,11 +4126,11 @@ and where each control point is an array of length (dim+1)</li>
         </li>
         
         
-        <li id="section-149">
+        <li id="section-145">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-149">&#182;</a>
+                <a class="pilcrow" href="#section-145">&#182;</a>
               </div>
               <h4 id="intersect_tris-points1-tri1-uvs1-points2-tri2-uvs2-">intersect_tris( points1, tri1, uvs1, points2, tri2, uvs2 )</h4>
 <p>Intersect two triangles</p>
@@ -4243,11 +4175,11 @@ and where each control point is an array of length (dim+1)</li>
         </li>
         
         
-        <li id="section-150">
+        <li id="section-146">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-150">&#182;</a>
+                <a class="pilcrow" href="#section-146">&#182;</a>
               </div>
               <p>if you don&#39;t have 2 intersections you do not have an intersection,
 0 would mean a glancing intersection
@@ -4262,11 +4194,11 @@ and where each control point is an array of length (dim+1)</li>
         </li>
         
         
-        <li id="section-151">
+        <li id="section-147">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-151">&#182;</a>
+                <a class="pilcrow" href="#section-147">&#182;</a>
               </div>
               <p>what portions of the segment lie within triangle 2</p>
 <p>intersect edges of triangle 2 with the segment, obtaining the &quot;inner&quot; triangle</p>
@@ -4286,11 +4218,11 @@ and where each control point is an array of length (dim+1)</li>
         </li>
         
         
-        <li id="section-152">
+        <li id="section-148">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-152">&#182;</a>
+                <a class="pilcrow" href="#section-148">&#182;</a>
               </div>
               <p>all intersections should be with uv&#39;s </p>
 
@@ -4301,14 +4233,15 @@ and where each control point is an array of length (dim+1)</li>
         </li>
         
         
-        <li id="section-153">
+        <li id="section-149">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-153">&#182;</a>
+                <a class="pilcrow" href="#section-149">&#182;</a>
               </div>
               <p>tri1 is intersecting and the intersection segment
 is inside tri2</p>
+<p>TODO</p>
 <p>return the two outer points</p>
 
             </div>
@@ -4318,14 +4251,15 @@ is inside tri2</p>
         </li>
         
         
-        <li id="section-154">
+        <li id="section-150">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-154">&#182;</a>
+                <a class="pilcrow" href="#section-150">&#182;</a>
               </div>
               <p>tri1 is intersecting and the intersection segment
 is partially inside tri2</p>
+<p>TODO</p>
 <p>return the end point of seg that is INSIDE tri2 and the intersection</p>
 
             </div>
@@ -4335,14 +4269,15 @@ is partially inside tri2</p>
         </li>
         
         
-        <li id="section-155">
+        <li id="section-151">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-155">&#182;</a>
+                <a class="pilcrow" href="#section-151">&#182;</a>
               </div>
               <p>tri1 is intersecting and the intersection segment&#39;s
 end points are outside of tri2</p>
+<p>TODO</p>
 <p>return the two seg_int_results </p>
 
             </div>
@@ -4354,13 +4289,143 @@ end points are outside of tri2</p>
         </li>
         
         
+        <li id="section-152">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-152">&#182;</a>
+              </div>
+              <h4 id="intersect_rational_curve_surface_by_aabb-degree_u-knots_u-degree_v-knots_v-homo_control_points-degree_crv-knots_crv-homo_control_points_crv-sample_tol-tol-">intersect_rational_curve_surface_by_aabb( degree_u, knots_u, degree_v, knots_v, homo_control_points, degree_crv, knots_crv, homo_control_points_crv, sample_tol, tol )</h4>
+<p>Get the intersection of a NURBS curve and a NURBS surface by axis-aligned bounding box intersection and refinement</p>
+<p><strong>params</strong></p>
+<ul>
+<li><em>Number</em>, integer degree of surface in u direction</li>
+<li><em>Array</em>, array of nondecreasing knot values in u direction</li>
+<li><em>Number</em>, integer degree of surface in v direction</li>
+<li><em>Array</em>, array of nondecreasing knot values in v direction</li>
+<li><em>Array</em>, 3d array of homogeneous control points, top to bottom is increasing u direction, left to right is increasing v direction,
+and where each control point is an array of length (dim+1)</li>
+<li><em>Number</em>, integer degree of curve</li>
+<li><em>Array</em>, array of nondecreasing knot values</li>
+<li><em>Array</em>, 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
+and form (wi*pi, wi)</li>
+<li><em>Number</em>, the sample tolerance of the curve</li>
+<li><em>Number</em>, tolerance for the curve intersection</li>
+<li><em>Number</em>, integer number of divisions of the surface in the U direction for initial approximation (placeholder until adaptive tess of surfaces)</li>
+<li><em>Number</em>, integer number of divisions of the surface in the V direction for initial approximation (placeholder until adaptive tess of surfaces)</li>
+</ul>
+<p><strong>returns</strong> </p>
+<ul>
+<li><em>Array</em>, array of intersection objects, each holding:<ul>
+<li>a &quot;point&quot; property where intersections took place</li>
+<li>a &quot;p&quot; the parameter on the curve</li>
+</ul>
+</li>
+<li>a &quot;uv&quot; the parameter on the surface<ul>
+<li>a &quot;face&quot; the index of the face where the intersection took place</li>
+</ul>
+</li>
+</ul>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>verb.eval.nurbs.intersect_rational_curve_surface_by_aabb_refine = <span class="function"><span class="keyword">function</span><span class="params">( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, sample_tol, tol, divs_u, divs_v )</span> {</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-153">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-153">&#182;</a>
+              </div>
+              <p>get the approximate intersections</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="keyword">var</span> ints = verb.eval.nurbs.intersect_rational_curve_surface_by_aabb( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, sample_tol, tol, divs_u, divs_v );</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-154">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-154">&#182;</a>
+              </div>
+              <p>refine them</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="keyword">return</span> ints.map(<span class="function"><span class="keyword">function</span><span class="params">( inter )</span>{</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-155">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-155">&#182;</a>
+              </div>
+              <p>get intersection params</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="keyword">var</span> start_params = [inter.p, inter.uv[<span class="number">0</span>], inter.uv[<span class="number">1</span>] ]</pre></div></div>
+            
+        </li>
+        
+        
         <li id="section-156">
             <div class="annotation">
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-156">&#182;</a>
               </div>
-              <h4 id="refine_rational_curve_surface_intersection-function-degree_u-knots_u-degree_v-knots_v-homo_control_points_srf-degree_crv-knots_crv-homo_control_points_crv-start_params-">refine_rational_curve_surface_intersection = function( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, start_params )</h4>
+              <p>refine the parameters</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>			, refined_params = verb.eval.nurbs.refine_rational_curve_surface_intersection( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, start_params );</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-157">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-157">&#182;</a>
+              </div>
+              <p>update the inter object</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		inter.p = refined_params[<span class="number">0</span>];
+		inter.uv[<span class="number">0</span>] = refined_params[<span class="number">1</span>];
+		inter.uv[<span class="number">1</span>] = refined_params[<span class="number">2</span>];
+		inter.distance = refined_params[<span class="number">3</span>];
+		<span class="keyword">delete</span> inter.face;
+
+		<span class="keyword">return</span> inter;
+
+	});
+
+}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-158">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-158">&#182;</a>
+              </div>
+              <h4 id="refine_rational_curve_surface_intersection-degree_u-knots_u-degree_v-knots_v-homo_control_points_srf-degree_crv-knots_crv-homo_control_points_crv-start_params-">refine_rational_curve_surface_intersection( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, start_params )</h4>
 <p>Refine an intersection pair for a surface and curve given an initial guess.  This is an unconstrained minimization,
 so the caller is responsible for providing a very good initial guess.</p>
 <p><strong>params</strong></p>
@@ -4403,11 +4468,11 @@ and form (wi*pi, wi)</li>
         </li>
         
         
-        <li id="section-157">
+        <li id="section-159">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-157">&#182;</a>
+                <a class="pilcrow" href="#section-159">&#182;</a>
               </div>
               <h4 id="intersect_rational_curve_surface_by_aabb-degree_u-knots_u-degree_v-knots_v-homo_control_points-degree_crv-knots_crv-homo_control_points_crv-sample_tol-tol-">intersect_rational_curve_surface_by_aabb( degree_u, knots_u, degree_v, knots_v, homo_control_points, degree_crv, knots_crv, homo_control_points_crv, sample_tol, tol )</h4>
 <p>Approximate the intersection of two nurbs surface by axis-aligned bounding box intersection.</p>
@@ -4449,11 +4514,11 @@ and form (wi*pi, wi)</li>
         </li>
         
         
-        <li id="section-158">
+        <li id="section-160">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-158">&#182;</a>
+                <a class="pilcrow" href="#section-160">&#182;</a>
               </div>
               <p>tesselate the curve</p>
 
@@ -4464,11 +4529,11 @@ and form (wi*pi, wi)</li>
         </li>
         
         
-        <li id="section-159">
+        <li id="section-161">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-159">&#182;</a>
+                <a class="pilcrow" href="#section-161">&#182;</a>
               </div>
               <p>tesselate the surface</p>
 
@@ -4479,11 +4544,11 @@ and form (wi*pi, wi)</li>
         </li>
         
         
-        <li id="section-160">
+        <li id="section-162">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-160">&#182;</a>
+                <a class="pilcrow" href="#section-162">&#182;</a>
               </div>
               <p>separate parameters from points in the polyline (params are the first index in the array)</p>
 
@@ -4495,11 +4560,11 @@ and form (wi*pi, wi)</li>
         </li>
         
         
-        <li id="section-161">
+        <li id="section-163">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-161">&#182;</a>
+                <a class="pilcrow" href="#section-163">&#182;</a>
               </div>
               <p>perform intersection</p>
 
@@ -4510,18 +4575,18 @@ and form (wi*pi, wi)</li>
         </li>
         
         
-        <li id="section-162">
+        <li id="section-164">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-162">&#182;</a>
+                <a class="pilcrow" href="#section-164">&#182;</a>
               </div>
               <p>eliminate duplicate intersections</p>
 
             </div>
             
             <div class="content"><div class='highlight'><pre>	<span class="keyword">return</span> verb.unique( res, <span class="function"><span class="keyword">function</span><span class="params">(a, b)</span>{</span>
-		<span class="keyword">return</span> numeric.norm2( numeric.sub( a.point, b.point ) ) &lt; tol;
+		<span class="keyword">return</span> numeric.norm2( numeric.sub( a.point, b.point ) ) &lt; tol &amp;&amp; Math.abs( a.p - b.p ) &lt; tol &amp;&amp; numeric.norm2( numeric.sub( a.uv, b.uv ) ) &lt; tol
 	});
 
 }</pre></div></div>
@@ -4529,13 +4594,13 @@ and form (wi*pi, wi)</li>
         </li>
         
         
-        <li id="section-163">
+        <li id="section-165">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-163">&#182;</a>
+                <a class="pilcrow" href="#section-165">&#182;</a>
               </div>
-              <h4 id="intersect_parametric_polyline_mesh_by_aabb-crv_points-crv_param_points-mesh-tol-">intersect_parametric_polyline_mesh_by_aabb( crv_points, crv_param_points, mesh, tol )</h4>
+              <h4 id="intersect_parametric_polyline_mesh_by_aabb-crv_points-crv_param_points-mesh-included_faces-tol-">intersect_parametric_polyline_mesh_by_aabb( crv_points, crv_param_points, mesh, included_faces, tol )</h4>
 <p>Approximate the intersection of a polyline and mesh while maintaining parameter information</p>
 <p><strong>params</strong></p>
 <ul>
@@ -4565,11 +4630,11 @@ and form (wi*pi, wi)</li>
         </li>
         
         
-        <li id="section-164">
+        <li id="section-166">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-164">&#182;</a>
+                <a class="pilcrow" href="#section-166">&#182;</a>
               </div>
               <p>check if two bounding boxes intersect</p>
 
@@ -4581,11 +4646,11 @@ and form (wi*pi, wi)</li>
         </li>
         
         
-        <li id="section-165">
+        <li id="section-167">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-165">&#182;</a>
+                <a class="pilcrow" href="#section-167">&#182;</a>
               </div>
               <p>if bounding boxes do not intersect, return empty array</p>
 
@@ -4600,11 +4665,11 @@ and form (wi*pi, wi)</li>
         </li>
         
         
-        <li id="section-166">
+        <li id="section-168">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-166">&#182;</a>
+                <a class="pilcrow" href="#section-168">&#182;</a>
               </div>
               <p>intersect segment and triangle</p>
 
@@ -4617,11 +4682,11 @@ and form (wi*pi, wi)</li>
         </li>
         
         
-        <li id="section-167">
+        <li id="section-169">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-167">&#182;</a>
+                <a class="pilcrow" href="#section-169">&#182;</a>
               </div>
               <p>map the parameters of the segment to the parametric space of the entire polyline</p>
 
@@ -4632,11 +4697,11 @@ and form (wi*pi, wi)</li>
         </li>
         
         
-        <li id="section-168">
+        <li id="section-170">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-168">&#182;</a>
+                <a class="pilcrow" href="#section-170">&#182;</a>
               </div>
               <p>map the parameters of the single triangle to the entire parametric space of the triangle</p>
 
@@ -4655,11 +4720,11 @@ and form (wi*pi, wi)</li>
         </li>
         
         
-        <li id="section-169">
+        <li id="section-171">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-169">&#182;</a>
+                <a class="pilcrow" href="#section-171">&#182;</a>
               </div>
               <p>a pair representing the param on the polyline and the param on the mesh</p>
 
@@ -4674,11 +4739,11 @@ and form (wi*pi, wi)</li>
         </li>
         
         
-        <li id="section-170">
+        <li id="section-172">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-170">&#182;</a>
+                <a class="pilcrow" href="#section-172">&#182;</a>
               </div>
               <p>intersect triangle and polyline</p>
 <p>divide polyline in half, rightside includes the pivot</p>
@@ -4699,11 +4764,11 @@ and form (wi*pi, wi)</li>
         </li>
         
         
-        <li id="section-171">
+        <li id="section-173">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-171">&#182;</a>
+                <a class="pilcrow" href="#section-173">&#182;</a>
               </div>
               <p>intersect mesh &gt;2 faces and line</p>
 <p>divide mesh in &quot;half&quot; by first sorting then dividing array in half</p>
@@ -4723,11 +4788,11 @@ and form (wi*pi, wi)</li>
         </li>
         
         
-        <li id="section-172">
+        <li id="section-174">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-172">&#182;</a>
+                <a class="pilcrow" href="#section-174">&#182;</a>
               </div>
               <p>intersect mesh with &gt;2 faces and polyline</p>
 <p>divide mesh in &quot;half&quot;</p>
@@ -4741,11 +4806,11 @@ and form (wi*pi, wi)</li>
         </li>
         
         
-        <li id="section-173">
+        <li id="section-175">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-173">&#182;</a>
+                <a class="pilcrow" href="#section-175">&#182;</a>
               </div>
               <p>divide polyline in half, rightside includes the pivot</p>
 
@@ -4770,11 +4835,11 @@ and form (wi*pi, wi)</li>
         </li>
         
         
-        <li id="section-174">
+        <li id="section-176">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-174">&#182;</a>
+                <a class="pilcrow" href="#section-176">&#182;</a>
               </div>
               <h4 id="intersect_segment_with_tri-p1-p0-points-tri-">intersect_segment_with_tri(  p1, p0, points, tri )</h4>
 <p> Intersect segment with triangle (from <a href="http://geomalgorithms.com/a06-_intersect-2.html">http://geomalgorithms.com/a06-_intersect-2.html</a>)</p>
@@ -4812,11 +4877,11 @@ where the intersection took place, and &quot;p&quot; property representing the p
         </li>
         
         
-        <li id="section-175">
+        <li id="section-177">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-175">&#182;</a>
+                <a class="pilcrow" href="#section-177">&#182;</a>
               </div>
               <p>is ray is parallel to triangle plane?</p>
 
@@ -4831,11 +4896,11 @@ where the intersection took place, and &quot;p&quot; property representing the p
         </li>
         
         
-        <li id="section-176">
+        <li id="section-178">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-176">&#182;</a>
+                <a class="pilcrow" href="#section-178">&#182;</a>
               </div>
               <p>segment goes away from triangle or is beyond segment</p>
 
@@ -4848,11 +4913,11 @@ where the intersection took place, and &quot;p&quot; property representing the p
         </li>
         
         
-        <li id="section-177">
+        <li id="section-179">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-177">&#182;</a>
+                <a class="pilcrow" href="#section-179">&#182;</a>
               </div>
               <p>get proposed intersection</p>
 
@@ -4863,11 +4928,11 @@ where the intersection took place, and &quot;p&quot; property representing the p
         </li>
         
         
-        <li id="section-178">
+        <li id="section-180">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-178">&#182;</a>
+                <a class="pilcrow" href="#section-180">&#182;</a>
               </div>
               <p>is I inside T?</p>
 
@@ -4894,11 +4959,11 @@ where the intersection took place, and &quot;p&quot; property representing the p
         </li>
         
         
-        <li id="section-179">
+        <li id="section-181">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-179">&#182;</a>
+                <a class="pilcrow" href="#section-181">&#182;</a>
               </div>
               <h4 id="intersect_segment_with_plane-p0-p1-v0-n-">intersect_segment_with_plane( p0, p1, v0, n )</h4>
 <p> Intersect ray/segment with plane (from <a href="http://geomalgorithms.com/a06-_intersect-2.html">http://geomalgorithms.com/a06-_intersect-2.html</a>)</p>
@@ -4923,11 +4988,11 @@ null or an object with a p property representing the param on the segment</p>
         </li>
         
         
-        <li id="section-180">
+        <li id="section-182">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-180">&#182;</a>
+                <a class="pilcrow" href="#section-182">&#182;</a>
               </div>
               <p>parallel case</p>
 
@@ -4946,11 +5011,11 @@ null or an object with a p property representing the param on the segment</p>
         </li>
         
         
-        <li id="section-181">
+        <li id="section-183">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-181">&#182;</a>
+                <a class="pilcrow" href="#section-183">&#182;</a>
               </div>
               <h4 id="intersect_aabb_trees-points1-tris1-points2-tris2-aabb_tree1-aabb_tree2-">intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1, aabb_tree2 )</h4>
 <p> Intersect two aabb trees - a recursive function</p>
@@ -5006,11 +5071,11 @@ null or an object with a p property representing the param on the segment</p>
         </li>
         
         
-        <li id="section-182">
+        <li id="section-184">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-182">&#182;</a>
+                <a class="pilcrow" href="#section-184">&#182;</a>
               </div>
               <h4 id="make_mesh_aabb_tree-points-tris-tri_indices-">make_mesh_aabb_tree( points, tris, tri_indices )</h4>
 <p>Make tree of axis aligned bounding boxes </p>
@@ -5032,11 +5097,11 @@ null or an object with a p property representing the param on the segment</p>
         </li>
         
         
-        <li id="section-183">
+        <li id="section-185">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-183">&#182;</a>
+                <a class="pilcrow" href="#section-185">&#182;</a>
               </div>
               <p>build bb</p>
 
@@ -5048,11 +5113,11 @@ null or an object with a p property representing the param on the segment</p>
         </li>
         
         
-        <li id="section-184">
+        <li id="section-186">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-184">&#182;</a>
+                <a class="pilcrow" href="#section-186">&#182;</a>
               </div>
               <p>if only one ele, terminate recursion and store the triangles</p>
 
@@ -5066,11 +5131,11 @@ null or an object with a p property representing the param on the segment</p>
         </li>
         
         
-        <li id="section-185">
+        <li id="section-187">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-185">&#182;</a>
+                <a class="pilcrow" href="#section-187">&#182;</a>
               </div>
               <p>sort triangles in sub mesh</p>
 
@@ -5083,11 +5148,11 @@ null or an object with a p property representing the param on the segment</p>
         </li>
         
         
-        <li id="section-186">
+        <li id="section-188">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-186">&#182;</a>
+                <a class="pilcrow" href="#section-188">&#182;</a>
               </div>
               <p>recurse </p>
 
@@ -5099,11 +5164,11 @@ null or an object with a p property representing the param on the segment</p>
         </li>
         
         
-        <li id="section-187">
+        <li id="section-189">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-187">&#182;</a>
+                <a class="pilcrow" href="#section-189">&#182;</a>
               </div>
               <p>return result</p>
 
@@ -5116,11 +5181,11 @@ null or an object with a p property representing the param on the segment</p>
         </li>
         
         
-        <li id="section-188">
+        <li id="section-190">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-188">&#182;</a>
+                <a class="pilcrow" href="#section-190">&#182;</a>
               </div>
               <h4 id="make_mesh_aabb-points-tris-tri_indices-">make_mesh_aabb( points, tris, tri_indices )</h4>
 <p>Form axis-aligned bounding box from triangles of mesh</p>
@@ -5154,11 +5219,11 @@ null or an object with a p property representing the param on the segment</p>
         </li>
         
         
-        <li id="section-189">
+        <li id="section-191">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-189">&#182;</a>
+                <a class="pilcrow" href="#section-191">&#182;</a>
               </div>
               <h4 id="sort_tris_on_longest_axis-container_bb-points-tris-tri_indices-">sort_tris_on_longest_axis( container_bb, points, tris, tri_indices )</h4>
 <p>Sort triangles on longest axis</p>
@@ -5204,11 +5269,11 @@ null or an object with a p property representing the param on the segment</p>
         </li>
         
         
-        <li id="section-190">
+        <li id="section-192">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-190">&#182;</a>
+                <a class="pilcrow" href="#section-192">&#182;</a>
               </div>
               <h4 id="get_min_coordinate_on_axis-points-tri-axis-">get_min_coordinate_on_axis( points, tri, axis )</h4>
 <p>Get min coordinate on axis</p>
@@ -5238,11 +5303,11 @@ null or an object with a p property representing the param on the segment</p>
         </li>
         
         
-        <li id="section-191">
+        <li id="section-193">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-191">&#182;</a>
+                <a class="pilcrow" href="#section-193">&#182;</a>
               </div>
               <h4 id="get_tri_centroid-points-tri-">get_tri_centroid( points, tri )</h4>
 <p>Get triangle centroid</p>
@@ -5279,11 +5344,11 @@ null or an object with a p property representing the param on the segment</p>
         </li>
         
         
-        <li id="section-192">
+        <li id="section-194">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-192">&#182;</a>
+                <a class="pilcrow" href="#section-194">&#182;</a>
               </div>
               <h4 id="get_tri_norm-points-tri-">get_tri_norm( points, tri )</h4>
 <p>Get triangle normal</p>
@@ -5315,11 +5380,11 @@ null or an object with a p property representing the param on the segment</p>
         </li>
         
         
-        <li id="section-193">
+        <li id="section-195">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-193">&#182;</a>
+                <a class="pilcrow" href="#section-195">&#182;</a>
               </div>
               <h4 id="tesselate_rational_surface_naive-degree_u-knots_u-degree_v-knots_v-homo_control_points-divs_u-divs_v-">tesselate_rational_surface_naive( degree_u, knots_u, degree_v, knots_v, homo_control_points, divs_u, divs_v )</h4>
 <p>Tesselate a nurbs surface</p>
@@ -5341,7 +5406,6 @@ uvs</li>
             </div>
             
             <div class="content"><div class='highlight'><pre>verb.eval.nurbs.tesselate_rational_surface_naive = <span class="function"><span class="keyword">function</span><span class="params">( degree_u, knots_u, degree_v, knots_v, homo_control_points, divs_u, divs_v )</span> {</span>
-
 
 	<span class="keyword">if</span> ( divs_u &lt; <span class="number">1</span> ) {
 		divs_u = <span class="number">1</span>;
@@ -5402,11 +5466,11 @@ uvs</li>
         </li>
         
         
-        <li id="section-194">
+        <li id="section-196">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-194">&#182;</a>
+                <a class="pilcrow" href="#section-196">&#182;</a>
               </div>
               <h4 id="intersect_rational_curves_by_aabb_refine-degree1-knots1-homo_control_points1-degree2-knots2-homo_control_points2-sample_tol-tol-">intersect_rational_curves_by_aabb_refine( degree1, knots1, homo_control_points1, degree2, knots2, homo_control_points2, sample_tol, tol )</h4>
 <p>Approximate the intersection of two nurbs surface by axis-aligned bounding box intersection and then refine all solutions.</p>
@@ -5440,11 +5504,11 @@ uvs</li>
         </li>
         
         
-        <li id="section-195">
+        <li id="section-197">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-195">&#182;</a>
+                <a class="pilcrow" href="#section-197">&#182;</a>
               </div>
               <h4 id="rational_curve_curve_bb_intersect_refine-degree1-knots1-control_points1-degree2-knots2-control_points2-start_params-">rational_curve_curve_bb_intersect_refine( degree1, knots1, control_points1, degree2, knots2, control_points2, start_params )</h4>
 <p>Refine an intersection pair for two curves given an initial guess.  This is an unconstrained minimization,
@@ -5487,11 +5551,11 @@ and form (wi*pi, wi) for curve 2</li>
         </li>
         
         
-        <li id="section-196">
+        <li id="section-198">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-196">&#182;</a>
+                <a class="pilcrow" href="#section-198">&#182;</a>
               </div>
               <h4 id="intersect_rational_curves_by_aabb-degree1-knots1-homo_control_points1-degree2-knots2-homo_control_points2-sample_tol-tol-">intersect_rational_curves_by_aabb( degree1, knots1, homo_control_points1, degree2, knots2, homo_control_points2, sample_tol, tol )</h4>
 <p>Approximate the intersection of two nurbs surface by axis-aligned bounding box intersection.</p>
@@ -5528,11 +5592,11 @@ and form (wi*pi, wi) for curve 2</li>
         </li>
         
         
-        <li id="section-197">
+        <li id="section-199">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-197">&#182;</a>
+                <a class="pilcrow" href="#section-199">&#182;</a>
               </div>
               <h4 id="intersect_parametric_polylines_by_aabb-p1-p2-u1-u2-tol-">intersect_parametric_polylines_by_aabb( p1, p2, u1, u2, tol )</h4>
 <p>Intersect two polyline curves, keeping track of parameterization on each</p>
@@ -5569,11 +5633,11 @@ and form (wi*pi, wi) for curve 2</li>
         </li>
         
         
-        <li id="section-198">
+        <li id="section-200">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-198">&#182;</a>
+                <a class="pilcrow" href="#section-200">&#182;</a>
               </div>
               <p>map the parameters of the segment to the parametric space of the entire polyline</p>
 
@@ -5636,11 +5700,11 @@ and form (wi*pi, wi) for curve 2</li>
         </li>
         
         
-        <li id="section-199">
+        <li id="section-201">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-199">&#182;</a>
+                <a class="pilcrow" href="#section-201">&#182;</a>
               </div>
               <h4 id="intersect_segments-a0-a1-b0-b1-tol-">intersect_segments( a0, a1, b0, b1, tol )</h4>
 <p>Find the closest parameter on two rays, see <a href="http://geomalgorithms.com/a07-_distance.html">http://geomalgorithms.com/a07-_distance.html</a></p>
@@ -5664,11 +5728,11 @@ and form (wi*pi, wi) for curve 2</li>
         </li>
         
         
-        <li id="section-200">
+        <li id="section-202">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-200">&#182;</a>
+                <a class="pilcrow" href="#section-202">&#182;</a>
               </div>
               <p>get axis and length of segments</p>
 
@@ -5703,11 +5767,11 @@ and form (wi*pi, wi) for curve 2</li>
         </li>
         
         
-        <li id="section-201">
+        <li id="section-203">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-201">&#182;</a>
+                <a class="pilcrow" href="#section-203">&#182;</a>
               </div>
               <h4 id="closest_point_on_ray-pt-o-r-">closest_point_on_ray( pt, o, r )</h4>
 <p>Find the closest point on a ray</p>
@@ -5737,11 +5801,11 @@ and form (wi*pi, wi) for curve 2</li>
         </li>
         
         
-        <li id="section-202">
+        <li id="section-204">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-202">&#182;</a>
+                <a class="pilcrow" href="#section-204">&#182;</a>
               </div>
               <h4 id="intersect_rays-a0-a-b0-b-">intersect_rays( a0, a, b0, b )</h4>
 <p>Find the closest parameter on two rays, see <a href="http://geomalgorithms.com/a07-_distance.html">http://geomalgorithms.com/a07-_distance.html</a></p>
@@ -5773,11 +5837,11 @@ and form (wi*pi, wi) for curve 2</li>
         </li>
         
         
-        <li id="section-203">
+        <li id="section-205">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-203">&#182;</a>
+                <a class="pilcrow" href="#section-205">&#182;</a>
               </div>
               <p>parallel case</p>
 
@@ -5798,11 +5862,11 @@ and form (wi*pi, wi) for curve 2</li>
         </li>
         
         
-        <li id="section-204">
+        <li id="section-206">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-204">&#182;</a>
+                <a class="pilcrow" href="#section-206">&#182;</a>
               </div>
               <h4 id="rational_curve_regular_sample-degree-knots-control_points-num_samples-include_u-">rational_curve_regular_sample( degree, knots, control_points, num_samples [, include_u] )</h4>
 <p>Sample a NURBS curve assuming parameterization 0 to 1, corresponds to <a href="http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf">http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf</a></p>
@@ -5829,11 +5893,11 @@ and form (wi*pi, wi) for curve 2</li>
         </li>
         
         
-        <li id="section-205">
+        <li id="section-207">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-205">&#182;</a>
+                <a class="pilcrow" href="#section-207">&#182;</a>
               </div>
               <h4 id="rational_curve_regular_sample_range-degree-knots-control_points-start_u-end_u-num_samples-include_u-">rational_curve_regular_sample_range( degree, knots, control_points, start_u, end_u, num_samples, include_u )</h4>
 <p>Sample a NURBS curve assuming parameterization 0 to 1, corresponds to <a href="http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf">http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf</a></p>
@@ -5882,11 +5946,11 @@ and form (wi*pi, wi) for curve 2</li>
         </li>
         
         
-        <li id="section-206">
+        <li id="section-208">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-206">&#182;</a>
+                <a class="pilcrow" href="#section-208">&#182;</a>
               </div>
               <h4 id="rational_curve_adaptive_sample-degree-knots-control_points-tol-include_u-">rational_curve_adaptive_sample( degree, knots, control_points, tol, include_u )</h4>
 <p>Sample a NURBS curve assuming parameterization 0 to 1, corresponds to <a href="http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf">http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf</a></p>
@@ -5911,11 +5975,11 @@ and form (wi*pi, wi) </li>
         </li>
         
         
-        <li id="section-207">
+        <li id="section-209">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-207">&#182;</a>
+                <a class="pilcrow" href="#section-209">&#182;</a>
               </div>
               <p>if degree is 1, just return the dehomogenized control points</p>
 
@@ -5929,11 +5993,11 @@ and form (wi*pi, wi) </li>
         </li>
         
         
-        <li id="section-208">
+        <li id="section-210">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-208">&#182;</a>
+                <a class="pilcrow" href="#section-210">&#182;</a>
               </div>
               <p>the first element of each array is the parameter</p>
 
@@ -5952,11 +6016,11 @@ and form (wi*pi, wi) </li>
         </li>
         
         
-        <li id="section-209">
+        <li id="section-211">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-209">&#182;</a>
+                <a class="pilcrow" href="#section-211">&#182;</a>
               </div>
               <h4 id="rational_curve_adaptive_sample_range-degree-knots-control_points-start_u-end_u-tol-include_u-">rational_curve_adaptive_sample_range( degree, knots, control_points, start_u, end_u, tol, include_u )</h4>
 <p>Sample a NURBS curve at 3 points, facilitating adaptive sampling</p>
@@ -5982,11 +6046,11 @@ and form (wi*pi, wi) </li>
         </li>
         
         
-        <li id="section-210">
+        <li id="section-212">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-210">&#182;</a>
+                <a class="pilcrow" href="#section-212">&#182;</a>
               </div>
               <p>sample curve at three pts</p>
 
@@ -6001,11 +6065,11 @@ and form (wi*pi, wi) </li>
         </li>
         
         
-        <li id="section-211">
+        <li id="section-213">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-211">&#182;</a>
+                <a class="pilcrow" href="#section-213">&#182;</a>
               </div>
               <p>if the two end control points are coincident, the three point test will always return 0, let&#39;s split the curve</p>
 
@@ -6017,11 +6081,11 @@ and form (wi*pi, wi) </li>
         </li>
         
         
-        <li id="section-212">
+        <li id="section-214">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-212">&#182;</a>
+                <a class="pilcrow" href="#section-214">&#182;</a>
               </div>
               <p>the first condition checks if the curve makes up a loop, if so, we will need to continue evaluation</p>
 
@@ -6032,11 +6096,11 @@ and form (wi*pi, wi) </li>
         </li>
         
         
-        <li id="section-213">
+        <li id="section-215">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-213">&#182;</a>
+                <a class="pilcrow" href="#section-215">&#182;</a>
               </div>
               <p>get the exact middle</p>
 
@@ -6047,11 +6111,11 @@ and form (wi*pi, wi) </li>
         </li>
         
         
-        <li id="section-214">
+        <li id="section-216">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-214">&#182;</a>
+                <a class="pilcrow" href="#section-216">&#182;</a>
               </div>
               <p>recurse on the two halves</p>
 
@@ -6063,11 +6127,11 @@ and form (wi*pi, wi) </li>
         </li>
         
         
-        <li id="section-215">
+        <li id="section-217">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-215">&#182;</a>
+                <a class="pilcrow" href="#section-217">&#182;</a>
               </div>
               <p>concatenate the two        </p>
 
@@ -6089,11 +6153,11 @@ and form (wi*pi, wi) </li>
         </li>
         
         
-        <li id="section-216">
+        <li id="section-218">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-216">&#182;</a>
+                <a class="pilcrow" href="#section-218">&#182;</a>
               </div>
               <h4 id="three_points_are_flat-p1-p2-p3-tol-">three_points_are_flat( p1, p2, p3, tol )</h4>
 <p>Determine if three points form a straight line within a given tolerance for their 2 * squared area</p>
@@ -6123,11 +6187,11 @@ and form (wi*pi, wi) </li>
         </li>
         
         
-        <li id="section-217">
+        <li id="section-219">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-217">&#182;</a>
+                <a class="pilcrow" href="#section-219">&#182;</a>
               </div>
               <p>find the area of the triangle without using a square root</p>
 
@@ -6145,11 +6209,11 @@ and form (wi*pi, wi) </li>
         </li>
         
         
-        <li id="section-218">
+        <li id="section-220">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-218">&#182;</a>
+                <a class="pilcrow" href="#section-220">&#182;</a>
               </div>
               <h4 id="curve_knot_insert-degree-knots-control_points-u-s-r-">curve_knot_insert( degree, knots, control_points, u, s, r )</h4>
 <p>Insert a knot along a rational curve</p>
@@ -6176,11 +6240,11 @@ and form (wi*pi, wi) </li>
         </li>
         
         
-        <li id="section-219">
+        <li id="section-221">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-219">&#182;</a>
+                <a class="pilcrow" href="#section-221">&#182;</a>
               </div>
               <p>np is n for the initial curve
 nq is n for the output curve with knots inserted
@@ -6206,11 +6270,11 @@ control_points is initial set of control points</p>
         </li>
         
         
-        <li id="section-220">
+        <li id="section-222">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-220">&#182;</a>
+                <a class="pilcrow" href="#section-222">&#182;</a>
               </div>
               <p>new knot vector</p>
 
@@ -6232,11 +6296,11 @@ control_points is initial set of control points</p>
         </li>
         
         
-        <li id="section-221">
+        <li id="section-223">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-221">&#182;</a>
+                <a class="pilcrow" href="#section-223">&#182;</a>
               </div>
               <p>control point generation</p>
 
@@ -6263,11 +6327,11 @@ control_points is initial set of control points</p>
         </li>
         
         
-        <li id="section-222">
+        <li id="section-224">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-222">&#182;</a>
+                <a class="pilcrow" href="#section-224">&#182;</a>
               </div>
               <p>insert knot r times</p>
 
@@ -6292,11 +6356,11 @@ control_points is initial set of control points</p>
         </li>
         
         
-        <li id="section-223">
+        <li id="section-225">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-223">&#182;</a>
+                <a class="pilcrow" href="#section-225">&#182;</a>
               </div>
               <p>not so confident about this part</p>
 
@@ -6314,11 +6378,11 @@ control_points is initial set of control points</p>
         </li>
         
         
-        <li id="section-224">
+        <li id="section-226">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-224">&#182;</a>
+                <a class="pilcrow" href="#section-226">&#182;</a>
               </div>
               <h4 id="rational_surface_derivs-degree_u-knots_u-degree_v-knots_v-homo_control_points-num_derivs-u-v-">rational_surface_derivs( degree_u, knots_u, degree_v, knots_v, homo_control_points, num_derivs, u, v)</h4>
 <p>Compute the derivatives at a point on a NURBS surface</p>
@@ -6388,11 +6452,11 @@ and where each control point is an array of length (dim)  </li>
         </li>
         
         
-        <li id="section-225">
+        <li id="section-227">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-225">&#182;</a>
+                <a class="pilcrow" href="#section-227">&#182;</a>
               </div>
               <h4 id="rational_surface_point-degree_u-knots_u-degree_v-knots_v-homo_control_points-u-v-">rational_surface_point( degree_u, knots_u,  degree_v, knots_v, homo_control_points, u, v )</h4>
 <p>Compute a point on a NURBS surface</p>
@@ -6423,11 +6487,11 @@ and where each control point is an array of length (dim+1)</li>
         </li>
         
         
-        <li id="section-226">
+        <li id="section-228">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-226">&#182;</a>
+                <a class="pilcrow" href="#section-228">&#182;</a>
               </div>
               <h4 id="rational_curve_derivs-degree-knots-homo_control_points-u-num_derivs-">rational_curve_derivs( degree, knots, homo_control_points, u, num_derivs )</h4>
 <p>Determine the derivatives of a NURBS curve at a given parameter</p>
@@ -6450,11 +6514,11 @@ and where each control point is an array of length (dim+1)</li>
         </li>
         
         
-        <li id="section-227">
+        <li id="section-229">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-227">&#182;</a>
+                <a class="pilcrow" href="#section-229">&#182;</a>
               </div>
               <p>compute the derivatives of the control points
 separate derivative array into two</p>
@@ -6484,11 +6548,11 @@ separate derivative array into two</p>
         </li>
         
         
-        <li id="section-228">
+        <li id="section-230">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-228">&#182;</a>
+                <a class="pilcrow" href="#section-230">&#182;</a>
               </div>
               <h4 id="separate_homo_derivs_1d-ck-">separate_homo_derivs_1d( ck )</h4>
 <p>Separate the array of derivatives into the A(u) component and w(u), i.e. the weight and everything else without dehomogenization</p>
@@ -6522,11 +6586,11 @@ separate derivative array into two</p>
         </li>
         
         
-        <li id="section-229">
+        <li id="section-231">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-229">&#182;</a>
+                <a class="pilcrow" href="#section-231">&#182;</a>
               </div>
               <h4 id="separate_homo_derivs_2d-skl-">separate_homo_derivs_2d( skl )</h4>
 <p>Separate the array of derivatives into the A(u) component and w(u), i.e. the weight and everything else without dehomogenization</p>
@@ -6559,11 +6623,11 @@ separate derivative array into two</p>
         </li>
         
         
-        <li id="section-230">
+        <li id="section-232">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-230">&#182;</a>
+                <a class="pilcrow" href="#section-232">&#182;</a>
               </div>
               <h4 id="rational_curve_point-degree-knots-homo_control_points-u-">rational_curve_point( degree, knots, homo_control_points, u)</h4>
 <p>Compute a point on a NURBS curve</p>
@@ -6591,11 +6655,11 @@ and form (wi*pi, wi)</li>
         </li>
         
         
-        <li id="section-231">
+        <li id="section-233">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-231">&#182;</a>
+                <a class="pilcrow" href="#section-233">&#182;</a>
               </div>
               <h4 id="dehomogenize-homo_point-">dehomogenize( homo_point )</h4>
 <p>Dehomogenize a point </p>
@@ -6626,11 +6690,11 @@ and form (wi*pi, wi)</li>
         </li>
         
         
-        <li id="section-232">
+        <li id="section-234">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-232">&#182;</a>
+                <a class="pilcrow" href="#section-234">&#182;</a>
               </div>
               <h4 id="homogenize_1d-control_points-weights-">homogenize_1d( control_points, weights)</h4>
 <p>Transform a 1d array of points into their homogeneous equivalents</p>
@@ -6670,11 +6734,11 @@ hence the dimension of the point is dim + 1</li>
         </li>
         
         
-        <li id="section-233">
+        <li id="section-235">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-233">&#182;</a>
+                <a class="pilcrow" href="#section-235">&#182;</a>
               </div>
               <p>append the weight</p>
 
@@ -6692,11 +6756,11 @@ hence the dimension of the point is dim + 1</li>
         </li>
         
         
-        <li id="section-234">
+        <li id="section-236">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-234">&#182;</a>
+                <a class="pilcrow" href="#section-236">&#182;</a>
               </div>
               <h4 id="homogenize_2d-control_points-weights-">homogenize_2d( control_points, weights)</h4>
 <p><strong>params</strong></p>
@@ -6735,11 +6799,11 @@ i the ith control point weight and pi is the ith control point, the size is
         </li>
         
         
-        <li id="section-235">
+        <li id="section-237">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-235">&#182;</a>
+                <a class="pilcrow" href="#section-237">&#182;</a>
               </div>
               <h4 id="surface_derivs-degree_u-knots_u-degree_v-knots_v-control_points-num_derivatives-u-v-">surface_derivs( degree_u, knots_u, degree_v, knots_v, control_points, num_derivatives, u, v )</h4>
 <p>Compute the derivatives on a non-uniform, non-rational B spline surface</p>
@@ -6773,11 +6837,11 @@ and where each control point is an array of length (dim)  </li>
         </li>
         
         
-        <li id="section-236">
+        <li id="section-238">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-236">&#182;</a>
+                <a class="pilcrow" href="#section-238">&#182;</a>
               </div>
               <h4 id="surface_derivs_given_n_m-n-degree_u-knots_u-m-degree_v-knots_v-control_points-num_derivatives-u-v-">surface_derivs_given_n_m( n, degree_u, knots_u, m, degree_v, knots_v, control_points, num_derivatives, u, v )</h4>
 <p>Compute the derivatives on a non-uniform, non-rational B spline surface 
@@ -6851,11 +6915,11 @@ and where each control point is an array of length (dim)  </li>
         </li>
         
         
-        <li id="section-237">
+        <li id="section-239">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-237">&#182;</a>
+                <a class="pilcrow" href="#section-239">&#182;</a>
               </div>
               <h4 id="surface_point-degree_u-knots_u-degree_v-knots_v-control_points-u-v-">surface_point( degree_u, knots_u, degree_v, knots_v, control_points, u, v)</h4>
 <p>Compute a point on a non-uniform, non-rational B-spline surface</p>
@@ -6889,11 +6953,11 @@ and where each control point is an array of length (dim)  </li>
         </li>
         
         
-        <li id="section-238">
+        <li id="section-240">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-238">&#182;</a>
+                <a class="pilcrow" href="#section-240">&#182;</a>
               </div>
               <h4 id="surface_point_given_n_m-n-degree_u-knots_u-m-degree_v-knots_v-control_points-u-v-">surface_point_given_n_m( n, degree_u, knots_u, m, degree_v, knots_v, control_points, u, v )</h4>
 <p>Compute a point on a non-uniform, non-rational B spline surface
@@ -6955,11 +7019,11 @@ and where each control point is an array of length (dim)  </li>
         </li>
         
         
-        <li id="section-239">
+        <li id="section-241">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-239">&#182;</a>
+                <a class="pilcrow" href="#section-241">&#182;</a>
               </div>
               <h4 id="curve_derivs-degree-knots-control_points-u-num_derivs-">curve_derivs( degree, knots, control_points, u, num_derivs )</h4>
 <p>Determine the derivatives of a non-uniform, non-rational B-spline curve at a given parameter</p>
@@ -6987,11 +7051,11 @@ and where each control point is an array of length (dim)  </li>
         </li>
         
         
-        <li id="section-240">
+        <li id="section-242">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-240">&#182;</a>
+                <a class="pilcrow" href="#section-242">&#182;</a>
               </div>
               <h4 id="curve_derivs_given_n-n-degree-knots-control_points-u-num_derivatives-">curve_derivs_given_n( n, degree, knots, control_points, u, num_derivatives )</h4>
 <p>Determine the derivatives of a non-uniform, non-rational B-spline curve at a given parameter
@@ -7038,11 +7102,11 @@ and where each control point is an array of length (dim)  </li>
         </li>
         
         
-        <li id="section-241">
+        <li id="section-243">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-241">&#182;</a>
+                <a class="pilcrow" href="#section-243">&#182;</a>
               </div>
               <h4 id="are_valid_relations-degree-num_control_points-knots_length-">are_valid_relations( degree, num_control_points, knots_length )</h4>
 <p>Confirm the relations between degree (p), number of control points(n+1), and the number of knots (m+1)
@@ -7069,11 +7133,11 @@ via The NURBS Book (section 3.2, Second Edition)</p>
         </li>
         
         
-        <li id="section-242">
+        <li id="section-244">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-242">&#182;</a>
+                <a class="pilcrow" href="#section-244">&#182;</a>
               </div>
               <h4 id="curve_point-degree-knots-control_points-u-">curve_point( degree, knots, control_points, u)</h4>
 <p>Compute a point on a non-uniform, non-rational b-spline curve</p>
@@ -7101,11 +7165,11 @@ via The NURBS Book (section 3.2, Second Edition)</p>
         </li>
         
         
-        <li id="section-243">
+        <li id="section-245">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-243">&#182;</a>
+                <a class="pilcrow" href="#section-245">&#182;</a>
               </div>
               <h4 id="curve_point_given_n-n-degree-knots-control_points-u-">curve_point_given_n( n, degree, knots, control_points, u)</h4>
 <p>Compute a point on a non-uniform, non-rational b-spline curve
@@ -7146,11 +7210,11 @@ via The NURBS Book (section 3.2, Second Edition)</p>
         </li>
         
         
-        <li id="section-244">
+        <li id="section-246">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-244">&#182;</a>
+                <a class="pilcrow" href="#section-246">&#182;</a>
               </div>
               <h4 id="zeros_1d-size-">zeros_1d(size)</h4>
 <p>Generate a 1d array of zeros</p>
@@ -7180,11 +7244,11 @@ via The NURBS Book (section 3.2, Second Edition)</p>
         </li>
         
         
-        <li id="section-245">
+        <li id="section-247">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-245">&#182;</a>
+                <a class="pilcrow" href="#section-247">&#182;</a>
               </div>
               <h4 id="zeros_2d-rows-cols-">zeros_2d(rows, cols)</h4>
 <p>Generate a 2D array of zeros</p>
@@ -7223,11 +7287,11 @@ via The NURBS Book (section 3.2, Second Edition)</p>
         </li>
         
         
-        <li id="section-246">
+        <li id="section-248">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-246">&#182;</a>
+                <a class="pilcrow" href="#section-248">&#182;</a>
               </div>
               <h4 id="zeros_3d-rows-cols-dim-">zeros_3d(rows, cols, dim)</h4>
 <p>Generate a 3D array of zeros</p>
@@ -7267,11 +7331,11 @@ via The NURBS Book (section 3.2, Second Edition)</p>
         </li>
         
         
-        <li id="section-247">
+        <li id="section-249">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-247">&#182;</a>
+                <a class="pilcrow" href="#section-249">&#182;</a>
               </div>
               <h4 id="deriv_basis_functions-u-degree-knots-">deriv_basis_functions( u, degree, knots )</h4>
 <p>Compute the non-vanishing basis functions and their derivatives</p>
@@ -7300,11 +7364,11 @@ via The NURBS Book (section 3.2, Second Edition)</p>
         </li>
         
         
-        <li id="section-248">
+        <li id="section-250">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-248">&#182;</a>
+                <a class="pilcrow" href="#section-250">&#182;</a>
               </div>
               <h4 id="deriv_basis_functions_given_n_i-knot_span_index-u-p-n-knots-">deriv_basis_functions_given_n_i( knot_span_index, u, p, n, knots )</h4>
 <p>Compute the non-vanishing basis functions and their derivatives
@@ -7431,11 +7495,11 @@ via The NURBS Book (section 3.2, Second Edition)</p>
         </li>
         
         
-        <li id="section-249">
+        <li id="section-251">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-249">&#182;</a>
+                <a class="pilcrow" href="#section-251">&#182;</a>
               </div>
               <h4 id="basis_functions-u-degree-knots-">basis_functions( u, degree, knots )</h4>
 <p>Compute the non-vanishing basis functions</p>
@@ -7461,11 +7525,11 @@ via The NURBS Book (section 3.2, Second Edition)</p>
         </li>
         
         
-        <li id="section-250">
+        <li id="section-252">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-250">&#182;</a>
+                <a class="pilcrow" href="#section-252">&#182;</a>
               </div>
               <h4 id="basis_functions_given_knot_span_index-knot_span_index-u-degree-knots-">basis_functions_given_knot_span_index( knot_span_index, u, degree, knots )</h4>
 <p>Compute the non-vanishing basis functions
@@ -7517,11 +7581,11 @@ via The NURBS Book (section 3.2, Second Edition)</p>
         </li>
         
         
-        <li id="section-251">
+        <li id="section-253">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-251">&#182;</a>
+                <a class="pilcrow" href="#section-253">&#182;</a>
               </div>
               <h4 id="knot_span-degree-u-knots-">knot_span( degree, u, knots )</h4>
 <p>Find the span on the knot vector without supplying n</p>
@@ -7551,11 +7615,11 @@ via The NURBS Book (section 3.2, Second Edition)</p>
         </li>
         
         
-        <li id="section-252">
+        <li id="section-254">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-252">&#182;</a>
+                <a class="pilcrow" href="#section-254">&#182;</a>
               </div>
               <h4 id="knot_span_given_n-n-degree-u-knots-">knot_span_given_n( n, degree, u, knots )</h4>
 <p>Find the span on the knot vector knots of the given parameter

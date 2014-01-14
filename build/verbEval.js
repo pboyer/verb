@@ -642,57 +642,6 @@ verb.eval.nurbs.get_arc = function( center, xaxis, yaxis, radius, start_angle, e
 }
 
 //
-// ####intersect_rational_surfaces( not, sure, yet )
-//
-// Intersect two NURBS surfaces
-//
-// **params**
-// 
-// **returns** 
-//
-
-verb.eval.nurbs.intersect_rational_surfaces = function( not, sure, yet ) {
-
-	// tesselate two nurbs surfaces
-	// verb.eval.mesh.intersect_meshes_by_aabb
-	// refine the curves using the two surfaces
-
-}
-
-//
-// ####intersect_meshes( vertices1, triangles1, uvs1, aabb1, vertices2, triangles2, uvs2, aabb2)
-//
-// Intersect two meshes
-//
-// **params**
-// + *Number*, integer degree of surface in u direction
-// + *Array*, array of nondecreasing knot values in u direction
-// + *Number*, integer degree of surface in v direction
-// + *Array*, array of nondecreasing knot values in v direction
-// + *Array*, 3d array of control points, top to bottom is increasing u direction, left to right is increasing v direction,
-// and where each control point is an array of length (dim+1)
-// + *Number*, u parameter at which to evaluate the surface point
-// + *Number*, v parameter at which to evaluate the surface point
-// 
-// **returns** 
-// + *Array*, a point represented by an array of length (dim)
-//
-
-verb.eval.mesh.intersect_meshes = function( vertices1, triangles1, uvs1, aabb1, vertices2, triangles2, uvs2, aabb2) {
-
-	// tesselate two nurbs surfaces
-
-	// call subroutine to:
-		// put polygons into kd trees
-		// intersect polygons via kd trees
-		// build up curves
-		// return poly line curves for further refinement
-
-		// return collection of lists of points with parameter values
-
-}
-
-//
 // ####intersect_meshes_by_aabb( points1, tris1, uvs1, points2, tris2, uvs2 )
 //
 // Intersect two meshes via aabb intersection
@@ -725,6 +674,8 @@ verb.eval.mesh.intersect_meshes_by_aabb = function( points1, tris1, uvs1, points
 	// get the segments of the intersection crv with uvs
 
 	// sort the intersection segments
+
+	// TODO
 
 }
 
@@ -794,12 +745,16 @@ verb.eval.geom.intersect_tris = function( points1, tri1, uvs1, points2, tri2, uv
   	// tri1 is intersecting and the intersection segment
   	// is inside tri2
 
+  	// TODO
+
   	// return the two outer points
 
   } else if ( seg_int_results.length === 1 ) {
 
   	// tri1 is intersecting and the intersection segment
   	// is partially inside tri2
+
+  	// TODO
 
   	// return the end point of seg that is INSIDE tri2 and the intersection
 
@@ -808,16 +763,72 @@ verb.eval.geom.intersect_tris = function( points1, tri1, uvs1, points2, tri2, uv
   	// tri1 is intersecting and the intersection segment's
   	// end points are outside of tri2
 
+  	// TODO
+
   	// return the two seg_int_results 
 
   } 
 
 }
 
+//
+// ####intersect_rational_curve_surface_by_aabb( degree_u, knots_u, degree_v, knots_v, homo_control_points, degree_crv, knots_crv, homo_control_points_crv, sample_tol, tol )
+//
+// Get the intersection of a NURBS curve and a NURBS surface by axis-aligned bounding box intersection and refinement
+//
+// **params**
+// + *Number*, integer degree of surface in u direction
+// + *Array*, array of nondecreasing knot values in u direction
+// + *Number*, integer degree of surface in v direction
+// + *Array*, array of nondecreasing knot values in v direction
+// + *Array*, 3d array of homogeneous control points, top to bottom is increasing u direction, left to right is increasing v direction,
+// and where each control point is an array of length (dim+1)
+// + *Number*, integer degree of curve
+// + *Array*, array of nondecreasing knot values
+// + *Array*, 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
+// and form (wi*pi, wi)
+// + *Number*, the sample tolerance of the curve
+// + *Number*, tolerance for the curve intersection
+// + *Number*, integer number of divisions of the surface in the U direction for initial approximation (placeholder until adaptive tess of surfaces)
+// + *Number*, integer number of divisions of the surface in the V direction for initial approximation (placeholder until adaptive tess of surfaces)
+// 
+// **returns** 
+// + *Array*, array of intersection objects, each holding:
+// 	- a "point" property where intersections took place
+// 	- a "p" the parameter on the curve
+//	- a "uv" the parameter on the surface
+// 	- a "face" the index of the face where the intersection took place
+//
 
+verb.eval.nurbs.intersect_rational_curve_surface_by_aabb_refine = function( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, sample_tol, tol, divs_u, divs_v ) {
+
+	// get the approximate intersections
+	var ints = verb.eval.nurbs.intersect_rational_curve_surface_by_aabb( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, sample_tol, tol, divs_u, divs_v );
+
+	// refine them
+	return ints.map(function( inter ){
+
+		// get intersection params
+		var start_params = [inter.p, inter.uv[0], inter.uv[1] ]
+
+		// refine the parameters
+			, refined_params = verb.eval.nurbs.refine_rational_curve_surface_intersection( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, start_params );
+	
+		// update the inter object
+		inter.p = refined_params[0];
+		inter.uv[0] = refined_params[1];
+		inter.uv[1] = refined_params[2];
+		inter.distance = refined_params[3];
+		delete inter.face;
+
+		return inter;
+
+	});
+
+}
 
 //
-// ####refine_rational_curve_surface_intersection = function( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, start_params )
+// ####refine_rational_curve_surface_intersection( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, start_params )
 //
 // Refine an intersection pair for a surface and curve given an initial guess.  This is an unconstrained minimization,
 // so the caller is responsible for providing a very good initial guess.
@@ -854,6 +865,8 @@ verb.eval.nurbs.refine_rational_curve_surface_intersection = function( degree_u,
 	return sol_obj.solution.concat( sol_obj.f );
 
 }
+
+
 
 //
 // ####intersect_rational_curve_surface_by_aabb( degree_u, knots_u, degree_v, knots_v, homo_control_points, degree_crv, knots_crv, homo_control_points_crv, sample_tol, tol )
@@ -902,13 +915,13 @@ verb.eval.nurbs.intersect_rational_curve_surface_by_aabb = function( degree_u, k
 
 	// eliminate duplicate intersections
 	return verb.unique( res, function(a, b){
-		return numeric.norm2( numeric.sub( a.point, b.point ) ) < tol;
+		return numeric.norm2( numeric.sub( a.point, b.point ) ) < tol && Math.abs( a.p - b.p ) < tol && numeric.norm2( numeric.sub( a.uv, b.uv ) ) < tol
 	});
 
 }
 
 //
-// ####intersect_parametric_polyline_mesh_by_aabb( crv_points, crv_param_points, mesh, tol )
+// ####intersect_parametric_polyline_mesh_by_aabb( crv_points, crv_param_points, mesh, included_faces, tol )
 //
 // Approximate the intersection of a polyline and mesh while maintaining parameter information
 //
@@ -1374,7 +1387,6 @@ verb.eval.geom.get_tri_norm = function( points, tri ) {
                   // uvs
 
 verb.eval.nurbs.tesselate_rational_surface_naive = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, divs_u, divs_v ) {
-
 
 	if ( divs_u < 1 ) {
 		divs_u = 1;

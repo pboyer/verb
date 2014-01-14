@@ -4155,3 +4155,66 @@ describe("verb.eval.nurbs.refine_rational_curve_surface_intersection",function()
 
 });
 
+describe("verb.eval.nurbs.intersect_rational_curve_surface_by_aabb_refine",function(){
+
+	it('gives valid result for planar surface and degree 2 bezier', function(){
+
+		var homo_control_points_srf = [ [ [0,0,0,1], [0,10,0,1] ], [[20,0,0,1], [20,10,0,1] ] ]
+			, degree_u  = 1
+			, degree_v = 1
+			, knots_u = [0,0,1,1]
+			, knots_v = [0,0,1,1];
+
+		var degree_crv = 2
+			, knots_crv = [0,0,0,1,1,1]
+			, homo_control_points_crv = [ [5.2,5.2,5,1], [5.4,4.8,0,1], [5.2,5.2,-5,1] ];
+
+		var sample_tol = 1e-6
+			, tol = 0.00001
+			, divs_u = 3
+			, divs_v = 3;
+
+		var res = verb.eval.nurbs.intersect_rational_curve_surface_by_aabb_refine( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, sample_tol, tol, divs_u, divs_v );
+
+		res.length.should.be.equal( 1 );
+		res[0].p.should.be.approximately(0.5, verb.TOLERANCE);
+		res[0].uv[0].should.be.approximately(0.265, verb.TOLERANCE);
+		res[0].uv[1].should.be.approximately(0.5, verb.TOLERANCE);
+
+	});
+
+});
+
+describe("verb.intersect.curveSurface",function(){
+
+	it('gives valid result for planar surface and degree 2 bezier', function(){
+
+		verb.init();
+
+		var base = [0,0,0]
+			, uaxis = [1,0,0]
+			, vaxis = [0,1,0]
+			, ulength = 20
+			, vlength = 10;
+
+		var srf = new verb.geom.PlanarSurface( base, uaxis, vaxis, ulength, vlength );
+		var crv = new verb.geom.BezierCurve( [ [5.2,5.2,5], [5.4,4.8,0], [5.2,5.2,-5] ] );
+
+		var options = {
+			sampleTolerance: 1e-12,
+			tolerance: 1e-5,
+			uDivs: 10,
+			vDivs: 15
+		};
+
+		var res = verb.intersect.curveSurface( crv, srf, options );
+
+		res.length.should.be.equal( 1 );
+		res[0].p.should.be.approximately(0.5, verb.TOLERANCE);
+		res[0].uv[0].should.be.approximately(0.265, verb.TOLERANCE);
+		res[0].uv[1].should.be.approximately(0.5, verb.TOLERANCE);
+
+	});
+
+});
+
