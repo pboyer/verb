@@ -4250,7 +4250,7 @@ describe("verb.eval.nurbs.volume_point",function(){
 			}
 		}
 
-		// sample a bunch of times
+		// sample a bunch of times and confirm the values are as expected
 		for (var i = 0; i < 10; i++){
 
 			var u = Math.random(), v = Math.random(), w = Math.random()
