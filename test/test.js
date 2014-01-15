@@ -4218,3 +4218,51 @@ describe("verb.intersect.curveSurface",function(){
 
 });
 
+
+describe("verb.eval.nurbs.volume_point",function(){
+
+	it('gives valid result for uniform 3x3x3 cube', function(){
+
+		var degree_u = 1
+			, knots_u = [ 0,0,0.5,1,1 ]
+			, degree_v = 1
+			, knots_v = [ 0,0,0.5,1,1 ]
+			, degree_w = 1
+			, knots_w = [ 0,0,0.5,1,1 ]
+			, control_points = [];
+
+		// build a 3d grid of points
+		for (var i = 0; i < 3; i++){
+
+			var row = [];
+			control_points.push( row );
+
+			for (var j = 0; j < 3; j++){
+
+				var col = [];
+				row.push( col );
+
+				for (var k = 0; k < 3; k++){
+
+					col.push( [ i/2, j/2, k/2 ] );
+
+				}
+			}
+		}
+
+		// sample a bunch of times
+		for (var i = 0; i < 10; i++){
+
+			var u = Math.random(), v = Math.random(), w = Math.random()
+			var result = verb.eval.nurbs.volume_point( degree_u, knots_u, degree_v, knots_v, degree_w, knots_w, control_points, u, v, w );
+
+			result[0].should.be.approximately( u, verb.TOLERANCE );
+			result[1].should.be.approximately( v, verb.TOLERANCE );
+			result[2].should.be.approximately( w, verb.TOLERANCE );
+
+		}
+
+	});
+
+});
+

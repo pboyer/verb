@@ -1992,7 +1992,7 @@ verb.eval.nurbs.rational_surface_point = function( degree_u, knots_u,  degree_v,
 
 };
 
-//
+//`
 // ####rational_curve_derivs( degree, knots, homo_control_points, u, num_derivs )
 //
 // Determine the derivatives of a NURBS curve at a given parameter
@@ -2338,6 +2338,120 @@ verb.eval.nurbs.surface_point = function( degree_u, knots_u, degree_v, knots_v, 
 }
 
 //
+// ####volume_point( degree_u, knots_u, degree_v, knots_v, degree_w, knots_w, control_points, u, v, w  )
+//
+// Compute a point in a non-uniform, non-rational B spline volume
+//
+// **params**
+// + *Number*, integer number of basis functions in u dir - 1 = knots_u.length - degree_u - 2
+// + *Number*, integer degree of volume in u direction
+// + *Array*, array of nondecreasing knot values in u direction
+// + *Number*, integer number of basis functions in v dir - 1 = knots_v.length - degree_v - 2
+// + *Number*, integer degree of volume in v direction
+// + *Array*, array of nondecreasing knot values in v direction
+// + *Number*, integer number of basis functions in w dir - 1 = knots_w.length - degree_w - 2
+// + *Number*, integer degree of volume in w direction
+// + *Array*, array of nondecreasing knot values in w direction
+// + *Array*, 4d array of control points where each control point is an array of length (dim)  
+// + *Number*, u parameter at which to evaluate the volume point
+// + *Number*, v parameter at which to evaluate the volume point
+// + *Number*, w parameter at which to evaluate the volume point
+// 
+// **returns** 
+// + *Array*, a point represented by an array of length (dim)
+//
+
+verb.eval.nurbs.volume_point = function( degree_u, knots_u, degree_v, knots_v, degree_w, knots_w, control_points, u, v, w ) {
+
+	var n = knots_u.length - degree_u - 2
+		, m = knots_v.length - degree_v - 2
+		, l = knots_w.length - degree_w - 2;
+
+	return verb.eval.nurbs.volume_point_given_n_m_l( n, degree_u, knots_u, m, degree_v, knots_v, l, degree_w, knots_w, control_points, u, v, w );
+
+}
+
+//
+// ####volume_point_given_n_m_l( n, degree_u, knots_u, m, degree_v, knots_v, l, degree_w, knots_w, control_points, u, v, w )
+//
+// Compute a point in a non-uniform, non-rational B spline volume
+//
+// **params**
+// + *Number*, integer number of basis functions in u dir - 1 = knots_u.length - degree_u - 2
+// + *Number*, integer degree of volume in u direction
+// + *Array*, array of nondecreasing knot values in u direction
+// + *Number*, integer number of basis functions in v dir - 1 = knots_v.length - degree_v - 2
+// + *Number*, integer degree of volume in v direction
+// + *Array*, array of nondecreasing knot values in v direction
+// + *Number*, integer number of basis functions in w dir - 1 = knots_w.length - degree_w - 2
+// + *Number*, integer degree of volume in w direction
+// + *Array*, array of nondecreasing knot values in w direction
+// + *Array*, 4d array of control points where each control point is an array of length (dim)  
+// + *Number*, u parameter at which to evaluate the volume point
+// + *Number*, v parameter at which to evaluate the volume point
+// + *Number*, w parameter at which to evaluate the volume point
+// 
+// **returns** 
+// + *Array*, a point represented by an array of length (dim)
+//
+
+verb.eval.nurbs.volume_point_given_n_m_l = function( n, degree_u, knots_u, m, degree_v, knots_v, l, degree_w, knots_w, control_points, u, v, w ) {
+
+	if ( 	!verb.eval.nurbs.are_valid_relations(degree_u, control_points.length, knots_u.length ) ||
+				!verb.eval.nurbs.are_valid_relations(degree_v, control_points[0].length, knots_v.length ) || 
+				!verb.eval.nurbs.are_valid_relations(degree_w, control_points[0][0].length, knots_w.length ) ) {
+		console.error('Invalid relations between control points and knot vector');
+		return null;
+	}
+
+	var dim = control_points[0][0][0].length
+		, knot_span_index_u = verb.eval.nurbs.knot_span_given_n( n, degree_u, u, knots_u )
+		, knot_span_index_v = verb.eval.nurbs.knot_span_given_n( m, degree_v, v, knots_v )
+		, knot_span_index_w = verb.eval.nurbs.knot_span_given_n( l, degree_w, w, knots_w )
+		, u_basis_vals = verb.eval.nurbs.basis_functions_given_knot_span_index( knot_span_index_u, u, degree_u, knots_u )
+		, v_basis_vals = verb.eval.nurbs.basis_functions_given_knot_span_index( knot_span_index_v, v, degree_v, knots_v )
+		, w_basis_vals = verb.eval.nurbs.basis_functions_given_knot_span_index( knot_span_index_w, w, degree_w, knots_w )
+		, uind = knot_span_index_u - degree_u
+		, vind = knot_span_index_v
+		, wind = knot_span_index_w
+		, position = verb.eval.nurbs.zeros_1d( dim )
+		, temp = verb.eval.nurbs.zeros_1d( dim )
+		, temp2 = verb.eval.nurbs.zeros_1d( dim )
+		, j = 0
+		, k = 0;
+
+	for (var i = 0; i <= degree_w; i++){
+
+		temp2 = verb.eval.nurbs.zeros_1d( dim );
+		wind = knot_span_index_w - degree_w + i;
+
+		for (j = 0; j <= degree_v; j++) {	
+
+			temp = verb.eval.nurbs.zeros_1d( dim );
+			vind = knot_span_index_v  - degree_v + j;
+
+			for (k = 0; k <= degree_u; k++) {	
+
+				// sample u isoline
+				temp = numeric.add( temp, 
+														numeric.mul( u_basis_vals[k], control_points[uind+k][vind][wind] ));
+			}
+
+			// add weighted contribution of u isoline
+			temp2 = numeric.add( temp2, 
+													numeric.mul( v_basis_vals[j], temp ) );
+		}
+
+		// add weighted contribution from uv isosurfaces
+		position = numeric.add( position, 
+														numeric.mul( w_basis_vals[i], temp2 ) );
+
+	}
+
+	return position;
+}
+
+//
 // ####surface_point_given_n_m( n, degree_u, knots_u, m, degree_v, knots_v, control_points, u, v )
 //
 // Compute a point on a non-uniform, non-rational B spline surface
@@ -2383,10 +2497,12 @@ verb.eval.nurbs.surface_point_given_n_m = function( n, degree_u, knots_u, m, deg
 		temp = verb.eval.nurbs.zeros_1d( dim );
 		vind = knot_span_index_v - degree_v + l;
 
+		// sample u isoline
 		for (k = 0; k <= degree_u; k++) {	
 			temp = numeric.add( temp, numeric.mul( u_basis_vals[k], control_points[uind+k][vind]) );
 		}
 
+		// add point from u isoline
 		position = numeric.add( position, numeric.mul(v_basis_vals[l], temp) );
 	}
 

@@ -101,53 +101,15 @@ surface.tesselate( tesselationOptions, function(tesselation){
 				Intersection
 			</h4>
 
-			<p>verb supplies routines for curve-surface intersection and curve-curve intersection.  These algorithms are fast and robust.  Algorithms for surface-surface intersection are in the works.</p>
+			<p>verb supplies routines for curve-surface intersection and curve-curve intersection.  These algorithms can be tuned any tolerance and designed to detect multiple intersections.  Algorithms for surface-surface intersection are in the works.</p>
 
-			<p> Intersecting a curve and curve </p>
-			
-				<pre>
-// build a bezier curve
-var p1 = [0,0,0]
-	, p2 = [1,0,1]
-	, p3 = [2,0,1]
-	, p4 = [3,0,0];
-
-var curve1 = new verb.geom.BezierCurve( [p1, p2, p3, p4] );
-
-// build another
-var c1 = [-5,0,3]
-	, c2 = [1,0,0]
-	, c3 = [2,0,0]
-	, c4 = [3,0,1];
-
-var curve2 = new verb.geom.BezierCurve( [c1, c2, c3, c4] );
-
-// make sync work
-var res = verb.intersect.curveCurve( curve1, curve2 );</pre>
-
-			<p> Intersecting a curve and surface </p>
+			<p> <strong> Intersecting a curve and surface </strong> </p>
 
 				<pre>
-
-// make a surface
-var base = [0,0,0]
-	, uaxis = [1,0,0]
-	, vaxis = [0,1,0]
-	, ulength = 20
-	, vlength = 10;
-
 var srf = new verb.geom.PlanarSurface( base, uaxis, vaxis, ulength, vlength );
-
-// make a curve
 var crv = new verb.geom.BezierCurve( [ [5.2,5.2,5], [5.4,4.8,0], [5.2,5.2,-5] ] );
+var options = { tolerance: 1e-5 };
 
-// intersection options
-var options = {
-	sampleTolerance: 1e-12,
-	tolerance: 1e-5
-};
-
-// do it synchronously
 var res = verb.intersect.curveSurface( crv, srf, options );</pre>
 
 		</div>
