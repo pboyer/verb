@@ -25,23 +25,41 @@ canvas {
   position: absolute;
   border-bottom: 10px;
   margin: 0;
+  z-index: 3;
 }
 
 #titlecontainer {
   padding-top: 120px;
-  
   width: 900px;
   margin: auto;
   text-align: center;
+  z-index: 3;
+}
+
+#description-section {
+  z-index: -1;
+  padding: 0;
+  background: #555;
+  margin: 0;
 }
 
 #description {
-  color: #444;
-  margin-top: 40px;
-  background: whitesmoke;
+  color: #DDD;
+  z-index: -1;
+  margin-top: 0;
   padding: 30px;
   font-size: 25px;
+  text-shadow:0 2px 1px rgba(0,0,0,1);
 }
+
+#description a {
+  color: #AAA;
+}
+
+#description a:hover {
+  color: #888;
+}
+
 
 #description h3 {
   font-style: italic;
@@ -50,29 +68,29 @@ canvas {
 
 h1 {
   padding: 0;
-  padding-top: 30px;
+  padding-top: 40px;
   margin: 0;
   font-weight: bold;
-  font-size: 64px;
+  font-size: 72px;
   text-shadow:0 2px 1px rgba(200, 200, 200,1);
 }
 
 h2 {
   font-weight: bold;
-  font-size: 18px;
+  font-size: 24px;
   text-shadow:0 2px 1px rgba(200, 200, 200,1);
 }
 
 h3 {
   margin-top: 60px;
   font-weight: bold;
-  font-size: 25px;
+  font-size: 32px;
 }
 
 h4 {
   margin-top: 30px;
   font-weight: bold;
-  font-size: 20px;
+  font-size: 24px;
 }
 
 #header {
@@ -80,9 +98,20 @@ h4 {
   margin: 0;
   height: 500px;
   padding: 0;
-  background: red;
+  background: whitesmoke;
   margin-bottom: 0;
-  box-shadow: 0px 10px 40px #AAA;
+  box-shadow: 0px 10px 40px #333;
+  z-index: 2;
+  position: relative;
+}
+
+#header a {
+  font-size: 16px;
+  color: #444;
+}
+
+#header a:hover {
+  color: #888;
 }
 
 #contribute {
@@ -115,10 +144,19 @@ pre, code {
 
 a { 
   color: inherit; 
+  text-decoration: none;
+  color: #999;
 }
+
+a:hover { 
+  color: #BBB;
+}
+
+
 
 .viewer { 
   width: 270px; 
+  min-height: 100px; 
   display: inline-block;
   background: #EEE; 
   padding: 10px; 

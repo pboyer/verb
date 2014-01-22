@@ -50,7 +50,7 @@ verb.geom.NurbsSurface.prototype.toGlType = function(gl, callback) {
   }
 
   // do sync
-  var s = this.tesselate();
+  var s = this.tesselate({ minDivsV: 10, minDivsU: 10 });
   return makeGLMeshFromTesselation(gl, s)
 
 };

@@ -22,12 +22,12 @@
 
 <body>
 
-	<div class="section" id="header"> 
-		<div class="container" id="title">
+	<div class="section" id="header" style="z-index: 1;"> 
+		<div class="container" id="title" style="z-index: 1;">
 			<div id="titlecontainer">
 
 				<h1><img src="assets/v2.png" style="height: 64px; padding-right: 10px; display: inline-block">verb<span style="font-size: 12px; padding-left: 5px">0.1.0</span></h1>
-				<h2>A NURBS Library for the Web</h2>
+				<h2>A CAD Library for the Web</h2>
 
 				<p><a href="geometry.html" style="padding-right: 10px">Examples</a><a href="https://github.com/pboyer/verb" style="padding-right: 10px">Source code</a> <a href="docs/verb.html">Documentation</a></p>
 
@@ -35,20 +35,15 @@
 		</div>
 	</div>
 	
-	<div class="section"> 
+	<div class="section" id="description-section"> 
 		<div class="container" id="description">
 	
 			<p>
 
-			<strong>verb</strong> is a JavaScript library for creating and manipulating <a href="http://en.wikipedia.org/wiki/Non-uniform_rational_B-spline">NURBS</a> surfaces and curves in the browser or <a href="http://nodejs.org/">node.js</a>.  It provides a <a href="geometry.html">rich set of geometric types like sweeps, extrusions, revolves, beziers, and other common curves and surfaces</a> in a <a href="js/verb.min.js">17kb-minified package</a>.
+			<strong>verb</strong> is a JavaScript library for creating and manipulating <a href="http://en.wikipedia.org/wiki/Non-uniform_rational_B-spline">NURBS</a> surfaces and curves in the browser or <a href="http://nodejs.org/">node.js</a>.  It provides a rich set of features with <a href="geometry.html">many types of surfaces and curves</a> in a <a href="js/verb.min.js">10kb (gzipped, minified) package</a>.
 
 			</p>
 
-			<p>
-
-			verb also provides advanced tools like derivative evaluation, adaptive tesselation, and intersection.  Geometry can be "watched" in a <a href="http://backbonejs.org/">backbone-like</a> style and defaults to multi-threaded parallel execution via <a href="http://en.wikipedia.org/wiki/Web_worker">WebWorkers</a> in modern browsers.  
-
-			</p>
 		</div>
 	</div>
 
@@ -192,7 +187,7 @@ var watcherId = l.watch('controlPoints', function(changeData) {
 			<h3>Contribute</h3>
 
 				<p>
-					Check out the <a href="https://github.com/pboyer/verb">Github page</a> here!
+					There's still a lot of exciting work to do and I'm definitely looking for collaborators!  Check out the <a href="https://github.com/pboyer/verb">Github page</a> here! 
 				</p>
 
 		</div>
