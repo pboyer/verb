@@ -70,6 +70,8 @@
 
 			<h4>Evaluation</h4>
 
+			<p> verb supplies methods for evaluation of points and arbitrary derivatives on NURBS curves and surfaces.</p>
+
 			<pre>var curve = new verb.geom.BezierCurve( [p1, p2, p3, p4] );
 
 var numDerivs = 1
@@ -83,7 +85,7 @@ var derivs = curve.derivatives( u, numDerivs );</pre>
 
 			<h4>Tesselation</h4>
 
-			<p>A NURBS curve or surface is a mathematic function that can be evaluated.  In order to visualize it, you must tesselize it into a sequence of lines or collection of triangles.  verb supplies naive and adaptive tesselation routines for curves and surfaces at arbitrary tolerance.</p>
+			<p>A NURBS curve or surface is an analytical function.  In order to visualize it, it must be "tesselated" into a collection of lines or triangles.  verb supplies naive and adaptive tesselation routines for curves and surfaces at arbitrary tolerance.</p>
 
 			<pre>
 var surface = new verb.geom.NurbsSurface(  );
@@ -181,6 +183,8 @@ var watcherId = l.watch('controlPoints', function(changeData) {
 		</div>
 	</div>
 
+
+
 	<div class="section" id="contribute"> 
 		<div class="container">
 
@@ -189,6 +193,8 @@ var watcherId = l.watch('controlPoints', function(changeData) {
 				<p>
 					There's still a lot of exciting work to do and I'm definitely looking for collaborators!  Check out the <a href="https://github.com/pboyer/verb">Github page</a> here! 
 				</p>
+
+				<p> verb uses the MIT License </p>
 
 		</div>
 	</div>
