@@ -265,7 +265,7 @@ verb.eval.nurbs.intersect_rational_curve_surface_by_aabb = function( degree_u, k
 		, p1 = crv.map( function(el) { return el.slice(1) })
 
 	// perform intersection
-		, res = verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( p1, u1, mesh, _.range(mesh.faces.length), tol );
+		, res = verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( p1, u1, mesh, verb.range(mesh.faces.length), tol );
 
 	// eliminate duplicate intersections
 	return verb.unique( res, function(a, b){
@@ -1016,7 +1016,7 @@ verb.eval.geom.intersect_rays = function( a0, a, b0, b ) {
 
 
 
- 
+
 //
 // ####intersect_meshes_by_aabb( points1, tris1, uvs1, points2, tris2, uvs2 )
 //
@@ -1039,8 +1039,8 @@ verb.eval.geom.intersect_rays = function( a0, a, b0, b ) {
 verb.eval.mesh.intersect_meshes_by_aabb = function( points1, tris1, uvs1, points2, tris2, uvs2 ) {
 
 	// build aabb for each mesh
-	var tri_indices1 = _.range(tris1.length)
-	  , tri_indices2 = _.range(tris2.length)
+	var tri_indices1 = verb.range(tris1.length)
+	  , tri_indices2 = verb.range(tris2.length)
 	  , aabb1 = verb.eval.mesh.make_mesh_aabb_tree( points1, tris1, tri_indices1 )
 	  , aabb2 = verb.eval.mesh.make_mesh_aabb_tree( points2, tris2, tri_indices2 )
   

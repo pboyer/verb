@@ -33,12 +33,12 @@ verb.geom.BoundingBox.prototype.add_elements = function( point_array, callback )
 {
 
 	var that = this; 
-	_.defer(function() {
-		_.each( point_array, function(elem, index) {
+	setTimeout(function() {
+		point_array.forEach(function(elem, index) {
 			that.add(elem);
 		});
 		callback(that);
-	});
+	}, 0);
 
 };
 
@@ -56,7 +56,7 @@ verb.geom.BoundingBox.prototype.add_elements = function( point_array, callback )
 verb.geom.BoundingBox.prototype.add_elements_sync = function( point_array ) 
 {
 	var that = this; 
-	_.each( point_array, function(elem) {
+	point_array.forEach( function(elem) {
 		that.add(elem);
 	});
 	return this;

@@ -4,8 +4,7 @@ if ( typeof exports != 'object' || exports === undefined )
 	var verb = {}
 		, numeric = window.numeric
 		, binomial = window.binomial
-		, labor = window.labor
-		, _ = window.underscore;
+		, labor = window.labor;
 }
 // node.js context
 else 
@@ -13,8 +12,7 @@ else
 	var verb = module.exports = {}
 		, numeric = require('numeric')
 		, binomial = require('binomial')
-		, labor = require('labor')
-		, _ = require('underscore');
+		, labor = require('labor');
 }
 
 // Initialize the verb namespace objects
@@ -212,6 +210,41 @@ verb.unique = function( arr, comparator ){
 	return uniques;
 
 }
+
+	//
+	// ####range(start, stop, step)
+	//
+	// Obtain the unique set of elements in an array
+	//
+	// Borrowed from underscore.js port of the python function
+	// of the same name
+	//
+	// **params**
+	// + *Number*, start point
+	// + *Number*, end point 
+	// + *Number*, step
+	// 
+	// **returns** 
+	// + *Array*, range array
+	//
+  verb.range = function(start, stop, step) {
+    if (arguments.length <= 1) {
+      stop = start || 0;
+      start = 0;
+    }
+    step = arguments[2] || 1;
+
+    var len = Math.max(Math.ceil((stop - start) / step), 0);
+    var idx = 0;
+    var range = new Array(len);
+
+    while(idx < len) {
+      range[idx++] = start;
+      start += step;
+    }
+
+    return range;
+  };
 // ###new Engine( [options] )
 //
 // Constructor for Engine
@@ -1081,12 +1114,12 @@ verb.geom.BoundingBox.prototype.add_elements = function( point_array, callback )
 {
 
 	var that = this; 
-	_.defer(function() {
-		_.each( point_array, function(elem, index) {
+	setTimeout(function() {
+		point_array.forEach(function(elem, index) {
 			that.add(elem);
 		});
 		callback(that);
-	});
+	}, 0);
 
 };
 
@@ -1104,7 +1137,7 @@ verb.geom.BoundingBox.prototype.add_elements = function( point_array, callback )
 verb.geom.BoundingBox.prototype.add_elements_sync = function( point_array ) 
 {
 	var that = this; 
-	_.each( point_array, function(elem) {
+	point_array.forEach( function(elem) {
 		that.add(elem);
 	});
 	return this;
@@ -2089,7 +2122,7 @@ verb.eval.nurbs.intersect_rational_curve_surface_by_aabb = function( degree_u, k
 		, p1 = crv.map( function(el) { return el.slice(1) })
 
 	// perform intersection
-		, res = verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( p1, u1, mesh, _.range(mesh.faces.length), tol );
+		, res = verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( p1, u1, mesh, verb.range(mesh.faces.length), tol );
 
 	// eliminate duplicate intersections
 	return verb.unique( res, function(a, b){
@@ -2840,7 +2873,7 @@ verb.eval.geom.intersect_rays = function( a0, a, b0, b ) {
 
 
 
- 
+
 //
 // ####intersect_meshes_by_aabb( points1, tris1, uvs1, points2, tris2, uvs2 )
 //
@@ -2863,8 +2896,8 @@ verb.eval.geom.intersect_rays = function( a0, a, b0, b ) {
 verb.eval.mesh.intersect_meshes_by_aabb = function( points1, tris1, uvs1, points2, tris2, uvs2 ) {
 
 	// build aabb for each mesh
-	var tri_indices1 = _.range(tris1.length)
-	  , tri_indices2 = _.range(tris2.length)
+	var tri_indices1 = verb.range(tris1.length)
+	  , tri_indices2 = verb.range(tris2.length)
 	  , aabb1 = verb.eval.mesh.make_mesh_aabb_tree( points1, tris1, tri_indices1 )
 	  , aabb2 = verb.eval.mesh.make_mesh_aabb_tree( points2, tris2, tri_indices2 )
   

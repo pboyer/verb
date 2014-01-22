@@ -17,7 +17,6 @@
   "dependencies": {
     "labor": "*",
     "binomial": "*",
-    "underscore": "1.4.4",
     "numeric": "1.2.6"
   },
   "devDependencies": {

@@ -4,8 +4,7 @@ if ( typeof exports != 'object' || exports === undefined )
 	var verb = {}
 		, numeric = window.numeric
 		, binomial = window.binomial
-		, labor = window.labor
-		, _ = window.underscore;
+		, labor = window.labor;
 }
 // node.js context
 else 
@@ -13,8 +12,7 @@ else
 	var verb = module.exports = {}
 		, numeric = require('numeric')
 		, binomial = require('binomial')
-		, labor = require('labor')
-		, _ = require('underscore');
+		, labor = require('labor');
 }
 
 // Initialize the verb namespace objects
@@ -212,3 +210,38 @@ verb.unique = function( arr, comparator ){
 	return uniques;
 
 }
+
+	//
+	// ####range(start, stop, step)
+	//
+	// Obtain the unique set of elements in an array
+	//
+	// Borrowed from underscore.js port of the python function
+	// of the same name
+	//
+	// **params**
+	// + *Number*, start point
+	// + *Number*, end point 
+	// + *Number*, step
+	// 
+	// **returns** 
+	// + *Array*, range array
+	//
+  verb.range = function(start, stop, step) {
+    if (arguments.length <= 1) {
+      stop = start || 0;
+      start = 0;
+    }
+    step = arguments[2] || 1;
+
+    var len = Math.max(Math.ceil((stop - start) / step), 0);
+    var idx = 0;
+    var range = new Array(len);
+
+    while(idx < len) {
+      range[idx++] = start;
+      start += step;
+    }
+
+    return range;
+  };
