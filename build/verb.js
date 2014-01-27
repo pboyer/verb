@@ -214,7 +214,7 @@ verb.unique = function( arr, comparator ){
 	//
 	// ####range(start, stop, step)
 	//
-	// Obtain the unique set of elements in an array
+	// Obtain a range of numbers
 	//
 	// Borrowed from underscore.js port of the python function
 	// of the same name
@@ -3238,6 +3238,9 @@ verb.eval.nurbs.rational_curve_adaptive_sample_range = function( degree, knots, 
 
 
 
+
+
+
 //
 // ####three_points_are_flat( p1, p2, p3, tol )
 //
@@ -3273,6 +3276,351 @@ verb.eval.nurbs.three_points_are_flat = function( p1, p2, p3, tol ) {
 	return area < tol;
 
 }
+
+function getEastNeighbor(index, i, j, min_divs_u, min_divs_v, divs){
+	
+	if (j === min_divs_v - 1){
+		return null;
+	}
+
+	return divs[ index + 1 ];
+
+}
+
+function getNorthNeighbor(index, i, j, min_divs_u, min_divs_v, divs){
+
+	if (i === 0){
+		return null;
+	}
+
+	return divs[ index - min_divs_v ];
+
+}
+
+function getSouthNeighbor(index, i, j, min_divs_u, min_divs_v, divs){
+
+	if (i === min_divs_u - 1){
+		return null;
+	}
+
+	return divs[ index + min_divs_v ];
+
+}
+
+function getWestNeighbor(index, i, j, min_divs_u, min_divs_v, divs){
+
+	if (j === 0){
+		return null;
+	}
+
+	return divs[ index - 1 ];
+
+}
+
+verb.eval.nurbs.divide_rational_surface_adaptive = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, options ) {
+
+	// degree_u, knots_u, degree_v, knots_v, homo_control_points, 
+	var srf = {
+		degree_u: degree_u,
+		knots_u: knots_u,
+		degree_v: degree_v,
+		knots_v: knots_v,
+		homo_control_points: homo_control_points
+	};
+
+	var min_divs_u = options.minDivsU;
+	var min_divs_v = options.minDivsV;
+
+	// get necessary intervals
+	var max_u = Math.max.apply(null, knots_u);
+	var min_u = Math.min.apply(null, knots_u);
+	var max_v = Math.max.apply(null, knots_v);
+	var min_v = Math.min.apply(null, knots_v);
+
+	var u_interval = (max_u - min_u) / min_divs_u
+		, v_interval = (max_v - min_v) / min_divs_v;
+
+	var divs = [];
+
+	// make all of the nodes
+	for (var i = 0; i < min_divs_u; i++){
+		for (var j = 0; j < min_divs_v; j++){
+
+			var u0 = min_u + u_interval * i
+				, u1 = min_u + u_interval * (i + 1)
+				, v0 = min_v + v_interval * j
+				, v1 = min_v + v_interval * (j + 1);
+
+		  divs.push( new AdaptiveRefinementNode( srf, u0, u1, v0, v1, null, null ) );
+
+		}
+	}
+
+	// assign all of the neighbors and divide
+	for (var i = 0; i < min_divs_u; i++){
+		for (var j = 0; j < min_divs_v; j++){
+
+			var index = i * min_divs_v + j
+				, n = getNorthNeighbor( index, i, j, min_divs_u, min_divs_v, divs )
+				, e = getEastNeighbor( index, i, j, min_divs_u, min_divs_v, divs  )
+				, s = getSouthNeighbor( index, i, j, min_divs_u, min_divs_v, divs )
+				, w = getWestNeighbor( index, i, j, min_divs_u, min_divs_v, divs  );
+
+		  divs[index].neighbors = [ n, e, s, w ];
+
+		  divs.divide( options );
+
+		}
+	}
+
+	return divs;
+
+}
+
+verb.eval.nurbs.is_rational_surface_domain_flat = function(srf, u0, u1, v0, v1, options ){
+
+	var eval_srf = verb.eval.nurbs.rational_surface_point
+		, u_half_step = (u[1] - u[0] / 2) * ( Math.random() * 0.1 + 1 )
+		, v_half_step = (v[1] - v[0] / 2) * ( Math.random() * 0.1 + 1 )
+		, p1 = eval_srf( srf.degree_u, srf.knots_u, srf.degree_v, srf.knots_v, srf.homo_control_points, u[0], v[0] )
+		, p2 = eval_srf( srf.degree_u, srf.knots_u, srf.degree_v, srf.knots_v, srf.homo_control_points, u[0] + u_half_step, v[0] + v_half_step )
+		, p3 = eval_srf( srf.degree_u, srf.knots_u, srf.degree_v, srf.knots_v, srf.homo_control_points, u[1], v[1] );
+
+	return verb.eval.nurbs.three_points_are_flat( p1, p2 , p3, tol );
+
+}
+
+verb.eval.nurbs.triangulate_adaptive_refinement_node_tree = function( arrTree ){
+
+	// triangulate all of the nodes of the tree
+	var mesh = { uvs : [], points : [], normals : [], faces : [] };
+	mesh.faces = arrTree.map(function(x){  x.triangulate( mesh ); }).flatten();
+	return mesh;
+
+};
+
+verb.eval.nurbs.tesselate_rational_surface_adaptive = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, options ) {
+
+	// division step
+	var arrArray = verb.eval.nurbs.divide_rational_surface_adaptive( degree_u, knots_u, degree_v, knots_v, homo_control_points, options );
+
+	// triangulation step
+	var res = verb.eval.nurbs.triangulate_adaptive_refinement_node_tree( arrTree );
+
+	return verb.eval.nurbs.unique_mesh( res );
+
+}
+
+verb.eval.nurbs.unique_mesh = function( mesh ) {
+
+	return mesh;
+
+}
+
+function AdaptiveRefinementNode( srf, u0, u1, v0, v1, parentNode, neighbors ) {
+
+	this.srf = srf;
+	this.u0 = u0;
+	this.u1 = u1;
+	this.v0 = v0;
+	this.v1 = v1;
+	this.parentNode = parentNode;
+	this.neighbors = neighbors;
+	this.leafEdgeUvs = [[ u0, v0 ], [ u1, v0 ], [ u1, v1 ], [ u0, v1 ]];
+	this.cachedEdgeUvs = [];
+
+}
+
+AdaptiveRefinementNode.prototype.isLeaf = function(){
+	return (this.children === undefined);
+};
+
+AdaptiveRefinementNode.prototype.evalSurface = function( uv ){
+
+	var derivs = verb.eval.nurbs.rational_surface_derivs( this.srf.degree_u, 
+																												this.srf.knots_u, 
+																												this.srf.degree_v, 
+																												this.srf.knots_v, 
+																												this.srf.homo_control_points, 
+																												1, 
+																												pt_u, 
+																												pt_v );
+	var pt = derivs[0][0];
+
+	points.push( pt );
+
+	var normal = numeric.cross(  derivs[0][1], derivs[1][0] );
+
+	return { point: pt, normal: normal };
+
+};
+
+Array.prototype.where = function( predicate ){
+
+	if (length === 0) return this;
+
+	var res = [];
+
+	for (var i = 0; i < this.length; i++){
+		if ( predicate( this[i] ) ) res.push( res[i] );
+	}
+
+	return res;
+
+}
+
+AdaptiveRefinementNode.prototype.getEdgeUvs = function( edgeIndex ){
+
+	// if its a leaf, there are no children to obtain uvs from
+	if ( this.isLeaf() ) return this.leafEdgeUvs[ edgeIndex ];
+
+	// get the uvs owned by the children along this edge
+	this.cachedEdgeUvs[edgeIndex] = this.cachedEdgeUvs[edgeIndex] || this.children[ edgeIndex ].getEdgeUvs( edgeIndex )
+																						 												.concat( this.children[ (edgeIndex + 1) % 4 ].getEdgeUvs( edgeIndex ));
+	return this.cachedEdgeUvs[edgeIndex];
+};
+
+AdaptiveRefinementNode.prototype.getAllEdgeUvs = function( edgeIndex ){
+
+	var baseArr = [ leafEdgeUvs[edgeIndex] ];
+
+	if (this.neighbors[edgeIndex] === null) return baseArr;
+
+	// get opposite edges uvs
+	var uvs = this.neighbors[edgeIndex].getEdgeUvs( ( edgeIndex + 2 ) % 4 );
+
+	var funcIndex = edgeIndex % 2;
+
+	// range clipping functions
+	var rangeFuncMap = [
+		function(x){ return x[0] > u0 + verb.EPSILON && x[0] < u1 - verb.EPSILON; },
+		function(x){ return x[1] > v0 + verb.EPSILON && x[1] < v1 - verb.EPSILON; }
+	];
+
+	// clip the range of uvs to match this one
+	return baseArr.concat( uvs.slice(0).reverse().where( rangeFuncMap[ funcIndex ] ) ) ;
+
+};
+
+AdaptiveRefinementNode.prototype.triangulateLeaf = function( mesh ){
+
+		var baseIndex = mesh.points.length - 1;
+
+		var uvs = [];
+
+		// enumerate all uvs in counter clockwise direction
+		for (var i = 0; i < 4; i++){
+			uvs.concat( this.getAllEdgeUvs(i) ); 
+		}
+
+		uvs.forEach(function(x){
+			mesh.uvs.push(x);
+			var point = this.evalSurface( x );
+
+			mesh.points.push( point.point );
+			mesh.normals.push( point.normal );
+
+		});
+
+		if (uvs.length === 4){
+
+			// if the number of points is 4, we're just doing a
+			// rectangle - just build the basic triangulated square
+			mesh.faces.push( [ baseIndex + 1, baseIndex + 4, baseIndex + 2 ] );
+			mesh.faces.push( [ baseIndex + 4, baseIndex + 3, baseIndex + 2 ] );
+
+			// all done ;)
+			return;
+
+		}
+
+		this.u05 = this.u05 || (this.u0 + this.u1) / 2;
+		this.v05 = this.v05 || (this.v0 + this.v1) / 2;
+
+		// make point at center of face
+		mesh.uvs.push( [  this.u05, this.v05 ] );
+		var center = this.evalSurface( this.u05, this.v05 );
+		mesh.points.push( center.point );
+		mesh.normals.push( center.normal );
+
+		// get index 
+		var centerIndex = mesh.points.length - 1;
+
+		// build triangle fan from center
+		for (var i = 0; i < uvs.length; i++){
+
+			mesh.faces.push( [	centerIndex, 
+													(baseIndex + i + 2) % uvs.length, 
+													(baseIndex + i + 1) % uvs.length   ]);
+
+		}
+
+};
+
+AdaptiveRefinementNode.prototype.triangulate = function( mesh ){
+
+	if ( this.isLeaf() ) return this.triangulateLeaf( mesh );
+
+	// recurse on the children
+	this.children.forEach(function(x){
+		if (x === null) return;
+		x.triangulate( mesh );
+	});
+
+};
+
+AdaptiveRefinementNode.prototype.divide = function( options ){
+
+	// 
+	// Structure of the child nodes
+	// in the adaptive refinement tree
+  //      
+  //  +--> u
+  //  |
+  //  v
+  //  v
+  // 
+  //                        neighbors[0]
+  //
+	//                (u0,v0)---(u05,v0)---(u1,v0)
+	//                  |           |          |
+	//                  |     0     |     1    |
+	//                  |           |          |
+	// neighbors[3]   (u0,v05)--(u05,v05)--(u1,v05)   neighbors[1] 
+	//                  |           |          | 
+	//                  |     3     |     2    |
+	//                  |           |          |
+	//                (u0,v1)---(u05,v1)---(u1,v1)
+	//
+	//                        neighbors[2]
+	//
+
+	if ( verb.eval.nurbs.is_rational_surface_domain_flat( this.srf, this.u0, this.u1, this.v0, this.v1, options ) )
+		return;
+
+	// divide the domain
+
+	this.u05 = (this.u0 + this.u1) / 2;
+	this.v05 = (this.v0 + this.v1) / 2;
+
+	this.children = [ 	new AdaptiveRefinementNode( this.srf, this.u0, this.u05, 	this.v0, 	this.v05, this ),
+											new AdaptiveRefinementNode( this.srf, this.u05, this.u1, 	this.v0, 	this.v05, this ),
+											new AdaptiveRefinementNode( this.srf, this.u05, this.u1, 	this.v05, this.v1, 	this ),
+											new AdaptiveRefinementNode( this.srf, this.u0, 	this.u05, this.v05, this.v1, 	this ) ];
+
+	// correctly assign neighbors
+	this.children[0].neighbors = [ this.neighbors[0], this.children[1], this.children[3], this.neighbors[3] ];
+	this.children[1].neighbors = [ this.neighbors[0], this.neighbors[1], this.children[2], this.children[0] ];
+	this.children[2].neighbors = [ this.children[1], this.neighbors[1], this.neighbors[2], this.children[3] ];
+	this.children[3].neighbors = [ this.children[0], this.children[2], this.neighbors[2], this.neighbors[3] ];
+
+	// divide all children recursively
+	this.children.forEach(function(x){  x.divide( options );  });
+
+};
+
+
+
 
 // ###verb.eval
 // This defines verb's core geometry library which is called by the current Engine.

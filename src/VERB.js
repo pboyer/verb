@@ -214,7 +214,7 @@ verb.unique = function( arr, comparator ){
 	//
 	// ####range(start, stop, step)
 	//
-	// Obtain the unique set of elements in an array
+	// Obtain a range of numbers
 	//
 	// Borrowed from underscore.js port of the python function
 	// of the same name
