@@ -4266,3 +4266,55 @@ describe("verb.eval.nurbs.volume_point",function(){
 
 });
 
+describe("AdaptiveRefinementNode.constructor",function(){
+
+	it('can be instantiated', function(){
+
+		
+
+	});
+
+});
+
+describe("AdaptiveRefinementNode.getEdgeUvs",function(){
+
+	it('returns expected result for node with children', function(){
+
+
+
+	});
+
+	it('returns expected result for node with children', function(){
+
+
+
+	});
+
+});
+
+describe("AdaptiveRefinementNode.getAllEdgeUvs",function(){
+
+	it('returns expected result for edge with neighbors that with a large number of vertices on opposite side', function(){
+
+
+
+	});
+
+	it('returns expected result for edge with neighbors that has with lesser number of vertices on opposite side', function(){
+
+
+
+	});
+
+});
+
+describe("AdaptiveRefinementNode",function(){
+
+	it('can be instantiated', function(){
+
+		
+
+	});
+
+});
+
