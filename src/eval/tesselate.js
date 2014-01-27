@@ -534,7 +534,7 @@ AdaptiveRefinementNode.prototype.triangulateLeaf = function( mesh ){
 
 		// make point at center of face
 		mesh.uvs.push( [  this.u05, this.v05 ] );
-		var center = this.evalSurface( this.u05, this.v05 );
+		var center = this.evalSurface( [ this.u05, this.v05 ] );
 		mesh.points.push( center.point );
 		mesh.normals.push( center.normal );
 
