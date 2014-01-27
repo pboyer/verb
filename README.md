@@ -2,9 +2,9 @@
 ###A CAD Library for the Web
 ####Current version: 0.1.0
 
-<strong>verb</strong> is a JavaScript library for creating and manipulating <a href="http://en.wikipedia.org/wiki/Non-uniform_rational_B-spline">NURBS</a> surfaces and curves in the browser or <a href="http://nodejs.org/">node.js</a>.  It provides a rich set of features with <a href="geometry.html">many types of surfaces and curves</a> in a <a href="http://verbnurbs.com.s3-website-us-east-1.amazonaws.com/js/verb.min.js">10kb (gzipped, minified) package</a>.
+<strong>verb</strong> is a JavaScript library for creating and manipulating NURBS surfaces and curves in the browser or node.js.  It provides a rich set of features with <a href="http://verbnurbs.com/geometry.html">many types of surfaces and curves</a> in a <a href="http://verbnurbs.com.s3-website-us-east-1.amazonaws.com/js/verb.min.js">10kb (gzipped, minified) package</a>.
 
-verb also provides advanced tools like derivative evaluation, adaptive tesselation, and intersection.  Geometry can be "watched" in a <a href="http://backbonejs.org/">backbone-like</a> style and defaults to multi-threaded parallel execution via <a href="http://en.wikipedia.org/wiki/Web_worker">WebWorkers</a> in modern browsers.  
+verb also provides advanced tools like derivative evaluation, adaptive tesselation, and intersection.  Geometry can be "watched" in a backbone-like style and defaults to multi-threaded parallel execution via WebWorkers in modern browsers.  
 
 ###Documentation
 
