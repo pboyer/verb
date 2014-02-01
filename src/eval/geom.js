@@ -314,28 +314,28 @@ verb.eval.nurbs.get_cone_surface = function( axis, xaxis, base, height, radius )
 
 verb.eval.nurbs.get_extruded_surface = function( axis, length, prof_knots, prof_degree, prof_control_points, prof_weights){
 
-	var control_points = verb.eval.nurbs.zeros_2d( 2, prof_control_points.length )
-		, weights = verb.eval.nurbs.zeros_2d( 2, prof_control_points.length );
+	var control_points = verb.eval.nurbs.zeros_2d( 3, prof_control_points.length )
+		, weights = verb.eval.nurbs.zeros_2d( 3, prof_control_points.length );
+
+	var translation = numeric.mul(axis, length);
+	var halfTranslation = numeric.mul(axis, 0.5 * length);
 
 	// original control points
 	for (var j = 0; j < prof_control_points.length; j++){
 		control_points[0][j] = prof_control_points[j];
+		control_points[1][j] = numeric.add( halfTranslation, prof_control_points[j] );
+		control_points[2][j] = numeric.add( translation, prof_control_points[j] );
+
 		weights[0][j] = prof_weights[j];
-	}
-
-	// build translated control points
-	var translation = numeric.mul(axis, length);
-
-	for (var j = 0; j < prof_control_points.length; j++){
-		control_points[1][j] = numeric.add( translation, prof_control_points[j] );
 		weights[1][j] = prof_weights[j];
+		weights[2][j] = prof_weights[j];
 	}
 
 	// return all parameters
-	return {"knots_u": [0,0,1,1], 
+	return {"knots_u": [0,0,0,1,1,1], 
 			"knots_v": prof_knots, 
 			"control_points": control_points, 
-			"degree_u": 1, 
+			"degree_u": 2, 
 			"degree_v": prof_degree, 
 			"weights": weights };
 }

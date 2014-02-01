@@ -346,7 +346,7 @@ verb.eval.nurbs.divide_rational_surface_adaptive = function( degree_u, knots_u, 
 				, v0 = min_v + v_interval * j
 				, v1 = min_v + v_interval * (j + 1);
 
-		  divs.push( new AdaptiveRefinementNode( srf, u0, u1, v0, v1, null, null ) );
+		  divs.push( new verb.eval.nurbs.AdaptiveRefinementNode( srf, u0, u1, v0, v1, null, null ) );
 
 		}
 	}
@@ -412,7 +412,46 @@ verb.eval.nurbs.unique_mesh = function( mesh ) {
 
 }
 
-function AdaptiveRefinementNode( srf, u0, u1, v0, v1, parentNode, neighbors ) {
+
+Array.prototype.where = function( predicate ){
+
+	if (this.length === 0) return this;
+
+	var res = [];
+
+	for (var i = 0; i < this.length; i++){
+		if ( predicate( this[i] ) ) res.push( this[i] );
+	}
+
+	return res;
+
+}
+
+verb.eval.nurbs.AdaptiveRefinementNode = function( srf, u0, u1, v0, v1, parentNode, neighbors ) {
+
+	// 
+	// Structure of the child nodes
+	// in the adaptive refinement tree
+  //      
+  //  +--> u
+  //  |
+  //  v
+  //  v
+  // 
+  //                        neighbors[0]
+  //
+	//                (u0,v0)---(u05,v0)---(u1,v0)
+	//                  |           |          |
+	//                  |     0     |     1    |
+	//                  |           |          |
+	// neighbors[3]   (u0,v05)--(u05,v05)--(u1,v05)   neighbors[1] 
+	//                  |           |          | 
+	//                  |     3     |     2    |
+	//                  |           |          |
+	//                (u0,v1)---(u05,v1)---(u1,v1)
+	//
+	//                        neighbors[2]
+	//
 
 	this.srf = srf;
 	this.u0 = u0;
@@ -426,11 +465,12 @@ function AdaptiveRefinementNode( srf, u0, u1, v0, v1, parentNode, neighbors ) {
 
 }
 
-AdaptiveRefinementNode.prototype.isLeaf = function(){
+verb.eval.nurbs.AdaptiveRefinementNode.prototype.isLeaf = function(){
 	return (this.children === undefined);
 };
 
-AdaptiveRefinementNode.prototype.evalSurface = function( uv ){
+
+verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalSurface = function( uv ){
 
 	var derivs = verb.eval.nurbs.rational_surface_derivs( this.srf.degree_u, 
 																												this.srf.knots_u, 
@@ -450,24 +490,11 @@ AdaptiveRefinementNode.prototype.evalSurface = function( uv ){
 
 };
 
-Array.prototype.where = function( predicate ){
 
-	if (length === 0) return this;
-
-	var res = [];
-
-	for (var i = 0; i < this.length; i++){
-		if ( predicate( this[i] ) ) res.push( res[i] );
-	}
-
-	return res;
-
-}
-
-AdaptiveRefinementNode.prototype.getEdgeUvs = function( edgeIndex ){
+verb.eval.nurbs.AdaptiveRefinementNode.prototype.getEdgeUvs = function( edgeIndex ){
 
 	// if its a leaf, there are no children to obtain uvs from
-	if ( this.isLeaf() ) return this.leafEdgeUvs[ edgeIndex ];
+	if ( this.isLeaf() ) return [ this.leafEdgeUvs[ edgeIndex ] ]
 
 	// get the uvs owned by the children along this edge
 	this.cachedEdgeUvs[edgeIndex] = this.cachedEdgeUvs[edgeIndex] || this.children[ edgeIndex ].getEdgeUvs( edgeIndex )
@@ -475,29 +502,31 @@ AdaptiveRefinementNode.prototype.getEdgeUvs = function( edgeIndex ){
 	return this.cachedEdgeUvs[edgeIndex];
 };
 
-AdaptiveRefinementNode.prototype.getAllEdgeUvs = function( edgeIndex ){
+verb.eval.nurbs.AdaptiveRefinementNode.prototype.getAllEdgeUvs = function( edgeIndex ){
 
-	var baseArr = [ leafEdgeUvs[edgeIndex] ];
+	var baseArr = [ this.leafEdgeUvs[edgeIndex] ];
 
-	if (this.neighbors[edgeIndex] === null) return baseArr;
+	if ( this.neighbors[edgeIndex] === null ) return baseArr;
 
 	// get opposite edges uvs
 	var uvs = this.neighbors[edgeIndex].getEdgeUvs( ( edgeIndex + 2 ) % 4 );
 
 	var funcIndex = edgeIndex % 2;
 
+	var that = this;
+
 	// range clipping functions
 	var rangeFuncMap = [
-		function(x){ return x[0] > u0 + verb.EPSILON && x[0] < u1 - verb.EPSILON; },
-		function(x){ return x[1] > v0 + verb.EPSILON && x[1] < v1 - verb.EPSILON; }
+		function(x){ return x[0] > that.u0 + verb.EPSILON && x[0] < that.u1 - verb.EPSILON; },
+		function(x){ return x[1] > that.v0 + verb.EPSILON && x[1] < that.v1 - verb.EPSILON; }
 	];
 
 	// clip the range of uvs to match this one
-	return baseArr.concat( uvs.slice(0).reverse().where( rangeFuncMap[ funcIndex ] ) ) ;
+	return baseArr.concat( uvs.where( rangeFuncMap[ funcIndex ] ).reverse() ) ;
 
 };
 
-AdaptiveRefinementNode.prototype.triangulateLeaf = function( mesh ){
+verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulateLeaf = function( mesh ){
 
 		var baseIndex = mesh.points.length - 1;
 
@@ -552,7 +581,7 @@ AdaptiveRefinementNode.prototype.triangulateLeaf = function( mesh ){
 
 };
 
-AdaptiveRefinementNode.prototype.triangulate = function( mesh ){
+verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulate = function( mesh ){
 
 	if ( this.isLeaf() ) return this.triangulateLeaf( mesh );
 
@@ -564,44 +593,37 @@ AdaptiveRefinementNode.prototype.triangulate = function( mesh ){
 
 };
 
-AdaptiveRefinementNode.prototype.divide = function( options ){
+verb.eval.nurbs.AdaptiveRefinementNode.prototype.shouldDivide = function( options, currentDepth ){
 
-	// 
-	// Structure of the child nodes
-	// in the adaptive refinement tree
-  //      
-  //  +--> u
-  //  |
-  //  v
-  //  v
-  // 
-  //                        neighbors[0]
-  //
-	//                (u0,v0)---(u05,v0)---(u1,v0)
-	//                  |           |          |
-	//                  |     0     |     1    |
-	//                  |           |          |
-	// neighbors[3]   (u0,v05)--(u05,v05)--(u1,v05)   neighbors[1] 
-	//                  |           |          | 
-	//                  |     3     |     2    |
-	//                  |           |          |
-	//                (u0,v1)---(u05,v1)---(u1,v1)
-	//
-	//                        neighbors[2]
-	//
+	if ( ( options.minDepth && currentDepth < options.minDepth ) ){
+		return true;
+	} else if ( this.srf && !verb.eval.nurbs.is_rational_surface_domain_flat( this.srf, this.u0, this.u1, this.v0, this.v1, options ) ){
+		return true;
+	}
 
-	if ( verb.eval.nurbs.is_rational_surface_domain_flat( this.srf, this.u0, this.u1, this.v0, this.v1, options ) )
-		return;
+	return false;
+
+}
+
+verb.eval.nurbs.AdaptiveRefinementNode.prototype.divide = function( options, currentDepth ){
+
+	// initialize currentDepth if it's not present
+	if (currentDepth === undefined) currentDepth = 0;
+
+	if ( !this.shouldDivide( options, currentDepth )  ) return;
+
+	// increment the depth
+	currentDepth++;
 
 	// divide the domain
-
 	this.u05 = (this.u0 + this.u1) / 2;
 	this.v05 = (this.v0 + this.v1) / 2;
 
-	this.children = [ 	new AdaptiveRefinementNode( this.srf, this.u0, this.u05, 	this.v0, 	this.v05, this ),
-											new AdaptiveRefinementNode( this.srf, this.u05, this.u1, 	this.v0, 	this.v05, this ),
-											new AdaptiveRefinementNode( this.srf, this.u05, this.u1, 	this.v05, this.v1, 	this ),
-											new AdaptiveRefinementNode( this.srf, this.u0, 	this.u05, this.v05, this.v1, 	this ) ];
+	// create the children
+	this.children = [ 	new verb.eval.nurbs.AdaptiveRefinementNode( this.srf, this.u0, this.u05, 	this.v0, 	this.v05, this ),
+											new verb.eval.nurbs.AdaptiveRefinementNode( this.srf, this.u05, this.u1, 	this.v0, 	this.v05, this ),
+											new verb.eval.nurbs.AdaptiveRefinementNode( this.srf, this.u05, this.u1, 	this.v05, this.v1, 	this ),
+											new verb.eval.nurbs.AdaptiveRefinementNode( this.srf, this.u0, 	this.u05, this.v05, this.v1, 	this ) ];
 
 	// correctly assign neighbors
 	this.children[0].neighbors = [ this.neighbors[0], this.children[1], this.children[3], this.neighbors[3] ];
@@ -610,7 +632,7 @@ AdaptiveRefinementNode.prototype.divide = function( options ){
 	this.children[3].neighbors = [ this.children[0], this.children[2], this.neighbors[2], this.neighbors[3] ];
 
 	// divide all children recursively
-	this.children.forEach(function(x){  x.divide( options );  });
+	this.children.forEach(function(x){ x.divide( options,currentDepth ); })
 
 };
 

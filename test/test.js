@@ -1575,7 +1575,7 @@ describe("verb.eval.nurbs.get_cylinder_surface",function(){
 
 		var comps = verb.eval.nurbs.get_cylinder_surface(axis, xaxis, base, height, radius);
 
-		comps.degree_u.should.equal(1);
+		comps.degree_u.should.equal(2);
 		comps.degree_v.should.equal(2);
 
 		// sample at the center
@@ -4266,53 +4266,162 @@ describe("verb.eval.nurbs.volume_point",function(){
 
 });
 
-describe("AdaptiveRefinementNode.constructor",function(){
+describe("verb.eval.nurbs.AdaptiveRefinementNode.constructor",function(){
 
 	it('can be instantiated', function(){
 
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, "a", "b" );
+
+		f.u0.should.be.equal(0);
+		f.u1.should.be.equal(1);
+		f.v0.should.be.equal(0);
+		f.v1.should.be.equal(1);
+		f.parentNode.should.be.equal("a");
+		f.neighbors.should.be.equal("b");
+		f.leafEdgeUvs.length.should.be.equal(4);
+		f.cachedEdgeUvs.length.should.be.equal(0);
 
 	});
 
 });
 
-describe("AdaptiveRefinementNode.getEdgeUvs",function(){
+describe("verb.eval.nurbs.AdaptiveRefinementNode.getEdgeUvs",function(){
 
-	it('returns expected result for node with children', function(){
+	it('returns expected result for node without children', function(){
 
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, null, null );
+
+		f.getEdgeUvs( 0 ).should.be.eql( [[0,0]] );
+		f.getEdgeUvs( 1 ).should.be.eql( [[1,0]] );
+		f.getEdgeUvs( 2 ).should.be.eql( [[1,1]] );
+		f.getEdgeUvs( 3 ).should.be.eql( [[0,1]] );
 
 	});
 
-	it('returns expected result for node with children', function(){
+	it('returns expected result for node with singly children', function(){
 
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, null, [null, null, null, null] );
+
+		f.divide({ minDepth : 1 });
+		f.children.length.should.be.equal( 4 );
+
+		f.getEdgeUvs(0).should.be.eql( [ [ 0, 0 ], [ 0.5, 0 ] ] );
+		f.getEdgeUvs(1).should.be.eql( [ [ 1, 0 ], [ 1, 0.5 ] ] );
+		f.getEdgeUvs(2).should.be.eql( [ [ 1, 1 ], [ 0.5, 1 ] ] );
+		f.getEdgeUvs(3).should.be.eql( [ [ 0, 1 ], [ 0, 0.5 ] ] );
+
+	});
+
+	it('returns expected result for node with singly children', function(){
+
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, null, [null, null, null, null] );
+
+		f.divide({ minDepth : 2 });
+		f.children.length.should.be.equal( 4 );
+
+		f.getEdgeUvs(0).should.be.eql( [ [ 0, 0 ], [ 0.25, 0 ], [ 0.5, 0 ], [ 0.75, 0 ] ] );
+		f.getEdgeUvs(1).should.be.eql( [ [ 1, 0 ], [ 1, 0.25 ], [ 1, 0.5 ], [ 1, 0.75 ] ] );
+		f.getEdgeUvs(2).should.be.eql( [ [ 1, 1 ], [ 0.75, 1 ], [ 0.5, 1 ], [ 0.25, 1 ] ] );
+		f.getEdgeUvs(3).should.be.eql( [ [ 0, 1 ], [ 0, 0.75 ], [ 0, 0.5 ], [ 0, 0.25 ] ] );
 
 	});
 
 });
 
-describe("AdaptiveRefinementNode.getAllEdgeUvs",function(){
+describe("verb.eval.nurbs.AdaptiveRefinementNode.getAllEdgeUvs",function(){
 
-	it('returns expected result for edge with neighbors that with a large number of vertices on opposite side', function(){
+	it('returns expected result for edge with more vertices on opposite side', function(){
 
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, null, [null, null, null, null] );
 
+		f.divide({ minDepth : 1 }); // now f is split in 4
 
+		f.children[0].divide({ minDepth : 1 }); //  f[0] is split in 4
+		f.children[1].divide({ minDepth : 1 }); //  f[1] is split in 4
+		f.children[1].children[3].divide({ minDepth : 1 }); //  f[1][3] is split in 4
+
+		f.children[0].getAllEdgeUvs(1).should.eql( [ [ 0.5, 0 ], [ 0.5, 0.25 ], [ 0.5, 0.375 ] ] );
+		f.children[0].children[2].getAllEdgeUvs(2).should.eql( [ [ 0.5, 0.5 ] ] );
+		
 	});
 
 	it('returns expected result for edge with neighbors that has with lesser number of vertices on opposite side', function(){
 
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, null, [null, null, null, null] );
+
+		f.divide({ minDepth : 1 }); // now f is split in 4
+
+		f.children[0].divide({ minDepth : 1 }); //  f[0] is split in 4
+		f.children[1].divide({ minDepth : 1 }); //  f[1] is split in 4
+		f.children[1].children[3].divide({ minDepth : 1 }); //  f[1][3] is split in 4
+
+		f.children[1].children[3].children[3].getAllEdgeUvs(3).should.eql( [ [ 0.5, 0.5 ] ] );
+
+	});
+
+});
+
+describe("verb.eval.nurbs.rational_surface_curvature ",function(){
+
+	it('returns expected result for cylinder', function(){
+
+		verb.init();
+
+		var axis = [0,0,1]
+			, xaxis = [1,0,0]
+			, base = [0,0,0]
+			, height = 1
+			, radius = 1;
+
+		var srf = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
+
+		var res = verb.eval.nurbs.rational_surface_curvature( srf.get('degreeU'), 
+																													srf.get('knotsU'), 
+																													srf.get('degreeV'), 
+																													srf.get('knotsV'), 
+																													srf.homogenize(),
+																													0.5, 0.5 );
+
+		res.point[0].should.be.approximately( -1, verb.TOLERANCE );
+		res.point[1].should.be.approximately( 0, verb.TOLERANCE );
+		res.point[2].should.be.approximately( 0.5, verb.TOLERANCE );
+
+		res.normal[0].should.be.approximately( -5.656854, verb.TOLERANCE );
+		res.normal[1].should.be.approximately( 0, verb.TOLERANCE );
+		res.normal[2].should.be.approximately( 0, verb.TOLERANCE );
+
+		res.mean.should.be.lessThan( 0 );
+		res.gaussian.should.be.approximately( 0, verb.TOLERANCE );
+
+		res.p1[0].should.be.approximately( 0, verb.TOLERANCE );
+		res.p1[1].should.be.approximately( -5.656854249, verb.TOLERANCE );
+		res.p1[2].should.be.approximately( 0, verb.TOLERANCE );
+
+		res.p2[0].should.be.approximately( 0, verb.TOLERANCE );
+		res.p2[1].should.be.approximately( 0, verb.TOLERANCE );
+		res.p2[2].should.be.approximately( 1, verb.TOLERANCE );
+
+		res.k1.should.be.approximately( -181.01933598, verb.TOLERANCE );
+		res.k2.should.be.approximately( 0, verb.TOLERANCE );
 
 
 	});
 
 });
 
-describe("AdaptiveRefinementNode.divide",function(){
+describe("verb.eval.nurbs.AdaptiveRefinementNode.divide",function(){
 
-	it('can be called with no options provided', function(){
+	it('can be called with options.minDepth', function(){
 
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, null, [null, null, null, null] );
+
+		f.divide({ minDepth : 2 });
+		f.children.length.should.be.equal( 4 );
 
 	});
 
 	it('can be called with no options provided', function(){
+
 
 
 	});
@@ -4326,84 +4435,84 @@ describe("AdaptiveRefinementNode.divide",function(){
 
 });
 
-describe("AdaptiveRefinementNode.triangulate",function(){
+// describe("verb.eval.nurbs.AdaptiveRefinementNode.triangulate",function(){
 
-	it('can triangulate a leaf with no edges', function(){
-
-
-	});
-
-	it('can triangulate a node with children', function(){
+// 	it('can triangulate a leaf with no edges', function(){
 
 
-	});
+// 	});
 
-	it('can triangulate a node with children and un-nested neighbors', function(){
-
-
-	});
-
-	it('can triangulate a node with children and equally nested neighbors', function(){
+// 	it('can triangulate a node with children', function(){
 
 
-	});
+// 	});
 
-	it('can triangulate a node with children and more nested neighbors', function(){
-
-
-	});
-
-});
+// 	it('can triangulate a node with children and un-nested neighbors', function(){
 
 
-describe("AdaptiveRefinementNode.evalSurface",function(){
+// 	});
 
-	it('works as expected', function(){
-
-
-	});
-
-});
-
-describe("verb.eval.nurbs.divide_rational_surface_adaptive",function(){
-
-	it('divides the domain according to minDivsU, minDivsV', function(){
-
-	});
-
-});
-
-describe("verb.eval.nurbs.is_rational_surface_domain_flat",function(){
-
-	it('evaluates as expected for different tolerances', function(){
+// 	it('can triangulate a node with children and equally nested neighbors', function(){
 
 
-	});
+// 	});
 
-});
-
-describe("verb.eval.nurbs.triangulate_adaptive_refinement_node_tree",function(){
-
-	it('produces a mesh from a uniform divided surface', function(){
+// 	it('can triangulate a node with children and more nested neighbors', function(){
 
 
-	});
+// 	});
+
+// });
 
 
-	it('produces a mesh from a non-uniformly divided surface', function(){
+// describe("verb.eval.nurbs.AdaptiveRefinementNode.evalSurface",function(){
+
+// 	it('works as expected', function(){
 
 
-	});
+// 	});
 
-});
+// });
 
-describe("verb.eval.nurbs.tesselate_rational_surface_adaptive",function(){
+// describe("verb.eval.nurbs.divide_rational_surface_adaptive",function(){
 
-	it('produces a mesh from a divided surface', function(){
+// 	it('divides the domain according to minDivsU, minDivsV', function(){
+
+// 	});
+
+// });
+
+// describe("verb.eval.nurbs.is_rational_surface_domain_flat",function(){
+
+// 	it('evaluates as expected for different tolerances', function(){
 
 
-	});
+// 	});
 
-});
+// });
+
+// describe("verb.eval.nurbs.triangulate_adaptive_refinement_node_tree",function(){
+
+// 	it('produces a mesh from a uniform divided surface', function(){
+
+
+// 	});
+
+
+// 	it('produces a mesh from a non-uniformly divided surface', function(){
+
+
+// 	});
+
+// });
+
+// describe("verb.eval.nurbs.tesselate_rational_surface_adaptive",function(){
+
+// 	it('produces a mesh from a divided surface', function(){
+
+
+// 	});
+
+// });
 
 
