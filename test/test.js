@@ -1730,12 +1730,8 @@ describe("verb.eval.nurbs.get_4pt_surface",function(){
 
 		var comps = verb.eval.nurbs.get_4pt_surface(p1, p2, p3, p4);
 
-		comps.degree_u.should.equal(1);
-		comps.degree_v.should.equal(1);
-		comps.knots_u.should.eql([0,0,1,1]);
-		comps.knots_u.should.eql([0,0,1,1]);
-		comps.weights.should.eql([ [1,1], [1, 1] ]);
-		comps.control_points.should.eql([ [p1, p4], [p2, p3] ]);
+		comps.degree_u.should.equal(2);
+		comps.degree_v.should.equal(2);
 
 		// sample at the center
 		var p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
@@ -1761,12 +1757,8 @@ describe("verb.eval.nurbs.get_4pt_surface",function(){
 
 		var comps = verb.eval.nurbs.get_4pt_surface(p1, p2, p3, p4);
 
-		comps.degree_u.should.equal(1);
-		comps.degree_v.should.equal(1);
-		comps.knots_u.should.eql([0,0,1,1]);
-		comps.knots_u.should.eql([0,0,1,1]);
-		comps.weights.should.eql([ [1,1], [1, 1] ]);
-		comps.control_points.should.eql([ [p1, p4], [p2, p3] ]);
+		comps.degree_u.should.equal(2);
+		comps.degree_v.should.equal(2);
 
 		// sample at the center
 		var p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
@@ -4407,33 +4399,75 @@ describe("verb.eval.nurbs.rational_surface_curvature ",function(){
 
 	});
 
+	it('returns expected result for sphere', function(){
+
+		verb.init();
+
+		var center = [0,0,0]
+			, radius = 1;
+
+		var srf = new verb.geom.Sphere( center, radius );
+
+		var res = verb.eval.nurbs.rational_surface_curvature( srf.get('degreeU'), 
+																													srf.get('knotsU'), 
+																													srf.get('degreeV'), 
+																													srf.get('knotsV'), 
+																													srf.homogenize(),
+																													0.5, 0.9 );
+
+		console.log(res)
+		// res.point[0].should.be.approximately( -1, verb.TOLERANCE );
+		// res.point[1].should.be.approximately( 0, verb.TOLERANCE );
+		// res.point[2].should.be.approximately( 0.5, verb.TOLERANCE );
+
+		// res.normal[0].should.be.approximately( -5.656854, verb.TOLERANCE );
+		// res.normal[1].should.be.approximately( 0, verb.TOLERANCE );
+		// res.normal[2].should.be.approximately( 0, verb.TOLERANCE );
+
+		// res.mean.should.be.lessThan( 0 );
+		// res.gaussian.should.be.approximately( 0, verb.TOLERANCE );
+
+		// res.p1[0].should.be.approximately( 0, verb.TOLERANCE );
+		// res.p1[1].should.be.approximately( -5.656854249, verb.TOLERANCE );
+		// res.p1[2].should.be.approximately( 0, verb.TOLERANCE );
+
+		// res.p2[0].should.be.approximately( 0, verb.TOLERANCE );
+		// res.p2[1].should.be.approximately( 0, verb.TOLERANCE );
+		// res.p2[2].should.be.approximately( 1, verb.TOLERANCE );
+
+		// res.k1.should.be.approximately( -181.01933598, verb.TOLERANCE );
+		// res.k2.should.be.approximately( 0, verb.TOLERANCE );
+
+
+	});
+
 });
 
-describe("verb.eval.nurbs.AdaptiveRefinementNode.divide",function(){
+// describe("verb.eval.nurbs.AdaptiveRefinementNode.divide",function(){
 
-	it('can be called with options.minDepth', function(){
+// 	it('can be called with options.minDepth', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, null, [null, null, null, null] );
+// 		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, null, [null, null, null, null] );
 
-		f.divide({ minDepth : 2 });
-		f.children.length.should.be.equal( 4 );
+// 		f.divide({ minDepth : 2 });
+// 		f.children.length.should.be.equal( 4 );
 
-	});
+// 	});
 
-	it('can be called with no options provided', function(){
-
-
-
-	});
-
-	it('can produce a non-uniformly nested tree', function(){
+// 	it('can be called with no options provided', function(){
 
 
-	});
 
-	// more tests for options as they're implemented
+// 	});
 
-});
+// 	it('can produce a non-uniformly nested tree', function(){
+
+
+// 	});
+
+// 	// more tests for options as they're implemented
+
+// });
 
 // describe("verb.eval.nurbs.AdaptiveRefinementNode.triangulate",function(){
 

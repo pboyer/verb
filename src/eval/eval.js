@@ -53,6 +53,8 @@ verb.eval.nurbs.rational_surface_curvature = function( degree_u, knots_u, degree
 															homo_control_points, 
 															2, u, v );
 
+	console.log(derivs)
+
 	// structure of the derivatives
 
 	// pos  du  vuu

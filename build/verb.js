@@ -3879,12 +3879,22 @@ verb.eval.nurbs.get_polyline_curve = function( pts ){
 
 verb.eval.nurbs.get_4pt_surface = function( p1, p2, p3, p4 ){
 
-	return {"knots_u": [0,0,1,1], 
-			"knots_v": [0,0,1,1], 
-			"control_points": [ [p1, p4], [p2, p3] ], 
-			"degree_u": 1, 
-			"degree_v": 1,
-			"weights": [ [1, 1], [1, 1] ] };
+	var p1p4 = numeric.mul( 0.5, numeric.add( p1, p4 ));
+	var p2p3 = numeric.mul( 0.5, numeric.add( p2, p3 ));
+	var p3p4 = numeric.mul( 0.5, numeric.add( p3, p4 ));
+	var p1p2 = numeric.mul( 0.5, numeric.add( p1, p2 ));
+	var p1p4p2p3 = numeric.mul( 0.5, numeric.add( p1p4, p2p3 ));
+
+	return {"knots_u": [0,0,0,1,1,1], 
+			"knots_v": [0,0,0,1,1,1], 
+			"control_points": [ [p1, 		p1p4, 		p4], 
+													[p1p2, 	p1p4p2p3, p3p4], 
+													[p2, 		p2p3, 		p3] ], 
+			"degree_u": 2, 
+			"degree_v": 2,
+			"weights": [ [ 1, 1, 1], 
+									 [ 1, 1, 1], 
+									 [ 1, 1, 1] ] };
 			
 }
 
@@ -4217,6 +4227,8 @@ verb.eval.nurbs.rational_surface_curvature = function( degree_u, knots_u, degree
 															knots_v, 
 															homo_control_points, 
 															2, u, v );
+
+	console.log(derivs)
 
 	// structure of the derivatives
 
