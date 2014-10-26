@@ -1,0 +1,13 @@
+NurbsCurve split
+	knot insertion
+	knot refinement
+	add to NurbsCurve
+NurbsSurface split
+	see above
+Curve interpolation
+Surface lofting
+Improved NurbsSurface tesselation
+	finish adaptive tesselation
+	see piegl and tiller paper
+Surface-Surface intersection
+	curve 
