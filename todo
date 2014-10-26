@@ -6,6 +6,7 @@ NurbsSurface split
 	see above
 Curve interpolation
 Surface lofting
+Finish sweep (it's incorrect)
 Improved NurbsSurface tesselation
 	finish adaptive tesselation
 	see piegl and tiller paper
