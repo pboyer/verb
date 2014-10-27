@@ -2413,24 +2413,27 @@ verb.eval.nurbs.rational_surface_curvature = function( degree_u, knots_u, degree
 //
 // ####curve_knot_insert( degree, knots, control_points, u, s, r )
 //
-// Insert a knot along a rational curve
+// Insert a knot along a rational curve.  Note that this algorithm only works
+// for r + s <= degree, where s is the initial multiplicity (number of duplicates) of the knot.
+//
+// Corresponds to algorithm A5.1 (Piegl & Tiller)
+//
+// Use the curve_knot_refine for applications like curve splitting.
 //
 // **params**
 // + *Number*, integer degree
 // + *Array*, array of nondecreasing knot values
 // + *Array*, array of control points
 // + *Number*, parameter at which to insert the knot
-// + *Number*, initial multiplicity of the knot
 // + *Number*, number of times to insert the knot
 // 
 // **returns** 
-// + *Object* the new curve, defined by degree, knots, and control_points
+// + *Object* the new curve, defined by knots and control_points
 //
 
 verb.eval.nurbs.curve_knot_insert = function( degree, knots, control_points, u, r ) {
 
 	// num_pts is num control points for the initial curve
-	// nq is num control points for the output curve with knots inserted
 	// k is the span on which the knots are inserted
 	// s is the initial multiplicity of the knot
 	// r is the number of times to insert the knot
@@ -2438,13 +2441,10 @@ verb.eval.nurbs.curve_knot_insert = function( degree, knots, control_points, u, 
 
 	var s = 0; // assume original multiplicity is 0 - TODO add check for multiplicity in knots
 
-	var dim = control_points[0].length
-		, num_pts = control_points.length
+	var num_pts = control_points.length
 		, k = verb.eval.nurbs.knot_span( degree, u, knots ) // the span in which the knot will be inserted
-		, mp = knots.length
-		, nq = num_pts + r
 		, num_pts_post = num_pts + r // a new control pt for every new knot    
-		, Rw = new Array( degree - s )  
+		, control_points_temp = new Array( degree - s )  
 		, knots_post = new Array( knots.length + r )  // r new knots
 		, control_points_post = new Array( num_pts_post ) 
 		, i = 0;
@@ -2480,7 +2480,7 @@ verb.eval.nurbs.curve_knot_insert = function( degree, knots, control_points, u, 
 
 		// collect the affected control points in this temporary array
 		for (i = 0; i <= degree-s; i++) {
-			Rw[i] = control_points[k-degree+i];
+			control_points_temp[i] = control_points[k-degree+i];
 		}
 
 	var L = 0
@@ -2494,26 +2494,29 @@ verb.eval.nurbs.curve_knot_insert = function( degree, knots, control_points, u, 
 		for (i = 0; i <= degree-j-s; i++) {
 
 			alpha = ( u - knots[L+i] ) / ( knots[i+k+1] - knots[L+i] );
-			Rw[i] = numeric.add( numeric.mul( alpha, Rw[i+1] ), numeric.mul( (1.0 - alpha), Rw[i]) );
+
+			control_points_temp[i] = 
+				numeric.add( 
+					numeric.mul( alpha, control_points_temp[i+1] ), 
+					numeric.mul( (1.0 - alpha), control_points_temp[i]) 
+				);
+
 
 		}
 
-		control_points_post[ L ] = Rw[0];
-		control_points_post[k+r-j-s] = Rw[degree-j-s];
+		control_points_post[ L ] = control_points_temp[0];
+		control_points_post[k+r-j-s] = control_points_temp[degree-j-s];
 
 	}
 
 	// not so confident about this part
-	for (i = L+1; i < k-s; i++) // set remaining control points
-	{
-		control_points_post[i] = Rw[ i - L ];
+	for (i = L+1; i < k-s; i++) {
+		control_points_post[i] = control_points_temp[ i - L ];
 	}
 
 	return { knots: knots_post, control_points: control_points_post };
 
 }
-
-// knot refinement
 
 
 //

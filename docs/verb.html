@@ -6371,12 +6371,22 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.divide = <span class="hljs-func
             
             <div class="content"><div class='highlight'><pre>verb.eval.nurbs.get_4pt_surface = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( p1, p2, p3, p4 )</span>{</span>
 
-	<span class="hljs-keyword">return</span> {<span class="hljs-string">"knots_u"</span>: [<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">1</span>], 
-			<span class="hljs-string">"knots_v"</span>: [<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">1</span>], 
-			<span class="hljs-string">"control_points"</span>: [ [p1, p4], [p2, p3] ], 
-			<span class="hljs-string">"degree_u"</span>: <span class="hljs-number">1</span>, 
-			<span class="hljs-string">"degree_v"</span>: <span class="hljs-number">1</span>,
-			<span class="hljs-string">"weights"</span>: [ [<span class="hljs-number">1</span>, <span class="hljs-number">1</span>], [<span class="hljs-number">1</span>, <span class="hljs-number">1</span>] ] };
+	<span class="hljs-keyword">var</span> p1p4 = numeric.mul( <span class="hljs-number">0.5</span>, numeric.add( p1, p4 ));
+	<span class="hljs-keyword">var</span> p2p3 = numeric.mul( <span class="hljs-number">0.5</span>, numeric.add( p2, p3 ));
+	<span class="hljs-keyword">var</span> p3p4 = numeric.mul( <span class="hljs-number">0.5</span>, numeric.add( p3, p4 ));
+	<span class="hljs-keyword">var</span> p1p2 = numeric.mul( <span class="hljs-number">0.5</span>, numeric.add( p1, p2 ));
+	<span class="hljs-keyword">var</span> p1p4p2p3 = numeric.mul( <span class="hljs-number">0.5</span>, numeric.add( p1p4, p2p3 ));
+
+	<span class="hljs-keyword">return</span> {<span class="hljs-string">"knots_u"</span>: [<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">1</span>,<span class="hljs-number">1</span>], 
+			<span class="hljs-string">"knots_v"</span>: [<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">0</span>,<span class="hljs-number">1</span>,<span class="hljs-number">1</span>,<span class="hljs-number">1</span>], 
+			<span class="hljs-string">"control_points"</span>: [ [p1, 		p1p4, 		p4], 
+													[p1p2, 	p1p4p2p3, p3p4], 
+													[p2, 		p2p3, 		p3] ], 
+			<span class="hljs-string">"degree_u"</span>: <span class="hljs-number">2</span>, 
+			<span class="hljs-string">"degree_v"</span>: <span class="hljs-number">2</span>,
+			<span class="hljs-string">"weights"</span>: [ [ <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>], 
+									 [ <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>], 
+									 [ <span class="hljs-number">1</span>, <span class="hljs-number">1</span>, <span class="hljs-number">1</span>] ] };
 			
 }</pre></div></div>
             
@@ -6916,18 +6926,18 @@ rotated generatrix pt</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-246">&#182;</a>
               </div>
-              <h4 id="curve_knot_insert-degree-knots-control_points-u-s-r-">curve_knot_insert( degree, knots, control_points, u, s, r )</h4>
-<p>Insert a knot along a rational curve</p>
+              <h4 id="surface_curvature-degree_u-knots_u-degree_v-knots_v-control_points-u-v-options-">surface_curvature( degree_u, knots_u, degree_v, knots_v, control_points, u, v, options )</h4>
+<p>Compute the gaussian curvature on a non-uniform, non-rational B spline surface</p>
 <p><strong>params</strong></p>
 <ul>
 <li><em>Number</em>, integer degree of surface in u direction</li>
 <li><em>Array</em>, array of nondecreasing knot values in u direction</li>
 <li><em>Number</em>, integer degree of surface in v direction</li>
 <li><em>Array</em>, array of nondecreasing knot values in v direction</li>
-<li><em>Array</em>, 3d array of control points, where rows are the u dir, and columns run along the positive v direction, and where each control point is an array of length (dim)  </li>
+<li><em>Array</em>, 3d array of control points, where rows are the u dir, and columns run alonsg the positive v direction, 
+and where each control point is an array of length (dim)  </li>
 <li><em>Number</em>, u parameter at which to evaluate the derivatives</li>
 <li><em>Number</em>, v parameter at which to evaluate the derivatives</li>
-<li><em>Array</em>, 1d array of control point weights </li>
 </ul>
 <p><strong>returns</strong> </p>
 <ul>
@@ -6936,7 +6946,7 @@ rotated generatrix pt</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>verb.eval.nurbs.curve_knot_insert = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( degree, knots, control_points, u, s, r )</span> {</span></pre></div></div>
+            <div class="content"><div class='highlight'><pre>verb.eval.nurbs.rational_surface_curvature = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( degree_u, knots_u, degree_v, knots_v, homo_control_points, u, v )</span> {</span></pre></div></div>
             
         </li>
         
@@ -6947,26 +6957,32 @@ rotated generatrix pt</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-247">&#182;</a>
               </div>
-              <p>np is n for the initial curve
-nq is n for the output curve with knots inserted
-k is the span on which the knots are inserted
-s is the initial multiplicity of the point
-r is the number of times to insert the knot
-control_points is initial set of control points</p>
+              <p>compute the first fundamental form</p>
+<p>symmetric matrix where</p>
+<p>I = [ E F; F G ]</p>
+<p>where:</p>
+<p>E = Xu <em> Xu
+F = Xu </em> Xv
+G = Xv * Xv</p>
+<p>second fundamental form (shape operator)</p>
+<p>symmetric matrix where</p>
+<p>II = [ L M; M N ]</p>
+<p>where:</p>
+<p>L = Xuu <em> n
+M = Xuv </em> n
+N = Xvv * n</p>
+<p>principal curvatures are the eigenvalues of the second fundamental form</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>	<span class="hljs-keyword">var</span> dim = control_points[<span class="hljs-number">0</span>].length
-		, np = knots.length - degree - <span class="hljs-number">2</span>
-		, num_pts = control_points.length
-		, k = verb.eval.nurbs.knot_span( degree, u, knots )
-		, mp = np + degree + <span class="hljs-number">1</span>
-		, nq = np + r
-		, num_pts_post = num_pts + r    
-		, Rw = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Array</span>( degree + <span class="hljs-number">1</span> )  
-		, knots_post = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Array</span>( knots.length + r ) 
-		, control_points_post = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Array</span>( num_pts_post ) 
-		, i = <span class="hljs-number">0</span>;</pre></div></div>
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-keyword">var</span> derivs = verb.eval.nurbs.rational_surface_derivs( 	degree_u, 
+															knots_u, 
+															degree_v, 
+															knots_v, 
+															homo_control_points, 
+															<span class="hljs-number">2</span>, u, v );
+
+	console.log(derivs)</pre></div></div>
             
         </li>
         
@@ -6977,22 +6993,28 @@ control_points is initial set of control points</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-248">&#182;</a>
               </div>
-              <p>new knot vector</p>
+              <p>structure of the derivatives</p>
+<p>pos  du  vuu
+dv   duv
+dvv </p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>	<span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt;= k; i++) {
-		knots_post[i] = knots[i];
-	}
-	
-	<span class="hljs-keyword">for</span> (i = <span class="hljs-number">1</span>; i &lt;= r; i++) {
-		knots_post[k+i] = u; 
-	}
+            <div class="content"><div class='highlight'><pre> 
+  <span class="hljs-keyword">var</span> du = derivs[<span class="hljs-number">0</span>][<span class="hljs-number">1</span>];
+  <span class="hljs-keyword">var</span> dv = derivs[<span class="hljs-number">1</span>][<span class="hljs-number">0</span>];
+  <span class="hljs-keyword">var</span> duu = derivs[<span class="hljs-number">0</span>][<span class="hljs-number">2</span>];
+  <span class="hljs-keyword">var</span> dvv = derivs[<span class="hljs-number">2</span>][<span class="hljs-number">0</span>];
+  <span class="hljs-keyword">var</span> duv = derivs[<span class="hljs-number">1</span>][<span class="hljs-number">1</span>];
 
-	<span class="hljs-keyword">for</span> (i = k+<span class="hljs-number">1</span>; i &lt;= mp; i++)
-	{
-		knots_post[i+r] = knots[i];
-	}</pre></div></div>
+  <span class="hljs-keyword">var</span> n = numeric.cross( du, dv );
+  <span class="hljs-keyword">var</span> L = numeric.dot( duu, n );
+  <span class="hljs-keyword">var</span> M = numeric.dot( duv, n );
+  <span class="hljs-keyword">var</span> N = numeric.dot( dvv, n );
+
+  <span class="hljs-keyword">var</span> shapeOperator = [ [ L, M ], [ M, N ] ];
+
+	<span class="hljs-keyword">var</span> eigs = numeric.eig( shapeOperator );</pre></div></div>
             
         </li>
         
@@ -7003,27 +7025,22 @@ control_points is initial set of control points</p>
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-249">&#182;</a>
               </div>
-              <p>control point generation</p>
+              <p>contains: lambda - x
+                 E - x</p>
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>	<span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt;= k-degree; i++)
-	{
-		control_points_post[i] = control_points[i]; 
-	}
+            <div class="content"><div class='highlight'><pre>	
+	<span class="hljs-keyword">var</span> k1 = eigs.lambda.x[<span class="hljs-number">0</span>];
+	<span class="hljs-keyword">var</span> k2 = eigs.lambda.x[<span class="hljs-number">1</span>];
+	<span class="hljs-keyword">var</span> mean = <span class="hljs-number">0.5</span> * ( k1 + k2 );
+	<span class="hljs-keyword">var</span> gaussian = k1 * k2;
+	<span class="hljs-keyword">var</span> p1 = numeric.add( numeric.mul( eigs.E.x[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>], du ), numeric.mul( eigs.E.x[<span class="hljs-number">0</span>][<span class="hljs-number">1</span>], dv ) );
+	<span class="hljs-keyword">var</span> p2 = numeric.add( numeric.mul( eigs.E.x[<span class="hljs-number">1</span>][<span class="hljs-number">0</span>], du ), numeric.mul( eigs.E.x[<span class="hljs-number">1</span>][<span class="hljs-number">1</span>], dv ) );
 
-	<span class="hljs-keyword">for</span> (i = k-s; i &lt;= np; i++)
-	{
-		control_points_post[i+r] = control_points[i];
-	}
+	<span class="hljs-keyword">return</span> { point: derivs[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>], normal: n, mean: mean, gaussian: gaussian, shapeOperator: shapeOperator, k1: k1, k2: k2, p1: p1, p2: p2, p1p : eigs.E.x[<span class="hljs-number">0</span>], p2p: eigs.E.x[<span class="hljs-number">1</span>]  };
 
-	<span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt;= degree-s; i++)
-	{
-		Rw[i] = control_points[k-degree+<span class="hljs-number">1</span>];
-	}
-
-	<span class="hljs-keyword">var</span> L = <span class="hljs-number">0</span>
-		, alpha = <span class="hljs-number">0</span>;</pre></div></div>
+};</pre></div></div>
             
         </li>
         
@@ -7033,6 +7050,173 @@ control_points is initial set of control points</p>
               
               <div class="pilwrap ">
                 <a class="pilcrow" href="#section-250">&#182;</a>
+              </div>
+              <h4 id="curve_knot_insert-degree-knots-control_points-u-s-r-">curve_knot_insert( degree, knots, control_points, u, s, r )</h4>
+<p>Insert a knot along a rational curve</p>
+<p><strong>params</strong></p>
+<ul>
+<li><em>Number</em>, integer degree</li>
+<li><em>Array</em>, array of nondecreasing knot values</li>
+<li><em>Array</em>, array of control points</li>
+<li><em>Number</em>, parameter at which to insert the knot</li>
+<li><em>Number</em>, initial multiplicity of the knot</li>
+<li><em>Number</em>, number of times to insert the knot</li>
+</ul>
+<p><strong>returns</strong> </p>
+<ul>
+<li><em>Object</em> the new curve, defined by degree, knots, and control_points</li>
+</ul>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>verb.eval.nurbs.curve_knot_insert = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( degree, knots, control_points, u, r )</span> {</span></pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-251">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-251">&#182;</a>
+              </div>
+              <p>num_pts is num control points for the initial curve
+nq is num control points for the output curve with knots inserted
+k is the span on which the knots are inserted
+s is the initial multiplicity of the knot
+r is the number of times to insert the knot
+control_points is initial set of control points</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>	<span class="hljs-keyword">var</span> s = <span class="hljs-number">0</span>; <span class="hljs-comment">// assume original multiplicity is 0 - TODO add check for multiplicity in knots</span>
+
+	<span class="hljs-keyword">var</span> dim = control_points[<span class="hljs-number">0</span>].length
+		, num_pts = control_points.length
+		, k = verb.eval.nurbs.knot_span( degree, u, knots ) <span class="hljs-comment">// the span in which the knot will be inserted</span>
+		, mp = knots.length
+		, nq = num_pts + r
+		, num_pts_post = num_pts + r <span class="hljs-comment">// a new control pt for every new knot    </span>
+		, Rw = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Array</span>( degree - s )  
+		, knots_post = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Array</span>( knots.length + r )  <span class="hljs-comment">// r new knots</span>
+		, control_points_post = <span class="hljs-keyword">new</span> <span class="hljs-built_in">Array</span>( num_pts_post ) 
+		, i = <span class="hljs-number">0</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-252">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-252">&#182;</a>
+              </div>
+              <p>new knot vector</p>
+<p>insert the k knots that will not be affected</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt;= k; i++) {
+			knots_post[i] = knots[i];
+		}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-253">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-253">&#182;</a>
+              </div>
+              <p>insert the new repeat knots</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="hljs-keyword">for</span> (i = <span class="hljs-number">1</span>; i &lt;= r; i++) {
+			knots_post[k+i] = u; 
+		}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-254">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-254">&#182;</a>
+              </div>
+              <p>insert the rest of the knots</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="hljs-keyword">for</span> (i = k+<span class="hljs-number">1</span>; i &lt; knots.length; i++) {
+			knots_post[i+r] = knots[i];
+		}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-255">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-255">&#182;</a>
+              </div>
+              <p>control point generation</p>
+<p>copy the original control points before the insertion span</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt;= k - degree; i++) {
+			control_points_post[i] = control_points[i]; 
+		}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-256">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-256">&#182;</a>
+              </div>
+              <p>copy the original controls after the insertion span</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="hljs-keyword">for</span> (i = k-s; i &lt; num_pts; i++) {
+			control_points_post[i+r] = control_points[i];
+		}</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-257">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-257">&#182;</a>
+              </div>
+              <p>collect the affected control points in this temporary array</p>
+
+            </div>
+            
+            <div class="content"><div class='highlight'><pre>		<span class="hljs-keyword">for</span> (i = <span class="hljs-number">0</span>; i &lt;= degree-s; i++) {
+			Rw[i] = control_points[k-degree+i];
+		}
+
+	<span class="hljs-keyword">var</span> L = <span class="hljs-number">0</span>
+		, alpha = <span class="hljs-number">0</span>;</pre></div></div>
+            
+        </li>
+        
+        
+        <li id="section-258">
+            <div class="annotation">
+              
+              <div class="pilwrap ">
+                <a class="pilcrow" href="#section-258">&#182;</a>
               </div>
               <p>insert knot r times</p>
 
@@ -7057,11 +7241,11 @@ control_points is initial set of control points</p>
         </li>
         
         
-        <li id="section-251">
+        <li id="section-259">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-251">&#182;</a>
+                <a class="pilcrow" href="#section-259">&#182;</a>
               </div>
               <p>not so confident about this part</p>
 
@@ -7072,20 +7256,21 @@ control_points is initial set of control points</p>
 		control_points_post[i] = Rw[ i - L ];
 	}
 
-	<span class="hljs-keyword">return</span> [knots_post, control_points_post];
+	<span class="hljs-keyword">return</span> { knots: knots_post, control_points: control_points_post };
 
 }</pre></div></div>
             
         </li>
         
         
-        <li id="section-252">
+        <li id="section-260">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-252">&#182;</a>
+                <a class="pilcrow" href="#section-260">&#182;</a>
               </div>
-              <h4 id="rational_surface_derivs-degree_u-knots_u-degree_v-knots_v-homo_control_points-num_derivs-u-v-">rational_surface_derivs( degree_u, knots_u, degree_v, knots_v, homo_control_points, num_derivs, u, v)</h4>
+              <p>knot refinement</p>
+<h4 id="rational_surface_derivs-degree_u-knots_u-degree_v-knots_v-homo_control_points-num_derivs-u-v-">rational_surface_derivs( degree_u, knots_u, degree_v, knots_v, homo_control_points, num_derivs, u, v)</h4>
 <p>Compute the derivatives at a point on a NURBS surface</p>
 <p><strong>params</strong></p>
 <ul>
@@ -7153,11 +7338,11 @@ and where each control point is an array of length (dim)  </li>
         </li>
         
         
-        <li id="section-253">
+        <li id="section-261">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-253">&#182;</a>
+                <a class="pilcrow" href="#section-261">&#182;</a>
               </div>
               <h4 id="rational_surface_point-degree_u-knots_u-degree_v-knots_v-homo_control_points-u-v-">rational_surface_point( degree_u, knots_u,  degree_v, knots_v, homo_control_points, u, v )</h4>
 <p>Compute a point on a NURBS surface</p>
@@ -7188,11 +7373,11 @@ and where each control point is an array of length (dim+1)</li>
         </li>
         
         
-        <li id="section-254">
+        <li id="section-262">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-254">&#182;</a>
+                <a class="pilcrow" href="#section-262">&#182;</a>
               </div>
               <p>`</p>
 <h4 id="rational_curve_derivs-degree-knots-homo_control_points-u-num_derivs-">rational_curve_derivs( degree, knots, homo_control_points, u, num_derivs )</h4>
@@ -7216,11 +7401,11 @@ and where each control point is an array of length (dim+1)</li>
         </li>
         
         
-        <li id="section-255">
+        <li id="section-263">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-255">&#182;</a>
+                <a class="pilcrow" href="#section-263">&#182;</a>
               </div>
               <p>compute the derivatives of the control points
 separate derivative array into two</p>
@@ -7250,11 +7435,11 @@ separate derivative array into two</p>
         </li>
         
         
-        <li id="section-256">
+        <li id="section-264">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-256">&#182;</a>
+                <a class="pilcrow" href="#section-264">&#182;</a>
               </div>
               <h4 id="separate_homo_derivs_1d-ck-">separate_homo_derivs_1d( ck )</h4>
 <p>Separate the array of derivatives into the A(u) component and w(u), i.e. the weight and everything else without dehomogenization</p>
@@ -7288,11 +7473,11 @@ separate derivative array into two</p>
         </li>
         
         
-        <li id="section-257">
+        <li id="section-265">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-257">&#182;</a>
+                <a class="pilcrow" href="#section-265">&#182;</a>
               </div>
               <h4 id="separate_homo_derivs_2d-skl-">separate_homo_derivs_2d( skl )</h4>
 <p>Separate the array of derivatives into the A(u) component and w(u), i.e. the weight and everything else without dehomogenization</p>
@@ -7325,11 +7510,11 @@ separate derivative array into two</p>
         </li>
         
         
-        <li id="section-258">
+        <li id="section-266">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-258">&#182;</a>
+                <a class="pilcrow" href="#section-266">&#182;</a>
               </div>
               <h4 id="rational_curve_point-degree-knots-homo_control_points-u-">rational_curve_point( degree, knots, homo_control_points, u)</h4>
 <p>Compute a point on a NURBS curve</p>
@@ -7357,11 +7542,11 @@ and form (wi*pi, wi)</li>
         </li>
         
         
-        <li id="section-259">
+        <li id="section-267">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-259">&#182;</a>
+                <a class="pilcrow" href="#section-267">&#182;</a>
               </div>
               <h4 id="dehomogenize-homo_point-">dehomogenize( homo_point )</h4>
 <p>Dehomogenize a point </p>
@@ -7392,11 +7577,11 @@ and form (wi*pi, wi)</li>
         </li>
         
         
-        <li id="section-260">
+        <li id="section-268">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-260">&#182;</a>
+                <a class="pilcrow" href="#section-268">&#182;</a>
               </div>
               <h4 id="homogenize_1d-control_points-weights-">homogenize_1d( control_points, weights)</h4>
 <p>Transform a 1d array of points into their homogeneous equivalents</p>
@@ -7436,11 +7621,11 @@ hence the dimension of the point is dim + 1</li>
         </li>
         
         
-        <li id="section-261">
+        <li id="section-269">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-261">&#182;</a>
+                <a class="pilcrow" href="#section-269">&#182;</a>
               </div>
               <p>append the weight</p>
 
@@ -7458,11 +7643,11 @@ hence the dimension of the point is dim + 1</li>
         </li>
         
         
-        <li id="section-262">
+        <li id="section-270">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-262">&#182;</a>
+                <a class="pilcrow" href="#section-270">&#182;</a>
               </div>
               <h4 id="homogenize_2d-control_points-weights-">homogenize_2d( control_points, weights)</h4>
 <p><strong>params</strong></p>
@@ -7501,134 +7686,11 @@ i the ith control point weight and pi is the ith control point, the size is
         </li>
         
         
-        <li id="section-263">
+        <li id="section-271">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-263">&#182;</a>
-              </div>
-              <h4 id="surface_curvature-degree_u-knots_u-degree_v-knots_v-control_points-u-v-options-">surface_curvature( degree_u, knots_u, degree_v, knots_v, control_points, u, v, options )</h4>
-<p>Compute the gaussian curvature on a non-uniform, non-rational B spline surface</p>
-<p><strong>params</strong></p>
-<ul>
-<li><em>Number</em>, integer degree of surface in u direction</li>
-<li><em>Array</em>, array of nondecreasing knot values in u direction</li>
-<li><em>Number</em>, integer degree of surface in v direction</li>
-<li><em>Array</em>, array of nondecreasing knot values in v direction</li>
-<li><em>Array</em>, 3d array of control points, where rows are the u dir, and columns run alonsg the positive v direction, 
-and where each control point is an array of length (dim)  </li>
-<li><em>Number</em>, u parameter at which to evaluate the derivatives</li>
-<li><em>Number</em>, v parameter at which to evaluate the derivatives</li>
-</ul>
-<p><strong>returns</strong> </p>
-<ul>
-<li><em>Array</em>, a point represented by an array of length (dim)</li>
-</ul>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>verb.eval.nurbs.rational_surface_curvature = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( degree_u, knots_u, degree_v, knots_v, homo_control_points, u, v )</span> {</span></pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-264">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-264">&#182;</a>
-              </div>
-              <p>compute the first fundamental form</p>
-<p>symmetric matrix where</p>
-<p>I = [ E F; F G ]</p>
-<p>where:</p>
-<p>E = Xu <em> Xu
-F = Xu </em> Xv
-G = Xv * Xv</p>
-<p>second fundamental form (shape operator)</p>
-<p>symmetric matrix where</p>
-<p>II = [ L M; M N ]</p>
-<p>where:</p>
-<p>L = Xuu <em> n
-M = Xuv </em> n
-N = Xvv * n</p>
-<p>principal curvatures are the eigenvalues of the second fundamental form</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>	<span class="hljs-keyword">var</span> derivs = verb.eval.nurbs.rational_surface_derivs( 	degree_u, 
-															knots_u, 
-															degree_v, 
-															knots_v, 
-															homo_control_points, 
-															<span class="hljs-number">2</span>, u, v );</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-265">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-265">&#182;</a>
-              </div>
-              <p>structure of the derivatives</p>
-<p>pos  du  vuu
-dv   duv
-dvv </p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre> 
-  <span class="hljs-keyword">var</span> du = derivs[<span class="hljs-number">0</span>][<span class="hljs-number">1</span>];
-  <span class="hljs-keyword">var</span> dv = derivs[<span class="hljs-number">1</span>][<span class="hljs-number">0</span>];
-  <span class="hljs-keyword">var</span> duu = derivs[<span class="hljs-number">0</span>][<span class="hljs-number">2</span>];
-  <span class="hljs-keyword">var</span> dvv = derivs[<span class="hljs-number">2</span>][<span class="hljs-number">0</span>];
-  <span class="hljs-keyword">var</span> duv = derivs[<span class="hljs-number">1</span>][<span class="hljs-number">1</span>];
-
-  <span class="hljs-keyword">var</span> n = numeric.cross( du, dv );
-  <span class="hljs-keyword">var</span> L = numeric.dot( duu, n );
-  <span class="hljs-keyword">var</span> M = numeric.dot( duv, n );
-  <span class="hljs-keyword">var</span> N = numeric.dot( dvv, n );
-
-  <span class="hljs-keyword">var</span> shapeOperator = [ [ L, M ], [ M, N ] ];
-
-	<span class="hljs-keyword">var</span> eigs = numeric.eig( shapeOperator );</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-266">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-266">&#182;</a>
-              </div>
-              <p>contains: lambda - x
-                 E - x</p>
-
-            </div>
-            
-            <div class="content"><div class='highlight'><pre>	
-	<span class="hljs-keyword">var</span> k1 = eigs.lambda.x[<span class="hljs-number">0</span>];
-	<span class="hljs-keyword">var</span> k2 = eigs.lambda.x[<span class="hljs-number">1</span>];
-	<span class="hljs-keyword">var</span> mean = <span class="hljs-number">0.5</span> * ( k1 + k2 );
-	<span class="hljs-keyword">var</span> gaussian = k1 * k2;
-	<span class="hljs-keyword">var</span> p1 = numeric.add( numeric.mul( eigs.E.x[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>], du ), numeric.mul( eigs.E.x[<span class="hljs-number">0</span>][<span class="hljs-number">1</span>], dv ) );
-	<span class="hljs-keyword">var</span> p2 = numeric.add( numeric.mul( eigs.E.x[<span class="hljs-number">1</span>][<span class="hljs-number">0</span>], du ), numeric.mul( eigs.E.x[<span class="hljs-number">1</span>][<span class="hljs-number">1</span>], dv ) );
-
-	<span class="hljs-keyword">return</span> { point: derivs[<span class="hljs-number">0</span>][<span class="hljs-number">0</span>], normal: n, mean: mean, gaussian: gaussian, shapeOperator: shapeOperator, k1: k1, k2: k2, p1: p1, p2: p2, p1p : eigs.E.x[<span class="hljs-number">0</span>], p2p: eigs.E.x[<span class="hljs-number">1</span>]  };
-
-};</pre></div></div>
-            
-        </li>
-        
-        
-        <li id="section-267">
-            <div class="annotation">
-              
-              <div class="pilwrap ">
-                <a class="pilcrow" href="#section-267">&#182;</a>
+                <a class="pilcrow" href="#section-271">&#182;</a>
               </div>
               <h4 id="surface_derivs-degree_u-knots_u-degree_v-knots_v-control_points-num_derivatives-u-v-">surface_derivs( degree_u, knots_u, degree_v, knots_v, control_points, num_derivatives, u, v )</h4>
 <p>Compute the derivatives on a non-uniform, non-rational B spline surface</p>
@@ -7662,11 +7724,11 @@ and where each control point is an array of length (dim)  </li>
         </li>
         
         
-        <li id="section-268">
+        <li id="section-272">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-268">&#182;</a>
+                <a class="pilcrow" href="#section-272">&#182;</a>
               </div>
               <h4 id="surface_derivs_given_n_m-n-degree_u-knots_u-m-degree_v-knots_v-control_points-num_derivatives-u-v-">surface_derivs_given_n_m( n, degree_u, knots_u, m, degree_v, knots_v, control_points, num_derivatives, u, v )</h4>
 <p>Compute the derivatives on a non-uniform, non-rational B spline surface 
@@ -7740,11 +7802,11 @@ and where each control point is an array of length (dim)  </li>
         </li>
         
         
-        <li id="section-269">
+        <li id="section-273">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-269">&#182;</a>
+                <a class="pilcrow" href="#section-273">&#182;</a>
               </div>
               <h4 id="surface_point-degree_u-knots_u-degree_v-knots_v-control_points-u-v-">surface_point( degree_u, knots_u, degree_v, knots_v, control_points, u, v)</h4>
 <p>Compute a point on a non-uniform, non-rational B-spline surface</p>
@@ -7778,11 +7840,11 @@ and where each control point is an array of length (dim)  </li>
         </li>
         
         
-        <li id="section-270">
+        <li id="section-274">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-270">&#182;</a>
+                <a class="pilcrow" href="#section-274">&#182;</a>
               </div>
               <h4 id="volume_point-degree_u-knots_u-degree_v-knots_v-degree_w-knots_w-control_points-u-v-w-">volume_point( degree_u, knots_u, degree_v, knots_v, degree_w, knots_w, control_points, u, v, w  )</h4>
 <p>Compute a point in a non-uniform, non-rational B spline volume</p>
@@ -7822,11 +7884,11 @@ and where each control point is an array of length (dim)  </li>
         </li>
         
         
-        <li id="section-271">
+        <li id="section-275">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-271">&#182;</a>
+                <a class="pilcrow" href="#section-275">&#182;</a>
               </div>
               <h4 id="volume_point_given_n_m_l-n-degree_u-knots_u-m-degree_v-knots_v-l-degree_w-knots_w-control_points-u-v-w-">volume_point_given_n_m_l( n, degree_u, knots_u, m, degree_v, knots_v, l, degree_w, knots_w, control_points, u, v, w )</h4>
 <p>Compute a point in a non-uniform, non-rational B spline volume</p>
@@ -7893,11 +7955,11 @@ and where each control point is an array of length (dim)  </li>
         </li>
         
         
-        <li id="section-272">
+        <li id="section-276">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-272">&#182;</a>
+                <a class="pilcrow" href="#section-276">&#182;</a>
               </div>
               <p>sample u isoline</p>
 
@@ -7910,11 +7972,11 @@ and where each control point is an array of length (dim)  </li>
         </li>
         
         
-        <li id="section-273">
+        <li id="section-277">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-273">&#182;</a>
+                <a class="pilcrow" href="#section-277">&#182;</a>
               </div>
               <p>add weighted contribution of u isoline</p>
 
@@ -7927,11 +7989,11 @@ and where each control point is an array of length (dim)  </li>
         </li>
         
         
-        <li id="section-274">
+        <li id="section-278">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-274">&#182;</a>
+                <a class="pilcrow" href="#section-278">&#182;</a>
               </div>
               <p>add weighted contribution from uv isosurfaces</p>
 
@@ -7948,11 +8010,11 @@ and where each control point is an array of length (dim)  </li>
         </li>
         
         
-        <li id="section-275">
+        <li id="section-279">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-275">&#182;</a>
+                <a class="pilcrow" href="#section-279">&#182;</a>
               </div>
               <h4 id="surface_point_given_n_m-n-degree_u-knots_u-m-degree_v-knots_v-control_points-u-v-">surface_point_given_n_m( n, degree_u, knots_u, m, degree_v, knots_v, control_points, u, v )</h4>
 <p>Compute a point on a non-uniform, non-rational B spline surface
@@ -8004,11 +8066,11 @@ and where each control point is an array of length (dim)  </li>
         </li>
         
         
-        <li id="section-276">
+        <li id="section-280">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-276">&#182;</a>
+                <a class="pilcrow" href="#section-280">&#182;</a>
               </div>
               <p>sample u isoline</p>
 
@@ -8021,11 +8083,11 @@ and where each control point is an array of length (dim)  </li>
         </li>
         
         
-        <li id="section-277">
+        <li id="section-281">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-277">&#182;</a>
+                <a class="pilcrow" href="#section-281">&#182;</a>
               </div>
               <p>add point from u isoline</p>
 
@@ -8040,11 +8102,11 @@ and where each control point is an array of length (dim)  </li>
         </li>
         
         
-        <li id="section-278">
+        <li id="section-282">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-278">&#182;</a>
+                <a class="pilcrow" href="#section-282">&#182;</a>
               </div>
               <h4 id="curve_derivs-degree-knots-control_points-u-num_derivs-">curve_derivs( degree, knots, control_points, u, num_derivs )</h4>
 <p>Determine the derivatives of a non-uniform, non-rational B-spline curve at a given parameter</p>
@@ -8072,11 +8134,11 @@ and where each control point is an array of length (dim)  </li>
         </li>
         
         
-        <li id="section-279">
+        <li id="section-283">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-279">&#182;</a>
+                <a class="pilcrow" href="#section-283">&#182;</a>
               </div>
               <h4 id="curve_derivs_given_n-n-degree-knots-control_points-u-num_derivatives-">curve_derivs_given_n( n, degree, knots, control_points, u, num_derivatives )</h4>
 <p>Determine the derivatives of a non-uniform, non-rational B-spline curve at a given parameter
@@ -8123,11 +8185,11 @@ and where each control point is an array of length (dim)  </li>
         </li>
         
         
-        <li id="section-280">
+        <li id="section-284">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-280">&#182;</a>
+                <a class="pilcrow" href="#section-284">&#182;</a>
               </div>
               <h4 id="are_valid_relations-degree-num_control_points-knots_length-">are_valid_relations( degree, num_control_points, knots_length )</h4>
 <p>Confirm the relations between degree (p), number of control points(n+1), and the number of knots (m+1)
@@ -8154,11 +8216,11 @@ via The NURBS Book (section 3.2, Second Edition)</p>
         </li>
         
         
-        <li id="section-281">
+        <li id="section-285">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-281">&#182;</a>
+                <a class="pilcrow" href="#section-285">&#182;</a>
               </div>
               <h4 id="curve_point-degree-knots-control_points-u-">curve_point( degree, knots, control_points, u)</h4>
 <p>Compute a point on a non-uniform, non-rational b-spline curve</p>
@@ -8186,11 +8248,11 @@ via The NURBS Book (section 3.2, Second Edition)</p>
         </li>
         
         
-        <li id="section-282">
+        <li id="section-286">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-282">&#182;</a>
+                <a class="pilcrow" href="#section-286">&#182;</a>
               </div>
               <h4 id="curve_point_given_n-n-degree-knots-control_points-u-">curve_point_given_n( n, degree, knots, control_points, u)</h4>
 <p>Compute a point on a non-uniform, non-rational b-spline curve
@@ -8231,11 +8293,11 @@ via The NURBS Book (section 3.2, Second Edition)</p>
         </li>
         
         
-        <li id="section-283">
+        <li id="section-287">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-283">&#182;</a>
+                <a class="pilcrow" href="#section-287">&#182;</a>
               </div>
               <h4 id="zeros_1d-size-">zeros_1d(size)</h4>
 <p>Generate a 1d array of zeros</p>
@@ -8265,11 +8327,11 @@ via The NURBS Book (section 3.2, Second Edition)</p>
         </li>
         
         
-        <li id="section-284">
+        <li id="section-288">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-284">&#182;</a>
+                <a class="pilcrow" href="#section-288">&#182;</a>
               </div>
               <h4 id="zeros_2d-rows-cols-">zeros_2d(rows, cols)</h4>
 <p>Generate a 2D array of zeros</p>
@@ -8308,11 +8370,11 @@ via The NURBS Book (section 3.2, Second Edition)</p>
         </li>
         
         
-        <li id="section-285">
+        <li id="section-289">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-285">&#182;</a>
+                <a class="pilcrow" href="#section-289">&#182;</a>
               </div>
               <h4 id="zeros_3d-rows-cols-dim-">zeros_3d(rows, cols, dim)</h4>
 <p>Generate a 3D array of zeros</p>
@@ -8352,11 +8414,11 @@ via The NURBS Book (section 3.2, Second Edition)</p>
         </li>
         
         
-        <li id="section-286">
+        <li id="section-290">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-286">&#182;</a>
+                <a class="pilcrow" href="#section-290">&#182;</a>
               </div>
               <h4 id="deriv_basis_functions-u-degree-knots-">deriv_basis_functions( u, degree, knots )</h4>
 <p>Compute the non-vanishing basis functions and their derivatives</p>
@@ -8385,11 +8447,11 @@ via The NURBS Book (section 3.2, Second Edition)</p>
         </li>
         
         
-        <li id="section-287">
+        <li id="section-291">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-287">&#182;</a>
+                <a class="pilcrow" href="#section-291">&#182;</a>
               </div>
               <h4 id="deriv_basis_functions_given_n_i-knot_span_index-u-p-n-knots-">deriv_basis_functions_given_n_i( knot_span_index, u, p, n, knots )</h4>
 <p>Compute the non-vanishing basis functions and their derivatives
@@ -8516,11 +8578,11 @@ via The NURBS Book (section 3.2, Second Edition)</p>
         </li>
         
         
-        <li id="section-288">
+        <li id="section-292">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-288">&#182;</a>
+                <a class="pilcrow" href="#section-292">&#182;</a>
               </div>
               <h4 id="basis_functions-u-degree-knots-">basis_functions( u, degree, knots )</h4>
 <p>Compute the non-vanishing basis functions</p>
@@ -8546,11 +8608,11 @@ via The NURBS Book (section 3.2, Second Edition)</p>
         </li>
         
         
-        <li id="section-289">
+        <li id="section-293">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-289">&#182;</a>
+                <a class="pilcrow" href="#section-293">&#182;</a>
               </div>
               <h4 id="basis_functions_given_knot_span_index-knot_span_index-u-degree-knots-">basis_functions_given_knot_span_index( knot_span_index, u, degree, knots )</h4>
 <p>Compute the non-vanishing basis functions
@@ -8602,11 +8664,11 @@ via The NURBS Book (section 3.2, Second Edition)</p>
         </li>
         
         
-        <li id="section-290">
+        <li id="section-294">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-290">&#182;</a>
+                <a class="pilcrow" href="#section-294">&#182;</a>
               </div>
               <h4 id="knot_span-degree-u-knots-">knot_span( degree, u, knots )</h4>
 <p>Find the span on the knot vector without supplying n</p>
@@ -8636,11 +8698,11 @@ via The NURBS Book (section 3.2, Second Edition)</p>
         </li>
         
         
-        <li id="section-291">
+        <li id="section-295">
             <div class="annotation">
               
               <div class="pilwrap ">
-                <a class="pilcrow" href="#section-291">&#182;</a>
+                <a class="pilcrow" href="#section-295">&#182;</a>
               </div>
               <h4 id="knot_span_given_n-n-degree-u-knots-">knot_span_given_n( n, degree, u, knots )</h4>
 <p>Find the span on the knot vector knots of the given parameter

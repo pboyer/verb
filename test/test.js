@@ -690,36 +690,6 @@ describe("verb.eval.nurbs.rational_surface_derivs",function(){
 	});
 });
 
-describe("verb.eval.nurbs.curve_knot_insert",function(){
-
-	it('returns expected results when inserting a single knot in arc', function(){
-
-		// this represents a single quarter arc, using a bezier curve
-		var degree = 3
-			, u = 2.5
-			, knots = [ 0, 0, 0, 0, 1, 2, 3, 4, 5, 5, 5, 5 ];
-		
-		var control_points = [];
-		for (var i = 0; i < 8; i++) control_points.push([i, 0, 0]);
-
-		// console.log(control_points)
-
-		var p = verb.eval.nurbs.curve_knot_insert( degree, knots, control_points, u, 1 );
-
-		// console.log(p);
-
-		// var p0 = verb.eval.nurbs.curve_point( degree, knots, control_points, 0.5);
-
-		// console.log(p0)
-
-		// var p1 = verb.eval.nurbs.curve_point( degree, p.knots, p.control_points, 0.5);
-
-		// console.log(p1)
-
-
-	});
-
-});
 
 describe("verb.eval.geom.three_points_are_flat",function(){
 
@@ -4454,6 +4424,125 @@ describe("verb.eval.nurbs.rational_surface_curvature ",function(){
 
 
 	});
+
+});
+
+
+describe("verb.eval.nurbs.curve_knot_insert",function(){
+
+	it('returns expected results when inserting 1 knot in the middle of a non-rational, cubic b-spline', function(){
+
+		var degree = 3
+			, u = 2.5
+			, knots = [ 0, 0, 0, 0, 1, 2, 3, 4, 5, 5, 5, 5 ]
+			, r = 1;
+		
+		var control_points = [];
+		for (var i = 0; i < 8; i++) control_points.push([i, 0, 0]);
+
+		var after = verb.eval.nurbs.curve_knot_insert( degree, knots, control_points, u, r );
+
+		after.control_points.forEach(function(cp){ should.exist(cp); });
+		after.knots.forEach(function(cp){ should.exist(cp); });
+
+		should.equal(knots.length + r, after.knots.length);
+		should.equal(control_points.length + r, after.control_points.length);
+
+		after.control_points[3][0].should.be.approximately( 2.8333333333, verb.TOLERANCE );
+		after.control_points[4][0].should.be.approximately( 3.5, verb.TOLERANCE );
+		after.control_points[5][0].should.be.approximately( 4.1666666666, verb.TOLERANCE );
+
+		var p0 = verb.eval.nurbs.curve_point( degree, knots, control_points, 2.5);
+
+		var p1 = verb.eval.nurbs.curve_point( degree, after.knots, after.control_points, 2.5);
+
+		p0[0].should.be.approximately(p1[0], verb.TOLERANCE);
+		p0[1].should.be.approximately(p1[1], verb.TOLERANCE);
+		p0[2].should.be.approximately(p1[2], verb.TOLERANCE);
+
+	});
+
+	it('returns expected results when inserting 3 knots at the middle of a non-rational, cubic b-spline', function(){
+
+		var degree = 3
+			, u = 2.5
+			, knots = [ 0, 0, 0, 0, 1, 2, 3, 4, 5, 5, 5, 5 ]
+			, r = 3;
+		
+		var control_points = [];
+		for (var i = 0; i < 8; i++) control_points.push([i, 0, 0]);
+
+		var after = verb.eval.nurbs.curve_knot_insert( degree, knots, control_points, u, r );
+
+		after.control_points.forEach(function(cp){ should.exist(cp); });
+		after.knots.forEach(function(cp){ should.exist(cp); });
+
+		should.equal(knots.length + r, after.knots.length);
+		should.equal(control_points.length + r, after.control_points.length);
+
+		var p0 = verb.eval.nurbs.curve_point( degree, knots, control_points, 2.5);
+		var p1 = verb.eval.nurbs.curve_point( degree, after.knots, after.control_points, 2.5);
+
+		p0[0].should.be.approximately(p1[0], verb.TOLERANCE);
+		p0[1].should.be.approximately(p1[1], verb.TOLERANCE);
+		p0[2].should.be.approximately(p1[2], verb.TOLERANCE);
+
+	});
+
+	it('returns expected results when inserting 1 knots at the beginning of a non-rational, cubic b-spline', function(){
+
+		var degree = 3
+			, u = 0.5
+			, knots = [ 0, 0, 0, 0, 1, 2, 3, 4, 5, 5, 5, 5 ]
+			, r = 1;
+		
+		var control_points = [];
+		for (var i = 0; i < 8; i++) control_points.push([i, 0, 0]);
+
+		var after = verb.eval.nurbs.curve_knot_insert( degree, knots, control_points, u, r );
+
+		after.control_points.forEach(function(cp){ should.exist(cp); });
+		after.knots.forEach(function(cp){ should.exist(cp); });
+
+		should.equal(knots.length + r, after.knots.length);
+		should.equal(control_points.length + r, after.control_points.length);
+
+		var p0 = verb.eval.nurbs.curve_point( degree, knots, control_points, 2.5);
+		var p1 = verb.eval.nurbs.curve_point( degree, after.knots, after.control_points, 2.5);
+
+		p0[0].should.be.approximately(p1[0], verb.TOLERANCE);
+		p0[1].should.be.approximately(p1[1], verb.TOLERANCE);
+		p0[2].should.be.approximately(p1[2], verb.TOLERANCE);
+
+	});
+
+	it('returns expected results when inserting 1 knot at the middle of a non-rational, linear b-spline', function(){
+
+		var degree = 1
+			, u = 0.5
+			, knots = [ 0, 0, 1, 2, 3, 4, 5, 5 ]
+			, r = 1;
+		
+		var control_points = [];
+		for (var i = 0; i < 6; i++) control_points.push([i, 0, 0]);
+
+		var after = verb.eval.nurbs.curve_knot_insert( degree, knots, control_points, u, r );
+
+		after.control_points.forEach(function(cp){ should.exist(cp); });
+		after.knots.forEach(function(cp){ should.exist(cp); });
+
+		should.equal(knots.length + r, after.knots.length);
+		should.equal(control_points.length + r, after.control_points.length);
+
+		var p0 = verb.eval.nurbs.curve_point( degree, knots, control_points, 2.5);
+		var p1 = verb.eval.nurbs.curve_point( degree, after.knots, after.control_points, 2.5);
+
+		p0[0].should.be.approximately(p1[0], verb.TOLERANCE);
+		p0[1].should.be.approximately(p1[1], verb.TOLERANCE);
+		p0[2].should.be.approximately(p1[2], verb.TOLERANCE);
+
+	});
+
 
 });
 
