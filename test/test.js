@@ -692,16 +692,30 @@ describe("verb.eval.nurbs.rational_surface_derivs",function(){
 
 describe("verb.eval.nurbs.curve_knot_insert",function(){
 
-	it('returns expected results', function(){
+	it('returns expected results when inserting a single knot in arc', function(){
 
-		// this represents a single quarter arc, using a rational bezier curve
-		var degree = 2
-			, u = 0.5
-			, knots = [0, 0, 0, 1, 1, 1 ]
-			, control_points = [ [1, 0], [1,1], [0,1] ];
+		// this represents a single quarter arc, using a bezier curve
+		var degree = 3
+			, u = 2.5
+			, knots = [ 0, 0, 0, 0, 1, 2, 3, 4, 5, 5, 5, 5 ];
+		
+		var control_points = [];
+		for (var i = 0; i < 8; i++) control_points.push([i, 0, 0]);
 
-		var p = verb.eval.nurbs.curve_knot_insert( degree, knots, control_points, u, 0, 1 );
-		// should.equal(0, 1);
+		// console.log(control_points)
+
+		var p = verb.eval.nurbs.curve_knot_insert( degree, knots, control_points, u, 1 );
+
+		// console.log(p);
+
+		// var p0 = verb.eval.nurbs.curve_point( degree, knots, control_points, 0.5);
+
+		// console.log(p0)
+
+		// var p1 = verb.eval.nurbs.curve_point( degree, p.knots, p.control_points, 0.5);
+
+		// console.log(p1)
+
 
 	});
 

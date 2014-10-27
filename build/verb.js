@@ -4273,69 +4273,72 @@ verb.eval.nurbs.rational_surface_curvature = function( degree_u, knots_u, degree
 // Insert a knot along a rational curve
 //
 // **params**
-// + *Number*, integer degree of surface in u direction
-// + *Array*, array of nondecreasing knot values in u direction
-// + *Number*, integer degree of surface in v direction
-// + *Array*, array of nondecreasing knot values in v direction
-// + *Array*, 3d array of control points, where rows are the u dir, and columns run along the positive v direction, and where each control point is an array of length (dim)  
-// + *Number*, u parameter at which to evaluate the derivatives
-// + *Number*, v parameter at which to evaluate the derivatives
-// + *Array*, 1d array of control point weights 
+// + *Number*, integer degree
+// + *Array*, array of nondecreasing knot values
+// + *Array*, array of control points
+// + *Number*, parameter at which to insert the knot
+// + *Number*, initial multiplicity of the knot
+// + *Number*, number of times to insert the knot
 // 
 // **returns** 
-// + *Array*, a point represented by an array of length (dim)
+// + *Object* the new curve, defined by degree, knots, and control_points
 //
 
-verb.eval.nurbs.curve_knot_insert = function( degree, knots, control_points, u, s, r ) {
+verb.eval.nurbs.curve_knot_insert = function( degree, knots, control_points, u, r ) {
 
-	// np is n for the initial curve
-	// nq is n for the output curve with knots inserted
+	// num_pts is num control points for the initial curve
+	// nq is num control points for the output curve with knots inserted
 	// k is the span on which the knots are inserted
-	// s is the initial multiplicity of the point
+	// s is the initial multiplicity of the knot
 	// r is the number of times to insert the knot
 	// control_points is initial set of control points
 
+	var s = 0; // assume original multiplicity is 0 - TODO add check for multiplicity in knots
+
 	var dim = control_points[0].length
-		, np = knots.length - degree - 2
 		, num_pts = control_points.length
-		, k = verb.eval.nurbs.knot_span( degree, u, knots )
-		, mp = np + degree + 1
-		, nq = np + r
-		, num_pts_post = num_pts + r    
-		, Rw = new Array( degree + 1 )  
-		, knots_post = new Array( knots.length + r ) 
+		, k = verb.eval.nurbs.knot_span( degree, u, knots ) // the span in which the knot will be inserted
+		, mp = knots.length
+		, nq = num_pts + r
+		, num_pts_post = num_pts + r // a new control pt for every new knot    
+		, Rw = new Array( degree - s )  
+		, knots_post = new Array( knots.length + r )  // r new knots
 		, control_points_post = new Array( num_pts_post ) 
 		, i = 0;
 
 	// new knot vector
-	for (i = 0; i <= k; i++) {
-		knots_post[i] = knots[i];
-	}
-	
-	for (i = 1; i <= r; i++) {
-		knots_post[k+i] = u; 
-	}
 
-	for (i = k+1; i <= mp; i++)
-	{
-		knots_post[i+r] = knots[i];
-	}
+		// insert the k knots that will not be affected
+		for (i = 0; i <= k; i++) {
+			knots_post[i] = knots[i];
+		}
+		
+		// insert the new repeat knots
+		for (i = 1; i <= r; i++) {
+			knots_post[k+i] = u; 
+		}
+
+		// insert the rest of the knots
+		for (i = k+1; i < knots.length; i++) {
+			knots_post[i+r] = knots[i];
+		}
 
 	// control point generation
-	for (i = 0; i <= k-degree; i++)
-	{
-		control_points_post[i] = control_points[i]; 
-	}
 
-	for (i = k-s; i <= np; i++)
-	{
-		control_points_post[i+r] = control_points[i];
-	}
+		// copy the original control points before the insertion span
+		for (i = 0; i <= k - degree; i++) {
+			control_points_post[i] = control_points[i]; 
+		}
 
-	for (i = 0; i <= degree-s; i++)
-	{
-		Rw[i] = control_points[k-degree+1];
-	}
+		// copy the original controls after the insertion span
+		for (i = k-s; i < num_pts; i++) {
+			control_points_post[i+r] = control_points[i];
+		}
+
+		// collect the affected control points in this temporary array
+		for (i = 0; i <= degree-s; i++) {
+			Rw[i] = control_points[k-degree+i];
+		}
 
 	var L = 0
 		, alpha = 0;
@@ -4363,9 +4366,12 @@ verb.eval.nurbs.curve_knot_insert = function( degree, knots, control_points, u, 
 		control_points_post[i] = Rw[ i - L ];
 	}
 
-	return [knots_post, control_points_post];
+	return { knots: knots_post, control_points: control_points_post };
 
 }
+
+// knot refinement
+
 
 //
 // ####rational_surface_derivs( degree_u, knots_u, degree_v, knots_v, homo_control_points, num_derivs, u, v)
