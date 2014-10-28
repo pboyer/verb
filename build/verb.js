@@ -4228,7 +4228,6 @@ verb.eval.nurbs.rational_surface_curvature = function( degree_u, knots_u, degree
 															homo_control_points, 
 															2, u, v );
 
-	console.log(derivs)
 
 	// structure of the derivatives
 
@@ -4265,6 +4264,100 @@ verb.eval.nurbs.rational_surface_curvature = function( degree_u, knots_u, degree
 	return { point: derivs[0][0], normal: n, mean: mean, gaussian: gaussian, shapeOperator: shapeOperator, k1: k1, k2: k2, p1: p1, p2: p2, p1p : eigs.E.x[0], p2p: eigs.E.x[1]  };
 
 };
+
+//
+// ####curve_knot_refine( degree, knots, control_points, u, s, r )
+//
+// Insert a knot along a rational curve.  Note that this algorithm only works
+// for r + s <= degree, where s is the initial multiplicity (number of duplicates) of the knot.
+//
+// Corresponds to algorithm A5.1 (Piegl & Tiller)
+//
+// Use the curve_knot_refine for applications like curve splitting.
+//
+// **params**
+// + *Number*, integer degree
+// + *Array*, array of nondecreasing knot values
+// + *Array*, array of control points
+// + *Number*, parameter at which to insert the knot
+// + *Number*, number of times to insert the knot
+// 
+// **returns** 
+// + *Object* the new curve, defined by knots and control_points
+//
+
+verb.eval.nurbs.curve_knot_refine = function( degree, knots, control_points, knots_to_insert ) {
+
+	var n = control_points.length - 1
+		, m = n + degree + 1
+		, r = knots_to_insert.length - 1
+		, a = verb.eval.nurbs.knot_span( degree, knots_to_insert[0], knots ) 
+		, b = verb.eval.nurbs.knot_span( degree, knots_to_insert[r], knots )
+		, control_points_post = new Array( control_points.length + r + 1 )
+		, knots_post = new Array( knots.length + r + 1 )
+		, i = 0
+		, j = 0;
+
+	// new control pts
+	for (i = 0; i <= a - degree; i++) {
+		control_points_post[i] = control_points[i];
+	}
+
+	for (i = b-1; i <= n; i++) {
+		control_points_post[i+r+1] = control_points[i];
+	}
+
+	// new knot vector
+	for (i = 0; i <= a; i++) {
+		knots_post[i] = knots[i];
+	}
+
+	for (i = b+degree; i <= m; i++){
+		knots_post[i+r+1] = knots[i];
+	}
+
+	i = b + degree - 1;
+	k = b + degree + r;
+
+	for (j=r; j>=0; j--) {
+
+		while (knots_to_insert[j] <= knots[i] && i > a){
+
+			control_points_post[k-degree-1] = control_points[i-degree-1];
+			knots_post[k] = knots[i];
+			k = k-1;
+			i = i-1;
+
+		}
+
+		control_points_post[k-degree-1] = control_points_post[k-degree];
+
+		for (var l = 1; l <= degree; l++){
+
+			var ind = k-degree+l;
+			var alfa = knots_post[k+l] - knots_to_insert[j];
+
+			if (Math.abs(alfa) < verb.EPSILON){
+				control_points_post[ind-1] = control_points_post[ind];
+			} else {
+				alfa = alfa / (knots_post[k+l] - knots[i-degree+l]);
+				control_points_post[ind-1] =
+									numeric.add( 
+										numeric.mul( alfa, control_points_post[ind-1] ), 
+										numeric.mul( (1.0 - alfa), control_points_post[ind]) 
+									);
+			}
+
+		}
+
+		knots_post[k] = knots_to_insert[j];
+		k = k - 1;
+
+	}
+
+	return { knots: knots_post, control_points: control_points_post };
+
+}
 
 
 //
