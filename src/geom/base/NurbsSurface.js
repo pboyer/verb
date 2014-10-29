@@ -96,6 +96,23 @@ verb.geom.NurbsSurface.prototype.tesselate = function(options, callback){
 };
 
 //
+// ####domain()
+//
+// Determine the valid domain of the surface
+//
+//
+// **returns**
+// + *Array*, An 2d array e.g. [[lowU, highU], [lowV, highV]]
+
+verb.geom.NurbsSurface.prototype.domain = function() {
+
+	var knotsU = this.get('knotsU');
+	var knotsV = this.get('knotsV');
+	return [ [ knotsU[0], knotsU[knotsU.length-1] ], [ knotsV[0], knotsV[knotsV.length-1] ] ];
+
+}
+
+//
 // ####transform( mat )
 //
 // Transform a curve with the given matrix.
