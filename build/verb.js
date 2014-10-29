@@ -5,10 +5,7 @@ if ( typeof exports != 'object' || exports === undefined )
 		, numeric = window.numeric
 		, binomial = window.binomial
 		, labor = window.labor;
-}
-// node.js context
-else 
-{
+} else  {
 	var verb = module.exports = {}
 		, numeric = require('numeric')
 		, binomial = require('binomial')
