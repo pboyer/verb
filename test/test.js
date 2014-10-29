@@ -2,6 +2,7 @@ var should = require('should')
 	, verb = require('../build/verb.js');
 
 console.log('running from ', process.cwd() );
+console.log(verb);
 
 describe("Array.flatten",function(){
 
