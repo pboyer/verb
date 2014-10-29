@@ -4597,6 +4597,86 @@ describe("verb.eval.nurbs.curve_knot_refine",function(){
 
 });
 
+describe("verb.eval.nurbs.curve_knot_split",function(){
+
+	function cubicSplit(u){
+		
+		var degree = 3
+			, knots = [ 0, 0, 0, 0, 1, 2, 3, 4, 5, 5, 5, 5 ];
+
+		var control_points = [];
+		for (var i = 0; i < 8; i++) control_points.push([i, 0, 0, 1]);
+
+		var after = verb.eval.nurbs.curve_split( degree, knots, control_points, u );
+
+		for (var i = 0; i < degree + 1; i++ ){
+			var d = after[0].knots.length - (degree+1);
+			after[0].knots[d+i].should.be.approximately(u, verb.TOLERANCE);
+		}
+
+		for (var i = 0; i < degree + 1; i++){
+			var d = 0;
+			after[1].knots[d+i].should.be.approximately(u, verb.TOLERANCE);
+		}
+
+		// a point evaluated on each curve is the same
+		var p0 = verb.eval.nurbs.curve_point( after[0].degree, after[0].knots, after[0].control_points, after[0].knots[ after[0].knots.length-1] );
+		var p1 = verb.eval.nurbs.curve_point( after[1].degree, after[1].knots, after[1].control_points, after[1].knots[ 0] );
+
+		p0[0].should.be.approximately(p1[0], verb.TOLERANCE);
+		p0[1].should.be.approximately(p1[1], verb.TOLERANCE);
+		p0[2].should.be.approximately(p1[2], verb.TOLERANCE);
+
+	}
+
+	it('returns expected results when splitting a non-rational, cubic b-spline', function(){
+
+		cubicSplit( 0.5 );
+		cubicSplit( 3.5 );
+
+	});
+
+});
+
+describe("NurbsCurve.split",function(){
+
+	function cubicSplit(u){
+		
+		var degree = 3
+			, knots = [ 0, 0, 0, 0, 1, 2, 3, 4, 5, 5, 5, 5 ];
+
+		var control_points = [];
+		var weights = [];
+		for (var i = 0; i < 8; i++) {
+			weights.push(1);
+			control_points.push([i, 0, 0]);
+		} 
+
+		var crv = new verb.geom.NurbsCurve( degree, control_points, weights, knots );
+		var res = crv.split(0.5);
+
+		var crv0 = res[0];
+		var crv1 = res[1];
+
+		// a point evaluated on each curve is the same
+		var p0 = crv0.point(crv0.domain()[1]);
+		var p1 = crv1.point(crv1.domain()[0]);
+
+		p0[0].should.be.approximately(p1[0], verb.TOLERANCE);
+		p0[1].should.be.approximately(p1[1], verb.TOLERANCE);
+		p0[2].should.be.approximately(p1[2], verb.TOLERANCE);
+
+	}
+
+	it('returns expected results when inserting multiple knots in the middle of a NurbsCurve', function(){
+
+		cubicSplit( 0.5 );
+		cubicSplit( 3.5 );
+
+	});
+
+});
+
 // describe("verb.eval.nurbs.AdaptiveRefinementNode.divide",function(){
 
 // 	it('can be called with options.minDepth', function(){

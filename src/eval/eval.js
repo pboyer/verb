@@ -1,3 +1,37 @@
+//
+// ####curve_split( degree, knots, control_points, u )
+//
+// Split a curve into two parts
+//
+// **params**
+// + *Number*, integer degree
+// + *Array*, array of nondecreasing knot values
+// + *Array*, array of control points
+// + *Number*, location to split the curve
+// 
+// **returns** 
+// + *Array* two new curves, defined by degree, knots, and control points
+//
+verb.eval.nurbs.curve_split = function( degree, knots, control_points, u ) {
+
+	var knots_to_insert = [];
+	for (var i = 0; i < degree+1; i++) knots_to_insert.push(u);
+	var res = verb.eval.nurbs.curve_knot_refine( degree, knots, control_points, knots_to_insert );
+
+	var s = verb.eval.nurbs.knot_span( degree, u, knots );
+
+	var knots0 = res.knots.slice(0, s + degree + 2);
+	var knots1 = res.knots.slice( s + 1 );
+
+	var cpts0 = res.control_points.slice( 0, s + 1 );
+	var cpts1 = res.control_points.slice( s + 1 );
+
+	return [
+		{ degree: degree, knots: knots0, control_points: cpts0 },
+		{ degree: degree, knots: knots1, control_points: cpts1 }
+	];
+
+}
 
 //
 // ####curve_knot_refine( degree, knots, control_points, knots_to_insert )
@@ -519,6 +553,45 @@ verb.eval.nurbs.dehomogenize = function( homo_point ) {
 		point.push( homo_point[i] / wt );
 
 	return point;
+
+};
+
+//
+// ####weights_1d( homo_points )
+//
+// Obtain the weight from a collection of points in homogeneous space, assuming all
+// are the same dimension
+//
+// **params**
+// + *Array*, array of points represented by an array (wi*pi, wi) with length (dim+1)
+// 
+// **returns** 
+// + *Array*, a point represented by an array pi with length (dim)
+//
+
+verb.eval.nurbs.weight_1d = function( homo_points ) {
+
+	var dim = homo_points[0].length - 1;
+
+	return homo_points.map(function(x){ return x[dim]; });
+
+};
+
+//
+// ####dehomogenize_1d( homo_points )
+//
+// Dehomogenize a point 
+//
+// **params**
+// + *Array*, array of points represented by an array (wi*pi, wi) with length (dim+1)
+// 
+// **returns** 
+// + *Array*, an array of points, each of length dim
+//
+
+verb.eval.nurbs.dehomogenize_1d = function( homo_points ) {
+
+	return homo_points.map(function(x){ return verb.eval.nurbs.dehomogenize( x ); });
 
 };
 

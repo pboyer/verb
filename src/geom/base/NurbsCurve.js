@@ -81,6 +81,69 @@ verb.geom.NurbsCurve.prototype.tesselate = function(options, callback){
 };
 
 //
+// ####split( u [, callback] )
+//
+// Split the curve at the given parameter
+//
+// **params**
+// + *Number*, The parameter at which to split the curve
+// + *Function*, Optional callback to do it async
+//
+// **returns**
+// + *Array*, Two curves - one at the lower end of the parameter range and one at the higher end.  
+
+verb.geom.NurbsCurve.prototype.split = function( u, callback ) {
+
+	var domain = this.domain();
+
+	if ( u <= domain[0] || u >= domain[1] ) {
+		throw new Error("Cannot split outside of the domain of the curve!");
+	}
+
+	// transform the result from the engine into a valid pair of NurbsCurves
+	function asNurbsCurves(res){
+
+		var cpts0 = verb.eval.nurbs.dehomogenize_1d( res[0].control_points );
+		var wts0 = verb.eval.nurbs.weight_1d( res[0].control_points );
+
+		var c0 = new verb.geom.NurbsCurve( res[0].degree, cpts0, wts0, res[0].knots );
+
+		var cpts1 = verb.eval.nurbs.dehomogenize_1d( res[1].control_points );
+		var wts1 = verb.eval.nurbs.weight_1d( res[1].control_points );
+
+		var c1 = new verb.geom.NurbsCurve( res[1].degree, cpts1, wts1, res[1].knots );
+
+		return [c0, c1];
+	}
+
+	if (callback){
+		return this.nurbsEngine.eval( 'curve_split', [ this.get('degree'), this.get('knots'), this.homogenize(), u ], function(res){
+			return callback( asNurbsCurves(res) );
+		});
+	} 
+
+	return asNurbsCurves( this.nurbsEngine.eval( 'curve_split', [ this.get('degree'), this.get('knots'), this.homogenize(), u ]));
+
+};
+
+
+//
+// ####domain()
+//
+// Determine the valid domain of the curve
+//
+//
+// **returns**
+// + *Array*, An array representing the high and end point of the domain of the curve 
+
+verb.geom.NurbsCurve.prototype.domain = function() {
+
+	var knots = this.get('knots');
+	return [ knots[0], knots[knots.length-1] ];
+
+}
+
+//
 // ####transform( mat )
 //
 // Transform a curve with the given matrix.
@@ -105,6 +168,7 @@ verb.geom.NurbsCurve.prototype.transform = function( mat ){
 	return this;
 
 }; 
+
 
 //
 // ####clone()

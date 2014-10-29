@@ -2316,114 +2316,53 @@ verb.eval.nurbs.get_arc = function( center, xaxis, yaxis, radius, start_angle, e
 }
 
 
-
 //
-// ####surface_curvature( degree_u, knots_u, degree_v, knots_v, control_points, u, v, options )
+// ####curve_split( degree, knots, control_points, u )
 //
-// Compute the gaussian curvature on a non-uniform, non-rational B spline surface
-//
-// **params**
-// + *Number*, integer degree of surface in u direction
-// + *Array*, array of nondecreasing knot values in u direction
-// + *Number*, integer degree of surface in v direction
-// + *Array*, array of nondecreasing knot values in v direction
-// + *Array*, 3d array of control points, where rows are the u dir, and columns run alonsg the positive v direction, 
-// and where each control point is an array of length (dim)  
-// + *Number*, u parameter at which to evaluate the derivatives
-// + *Number*, v parameter at which to evaluate the derivatives
-// 
-// **returns** 
-// + *Array*, a point represented by an array of length (dim)
-//
-
-verb.eval.nurbs.rational_surface_curvature = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, u, v ) {
-
-	// compute the first fundamental form
-
-		// symmetric matrix where
-		//
-		// I = [ E F; F G ]
-		//
-		// where:
-		//
-		// E = Xu * Xu
-		// F = Xu * Xv
-		// G = Xv * Xv
-
-	// second fundamental form (shape operator)
-
-		// symmetric matrix where
-		//
-		// II = [ L M; M N ]
-		//
-		// where:
-		//
-		// L = Xuu * n
-		// M = Xuv * n
-		// N = Xvv * n
-
-	// principal curvatures are the eigenvalues of the second fundamental form
-
-	var derivs = verb.eval.nurbs.rational_surface_derivs( 	degree_u, 
-															knots_u, 
-															degree_v, 
-															knots_v, 
-															homo_control_points, 
-															2, u, v );
-
-
-	// structure of the derivatives
-
-	// pos  du  vuu
-	// dv   duv
-  // dvv 
-
- 
-  var du = derivs[0][1];
-  var dv = derivs[1][0];
-  var duu = derivs[0][2];
-  var dvv = derivs[2][0];
-  var duv = derivs[1][1];
-
-  var n = numeric.cross( du, dv );
-  var L = numeric.dot( duu, n );
-  var M = numeric.dot( duv, n );
-  var N = numeric.dot( dvv, n );
-
-  var shapeOperator = [ [ L, M ], [ M, N ] ];
-
-	var eigs = numeric.eig( shapeOperator );
-
-	// contains: lambda - x
-	// 			     E - x
-	
-	var k1 = eigs.lambda.x[0];
-	var k2 = eigs.lambda.x[1];
-	var mean = 0.5 * ( k1 + k2 );
-	var gaussian = k1 * k2;
-	var p1 = numeric.add( numeric.mul( eigs.E.x[0][0], du ), numeric.mul( eigs.E.x[0][1], dv ) );
-	var p2 = numeric.add( numeric.mul( eigs.E.x[1][0], du ), numeric.mul( eigs.E.x[1][1], dv ) );
-
-	return { point: derivs[0][0], normal: n, mean: mean, gaussian: gaussian, shapeOperator: shapeOperator, k1: k1, k2: k2, p1: p1, p2: p2, p1p : eigs.E.x[0], p2p: eigs.E.x[1]  };
-
-};
-
-//
-// ####curve_knot_refine( degree, knots, control_points, u, s, r )
-//
-// Insert a knot along a rational curve.  Note that this algorithm only works
-// for r + s <= degree, where s is the initial multiplicity (number of duplicates) of the knot.
-//
-// Corresponds to algorithm A5.1 (Piegl & Tiller)
-//
-// Use the curve_knot_refine for applications like curve splitting.
+// Split a curve into two parts
 //
 // **params**
 // + *Number*, integer degree
 // + *Array*, array of nondecreasing knot values
 // + *Array*, array of control points
-// + *Number*, parameter at which to insert the knot
-// + *Number*, number of times to insert the knot
+// + *Number*, location to split the curve
+// 
+// **returns** 
+// + *Array* two new curves, defined by degree, knots, and control points
+//
+verb.eval.nurbs.curve_split = function( degree, knots, control_points, u ) {
+
+	var knots_to_insert = [];
+	for (var i = 0; i < degree+1; i++) knots_to_insert.push(u);
+	var res = verb.eval.nurbs.curve_knot_refine( degree, knots, control_points, knots_to_insert );
+
+	var s = verb.eval.nurbs.knot_span( degree, u, knots );
+
+	var knots0 = res.knots.slice(0, s + degree + 2);
+	var knots1 = res.knots.slice( s + 1 );
+
+	var cpts0 = res.control_points.slice( 0, s + 1 );
+	var cpts1 = res.control_points.slice( s + 1 );
+
+	return [
+		{ degree: degree, knots: knots0, control_points: cpts0 },
+		{ degree: degree, knots: knots1, control_points: cpts1 }
+	];
+
+}
+
+//
+// ####curve_knot_refine( degree, knots, control_points, knots_to_insert )
+//
+// Insert a collection of knots on a curve
+//
+// Corresponds to Algorithm A5.4 (Piegl & Tiller)
+//
+// **params**
+// + *Number*, integer degree
+// + *Array*, array of nondecreasing knot values
+// + *Array*, array of control points
+// + *Array*, knots to insert
 // 
 // **returns** 
 // + *Object* the new curve, defined by knots and control_points
@@ -2502,9 +2441,8 @@ verb.eval.nurbs.curve_knot_refine = function( degree, knots, control_points, kno
 
 }
 
-
 //
-// ####curve_knot_insert( degree, knots, control_points, u, s, r )
+// ####curve_knot_insert( degree, knots, control_points, u, r )
 //
 // Insert a knot along a rational curve.  Note that this algorithm only works
 // for r + s <= degree, where s is the initial multiplicity (number of duplicates) of the knot.
@@ -2610,6 +2548,98 @@ verb.eval.nurbs.curve_knot_insert = function( degree, knots, control_points, u, 
 	return { knots: knots_post, control_points: control_points_post };
 
 }
+
+
+//
+// ####surface_curvature( degree_u, knots_u, degree_v, knots_v, control_points, u, v, options )
+//
+// Compute the gaussian curvature on a non-uniform, non-rational B spline surface
+//
+// **params**
+// + *Number*, integer degree of surface in u direction
+// + *Array*, array of nondecreasing knot values in u direction
+// + *Number*, integer degree of surface in v direction
+// + *Array*, array of nondecreasing knot values in v direction
+// + *Array*, 3d array of control points, where rows are the u dir, and columns run alonsg the positive v direction, 
+// and where each control point is an array of length (dim)  
+// + *Number*, u parameter at which to evaluate the derivatives
+// + *Number*, v parameter at which to evaluate the derivatives
+// 
+// **returns** 
+// + *Array*, a point represented by an array of length (dim)
+//
+
+verb.eval.nurbs.rational_surface_curvature = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, u, v ) {
+
+	// compute the first fundamental form
+
+		// symmetric matrix where
+		//
+		// I = [ E F; F G ]
+		//
+		// where:
+		//
+		// E = Xu * Xu
+		// F = Xu * Xv
+		// G = Xv * Xv
+
+	// second fundamental form (shape operator)
+
+		// symmetric matrix where
+		//
+		// II = [ L M; M N ]
+		//
+		// where:
+		//
+		// L = Xuu * n
+		// M = Xuv * n
+		// N = Xvv * n
+
+	// principal curvatures are the eigenvalues of the second fundamental form
+
+	var derivs = verb.eval.nurbs.rational_surface_derivs( 	degree_u, 
+															knots_u, 
+															degree_v, 
+															knots_v, 
+															homo_control_points, 
+															2, u, v );
+
+
+	// structure of the derivatives
+
+	// pos  du  vuu
+	// dv   duv
+  // dvv 
+
+ 
+  var du = derivs[0][1];
+  var dv = derivs[1][0];
+  var duu = derivs[0][2];
+  var dvv = derivs[2][0];
+  var duv = derivs[1][1];
+
+  var n = numeric.cross( du, dv );
+  var L = numeric.dot( duu, n );
+  var M = numeric.dot( duv, n );
+  var N = numeric.dot( dvv, n );
+
+  var shapeOperator = [ [ L, M ], [ M, N ] ];
+
+	var eigs = numeric.eig( shapeOperator );
+
+	// contains: lambda - x
+	// 			     E - x
+	
+	var k1 = eigs.lambda.x[0];
+	var k2 = eigs.lambda.x[1];
+	var mean = 0.5 * ( k1 + k2 );
+	var gaussian = k1 * k2;
+	var p1 = numeric.add( numeric.mul( eigs.E.x[0][0], du ), numeric.mul( eigs.E.x[0][1], dv ) );
+	var p2 = numeric.add( numeric.mul( eigs.E.x[1][0], du ), numeric.mul( eigs.E.x[1][1], dv ) );
+
+	return { point: derivs[0][0], normal: n, mean: mean, gaussian: gaussian, shapeOperator: shapeOperator, k1: k1, k2: k2, p1: p1, p2: p2, p1p : eigs.E.x[0], p2p: eigs.E.x[1]  };
+
+};
 
 
 //
@@ -2841,6 +2871,45 @@ verb.eval.nurbs.dehomogenize = function( homo_point ) {
 		point.push( homo_point[i] / wt );
 
 	return point;
+
+};
+
+//
+// ####weights_1d( homo_points )
+//
+// Obtain the weight from a collection of points in homogeneous space, assuming all
+// are the same dimension
+//
+// **params**
+// + *Array*, array of points represented by an array (wi*pi, wi) with length (dim+1)
+// 
+// **returns** 
+// + *Array*, a point represented by an array pi with length (dim)
+//
+
+verb.eval.nurbs.weight_1d = function( homo_points ) {
+
+	var dim = homo_points[0].length - 1;
+
+	return homo_points.map(function(x){ return x[dim]; });
+
+};
+
+//
+// ####dehomogenize_1d( homo_points )
+//
+// Dehomogenize a point 
+//
+// **params**
+// + *Array*, array of points represented by an array (wi*pi, wi) with length (dim+1)
+// 
+// **returns** 
+// + *Array*, an array of points, each of length dim
+//
+
+verb.eval.nurbs.dehomogenize_1d = function( homo_points ) {
+
+	return homo_points.map(function(x){ return verb.eval.nurbs.dehomogenize( x ); });
 
 };
 
