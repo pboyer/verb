@@ -30,6 +30,17 @@ module.exports = function(grunt) {
       }
     },
 
+    // Configure a mochaTest task
+    mochaTest: {
+      test: {
+        options: {
+          reporter: 'spec',
+          quiet: false // Optionally suppress output to standard out (defaults to false)
+        },
+        src: ['test/test.js']
+      }
+    },
+
     // uglify step
     uglify: {
       options: {
@@ -40,18 +51,6 @@ module.exports = function(grunt) {
           'build/<%= pkg.name %>.min.js': ['build/<%= pkg.name %>.js'],
           'build/<%= pkg.name %>Eval.min.js': ['build/<%= pkg.name %>Eval.js']
         }
-      }
-    },
-
-    // test
-    simplemocha: {
-      all: {
-        src: 'test/test.js', 
-        options: {
-          globals: ['should'],
-          ui: 'bdd',
-          reporter: 'tap'
-        },
       }
     },
 
@@ -67,15 +66,15 @@ module.exports = function(grunt) {
 
   });
 
+  grunt.loadNpmTasks('grunt-mocha-test');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-simple-mocha');
   grunt.loadNpmTasks('grunt-docco');
 
   var build_steps = ['concat', 'uglify', 'docco'];
   grunt.registerTask('default', build_steps );
   grunt.registerTask('build', build_steps);
-  grunt.registerTask('test', ['concat', 'simplemocha']);
+  grunt.registerTask('test', ['concat', 'mochaTest']);
 
 
 };
