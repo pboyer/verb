@@ -1,7 +1,3 @@
-NurbsCurve split
-	knot insertion
-	knot refinement
-	add to NurbsCurve
 NurbsSurface split
 	see above
 Curve interpolation
