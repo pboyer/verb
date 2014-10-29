@@ -7,6 +7,9 @@
     "type": "git",
     "url": "https://github.com/pboyer/verb.git"
   },
+  "scripts": {
+    "test": "grunt test"
+  },
   "keywords": [
     "NURBS",
     "webworker",
