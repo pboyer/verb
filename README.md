@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/pboyer/verb.svg?branch=master)](https://travis-ci.org/pboyer/verb)
+
 #verb
 ###A CAD Library for the Web
 ####Current version: 0.1.0
