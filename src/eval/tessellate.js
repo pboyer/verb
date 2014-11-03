@@ -1,7 +1,7 @@
 //
-// ####tesselate_rational_surface_uniform_cubic( degree_u, knots_u, degree_v, knots_v, homo_control_points, tol )
+// ####tessellate_rational_surface_uniform_cubic( degree_u, knots_u, degree_v, knots_v, homo_control_points, tol )
 //
-// Tesselate a NURBS surface given a tolerance.  The result is a uniform triangular mesh.  The surface must be >=degree 3
+// Tessellate a NURBS surface given a tolerance.  The result is a uniform triangular mesh.  The surface must be >=degree 3
 // in both directions.
 //
 // See Piegl & Richard, Tessellating Trimmed NURBS Surfaces, 1995
@@ -18,7 +18,7 @@
 // **returns** 
 // + *Array*, first element of array is an array of positions, second element are 3-tuple of triangle windings, third element is the 
 // uvs
-verb.eval.nurbs.tesselate_rational_surface_uniform_cubic = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, homo_control_points, tol ){
+verb.eval.nurbs.tessellate_rational_surface_uniform_cubic = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, homo_control_points, tol ){
 
 	if (degree_u < 3 || degree_v < 3) throw new Error("The surface must be degree >=3 in both directions!")
 
@@ -30,7 +30,7 @@ verb.eval.nurbs.tesselate_rational_surface_uniform_cubic = function( degree_u, k
 	var uSteps = (udom / stepSize) + 1;
 	var vSteps = (vdom / stepSize) + 1;
 
-	return verb.eval.nurbs.tesselate_rational_surface_naive( degree_u, knots_u, degree_v, knots_v, homo_control_points, uSteps, vSteps );
+	return verb.eval.nurbs.tessellate_rational_surface_naive( degree_u, knots_u, degree_v, knots_v, homo_control_points, uSteps, vSteps );
 
 }
 
@@ -206,9 +206,9 @@ verb.eval.nurbs.compute_rational_surface_deriv2_bounds = function( degree_u, u, 
 
 
 //
-// ####tesselate_rational_surface_naive( degree_u, knots_u, degree_v, knots_v, homo_control_points, divs_u, divs_v )
+// ####tessellate_rational_surface_naive( degree_u, knots_u, degree_v, knots_v, homo_control_points, divs_u, divs_v )
 //
-// Tesselate a nurbs surface
+// Tessellate a nurbs surface
 //
 // **params**
 // + *Number*, integer degree of surface in u direction
@@ -222,7 +222,7 @@ verb.eval.nurbs.compute_rational_surface_deriv2_bounds = function( degree_u, u, 
 // + *Array*, first element of array is an array of positions, second element are 3-tuple of triangle windings, third element is the 
 // uvs
 
-verb.eval.nurbs.tesselate_rational_surface_naive = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, divs_u, divs_v ) {
+verb.eval.nurbs.tessellate_rational_surface_naive = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, divs_u, divs_v ) {
 
 	if ( divs_u < 1 ) {
 		divs_u = 1;
@@ -599,7 +599,7 @@ verb.eval.nurbs.triangulate_adaptive_refinement_node_tree = function( arrTree ){
 
 };
 
-verb.eval.nurbs.tesselate_rational_surface_adaptive = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, options ) {
+verb.eval.nurbs.tessellate_rational_surface_adaptive = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, options ) {
 
 	// division step
 	var arrArray = verb.eval.nurbs.divide_rational_surface_adaptive( degree_u, knots_u, degree_v, knots_v, homo_control_points, options );

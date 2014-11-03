@@ -2050,14 +2050,14 @@ describe("Arc.point",function(){
 
 });
 
-describe("Arc.tesselate",function(){
+describe("Arc.tessellate",function(){
 
 	it('should return a list of vertices', function(){
 
 		verb.init();
 
 		var arc = new verb.geom.Arc([0,0,1], [1,0,0], [0,1,0], 1, new verb.geom.Interval(0, Math.PI/ 2) );
-		var pts = arc.tesselate();
+		var pts = arc.tessellate();
 
 		pts.length.should.be.greaterThan(2);
 
@@ -2136,7 +2136,7 @@ describe("FourPointSurface.derivatives",function(){
 
 });
 
-describe("FourPointSurface.tesselate",function(){
+describe("FourPointSurface.tessellate",function(){
 
 	it('gives mesh result', function(){
 
@@ -2151,7 +2151,7 @@ describe("FourPointSurface.tesselate",function(){
 
 		should.exist(srf);
 
-		var p = srf.tesselate();
+		var p = srf.tessellate();
 
 		p.uvs.length.should.be.equal(441);
 		p.points.length.should.be.equal(441);
@@ -2229,7 +2229,7 @@ describe("Line.derivatives",function(){
 
 });
 
-describe("Line.tesselate",function(){
+describe("Line.tessellate",function(){
 
 	it('gives mesh result', function(){
 
@@ -2242,7 +2242,7 @@ describe("Line.tesselate",function(){
 
 		should.exist(c);
 
-		var p = c.tesselate();
+		var p = c.tessellate();
 
 		p.length.should.be.equal(2);
 		p[0].length.should.be.equal(3);
@@ -2319,7 +2319,7 @@ describe("BezierCurve.derivatives",function(){
 
 });
 
-describe("BezierCurve.tesselate",function(){
+describe("BezierCurve.tessellate",function(){
 
 	it('gives mesh result', function(){
 
@@ -2334,7 +2334,7 @@ describe("BezierCurve.tesselate",function(){
 
 		should.exist(c);
 
-		var pts = c.tesselate();
+		var pts = c.tessellate();
 
 		pts.length.should.be.greaterThan(2);
 
@@ -2405,7 +2405,7 @@ describe("Circle.derivatives",function(){
 
 });
 
-describe("Circle.tesselate",function(){
+describe("Circle.tessellate",function(){
 
 	it('gives correct result', function(){
 
@@ -2415,7 +2415,7 @@ describe("Circle.tesselate",function(){
 
 		should.exist(c);
 
-		var pts = c.tesselate();
+		var pts = c.tessellate();
 
 		pts.length.should.be.greaterThan(2);
 		pts.map( function(e){  e.length.should.be.equal(3); });
@@ -2506,7 +2506,7 @@ describe("Ellipse.derivatives",function(){
 
 });
 
-describe("Ellipse.tesselate",function(){
+describe("Ellipse.tessellate",function(){
 
 	it('gives correct result', function(){
 
@@ -2516,7 +2516,7 @@ describe("Ellipse.tesselate",function(){
 
 		should.exist(c);
 
-		var pts = c.tesselate();
+		var pts = c.tessellate();
 
 		pts.length.should.be.greaterThan(2);
 		pts.map( function(e){  e.length.should.be.equal(3); });
@@ -2586,7 +2586,7 @@ describe("EllipseArc.derivatives",function(){
 
 });
 
-describe("EllipseArc.tesselate",function(){
+describe("EllipseArc.tessellate",function(){
 
 	it('gives correct result', function(){
 
@@ -2596,7 +2596,7 @@ describe("EllipseArc.tesselate",function(){
 
 		should.exist(c);
 
-		var pts = c.tesselate();
+		var pts = c.tessellate();
 
 		pts.length.should.be.greaterThan(2);
 		pts.map( function(e){  e.length.should.be.equal(3); });
@@ -2662,7 +2662,7 @@ describe("PolyLine.derivatives",function(){
 
 });
 
-describe("PolyLine.tesselate",function(){
+describe("PolyLine.tessellate",function(){
 
 	it('gives correct result', function(){
 
@@ -2672,7 +2672,7 @@ describe("PolyLine.tesselate",function(){
 
 		should.exist(c);
 
-		var pts = c.tesselate();
+		var pts = c.tessellate();
 
 		pts.length.should.be.equal(3);
 		pts.map( function(e){  e.length.should.be.equal(3); });
@@ -2739,7 +2739,7 @@ describe("PolyLine.derivatives",function(){
 
 });
 
-describe("PolyLine.tesselate",function(){
+describe("PolyLine.tessellate",function(){
 
 	it('gives correct result', function(){
 
@@ -2749,7 +2749,7 @@ describe("PolyLine.tesselate",function(){
 
 		should.exist(c);
 
-		var pts = c.tesselate();
+		var pts = c.tessellate();
 
 		pts.length.should.be.equal(3);
 		pts.map( function(e){  e.length.should.be.equal(3); });
@@ -2841,7 +2841,7 @@ describe("Cone.derivatives",function(){
 });
 
 
-describe("Cone.tesselate",function(){
+describe("Cone.tessellate",function(){
 
 	it('gives mesh result', function(){
 
@@ -2857,7 +2857,7 @@ describe("Cone.tesselate",function(){
 
 		should.exist(srf);
 
-		var p = srf.tesselate();
+		var p = srf.tessellate();
 
 		p.uvs.length.should.be.equal(441);
 		p.points.length.should.be.equal(441);
@@ -2955,7 +2955,7 @@ describe("Cylinder.derivatives",function(){
 });
 
 
-describe("Cylinder.tesselate",function(){
+describe("Cylinder.tessellate",function(){
 
 	it('gives mesh result', function(){
 
@@ -2971,7 +2971,7 @@ describe("Cylinder.tesselate",function(){
 
 		should.exist(srf);
 
-		var p = srf.tesselate();
+		var p = srf.tessellate();
 
 		p.uvs.length.should.be.equal(441);
 		p.points.length.should.be.equal(441);
@@ -3061,7 +3061,7 @@ describe("Extrusion.derivatives",function(){
 });
 
 
-describe("Extrusion.tesselate",function(){
+describe("Extrusion.tessellate",function(){
 
 	it('gives mesh result', function(){
 
@@ -3075,7 +3075,7 @@ describe("Extrusion.tesselate",function(){
 
 		should.exist(srf);
 
-		var p = srf.tesselate();
+		var p = srf.tessellate();
 
 		p.uvs.length.should.be.equal(441);
 		p.points.length.should.be.equal(441);
@@ -3171,7 +3171,7 @@ describe("PlanarSurface.derivatives",function(){
 });
 
 
-describe("PlanarSurface.tesselate",function(){
+describe("PlanarSurface.tessellate",function(){
 
 	it('gives mesh result', function(){
 
@@ -3187,7 +3187,7 @@ describe("PlanarSurface.tesselate",function(){
 
 		should.exist(srf);
 
-		var p = srf.tesselate();
+		var p = srf.tessellate();
 
 		p.uvs.length.should.be.equal(441);
 		p.points.length.should.be.equal(441);
@@ -3283,7 +3283,7 @@ describe("RevolvedSurface.derivatives",function(){
 });
 
 
-describe("RevolvedSurface.tesselate",function(){
+describe("RevolvedSurface.tessellate",function(){
 
 	it('gives mesh result', function(){
 
@@ -3298,7 +3298,7 @@ describe("RevolvedSurface.tesselate",function(){
 
 		should.exist(srf);
 
-		var p = srf.tesselate();
+		var p = srf.tessellate();
 
 		p.uvs.length.should.be.equal(441);
 		p.points.length.should.be.equal(441);
@@ -3392,7 +3392,7 @@ describe("Sphere.derivatives",function(){
 });
 
 
-describe("Sphere.tesselate",function(){
+describe("Sphere.tessellate",function(){
 
 	it('gives mesh result', function(){
 
@@ -3405,7 +3405,7 @@ describe("Sphere.tesselate",function(){
 
 		should.exist(srf);
 
-		var p = srf.tesselate();
+		var p = srf.tessellate();
 
 		p.uvs.length.should.be.equal(441);
 		p.points.length.should.be.equal(441);
@@ -3508,7 +3508,7 @@ describe("SweepOneRail.derivatives",function(){
 });
 
 
-describe("SweepOneRail.tesselate",function(){
+describe("SweepOneRail.tessellate",function(){
 
 	it('gives mesh result', function(){
 
@@ -3526,7 +3526,7 @@ describe("SweepOneRail.tesselate",function(){
 
 		should.exist(srf);
 
-		var p = srf.tesselate();
+		var p = srf.tessellate();
 
 		p.uvs.length.should.be.equal(441);
 		p.points.length.should.be.equal(441);
@@ -4679,6 +4679,61 @@ describe("NurbsCurve.split",function(){
 
 });
 
+
+describe("verb.eval.nurbs.compute_rational_surface_deriv2_bounds",function(){
+
+	it('determines tight bound on second derivatives for cubic surface', function(){
+
+		// attempt
+
+		var p = 3
+			, q = 3
+			, u = [0, 0, 0, 0, 1, 1, 1, 1]
+			, v =	[0, 0, 0, 0, 1, 1, 1, 1]
+			, pts = [ 	[ [0, 0, 100, 1], 		[10, 0, 0, 1], 		[20, 0, 0, 1], 		[30, 0, 0, 1] 		],
+									[ [0, -10, 0, 1], 	[10, -10, 10, 1], 	[20, -10, 10, 1], 	[30, -10, 0, 1] 	],
+									[ [0, -20, 0, 1], 	[10, -20, 10, 1], 	[20, -20, 10, 1], 	[30, -20, 0, 1] 	],
+									[ [0, -30, 0, 1], 	[10, -30, 0, 1], 	[20, -30, 0, 1], 	[30, -30, 1000, 1] 	] ];
+
+		var p2 = verb.eval.nurbs.compute_rational_surface_deriv2_bounds( p, u, q, v, pts );
+
+		for (var i = 0; i < 1.0; i += 0.05){
+			for (var j = 0; j < 1.0; j += 0.05){
+
+				var val = verb.eval.nurbs.surface_derivs( p, u, q, v, pts, 2, i, j);
+
+				numeric.norm2( val[0][2] ).should.be.lessThan( p2[0] + verb.EPSILON );
+				numeric.norm2( val[2][0] ).should.be.lessThan( p2[1] + verb.EPSILON );
+				numeric.norm2( val[1][1] ).should.be.lessThan( p2[2] + verb.EPSILON );
+
+			}
+		}
+		
+	});
+});
+
+describe("verb.eval.nurbs.compute_rational_surface_max_edge_length",function(){
+
+	it('not sure how to test this yet :|', function(){
+
+		// attempt
+
+		var p = 3
+			, q = 3
+			, u = [0, 0, 0, 0, 1, 1, 1, 1]
+			, v =	[0, 0, 0, 0, 1, 1, 1, 1]
+			, pts = [ 	[ [0, 0, 5, 1], 		[10, 0, 0, 1], 		[20, 0, 0, 1], 		[30, 0, 0, 1] 		],
+									[ [0, -10, 0, 1], 	[10, -10, 5, 1], 	[20, -10, 5, 1], 	[30, -10, 0, 1] 	],
+									[ [0, -20, 0, 1], 	[10, -20, 5, 1], 	[20, -20, 5, 1], 	[30, -20, 0, 1] 	],
+									[ [0, -30, 0, 1], 	[10, -30, 0, 1], 	[20, -30, 0, 1], 	[30, -30, 5, 1] 	] ];
+
+		var p2 = verb.eval.nurbs.compute_rational_surface_max_edge_length( p, u, q, v, pts, 0.4 );
+		
+	});
+});
+
+
+
 // describe("verb.eval.nurbs.AdaptiveRefinementNode.divide",function(){
 
 // 	it('can be called with options.minDepth', function(){
@@ -4776,7 +4831,7 @@ describe("NurbsCurve.split",function(){
 
 // });
 
-// describe("verb.eval.nurbs.tesselate_rational_surface_adaptive",function(){
+// describe("verb.eval.nurbs.tessellate_rational_surface_adaptive",function(){
 
 // 	it('produces a mesh from a divided surface', function(){
 

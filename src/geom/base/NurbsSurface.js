@@ -68,17 +68,17 @@ verb.geom.NurbsSurface.prototype.derivatives = function( u, v, num_derivs, callb
 };
 
 //
-// ####tesselate(options [, callback] )
+// ####tessellate(options [, callback] )
 //
-// Tesselate the surface
+// tessellate the surface
 //
 // **params**
-// + *Object*, Tesselate the surface, given an options object includings a vdivs and udivs property
+// + *Object*, tessellate the surface, given an options object includings a vdivs and udivs property
 //
 // **returns**
 // + *Array*, An array if called synchronously, otherwise nothing
 
-verb.geom.NurbsSurface.prototype.tesselate = function(options, callback){
+verb.geom.NurbsSurface.prototype.tessellate = function(options, callback){
 
 	var minDivsV = 20
 		, minDivsU = 20;
@@ -89,7 +89,7 @@ verb.geom.NurbsSurface.prototype.tesselate = function(options, callback){
 	}
 
 	// naive surface tesselation, for now
-	return this.nurbsEngine.eval( 'tesselate_rational_surface_naive', 
+	return this.nurbsEngine.eval( 'tessellate_rational_surface_naive', 
 			[	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), 
 			minDivsU, minDivsV ], callback ); 
 

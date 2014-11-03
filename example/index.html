@@ -83,14 +83,14 @@ var point = curve.point( u );
 // synchronously evaluate first derivative of the curve at 0.5
 var derivs = curve.derivatives( u, numDerivs );</pre>
 
-			<h4>Tesselation</h4>
+			<h4>Tessellation</h4>
 
-			<p>A NURBS curve or surface is an analytical function.  In order to visualize it, it must be "tesselated" into a collection of lines or triangles.  verb supplies naive and adaptive tesselation routines for curves and surfaces at arbitrary tolerance.</p>
+			<p>A NURBS curve or surface is an analytical function.  In order to visualize it, it must be "tessellated" into a collection of lines or triangles.  verb supplies naive and adaptive tessellation routines for curves and surfaces at arbitrary tolerance.</p>
 
 			<pre>
 var surface = new verb.geom.NurbsSurface(  );
 
-surface.tesselate( tesselationOptions, function(tesselation){
+surface.tessellate( tessellationOptions, function(tessellation){
 	...
 });</pre>
 
@@ -123,11 +123,11 @@ var res = verb.intersect.curveSurface( crv, srf, options );</pre>
 
 			<pre>var curve = new verb.geom.BezierCurve( [p1, p2, p3, p4] );
 
-// tesselate the curve synchronously with default options
-var pointsSync = curve.tesselate();
+// tessellate the curve synchronously with default options
+var pointsSync = curve.tessellate();
 
-// tesselate the curve asynchronously (again, default options) in a background thread
-curve.tesselate({}, function(points){
+// tessellate the curve asynchronously (again, default options) in a background thread
+curve.tessellate({}, function(points){
 	...
 });</pre>
 
@@ -140,7 +140,7 @@ curve.tesselate({}, function(points){
 			<h3>Multi-threaded execution</h3>
 
 				<p>
-					verb uses <a href="https://github.com/pboyer/labor.js">labor.js</a> for multi-threading using WebWorkers.  If these are available, verb will automatically put them to use - potentially running multiple instances of a stateless NURBS engine.  This allows expensive operations like tesselation or intersection to be elegantly handled in the background via verb's async API. 
+					verb uses <a href="https://github.com/pboyer/labor.js">labor.js</a> for multi-threading using WebWorkers.  If these are available, verb will automatically put them to use - potentially running multiple instances of a stateless NURBS engine.  This allows expensive operations like tessellation or intersection to be elegantly handled in the background via verb's async API. 
 				</p>
 
 				<p> Here's an example of building an Engine and calling it directly: </p>
@@ -166,14 +166,14 @@ engine.eval('rational_curve_derivs', [degree, control_points, weights, knots, u,
 			<h3>Reactive programming</h3>
 
 				<p>
-					All verb geometry types (NurbsCurve, Cone, etc) inherit from WatchObject - a prototype for watching for property changes on an object.  This can be useful for operations like tesselation, where a change to the control points should cause retesselation.
+					All verb geometry types (NurbsCurve, Cone, etc) inherit from WatchObject - a prototype for watching for property changes on an object.  This can be useful for operations like tessellation, where a change to the control points should cause retessellation.
 				</p>
 
 				<pre>
 var l = new verb.geom.BezierCurve( [p1, p2, p3, p4] );
 
 var watcherId = l.watch('controlPoints', function(changeData) {
-	l.tesselate(function(tesselation){
+	l.tessellate(function(tessellation){
 
 		... update view ...
 

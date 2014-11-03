@@ -59,9 +59,9 @@ verb.geom.NurbsCurve.prototype.derivatives = function( u, num_derivs, callback )
 };
 
 //
-// ####tesselate(options [, callback] )
+// ####tessellate(options [, callback] )
 //
-// Tesselate a curve at a given tolerance
+// Tessellate a curve at a given tolerance
 //
 // **params**
 // + *Number*, The parameter to sample the curve
@@ -71,7 +71,7 @@ verb.geom.NurbsCurve.prototype.derivatives = function( u, num_derivs, callback )
 // **returns**
 // + *Array*, An array if called synchronously, otherwise nothing
 
-verb.geom.NurbsCurve.prototype.tesselate = function(options, callback){
+verb.geom.NurbsCurve.prototype.tessellate = function(options, callback){
 
 	var options = options || {};
 	options.tolerance = options.tolerance || verb.EPSILON;

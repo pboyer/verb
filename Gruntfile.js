@@ -18,12 +18,12 @@ module.exports = function(grunt) {
                                         'src/geom/*.js', 
                                         'src/intersect/*.js', 
                                         'src/eval/intersect.js',
-                                        'src/eval/tesselate.js',
+                                        'src/eval/tessellate.js',
                                         'src/eval/geom.js',
                                         'src/eval/eval.js' ],
           'build/<%= pkg.name %>Eval.js': [ 'src/eval/header.js', 
                                             'src/eval/intersect.js', 
-                                            'src/eval/tesselate.js', 
+                                            'src/eval/tessellate.js', 
                                             'src/eval/geom.js', 
                                             'src/eval/eval.js']
         }

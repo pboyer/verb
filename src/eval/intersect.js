@@ -129,11 +129,11 @@ verb.eval.nurbs.refine_rational_curve_surface_intersection = function( degree_u,
 
 verb.eval.nurbs.intersect_rational_curve_surface_by_aabb = function( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, sample_tol, tol, divs_u, divs_v ) {
 
-	// tesselate the curve
+	// tessellate the curve
 	var crv = verb.eval.nurbs.rational_curve_adaptive_sample( degree_crv, knots_crv, homo_control_points_crv, sample_tol, true)
 
-	// tesselate the surface
-		, mesh = verb.eval.nurbs.tesselate_rational_surface_naive( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, divs_u, divs_v )
+	// tessellate the surface
+		, mesh = verb.eval.nurbs.tessellate_rational_surface_naive( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, divs_u, divs_v )
 
 	// separate parameters from points in the polyline (params are the first index in the array)
 		, u1 = crv.map( function(el) { return el[0]; })
