@@ -1,3 +1,56 @@
+//
+// ####tesselate_rational_surface_uniform_cubic( degree_u, knots_u, degree_v, knots_v, homo_control_points, tol )
+//
+// Tesselate a NURBS surface given a tolerance.  The result is a uniform triangular mesh.  The surface must be >=degree 3
+// in both directions.
+//
+// See Piegl & Richard, Tessellating Trimmed NURBS Surfaces, 1995
+//
+// **params**
+// + *Number*, integer degree of surface in u direction
+// + *Array*, array of nondecreasing knot values in u direction
+// + *Number*, integer degree of surface in v direction
+// + *Array*, array of nondecreasing knot values in v direction
+// + *Array*, 3d array of control points, top to bottom is increasing u direction, left to right is increasing v direction,
+// and where each control point is an array of length (dim+1)
+// + *Number*, maximum deviation from the surface
+// 
+// **returns** 
+// + *Array*, first element of array is an array of positions, second element are 3-tuple of triangle windings, third element is the 
+// uvs
+verb.eval.nurbs.tesselate_rational_surface_uniform_cubic = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, homo_control_points, tol ){
+
+	if (degree_u < 3 || degree_v < 3) throw new Error("The surface must be degree >=3 in both directions!")
+
+	var stepSize = verb.eval.nurbs.compute_rational_surface_max_edge_length( degree_u, knots_u, degree_v, knots_v, homo_control_points, tol );
+	
+	var udom = knots_u[knots_u.length-1] - knots_u[0];
+	var vdom = knots_v[knots_v.length-1] - knots_v[0];
+
+	var uSteps = (udom / stepSize) + 1;
+	var vSteps = (vdom / stepSize) + 1;
+
+	return verb.eval.nurbs.tesselate_rational_surface_naive( degree_u, knots_u, degree_v, knots_v, homo_control_points, uSteps, vSteps );
+
+}
+
+//
+// ####compute_rational_surface_max_edge_length( degree_u, knots_u, degree_v, knots_v, homo_control_points, tol )
+//
+// Determine the step size for a given surface in order to be under the supplied maximum deviation
+//
+// **params**
+// + *Number*, integer degree of surface in u direction
+// + *Array*, array of nondecreasing knot values in u direction
+// + *Number*, integer degree of surface in v direction
+// + *Array*, array of nondecreasing knot values in v direction
+// + *Array*, 3d array of control points, top to bottom is increasing u direction, left to right is increasing v direction,
+// and where each control point is an array of length (dim+1)
+// + *Number*, maximum deviation from the surface
+// 
+// **returns** 
+// + *Number*, the step size to use in both directions
+//
 verb.eval.nurbs.compute_rational_surface_max_edge_length = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, tol ){
 
 	// using the second derivative surfaces, compute the max edge length according to (22)
@@ -36,6 +89,23 @@ verb.eval.nurbs.compute_rational_surface_max_edge_length = function( degree_u, k
 
 }
 
+//
+// ####compute_rational_surface_deriv2_bounds( degree_u, knots_u, degree_v, knots_v, homo_control_points )
+//
+// Compute the maximum magnitude of the second derivative on the surface.  This is done by forming the second
+// derivative surfaces and inspecting the magnitudes of their control points.
+//
+// **params**
+// + *Number*, integer degree of surface in u direction
+// + *Array*, array of nondecreasing knot values in u direction
+// + *Number*, integer degree of surface in v direction
+// + *Array*, array of nondecreasing knot values in v direction
+// + *Array*, 3d array of control points, top to bottom is increasing u direction, left to right is increasing v direction,
+// and where each control point is an array of length (dim+1)
+// 
+// **returns** 
+// + *Array*, [ maxp20, maxp02, maxp11 ]
+//
 verb.eval.nurbs.compute_rational_surface_deriv2_bounds = function( degree_u, u, degree_v, v, pts ){
 
 	// we find the bounds on the second derivatives of the surface
@@ -135,7 +205,6 @@ verb.eval.nurbs.compute_rational_surface_deriv2_bounds = function( degree_u, u, 
 }
 
 
-
 //
 // ####tesselate_rational_surface_naive( degree_u, knots_u, degree_v, knots_v, homo_control_points, divs_u, divs_v )
 //
@@ -151,7 +220,7 @@ verb.eval.nurbs.compute_rational_surface_deriv2_bounds = function( degree_u, u, 
 // 
 // **returns** 
 // + *Array*, first element of array is an array of positions, second element are 3-tuple of triangle windings, third element is the 
-                  // uvs
+// uvs
 
 verb.eval.nurbs.tesselate_rational_surface_naive = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, divs_u, divs_v ) {
 
