@@ -1,4 +1,139 @@
 
+verb.eval.nurbs.compute_bounds_derivs2 = function( degree_u, u, degree_v, v, pts, tol ){
+
+	// we find the bounds on the second derivatives of the surface
+	// by constructing second partial derivative surfaces
+
+	// construct the second derivative surface control points according to (9), (11), (13) 
+	var n = pts.length;
+	var m = pts[0].length;
+
+	// form the control points of the p20 surface
+	var n2 = n-2;
+	var p = degree_u;
+	var pp1 = p * (p-1);
+
+	var maxp20 = 0;
+
+	for(var i = 0; i < n2; i++){
+		for(var j = 0; j < m; j++){
+
+			var pij = pts[i][j];
+			var pi1j = pts[i+1][j];
+			var pi2j = pts[i+2][j];
+			
+			var ptdiff1 = numeric.sub( pi2j, pi1j );
+			var ptdiff2 = numeric.sub( pi1j, pij );
+
+			var ptdiffscaled1 = numeric.mul( 1 / (u[i+p+2] - u[i+2]), ptdiff1 );
+			var ptdiffscaled2 = numeric.mul( 1 / (u[i+p+1] - u[i+1]), ptdiff2 );
+
+			var ptdiffFinal = numeric.sub( ptdiffscaled1, ptdiffscaled2 );
+			var finalScale = pp1 / ( u[i+p+1] - u[i+2] );
+
+			var max = numeric.norm2( numeric.mul( finalScale, ptdiffFinal ) );
+			if (max > maxp20) maxp20 = max;
+			
+		}
+	}
+
+	// form the control points of the p02 surface
+	var q = degree_v; 
+	var qq1 = q * (q-1);
+	var m2 = m - 2;
+
+	var maxp02 = 0;
+
+	for(var i = 0; i < n; i++){
+		for(var j = 0; j < m2; j++){
+
+			var pij = pts[i][j];
+			var pij1 = pts[i][j+1];
+			var pij2 = pts[i][j+2];
+			
+			var ptdiff1 = numeric.sub( pij2, pij1 );
+			var ptdiff2 = numeric.sub( pij1, pij );
+
+			var ptdiffscaled1 = numeric.mul( 1 / (v[j+q+2] - v[j+2]), ptdiff1 );
+			var ptdiffscaled2 = numeric.mul( 1 / (v[j+q+1] - v[j+1]), ptdiff2 );
+
+			var ptdiffFinal = numeric.sub( ptdiffscaled1, ptdiffscaled2 );
+			var finalScale = qq1 / ( v[j+q+1] - v[j+2] );
+
+			var max = numeric.norm2( numeric.mul( finalScale, ptdiffFinal ) );
+			if (max > maxp02) maxp02 = max;
+			
+		}
+	}
+
+	// form the control points of the p11 surface
+	var p11pts = [];
+	var pq = p * q;
+	var n1 = n - 1;
+	var m1 = m - 1;
+
+	var maxp11 = 0;
+
+	for(var i = 0; i < n1; i++){
+		for(var j = 0; j < m1; j++){
+
+			var pij = pts[i][j];
+			var pi1j = pts[i+1][j];
+			var pij1 = pts[i][j+1];
+			var pi1j1 = pts[i+1][j+1];
+			
+			var ptdiff = numeric.add( numeric.sub( numeric.sub( pi1j1, pij1 ), pi1j), pij );
+			var ptdiffscaled = numeric.mul( 1 / (u[i+p+1] - u[i+1]), ptdiff );
+
+			var finalScale = pq / (v[j+q+1] - v[j+1]);
+
+			var max = numeric.norm2( numeric.mul( finalScale, ptdiffscaled ) );
+			if (max > maxp11) maxp11 = max;
+			
+		}
+	}
+
+	return [maxp20, maxp02, maxp11];
+
+}
+
+// using the second derivative surfaces, compute the max edge length according to (22)
+
+verb.eval.nurbs.compute_4d_tolerance = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, tol ){
+
+	// min w * ( eps / (1 + max( len(p) ) ) )
+
+	var nu = homo_control_points.length;
+	var nv = homo_control_points[0].length;
+
+	var maxlen = 0;
+
+	for (var i = 0; i < nu; i++){
+		for (var j = 0; j < nv; j++){
+			var len = numeric.norm( homo_control_points[i][j] );
+			if (len > maxlen) maxlen = len;
+		}
+	}
+
+	var denom = 1 + maxlen;
+	var wi = homo_control_points[0][0].length - 1;
+
+	var minval = Number.MAX_VALUE;
+
+	for (var i = 0; i < nu; i++){
+		for (var j = 0; j < nv; j++){
+		
+			var wt = homo_control_points[i][j][wi];
+			var val = wt * tol / denom;
+			if (val < minval) maxvalP = val;
+			
+		}
+	}
+
+	return minval;
+
+}
+
 
 //
 // ####tesselate_rational_surface_naive( degree_u, knots_u, degree_v, knots_v, homo_control_points, divs_u, divs_v )
@@ -151,7 +286,7 @@ verb.eval.nurbs.rational_curve_regular_sample_range = function( degree, knots, c
 // + *Array*, array of nondecreasing knot values 
 // + *Array*, 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
 // and form (wi*pi, wi) 
-// + *Number*, tolerance for the adaptive scheme
+// + *Number*, tol for the adaptive scheme
 // + *Boolean*, whether to prefix the point with the parameter
 // 
 // **returns** 
