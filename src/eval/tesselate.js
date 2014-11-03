@@ -1,5 +1,42 @@
+verb.eval.nurbs.compute_rational_surface_max_edge_length = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, tol ){
 
-verb.eval.nurbs.compute_bounds_derivs2 = function( degree_u, u, degree_v, v, pts, tol ){
+	// using the second derivative surfaces, compute the max edge length according to (22)
+
+	// min w * ( eps / (1 + max( len(p) ) ) )
+
+	var nu = homo_control_points.length;
+	var nv = homo_control_points[0].length;
+
+	var maxlen = 0;
+
+	for (var i = 0; i < nu; i++){
+		for (var j = 0; j < nv; j++){
+			var len = numeric.norm2( homo_control_points[i][j] );
+			if (len > maxlen) maxlen = len;
+		}
+	}
+
+	var denom = 1 + maxlen;
+	var wi = homo_control_points[0][0].length - 1;
+
+	var epsw = Number.MAX_VALUE;
+
+	for (var i = 0; i < nu; i++){
+		for (var j = 0; j < nv; j++){
+			var wt = homo_control_points[i][j][wi];
+			var val = wt * tol / denom;
+			if (val < epsw) epsw = val;
+		}
+	}
+
+	var d2bounds = verb.eval.nurbs.compute_rational_surface_deriv2_bounds( degree_u, knots_u, degree_v, knots_v, homo_control_points );
+
+	// use equation (22) to determine the bounds on the surface
+	return (Math.sqrt(2) / 2) *  3 * Math.sqrt( epsw / (2 * ( d2bounds[0] + d2bounds[1] + 2 * d2bounds[2])));
+
+}
+
+verb.eval.nurbs.compute_rational_surface_deriv2_bounds = function( degree_u, u, degree_v, v, pts ){
 
 	// we find the bounds on the second derivatives of the surface
 	// by constructing second partial derivative surfaces
@@ -97,42 +134,6 @@ verb.eval.nurbs.compute_bounds_derivs2 = function( degree_u, u, degree_v, v, pts
 
 }
 
-// using the second derivative surfaces, compute the max edge length according to (22)
-
-verb.eval.nurbs.compute_4d_tolerance = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, tol ){
-
-	// min w * ( eps / (1 + max( len(p) ) ) )
-
-	var nu = homo_control_points.length;
-	var nv = homo_control_points[0].length;
-
-	var maxlen = 0;
-
-	for (var i = 0; i < nu; i++){
-		for (var j = 0; j < nv; j++){
-			var len = numeric.norm( homo_control_points[i][j] );
-			if (len > maxlen) maxlen = len;
-		}
-	}
-
-	var denom = 1 + maxlen;
-	var wi = homo_control_points[0][0].length - 1;
-
-	var minval = Number.MAX_VALUE;
-
-	for (var i = 0; i < nu; i++){
-		for (var j = 0; j < nv; j++){
-		
-			var wt = homo_control_points[i][j][wi];
-			var val = wt * tol / denom;
-			if (val < minval) maxvalP = val;
-			
-		}
-	}
-
-	return minval;
-
-}
 
 
 //
