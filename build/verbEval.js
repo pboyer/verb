@@ -1994,6 +1994,84 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.divide = function( options, cur
 
 // ###verb.eval
 // This defines verb's core geometry library which is called by the current Engine.
+
+
+verb.eval.nurbs.rational_interp_curve = function( points ) {
+
+	// 0) build knot vector for curve by normalized chord length
+	// 1) construct effective weights in square matrix (W)
+	// 2) construct set of coordinattes to interpolate vector (p)
+	// 3) set of control points (c)
+
+		// Wc = p
+
+	// 4) solve for c in all 3 dimensions
+
+	var degree = 3;
+
+	
+	var us = [ 0 ]; 
+	for (var i = 1; i < points.length; i++){
+
+		var chord = numeric.norm2( numeric.sub( points[i], points[i-1] ) );
+		var last = us[us.length - 1];
+		us.push( last + chord );
+
+	}
+
+	// normalize
+	var max = us[us.length-1];
+	for (var i = 0; i < us.length; i++){
+		us[i] = us[i] / max;
+	}
+
+	// fixed
+	var knotsStart = [ 0, 0, 0, 0 ];
+
+	var n = points.length - 1;
+	var innerKnotNum = n - degree;
+
+	for (var i = 1; i < us.length - degree; i++){
+
+		knotsStart.push( (1/3) * ( us[i] + us[i+1] + us[i+2] ));
+	}
+
+	var knots = knotsStart.concat( [ 1, 1, 1, 1 ] );
+
+	// build matrix of basis function coeffs (TODO: use sparse rep)
+	var A = [];
+	for ( var i = 0; i < us.length; i++ ){
+
+		var u = us[i];
+
+		var span = verb.eval.nurbs.knot_span_given_n( n, degree, u, knots )
+		var basisFuncs = verb.eval.nurbs.basis_functions_given_knot_span_index( span, u, degree, knots );
+
+		var ls = span - degree;
+		var rowstart = verb.eval.nurbs.zeros_1d( ls );
+		var rowend = verb.eval.nurbs.zeros_1d( points.length - (degree + 1) - ls );
+
+		A.push( rowstart.concat(basisFuncs).concat(rowend) );
+
+	}
+
+	// for each dimension, solve
+	var dim = points[0].length;
+	var xs = [];
+
+	for (var i = 0; i < dim; i++){
+		var b = points.map(function(x){ return x[i]; });
+		var x = numeric.solve( A, b );
+
+		xs.push(x);
+	}
+
+	var controlPts = numeric.transpose(xs).map(function(x){ x.push(1); return x; });
+
+	return { control_points: controlPts, knots: knots, degree: degree };
+
+}
+
 //
 // ####get_sweep1_surface( profile_knots, profile_degree, profile_control_points, profile_weights, rail_knots, rail_degree, rail_control_points, rail_weights )
 //

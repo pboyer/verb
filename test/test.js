@@ -4732,6 +4732,56 @@ describe("verb.eval.nurbs.compute_rational_surface_max_edge_length",function(){
 	});
 });
 
+// verb.eval.nurbs.interp_curve = function( points ) 
+
+describe("verb.eval.nurbs.rational_interp_curve",function(){
+
+	it('can compute valid interp curve for 4 points', function(){
+
+		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ]; 
+		var crv = verb.eval.nurbs.rational_interp_curve( pts );
+
+		// interpolates the end points
+
+		crv.control_points[0][0].should.be.approximately(pts[0][0], verb.TOLERANCE);
+		crv.control_points[0][1].should.be.approximately(pts[0][1], verb.TOLERANCE);
+
+		var last = pts.length - 1;
+
+		crv.control_points[last][0].should.be.approximately(pts[last][0], verb.TOLERANCE);
+		crv.control_points[last][1].should.be.approximately(pts[last][1], verb.TOLERANCE);
+
+		// the internal points are hit (TODO: do this more efficiently)
+		var tess = verb.eval.nurbs.rational_curve_adaptive_sample( crv.degree, crv.knots, crv.control_points, 1e-8  );
+
+		for (var j = 0; j < pts.length; j++){
+
+			var min = Number.MAX_VALUE;
+			for (var i = 1; i < tess.length; i++){
+
+				var pt = pts[j];
+				var o = tess[i-1];
+				var r = numeric.normalized( numeric.sub( tess[i], tess[i-1] ) );
+
+				var res = verb.eval.geom.closest_point_on_ray( pt, o, r );
+
+				// console.log(res)
+
+				var dist = numeric.norm2( numeric.sub( pts[j], res ) );
+
+				if (dist < min) {
+					min = dist;
+				}
+
+			}
+
+			min.should.be.lessThan( 1e-3 );
+
+		}
+
+	});
+});
+
 
 
 // describe("verb.eval.nurbs.AdaptiveRefinementNode.divide",function(){
