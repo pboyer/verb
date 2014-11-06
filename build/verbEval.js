@@ -1997,7 +1997,7 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.divide = function( options, cur
 // This defines verb's core geometry library which is called by the current Engine.
 
 
-verb.eval.nurbs.rational_interp_curve = function( points ) {
+verb.eval.nurbs.rational_interp_curve = function( points, degree ) {
 
 	// 0) build knot vector for curve by normalized chord length
 	// 1) construct effective weights in square matrix (W)
@@ -2008,8 +2008,7 @@ verb.eval.nurbs.rational_interp_curve = function( points ) {
 
 	// 4) solve for c in all 3 dimensions
 
-	var degree = 3;
-
+	degree = degree || 3;
 	
 	var us = [ 0 ]; 
 	for (var i = 1; i < points.length; i++){
@@ -2026,18 +2025,23 @@ verb.eval.nurbs.rational_interp_curve = function( points ) {
 		us[i] = us[i] / max;
 	}
 
-	// fixed
-	var knotsStart = [ 0, 0, 0, 0 ];
+	var knotsStart = numeric.rep( [ degree + 1 ], 0 ); // [ 0, 0, 0, 0 ];
 
 	var n = points.length - 1;
 	var innerKnotNum = n - degree;
 
-	for (var i = 1; i < us.length - degree; i++){
 
-		knotsStart.push( (1/3) * ( us[i] + us[i+1] + us[i+2] ));
+	for (var i = 1, l = us.length - degree; i < l; i++){
+
+		var weightSums = 0;
+		for (var j = 0; j < degree; j++){
+			weightSums += us[i + j]
+		}
+
+		knotsStart.push( (1 / degree) * weightSums );
 	}
 
-	var knots = knotsStart.concat( [ 1, 1, 1, 1 ] );
+	var knots = knotsStart.concat( numeric.rep( [ degree + 1 ], 1 ) );
 
 	// build matrix of basis function coeffs (TODO: use sparse rep)
 	var A = [];
@@ -2067,6 +2071,7 @@ verb.eval.nurbs.rational_interp_curve = function( points ) {
 		xs.push(x);
 	}
 
+	// homogenous control points
 	var controlPts = numeric.transpose(xs).map(function(x){ x.push(1); return x; });
 
 	return { control_points: controlPts, knots: knots, degree: degree };

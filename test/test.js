@@ -4734,12 +4734,12 @@ describe("verb.eval.nurbs.compute_rational_surface_max_edge_length",function(){
 
 describe("verb.eval.nurbs.rational_interp_curve",function(){
 
-	it('can compute valid interp curve for 4 points', function(){
-
-		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ]; 
-		var crv = verb.eval.nurbs.rational_interp_curve( pts );
+	function shouldInterpPoints(pts, degree){
 
 		// interpolates the end points
+		var crv = verb.eval.nurbs.rational_interp_curve( pts, degree );
+
+		crv.degree.should.be.equal( degree );
 
 		crv.control_points[0][0].should.be.approximately(pts[0][0], verb.TOLERANCE);
 		crv.control_points[0][1].should.be.approximately(pts[0][1], verb.TOLERANCE);
@@ -4749,7 +4749,7 @@ describe("verb.eval.nurbs.rational_interp_curve",function(){
 		crv.control_points[last][0].should.be.approximately(pts[last][0], verb.TOLERANCE);
 		crv.control_points[last][1].should.be.approximately(pts[last][1], verb.TOLERANCE);
 
-		// the internal points are hit (TODO: do this more efficiently)
+		// the internal points are interped (TODO: do this more efficiently)
 		var tess = verb.eval.nurbs.rational_curve_adaptive_sample( crv.degree, crv.knots, crv.control_points, 1e-8  );
 
 		for (var j = 0; j < pts.length; j++){
@@ -4773,6 +4773,36 @@ describe("verb.eval.nurbs.rational_interp_curve",function(){
 			min.should.be.lessThan( 1e-3 );
 
 		}
+	}
+
+	it('can compute valid cubic interpolating curve for 4 points', function(){
+
+		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ]; 
+
+		shouldInterpPoints( pts, 3 );
+
+	});
+
+	it('can compute valid quadratic interpolating curve for 4 points', function(){
+
+		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ]; 
+
+		shouldInterpPoints( pts, 2 );
+
+	});
+
+	it('can compute valid cubic interpolating curve for 100 points', function(){
+
+		var pts = [];
+		for (var i = 0; i < 100; i++){
+
+			pts.push( [ 50 * Math.sin( (i / 100) * Math.PI ),
+									50 * Math.cos( (i / 100) * Math.PI ), 
+									0 ]);
+
+		}
+
+		shouldInterpPoints( pts, 3 );
 
 	});
 });
