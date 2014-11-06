@@ -1,4 +1,26 @@
 //
+// ####curve_bezier_decompose( degree, knots, control_points, u )
+//
+// Decompose a NURBS curve into a collection of bezier's.  Useful
+// as each bezier fits into it's convex hull.  This is a useful starting
+// point for intersection, closest point, algorithms
+//
+// **params**
+// + *Number*, integer degree
+// + *Array*, array of nondecreasing knot values
+// + *Array*, array of control points
+// 
+// **returns** 
+// + *Array* of curves, defined by degree, knots, and control points
+//
+verb.eval.nurbs.curve_bezier_decompose = function( degree, knots, control_points ) {
+
+	// find all of the unique knot values and their multiplicity
+	// for each, increase their multiplicity to degree + 1
+	
+}
+
+//
 // ####curve_split( degree, knots, control_points, u )
 //
 // Split a curve into two parts

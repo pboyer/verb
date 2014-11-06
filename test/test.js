@@ -4764,9 +4764,6 @@ describe("verb.eval.nurbs.rational_interp_curve",function(){
 				var r = numeric.normalized( numeric.sub( tess[i], tess[i-1] ) );
 
 				var res = verb.eval.geom.closest_point_on_ray( pt, o, r );
-
-				// console.log(res)
-
 				var dist = numeric.norm2( numeric.sub( pts[j], res ) );
 
 				if (dist < min) {
