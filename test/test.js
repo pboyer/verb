@@ -4783,6 +4783,14 @@ describe("verb.eval.nurbs.rational_interp_curve",function(){
 
 	});
 
+	it('can compute valid degree 4 interpolating curve for 4 points', function(){
+
+		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ]; 
+
+		shouldInterpPoints( pts, 4 );
+
+	});
+
 	it('can compute valid quadratic interpolating curve for 4 points', function(){
 
 		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ]; 
