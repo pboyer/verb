@@ -2234,7 +2234,8 @@ verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb = function( crv_point
 
 	// check if two bounding boxes intersect
 	var pl_bb = new verb.geom.BoundingBox( crv_points )
-		, mesh_bb = verb.eval.mesh.make_mesh_aabb( mesh.points, mesh.faces, included_faces );
+		, mesh_bb = verb.eval.mesh.make_mesh_aabb( mesh.points, mesh.faces, included_faces )
+		, rec = verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb;
 
 	// if bounding boxes do not intersect, return empty array
 	if ( !pl_bb.intersects( mesh_bb, tol ) ) {
@@ -2278,8 +2279,8 @@ verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb = function( crv_point
 			, crv_param_points_a = verb.left( crv_param_points )
 			, crv_param_points_b = verb.rightWithPivot( crv_param_points );
 
-		return 	 verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points_a, crv_param_points_a, mesh, included_faces, tol )
-		.concat( verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points_b, crv_param_points_b, mesh, included_faces, tol ) );
+		return 	 rec( crv_points_a, crv_param_points_a, mesh, included_faces, tol )
+		.concat( rec( crv_points_b, crv_param_points_b, mesh, included_faces, tol ) );
 
 	
 	} else if ( crv_points.length === 2 ) {
@@ -2291,8 +2292,8 @@ verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb = function( crv_point
 			, included_faces_a = verb.left( sorted_included_faces )
 			, included_faces_b = verb.right( sorted_included_faces );
 
-		return 		 verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points, crv_param_points, mesh, included_faces_a, tol )
-			.concat( verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points, crv_param_points, mesh, included_faces_b, tol ));
+		return 		 rec( crv_points, crv_param_points, mesh, included_faces_a, tol )
+			.concat( rec( crv_points, crv_param_points, mesh, included_faces_b, tol ));
 
 
 	} else { 
@@ -2310,10 +2311,10 @@ verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb = function( crv_point
 			, crv_param_points_a = verb.left( crv_param_points )
 			, crv_param_points_b = verb.rightWithPivot( crv_param_points );
 
-		return 	 	 verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points_a, crv_param_points_a, mesh, included_faces_a, tol )
-			.concat( verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points_a, crv_param_points_a, mesh, included_faces_b, tol ) )
-			.concat( verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points_b, crv_param_points_b, mesh, included_faces_a, tol ) )
-			.concat( verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points_b, crv_param_points_b, mesh, included_faces_b, tol ) );
+		return 	 	 rec( crv_points_a, crv_param_points_a, mesh, included_faces_a, tol )
+			.concat( rec( crv_points_a, crv_param_points_a, mesh, included_faces_b, tol ) )
+			.concat( rec( crv_points_b, crv_param_points_b, mesh, included_faces_a, tol ) )
+			.concat( rec( crv_points_b, crv_param_points_b, mesh, included_faces_b, tol ) );
 
 	}
 
@@ -4556,22 +4557,37 @@ verb.eval.nurbs.curve_bezier_decompose = function( degree, knots, control_points
 	// for each, increase their multiplicity to degree + 1
 
 	var mults = verb.eval.nurbs.knot_multiplicities( knots );
-	var reqKnots = degree + 1;
+	var reqMult = degree + 1;
 	var refine = verb.eval.nurbs.curve_knot_refine;
 
+	// insert the knots
+	for (var i = 0; i < mults.length; i++){
+		if ( mults[i][1] < reqMult ){
 
-	for (var i = 0; i < mults; i++){
+			var knotsInsert = numeric.rep( [ reqMult - mults[i][1] ], mults[i][0] );
+			var res = refine( degree, knots, control_points, knotsInsert );
 
-		// if ( mults[i][1] <  )
+			knots = res.knots;
+			control_points = res.control_points;
 
+		}
+	}
 
-		// var res = refine( degree, knots, control_points, numeric.repeat(numKnots) );
+	var numCrvs = knots.length / reqMult - 1;
+	var crvKnotLength = reqMult * 2;
 
-		// knots = 
+	var crvs = [];
+
+	for (var i = 0; i < control_points.length; i += reqMult ){
+
+		var kts = knots.slice( i, i + crvKnotLength );
+		var pts = control_points.slice( i, i + reqMult );
+
+		crvs.push( { degree : degree, knots: kts, control_points: pts } );
 
 	}
 
-	// split each curve
+	return crvs;
 
 }
 

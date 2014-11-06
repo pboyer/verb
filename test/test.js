@@ -4803,6 +4803,36 @@ describe("verb.eval.nurbs.knot_multiplicities",function(){
 	});
 });
 
+describe("verb.eval.nurbs.curve_bezier_decompose",function(){
+
+	it('is correct for a basic example', function(){
+
+		var degree = 3
+			, knots = [ 0, 0, 0, 0, 1, 2, 3, 4, 5, 5, 5, 5 ];
+
+		var control_points = [];
+		for (var i = 0; i < 8; i++) {
+			control_points.push([i, 0, 0]);
+		} 
+
+		var res = verb.eval.nurbs.curve_bezier_decompose( degree, knots, control_points );
+
+		res.length.should.be.equal( 5 );
+
+		res.forEach(function(x){
+			
+			var u0 = x.knots[0];
+
+			var pt0 = verb.eval.nurbs.curve_point( x.degree, x.knots, x.control_points, u0);
+			var pt1 = verb.eval.nurbs.curve_point( degree, knots, control_points, u0);
+
+			( numeric.norm2(numeric.sub(pt0, pt1))).should.be.approximately(0, verb.TOLERANCE );
+
+		});
+
+	});
+});
+
 
 
 // describe("verb.eval.nurbs.AdaptiveRefinementNode.divide",function(){

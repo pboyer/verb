@@ -19,22 +19,37 @@ verb.eval.nurbs.curve_bezier_decompose = function( degree, knots, control_points
 	// for each, increase their multiplicity to degree + 1
 
 	var mults = verb.eval.nurbs.knot_multiplicities( knots );
-	var reqKnots = degree + 1;
+	var reqMult = degree + 1;
 	var refine = verb.eval.nurbs.curve_knot_refine;
 
+	// insert the knots
+	for (var i = 0; i < mults.length; i++){
+		if ( mults[i][1] < reqMult ){
 
-	for (var i = 0; i < mults; i++){
+			var knotsInsert = numeric.rep( [ reqMult - mults[i][1] ], mults[i][0] );
+			var res = refine( degree, knots, control_points, knotsInsert );
 
-		// if ( mults[i][1] <  )
+			knots = res.knots;
+			control_points = res.control_points;
 
+		}
+	}
 
-		// var res = refine( degree, knots, control_points, numeric.repeat(numKnots) );
+	var numCrvs = knots.length / reqMult - 1;
+	var crvKnotLength = reqMult * 2;
 
-		// knots = 
+	var crvs = [];
+
+	for (var i = 0; i < control_points.length; i += reqMult ){
+
+		var kts = knots.slice( i, i + crvKnotLength );
+		var pts = control_points.slice( i, i + reqMult );
+
+		crvs.push( { degree : degree, knots: kts, control_points: pts } );
 
 	}
 
-	// split each curve
+	return crvs;
 
 }
 

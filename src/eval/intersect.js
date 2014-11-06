@@ -173,7 +173,8 @@ verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb = function( crv_point
 
 	// check if two bounding boxes intersect
 	var pl_bb = new verb.geom.BoundingBox( crv_points )
-		, mesh_bb = verb.eval.mesh.make_mesh_aabb( mesh.points, mesh.faces, included_faces );
+		, mesh_bb = verb.eval.mesh.make_mesh_aabb( mesh.points, mesh.faces, included_faces )
+		, rec = verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb;
 
 	// if bounding boxes do not intersect, return empty array
 	if ( !pl_bb.intersects( mesh_bb, tol ) ) {
@@ -217,8 +218,8 @@ verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb = function( crv_point
 			, crv_param_points_a = verb.left( crv_param_points )
 			, crv_param_points_b = verb.rightWithPivot( crv_param_points );
 
-		return 	 verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points_a, crv_param_points_a, mesh, included_faces, tol )
-		.concat( verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points_b, crv_param_points_b, mesh, included_faces, tol ) );
+		return 	 rec( crv_points_a, crv_param_points_a, mesh, included_faces, tol )
+		.concat( rec( crv_points_b, crv_param_points_b, mesh, included_faces, tol ) );
 
 	
 	} else if ( crv_points.length === 2 ) {
@@ -230,8 +231,8 @@ verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb = function( crv_point
 			, included_faces_a = verb.left( sorted_included_faces )
 			, included_faces_b = verb.right( sorted_included_faces );
 
-		return 		 verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points, crv_param_points, mesh, included_faces_a, tol )
-			.concat( verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points, crv_param_points, mesh, included_faces_b, tol ));
+		return 		 rec( crv_points, crv_param_points, mesh, included_faces_a, tol )
+			.concat( rec( crv_points, crv_param_points, mesh, included_faces_b, tol ));
 
 
 	} else { 
@@ -249,10 +250,10 @@ verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb = function( crv_point
 			, crv_param_points_a = verb.left( crv_param_points )
 			, crv_param_points_b = verb.rightWithPivot( crv_param_points );
 
-		return 	 	 verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points_a, crv_param_points_a, mesh, included_faces_a, tol )
-			.concat( verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points_a, crv_param_points_a, mesh, included_faces_b, tol ) )
-			.concat( verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points_b, crv_param_points_b, mesh, included_faces_a, tol ) )
-			.concat( verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( crv_points_b, crv_param_points_b, mesh, included_faces_b, tol ) );
+		return 	 	 rec( crv_points_a, crv_param_points_a, mesh, included_faces_a, tol )
+			.concat( rec( crv_points_a, crv_param_points_a, mesh, included_faces_b, tol ) )
+			.concat( rec( crv_points_b, crv_param_points_b, mesh, included_faces_a, tol ) )
+			.concat( rec( crv_points_b, crv_param_points_b, mesh, included_faces_b, tol ) );
 
 	}
 
