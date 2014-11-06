@@ -1,3 +1,5 @@
+"use strict";
+
 // browser context
 if ( typeof exports != 'object' || exports === undefined )  
 {

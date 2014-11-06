@@ -1166,7 +1166,7 @@ verb.eval.geom.intersect_tris = function( points1, tri1, uvs1, points2, tri2, uv
 // **returns** 
 // + *Array*, first element of array is an array of positions, second element are 3-tuple of triangle windings, third element is the 
 // uvs
-verb.eval.nurbs.tessellate_rational_surface_uniform_cubic = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, homo_control_points, tol ){
+verb.eval.nurbs.tessellate_rational_surface_uniform_cubic = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, tol ){
 
 	if (degree_u < 3 || degree_v < 3) throw new Error("The surface must be degree >=3 in both directions!")
 
@@ -2619,7 +2619,23 @@ verb.eval.nurbs.curve_bezier_decompose = function( degree, knots, control_points
 	// find all of the unique knot values and their multiplicity
 	// for each, increase their multiplicity to degree + 1
 
+	var mults = verb.eval.nurbs.knot_multiplicities( knots );
+	var reqKnots = degree + 1;
+	var refine = verb.eval.nurbs.curve_knot_refine;
 
+
+	for (var i = 0; i < mults; i++){
+
+		// if ( mults[i][1] <  )
+
+
+		// var res = refine( degree, knots, control_points, numeric.repeat(numKnots) );
+
+		// knots = 
+
+	}
+
+	// split each curve
 
 }
 
@@ -2740,7 +2756,7 @@ verb.eval.nurbs.curve_knot_refine = function( degree, knots, control_points, kno
 	}
 
 	i = b + degree - 1;
-	k = b + degree + r;
+	var k = b + degree + r;
 
 	for (j=r; j>=0; j--) {
 

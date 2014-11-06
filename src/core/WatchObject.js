@@ -24,16 +24,16 @@ verb.core.WatchObject = function() {
 
 		if (typeof name === "string"){
 
-			for (ele in watchers[name]){
+			for (var ele in watchers[name]){
 				watchers[name][ele]( updateObject );
 			}
 
-			for (ele in watchers["change"]){
+			for (var ele in watchers["change"]){
 				watchers["change"][ele]( updateObject );
 			}
 			
 		} else {
-			for (n in name){
+			for (var n in name){
 				report( n, updateObject );
 			}
 		}
@@ -85,7 +85,7 @@ verb.core.WatchObject = function() {
 
 		var oldVals = {};
 
-		for ( propName in propertyNameValuePairs ){
+		for ( var propName in propertyNameValuePairs ){
 			oldVals[propName] = properties[propName];
 			properties[propName] = propertyNameValuePairs[propName];
 			watchers[propName] = watchers[propName] || {};

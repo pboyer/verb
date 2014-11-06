@@ -18,7 +18,23 @@ verb.eval.nurbs.curve_bezier_decompose = function( degree, knots, control_points
 	// find all of the unique knot values and their multiplicity
 	// for each, increase their multiplicity to degree + 1
 
+	var mults = verb.eval.nurbs.knot_multiplicities( knots );
+	var reqKnots = degree + 1;
+	var refine = verb.eval.nurbs.curve_knot_refine;
 
+
+	for (var i = 0; i < mults; i++){
+
+		// if ( mults[i][1] <  )
+
+
+		// var res = refine( degree, knots, control_points, numeric.repeat(numKnots) );
+
+		// knots = 
+
+	}
+
+	// split each curve
 
 }
 
@@ -139,7 +155,7 @@ verb.eval.nurbs.curve_knot_refine = function( degree, knots, control_points, kno
 	}
 
 	i = b + degree - 1;
-	k = b + degree + r;
+	var k = b + degree + r;
 
 	for (j=r; j>=0; j--) {
 

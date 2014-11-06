@@ -18,7 +18,7 @@
 // **returns** 
 // + *Array*, first element of array is an array of positions, second element are 3-tuple of triangle windings, third element is the 
 // uvs
-verb.eval.nurbs.tessellate_rational_surface_uniform_cubic = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, homo_control_points, tol ){
+verb.eval.nurbs.tessellate_rational_surface_uniform_cubic = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, tol ){
 
 	if (degree_u < 3 || degree_v < 3) throw new Error("The surface must be degree >=3 in both directions!")
 

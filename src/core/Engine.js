@@ -101,7 +101,6 @@ verb.core.Engine = function(options) {
 			return true;
 		} else if ( !use_pool ) {
 			_pool = null;
-			delete _pool;
 			return true;
 		} else {
 			return false;
