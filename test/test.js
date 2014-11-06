@@ -4732,8 +4732,6 @@ describe("verb.eval.nurbs.compute_rational_surface_max_edge_length",function(){
 	});
 });
 
-// verb.eval.nurbs.interp_curve = function( points ) 
-
 describe("verb.eval.nurbs.rational_interp_curve",function(){
 
 	it('can compute valid interp curve for 4 points', function(){
@@ -4775,6 +4773,32 @@ describe("verb.eval.nurbs.rational_interp_curve",function(){
 			min.should.be.lessThan( 1e-3 );
 
 		}
+
+	});
+});
+
+describe("verb.eval.nurbs.knot_multiplicities",function(){
+
+	it('is correct for a basic example', function(){
+
+		var res = verb.eval.nurbs.knot_multiplicities( [ 0, 0, 0, 0, 1, 1, 2, 2, 2, 3, 3.3] );
+
+		res.length.should.be.equal( 5 );
+
+		res[0][0].should.be.equal( 0 );
+		res[0][1].should.be.equal( 4 );
+
+		res[1][0].should.be.equal( 1 );
+		res[1][1].should.be.equal( 2 );
+
+		res[2][0].should.be.equal( 2 );
+		res[2][1].should.be.equal( 3 );
+
+		res[3][0].should.be.equal( 3 );
+		res[3][1].should.be.equal( 1 );
+
+		res[4][0].should.be.equal( 3.3 );
+		res[4][1].should.be.equal( 1 );
 
 	});
 });

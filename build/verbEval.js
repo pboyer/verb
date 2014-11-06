@@ -2600,6 +2600,64 @@ verb.eval.nurbs.get_arc = function( center, xaxis, yaxis, radius, start_angle, e
 
 
 //
+// ####curve_bezier_decompose( degree, knots, control_points )
+//
+// Decompose a NURBS curve into a collection of bezier's.  Useful
+// as each bezier fits into it's convex hull.  This is a useful starting
+// point for intersection, closest point, algorithms
+//
+// **params**
+// + *Number*, integer degree
+// + *Array*, array of nondecreasing knot values
+// + *Array*, array of control points
+// 
+// **returns** 
+// + *Array* of curves, defined by degree, knots, and control points
+//
+verb.eval.nurbs.curve_bezier_decompose = function( degree, knots, control_points ) {
+
+	// find all of the unique knot values and their multiplicity
+	// for each, increase their multiplicity to degree + 1
+
+
+
+}
+
+//
+// ####knot_multiplicities( knots )
+//
+// Determine the multiplicities of the values in a knot vector
+//
+// **params**
+// + *Array*, array of nondecreasing knot values
+// 
+// **returns** 
+// + *Array* of length 2 arrays, [knotValue, knotMultiplicity]
+//
+verb.eval.nurbs.knot_multiplicities = function(knots){
+
+	// initialize
+	var mults = [ [ knots[0], 0 ] ];
+	var curr = mults[0];
+
+	for (var i = 0; i < knots.length; i++){
+
+		if ( (Math.abs(knots[i] - curr[0])) > verb.EPSILON ){
+
+			curr = [knots[i], 0];
+			mults.push(curr);
+
+		} 
+
+		curr[1]++;
+
+	}
+
+	return mults;
+
+}
+
+//
 // ####curve_split( degree, knots, control_points, u )
 //
 // Split a curve into two parts
