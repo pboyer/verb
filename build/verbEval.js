@@ -489,9 +489,6 @@ verb.eval.geom.intersect_segment_with_plane = function( p0, p1, v0, n ) {
 
 }
 
-
-
-
 //
 // ####intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1, aabb_tree2 )
 //
@@ -1025,8 +1022,6 @@ verb.eval.geom.intersect_rays = function( a0, a, b0, b ) {
  }
 
 
-
-
 //
 // ####intersect_meshes_by_aabb( points1, tris1, uvs1, points2, tris2, uvs2 )
 //
@@ -1125,7 +1120,6 @@ verb.eval.geom.intersect_tris = function( points1, tri1, uvs1, points2, tri2, uv
   }
 
   // all intersections should be with uv's 
-
   if ( seg_int_results.length === 0 ) {
 
   	// tri1 is intersecting and the intersection segment
@@ -1156,6 +1150,44 @@ verb.eval.geom.intersect_tris = function( points1, tri1, uvs1, points2, tri2, uv
   } 
 
 }
+
+
+verb.eval.geom.intersect_tri_with_tri = function(){
+
+	// intersect with plane_with_plane to yield ray, then clip the ray within the two triangles to yield a segment
+
+
+	// intersect ray with segment
+
+
+}
+
+verb.eval.geom.intersect_plane_with_plane = function(o0, n0, o1, n1){
+
+	var d = numeric.cross(n0, n1);
+
+	if (numeric.dot(d, d) < verb.EPSILON) return null;
+
+	var d11 = numeric.dot( n0, n0 );
+	var d12 = numeric.dot( n0, n1 );
+	var d22 = numeric.dot( n1, n1 );
+
+	// rhs of the plane equation: dot( n, X ) = d
+	var d0 = numeric.dot( o0, n0 );
+	var d1 = numeric.dot( o1, n1 );
+
+	var denom = d11 * d22 - d12 * d22;
+	var k1 = ( d0 * d22 - d1 * d12 ) / denom;
+	var k2 = ( d1 * d11 - d0 * d12 ) / denom;
+
+	var p = numeric.add( numeric.mul( k1, n0 ), numeric.mul(k2, n1) );
+
+	return { origin: o, dir : d };
+
+}
+
+
+
 //
 // ####tessellate_rational_surface_uniform_cubic( degree_u, knots_u, degree_v, knots_v, homo_control_points, tol )
 //
