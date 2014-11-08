@@ -4818,10 +4818,11 @@ describe("verb.geom.InterpCurve",function(){
 
 	function shouldInterpPoints(pts, degree){
 
-		// interpolates the end points
 		var crv = new verb.geom.InterpCurve( pts, degree );
 
-		// // the internal points are interped
+		crv.get('degree').should.be.equal( degree );
+
+		// the points are interped
 		var tess = crv.tessellate();
 
 		for (var j = 0; j < pts.length; j++){
@@ -4851,7 +4852,7 @@ describe("verb.geom.InterpCurve",function(){
 
 		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ]; 
 
-		shouldInterpPoints( pts, 3 );
+		shouldInterpPoints( pts, 2 );
 
 	});
 

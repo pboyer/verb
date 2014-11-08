@@ -40,7 +40,7 @@
 		var srf = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
 
 		// verb.NurbsSurface -> THREE.Geometry
-		function tessellate() {
+		function tessellate(srf) {
 
 			var tess = srf.tessellate();
 
@@ -71,7 +71,7 @@
 
 		var geometry = tessellate(srf);
 
-		var material = new THREE.MeshNormalMaterial( { side: THREE.DoubleSide, shading: THREE.SmoothShading, wireframe: true } );
+		var material = new THREE.MeshNormalMaterial( { side: THREE.DoubleSide, shading: THREE.SmoothShading } );
 		var mesh = new THREE.Mesh( geometry, material );
 
 		scene.add( mesh );
