@@ -1526,7 +1526,7 @@ verb.eval.nurbs.rational_curve_adaptive_sample = function( degree, knots, contro
 		}
 	}
 
-	return verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knots, control_points, 0, 1.0, tol, include_u );
+	return verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knots, control_points, knots[0], knots[knots.length-1], tol, include_u );
 
 }
 
