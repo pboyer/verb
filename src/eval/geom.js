@@ -76,10 +76,10 @@ verb.eval.nurbs.rational_interp_curve = function( points, degree ) {
 		xs.push(x);
 	}
 
-	// homogenous control points
-	var controlPts = numeric.transpose(xs).map(function(x){ x.push(1); return x; });
+	var controlPts = numeric.transpose(xs);
+	var weights = numeric.rep([controlPts.length], 1);
 
-	return { control_points: controlPts, knots: knots, degree: degree };
+	return { control_points: controlPts, knots: knots, degree: degree, weights: weights };
 
 }
 

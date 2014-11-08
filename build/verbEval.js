@@ -1996,11 +1996,10 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.divide = function( options, cur
 // ###verb.eval
 // This defines verb's core geometry library which is called by the current Engine.
 
-
 verb.eval.nurbs.rational_interp_curve = function( points, degree ) {
 
 	// 0) build knot vector for curve by normalized chord length
-	// 1) construct effective weights in square matrix (W)
+	// 1) construct effective basis function in square matrix (W)
 	// 2) construct set of coordinattes to interpolate vector (p)
 	// 3) set of control points (c)
 
@@ -2071,10 +2070,10 @@ verb.eval.nurbs.rational_interp_curve = function( points, degree ) {
 		xs.push(x);
 	}
 
-	// homogenous control points
-	var controlPts = numeric.transpose(xs).map(function(x){ x.push(1); return x; });
+	var controlPts = numeric.transpose(xs);
+	var weights = numeric.rep([controlPts.length], 1);
 
-	return { control_points: controlPts, knots: knots, degree: degree };
+	return { control_points: controlPts, knots: knots, degree: degree, weights: weights };
 
 }
 

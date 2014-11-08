@@ -4716,8 +4716,6 @@ describe("verb.eval.nurbs.compute_rational_surface_max_edge_length",function(){
 
 	it('not sure how to test this yet :|', function(){
 
-		// attempt
-
 		var p = 3
 			, q = 3
 			, u = [0, 0, 0, 0, 1, 1, 1, 1]
@@ -4749,8 +4747,9 @@ describe("verb.eval.nurbs.rational_interp_curve",function(){
 		crv.control_points[last][0].should.be.approximately(pts[last][0], verb.TOLERANCE);
 		crv.control_points[last][1].should.be.approximately(pts[last][1], verb.TOLERANCE);
 
-		// the internal points are interped (TODO: do this more efficiently)
-		var tess = verb.eval.nurbs.rational_curve_adaptive_sample( crv.degree, crv.knots, crv.control_points, 1e-8  );
+		// // the internal points are interped (TODO: do this more efficiently)
+		var tess = verb.eval.nurbs.rational_curve_adaptive_sample( crv.degree, crv.knots, 
+			verb.eval.nurbs.homogenize_1d( crv.control_points, crv.weights ), 1e-8  );
 
 		for (var j = 0; j < pts.length; j++){
 
@@ -4813,6 +4812,49 @@ describe("verb.eval.nurbs.rational_interp_curve",function(){
 		shouldInterpPoints( pts, 3 );
 
 	});
+});
+
+describe("verb.geom.InterpCurve",function(){
+
+	function shouldInterpPoints(pts, degree){
+
+		// interpolates the end points
+		var crv = new verb.geom.InterpCurve( pts, degree );
+
+		// // the internal points are interped
+		var tess = crv.tessellate();
+
+		for (var j = 0; j < pts.length; j++){
+
+			var min = Number.MAX_VALUE;
+			for (var i = 1; i < tess.length; i++){
+
+				var pt = pts[j];
+				var o = tess[i-1];
+				var r = numeric.normalized( numeric.sub( tess[i], tess[i-1] ) );
+
+				var res = verb.eval.geom.closest_point_on_ray( pt, o, r );
+				var dist = numeric.norm2( numeric.sub( pts[j], res ) );
+
+				if (dist < min) {
+					min = dist;
+				}
+
+			}
+
+			min.should.be.lessThan( 1e-3 );
+
+		}
+	}
+
+	it('can compute valid cubic interpolating curve for 4 points', function(){
+
+		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ]; 
+
+		shouldInterpPoints( pts, 3 );
+
+	});
+
 });
 
 describe("verb.eval.nurbs.knot_multiplicities",function(){
