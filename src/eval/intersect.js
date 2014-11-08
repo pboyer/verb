@@ -368,11 +368,34 @@ verb.eval.geom.intersect_tri_with_tri = function(){
 
 	// intersect with plane_with_plane to yield segment, then clip the segment within the two triangles
 
+
+
+
 }
+
+
 
 verb.eval.gem.intersect_plane_with_plane = function(o0, n0, o1, n1){
 
-	
+	var d = numeric.cross(n0, n1);
+
+	if (numeric.dot(d, d) < verb.EPSILON) return null;
+
+	var d11 = numeric.dot( n0, n0 );
+	var d12 = numeric.dot( n0, n1 );
+	var d22 = numeric.dot( n1, n1 );
+
+	// rhs of the plane equation: dot( n, X ) = d
+	var d0 = numeric.dot( o0, n0 );
+	var d1 = numeric.dot( o1, n1 );
+
+	var denom = d11 * d22 - d12 * d22;
+	var k1 = ( d0 * d22 - d1 * d12 ) / denom;
+	var k2 = ( d1 * d11 - d0 * d12 ) / denom;
+
+	var p = numeric.add( numeric.mul( k1, n0 ), numeric.mul(k2, n1) );
+
+	return { origin: o, dir : d };
 
 }
 
