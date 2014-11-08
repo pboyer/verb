@@ -32,7 +32,7 @@ verb.EPSILON = 1e-8;
 //
 // Default tolerance for geometric operations - defines "close enough" 
 // for tesselation, intersection, and more
-verb.TOLERANCE = 1e-3;
+verb.TOLERANCE = 1e-6;
 
 // ####init()
 //

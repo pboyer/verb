@@ -29,10 +29,14 @@
 // 	- a "face" the index of the face where the intersection took place
 //
 
-verb.eval.nurbs.intersect_rational_curve_surface_by_aabb_refine = function( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, sample_tol, tol, divs_u, divs_v ) {
+verb.eval.nurbs.intersect_rational_curve_surface_by_aabb_refine = function( degree_u, knots_u, degree_v, 
+	knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, sample_tol, tol, 
+	divs_u, divs_v ) {
 
 	// get the approximate intersections
-	var ints = verb.eval.nurbs.intersect_rational_curve_surface_by_aabb( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, sample_tol, tol, divs_u, divs_v );
+	var ints = verb.eval.nurbs.intersect_rational_curve_surface_by_aabb( degree_u, knots_u, degree_v, 
+		knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, sample_tol, tol, 
+		divs_u, divs_v );
 
 	// refine them
 	return ints.map(function( inter ){
@@ -360,6 +364,9 @@ verb.eval.geom.intersect_segment_with_plane = function( p0, p1, v0, n ) {
 
 }
 
+
+
+
 //
 // ####intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1, aabb_tree2 )
 //
@@ -381,6 +388,8 @@ verb.eval.geom.intersect_aabb_trees = function( points1, tris1, points2, tris2, 
 
   var intersects = aabb_tree1.bounding_box.intersects( aabb_tree2.bounding_box );
 
+  var recur = verb.eval.geom.intersect_aabb_trees;
+
   if (!intersects){
   	return [];
   }
@@ -391,20 +400,20 @@ verb.eval.geom.intersect_aabb_trees = function( points1, tris1, points2, tris2, 
 
   } else if (aabb_tree1.children.length === 0 && aabb_tree2.children.length != 0){
 
-  	return     verb.eval.geom.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1, aabb_tree2.children[0] )
-  		.concat( verb.eval.geom.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1, aabb_tree2.children[1] ) );
+  	return     recur( points1, tris1, points2, tris2, aabb_tree1, aabb_tree2.children[0] )
+  		.concat( recur( points1, tris1, points2, tris2, aabb_tree1, aabb_tree2.children[1] ) );
 
   } else if (aabb_tree1.children.length != 0 && aabb_tree2.children.length === 0){
 
-  	return     verb.eval.geom.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[0], aabb_tree2 )
-  		.concat( verb.eval.geom.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[1], aabb_tree2 ) );
+  	return     recur( points1, tris1, points2, tris2, aabb_tree1.children[0], aabb_tree2 )
+  		.concat( recur( points1, tris1, points2, tris2, aabb_tree1.children[1], aabb_tree2 ) );
 
   } else if (aabb_tree1.children.length != 0 && aabb_tree2.children.length != 0){
 
-  	return     verb.eval.geom.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[0], aabb_tree2.children[0] )
-  		.concat( verb.eval.geom.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[0], aabb_tree2.children[1] ) )
-  		.concat( verb.eval.geom.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[1], aabb_tree2.children[0] ) )
-  		.concat( verb.eval.geom.intersect_aabb_trees( points1, tris1, points2, tris2, aabb_tree1.children[1], aabb_tree2.children[1] ) );
+  	return     recur( points1, tris1, points2, tris2, aabb_tree1.children[0], aabb_tree2.children[0] )
+  		.concat( recur( points1, tris1, points2, tris2, aabb_tree1.children[0], aabb_tree2.children[1] ) )
+  		.concat( recur( points1, tris1, points2, tris2, aabb_tree1.children[1], aabb_tree2.children[0] ) )
+  		.concat( recur( points1, tris1, points2, tris2, aabb_tree1.children[1], aabb_tree2.children[1] ) );
 
   }
 
