@@ -2,11 +2,10 @@
 // ###verb.eval
 // This defines verb's core geometry library which is called by the current Engine.
 
-
 verb.eval.nurbs.rational_interp_curve = function( points, degree ) {
 
 	// 0) build knot vector for curve by normalized chord length
-	// 1) construct effective weights in square matrix (W)
+	// 1) construct effective basis function in square matrix (W)
 	// 2) construct set of coordinattes to interpolate vector (p)
 	// 3) set of control points (c)
 
