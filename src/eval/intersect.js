@@ -364,7 +364,17 @@ verb.eval.geom.intersect_segment_with_plane = function( p0, p1, v0, n ) {
 
 }
 
+verb.eval.geom.intersect_tri_with_tri = function(){
 
+	// intersect with plane_with_plane to yield segment, then clip the segment within the two triangles
+
+}
+
+verb.eval.gem.intersect_plane_with_plane = function(o0, n0, o1, n1){
+
+	
+
+}
 
 
 //

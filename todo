@@ -1,10 +1,11 @@
 NurbsSurface split
 	see above
-Curve interpolation
+Curve interpolation with tangents
+Curve interpolation with sparse matrices
+Curve approximation
+
+Surface-Surface intersection
+	Integrate results of intersect_aabb_trees into single polyline result
+
 Surface lofting
 Finish sweep (it's incorrect)
-Improved NurbsSurface tesselation
-	finish adaptive tesselation
-	see piegl and tiller paper
-Surface-Surface intersection
-	curve 
