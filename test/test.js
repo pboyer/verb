@@ -4918,8 +4918,8 @@ describe("verb.eval.geom.tri_uv_from_point",function(){
 
 	it('is correct for a basic example', function(){
 
-		var uvs = [ [0,0], [1,0], [Math.sqrt(2), Math.sqrt(2)] ];
-		var pts = [ [0,0,0], [1,0,0], [Math.sqrt(2), Math.sqrt(2),0] ];
+		var uvs = [ [0,0], [1,0], [1,1] ];
+		var pts = [ [0,0,0], [1,0,0], [1,1,0] ];
 		var tri = [ 0, 1, 2 ];
 		var pt = [0.5, 0.25, 0];
 
@@ -4933,38 +4933,158 @@ describe("verb.eval.geom.tri_uv_from_point",function(){
 
 describe("verb.eval.geom.intersect_planes",function(){
 
-	it('is correct for a basic example', function(){
+	it('is correct for intersection of xz and yz planes', function(){
 
+		var o1 = [0,0,0];
+		var n1 = [1,0,0];
+		var o2 = [0,0,0];
+		var n2 = [0,1,0];
 
+		var res = verb.eval.geom.intersect_planes(o1, n1, o2, n2);
+
+		res.origin.should.be.eql( [0,0,0] );
+		res.dir.should.be.eql( [0,0,1] );
 
 	});
+
+	it('is correct for intersection of xz and shifted yz plane', function(){
+
+		var o1 = [20,0,0];
+		var n1 = [1,0,0];
+		var o2 = [0,0,0];
+		var n2 = [0,1,0];
+
+		var res = verb.eval.geom.intersect_planes(o1, n1, o2, n2);
+
+		res.origin.should.be.eql( [20,0,0] );
+		res.dir.should.be.eql( [0,0,1] );
+
+	});
+
+	it('is correct for intersection of shifted xz and yz plane', function(){
+
+		var o1 = [0,0,0];
+		var n1 = [1,0,0];
+		var o2 = [0,20,0];
+		var n2 = [0,1,0];
+
+		// should be z-axis
+		var res = verb.eval.geom.intersect_planes(o1, n1, o2, n2);
+
+		res.origin.should.be.eql( [0,20,0] );
+		res.dir.should.be.eql( [0,0,1] );
+
+	});
+
+});
+
+describe("verb.eval.geom.point_on_ray",function(){
+
+	it('is correct for a basic example', function(){
+
+		var o = [1,2,3];
+		var d = [1,1,1];
+		var u = 2;
+		var res = verb.eval.geom.point_on_ray(o, d, u);
+
+		res.should.eql( [3, 4, 5] );
+
+	});
+
+});
+
+function vecShouldBe( expected, test, tol ){
+
+	if (tol === undefined) tol = verb.TOLERANCE;
+
+ 	test.length.should.be.equal( expected.length );
+
+ 	for (var i = 0; i < test.length; i++){
+
+ 		test[i].should.be.approximately( expected[i], tol );
+
+ 	}
+
+}
+
+describe("verb.eval.geom.clip_ray_in_coplanar_tri",function(){
+
+	it('is correct for a basic example', function(){
+
+		var o = [0,1,0];
+		var d = [1,0,0];
+		
+		var pts = [ [0,0,0], [2,0,0], [2, 2,0] ];
+		var tri = [ 0, 1, 2 ];
+		var uvs = [ [0,0], [2,0], [2, 2] ];
+
+		var res = verb.eval.geom.clip_ray_in_coplanar_tri(o, d, pts, tri, uvs );
+
+		res.min.u.should.be.approximately(1, verb.TOLERANCE);
+		res.max.u.should.be.approximately(2, verb.TOLERANCE);
+
+		vecShouldBe( [1,1], res.min.uv );
+		vecShouldBe( [2,1], res.max.uv );
+
+		vecShouldBe( [1,1,0], res.min.pt );
+		vecShouldBe( [2,1,0], res.max.pt );
+
+	});
+
+	// TODO: test degeneracies
+	// ray aligned with edge
+
 });
 
 describe("verb.eval.geom.merge_tri_clip_intervals",function(){
 
 	it('is correct for a basic example', function(){
 
+		var o = [0,1,0];
+		var d = [1,0,0];
 		
+		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
+		var tri1 = [ 0, 1, 2 ];
+		var uvs1 = [ [0,0], [2,0], [2, 2] ];
+
+		var clip1 = verb.eval.geom.clip_ray_in_coplanar_tri(o, d, pts1, tri1, uvs1 );
+
+		console.log(clip1);
+
+		var pts2 = [ [1,1,-1], [3,1,-1], [3,1,2] ];
+		var tri2 = [ 0, 1, 2 ];
+		var uvs2 = [ [0,0], [3,0], [3,3] ];
+		var clip2 = verb.eval.geom.clip_ray_in_coplanar_tri(o, d, pts2, tri2, uvs2 );
+
+		console.log(clip2);
+
+		var res = verb.eval.geom.merge_tri_clip_intervals(clip1, clip2, pts1, tri1, uvs1, pts2, tri2, uvs2);
+
+		console.log(res)
 
 	});
+
+	// TODO: check all failure scenarios
+
 });
-
-describe("verb.eval.geom.clip_ray_in_coplanar_tri",function(){
-
-	it('is correct for a basic example', function(){
-
-		
-
-	});
-});
-
 
 describe("verb.eval.geom.intersect_tris",function(){
 
 	it('is correct for a basic example', function(){
-
 		
+		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
+		var tri1 = [ 0, 1, 2 ];
+		var uvs1 = [ [0,0], [2,0], [2, 2] ];
+
+		var pts2 = [ [1,1,-1], [3,1,-1], [3,1,2] ];
+		var tri2 = [ 0, 1, 2 ];
+		var uvs2 = [ [0,0], [3,0], [3,3] ];
+
+		var res = verb.eval.geom.intersect_tris( pts1, tri1, uvs1, pts2, tri2, uvs2 );
+
+		console.log(res);
 
 	});
+
 });
 

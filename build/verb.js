@@ -3046,25 +3046,29 @@ verb.eval.mesh.intersect_meshes_by_aabb = function( points1, tris1, uvs1, points
 verb.eval.geom.intersect_tris = function( points1, tri1, uvs1, points2, tri2, uvs2 ){
 
 	// 0) get the plane rep of the two triangles
-	var n1 = verb.eval.geom.get_tri_norm( points1, tri1 );
-	var n2 = verb.eval.geom.get_tri_norm( points2, tri2 );
-	var o1 = points1[ tri1[0] ];
-	var o2 = points2[ tri2[0] ];
+	var n0 = verb.eval.geom.get_tri_norm( points1, tri1 );
+	var n1 = verb.eval.geom.get_tri_norm( points2, tri2 );
+	var o0 = points1[ tri1[0] ];
+	var o1 = points2[ tri2[0] ];
 
 // TODO: fail early if all of the points of tri1 are on the same side of plane of tri2
 
 	// 1) intersect with planes to yield ray of intersection
 	var ray = verb.eval.geom.intersect_planes(o0, n0, o1, n1)
-	if (!ray.intersects) return ray;
+	if (!ray.intersects) return { intersects: false };
 
 	// 2) clip the ray within tri1
 	var clip1 = verb.eval.geom.clip_ray_in_coplanar_tri( ray.origin, ray.dir, points1, tri1, uvs1 );
 
+	console.log(clip1)
+
 	// 3) clip the ray within tri2
 	var clip2 = verb.eval.geom.clip_ray_in_coplanar_tri( ray.origin, ray.dir, points2, tri2, uvs2 );
 
+	console.log(clip2)
+
 	// 4) find the interval that overlaps
-	var merged = verb.eval.geom.merge_tri_clip_intervals(clip1, clip2);
+	var merged = verb.eval.geom.merge_tri_clip_intervals(clip1, clip2, points1, tri1, uvs1, points2, tri2, uvs2 );
 
 	if (merged === null) return { intersects: false };
 
@@ -3099,11 +3103,14 @@ verb.eval.geom.clip_ray_in_coplanar_tri = function(o1, d1, points, tri, uvs ){
 
 		var res = verb.eval.geom.intersect_rays( o0, d0, o1, d1 );
 
+		// the rays are parallel
+		if (res === null) continue;
+
 		var useg = res[0];
 		var uray = res[1];
 
 		// if outside of triangle edge interval, discard
-		if (useg < 0 || u > l[i]) continue;
+		if (useg < 0 || useg > l[i]) continue;
 
 		// if inside interval
 		if (minU === null || uray < minU.u){
@@ -3166,17 +3173,17 @@ verb.eval.geom.merge_tri_clip_intervals = function(clip1, clip2, points1, tri1, 
 
 	if (max.tri === 0){
 
-		res.uv2tri1 = min.uv;
+		res.uv2tri1 = max.uv;
 		res.uv2tri2 = verb.eval.geom.tri_uv_from_point( points2, tri2, uvs2, max.pt );
 
 	} else {
 
 		res.uv2tri1 = verb.eval.geom.tri_uv_from_point( points1, tri1, uvs1, max.pt );
-		res.uv2tri2 = min.uv;
+		res.uv2tri2 = max.uv;
 
 	}
 
-	res.pt2 = min.pt;
+	res.pt2 = max.pt;
 
 	return res;
 
@@ -3202,7 +3209,7 @@ verb.eval.geom.intersect_planes = function(o1, n1, o2, n2){
 
 	var p = numeric.add( numeric.mul( k1, n1 ), numeric.mul(k2, n2) );
 
-	return { intersects: true, origin: o, dir : d };
+	return { intersects: true, origin: p, dir : d };
 
 }
 
