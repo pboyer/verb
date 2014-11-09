@@ -3043,119 +3043,193 @@ verb.eval.mesh.intersect_meshes_by_aabb = function( points1, tris1, uvs1, points
 // + *Array*, a point represented by an array of length (dim)
 //
 
-verb.eval.geom.intersect_tris = function( points1, tri1, uvs1, points2, tri2, uvs2 ) {
+verb.eval.geom.intersect_tris = function( points1, tri1, uvs1, points2, tri2, uvs2 ){
 
-  var seg1a = [ points1[ tr1[0] ], points1[ tr1[1] ] ]
-  	, seg1b = [ points1[ tr1[1] ], points1[ tr1[2] ] ]
-  	, seg1c = [ points1[ tr1[2] ], points1[ tr1[0] ] ]
-  	, seg2a = [ points2[ tr2[0] ], points2[ tr2[1] ] ]
-  	, seg2b = [ points2[ tr2[1] ], points2[ tr2[2] ] ]
-  	, seg2c = [ points2[ tr2[2] ], points2[ tr2[0] ] ] 
-  	, segs1 = [ seg1a, seg1b, seg1c ]
-  	, segs2 = [ seg2a, seg2b, seg2c ]
-  	, int_results = []
-  	, tri2norm = verb.eval.geom.get_tri_norm(points2, tri2)
-  	, pt2 = points2[ tr2[0] ];
+	// 0) get the plane rep of the two triangles
+	var n1 = verb.eval.geom.get_tri_norm( points1, tri1 );
+	var n2 = verb.eval.geom.get_tri_norm( points2, tri2 );
+	var o1 = points1[ tri1[0] ];
+	var o2 = points2[ tri2[0] ];
 
-  for (var i = 0; i < 3; i++){
-  	
-  	var result = verb.eval.geom.intersect_segment_with_plane( segs1[i][0], segs2[i][1], pt2, tri2norm );
-    
-    if ( result.intersects ){
-    	int_results.push( result );
-    }
+// TODO: fail early if all of the points of tri1 are on the same side of plane of tri2
 
-  }
+	// 1) intersect with planes to yield ray of intersection
+	var ray = verb.eval.geom.intersect_planes(o0, n0, o1, n1)
+	if (!ray.intersects) return ray;
 
-  // if you don't have 2 intersections you do not have an intersection,
-  // 0 would mean a glancing intersection
-  // 3 means we don't have a triangle
-  if ( int_results.length !== 2 ){
-  	return null;
-  }
+	// 2) clip the ray within tri1
+	var clip1 = verb.eval.geom.clip_ray_in_coplanar_tri( ray.origin, ray.dir, points1, tri1, uvs1 );
 
-  // what portions of the segment lie within triangle 2
+	// 3) clip the ray within tri2
+	var clip2 = verb.eval.geom.clip_ray_in_coplanar_tri( ray.origin, ray.dir, points2, tri2, uvs2 );
 
-  // intersect edges of triangle 2 with the segment, obtaining the "inner" triangle
-  var seg = [int_results[0].point, int_results[1].point ]
-  	, seg_int_results = [];
+	// 4) find the interval that overlaps
+	var merged = verb.eval.geom.merge_tri_clip_intervals(clip1, clip2);
 
-  for (var i = 0; i < 3; i++){
-  	var seg_int_result = verb.eval.geom.intersect_segments( seg[0], seg[1], seg, b1, tol );
-  	if ( seg_int_result ){
-  		seg_int_results.push( seg_int_result );
-  	}
-  }
+	if (merged === null) return { intersects: false };
 
-  // all intersections should be with uv's 
-  if ( seg_int_results.length === 0 ) {
-
-  	// tri1 is intersecting and the intersection segment
-  	// is inside tri2
-
-  	// TODO
-
-  	// return the two outer points
-
-  } else if ( seg_int_results.length === 1 ) {
-
-  	// tri1 is intersecting and the intersection segment
-  	// is partially inside tri2
-
-  	// TODO
-
-  	// return the end point of seg that is INSIDE tri2 and the intersection
-
-  } else if ( seg_int_results.length === 2 ) {
-
-  	// tri1 is intersecting and the intersection segment's
-  	// end points are outside of tri2
-
-  	// TODO
-
-  	// return the two seg_int_results 
-
-  } 
+	return { intersects: true, 
+			 uv1tri1: merged.uv1tri1,
+			 uv2tri1: merged.uv2tri1, 
+			 uv1tri2: merged.uv1tri2, 
+			 uv2tri2: merged.uv2tri2, 
+			 pt1 : merged.pt1, 
+			 pt2 : merged.pt2 };
 
 }
 
+verb.eval.geom.clip_ray_in_coplanar_tri = function(o1, d1, points, tri, uvs ){
 
-verb.eval.geom.intersect_tri_with_tri = function(){
+	// 0) construct rays for each edge of the triangle
+	var o = [ points[ tri[0] ], points[ tri[1] ], points[ tri[2] ] ]
+		, uvs = [ uvs[ tri[0] ], uvs[ tri[1] ], uvs[ tri[2] ] ]
+		, uvd = [ numeric.sub(uvs[1], uvs[0]), numeric.sub(uvs[2], uvs[1]), numeric.sub(uvs[0], uvs[2]) ] 
+		, s = [ numeric.sub( o[1], o[0] ), numeric.sub( o[2], o[1] ), numeric.sub( o[0], o[2] ) ]
+		, d = s.map( numeric.normalized )
+		, l = s.map( numeric.norm2 )
 
-	// intersect with plane_with_plane to yield ray, then clip the ray within the two triangles to yield a segment
+	// 1) for each tri ray, if intersects and in segment interval, store minU, maxU
+	var minU = null;
+	var maxU = null;
 
+	for (var i = 0; i < 3; i++){
 
-	// intersect ray with segment
+		var o0 = o[i];
+		var d0 = d[i];
 
+		var res = verb.eval.geom.intersect_rays( o0, d0, o1, d1 );
+
+		var useg = res[0];
+		var uray = res[1];
+
+		// if outside of triangle edge interval, discard
+		if (useg < 0 || u > l[i]) continue;
+
+		// if inside interval
+		if (minU === null || uray < minU.u){
+
+			minU = { 	u: uray, 
+								pt: verb.eval.geom.point_on_ray( o1, d1, uray ),
+								uv: numeric.add( uvs[i], numeric.mul( useg / l[i], uvd[i] ) ) };
+
+		}
+
+		if (maxU === null || uray > maxU.u){
+
+			maxU = { 	u: uray, 
+								pt: verb.eval.geom.point_on_ray( o1, d1, uray ),
+								uv: numeric.add( uvs[i], numeric.mul( useg / l[i], uvd[i] ) ) };
+
+		}
+	}
+
+	if (maxU === null || minU === null) return { intersects: none };
+
+	// 3) otherwise, return minU maxU along with uv info
+	return { min : minU, max: maxU };
+	
+}
+
+verb.eval.geom.point_on_ray = function(o, d, u){
+
+	return numeric.add( o, numeric.mul( u, d ));
 
 }
 
-verb.eval.geom.intersect_plane_with_plane = function(o0, n0, o1, n1){
+verb.eval.geom.merge_tri_clip_intervals = function(clip1, clip2, points1, tri1, uvs1, points2, tri2, uvs2){
 
-	var d = numeric.cross(n0, n1);
+	// if the intervals dont overlap, fail
+	if (clip2.min.u > clip1.max.u || clip1.min.u > clip2.max.u) return null;
 
-	if (numeric.dot(d, d) < verb.EPSILON) return null;
+	// label each clip to indicate which triangle it came from
+	clip1.tri = 0;
+	clip2.tri = 1;
 
-	var d11 = numeric.dot( n0, n0 );
-	var d12 = numeric.dot( n0, n1 );
-	var d22 = numeric.dot( n1, n1 );
+	var min = (clip1.min.u > clip2.min.u) ? clip1.min : clip2.min;
+	var max = (clip1.max.u < clip2.max.u) ? clip1.max : clip2.max;
+
+	var res = {};
+
+	if (min.tri === 0){
+
+		res.uv1tri1 = min.uv;
+		res.uv1tri2 = verb.eval.geom.tri_uv_from_point( points2, tri2, uvs2, min.pt );
+
+	} else {
+
+		res.uv1tri1 = verb.eval.geom.tri_uv_from_point( points1, tri1, uvs1, min.pt );
+		res.uv1tri2 = min.uv;
+
+	}
+
+	res.pt1 = min.pt;
+
+	if (max.tri === 0){
+
+		res.uv2tri1 = min.uv;
+		res.uv2tri2 = verb.eval.geom.tri_uv_from_point( points2, tri2, uvs2, max.pt );
+
+	} else {
+
+		res.uv2tri1 = verb.eval.geom.tri_uv_from_point( points1, tri1, uvs1, max.pt );
+		res.uv2tri2 = min.uv;
+
+	}
+
+	res.pt2 = min.pt;
+
+	return res;
+
+}
+
+verb.eval.geom.intersect_planes = function(o1, n1, o2, n2){
+
+	var d = numeric.cross(n1, n2);
+
+	if (numeric.dot(d, d) < verb.EPSILON) return { intersects: false };
+
+	var d11 = numeric.dot( n1, n1 );
+	var d12 = numeric.dot( n1, n2 );
+	var d22 = numeric.dot( n2, n2 );
 
 	// rhs of the plane equation: dot( n, X ) = d
-	var d0 = numeric.dot( o0, n0 );
 	var d1 = numeric.dot( o1, n1 );
+	var d2 = numeric.dot( o2, n2 );
 
 	var denom = d11 * d22 - d12 * d22;
-	var k1 = ( d0 * d22 - d1 * d12 ) / denom;
-	var k2 = ( d1 * d11 - d0 * d12 ) / denom;
+	var k1 = ( d1 * d22 - d2* d12 ) / denom;
+	var k2 = ( d2* d11 - d1 * d12 ) / denom;
 
-	var p = numeric.add( numeric.mul( k1, n0 ), numeric.mul(k2, n1) );
+	var p = numeric.add( numeric.mul( k1, n1 ), numeric.mul(k2, n2) );
 
-	return { origin: o, dir : d };
+	return { intersects: true, origin: o, dir : d };
 
 }
 
+verb.eval.geom.tri_uv_from_point = function( points, tri, uvs, f ){
 
+	var p1 = points[ tri[0] ];
+	var p2 = points[ tri[1] ];
+	var p3 = points[ tri[2] ];
 
+	var uv1 = uvs[ tri[0] ];
+	var uv2 = uvs[ tri[1] ];
+	var uv3 = uvs[ tri[2] ];
+
+	var f1 = numeric.sub(p1, f);
+	var f2 = numeric.sub(p2, f);
+	var f3 = numeric.sub(p3, f);
+
+	// calculate the areas and factors (order of parameters doesn't matter):
+	var a = numeric.norm2( numeric.cross( numeric.sub(p1, p2), numeric.sub(p1, p3) ) ); // main triangle area a
+	var a1 = numeric.norm2( numeric.cross(f2, f3) ) / a; // p1's triangle area / a
+	var a2 = numeric.norm2( numeric.cross(f3, f1) ) / a; // p2's triangle area / a 
+	var a3 = numeric.norm2( numeric.cross(f1, f2) ) / a; // p3's triangle area / a
+
+	// find the uv corresponding to point f (uv1/uv2/uv3 are associated to p1/p2/p3):
+	return numeric.add( numeric.mul( a1, uv1), numeric.mul( a2, uv2), numeric.mul( a3, uv3) );
+
+}
 //
 // ####tessellate_rational_surface_uniform_cubic( degree_u, knots_u, degree_v, knots_v, homo_control_points, tol )
 //

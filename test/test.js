@@ -4914,5 +4914,57 @@ describe("verb.eval.nurbs.curve_bezier_decompose",function(){
 	});
 });
 
+describe("verb.eval.geom.tri_uv_from_point",function(){
 
+	it('is correct for a basic example', function(){
+
+		var uvs = [ [0,0], [1,0], [Math.sqrt(2), Math.sqrt(2)] ];
+		var pts = [ [0,0,0], [1,0,0], [Math.sqrt(2), Math.sqrt(2),0] ];
+		var tri = [ 0, 1, 2 ];
+		var pt = [0.5, 0.25, 0];
+
+		var uv = verb.eval.geom.tri_uv_from_point( pts, tri, uvs, pt );
+
+		uv[0].should.be.approximately( pt[0], verb.TOLERANCE );
+		uv[1].should.be.approximately( pt[1], verb.TOLERANCE );
+
+	});
+});
+
+describe("verb.eval.geom.intersect_planes",function(){
+
+	it('is correct for a basic example', function(){
+
+
+
+	});
+});
+
+describe("verb.eval.geom.merge_tri_clip_intervals",function(){
+
+	it('is correct for a basic example', function(){
+
+		
+
+	});
+});
+
+describe("verb.eval.geom.clip_ray_in_coplanar_tri",function(){
+
+	it('is correct for a basic example', function(){
+
+		
+
+	});
+});
+
+
+describe("verb.eval.geom.intersect_tris",function(){
+
+	it('is correct for a basic example', function(){
+
+		
+
+	});
+});
 
