@@ -1048,17 +1048,148 @@ verb.eval.mesh.intersect_meshes_by_aabb = function( points1, tris1, uvs1, points
 	  , tri_indices2 = verb.range(tris2.length)
 	  , aabb1 = verb.eval.mesh.make_mesh_aabb_tree( points1, tris1, tri_indices1 )
 	  , aabb2 = verb.eval.mesh.make_mesh_aabb_tree( points2, tris2, tri_indices2 )
-  
+ 
   // intersect and get the pairs of triangle intersctions
-		, intersection_pairs = verb.eval.mesh.intersect_aabb_tree( points1, tris1, points2, tris2, aabb1, aabb2 );
+	var bbints = verb.eval.geom.intersect_aabb_trees( points1, tris1, points2, tris2, aabb1, aabb2 )
 
 	// get the segments of the intersection crv with uvs
+	var triints = bbints.map(function(ids){
+		return verb.eval.geom.intersect_tris( points1, tris1[ ids[0] ], uvs1, points2, tris2[ ids[1] ], uvs2 );
+	});
+
+	if (triints.length === 0) return [];
+
+	// 1) put all of the triints into an fast lookup tree
+
+	// 2) construct an empty linked list
+	var first = {};
+
+	// 3) for each triint 
+
+	// rescan and link up all of the intersections
+
+	return triints;
 
 	// sort the intersection segments
 
 	// TODO
 
 }
+
+
+var df3 = function(a, b){
+  return Math.pow(a.x - b.x, 2) +  Math.pow(a.y - b.y, 2) + Math.pow(a.z - b.z, 2);
+};
+
+
+verb.eval.mesh.make_mesh_intersection_polyline = function( segments ) {
+
+	// for each segment
+	var pts = [];
+
+	// transform into two elements, each keyed by pt1 and pt2
+	segments.forEach(function(seg){
+		segments.push({ "x": seg.pt1[0], "y": seg.pt1[1], "z": seg.pt1[2], ele: seg });
+		segments.push({ "x": seg.pt2[0], "y": seg.pt2[1], "z": seg.pt2[2], ele: seg });
+	});
+
+	// make our tree
+	var tree = new kdTree(pts, df, ["x", "y", "z"]);
+
+	var lists = [];
+
+	for (var i = 0; i < segments.length; i++){
+
+		var curSeg = segments[i];
+		if (curSeg.visited) continue;
+
+		var list = [];
+
+		while (curSeg){
+
+			lists.push( curSeg );
+			curSeg.visited = true;
+
+			curSeg = verb.eval.mesh.get_next_segment( curSeg, pts, tree, "pt2" );
+
+			// if the end isn't connected we try the other direction
+			if (!curSeg) curSeg = verb.eval.mesh.get_next_segment( curSeg, pts, tree, "pt1" );
+
+		}
+
+		lists.push( list );
+
+	}
+
+	// post-process the lists, rejoining where necessary
+
+}
+
+verb.eval.mesh.get_next_segment = function( curSeg, pts, tree, prop ) {
+
+	// otherwise we want to find the next element connected to this one, we do 
+	// this by linear scan
+	var curPt = curSeg[prop];
+
+	// get nearest two segments
+	var nearest = tree.nearest({ x: curPt[0], y: curPt[1], z: curPt[2] }, 2)
+										.filter(function(seg){
+
+											if (seg.ele.visited) return false;
+
+											var s1 = numeric.sub( seg.ele.pt1, curPt );
+											var d1 = numeric.dot( s1, s1 );
+
+											if (d1 < verb.TOLERANCE) return true;
+
+											var s2 = numeric.sub( seg.ele.pt2, curPt );
+											var d2 = numeric.dot( s2, s2 );
+
+											if (d2 < verb.TOLERANCE) return true;
+
+											// this should never happen
+											return false;
+
+										});
+
+	if (nearest.length === 1){
+		return nearest.ele;
+	} 
+
+	return;
+
+}
+
+// pts = pts.map(function(x){
+// 	x.x = x.pt[0];
+// 	x.y = x.pt[1];
+// 	x.z = x.pt[2];
+// });
+
+// var tree = new kdTree(points, distance, ["x", "y"]);
+
+// var coords = [
+//   { name: 'Gramercy Theatre',
+//     loc: {lat: '40.739683', long: '73.985151'} },
+//   { name: 'Blue Note Jazz Club',
+//     loc: {lat: '40.730601', long: '74.000447'} },
+//   { name: 'Milk Studios',
+//     loc: {lat: '40.742256', long: '74.006344'} },
+//   { name: 'Greenroom Brooklyn',
+//     loc: {lat: '40.691805', long: '73.908089'} }
+// ].map(function (v) {
+//   return v.loc
+// });
+
+// var distance = function(a, b){
+//   return Math.pow(a.lat - b.lat, 2) + Math.pow(a.long - b.long, 2);
+// }
+
+// var tree = kdt.createKdTree(coords, distance, ['0', '1', '2'])
+
+// var nearest = tree.nearest({ lat: 40, long: 75 }, 4);
+
+// if ( next === null )
 
 //
 // ####intersect_tris( points1, tri1, uvs1, points2, tri2, uvs2 )

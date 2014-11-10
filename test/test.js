@@ -833,10 +833,6 @@ describe("verb.eval.mesh.get_tri_centroid",function(){
 
 	});
 
-});
-
-describe("verb.eval.mesh.get_tri_centroid",function(){
-
 	it('should return correct value', function(){
 
 		var points = [[5,10,2],[3,-4,5],[-10,-3, 10]]
@@ -915,163 +911,6 @@ describe("verb.eval.mesh.sort_tris_on_longest_axis",function(){
 		should.equal( 1, sort_tri_indices[0] );
 		should.equal( 2, sort_tri_indices[1] );
 		should.equal( 0, sort_tri_indices[2] );
-
-	});
-
-});
-
-describe("verb.eval.mesh.make_mesh_aabb",function(){
-
-	it('should return correct result for planar mesh', function(){
-
-		//
-		//  0  - 1
-		//  |  /  \
-		//  2   --  3
-		//  |  \   /
-		//  4  -  5
-		// 
-
-		var points = [ [0,0,0], [1,0,0], [0, -1, 0 ], [2, -1, 0], [0, -2, 0], [1, -2, 0] ]
-			, tris = [ [0,2,1], [1,2,3], [2,4,5], [2,5,3] ]
-			, tri_indices = [0,1,2,3]
-			, aabb = verb.eval.mesh.make_mesh_aabb(points, tris, tri_indices);
-
-		should.equal( 2, aabb.max[0] );
-		should.equal( 0, aabb.min[0] );
-		should.equal( 0, aabb.max[1] );
-		should.equal( -2, aabb.min[1] );		
-		should.equal( 0, aabb.max[2] );
-		should.equal( 0, aabb.min[2] );
-
-	});
-
-});
-
-describe("verb.eval.mesh.make_mesh_aabb",function(){
-
-	it('make_mesh_aabb should return correct result for non-planar mesh', function(){
-
-		//
-		//  0  - 1
-		//  |  /  \
-		//  2   --  3
-		//  |  \   /
-		//  4  -  5
-		// 
-
-		var points = [ [0,0,-5], [1,0,0], [0, -1, 0 ], [2, -1, 0], [0, -2, 0], [1, -2, 4] ]
-			, tris = [ [0,2,1], [1,2,3], [2,4,5], [2,5,3] ]
-			, tri_indices = [0,1,2,3]
-			, aabb = verb.eval.mesh.make_mesh_aabb(points, tris, tri_indices);
-
-		should.equal( 2, aabb.max[0] );
-		should.equal( 0, aabb.min[0] );
-		should.equal( 0, aabb.max[1] );
-		should.equal( -2, aabb.min[1] );		
-		should.equal( 4, aabb.max[2] );
-		should.equal( -5, aabb.min[2] );
-
-	});
-
-});
-
-describe("verb.eval.mesh.make_mesh_aabb_tree",function(){
-
-	it('make_mesh_aabb_tree should have the correct structure', function(){
-
-		//
-		//  0  - 1
-		//  |  /  \
-		//  2   --  3
-		//  |  \   /
-		//  4  -  5
-		// 
-
-		var points = [ [0,0,0], [1,0,0], [0, -1, 0 ], [2, -1, 0], [0, -2, 0], [1, -2, 0] ]
-			, tris = [ [0,2,1], [1,2,3], [2,4,5], [2,5,3] ]
-			, tri_indices = [0,1,2,3]
-			, root = verb.eval.mesh.make_mesh_aabb_tree( points, tris, tri_indices );
-
-		// root bb is correct
-		should.equal( 2, root.bounding_box.max[0] );
-		should.equal( 0, root.bounding_box.min[0] );
-		should.equal( 0, root.bounding_box.max[1] );
-		should.equal( -2, root.bounding_box.min[1] );		
-		should.equal( 0, root.bounding_box.max[2] );
-		should.equal( 0, root.bounding_box.min[2] );
-
-		// root is not a leaf
-		should.equal( 2, root.children.length);
-
-		// children should have 2 children, too
-		var child1 = root.children[0],
-			child2 = root.children[1];
-
-		should.equal( 2, child1.children.length );
-		should.equal( 2, child2.children.length );
-
-		// the children's children should be leaves
-		var child1child1 = child1.children[0],
-			child1child2 = child1.children[1],
-			child2child1 = child2.children[0],
-			child2child2 = child2.children[1];
-
-		should.equal( 0, child1child1.children.length );
-		should.equal( 0, child1child2.children.length );
-
-		should.equal( 0, child2child1.children.length );
-		should.equal( 0, child2child2.children.length );
-
-		// the grandchildren have the correct triangles in them
-		should.equal( 2, child1child1.triangle );
-		should.equal( 3, child1child2.triangle );
-
-		should.equal( 0, child2child1.triangle );
-		should.equal( 1, child2child2.triangle );
-
-	});
-
-});
-
-describe("verb.eval.mesh.intersect_aabb_trees",function(){
-
-	it('intersect_aabb_trees should have the correct result', function(){
-
-		//
-		//  0  - 1
-		//  |  /  \   
-		//  2   --  3
-		//  |  \   /
-		//  4  -  5
-		// 
-
-		var points1 = [ [0,0,0], [1,0,0], [0, -1, 0 ], [2, -1, 0], [0, -2, 0], [1, -2, 0] ]
-			, tris1 = [ [0,2,1], [1,2,3], [2,4,5], [2,5,3] ]
-			, tri_indices1 = [0,1,2,3]
-			, aabb1 = verb.eval.mesh.make_mesh_aabb_tree( points1, tris1, tri_indices1 )
-
-			, points2 = [ [0.5,-2,0.5], [0.5,-2,-1], [1,0.5,-1 ] ]
-			, tris2 = [ [0,1,2] ]
-			, tri_indices2 = [0]
-			, aabb2 = verb.eval.mesh.make_mesh_aabb_tree( points2, tris2, tri_indices2 )
-			, inter_result = verb.eval.geom.intersect_aabb_trees( points1, tris1, points2, tris2, aabb1, aabb2 );
-
-		// find all 4 triangle intersections
-		should.equal( 4, inter_result.length );
-
-		// find the specific intersections
-		should.equal( 2, inter_result[0][0] );
-		should.equal( 0, inter_result[0][1] );
-
-		should.equal( 3, inter_result[1][0] );
-		should.equal( 0, inter_result[1][1] );
-
-		should.equal( 0, inter_result[2][0] );
-		should.equal( 0, inter_result[2][1] );
-
-		should.equal( 1, inter_result[3][0] );
-		should.equal( 0, inter_result[3][1] );
 
 	});
 
@@ -4931,6 +4770,165 @@ describe("verb.eval.geom.tri_uv_from_point",function(){
 	});
 });
 
+
+describe("verb.eval.mesh.make_mesh_aabb",function(){
+
+	it('should return correct result for planar mesh', function(){
+
+		//
+		//  0  - 1
+		//  |  /  \
+		//  2   --  3
+		//  |  \   /
+		//  4  -  5
+		// 
+
+		var points = [ [0,0,0], [1,0,0], [0, -1, 0 ], [2, -1, 0], [0, -2, 0], [1, -2, 0] ]
+			, tris = [ [0,2,1], [1,2,3], [2,4,5], [2,5,3] ]
+			, tri_indices = [0,1,2,3]
+			, aabb = verb.eval.mesh.make_mesh_aabb(points, tris, tri_indices);
+
+		should.equal( 2, aabb.max[0] );
+		should.equal( 0, aabb.min[0] );
+		should.equal( 0, aabb.max[1] );
+		should.equal( -2, aabb.min[1] );		
+		should.equal( 0, aabb.max[2] );
+		should.equal( 0, aabb.min[2] );
+
+	});
+
+});
+
+describe("verb.eval.mesh.make_mesh_aabb",function(){
+
+	it('make_mesh_aabb should return correct result for non-planar mesh', function(){
+
+		//
+		//  0  - 1
+		//  |  /  \
+		//  2   --  3
+		//  |  \   /
+		//  4  -  5
+		// 
+
+		var points = [ [0,0,-5], [1,0,0], [0, -1, 0 ], [2, -1, 0], [0, -2, 0], [1, -2, 4] ]
+			, tris = [ [0,2,1], [1,2,3], [2,4,5], [2,5,3] ]
+			, tri_indices = [0,1,2,3]
+			, aabb = verb.eval.mesh.make_mesh_aabb(points, tris, tri_indices);
+
+		should.equal( 2, aabb.max[0] );
+		should.equal( 0, aabb.min[0] );
+		should.equal( 0, aabb.max[1] );
+		should.equal( -2, aabb.min[1] );		
+		should.equal( 4, aabb.max[2] );
+		should.equal( -5, aabb.min[2] );
+
+	});
+
+});
+
+describe("verb.eval.mesh.make_mesh_aabb_tree",function(){
+
+	it('make_mesh_aabb_tree should have the correct structure', function(){
+
+		//
+		//  0  - 1
+		//  |  /  \
+		//  2   --  3
+		//  |  \   /
+		//  4  -  5
+		// 
+
+		var points = [ [0,0,0], [1,0,0], [0, -1, 0 ], [2, -1, 0], [0, -2, 0], [1, -2, 0] ]
+			, tris = [ [0,2,1], [1,2,3], [2,4,5], [2,5,3] ]
+			, tri_indices = [0,1,2,3]
+			, root = verb.eval.mesh.make_mesh_aabb_tree( points, tris, tri_indices );
+
+		// root bb is correct
+		should.equal( 2, root.bounding_box.max[0] );
+		should.equal( 0, root.bounding_box.min[0] );
+		should.equal( 0, root.bounding_box.max[1] );
+		should.equal( -2, root.bounding_box.min[1] );		
+		should.equal( 0, root.bounding_box.max[2] );
+		should.equal( 0, root.bounding_box.min[2] );
+
+		// root is not a leaf
+		should.equal( 2, root.children.length);
+
+		// children should have 2 children, too
+		var child1 = root.children[0],
+			child2 = root.children[1];
+
+		should.equal( 2, child1.children.length );
+		should.equal( 2, child2.children.length );
+
+		// the children's children should be leaves
+		var child1child1 = child1.children[0],
+			child1child2 = child1.children[1],
+			child2child1 = child2.children[0],
+			child2child2 = child2.children[1];
+
+		should.equal( 0, child1child1.children.length );
+		should.equal( 0, child1child2.children.length );
+
+		should.equal( 0, child2child1.children.length );
+		should.equal( 0, child2child2.children.length );
+
+		// the grandchildren have the correct triangles in them
+		should.equal( 2, child1child1.triangle );
+		should.equal( 3, child1child2.triangle );
+
+		should.equal( 0, child2child1.triangle );
+		should.equal( 1, child2child2.triangle );
+
+	});
+
+});
+
+describe("verb.eval.mesh.intersect_aabb_trees",function(){
+
+	it('intersect_aabb_trees should have the correct result', function(){
+
+		//
+		//  0  - 1
+		//  |  /  \   
+		//  2   --  3
+		//  |  \   /
+		//  4  -  5
+		// 
+
+		var points1 = [ [0,0,0], [1,0,0], [0, -1, 0 ], [2, -1, 0], [0, -2, 0], [1, -2, 0] ]
+			, tris1 = [ [0,2,1], [1,2,3], [2,4,5], [2,5,3] ]
+			, tri_indices1 = [0,1,2,3]
+			, aabb1 = verb.eval.mesh.make_mesh_aabb_tree( points1, tris1, tri_indices1 )
+
+			, points2 = [ [0.5,-2,0.5], [0.5,-2,-1], [1,0.5,-1 ] ]
+			, tris2 = [ [0,1,2] ]
+			, tri_indices2 = [0]
+			, aabb2 = verb.eval.mesh.make_mesh_aabb_tree( points2, tris2, tri_indices2 )
+			, inter_result = verb.eval.geom.intersect_aabb_trees( points1, tris1, points2, tris2, aabb1, aabb2 );
+
+		// find all 4 triangle intersections
+		should.equal( 4, inter_result.length );
+
+		// find the specific intersections
+		should.equal( 2, inter_result[0][0] );
+		should.equal( 0, inter_result[0][1] );
+
+		should.equal( 3, inter_result[1][0] );
+		should.equal( 0, inter_result[1][1] );
+
+		should.equal( 0, inter_result[2][0] );
+		should.equal( 0, inter_result[2][1] );
+
+		should.equal( 1, inter_result[3][0] );
+		should.equal( 0, inter_result[3][1] );
+
+	});
+
+});
+
+
 describe("verb.eval.geom.intersect_planes",function(){
 
 	it('is correct for intersection of xz and yz planes', function(){
@@ -5049,18 +5047,18 @@ describe("verb.eval.geom.merge_tri_clip_intervals",function(){
 
 		var clip1 = verb.eval.geom.clip_ray_in_coplanar_tri(o, d, pts1, tri1, uvs1 );
 
-		console.log(clip1);
+		// console.log(clip1);
 
 		var pts2 = [ [1,1,-1], [3,1,-1], [3,1,2] ];
 		var tri2 = [ 0, 1, 2 ];
 		var uvs2 = [ [0,0], [3,0], [3,3] ];
 		var clip2 = verb.eval.geom.clip_ray_in_coplanar_tri(o, d, pts2, tri2, uvs2 );
 
-		console.log(clip2);
+		// console.log(clip2);
 
 		var res = verb.eval.geom.merge_tri_clip_intervals(clip1, clip2, pts1, tri1, uvs1, pts2, tri2, uvs2);
 
-		console.log(res)
+		// console.log(res);
 
 	});
 
@@ -5082,9 +5080,31 @@ describe("verb.eval.geom.intersect_tris",function(){
 
 		var res = verb.eval.geom.intersect_tris( pts1, tri1, uvs1, pts2, tri2, uvs2 );
 
+		// console.log(res);
+
+	});
+
+});
+
+
+describe("verb.eval.mesh.intersect_meshes_by_aabb",function(){
+
+	it('is correct for a basic example', function(){
+		
+		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
+		var tris1 = [[ 0, 1, 2 ]];
+		var uvs1 = [ [0,0], [2,0], [2, 2] ];
+
+		var pts2 = [ [1,1,-1], [3,1,-1], [3,1,2] ];
+		var tris2 = [[ 0, 1, 2 ]];
+		var uvs2 = [ [0,0], [3,0], [3,3] ];
+
+		var res = verb.eval.mesh.intersect_meshes_by_aabb( pts1, tris1, uvs1, pts2, tris2, uvs2 );
+
 		console.log(res);
 
 	});
 
 });
+
 

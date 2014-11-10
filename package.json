@@ -18,8 +18,8 @@
     "nurbs"
   ],
   "dependencies": {
-    "labor": "*",
     "binomial": "*",
+    "labor": "*",
     "numeric": "1.2.6"
   },
   "devDependencies": {
