@@ -1098,67 +1098,133 @@ verb.eval.mesh.make_mesh_intersection_polyline = function( segments ) {
 
 	var lists = [];
 
-	for (var i = 0; i < segments.length; i++){
+	// for (var i = 0; i < segments.length; i++){
 
-		var curSeg = segments[i];
-		if (curSeg.visited) continue;
+	// 	var curSeg = segments[i];
+	// 	if (curSeg.visited) continue;
 
-		var list = [];
+	// 	var list = [];
 
-		while (curSeg){
+	// 	while (curSeg){
 
-			lists.push( curSeg );
-			curSeg.visited = true;
+	// 		lists.push( curSeg );
 
-			curSeg = verb.eval.mesh.get_next_segment( curSeg, pts, tree, "pt2" );
+	// 		curSeg.visited = true;
 
-			// if the end isn't connected we try the other direction
-			if (!curSeg) curSeg = verb.eval.mesh.get_next_segment( curSeg, pts, tree, "pt1" );
+	// 		var newSeg = verb.eval.mesh.get_next_segment( curSeg, pts, tree );
 
-		}
+	// 		if (newSeg === null){
 
-		lists.push( list );
+	// 			// we reverse the seg and traverse from there
+	// 			var revSeg = [ curSeg[0], curSeg[1] ];
+	// 			revSeg.visited = true;
 
-	}
+	// 			curSeg = verb.eval.mesh.get_next_segment( revSeg, pts, tree );
 
-	// post-process the lists, rejoining where necessary
+	// 		}
+
+	// 		curSeg = newSeg;
+
+	// 	}
+
+	// 	lists.push( list );
+
+	// }
+
+	// step 1: assigning the vertices to the edges
+
+		// each pt in a seg should have a ref to the other
+		// this makes it easy to traverse this data structure
+
+			// seg = [ { uv1, uv2, pt, vtx, opp }, { uv1, uv2, pt, vtx, opp } ]
+
+			//
+			// the vtx makes it easy to get to the next edge
+			// 
+			// opp = pt.opp
+			// nextseg = opp.vtx.a === opp ? opp.vtx.b : opp.vtx.a
+			// 
+			// the opp makes it easy to get to the opposite edge pt
+			// 
+			// opp = pt.opp
+			// 
+
+		// for each seg
+
+			// if seg[0].vtx === undefined
+
+				// segidpair = lookup(seg[0].pt, tree)
+
+				// if (segidpair != null)
+
+					// segpt = segidpair.seg[ segidpair.id ]
+					// vtx = { a: seg[0], b: segpt }
+					// seg[0].vtx = vtx;
+					// segpt.vtx = vtx;
+
+			// if seg[1].vtx === undefined
+
+				// segidpair = lookup(seg[1].pt, tree)
+
+				// if (segidpair != null)
+
+					// segpt = segidpair.seg[ segidpair.id ]
+					// vtx = { a: seg[1], b: segpt }
+					// seg[1].vtx = vtx;
+					// segpt.vtx = vtx;
+
+	// step 2: traversing the edges
+
+		// find an seg with a free end (i.e. seg[0].vtx === undefined || seg[1].vtx === undefined)
+		// if you cant find one, youve got a loop, just then just pick the last one
+		// traverse along its length by moving along seg pointers, inserting pts into the list
+		// if you get to an empty pt, stop
+		// set a flag to say you've seen it whenever you check one, if you run into it twice top
+
 
 }
 
-verb.eval.mesh.get_next_segment = function( curSeg, pts, tree, prop ) {
+verb.eval.mesh.get_next_segment = function( curSeg, pts, tree ) {
 
 	// otherwise we want to find the next element connected to this one, we do 
 	// this by linear scan
-	var curPt = curSeg[prop];
+	// var curPt = curSeg[1];
 
-	// get nearest two segments
-	var nearest = tree.nearest({ x: curPt[0], y: curPt[1], z: curPt[2] }, 2)
-										.filter(function(seg){
+	// // get nearest two segments
+	// var nearest = tree.nearest({ x: curPt[0], y: curPt[1], z: curPt[2] }, 2)
+	// 									.filter(function(seg){ return seg.ele.visited; });
 
-											if (seg.ele.visited) return false;
+	// if (nearest.length === 1){
 
-											var s1 = numeric.sub( seg.ele.pt1, curPt );
-											var d1 = numeric.dot( s1, s1 );
+	// 	var seg = nearest[0].ele;
 
-											if (d1 < verb.TOLERANCE) return true;
+	// 	// set the correct ordering
+	// 	var s1 = numeric.sub( seg[0].  , curPt );
+	// 	var d1 = numeric.dot( s1, s1 );
 
-											var s2 = numeric.sub( seg.ele.pt2, curPt );
-											var d2 = numeric.dot( s2, s2 );
+	// 	if (d1 < verb.TOLERANCE) return seg;
 
-											if (d2 < verb.TOLERANCE) return true;
+	// 	var s2 = numeric.sub( seg.ele.pt2, curPt );
+	// 	var d2 = numeric.dot( s2, s2 );
 
-											// this should never happen
-											return false;
+	// 	if (d2 < verb.TOLERANCE) {
+	// 		seg.reverse();
+	// 		return seg;
+	// 	}
 
-										});
+	// 	return nearest.ele;
+	// } 
 
-	if (nearest.length === 1){
-		return nearest.ele;
-	} 
 
-	return;
+
+
+
+
+	// return;
 
 }
+
+
 
 // pts = pts.map(function(x){
 // 	x.x = x.pt[0];
@@ -1218,30 +1284,21 @@ verb.eval.geom.intersect_tris = function( points1, tri1, uvs1, points2, tri2, uv
 
 	// 1) intersect with planes to yield ray of intersection
 	var ray = verb.eval.geom.intersect_planes(o0, n0, o1, n1)
-	if (!ray.intersects) return { intersects: false };
+	if (!ray.intersects) return null;
 
 	// 2) clip the ray within tri1
 	var clip1 = verb.eval.geom.clip_ray_in_coplanar_tri( ray.origin, ray.dir, points1, tri1, uvs1 );
 
-	console.log(clip1)
-
 	// 3) clip the ray within tri2
 	var clip2 = verb.eval.geom.clip_ray_in_coplanar_tri( ray.origin, ray.dir, points2, tri2, uvs2 );
-
-	console.log(clip2)
 
 	// 4) find the interval that overlaps
 	var merged = verb.eval.geom.merge_tri_clip_intervals(clip1, clip2, points1, tri1, uvs1, points2, tri2, uvs2 );
 
-	if (merged === null) return { intersects: false };
+	if (merged === null) return null;
 
-	return { intersects: true, 
-			 uv1tri1: merged.uv1tri1,
-			 uv2tri1: merged.uv2tri1, 
-			 uv1tri2: merged.uv1tri2, 
-			 uv2tri2: merged.uv2tri2, 
-			 pt1 : merged.pt1, 
-			 pt2 : merged.pt2 };
+	return [ 	{ uvtri1 : merged.uv1tri1, uvtri2: merged.uv1tri2, pt: merged.pt1 }, 
+						{ uvtri1 : merged.uv2tri1, uvtri2: merged.uv2tri2, pt: merged.pt2 }];
 
 }
 
