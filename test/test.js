@@ -5107,4 +5107,106 @@ describe("verb.eval.mesh.intersect_meshes_by_aabb",function(){
 
 });
 
+describe("verb.eval.mesh.intersect_meshes_by_aabb",function(){
 
+	it('is correct for a basic example', function(){
+		
+		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
+		var tris1 = [[ 0, 1, 2 ]];
+		var uvs1 = [ [0,0], [2,0], [2, 2] ];
+
+		var pts2 = [ [1,1,-1], [3,1,-1], [3,1,2] ];
+		var tris2 = [[ 0, 1, 2 ]];
+		var uvs2 = [ [0,0], [3,0], [3,3] ];
+
+		var res = verb.eval.mesh.intersect_meshes_by_aabb( pts1, tris1, uvs1, pts2, tris2, uvs2 );
+
+		console.log(res);
+
+	});
+
+});
+
+describe("verb.eval.mesh.kdtree_from_segs",function(){
+
+	it('is correct for a basic example', function(){
+
+		// the uvs dont matter
+		var segs = [
+				[ 	{ pt: [1,2,3] }, 
+						{ pt: [5,6,7] } ],
+				[ 	{ pt: [2,2,3] }, 
+						{ pt: [6,6,7] } ],
+				[ 	{ pt: [3,2,3] }, 
+						{ pt: [7,6,7] } ] ];
+
+		var tree = verb.eval.mesh.kdtree_from_segs( segs );
+
+		// result should be non-null
+
+	});
+
+});
+
+describe("verb.eval.mesh.lookup_adj_segment",function(){
+
+	it('returns null when only nearest is argument itself', function(){
+
+		var segs = [
+				[ 	{ pt: [1,2,3], key: "a" }, 
+						{ pt: [5,6,7], key: "b" } ],
+				[ 	{ pt: [2,2,3], key: "c" }, 
+						{ pt: [6,6,7], key: "d" } ],
+				[ 	{ pt: [3,2,3], key: "e" }, 
+						{ pt: [7,6,7], key: "f" } ] ];
+
+		var end = segs[0][0];
+
+		var tree = verb.eval.mesh.kdtree_from_segs( segs );
+		var nearest = verb.eval.mesh.lookup_adj_segment( end, tree );
+
+		// result should be null
+
+	});
+
+	it('is correct for a basic example', function(){
+
+		var segs = [
+				[ 	{ pt: [1,2,3], key: "a" }, 
+						{ pt: [5,6,7], key: "b" } ],
+				[ 	{ pt: [2,2,3], key: "c" }, 
+						{ pt: [6,6,7], key: "d" } ],
+				[ 	{ pt: [3,2,3], key: "e" }, 
+						{ pt: [7,6,7], key: "f" } ] ];
+
+		var end = { pt: [1,2,3], key: "g" }; // same pos, but different object
+
+		var tree = verb.eval.mesh.kdtree_from_segs( segs );
+		var nearest = verb.eval.mesh.lookup_adj_segment( end, tree );
+
+		nearest.should.be.equal(segs[0][0])
+
+	});
+
+});
+
+// describe("verb.eval.mesh.make_intersect_polylines ",function(){
+
+// 	it('is correct for a basic example', function(){
+		
+// 		// not closed
+// 		var segs = [
+// 				[ 	{ pt: [1,2,3], key: "a" }, 
+// 						{ pt: [5,6,7], key: "b" } ],
+// 				[ 	{ pt: [2,2,3], key: "c" }, 
+// 						{ pt: [6,6,7], key: "d" } ],
+// 				[ 	{ pt: [3,2,3], key: "e" }, 
+// 						{ pt: [7,6,7], key: "f" } ] ];
+
+// 		var pls = verb.eval.mesh.make_intersect_polylines( segs );
+// 		console.log( pls )
+
+
+// 	});
+
+// });

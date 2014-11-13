@@ -3496,17 +3496,12 @@ verb.eval.mesh.intersect_meshes_by_aabb = function( points1, tris1, uvs1, points
 }
 
 
-var df3 = function(a, b){
-  return Math.pow(a.x - b.x, 2) +  Math.pow(a.y - b.y, 2) + Math.pow(a.z - b.z, 2);
-};
-
-
 verb.eval.mesh.make_intersect_polylines = function( segments ) {
 
 	// we need to be able to traverse from one end of a segment to the other
-	segments.forEach( function(){
-		segment[1].opp = segment[0];
-		segment[0].opp = segment[1];
+	segments.forEach( function(s){
+		s[1].opp = s[0];
+		s[0].opp = s[1];
 	});
 
 	// construct a tree for fast lookup 
@@ -3543,39 +3538,46 @@ verb.eval.mesh.make_intersect_polylines = function( segments ) {
 
 	var pls = [];
 
-	freeEnds.forEach(function(end){
+	console.log( freeEnds )
+	console.log( freeEnds.map(function(x){ return x.adj ? x.adj.key : x.adj; }) )
+	
+	// freeEnds.forEach(function(end){
 
-		if (curEnd.visited) return;
+	// 	if (end.visited) return;
 
-		// traverse to end
-		var pl = [];
-		var curEnd = end;
+	// 	// traverse to end
+	// 	var pl = [];
+	// 	var curEnd = end;
 
-		while (curEnd) {
+	// 	while (curEnd) {
 
-			// debug
-			if (curEnd.visited) throw new Error('Segment end encountered twice!');
+	// 		// debug
+	// 		if (curEnd.visited) throw new Error('Segment end encountered twice!');
 
-			curEnd.visited = true;
-			curEnd.opp.visited = true;
+	// 		curEnd.visited = true;
+	// 		curEnd.opp.visited = true;
 
-			pl.push(curEnd);
-			pl.push(curEnd.opp);
+	// 		pl.push(curEnd);
+	// 		pl.push(curEnd.opp);
 
-			curEnd = curEnd.opp.adj;
+	// 		curEnd = curEnd.opp.adj;
 
-			// loop condition
-			if (curEnd === end) break;
+	// 		// loop condition
+	// 		if (curEnd === end) break;
 
-		}
+	// 	}
 
-		if (pl.length > 0) pls.push( pl );
+	// 	if (pl.length > 0) pls.push( pl );
 
-	})
+	// })
 
 	return pls;
 
 }
+
+verb.eval.mesh.pt_dist = function(a, b){
+  return Math.pow(a.x - b.x, 2) +  Math.pow(a.y - b.y, 2) + Math.pow(a.z - b.z, 2);
+};
 
 verb.eval.mesh.kdtree_from_segs = function( segments ){
 
@@ -3583,27 +3585,22 @@ verb.eval.mesh.kdtree_from_segs = function( segments ){
 
 	// for each segment, transform into two elements, each keyed by pt1 and pt2
 	segments.forEach(function(seg){
-		treePoints.push({ "x": seg[0].pt[0], "y": seg[0].pt[1], "z": seg[0].pt[2], ele: seg });
-		treePoints.push({ "x": seg[1].pt[0], "y": seg[1].pt[1], "z": seg[1].pt[2], ele: seg });
+		treePoints.push({ "x": seg[0].pt[0], "y": seg[0].pt[1], "z": seg[0].pt[2], ele: seg[0] });
+		treePoints.push({ "x": seg[1].pt[0], "y": seg[1].pt[1], "z": seg[1].pt[2], ele: seg[1] });
 	});
 
 	// make our tree
-	return new kdTree(treePoints, df, ["x", "y", "z"]);
+	return new KdTree(treePoints, verb.eval.mesh.pt_dist, ["x", "y", "z"]);
 
 }
 
 verb.eval.mesh.lookup_adj_segment = function( segEnd, tree ) {
 
 	var adj = tree.nearest({ x: segEnd.pt[0], y: segEnd.pt[1], z: segEnd.pt[2] }, 2)
-										.filter(function(treeEle){ 
-											if (!(seg.ele != segEnd.seg)) return false;
-											var pt = segEnd.pt;
-											return df3( treeEle, { x : pt[0], y : pt[1], z : pt[2] } ) < verb.TOLERANCE;
-										}) 
-										.map(function(treeEle){ return treeEle.ele; })
-										.map(function(seg){
-											return (seg[0] === segEnd) ? seg[0] : seg[1];
-										});
+								.filter(function(r){ 
+									return segEnd != r[0].ele && r[1] < verb.TOLERANCE;
+								})
+								.map(function(r){ return r[0].ele; });
 
 	return adj.length != 0 ? adj[0] : null;
 
@@ -3651,7 +3648,7 @@ verb.eval.geom.intersect_tris = function( points1, tri1, uvs1, points2, tri2, uv
 	if (merged === null) return null;
 
 	return [ 	{ uvtri1 : merged.uv1tri1, uvtri2: merged.uv1tri2, pt: merged.pt1 }, 
-						{ uvtri1 : merged.uv2tri1, uvtri2: merged.uv2tri2, pt: merged.pt2 }];
+						{ uvtri1 : merged.uv2tri1, uvtri2: merged.uv2tri2, pt: merged.pt2 } ];
 
 }
 
