@@ -3501,180 +3501,114 @@ var df3 = function(a, b){
 };
 
 
-verb.eval.mesh.make_mesh_intersection_polyline = function( segments ) {
+verb.eval.mesh.make_intersect_polylines = function( segments ) {
 
-	// for each segment
-	var pts = [];
+	// we need to be able to traverse from one end of a segment to the other
+	segments.forEach( function(){
+		segment[1].opp = segment[0];
+		segment[0].opp = segment[1];
+	});
 
-	// transform into two elements, each keyed by pt1 and pt2
+	// construct a tree for fast lookup 
+	var tree = verb.eval.mesh.kdtree_from_segs( segments );
+
+	// flatten everything, we no longer need the segments
+	var ends = segments.flatten();
+
+	// step 1: assigning the vertices to the segment ends 
+	ends.forEach(function(segEnd){
+
+			if (segEnd.adj) return;
+
+			var adjEnd = verb.eval.mesh.lookup_adj_segment( segEnd, tree );
+			if (adjEnd && !adjEnd.adj){
+
+				var vtx = { a : segEnd, b : adjEnd };
+				segEnd.adj = adjEnd;
+				adjEnd.adj = segEnd;
+
+			} 
+
+		});
+
+	// step 2: traversing the topology to construct the pls
+	var freeEnds = ends.filter(function(x){
+		return !x.vtx;
+	});
+
+	// if you cant find one, youve got a loop (or multiple), we run through all
+	if (freeEnds.length === 0) {
+		freeEnds = ends;
+	}
+
+	var pls = [];
+
+	freeEnds.forEach(function(end){
+
+		if (curEnd.visited) return;
+
+		// traverse to end
+		var pl = [];
+		var curEnd = end;
+
+		while (curEnd) {
+
+			// debug
+			if (curEnd.visited) throw new Error('Segment end encountered twice!');
+
+			curEnd.visited = true;
+			curEnd.opp.visited = true;
+
+			pl.push(curEnd);
+			pl.push(curEnd.opp);
+
+			curEnd = curEnd.opp.adj;
+
+			// loop condition
+			if (curEnd === end) break;
+
+		}
+
+		if (pl.length > 0) pls.push( pl );
+
+	})
+
+	return pls;
+
+}
+
+verb.eval.mesh.kdtree_from_segs = function( segments ){
+
+	var treePoints = [];
+
+	// for each segment, transform into two elements, each keyed by pt1 and pt2
 	segments.forEach(function(seg){
-		segments.push({ "x": seg.pt1[0], "y": seg.pt1[1], "z": seg.pt1[2], ele: seg });
-		segments.push({ "x": seg.pt2[0], "y": seg.pt2[1], "z": seg.pt2[2], ele: seg });
+		treePoints.push({ "x": seg[0].pt[0], "y": seg[0].pt[1], "z": seg[0].pt[2], ele: seg });
+		treePoints.push({ "x": seg[1].pt[0], "y": seg[1].pt[1], "z": seg[1].pt[2], ele: seg });
 	});
 
 	// make our tree
-	var tree = new kdTree(pts, df, ["x", "y", "z"]);
-
-	var lists = [];
-
-	// for (var i = 0; i < segments.length; i++){
-
-	// 	var curSeg = segments[i];
-	// 	if (curSeg.visited) continue;
-
-	// 	var list = [];
-
-	// 	while (curSeg){
-
-	// 		lists.push( curSeg );
-
-	// 		curSeg.visited = true;
-
-	// 		var newSeg = verb.eval.mesh.get_next_segment( curSeg, pts, tree );
-
-	// 		if (newSeg === null){
-
-	// 			// we reverse the seg and traverse from there
-	// 			var revSeg = [ curSeg[0], curSeg[1] ];
-	// 			revSeg.visited = true;
-
-	// 			curSeg = verb.eval.mesh.get_next_segment( revSeg, pts, tree );
-
-	// 		}
-
-	// 		curSeg = newSeg;
-
-	// 	}
-
-	// 	lists.push( list );
-
-	// }
-
-	// step 1: assigning the vertices to the edges
-
-		// each pt in a seg should have a ref to the other
-		// this makes it easy to traverse this data structure
-
-			// seg = [ { uv1, uv2, pt, vtx, opp }, { uv1, uv2, pt, vtx, opp } ]
-
-			//
-			// the vtx makes it easy to get to the next edge
-			// 
-			// opp = pt.opp
-			// nextseg = opp.vtx.a === opp ? opp.vtx.b : opp.vtx.a
-			// 
-			// the opp makes it easy to get to the opposite edge pt
-			// 
-			// opp = pt.opp
-			// 
-
-		// for each seg
-
-			// if seg[0].vtx === undefined
-
-				// segidpair = lookup(seg[0].pt, tree)
-
-				// if (segidpair != null)
-
-					// segpt = segidpair.seg[ segidpair.id ]
-					// vtx = { a: seg[0], b: segpt }
-					// seg[0].vtx = vtx;
-					// segpt.vtx = vtx;
-
-			// if seg[1].vtx === undefined
-
-				// segidpair = lookup(seg[1].pt, tree)
-
-				// if (segidpair != null)
-
-					// segpt = segidpair.seg[ segidpair.id ]
-					// vtx = { a: seg[1], b: segpt }
-					// seg[1].vtx = vtx;
-					// segpt.vtx = vtx;
-
-	// step 2: traversing the edges
-
-		// find an seg with a free end (i.e. seg[0].vtx === undefined || seg[1].vtx === undefined)
-		// if you cant find one, youve got a loop, just then just pick the last one
-		// traverse along its length by moving along seg pointers, inserting pts into the list
-		// if you get to an empty pt, stop
-		// set a flag to say you've seen it whenever you check one, if you run into it twice top
-
+	return new kdTree(treePoints, df, ["x", "y", "z"]);
 
 }
 
-verb.eval.mesh.get_next_segment = function( curSeg, pts, tree ) {
+verb.eval.mesh.lookup_adj_segment = function( segEnd, tree ) {
 
-	// otherwise we want to find the next element connected to this one, we do 
-	// this by linear scan
-	// var curPt = curSeg[1];
+	var adj = tree.nearest({ x: segEnd.pt[0], y: segEnd.pt[1], z: segEnd.pt[2] }, 2)
+										.filter(function(treeEle){ 
+											if (!(seg.ele != segEnd.seg)) return false;
+											var pt = segEnd.pt;
+											return df3( treeEle, { x : pt[0], y : pt[1], z : pt[2] } ) < verb.TOLERANCE;
+										}) 
+										.map(function(treeEle){ return treeEle.ele; })
+										.map(function(seg){
+											return (seg[0] === segEnd) ? seg[0] : seg[1];
+										});
 
-	// // get nearest two segments
-	// var nearest = tree.nearest({ x: curPt[0], y: curPt[1], z: curPt[2] }, 2)
-	// 									.filter(function(seg){ return seg.ele.visited; });
-
-	// if (nearest.length === 1){
-
-	// 	var seg = nearest[0].ele;
-
-	// 	// set the correct ordering
-	// 	var s1 = numeric.sub( seg[0].  , curPt );
-	// 	var d1 = numeric.dot( s1, s1 );
-
-	// 	if (d1 < verb.TOLERANCE) return seg;
-
-	// 	var s2 = numeric.sub( seg.ele.pt2, curPt );
-	// 	var d2 = numeric.dot( s2, s2 );
-
-	// 	if (d2 < verb.TOLERANCE) {
-	// 		seg.reverse();
-	// 		return seg;
-	// 	}
-
-	// 	return nearest.ele;
-	// } 
-
-
-
-
-
-
-	// return;
+	return adj.length != 0 ? adj[0] : null;
 
 }
 
-
-
-// pts = pts.map(function(x){
-// 	x.x = x.pt[0];
-// 	x.y = x.pt[1];
-// 	x.z = x.pt[2];
-// });
-
-// var tree = new kdTree(points, distance, ["x", "y"]);
-
-// var coords = [
-//   { name: 'Gramercy Theatre',
-//     loc: {lat: '40.739683', long: '73.985151'} },
-//   { name: 'Blue Note Jazz Club',
-//     loc: {lat: '40.730601', long: '74.000447'} },
-//   { name: 'Milk Studios',
-//     loc: {lat: '40.742256', long: '74.006344'} },
-//   { name: 'Greenroom Brooklyn',
-//     loc: {lat: '40.691805', long: '73.908089'} }
-// ].map(function (v) {
-//   return v.loc
-// });
-
-// var distance = function(a, b){
-//   return Math.pow(a.lat - b.lat, 2) + Math.pow(a.long - b.long, 2);
-// }
-
-// var tree = kdt.createKdTree(coords, distance, ['0', '1', '2'])
-
-// var nearest = tree.nearest({ lat: 40, long: 75 }, 4);
-
-// if ( next === null )
 
 //
 // ####intersect_tris( points1, tri1, uvs1, points2, tri2, uvs2 )
