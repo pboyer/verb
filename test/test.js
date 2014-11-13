@@ -5190,23 +5190,23 @@ describe("verb.eval.mesh.lookup_adj_segment",function(){
 
 });
 
-// describe("verb.eval.mesh.make_intersect_polylines ",function(){
+describe("verb.eval.mesh.make_intersect_polylines ",function(){
 
-// 	it('is correct for a basic example', function(){
+	it('is correct for a basic example', function(){
 		
-// 		// not closed
-// 		var segs = [
-// 				[ 	{ pt: [1,2,3], key: "a" }, 
-// 						{ pt: [5,6,7], key: "b" } ],
-// 				[ 	{ pt: [2,2,3], key: "c" }, 
-// 						{ pt: [6,6,7], key: "d" } ],
-// 				[ 	{ pt: [3,2,3], key: "e" }, 
-// 						{ pt: [7,6,7], key: "f" } ] ];
+		// not closed
+		var segs = [
+				[ 	{ pt: [10,0,0], key: "a" }, 
+						{ pt: [10,10,0], key: "b" } ],
+				[ 	{ pt: [0,10,0], key: "c" }, 
+						{ pt: [10,10,0], key: "d" } ],
+				[ 	{ pt: [5,5,0], key: "e" }, 
+						{ pt: [0,10,0], key: "f" } ] ];
 
-// 		var pls = verb.eval.mesh.make_intersect_polylines( segs );
-// 		console.log( pls )
+		var pls = verb.eval.mesh.make_intersect_polylines( segs );
+		console.log( pls[0].map(function(x){ return x.pt; }) )
 
 
-// 	});
+	});
 
-// });
+});

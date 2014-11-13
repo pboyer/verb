@@ -972,6 +972,10 @@ verb.eval.mesh.make_intersect_polylines = function( segments ) {
 			if (segEnd.adj) return;
 
 			var adjEnd = verb.eval.mesh.lookup_adj_segment( segEnd, tree );
+
+			// console.log(segEnd)
+			// console.log(adjEnd)
+
 			if (adjEnd && !adjEnd.adj){
 
 				var vtx = { a : segEnd, b : adjEnd };
@@ -994,38 +998,38 @@ verb.eval.mesh.make_intersect_polylines = function( segments ) {
 
 	var pls = [];
 
-	console.log( freeEnds )
-	console.log( freeEnds.map(function(x){ return x.adj ? x.adj.key : x.adj; }) )
+	// console.log( freeEnds )
+	// console.log( freeEnds.map(function(x){ return x.adj ? x.adj.key : x.adj; }) )
 	
-	// freeEnds.forEach(function(end){
+	freeEnds.forEach(function(end){
 
-	// 	if (end.visited) return;
+		if (end.v) return;
 
-	// 	// traverse to end
-	// 	var pl = [];
-	// 	var curEnd = end;
+		// traverse to end
+		var pl = [];
+		var curEnd = end;
 
-	// 	while (curEnd) {
+		while (curEnd) {
 
-	// 		// debug
-	// 		if (curEnd.visited) throw new Error('Segment end encountered twice!');
+			// debug
+			if (curEnd.v) throw new Error('Segment end encountered twice!');
 
-	// 		curEnd.visited = true;
-	// 		curEnd.opp.visited = true;
+			curEnd.v = true;
+			curEnd.opp.v = true;
 
-	// 		pl.push(curEnd);
-	// 		pl.push(curEnd.opp);
+			pl.push(curEnd);
+			pl.push(curEnd.opp);
 
-	// 		curEnd = curEnd.opp.adj;
+			curEnd = curEnd.opp.adj;
 
-	// 		// loop condition
-	// 		if (curEnd === end) break;
+			// loop condition
+			if (curEnd === end) break;
 
-	// 	}
+		}
 
-	// 	if (pl.length > 0) pls.push( pl );
+		if (pl.length > 0) pls.push( pl );
 
-	// })
+	})
 
 	return pls;
 
