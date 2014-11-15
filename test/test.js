@@ -5107,26 +5107,6 @@ describe("verb.eval.mesh.intersect_meshes_by_aabb",function(){
 
 });
 
-describe("verb.eval.mesh.intersect_meshes_by_aabb",function(){
-
-	it('is correct for a basic example', function(){
-		
-		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
-		var tris1 = [[ 0, 1, 2 ]];
-		var uvs1 = [ [0,0], [2,0], [2, 2] ];
-
-		var pts2 = [ [1,1,-1], [3,1,-1], [3,1,2] ];
-		var tris2 = [[ 0, 1, 2 ]];
-		var uvs2 = [ [0,0], [3,0], [3,3] ];
-
-		var res = verb.eval.mesh.intersect_meshes_by_aabb( pts1, tris1, uvs1, pts2, tris2, uvs2 );
-
-		console.log(res);
-
-	});
-
-});
-
 describe("verb.eval.mesh.kdtree_from_segs",function(){
 
 	it('is correct for a basic example', function(){
@@ -5200,13 +5180,95 @@ describe("verb.eval.mesh.make_intersect_polylines ",function(){
 						{ pt: [10,10,0], key: "b" } ],
 				[ 	{ pt: [0,10,0], key: "c" }, 
 						{ pt: [10,10,0], key: "d" } ],
-				[ 	{ pt: [5,5,0], key: "e" }, 
+				[ 	{ pt: [5,0,0], key: "e" }, 
 						{ pt: [0,10,0], key: "f" } ] ];
 
 		var pls = verb.eval.mesh.make_intersect_polylines( segs );
-		console.log( pls[0].map(function(x){ return x.pt; }) )
 
+		// discovers one continuous polyline
+
+		pls.length.should.be.equal( 1 );
+		pls[0].length.should.be.equal( 4 );
+		pls[0][0].pt.should.be.eql( [10,0,0] );
+		pls[0][1].pt.should.be.eql( [10,10,0] );
+		pls[0][2].pt.should.be.eql( [0,10,0] );
+		pls[0][3].pt.should.be.eql( [5,0,0] );
 
 	});
 
 });
+
+describe("verb.eval.mesh.intersect_meshes_by_aabb",function(){
+
+	// it('is correct for two intersecting triangles', function(){
+		
+	// 	var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
+	// 	var tris1 = [[ 0, 1, 2 ]];
+	// 	var uvs1 = [ [0,0], [2,0], [2, 2] ];
+
+	// 	var pts2 = [ [1,1,-1], [1,1,5], [1,-5,-1] ];
+	// 	var tris2 = [[ 0, 1, 2 ]];
+	// 	var uvs2 = [ [0,0], [3,0], [3,3] ];
+
+	// 	var pls = verb.eval.mesh.intersect_meshes_by_aabb( pts1, tris1, uvs1, pts2, tris2, uvs2 );
+
+	// 	pls.length.should.be.equal( 1 );
+	// 	pls[0].length.should.be.equal( 2 );
+
+	// });
+
+	// it('is correct for two non-intersecting triangles', function(){
+		
+	// 	var pts1 = [ [10,10,10], [2,10,10], [2, 2,10] ];
+	// 	var tris1 = [[ 0, 1, 2 ]];
+	// 	var uvs1 = [ [0,0], [2,0], [2, 2] ];
+
+	// 	var pts2 = [ [1,1,-1], [3,1,-1], [3,1,2] ];
+	// 	var tris2 = [[ 0, 1, 2 ]];
+	// 	var uvs2 = [ [0,0], [3,0], [3,3] ];
+
+	// 	var res = verb.eval.mesh.intersect_meshes_by_aabb( pts1, tris1, uvs1, pts2, tris2, uvs2 );
+
+	// 	res.length.should.be.equal( 0 );
+
+	// });
+
+	it('is correct for two non-intersecting triangles', function(){
+		
+		verb.init();
+
+		var p1 = [0,0,0]
+			, p2 = [1,0,0]
+			, p3 = [1,1,0]
+			, p4 = [0,1,0];
+
+		var srf1 = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
+
+		var p5 = [0.5,-0.5,-0.5]
+			, p6 = [0.5,0.5,-0.5]
+			, p7 = [0.5,0.5,0.5]
+			, p8 = [0.5,-0.5,0.5];
+
+		var srf2 = new verb.geom.FourPointSurface( p5, p6, p7, p8 );
+
+
+
+		var opts = { minDivsU: 3, minDivsV: 3 };
+		var tess1 = srf1.tessellate(opts);
+		var tess2 = srf2.tessellate(opts);
+
+		console.log(tess1)
+
+		// console.log(tess1)
+
+		// console.log(tess1.points)
+		var res = verb.eval.mesh.intersect_meshes_by_aabb( tess1.points, tess1.faces, tess1.uvs, tess2.points, tess2.faces, tess2.uvs );
+
+		console.log( res[0].map(function(x){ return x.pt; }) );
+
+		// res.length.should.be.equal( 0 );
+
+	});
+
+});
+

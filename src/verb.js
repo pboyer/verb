@@ -182,19 +182,19 @@ verb.rightWithPivot = function(arr){
 // + *Array*, array of unique elements
 //
 
-verb.unique = function( arr, comparator ){
+verb.unique = function( arr, comp ){
 
 	if (arr.length === 0) return [];
 
 	var uniques = [ arr.pop() ];
 
-	for (var i = 0; i < arr.length; i++ ){
+	while (arr.length > 0){
 
 		var ele = arr.pop();
 		var isUnique = true;
 
 		for (var j = 0; j < uniques.length; j++ ){
-			if ( comparator( ele, uniques[i] ) ){
+			if ( comp( ele, uniques[j] ) ){
 				isUnique = false;
 				break;
 			}

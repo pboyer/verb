@@ -1041,6 +1041,10 @@ verb.eval.geom.intersect_rays = function( a0, a, b0, b ) {
 // + *Array*, a point represented by an array of length (dim)
 //
 
+var d3 = function(a, b){
+	return numeric.norm2( numeric.sub( a.pt, b.pt ));
+};
+
 verb.eval.mesh.intersect_meshes_by_aabb = function( points1, tris1, uvs1, points2, tris2, uvs2 ) {
 
 	// build aabb for each mesh
@@ -1050,29 +1054,37 @@ verb.eval.mesh.intersect_meshes_by_aabb = function( points1, tris1, uvs1, points
 	  , aabb2 = verb.eval.mesh.make_mesh_aabb_tree( points2, tris2, tri_indices2 )
  
   // intersect and get the pairs of triangle intersctions
-	var bbints = verb.eval.geom.intersect_aabb_trees( points1, tris1, points2, tris2, aabb1, aabb2 )
+	var bbints = verb.eval.geom.intersect_aabb_trees( points1, tris1, points2, tris2, aabb1, aabb2 );
 
-	// get the segments of the intersection crv with uvs
-	var triints = bbints.map(function(ids){
-		return verb.eval.geom.intersect_tris( points1, tris1[ ids[0] ], uvs1, points2, tris2[ ids[1] ], uvs2 );
+// console.log( bbints )
+
+	// remove any duplicates
+	bbints = verb.unique( bbints, function(a, b){
+		return (a[0] === b[0] && a[1] === b[1]) || (a[1] === b[0] && a[0] === b[1]);
 	});
 
-	if (triints.length === 0) return [];
+	// console.log( bbints )
 
-	// 1) put all of the triints into an fast lookup tree
+	// get the segments of the intersection crv with uvs
+	var segments = bbints.map(function(ids){
+													console.log(ids)
+													return verb.eval.geom.intersect_tris( points1, tris1[ ids[0] ], uvs1, points2, tris2[ ids[1] ], uvs2 );
+												})
+												.filter(function(x){ return x; })
+												.filter(function(x){ return d3( x[0], x[1] ) > verb.TOLERANCE })
 
-	// 2) construct an empty linked list
-	var first = {};
+	segments = verb.unique( segments, function(a, b){
 
-	// 3) for each triint 
+		return ( d3(a[0], b[0]) < verb.TOLERANCE && d3(a[1], b[1]) < verb.TOLERANCE ) ||
+			( d3(a[1], b[0]) < verb.TOLERANCE && d3(a[0], b[1]) < verb.TOLERANCE );
 
-	// rescan and link up all of the intersections
+	});
 
-	return triints;
+	console.log( JSON.stringify( segments ) )
 
-	// sort the intersection segments
+	if (segments.length === 0) return [];
 
-	// TODO
+	return verb.eval.mesh.make_intersect_polylines( segments );
 
 }
 
@@ -1091,6 +1103,8 @@ verb.eval.mesh.make_intersect_polylines = function( segments ) {
 	// flatten everything, we no longer need the segments
 	var ends = segments.flatten();
 
+	console.log( ends )
+
 	// step 1: assigning the vertices to the segment ends 
 	ends.forEach(function(segEnd){
 
@@ -1098,12 +1112,8 @@ verb.eval.mesh.make_intersect_polylines = function( segments ) {
 
 			var adjEnd = verb.eval.mesh.lookup_adj_segment( segEnd, tree );
 
-			// console.log(segEnd)
-			// console.log(adjEnd)
-
 			if (adjEnd && !adjEnd.adj){
 
-				var vtx = { a : segEnd, b : adjEnd };
 				segEnd.adj = adjEnd;
 				adjEnd.adj = segEnd;
 
@@ -1113,7 +1123,7 @@ verb.eval.mesh.make_intersect_polylines = function( segments ) {
 
 	// step 2: traversing the topology to construct the pls
 	var freeEnds = ends.filter(function(x){
-		return !x.vtx;
+		return !x.adj;
 	});
 
 	// if you cant find one, youve got a loop (or multiple), we run through all
@@ -1122,9 +1132,6 @@ verb.eval.mesh.make_intersect_polylines = function( segments ) {
 	}
 
 	var pls = [];
-
-	// console.log( freeEnds )
-	// console.log( freeEnds.map(function(x){ return x.adj ? x.adj.key : x.adj; }) )
 	
 	freeEnds.forEach(function(end){
 
@@ -1139,11 +1146,11 @@ verb.eval.mesh.make_intersect_polylines = function( segments ) {
 			// debug
 			if (curEnd.v) throw new Error('Segment end encountered twice!');
 
+			// technically we consume both ends of the segment
 			curEnd.v = true;
 			curEnd.opp.v = true;
 
 			pl.push(curEnd);
-			pl.push(curEnd.opp);
 
 			curEnd = curEnd.opp.adj;
 
@@ -1152,7 +1159,10 @@ verb.eval.mesh.make_intersect_polylines = function( segments ) {
 
 		}
 
-		if (pl.length > 0) pls.push( pl );
+		if (pl.length > 0) {
+			pl.push( pl[pl.length-1].opp );
+			pls.push( pl );
+		}
 
 	})
 
@@ -1218,14 +1228,17 @@ verb.eval.geom.intersect_tris = function( points1, tri1, uvs1, points2, tri2, uv
 // TODO: fail early if all of the points of tri1 are on the same side of plane of tri2
 
 	// 1) intersect with planes to yield ray of intersection
-	var ray = verb.eval.geom.intersect_planes(o0, n0, o1, n1)
+	var ray = verb.eval.geom.intersect_planes(o0, n0, o1, n1);
+
 	if (!ray.intersects) return null;
 
 	// 2) clip the ray within tri1
 	var clip1 = verb.eval.geom.clip_ray_in_coplanar_tri( ray.origin, ray.dir, points1, tri1, uvs1 );
+	if (clip1 === null) return null;
 
 	// 3) clip the ray within tri2
 	var clip2 = verb.eval.geom.clip_ray_in_coplanar_tri( ray.origin, ray.dir, points2, tri2, uvs2 );
+	if (clip2 === null) return null;
 
 	// 4) find the interval that overlaps
 	var merged = verb.eval.geom.merge_tri_clip_intervals(clip1, clip2, points1, tri1, uvs1, points2, tri2, uvs2 );
@@ -1285,7 +1298,7 @@ verb.eval.geom.clip_ray_in_coplanar_tri = function(o1, d1, points, tri, uvs ){
 		}
 	}
 
-	if (maxU === null || minU === null) return { intersects: none };
+	if (maxU === null || minU === null) return null;
 
 	// 3) otherwise, return minU maxU along with uv info
 	return { min : minU, max: maxU };
