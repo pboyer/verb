@@ -4928,6 +4928,17 @@ describe("verb.eval.mesh.intersect_aabb_trees",function(){
 
 });
 
+function vecShouldBe( expected, test, tol ){
+
+	if (tol === undefined) tol = verb.TOLERANCE;
+
+ 	test.length.should.be.equal( expected.length );
+
+ 	for (var i = 0; i < test.length; i++){
+ 		test[i].should.be.approximately( expected[i], tol );
+ 	}
+
+}
 
 describe("verb.eval.geom.intersect_planes",function(){
 
@@ -4974,301 +4985,333 @@ describe("verb.eval.geom.intersect_planes",function(){
 
 	});
 
-});
+	it('is correct for intersection of skew planes through origin 1', function(){
 
-describe("verb.eval.geom.point_on_ray",function(){
+		var o1 = [0,0,0];
+		var n1 = [1,0,0];
+		var o2 = [0,0,0];
+		var n2 = numeric.normalized( [1,1,1] );
 
-	it('is correct for a basic example', function(){
+		var res = verb.eval.geom.intersect_planes(o1, n1, o2, n2);
 
-		var o = [1,2,3];
-		var d = [1,1,1];
-		var u = 2;
-		var res = verb.eval.geom.point_on_ray(o, d, u);
+		console.log(res)
 
-		res.should.eql( [3, 4, 5] );
+		// res.origin.should.be.eql( [0,0,0] );
+		// res.dir.should.be.eql( [0,0,1] );
+
+	});
+
+	it('is correct for intersection of skew planes through origin 2', function(){
+
+		var o1 = [0,0,0];
+		var n1 = numeric.normalized( [-1,1,1] );
+		var o2 = [0,0,0];
+		var n2 = numeric.normalized( [1,1,1] );
+
+		var res = verb.eval.geom.intersect_planes(o1, n1, o2, n2);
+
+		console.log(res)
+
+		// res.origin.should.be.eql( [0,0,0] );
+		// res.dir.should.be.eql( [0,0,1] );
+
+	});
+
+	it('is correct for intersection of skew planes through origin 2', function(){
+
+		var o1 = [0,0,0];
+		var n1 = numeric.normalized( [-1,1,1] );
+		var o2 = [0,0,5];
+		var n2 = numeric.normalized( [1,1,1] );
+
+		var res = verb.eval.geom.intersect_planes(o1, n1, o2, n2);
+
+		console.log(res)
+
+		// res.origin.should.be.eql( [0,0,0] );
+		// res.dir.should.be.eql( [0,0,1] );
 
 	});
 
 });
 
-function vecShouldBe( expected, test, tol ){
+// describe("verb.eval.geom.point_on_ray",function(){
 
-	if (tol === undefined) tol = verb.TOLERANCE;
+// 	it('is correct for a basic example', function(){
 
- 	test.length.should.be.equal( expected.length );
+// 		var o = [1,2,3];
+// 		var d = [1,1,1];
+// 		var u = 2;
+// 		var res = verb.eval.geom.point_on_ray(o, d, u);
 
- 	for (var i = 0; i < test.length; i++){
+// 		res.should.eql( [3, 4, 5] );
 
- 		test[i].should.be.approximately( expected[i], tol );
+// 	});
 
- 	}
+// });
 
-}
+// describe("verb.eval.geom.clip_ray_in_coplanar_tri",function(){
 
-describe("verb.eval.geom.clip_ray_in_coplanar_tri",function(){
+// 	it('is correct for a basic example', function(){
 
-	it('is correct for a basic example', function(){
-
-		var o = [0,1,0];
-		var d = [1,0,0];
+// 		var o = [0,1,0];
+// 		var d = [1,0,0];
 		
-		var pts = [ [0,0,0], [2,0,0], [2, 2,0] ];
-		var tri = [ 0, 1, 2 ];
-		var uvs = [ [0,0], [2,0], [2, 2] ];
+// 		var pts = [ [0,0,0], [2,0,0], [2, 2,0] ];
+// 		var tri = [ 0, 1, 2 ];
+// 		var uvs = [ [0,0], [2,0], [2, 2] ];
 
-		var res = verb.eval.geom.clip_ray_in_coplanar_tri(o, d, pts, tri, uvs );
+// 		var res = verb.eval.geom.clip_ray_in_coplanar_tri(o, d, pts, tri, uvs );
 
-		res.min.u.should.be.approximately(1, verb.TOLERANCE);
-		res.max.u.should.be.approximately(2, verb.TOLERANCE);
+// 		res.min.u.should.be.approximately(1, verb.TOLERANCE);
+// 		res.max.u.should.be.approximately(2, verb.TOLERANCE);
 
-		vecShouldBe( [1,1], res.min.uv );
-		vecShouldBe( [2,1], res.max.uv );
+// 		vecShouldBe( [1,1], res.min.uv );
+// 		vecShouldBe( [2,1], res.max.uv );
 
-		vecShouldBe( [1,1,0], res.min.pt );
-		vecShouldBe( [2,1,0], res.max.pt );
+// 		vecShouldBe( [1,1,0], res.min.pt );
+// 		vecShouldBe( [2,1,0], res.max.pt );
 
-	});
+// 	});
 
-	// TODO: test degeneracies
-	// ray aligned with edge
+// 	// TODO: test degeneracies
+// 	// ray aligned with edge
 
-});
+// });
 
-describe("verb.eval.geom.merge_tri_clip_intervals",function(){
+// describe("verb.eval.geom.merge_tri_clip_intervals",function(){
 
-	it('is correct for a basic example', function(){
+// 	it('is correct for a basic example', function(){
 
-		var o = [0,1,0];
-		var d = [1,0,0];
+// 		var o = [0,1,0];
+// 		var d = [1,0,0];
 		
-		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
-		var tri1 = [ 0, 1, 2 ];
-		var uvs1 = [ [0,0], [2,0], [2, 2] ];
+// 		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
+// 		var tri1 = [ 0, 1, 2 ];
+// 		var uvs1 = [ [0,0], [2,0], [2, 2] ];
 
-		var clip1 = verb.eval.geom.clip_ray_in_coplanar_tri(o, d, pts1, tri1, uvs1 );
+// 		var clip1 = verb.eval.geom.clip_ray_in_coplanar_tri(o, d, pts1, tri1, uvs1 );
 
-		// console.log(clip1);
+// 		// console.log(clip1);
 
-		var pts2 = [ [1,1,-1], [3,1,-1], [3,1,2] ];
-		var tri2 = [ 0, 1, 2 ];
-		var uvs2 = [ [0,0], [3,0], [3,3] ];
-		var clip2 = verb.eval.geom.clip_ray_in_coplanar_tri(o, d, pts2, tri2, uvs2 );
+// 		var pts2 = [ [1,1,-1], [3,1,-1], [3,1,2] ];
+// 		var tri2 = [ 0, 1, 2 ];
+// 		var uvs2 = [ [0,0], [3,0], [3,3] ];
+// 		var clip2 = verb.eval.geom.clip_ray_in_coplanar_tri(o, d, pts2, tri2, uvs2 );
 
-		// console.log(clip2);
+// 		// console.log(clip2);
 
-		var res = verb.eval.geom.merge_tri_clip_intervals(clip1, clip2, pts1, tri1, uvs1, pts2, tri2, uvs2);
+// 		var res = verb.eval.geom.merge_tri_clip_intervals(clip1, clip2, pts1, tri1, uvs1, pts2, tri2, uvs2);
 
-		// console.log(res);
+// 		// console.log(res);
 
-	});
+// 	});
 
-	// TODO: check all failure scenarios
+// 	// TODO: check all failure scenarios
 
-});
+// });
 
-describe("verb.eval.geom.intersect_tris",function(){
+// describe("verb.eval.geom.intersect_tris",function(){
 
-	it('is correct for a basic example', function(){
+// 	it('is correct for a basic example', function(){
 		
-		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
-		var tri1 = [ 0, 1, 2 ];
-		var uvs1 = [ [0,0], [2,0], [2, 2] ];
+// 		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
+// 		var tri1 = [ 0, 1, 2 ];
+// 		var uvs1 = [ [0,0], [2,0], [2, 2] ];
 
-		var pts2 = [ [1,1,-1], [3,1,-1], [3,1,2] ];
-		var tri2 = [ 0, 1, 2 ];
-		var uvs2 = [ [0,0], [3,0], [3,3] ];
+// 		var pts2 = [ [1,1,-1], [3,1,-1], [3,1,2] ];
+// 		var tri2 = [ 0, 1, 2 ];
+// 		var uvs2 = [ [0,0], [3,0], [3,3] ];
 
-		var res = verb.eval.geom.intersect_tris( pts1, tri1, uvs1, pts2, tri2, uvs2 );
+// 		var res = verb.eval.geom.intersect_tris( pts1, tri1, uvs1, pts2, tri2, uvs2 );
 
-		// console.log(res);
+// 		// console.log(res);
 
-	});
+// 	});
 
-});
+// });
 
 
-describe("verb.eval.mesh.intersect_meshes_by_aabb",function(){
+// describe("verb.eval.mesh.intersect_meshes_by_aabb",function(){
 
-	it('is correct for a basic example', function(){
+// 	it('is correct for a basic example', function(){
 		
-		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
-		var tris1 = [[ 0, 1, 2 ]];
-		var uvs1 = [ [0,0], [2,0], [2, 2] ];
+// 		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
+// 		var tris1 = [[ 0, 1, 2 ]];
+// 		var uvs1 = [ [0,0], [2,0], [2, 2] ];
 
-		var pts2 = [ [1,1,-1], [3,1,-1], [3,1,2] ];
-		var tris2 = [[ 0, 1, 2 ]];
-		var uvs2 = [ [0,0], [3,0], [3,3] ];
+// 		var pts2 = [ [1,1,-1], [3,1,-1], [3,1,2] ];
+// 		var tris2 = [[ 0, 1, 2 ]];
+// 		var uvs2 = [ [0,0], [3,0], [3,3] ];
 
-		var res = verb.eval.mesh.intersect_meshes_by_aabb( pts1, tris1, uvs1, pts2, tris2, uvs2 );
+// 		var res = verb.eval.mesh.intersect_meshes_by_aabb( pts1, tris1, uvs1, pts2, tris2, uvs2 );
 
-		console.log(res);
+// 		console.log(res);
 
-	});
+// 	});
 
-});
+// });
 
-describe("verb.eval.mesh.kdtree_from_segs",function(){
+// describe("verb.eval.mesh.kdtree_from_segs",function(){
 
-	it('is correct for a basic example', function(){
+// 	it('is correct for a basic example', function(){
 
-		// the uvs dont matter
-		var segs = [
-				[ 	{ pt: [1,2,3] }, 
-						{ pt: [5,6,7] } ],
-				[ 	{ pt: [2,2,3] }, 
-						{ pt: [6,6,7] } ],
-				[ 	{ pt: [3,2,3] }, 
-						{ pt: [7,6,7] } ] ];
+// 		// the uvs dont matter
+// 		var segs = [
+// 				[ 	{ pt: [1,2,3] }, 
+// 						{ pt: [5,6,7] } ],
+// 				[ 	{ pt: [2,2,3] }, 
+// 						{ pt: [6,6,7] } ],
+// 				[ 	{ pt: [3,2,3] }, 
+// 						{ pt: [7,6,7] } ] ];
 
-		var tree = verb.eval.mesh.kdtree_from_segs( segs );
+// 		var tree = verb.eval.mesh.kdtree_from_segs( segs );
 
-		// result should be non-null
+// 		// result should be non-null
 
-	});
+// 	});
 
-});
+// });
 
-describe("verb.eval.mesh.lookup_adj_segment",function(){
+// describe("verb.eval.mesh.lookup_adj_segment",function(){
 
-	it('returns null when only nearest is argument itself', function(){
+// 	it('returns null when only nearest is argument itself', function(){
 
-		var segs = [
-				[ 	{ pt: [1,2,3], key: "a" }, 
-						{ pt: [5,6,7], key: "b" } ],
-				[ 	{ pt: [2,2,3], key: "c" }, 
-						{ pt: [6,6,7], key: "d" } ],
-				[ 	{ pt: [3,2,3], key: "e" }, 
-						{ pt: [7,6,7], key: "f" } ] ];
+// 		var segs = [
+// 				[ 	{ pt: [1,2,3], key: "a" }, 
+// 						{ pt: [5,6,7], key: "b" } ],
+// 				[ 	{ pt: [2,2,3], key: "c" }, 
+// 						{ pt: [6,6,7], key: "d" } ],
+// 				[ 	{ pt: [3,2,3], key: "e" }, 
+// 						{ pt: [7,6,7], key: "f" } ] ];
 
-		var end = segs[0][0];
+// 		var end = segs[0][0];
 
-		var tree = verb.eval.mesh.kdtree_from_segs( segs );
-		var nearest = verb.eval.mesh.lookup_adj_segment( end, tree );
+// 		var tree = verb.eval.mesh.kdtree_from_segs( segs );
+// 		var nearest = verb.eval.mesh.lookup_adj_segment( end, tree );
 
-		// result should be null
+// 		// result should be null
 
-	});
+// 	});
 
-	it('is correct for a basic example', function(){
+// 	it('is correct for a basic example', function(){
 
-		var segs = [
-				[ 	{ pt: [1,2,3], key: "a" }, 
-						{ pt: [5,6,7], key: "b" } ],
-				[ 	{ pt: [2,2,3], key: "c" }, 
-						{ pt: [6,6,7], key: "d" } ],
-				[ 	{ pt: [3,2,3], key: "e" }, 
-						{ pt: [7,6,7], key: "f" } ] ];
+// 		var segs = [
+// 				[ 	{ pt: [1,2,3], key: "a" }, 
+// 						{ pt: [5,6,7], key: "b" } ],
+// 				[ 	{ pt: [2,2,3], key: "c" }, 
+// 						{ pt: [6,6,7], key: "d" } ],
+// 				[ 	{ pt: [3,2,3], key: "e" }, 
+// 						{ pt: [7,6,7], key: "f" } ] ];
 
-		var end = { pt: [1,2,3], key: "g" }; // same pos, but different object
+// 		var end = { pt: [1,2,3], key: "g" }; // same pos, but different object
 
-		var tree = verb.eval.mesh.kdtree_from_segs( segs );
-		var nearest = verb.eval.mesh.lookup_adj_segment( end, tree );
+// 		var tree = verb.eval.mesh.kdtree_from_segs( segs );
+// 		var nearest = verb.eval.mesh.lookup_adj_segment( end, tree );
 
-		nearest.should.be.equal(segs[0][0])
+// 		nearest.should.be.equal(segs[0][0])
 
-	});
+// 	});
 
-});
+// });
 
-describe("verb.eval.mesh.make_intersect_polylines ",function(){
+// describe("verb.eval.mesh.make_intersect_polylines ",function(){
 
-	it('is correct for a basic example', function(){
+// 	it('is correct for a basic example', function(){
 		
-		// not closed
-		var segs = [
-				[ 	{ pt: [10,0,0], key: "a" }, 
-						{ pt: [10,10,0], key: "b" } ],
-				[ 	{ pt: [0,10,0], key: "c" }, 
-						{ pt: [10,10,0], key: "d" } ],
-				[ 	{ pt: [5,0,0], key: "e" }, 
-						{ pt: [0,10,0], key: "f" } ] ];
+// 		// not closed
+// 		var segs = [
+// 				[ 	{ pt: [10,0,0], key: "a" }, 
+// 						{ pt: [10,10,0], key: "b" } ],
+// 				[ 	{ pt: [0,10,0], key: "c" }, 
+// 						{ pt: [10,10,0], key: "d" } ],
+// 				[ 	{ pt: [5,0,0], key: "e" }, 
+// 						{ pt: [0,10,0], key: "f" } ] ];
 
-		var pls = verb.eval.mesh.make_intersect_polylines( segs );
+// 		var pls = verb.eval.mesh.make_intersect_polylines( segs );
 
-		// discovers one continuous polyline
+// 		// discovers one continuous polyline
 
-		pls.length.should.be.equal( 1 );
-		pls[0].length.should.be.equal( 4 );
-		pls[0][0].pt.should.be.eql( [10,0,0] );
-		pls[0][1].pt.should.be.eql( [10,10,0] );
-		pls[0][2].pt.should.be.eql( [0,10,0] );
-		pls[0][3].pt.should.be.eql( [5,0,0] );
+// 		pls.length.should.be.equal( 1 );
+// 		pls[0].length.should.be.equal( 4 );
+// 		pls[0][0].pt.should.be.eql( [10,0,0] );
+// 		pls[0][1].pt.should.be.eql( [10,10,0] );
+// 		pls[0][2].pt.should.be.eql( [0,10,0] );
+// 		pls[0][3].pt.should.be.eql( [5,0,0] );
 
-	});
+// 	});
 
-});
+// });
 
-describe("verb.eval.mesh.intersect_meshes_by_aabb",function(){
+// describe("verb.eval.mesh.intersect_meshes_by_aabb",function(){
 
-	// it('is correct for two intersecting triangles', function(){
+// 	// it('is correct for two intersecting triangles', function(){
 		
-	// 	var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
-	// 	var tris1 = [[ 0, 1, 2 ]];
-	// 	var uvs1 = [ [0,0], [2,0], [2, 2] ];
+// 	// 	var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
+// 	// 	var tris1 = [[ 0, 1, 2 ]];
+// 	// 	var uvs1 = [ [0,0], [2,0], [2, 2] ];
 
-	// 	var pts2 = [ [1,1,-1], [1,1,5], [1,-5,-1] ];
-	// 	var tris2 = [[ 0, 1, 2 ]];
-	// 	var uvs2 = [ [0,0], [3,0], [3,3] ];
+// 	// 	var pts2 = [ [1,1,-1], [1,1,5], [1,-5,-1] ];
+// 	// 	var tris2 = [[ 0, 1, 2 ]];
+// 	// 	var uvs2 = [ [0,0], [3,0], [3,3] ];
 
-	// 	var pls = verb.eval.mesh.intersect_meshes_by_aabb( pts1, tris1, uvs1, pts2, tris2, uvs2 );
+// 	// 	var pls = verb.eval.mesh.intersect_meshes_by_aabb( pts1, tris1, uvs1, pts2, tris2, uvs2 );
 
-	// 	pls.length.should.be.equal( 1 );
-	// 	pls[0].length.should.be.equal( 2 );
+// 	// 	pls.length.should.be.equal( 1 );
+// 	// 	pls[0].length.should.be.equal( 2 );
 
-	// });
+// 	// });
 
-	// it('is correct for two non-intersecting triangles', function(){
+// 	// it('is correct for two non-intersecting triangles', function(){
 		
-	// 	var pts1 = [ [10,10,10], [2,10,10], [2, 2,10] ];
-	// 	var tris1 = [[ 0, 1, 2 ]];
-	// 	var uvs1 = [ [0,0], [2,0], [2, 2] ];
+// 	// 	var pts1 = [ [10,10,10], [2,10,10], [2, 2,10] ];
+// 	// 	var tris1 = [[ 0, 1, 2 ]];
+// 	// 	var uvs1 = [ [0,0], [2,0], [2, 2] ];
 
-	// 	var pts2 = [ [1,1,-1], [3,1,-1], [3,1,2] ];
-	// 	var tris2 = [[ 0, 1, 2 ]];
-	// 	var uvs2 = [ [0,0], [3,0], [3,3] ];
+// 	// 	var pts2 = [ [1,1,-1], [3,1,-1], [3,1,2] ];
+// 	// 	var tris2 = [[ 0, 1, 2 ]];
+// 	// 	var uvs2 = [ [0,0], [3,0], [3,3] ];
 
-	// 	var res = verb.eval.mesh.intersect_meshes_by_aabb( pts1, tris1, uvs1, pts2, tris2, uvs2 );
+// 	// 	var res = verb.eval.mesh.intersect_meshes_by_aabb( pts1, tris1, uvs1, pts2, tris2, uvs2 );
 
-	// 	res.length.should.be.equal( 0 );
+// 	// 	res.length.should.be.equal( 0 );
 
-	// });
+// 	// });
 
-	it('is correct for two non-intersecting triangles', function(){
-		
-		verb.init();
+// 	verb.init();
 
-		var p1 = [0,0,0]
-			, p2 = [1,0,0]
-			, p3 = [1,1,0]
-			, p4 = [0,1,0];
+// 	var p1 = [0,0,0]
+// 		, p2 = [1,0,0]
+// 		, p3 = [1,1,0]
+// 		, p4 = [0,1,0];
 
-		var srf1 = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
+// 	var srf1 = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
 
-		var p5 = [0.5,-0.5,-0.5]
-			, p6 = [0.5,0.5,-0.5]
-			, p7 = [0.5,0.5,0.5]
-			, p8 = [0.5,-0.5,0.5];
+// 	var p5 = [0.5,-0.5,-0.5]
+// 		, p6 = [0.5,0.5,-0.5]
+// 		, p7 = [0.5,0.5,0.5]
+// 		, p8 = [0.5,-0.5,0.5];
 
-		var srf2 = new verb.geom.FourPointSurface( p5, p6, p7, p8 );
+// 	var srf2 = new verb.geom.FourPointSurface( p5, p6, p7, p8 );
 
+// 	var opts = { minDivsU: 20, minDivsV: 20 };
+// 	var tess1 = srf1.tessellate(opts);
+// 	var tess2 = srf2.tessellate(opts);
 
+// 	it('is correct for two non-intersecting triangles', function(){
 
-		var opts = { minDivsU: 3, minDivsV: 3 };
-		var tess1 = srf1.tessellate(opts);
-		var tess2 = srf2.tessellate(opts);
+// 		var res = verb.eval.mesh.intersect_meshes_by_aabb( tess1.points, tess1.faces, tess1.uvs, tess2.points, tess2.faces, tess2.uvs );
 
-		console.log(tess1)
+// 		for (var i = 0; i < res.length; i++){
+// 			console.log("PL")
+// 			console.log( res[i].map(function(x){ return x.pt; }) );
+// 		}
 
-		// console.log(tess1)
+// 		// 
 
-		// console.log(tess1.points)
-		var res = verb.eval.mesh.intersect_meshes_by_aabb( tess1.points, tess1.faces, tess1.uvs, tess2.points, tess2.faces, tess2.uvs );
+// 		// res.length.should.be.equal( 0 );
 
-		console.log( res[0].map(function(x){ return x.pt; }) );
+// 	});
 
-		// res.length.should.be.equal( 0 );
-
-	});
-
-});
+// });
 

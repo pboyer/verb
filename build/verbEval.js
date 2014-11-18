@@ -1042,54 +1042,73 @@ verb.eval.geom.intersect_rays = function( a0, a, b0, b ) {
 //
 
 var d3 = function(a, b){
-	return numeric.norm2( numeric.sub( a.pt, b.pt ));
+	var dif = numeric.sub( a.pt, b.pt );
+	return numeric.dot( dif, dif );
 };
 
 verb.eval.mesh.intersect_meshes_by_aabb = function( points1, tris1, uvs1, points2, tris2, uvs2 ) {
+
+	var d1 = Date.now();
 
 	// build aabb for each mesh
 	var tri_indices1 = verb.range(tris1.length)
 	  , tri_indices2 = verb.range(tris2.length)
 	  , aabb1 = verb.eval.mesh.make_mesh_aabb_tree( points1, tris1, tri_indices1 )
-	  , aabb2 = verb.eval.mesh.make_mesh_aabb_tree( points2, tris2, tri_indices2 )
+	  , aabb2 = verb.eval.mesh.make_mesh_aabb_tree( points2, tris2, tri_indices2 );
+
+	console.log(aabb1);
  
+	var d2 = Date.now();
+	console.log( (d2 - d1) / 1000, " s to compute make mesh aabb trees");
+
+	d1 = Date.now();
+
   // intersect and get the pairs of triangle intersctions
 	var bbints = verb.eval.geom.intersect_aabb_trees( points1, tris1, points2, tris2, aabb1, aabb2 );
 
-// console.log( bbints )
+	d2 = Date.now();
+	console.log( (d2 - d1) / 1000, " s to compute intersect mesh aabb trees");
 
-	// remove any duplicates
-	bbints = verb.unique( bbints, function(a, b){
-		return (a[0] === b[0] && a[1] === b[1]) || (a[1] === b[0] && a[0] === b[1]);
-	});
-
-	// console.log( bbints )
+	d1 = Date.now();
 
 	// get the segments of the intersection crv with uvs
 	var segments = bbints.map(function(ids){
-													console.log(ids)
-													return verb.eval.geom.intersect_tris( points1, tris1[ ids[0] ], uvs1, points2, tris2[ ids[1] ], uvs2 );
+													var res = verb.eval.geom.intersect_tris( points1, tris1[ ids[0] ], uvs1, points2, tris2[ ids[1] ], uvs2 );
+													if (!res) return res;
+
+													res[0].tri1id = ids[0];
+													res[1].tri1id = ids[0];
+													res[0].tri2id = ids[1];
+													res[1].tri2id = ids[1];
+
+													return res;
 												})
 												.filter(function(x){ return x; })
-												.filter(function(x){ return d3( x[0], x[1] ) > verb.TOLERANCE })
+												.filter(function(x){ return d3( x[0], x[1] ) > verb.TOLERANCE });
 
-	segments = verb.unique( segments, function(a, b){
-
-		return ( d3(a[0], b[0]) < verb.TOLERANCE && d3(a[1], b[1]) < verb.TOLERANCE ) ||
-			( d3(a[1], b[0]) < verb.TOLERANCE && d3(a[0], b[1]) < verb.TOLERANCE );
-
-	});
-
-	console.log( JSON.stringify( segments ) )
+	d2 = Date.now();
+	console.log( (d2 - d1) / 1000, " s to intersect ", bbints.length, " triangle pairs");
+	console.log( bbints );
+	console.log( segments.length, " intersections were produced");
 
 	if (segments.length === 0) return [];
 
-	return verb.eval.mesh.make_intersect_polylines( segments );
+	d1 = Date.now();
+
+	var res = verb.eval.mesh.make_intersect_polylines( segments );
+
+	d2 = Date.now();
+	console.log( (d2 - d1) / 1000, " s to construct polylines");
+
+	return res;
 
 }
 
 
 verb.eval.mesh.make_intersect_polylines = function( segments ) {
+
+	// debug (return all segments)
+	// return segments;
 
 	// we need to be able to traverse from one end of a segment to the other
 	segments.forEach( function(s){
@@ -1102,8 +1121,6 @@ verb.eval.mesh.make_intersect_polylines = function( segments ) {
 
 	// flatten everything, we no longer need the segments
 	var ends = segments.flatten();
-
-	console.log( ends )
 
 	// step 1: assigning the vertices to the segment ends 
 	ends.forEach(function(segEnd){
@@ -1171,7 +1188,7 @@ verb.eval.mesh.make_intersect_polylines = function( segments ) {
 }
 
 verb.eval.mesh.pt_dist = function(a, b){
-  return Math.pow(a.x - b.x, 2) +  Math.pow(a.y - b.y, 2) + Math.pow(a.z - b.z, 2);
+  return Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2) + Math.pow(a.z - b.z, 2);
 };
 
 verb.eval.mesh.kdtree_from_segs = function( segments ){
@@ -1191,16 +1208,18 @@ verb.eval.mesh.kdtree_from_segs = function( segments ){
 
 verb.eval.mesh.lookup_adj_segment = function( segEnd, tree ) {
 
-	var adj = tree.nearest({ x: segEnd.pt[0], y: segEnd.pt[1], z: segEnd.pt[2] }, 2)
+	// we look up 3 elements because we need to find the unique adj ele
+	// we expect one result to be self, one to be neighbor and no more
+	var adj = tree.nearest({ x: segEnd.pt[0], y: segEnd.pt[1], z: segEnd.pt[2] }, 3)
 								.filter(function(r){ 
 									return segEnd != r[0].ele && r[1] < verb.TOLERANCE;
 								})
 								.map(function(r){ return r[0].ele; });
 
-	return adj.length != 0 ? adj[0] : null;
+	// if its not unique (i.e. were at a branching point) we dont return it
+	return (adj.length === 1) ? adj[0] : null;
 
 }
-
 
 //
 // ####intersect_tris( points1, tri1, uvs1, points2, tri2, uvs2 )
@@ -1226,10 +1245,9 @@ verb.eval.geom.intersect_tris = function( points1, tri1, uvs1, points2, tri2, uv
 	var o1 = points2[ tri2[0] ];
 
 // TODO: fail early if all of the points of tri1 are on the same side of plane of tri2
-
+	
 	// 1) intersect with planes to yield ray of intersection
 	var ray = verb.eval.geom.intersect_planes(o0, n0, o1, n1);
-
 	if (!ray.intersects) return null;
 
 	// 2) clip the ray within tri1
@@ -1242,7 +1260,6 @@ verb.eval.geom.intersect_tris = function( points1, tri1, uvs1, points2, tri2, uv
 
 	// 4) find the interval that overlaps
 	var merged = verb.eval.geom.merge_tri_clip_intervals(clip1, clip2, points1, tri1, uvs1, points2, tri2, uvs2 );
-
 	if (merged === null) return null;
 
 	return [ 	{ uvtri1 : merged.uv1tri1, uvtri2: merged.uv1tri2, pt: merged.pt1 }, 
@@ -1264,6 +1281,8 @@ verb.eval.geom.clip_ray_in_coplanar_tri = function(o1, d1, points, tri, uvs ){
 	var minU = null;
 	var maxU = null;
 
+	// need to clip in order to maximize the width of the intervals
+
 	for (var i = 0; i < 3; i++){
 
 		var o0 = o[i];
@@ -1272,17 +1291,18 @@ verb.eval.geom.clip_ray_in_coplanar_tri = function(o1, d1, points, tri, uvs ){
 		var res = verb.eval.geom.intersect_rays( o0, d0, o1, d1 );
 
 		// the rays are parallel
-		if (res === null) continue;
+		if (res === null) {
+			continue;
+		}
 
 		var useg = res[0];
 		var uray = res[1];
 
 		// if outside of triangle edge interval, discard
-		if (useg < 0 || useg > l[i]) continue;
+		if (useg < -verb.EPSILON || useg > l[i] + verb.EPSILON) continue;
 
 		// if inside interval
 		if (minU === null || uray < minU.u){
-
 			minU = { 	u: uray, 
 								pt: verb.eval.geom.point_on_ray( o1, d1, uray ),
 								uv: numeric.add( uvs[i], numeric.mul( useg / l[i], uvd[i] ) ) };
@@ -1290,7 +1310,6 @@ verb.eval.geom.clip_ray_in_coplanar_tri = function(o1, d1, points, tri, uvs ){
 		}
 
 		if (maxU === null || uray > maxU.u){
-
 			maxU = { 	u: uray, 
 								pt: verb.eval.geom.point_on_ray( o1, d1, uray ),
 								uv: numeric.add( uvs[i], numeric.mul( useg / l[i], uvd[i] ) ) };
@@ -1298,7 +1317,9 @@ verb.eval.geom.clip_ray_in_coplanar_tri = function(o1, d1, points, tri, uvs ){
 		}
 	}
 
-	if (maxU === null || minU === null) return null;
+	if (maxU === null || minU === null) {
+		return null;
+	}
 
 	// 3) otherwise, return minU maxU along with uv info
 	return { min : minU, max: maxU };
@@ -1313,8 +1334,14 @@ verb.eval.geom.point_on_ray = function(o, d, u){
 
 verb.eval.geom.merge_tri_clip_intervals = function(clip1, clip2, points1, tri1, uvs1, points2, tri2, uvs2){
 
+	// console.log( clip1, clip2 );
+
 	// if the intervals dont overlap, fail
-	if (clip2.min.u > clip1.max.u || clip1.min.u > clip2.max.u) return null;
+	if (clip2.min.u > clip1.max.u + verb.EPSILON 
+		|| clip1.min.u > clip2.max.u + verb.EPSILON) {
+		// console.log('intervals bad!')
+		return null;
+	}
 
 	// label each clip to indicate which triangle it came from
 	clip1.tri = 0;
@@ -1363,21 +1390,60 @@ verb.eval.geom.intersect_planes = function(o1, n1, o2, n2){
 
 	if (numeric.dot(d, d) < verb.EPSILON) return { intersects: false };
 
-	var d11 = numeric.dot( n1, n1 );
-	var d12 = numeric.dot( n1, n2 );
-	var d22 = numeric.dot( n2, n2 );
+	// find the largest index of d
+	var li = 0;
+	var mi = Math.abs( d[0] );
+	var m1 = Math.abs( d[1] );
+	var m2 = Math.abs( d[2] );
 
-	// rhs of the plane equation: dot( n, X ) = d
-	var d1 = numeric.dot( o1, n1 );
-	var d2 = numeric.dot( o2, n2 );
+	if ( m1 > mi ){
+		li = 1;
+		mi = m1;
+	}
 
-	var denom = d11 * d22 - d12 * d22;
-	var k1 = ( d1 * d22 - d2* d12 ) / denom;
-	var k2 = ( d2* d11 - d1 * d12 ) / denom;
+	if ( m2 > mi ){
+		li = 2;
+		mi = m2;
+	}
 
-	var p = numeric.add( numeric.mul( k1, n1 ), numeric.mul(k2, n2) );
+	var a1, b1, a2, b2;
 
-	return { intersects: true, origin: p, dir : d };
+	if ( li === 0 ){
+		a1 = n1[1];
+		b1 = n1[2];
+		a2 = n2[1];
+		b2 = n2[2];
+	} else if ( li === 1 ){
+		a1 = n1[0];
+		b1 = n1[2];
+		a2 = n2[0];
+		b2 = n2[2];
+	} else {
+		a1 = n1[0];
+		b1 = n1[1];
+		a2 = n2[0];
+		b2 = n2[1];
+	}
+
+	// n dot X = d
+	var d1 = -numeric.dot( o1, n1 );
+	var d2 = -numeric.dot( o2, n2 );
+
+	var den = a1 * b2 - b1 * a2;
+
+	var x = (b1 * d2 - d1 * b2) / den;
+	var y = (d1 * a2 - a1 * d2) / den;
+	var p;
+
+	if ( li === 0 ){
+		p = [0,x,y];
+	} else if ( li === 1 ){
+		p = [x,0,y];
+	} else {
+		p = [x,y,0];
+	}
+
+	return { intersects: true, origin: p, dir : numeric.normalized( d ) };
 
 }
 
