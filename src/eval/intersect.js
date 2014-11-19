@@ -894,7 +894,72 @@ verb.eval.geom.intersect_rays = function( a0, a, b0, b ) {
 
 		return [t, w];
 
- }
+}
+
+verb.eval.nurbs.refine_rational_surface_intersect_point = function(uv1, uv2, degree_u1, knots_u1, degree_v1, knots_v1, homo_control_points_srf1, degree_u2, knots_u2, degree_v2, knots_v2, homo_control_points_srf2, tol){
+
+ var pds, p, pn, pu, pv, qds, q, qn, qu, qv;
+ var maxits = 10;
+ var its = 0;
+
+ do {
+
+	// 1) eval normals, pts on respective surfaces (p, q, pn, qn)
+
+		var pds = verb.eval.nurbs.rational_surface_derivs( degree_u1, knots_u1, degree_v1, knots_v1, homo_control_points1, 1, uv1[0], uv1[1] );
+		var p = pds[0][0];
+		var pu = pds[0][1];
+		var pv = pds[1][0];
+		var pn = numeric.normalized( numeric.cross( pu, pv ) );
+		var pd = numeric.dot( pn, p );
+		
+		var qds = verb.eval.nurbs.rational_surface_derivs( degree_u2, knots_u2, degree_v2, knots_v2, homo_control_points2, 1, uv2[0], uv2[1] );
+		var q = qds[0][0];
+		var qu = qds[0][1];
+		var qv = qds[1][0];
+		var qn = numeric.normalized( numeric.cross( qu, qv ) );
+		var qd = numeric.dot( qn, q );
+
+ 	// 2) construct plane perp to both that passes through p (fn)
+
+		var fn = numeric.cross( pn, qn );
+		var fd = numeric.dot( fn, p );
+
+ 	// 3) x = intersection of all 3 planes
+
+		var xnum = numeric.add(
+								numeric.mul( pd, numeric.cross(qn, fn) ),
+								numeric.mul( qd, numeric.cross(fn, pn) ),
+								numeric.mul( fd, fn ) );
+
+		var xden = numeric.dot( fn, fn );
+
+ 	// 4) represent the difference vectors (pd = x - p, qd = x - q) in the partial derivative vectors of the respective surfaces (pu, pv, qu, qv)
+
+		var pdif = numeric.sub( x, p );
+
+		var pudif = numeric.dot( pu, pdif );
+		var pvdif = numeric.dot( pv, pdif );
+
+		var qdif = numeric.sub( x, q );
+
+		var qudif = numeric.dot( qu, qdif );
+		var qvdif = numeric.dot( qv, qdif );
+
+ 	// 5) this the increment, to put on uv1 and uv2
+
+		uv1 = numeric.add( [pudif, pvdif], uv1 );
+		uv2 = numeric.add( [qudif, qvdif], uv2 );
+
+ 	// repeat
+ 		its++;
+
+ } while( its < maxits ) // tolerance is not met? not sure what this should be
+
+ 
+
+}
+
 
 
 //
@@ -915,11 +980,6 @@ verb.eval.geom.intersect_rays = function( a0, a, b0, b ) {
 // **returns** 
 // + *Array*, a point represented by an array of length (dim)
 //
-
-var d3 = function(a, b){
-	var dif = numeric.sub( a.pt, b.pt );
-	return numeric.dot( dif, dif );
-};
 
 verb.eval.mesh.intersect_meshes_by_aabb = function( points1, tris1, uvs1, points2, tris2, uvs2 ) {
 
@@ -959,7 +1019,13 @@ verb.eval.mesh.intersect_meshes_by_aabb = function( points1, tris1, uvs1, points
 													return res;
 												})
 												.filter(function(x){ return x; })
-												.filter(function(x){ return d3( x[0], x[1] ) > verb.TOLERANCE });
+												.filter(function(x){ 
+													var dif = numeric.sub( x[0].pt, x[1].pt );
+													return numeric.dot( dif, dif ) > verb.TOLERANCE 
+												});
+
+
+	// TODO: weed out duplicates - can potentially result colinear edges
 
 	d2 = Date.now();
 	console.log( (d2 - d1) / 1000, " s to intersect ", bbints.length, " triangle pairs");
