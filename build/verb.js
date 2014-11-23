@@ -151,6 +151,26 @@ verb.right = function(arr){
 }
 
 //
+// ####last(arr)
+//
+// Get the last element of an array
+//
+// **params**
+// + *Array*, array of stuff
+// 
+// **returns** 
+// + *Something*, the last element of the array
+//
+
+verb.last = function(arr){
+
+	if (!arr.length) return undefined;
+
+	return arr[arr.length-1];
+}
+
+
+//
 // ####rightWithPivot(arr)
 //
 // Get the second half of an array including the pivot
@@ -4555,10 +4575,10 @@ verb.eval.nurbs.divide_rational_surface_adaptive = function( degree_u, knots_u, 
 	var min_divs_v = options.minDivsV;
 
 	// get necessary intervals
-	var max_u = Math.max.apply(null, knots_u);
-	var min_u = Math.min.apply(null, knots_u);
-	var max_v = Math.max.apply(null, knots_v);
-	var min_v = Math.min.apply(null, knots_v);
+	var max_u = verb.last(knots_u);
+	var min_u = knots_u[0];
+	var max_v = verb.last(knots_v);
+	var min_v = knots_v[0];
 
 	var u_interval = (max_u - min_u) / min_divs_u
 		, v_interval = (max_v - min_v) / min_divs_v;
@@ -4600,7 +4620,7 @@ verb.eval.nurbs.divide_rational_surface_adaptive = function( degree_u, knots_u, 
 
 }
 
-verb.eval.nurbs.is_rational_surface_domain_flat = function(srf, u0, u1, v0, v1, options ){
+verb.eval.nurbs.is_rational_surface_domain_flat = function(srf, u0, u1, v0, v1 ){
 
 	var eval_srf = verb.eval.nurbs.rational_surface_point
 		, u_half_step = (u[1] - u[0] / 2) * ( Math.random() * 0.1 + 1 )
@@ -4630,6 +4650,7 @@ verb.eval.nurbs.tessellate_rational_surface_adaptive = function( degree_u, knots
 	// triangulation step
 	var res = verb.eval.nurbs.triangulate_adaptive_refinement_node_tree( arrTree );
 
+	// TODO not sure actually what is the problem here
 	return verb.eval.nurbs.unique_mesh( res );
 
 }
@@ -4639,7 +4660,6 @@ verb.eval.nurbs.unique_mesh = function( mesh ) {
 	return mesh;
 
 }
-
 
 Array.prototype.where = function( predicate ){
 
@@ -4709,7 +4729,6 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalSurface = function( uv ){
 																												pt_u, 
 																												pt_v );
 	var pt = derivs[0][0];
-
 	points.push( pt );
 
 	var normal = numeric.cross(  derivs[0][1], derivs[1][0] );
@@ -4815,7 +4834,7 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulate = function( mesh ){
 
 	// recurse on the children
 	this.children.forEach(function(x){
-		if (x === null) return;
+		if (!x) return;
 		x.triangulate( mesh );
 	});
 
@@ -4823,7 +4842,7 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulate = function( mesh ){
 
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.shouldDivide = function( options, currentDepth ){
 
-	if ( ( options.minDepth && currentDepth < options.minDepth ) ){
+	if ( options.minDepth && currentDepth < options.minDepth ){
 		return true;
 	} else if ( this.srf && !verb.eval.nurbs.is_rational_surface_domain_flat( this.srf, this.u0, this.u1, this.v0, this.v1, options ) ){
 		return true;
@@ -4837,6 +4856,8 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.divide = function( options, cur
 
 	// initialize currentDepth if it's not present
 	if (currentDepth === undefined) currentDepth = 0;
+
+	options = options || {};
 
 	if ( !this.shouldDivide( options, currentDepth )  ) return;
 

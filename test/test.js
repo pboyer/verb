@@ -4,6 +4,19 @@ var should = require('should')
 console.log('running from ', process.cwd() );
 console.log(verb);
 
+
+function vecShouldBe( expected, test, tol ){
+
+	if (tol === undefined) tol = verb.TOLERANCE;
+
+ 	test.length.should.be.equal( expected.length );
+
+ 	for (var i = 0; i < test.length; i++){
+ 		test[i].should.be.approximately( expected[i], tol );
+ 	}
+
+}
+
 describe("Array.flatten",function(){
 
 	it('returns a flattened version of a nested array', function(){
@@ -4833,17 +4846,6 @@ describe("verb.eval.mesh.intersect_aabb_trees",function(){
 
 });
 
-function vecShouldBe( expected, test, tol ){
-
-	if (tol === undefined) tol = verb.TOLERANCE;
-
- 	test.length.should.be.equal( expected.length );
-
- 	for (var i = 0; i < test.length; i++){
- 		test[i].should.be.approximately( expected[i], tol );
- 	}
-
-}
 
 describe("verb.eval.geom.intersect_3_planes",function(){
 
@@ -5470,100 +5472,109 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.divide",function(){
 
 	});
 
-// 	it('can be called with no options provided', function(){
+	it('can be called with no options provided', function(){
+
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, null, [null, null, null, null] );
+
+		f.divide();
+
+		// not division is done
+		should.equal( f.children, null);
+
+	});
+
+	it('can produce a non-uniformly nested tree', function(){
+
+		
+
+	});
+
+	// more tests for options as they're implemented
+
+});
+
+describe("verb.eval.nurbs.AdaptiveRefinementNode.triangulate",function(){
+
+	it('can triangulate a leaf with no edges', function(){
 
 
 
-// 	});
+	});
 
-// 	it('can produce a non-uniformly nested tree', function(){
-
-
-// 	});
-
-// 	// more tests for options as they're implemented
-
-// });
-
-// describe("verb.eval.nurbs.AdaptiveRefinementNode.triangulate",function(){
-
-// 	it('can triangulate a leaf with no edges', function(){
+	it('can triangulate a node with children', function(){
 
 
-// 	});
+	});
 
-// 	it('can triangulate a node with children', function(){
-
-
-// 	});
-
-// 	it('can triangulate a node with children and un-nested neighbors', function(){
+	it('can triangulate a node with children and un-nested neighbors', function(){
 
 
-// 	});
+	});
 
-// 	it('can triangulate a node with children and equally nested neighbors', function(){
-
-
-// 	});
-
-// 	it('can triangulate a node with children and more nested neighbors', function(){
+	it('can triangulate a node with children and equally nested neighbors', function(){
 
 
-// 	});
+	});
 
-// });
-
-
-// describe("verb.eval.nurbs.AdaptiveRefinementNode.evalSurface",function(){
-
-// 	it('works as expected', function(){
+	it('can triangulate a node with children and more nested neighbors', function(){
 
 
-// 	});
+	});
 
-// });
-
-// describe("verb.eval.nurbs.divide_rational_surface_adaptive",function(){
-
-// 	it('divides the domain according to minDivsU, minDivsV', function(){
-
-// 	});
-
-// });
-
-// describe("verb.eval.nurbs.is_rational_surface_domain_flat",function(){
-
-// 	it('evaluates as expected for different tolerances', function(){
+});
 
 
-// 	});
+describe("verb.eval.nurbs.AdaptiveRefinementNode.evalSurface",function(){
 
-// });
-
-// describe("verb.eval.nurbs.triangulate_adaptive_refinement_node_tree",function(){
-
-// 	it('produces a mesh from a uniform divided surface', function(){
+	it('works as expected', function(){
 
 
-// 	});
+	});
+
+});
+
+describe("verb.eval.nurbs.divide_rational_surface_adaptive",function(){
+
+	it('divides the domain according to minDivsU, minDivsV', function(){
+
+	});
+
+});
+
+describe("verb.eval.nurbs.is_rational_surface_domain_flat",function(){
+
+	it('evaluates as expected for different tolerances', function(){
 
 
-// 	it('produces a mesh from a non-uniformly divided surface', function(){
 
 
-// 	});
+	});
 
-// });
+});
 
-// describe("verb.eval.nurbs.tesselate_rational_surface_adaptive",function(){
+describe("verb.eval.nurbs.triangulate_adaptive_refinement_node_tree",function(){
 
-// 	it('produces a mesh from a divided surface', function(){
+	it('produces a mesh from a uniform divided surface', function(){
 
 
-// 	});
+	});
 
-// });
+
+	it('produces a mesh from a non-uniformly divided surface', function(){
+
+
+	});
+
+});
+
+describe("verb.eval.nurbs.tesselate_rational_surface_adaptive",function(){
+
+	it('produces a mesh from a divided surface', function(){
+
+
+	});
+
+});
 
 
 

@@ -151,6 +151,26 @@ verb.right = function(arr){
 }
 
 //
+// ####last(arr)
+//
+// Get the last element of an array
+//
+// **params**
+// + *Array*, array of stuff
+// 
+// **returns** 
+// + *Something*, the last element of the array
+//
+
+verb.last = function(arr){
+
+	if (!arr.length) return undefined;
+
+	return arr[arr.length-1];
+}
+
+
+//
 // ####rightWithPivot(arr)
 //
 // Get the second half of an array including the pivot
