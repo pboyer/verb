@@ -5322,28 +5322,54 @@ describe("verb.eval.mesh.make_intersect_polylines ",function(){
 
 });
 
+describe("verb.eval.geom.intersect_tris",function(){
 
-// describe("verb.eval.geom.intersect_tris",function(){
-
-// 	it('is correct for a basic example', function(){
+	it('is correct for a basic example', function(){
 		
-// 		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
-// 		var tri1 = [ 0, 1, 2 ];
-// 		var uvs1 = [ [0,0], [2,0], [2, 2] ];
+		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
+		var tri1 = [ 0, 1, 2 ];
+		var uvs1 = [ [0,0], [2,0], [2, 2] ];
 
-// 		var pts2 = [ [1,1,-1], [3,1,-1], [3,1,2] ];
-// 		var tri2 = [ 0, 1, 2 ];
-// 		var uvs2 = [ [0,0], [3,0], [3,3] ];
+		var pts2 = [ [1,0.5,-1], [1,2.5,-1], [1,0.5,1] ];
+		var tri2 = [ 0, 1, 2 ];
+		var uvs2 = [ [0,0], [2,0], [0,2] ];
 
-// 		var res = verb.eval.geom.intersect_tris( pts1, tri1, uvs1, pts2, tri2, uvs2 );
+		var res = verb.eval.geom.intersect_tris( pts1, tri1, uvs1, pts2, tri2, uvs2 );
 
-// 		// TODO: need to check that uvs are expected in various scenarios
+		vecShouldBe( [1, 0.5], res[0].uvtri1 );
+		vecShouldBe( [0, 1], res[0].uvtri2 );
+		vecShouldBe( [1, 0.5, 0], res[0].pt );
 
-// 		// console.log(res);
+		vecShouldBe( [1, 1], res[1].uvtri1 );
+		vecShouldBe( [0.5, 1], res[1].uvtri2 );
+		vecShouldBe( [1, 1, 0], res[1].pt );
 
-// 	});
+	});
 
-// });
+	it('is correct for triangles sharing an edge', function(){
+		
+		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
+		var tri1 = [ 0, 1, 2 ];
+		var uvs1 = [ [0,0], [2,0], [2, 2] ];
+
+		var pts2 = [ [2, 0, 0], [2, 2, 0], [2,0,2] ];
+		var tri2 = [ 0, 1, 2 ];
+		var uvs2 = [ [0,0], [2,0], [0,2] ];
+
+		var res = verb.eval.geom.intersect_tris( pts1, tri1, uvs1, pts2, tri2, uvs2 );
+
+		vecShouldBe( [2,0], res[0].uvtri1 );
+		vecShouldBe( [0,0], res[0].uvtri2 );
+		vecShouldBe( [2,0,0], res[0].pt );
+
+		vecShouldBe( [2,2], res[1].uvtri1 );
+		vecShouldBe( [2,0], res[1].uvtri2 );
+		vecShouldBe( [2, 2, 0], res[1].pt );
+
+	});
+
+
+});
 
 
 // describe("verb.eval.mesh.intersect_meshes_by_aabb",function(){
