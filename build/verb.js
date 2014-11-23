@@ -3671,7 +3671,7 @@ verb.eval.mesh.make_intersect_polylines = function( segments ) {
 
 			if (segEnd.adj) return;
 
-			var adjEnd = verb.eval.mesh.lookup_adj_segment( segEnd, tree );
+			var adjEnd = verb.eval.mesh.lookup_adj_segment( segEnd, tree, segments.length );
 
 			if (adjEnd && !adjEnd.adj){
 
@@ -3750,11 +3750,13 @@ verb.eval.mesh.kdtree_from_segs = function( segments ){
 
 }
 
-verb.eval.mesh.lookup_adj_segment = function( segEnd, tree ) {
+verb.eval.mesh.lookup_adj_segment = function( segEnd, tree, numSegments ) {
+
+	var numResults = numSegments ? Math.min( numSegments, 3 ) : 3;
 
 	// we look up 3 elements because we need to find the unique adj ele
 	// we expect one result to be self, one to be neighbor and no more
-	var adj = tree.nearest({ x: segEnd.pt[0], y: segEnd.pt[1], z: segEnd.pt[2] }, 3)
+	var adj = tree.nearest({ x: segEnd.pt[0], y: segEnd.pt[1], z: segEnd.pt[2] }, numResults)
 								.filter(function(r){ 
 									return segEnd != r[0].ele && r[1] < verb.TOLERANCE;
 								})

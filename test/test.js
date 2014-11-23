@@ -5371,66 +5371,45 @@ describe("verb.eval.geom.intersect_tris",function(){
 
 });
 
+describe("verb.eval.mesh.kdtree_from_segs",function(){
 
-// describe("verb.eval.mesh.intersect_meshes_by_aabb",function(){
+	it('is correct for a basic example', function(){
 
-// 	it('is correct for a basic example', function(){
-		
-// 		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
-// 		var tris1 = [[ 0, 1, 2 ]];
-// 		var uvs1 = [ [0,0], [2,0], [2, 2] ];
+		// the uvs dont matter
+		var segs = [
+				[ 	{ pt: [1,2,3] }, 
+						{ pt: [5,6,7] } ],
+				[ 	{ pt: [2,2,3] }, 
+						{ pt: [6,6,7] } ],
+				[ 	{ pt: [3,2,3] }, 
+						{ pt: [7,6,7] } ] ];
 
-// 		var pts2 = [ [1,1,-1], [3,1,-1], [3,1,2] ];
-// 		var tris2 = [[ 0, 1, 2 ]];
-// 		var uvs2 = [ [0,0], [3,0], [3,3] ];
+		var tree = verb.eval.mesh.kdtree_from_segs( segs );
 
-// 		var res = verb.eval.mesh.intersect_meshes_by_aabb( pts1, tris1, uvs1, pts2, tris2, uvs2 );
+		tree.should.not.be.null;
 
-// 		console.log(res);
+	});
 
-// 	});
-
-// });
-
-// describe("verb.eval.mesh.kdtree_from_segs",function(){
-
-// 	it('is correct for a basic example', function(){
-
-// 		// the uvs dont matter
-// 		var segs = [
-// 				[ 	{ pt: [1,2,3] }, 
-// 						{ pt: [5,6,7] } ],
-// 				[ 	{ pt: [2,2,3] }, 
-// 						{ pt: [6,6,7] } ],
-// 				[ 	{ pt: [3,2,3] }, 
-// 						{ pt: [7,6,7] } ] ];
-
-// 		var tree = verb.eval.mesh.kdtree_from_segs( segs );
-
-// 		// result should be non-null
-
-// 	});
-
-// });
+});
 
 describe("verb.eval.mesh.intersect_meshes_by_aabb",function(){
 
-	// it('is correct for two intersecting triangles', function(){
+	it('is correct for two intersecting triangles', function(){
 		
-	// 	var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
-	// 	var tris1 = [[ 0, 1, 2 ]];
-	// 	var uvs1 = [ [0,0], [2,0], [2, 2] ];
+		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
+		var tris1 = [[ 0, 1, 2 ]];
+		var uvs1 = [ [0,0], [2,0], [2, 2] ];
 
-	// 	var pts2 = [ [1,1,-1], [1,1,5], [1,-5,-1] ];
-	// 	var tris2 = [[ 0, 1, 2 ]];
-	// 	var uvs2 = [ [0,0], [3,0], [3,3] ];
+		var pts2 = [ [1,1,-1], [1,1,5], [1,-5,-1] ];
+		var tris2 = [[ 0, 1, 2 ]];
+		var uvs2 = [ [0,0], [3,0], [3,3] ];
 
-	// 	var pls = verb.eval.mesh.intersect_meshes_by_aabb( pts1, tris1, uvs1, pts2, tris2, uvs2 );
+		var pls = verb.eval.mesh.intersect_meshes_by_aabb( pts1, tris1, uvs1, pts2, tris2, uvs2 );
 
-	// 	pls.length.should.be.equal( 1 );
-	// 	pls[0].length.should.be.equal( 2 );
+		pls.length.should.be.equal( 1 );
+		pls[0].length.should.be.equal( 2 );
 
-	// });
+	});
 
 	// it('is correct for two non-intersecting triangles', function(){
 		
