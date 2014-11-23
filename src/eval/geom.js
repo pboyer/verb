@@ -14,6 +14,10 @@ verb.eval.nurbs.rational_interp_curve = function( points, degree ) {
 	// 4) solve for c in all 3 dimensions
 
 	degree = degree || 3;
+
+	if (points.length < degree + 1){
+		throw new Error("You need to supply at least degree + 1 points!")
+	}
 	
 	var us = [ 0 ]; 
 	for (var i = 1; i < points.length; i++){
@@ -414,9 +418,9 @@ verb.eval.nurbs.get_extruded_surface = function( axis, length, prof_knots, prof_
 
 	// original control points
 	for (var j = 0; j < prof_control_points.length; j++){
-		control_points[0][j] = prof_control_points[j];
+		control_points[2][j] = prof_control_points[j];
 		control_points[1][j] = numeric.add( halfTranslation, prof_control_points[j] );
-		control_points[2][j] = numeric.add( translation, prof_control_points[j] );
+		control_points[0][j] = numeric.add( translation, prof_control_points[j] );
 
 		weights[0][j] = prof_weights[j];
 		weights[1][j] = prof_weights[j];

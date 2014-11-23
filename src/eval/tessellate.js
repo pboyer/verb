@@ -232,8 +232,11 @@ verb.eval.nurbs.tessellate_rational_surface_naive = function( degree_u, knots_u,
 		divs_v = 1;
 	}
 
-	var span_u = 1 / divs_u,
-		span_v = 1 / divs_v;
+	var u_span = knots_u[knots_u.length-1] - knots_u[0];
+	var v_span = knots_v[knots_v.length-1] - knots_v[0];
+
+	var span_u = u_span / divs_u,
+		span_v = v_span / divs_v;
   
   var points = [];
   var uvs = [];
@@ -279,8 +282,6 @@ verb.eval.nurbs.tessellate_rational_surface_naive = function( degree_u, knots_u,
 	return { points: points, faces : faces, uvs: uvs, normals: normals };
 
 }
-
-
 
 //
 // ####rational_curve_regular_sample( degree, knots, control_points, num_samples [, include_u] )
@@ -435,11 +436,6 @@ verb.eval.nurbs.rational_curve_adaptive_sample_range = function( degree, knots, 
 
 		}
 }
-
-
-
-
-
 
 //
 // ####three_points_are_flat( p1, p2, p3, tol )

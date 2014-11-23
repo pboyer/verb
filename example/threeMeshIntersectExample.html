@@ -73,10 +73,13 @@
 			var threeFaces = tess.faces.map(function(faceIndices){
 				var normals = faceIndices.map(function(x){
 					var vn = tess.normals[x];
+					vn = numeric.normalized( vn );
 					return new THREE.Vector3( vn[0], vn[1], vn[2] );
 				});
 
-				return new THREE.Face3(faceIndices[0],faceIndices[1],faceIndices[2], normals);
+				// console.log(normals)
+
+				return new THREE.Face3(faceIndices[0],faceIndices[1],faceIndices[2], normals[0]);
 			});
 
 			geometry.faces.push.apply(geometry.faces, threeFaces);
@@ -87,8 +90,8 @@
 
 		function addMeshToScene(mesh){
 
-			// var material = new THREE.MeshNormalMaterial( { side: THREE.DoubleSide, wireframe: true, shading: THREE.SmoothShading } );
-			var material = new THREE.MeshBasicMaterial( { color: 0x444444, side: THREE.DoubleSide, wireframe: true, shading: THREE.SmoothShading } );
+			var material = new THREE.MeshNormalMaterial( { wireframe: true, shading: THREE.SmoothShading, side: THREE.DoubleSide } );
+			// var material = new THREE.MeshPhongMaterial( { color: 0x444444, side: THREE.DoubleSide, shading: THREE.SmoothShading } );
 			var tm = new THREE.Mesh( mesh, material );
 
 			scene.add( tm );
@@ -100,7 +103,7 @@
 			var hexString = Math.floor(Math.random()*16777215).toString(16);
 			var hex = parseInt(hexString, 16);
 
-			var lineMat = new THREE.LineBasicMaterial({ linewidth: 5, color: hex });
+			var lineMat = new THREE.LineBasicMaterial({ linewidth: 2, color: 0xffffff });
 			var l = new THREE.Line( geom, lineMat );
 
 			scene.add( l );
@@ -132,10 +135,10 @@
 			srf2 = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
 
 			udivs0 = 40;
-			vdivs0 = 20;
+			vdivs0 = 40;
 
-			udivs1 = 20;
-			vdivs1 = 20;
+			udivs1 = 40;
+			vdivs1 = 40;
 
 		}
 
@@ -185,10 +188,37 @@
 			srf2 = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
 
 			udivs0 = 80;
-			vdivs0 = 81;
+			vdivs0 = 40;
 
 			udivs1 = 2;
-			vdivs1 = 100;
+			vdivs1 = 40;
+
+		}
+
+
+		function exampleTorusCylinderSuccess3(){
+
+			// center, xaxis, yaxis, radius
+			var profile = new verb.geom.Circle( [5,0,0], [1,0,0], [0,0,1], 2 );
+
+			var base = [0,0,0];
+			var axis = [0,0,1];
+			var angle = 2 * Math.PI
+			srf1 = new verb.geom.RevolvedSurface( base, axis, angle, profile );
+
+			var axis = [-1,0,0]
+				, xaxis = [0,0,1]
+				, base = [8,0,2]
+				, height = 16
+				, radius = 2;
+
+			srf2 = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
+
+			udivs0 = 34;
+			vdivs0 = 20;
+
+			udivs1 = 2;
+			vdivs1 = 40;
 
 		}
 
@@ -202,7 +232,7 @@
 
 			srf1 = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
 
-			var p5 = [5,5,0]
+			var p5 	= [5,5,0]
 				, p6 = [-5,5,0]
 				, p7 = [-5,-5,0]
 				, p8 = [5,-5,0];
@@ -210,10 +240,61 @@
 			srf2 = new verb.geom.FourPointSurface( p5, p6, p7, p8 );
 
 			udivs0 = 40;
-			vdivs0 = 20;
+			vdivs0 = 40;
 
-			udivs1 = 20;
-			vdivs1 = 20;
+			udivs1 = 40;
+			vdivs1 = 40;
+
+		}
+
+
+		function examplePlanePlaneSuccess(){
+
+			var p1 =   [5,0,0]
+				, p2 = [5,0,6]
+				, p3 = [0,1,6]
+				, p4 = [0,0,0];
+
+			srf1 = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
+
+			var p5 = [5,-5,-5]
+				, p6 = [5,5,5]
+				, p7 = [0,5,9]
+				, p8 = [0,-5,-5];
+
+			srf2 = new verb.geom.FourPointSurface( p5, p6, p7, p8 );
+
+			udivs0 = 15;
+			vdivs0 = 15;
+
+			udivs1 = 15;
+			vdivs1 = 15;
+
+		}
+
+		function exampleGlancingPlaneCylinderSuccess(){
+
+			var axis = [0,0,1]
+				, xaxis = [1,0,0]
+				, base = [0,0,0]
+				, height = 5
+				, radius = 3;
+
+			srf1 = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
+
+			var axis2 = [1,0,0]
+				, xaxis2 = [0,1,0]
+				, base2 = [0,0,-1]
+				, height2 = 10
+				, radius2 = 3;
+
+			srf2 = new verb.geom.Cylinder( axis2, xaxis2, base2, height2, radius2 );
+
+			udivs0 = 60;
+			vdivs0 = 60;
+
+			udivs1 = 60;
+			vdivs1 = 60;
 
 		}
 
@@ -222,26 +303,12 @@
 
 		var srf1, srf2;
 
-		// var p1 = [-5,0,0]
-		// 	, p2 = [5,0,0.5]
-		// 	, p3 = [5,5,0]
-		// 	, p4 = [0,5,0];
-
-		// var srf1 = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
-
-		// var p5 = [5,5,0]
-		// 	, p6 = [-5,5,5]
-		// 	, p7 = [-5,-5,5]
-		// 	, p8 = [5,-5,0];
-
-		// var srf2 = new verb.geom.FourPointSurface( p5, p6, p7, p8 );
-
-
 		//exampleTorusCylinderSuccess();
-		// exampleTorusCylinderSuccess();
+		//exampleTorusCylinderSuccess();
 		// exampleGlancingPlaneCylinderSuccess();
-		exampleTorusCylinderSuccess2();
-
+		//exampleTorusCylinderSuccess2();
+		exampleTorusCylinderSuccess3();
+		//examplePlanePlaneSuccess();
 
 		addMeshToScene( tessellate(srf1, udivs0, vdivs0) );
 		addMeshToScene( tessellate(srf2, udivs1, vdivs1) );
@@ -249,25 +316,19 @@
 		var tess1 = srf1.tessellate({ minDivsU: udivs0, minDivsV: vdivs0 });
 		var tess2 = srf2.tessellate({ minDivsU: udivs1, minDivsV: vdivs1 });
 
-		console.log( tess1.faces.length, " tris in tess1");
-		console.log( tess2.faces.length, " tris in tess2");
-		console.log( tess2.faces.length * tess1.faces.length, " potential intersections");
+		// var res = verb.eval.mesh.intersect_meshes_by_aabb( tess1.points, tess1.faces, 
+		// 	tess1.uvs, tess2.points, tess2.faces, tess2.uvs );
 
-		var d1 = Date.now();
+		var ref = verb.eval.nurbs.intersect_rational_surface_surface_by_aabb_refine(srf1.get('degreeU'), srf1.get('knotsU'), srf1.get('degreeV'), srf1.get('knotsV'), srf1.homogenize(), srf2.get('degreeU'), srf2.get('knotsU'), srf2.get('degreeV'), srf2.get('knotsV'), srf2.homogenize(), 1e-6, 40, 40);
 
-		var res = verb.eval.mesh.intersect_meshes_by_aabb( tess1.points, tess1.faces, 
-			tess1.uvs, tess2.points, tess2.faces, tess2.uvs );
+		for (var i = 0; i < ref.length; i++){
 
-		var d2 = Date.now();
+			var homo = verb.eval.nurbs.homogenize_1d( ref[i].control_points, ref[i].weights );
+			var res2 = verb.eval.nurbs.rational_curve_adaptive_sample(ref[i].degree, ref[i].knots, homo, 1e-6 );
 
-		console.log( (d2 - d1) / 1000, " s to complete" );
-		console.log( res )
-
-		for (var i = 0; i < res.length; i++){
 			addLinesToScene( 
 				pointsAsGeometry( 
-					asVector3( res[i].map(function(x){ return x.pt; }) 
-			)));
+					asVector3( res2 )));
 		}
 
 		render();

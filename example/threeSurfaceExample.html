@@ -28,37 +28,21 @@
 		// construct the scene & camera
 		var scene = new THREE.Scene();
 		var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-		camera.position.z = 1;
-		camera.position.y = -1;
-		camera.position.x = 2;
+		camera.position.z = 20;
 
 		var renderer = new THREE.WebGLRenderer();
 		renderer.setSize( window.innerWidth, window.innerHeight );
 		document.body.appendChild( renderer.domElement );
 
-		var controls = new THREE.OrbitControls(camera, renderer.domElement);
-
-		function render() {
-			requestAnimationFrame( render );
-			renderer.render( scene, camera );
-		}
-
-		function asVector3(pts){
-			return pts.map(function(x){
-				return new THREE.Vector3(x[0],x[1],x[2]);
-			});
-		}
-
-		function pointsAsGeometry(threePts){
-			var geometry = new THREE.Geometry();
-			geometry.vertices.push.apply( geometry.vertices, threePts );
-			return geometry;
-		}
+		// construct a nurbs surface
+		verb.init();
+		var p1 = [0,0,0], p2 = [10,0,0], p3 = [10,10,5], p4 = [0,10,0];
+		var srf = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
 
 		// verb.NurbsSurface -> THREE.Geometry
-		function tessellate(srf, udivs, vdivs) {
+		function tessellate(srf) {
 
-			var tess = srf.tessellate({ minDivsU: udivs, minDivsV: vdivs });
+			var tess = srf.tessellate();
 
 			var geometry = new THREE.Geometry();
 
@@ -85,63 +69,19 @@
 
 		}
 
-		function addMeshToScene(mesh){
+		var geometry = tessellate(srf);
 
-			var material = new THREE.MeshNormalMaterial( { side: THREE.DoubleSide, wireframe: true, shading: THREE.SmoothShading } );
-			var tm = new THREE.Mesh( mesh, material );
+		var material = new THREE.MeshNormalMaterial( { side: THREE.DoubleSide, shading: THREE.SmoothShading } );
+		var mesh = new THREE.Mesh( geometry, material );
 
-			scene.add( tm );
+		scene.add( mesh );
 
+		var controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+		function render() {
+			requestAnimationFrame( render );
+			renderer.render( scene, camera );
 		}
-
-		function addLinesToScene(geom){
-
-			var lineMat = new THREE.LineBasicMaterial({ linewidth: 3 });
-			var l = new THREE.Line( geom, lineMat );
-
-			scene.add( l );
-
-		}
-
-		verb.init();
-
-		var p1 = [0,0,0]
-			, p2 = [1,0,0]
-			, p3 = [1,1,0]
-			, p4 = [0,1,0];
-
-		var srf1 = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
-
-		var p5 = [0.3,-0.5,-0.5]
-			, p6 = [0.5,0.5,-0.5]
-			, p7 = [0.7,0.5,0.5]
-			, p8 = [0.5,-0.5,0.5];
-
-		var srf2 = new verb.geom.FourPointSurface( p5, p6, p7, p8 );
-
-		var udivs = 1;
-		var vdivs = 1;
-
-		addMeshToScene( tessellate(srf1, udivs, vdivs) );
-		addMeshToScene( tessellate(srf2, udivs, vdivs) );
-
-		var opts = { minDivsU: udivs, minDivsV: vdivs };
-		var tess1 = srf1.tessellate(opts);
-		var tess2 = srf2.tessellate(opts);
-
-		var res = verb.eval.mesh.intersect_meshes_by_aabb( tess1.points, tess1.faces, 
-			tess1.uvs, tess2.points, tess2.faces, tess2.uvs );
-
-		console.log( res )
-
-		for (var i = 0; i < res.length; i++){
-			addLinesToScene( 
-				pointsAsGeometry( 
-					asVector3( res[i].map(function(x){ return x.pt; }) 
-			)));
-		}
-
-
 		render();
 
 	</script>

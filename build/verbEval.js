@@ -1019,36 +1019,160 @@ verb.eval.geom.intersect_rays = function( a0, a, b0, b ) {
 
 		return [t, w];
 
+}
+
+verb.eval.geom.intersect_3_planes = function(n0, d0, n1, d1, n2, d2){
+
+	var u = numeric.cross( n1, n2 );
+	var den = numeric.dot( n0, u );
+
+	if (Math.abs(den) < verb.EPSILON) return null;
+
+	var num = numeric.add(
+							numeric.mul( d0, u ), 
+							numeric.cross( n0, 
+								numeric.sub( 	numeric.mul( d2, n1 ), numeric.mul( d1, n2 ) )));
+
+	return numeric.mul( 1 / den, num );
+
+}
+
+verb.eval.nurbs.refine_rational_surface_intersect_point = function(uv1, uv2, degree_u1, knots_u1, degree_v1, knots_v1, homo_control_points1, degree_u2, knots_u2, degree_v2, knots_v2, homo_control_points2, tol){
+
+	// var start = false;
+	// var objective = function(x) { 
+
+	// 	var p1 = verb.eval.nurbs.rational_surface_point( degree_u1, knots_u1,  degree_v1, knots_v1, homo_control_points1, x[0], x[1] )
+	// 		, p2 = verb.eval.nurbs.rational_surface_point( degree_u2, knots_u2,  degree_v2, knots_v2, homo_control_points2, x[2], x[3] )
+	// 		, p1_p2 = numeric.sub(p1, p2);
+
+	// 	var d = numeric.dot(p1_p2, p1_p2);
+
+	// 	if (!start){
+	// 		console.log("dstart", d);
+	// 		start = true;
+	// 	}
+	// 	return d;
+	// }
+
+	// var sol_obj = numeric.uncmin( objective, [uv1[0], uv1[1], uv2[0], uv2[1]], 1e-4);
+	// var sol = sol_obj.solution;
+
+	// console.log("DONE")
+	// console.log( sol_obj.f );
+
+	// var p = verb.eval.nurbs.rational_surface_point( degree_u1, knots_u1,  degree_v1, knots_v1, homo_control_points1, sol[0], sol[1])
+
+	// return {uv1: [ sol[0], sol[1] ], uv2: [ sol[2], sol[3] ], pt: p, d: sol_obj.f };
+
+ var pds, p, pn, pu, pv, pd, qds, q, qn, qu, qv, qd, dist;
+ var maxits = 1;
+ var its = 0;
+
+ var r = function(u, v){
+ 	return verb.eval.nurbs.rational_surface_derivs( degree_u1, knots_u1, degree_v1, knots_v1, 
+			homo_control_points1, 1, u, v );
  }
 
+ var s = function(u, v){
+ 	return verb.eval.nurbs.rational_surface_derivs( degree_u2, knots_u2, degree_v2, knots_v2, 
+			homo_control_points2, 1, u, v );
+ }
 
-//
-// ####intersect_meshes_by_aabb( points1, tris1, uvs1, points2, tris2, uvs2 )
-//
-// Intersect two meshes via aabb intersection
-//
-// **params**
-// + *Number*, integer degree of surface in u direction
-// + *Array*, array of nondecreasing knot values in u direction
-// + *Number*, integer degree of surface in v direction
-// + *Array*, array of nondecreasing knot values in v direction
-// + *Array*, 3d array of control points, top to bottom is increasing u direction, left to right is increasing v direction,
-// and where each control point is an array of length (dim+1)
-// + *Number*, u parameter at which to evaluate the surface point
-// + *Number*, v parameter at which to evaluate the surface point
-// 
-// **returns** 
-// + *Array*, a point represented by an array of length (dim)
-//
+ do {
 
-var d3 = function(a, b){
-	var dif = numeric.sub( a.pt, b.pt );
-	return numeric.dot( dif, dif );
-};
+	// 1) eval normals, pts on respective surfaces (p, q, pn, qn)
+
+		pds = r( uv1[0], uv1[1] );
+		p = pds[0][0];
+		pu = pds[1][0];
+		pv = pds[0][1];
+		pn = numeric.normalized( numeric.cross( pu, pv ) );
+		pd = numeric.dot( pn, p );
+		
+		qds = s( uv2[0], uv2[1] );
+		q = qds[0][0];
+		qu = qds[1][0];
+		qv = qds[0][1];
+		qn = numeric.normalized( numeric.cross( qu, qv ) );
+		qd = numeric.dot( qn, q );
+
+		// if tolerance is met, exit loop
+		dist = numeric.norm2( numeric.sub(p, q) );
+
+		
+		if (dist < tol) {
+			console.log("distf = ", dist);
+			break;
+		}
+
+ 	// 2) construct plane perp to both that passes through p (fn)
+
+		var fn = numeric.normalized( numeric.cross( pn, qn ) );
+		var fd = numeric.dot( fn, p );
+
+ 	// 3) x = intersection of all 3 planes
+		var x = verb.eval.geom.intersect_3_planes( pn, pd, qn, qd, fn, fd );
+
+		if (x === null) throw new Error("panic!")
+
+ 	// 4) represent the difference vectors (pd = x - p, qd = x - q) in the partial 
+	// 		derivative vectors of the respective surfaces (pu, pv, qu, qv)
+
+		var pdif = numeric.sub( x, p );
+		var qdif = numeric.sub( x, q );
+
+		var rw = numeric.cross( pu, pn ); 
+		var rt = numeric.cross( pv, pn );
+
+		var su = numeric.cross( qu, qn );
+		var sv = numeric.cross( qv, qn );
+
+		var dw = numeric.dot( rt, pdif ) / numeric.dot( rt, pu );
+		var dt = numeric.dot( rw, pdif ) / numeric.dot( rw, pv );
+
+		var du = numeric.dot( sv, qdif ) / numeric.dot( sv, qu );
+		var dv = numeric.dot( su, qdif ) / numeric.dot( su, qv );
+
+		uv1 = numeric.add( [dw, dt], uv1 );
+		uv2 = numeric.add( [du, dv], uv2 );
+
+ 	// repeat
+ 		its++;
+
+ } while( its < maxits ) // tolerance is not met? not sure what this should be
+
+ return {uv1: uv1, uv2: uv2, pt: p, d: dist };
+
+}
+
+verb.eval.nurbs.intersect_rational_surface_surface_by_aabb_refine = function( degree_u1, knots_u1, degree_v1, knots_v1, homo_control_points_srf1, degree_u2, knots_u2, degree_v2, knots_v2, homo_control_points_srf2, tol, divs_u, divs_v ) {
+
+	// 1) tessellate the meshes to get the approximate intersections
+	var tess1 = verb.eval.nurbs.tessellate_rational_surface_naive( degree_u1, knots_u1, degree_v1, knots_v1, homo_control_points_srf1, divs_u, divs_v );
+	var tess2 = verb.eval.nurbs.tessellate_rational_surface_naive( degree_u2, knots_u2, degree_v2, knots_v2, homo_control_points_srf2, divs_u, divs_v );
+	var resApprox = verb.eval.mesh.intersect_meshes_by_aabb( tess1.points, tess1.faces, tess1.uvs, tess2.points, tess2.faces, tess2.uvs );
+
+	// 2) refine the intersection points so that they lie on both surfaces
+	var exactPls = resApprox.map(function(pl){
+		return pl.map( function(inter){
+			return verb.eval.nurbs.refine_rational_surface_intersect_point(inter.uvtri1, inter.uvtri2, degree_u1, knots_u1, degree_v1, knots_v1, homo_control_points_srf1, 
+				degree_u2, knots_u2, degree_v2, knots_v2, homo_control_points_srf2, tol );
+		});
+	});
+
+	// 3) perform cubic interpolation
+	return exactPls.map(function(x){
+		return verb.eval.nurbs.rational_interp_curve( x.map(function(x){ return x.pt; }), 3 ); 
+	});
+
+	// TODO: represent this in uv space
+	// TODO: refine between initial points
+	// TODO: use adaptive sampling of surfaces
+
+}
 
 verb.eval.mesh.intersect_meshes_by_aabb = function( points1, tris1, uvs1, points2, tris2, uvs2 ) {
-
-	var d1 = Date.now();
 
 	// build aabb for each mesh
 	var tri_indices1 = verb.range(tris1.length)
@@ -1056,20 +1180,8 @@ verb.eval.mesh.intersect_meshes_by_aabb = function( points1, tris1, uvs1, points
 	  , aabb1 = verb.eval.mesh.make_mesh_aabb_tree( points1, tris1, tri_indices1 )
 	  , aabb2 = verb.eval.mesh.make_mesh_aabb_tree( points2, tris2, tri_indices2 );
 
-	console.log(aabb1);
- 
-	var d2 = Date.now();
-	console.log( (d2 - d1) / 1000, " s to compute make mesh aabb trees");
-
-	d1 = Date.now();
-
   // intersect and get the pairs of triangle intersctions
 	var bbints = verb.eval.geom.intersect_aabb_trees( points1, tris1, points2, tris2, aabb1, aabb2 );
-
-	d2 = Date.now();
-	console.log( (d2 - d1) / 1000, " s to compute intersect mesh aabb trees");
-
-	d1 = Date.now();
 
 	// get the segments of the intersection crv with uvs
 	var segments = bbints.map(function(ids){
@@ -1084,23 +1196,36 @@ verb.eval.mesh.intersect_meshes_by_aabb = function( points1, tris1, uvs1, points
 													return res;
 												})
 												.filter(function(x){ return x; })
-												.filter(function(x){ return d3( x[0], x[1] ) > verb.TOLERANCE });
+												.filter(function(x){ 
+													var dif = numeric.sub( x[0].pt, x[1].pt );
+													return numeric.dot( dif, dif ) > verb.TOLERANCE 
+												});
 
-	d2 = Date.now();
-	console.log( (d2 - d1) / 1000, " s to intersect ", bbints.length, " triangle pairs");
-	console.log( bbints );
-	console.log( segments.length, " intersections were produced");
+	// TODO: this is too expensive and this only occurs when the intersection
+	// 			 line is on an edge.  we should mark these to avoid doing all of 
+	//			 these computations
+	segments = verb.unique( segments, function(a, b){
+
+		var s1 = numeric.sub( a[0].uvtri1, b[0].uvtri1 );
+		var d1 = numeric.dot( s1, s1 );
+
+		var s2 = numeric.sub( a[1].uvtri1, b[1].uvtri1 );
+		var d2 = numeric.dot( s2, s2 );
+
+		var s3 = numeric.sub( a[0].uvtri1, b[1].uvtri1 );
+		var d3 = numeric.dot( s3, s3 );
+
+		var s4 = numeric.sub( a[1].uvtri1, b[0].uvtri1 );
+		var d4 = numeric.dot( s4, s4 );
+
+		return ( d1 < verb.TOLERANCE && d2 < verb.TOLERANCE ) || 
+			( d3 < verb.TOLERANCE && d4 < verb.TOLERANCE );
+
+	});
 
 	if (segments.length === 0) return [];
 
-	d1 = Date.now();
-
-	var res = verb.eval.mesh.make_intersect_polylines( segments );
-
-	d2 = Date.now();
-	console.log( (d2 - d1) / 1000, " s to construct polylines");
-
-	return res;
+	return verb.eval.mesh.make_intersect_polylines( segments );
 
 }
 
@@ -1216,6 +1341,8 @@ verb.eval.mesh.lookup_adj_segment = function( segEnd, tree ) {
 								})
 								.map(function(r){ return r[0].ele; });
 
+	// there may be as many as 1 duplicate pt
+
 	// if its not unique (i.e. were at a branching point) we dont return it
 	return (adj.length === 1) ? adj[0] : null;
 
@@ -1245,6 +1372,7 @@ verb.eval.geom.intersect_tris = function( points1, tri1, uvs1, points2, tri2, uv
 	var o1 = points2[ tri2[0] ];
 
 // TODO: fail early if all of the points of tri1 are on the same side of plane of tri2
+// TODO: mark appropriately if the intersection is along an edge
 	
 	// 1) intersect with planes to yield ray of intersection
 	var ray = verb.eval.geom.intersect_planes(o0, n0, o1, n1);
@@ -1271,9 +1399,13 @@ verb.eval.geom.clip_ray_in_coplanar_tri = function(o1, d1, points, tri, uvs ){
 
 	// 0) construct rays for each edge of the triangle
 	var o = [ points[ tri[0] ], points[ tri[1] ], points[ tri[2] ] ]
+
 		, uvs = [ uvs[ tri[0] ], uvs[ tri[1] ], uvs[ tri[2] ] ]
+
 		, uvd = [ numeric.sub(uvs[1], uvs[0]), numeric.sub(uvs[2], uvs[1]), numeric.sub(uvs[0], uvs[2]) ] 
+
 		, s = [ numeric.sub( o[1], o[0] ), numeric.sub( o[2], o[1] ), numeric.sub( o[0], o[2] ) ]
+
 		, d = s.map( numeric.normalized )
 		, l = s.map( numeric.norm2 )
 
@@ -1334,18 +1466,19 @@ verb.eval.geom.point_on_ray = function(o, d, u){
 
 verb.eval.geom.merge_tri_clip_intervals = function(clip1, clip2, points1, tri1, uvs1, points2, tri2, uvs2){
 
-	// console.log( clip1, clip2 );
-
 	// if the intervals dont overlap, fail
 	if (clip2.min.u > clip1.max.u + verb.EPSILON 
 		|| clip1.min.u > clip2.max.u + verb.EPSILON) {
-		// console.log('intervals bad!')
 		return null;
 	}
 
 	// label each clip to indicate which triangle it came from
-	clip1.tri = 0;
-	clip2.tri = 1;
+	clip1.min.tri = 0;
+	clip1.max.tri = 0;
+	clip2.min.tri = 1;
+	clip2.max.tri = 1;
+
+	// are these assigned properly?  
 
 	var min = (clip1.min.u > clip2.min.u) ? clip1.min : clip2.min;
 	var max = (clip1.max.u < clip2.max.u) ? clip1.max : clip2.max;
@@ -1705,8 +1838,11 @@ verb.eval.nurbs.tessellate_rational_surface_naive = function( degree_u, knots_u,
 		divs_v = 1;
 	}
 
-	var span_u = 1 / divs_u,
-		span_v = 1 / divs_v;
+	var u_span = knots_u[knots_u.length-1] - knots_u[0];
+	var v_span = knots_v[knots_v.length-1] - knots_v[0];
+
+	var span_u = u_span / divs_u,
+		span_v = v_span / divs_v;
   
   var points = [];
   var uvs = [];
@@ -1752,8 +1888,6 @@ verb.eval.nurbs.tessellate_rational_surface_naive = function( degree_u, knots_u,
 	return { points: points, faces : faces, uvs: uvs, normals: normals };
 
 }
-
-
 
 //
 // ####rational_curve_regular_sample( degree, knots, control_points, num_samples [, include_u] )
@@ -1908,11 +2042,6 @@ verb.eval.nurbs.rational_curve_adaptive_sample_range = function( degree, knots, 
 
 		}
 }
-
-
-
-
-
 
 //
 // ####three_points_are_flat( p1, p2, p3, tol )
@@ -2332,6 +2461,10 @@ verb.eval.nurbs.rational_interp_curve = function( points, degree ) {
 	// 4) solve for c in all 3 dimensions
 
 	degree = degree || 3;
+
+	if (points.length < degree + 1){
+		throw new Error("You need to supply at least degree + 1 points!")
+	}
 	
 	var us = [ 0 ]; 
 	for (var i = 1; i < points.length; i++){
@@ -2732,9 +2865,9 @@ verb.eval.nurbs.get_extruded_surface = function( axis, length, prof_knots, prof_
 
 	// original control points
 	for (var j = 0; j < prof_control_points.length; j++){
-		control_points[0][j] = prof_control_points[j];
+		control_points[2][j] = prof_control_points[j];
 		control_points[1][j] = numeric.add( halfTranslation, prof_control_points[j] );
-		control_points[2][j] = numeric.add( translation, prof_control_points[j] );
+		control_points[0][j] = numeric.add( translation, prof_control_points[j] );
 
 		weights[0][j] = prof_weights[j];
 		weights[1][j] = prof_weights[j];
