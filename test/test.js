@@ -4083,101 +4083,6 @@ describe("verb.eval.nurbs.volume_point",function(){
 
 });
 
-describe("verb.eval.nurbs.AdaptiveRefinementNode.constructor",function(){
-
-	it('can be instantiated', function(){
-
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, "a", "b" );
-
-		f.u0.should.be.equal(0);
-		f.u1.should.be.equal(1);
-		f.v0.should.be.equal(0);
-		f.v1.should.be.equal(1);
-		f.parentNode.should.be.equal("a");
-		f.neighbors.should.be.equal("b");
-		f.leafEdgeUvs.length.should.be.equal(4);
-		f.cachedEdgeUvs.length.should.be.equal(0);
-
-	});
-
-});
-
-describe("verb.eval.nurbs.AdaptiveRefinementNode.getEdgeUvs",function(){
-
-	it('returns expected result for node without children', function(){
-
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, null, null );
-
-		f.getEdgeUvs( 0 ).should.be.eql( [[0,0]] );
-		f.getEdgeUvs( 1 ).should.be.eql( [[1,0]] );
-		f.getEdgeUvs( 2 ).should.be.eql( [[1,1]] );
-		f.getEdgeUvs( 3 ).should.be.eql( [[0,1]] );
-
-	});
-
-	it('returns expected result for node with singly children', function(){
-
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, null, [null, null, null, null] );
-
-		f.divide({ minDepth : 1 });
-		f.children.length.should.be.equal( 4 );
-
-		f.getEdgeUvs(0).should.be.eql( [ [ 0, 0 ], [ 0.5, 0 ] ] );
-		f.getEdgeUvs(1).should.be.eql( [ [ 1, 0 ], [ 1, 0.5 ] ] );
-		f.getEdgeUvs(2).should.be.eql( [ [ 1, 1 ], [ 0.5, 1 ] ] );
-		f.getEdgeUvs(3).should.be.eql( [ [ 0, 1 ], [ 0, 0.5 ] ] );
-
-	});
-
-	it('returns expected result for node with singly children', function(){
-
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, null, [null, null, null, null] );
-
-		f.divide({ minDepth : 2 });
-		f.children.length.should.be.equal( 4 );
-
-		f.getEdgeUvs(0).should.be.eql( [ [ 0, 0 ], [ 0.25, 0 ], [ 0.5, 0 ], [ 0.75, 0 ] ] );
-		f.getEdgeUvs(1).should.be.eql( [ [ 1, 0 ], [ 1, 0.25 ], [ 1, 0.5 ], [ 1, 0.75 ] ] );
-		f.getEdgeUvs(2).should.be.eql( [ [ 1, 1 ], [ 0.75, 1 ], [ 0.5, 1 ], [ 0.25, 1 ] ] );
-		f.getEdgeUvs(3).should.be.eql( [ [ 0, 1 ], [ 0, 0.75 ], [ 0, 0.5 ], [ 0, 0.25 ] ] );
-
-	});
-
-});
-
-describe("verb.eval.nurbs.AdaptiveRefinementNode.getAllEdgeUvs",function(){
-
-	it('returns expected result for edge with more vertices on opposite side', function(){
-
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, null, [null, null, null, null] );
-
-		f.divide({ minDepth : 1 }); // now f is split in 4
-
-		f.children[0].divide({ minDepth : 1 }); //  f[0] is split in 4
-		f.children[1].divide({ minDepth : 1 }); //  f[1] is split in 4
-		f.children[1].children[3].divide({ minDepth : 1 }); //  f[1][3] is split in 4
-
-		f.children[0].getAllEdgeUvs(1).should.eql( [ [ 0.5, 0 ], [ 0.5, 0.25 ], [ 0.5, 0.375 ] ] );
-		f.children[0].children[2].getAllEdgeUvs(2).should.eql( [ [ 0.5, 0.5 ] ] );
-		
-	});
-
-	it('returns expected result for edge with neighbors that has with lesser number of vertices on opposite side', function(){
-
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, null, [null, null, null, null] );
-
-		f.divide({ minDepth : 1 }); // now f is split in 4
-
-		f.children[0].divide({ minDepth : 1 }); //  f[0] is split in 4
-		f.children[1].divide({ minDepth : 1 }); //  f[1] is split in 4
-		f.children[1].children[3].divide({ minDepth : 1 }); //  f[1][3] is split in 4
-
-		f.children[1].children[3].children[3].getAllEdgeUvs(3).should.eql( [ [ 0.5, 0.5 ] ] );
-
-	});
-
-});
-
 describe("verb.eval.nurbs.rational_surface_curvature ",function(){
 
 	it('returns expected result for cylinder', function(){
@@ -5411,56 +5316,147 @@ describe("verb.eval.mesh.intersect_meshes_by_aabb",function(){
 
 	});
 
-	// it('is correct for two non-intersecting triangles', function(){
+	it('is correct for two non-intersecting triangles', function(){
 		
-	// 	var pts1 = [ [10,10,10], [2,10,10], [2, 2,10] ];
-	// 	var tris1 = [[ 0, 1, 2 ]];
-	// 	var uvs1 = [ [0,0], [2,0], [2, 2] ];
+		var pts1 = [ [10,10,10], [2,10,10], [2, 2,10] ];
+		var tris1 = [[ 0, 1, 2 ]];
+		var uvs1 = [ [0,0], [2,0], [2, 2] ];
 
-	// 	var pts2 = [ [1,1,-1], [3,1,-1], [3,1,2] ];
-	// 	var tris2 = [[ 0, 1, 2 ]];
-	// 	var uvs2 = [ [0,0], [3,0], [3,3] ];
+		var pts2 = [ [1,1,-1], [3,1,-1], [3,1,2] ];
+		var tris2 = [[ 0, 1, 2 ]];
+		var uvs2 = [ [0,0], [3,0], [3,3] ];
 
-	// 	var res = verb.eval.mesh.intersect_meshes_by_aabb( pts1, tris1, uvs1, pts2, tris2, uvs2 );
+		var res = verb.eval.mesh.intersect_meshes_by_aabb( pts1, tris1, uvs1, pts2, tris2, uvs2 );
 
-	// 	res.length.should.be.equal( 0 );
+		res.length.should.be.equal( 0 );
 
-	// });
+	});
 
-	// verb.init();
 
-	// var p1 = [0,0,0]
-	// 	, p2 = [1,0,0]
-	// 	, p3 = [1,1,0]
-	// 	, p4 = [0,1,0];
+	it('is correct for two intersecting FourPointSurfaces', function(){
 
-	// var srf1 = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
+		verb.init();
 
-	// var p5 = [0.5,-0.5,-0.5]
-	// 	, p6 = [0.5,0.5,-0.5]
-	// 	, p7 = [0.5,0.5,0.5]
-	// 	, p8 = [0.5,-0.5,0.5];
+		var p1 = [0,0,0]
+			, p2 = [1,0,0]
+			, p3 = [1,1,0]
+			, p4 = [0,1,0];
 
-	// var srf2 = new verb.geom.FourPointSurface( p5, p6, p7, p8 );
+		var srf1 = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
 
-	// var opts = { minDivsU: 20, minDivsV: 20 };
-	// var tess1 = srf1.tessellate(opts);
-	// var tess2 = srf2.tessellate(opts);
+		var p5 = [0.5,-0.5,-0.5]
+			, p6 = [0.5,0.5,-0.5]
+			, p7 = [0.5,0.5,0.5]
+			, p8 = [0.5,-0.5,0.5];
 
-	// it('is correct for two non-intersecting triangles', function(){
+		var srf2 = new verb.geom.FourPointSurface( p5, p6, p7, p8 );
 
-	// 	var res = verb.eval.mesh.intersect_meshes_by_aabb( tess1.points, tess1.faces, tess1.uvs, tess2.points, tess2.faces, tess2.uvs );
+		var opts = { minDivsU: 20, minDivsV: 20 };
+		var tess1 = srf1.tessellate(opts);
+		var tess2 = srf2.tessellate(opts);
 
-	// 	for (var i = 0; i < res.length; i++){
-	// 		console.log("PL")
-	// 		console.log( res[i].map(function(x){ return x.pt; }) );
-	// 	}
+		var res = verb.eval.mesh.intersect_meshes_by_aabb( tess1.points, tess1.faces, tess1.uvs, tess2.points, tess2.faces, tess2.uvs );
 
-	// 	// 
+		res.length.should.be.equal( 1 );
 
-	// 	// res.length.should.be.equal( 0 );
-
-	// });
+	});
 
 });
+
+
+describe("verb.eval.nurbs.AdaptiveRefinementNode.constructor",function(){
+
+	it('can be instantiated', function(){
+
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, "a", "b" );
+
+		f.u0.should.be.equal(0);
+		f.u1.should.be.equal(1);
+		f.v0.should.be.equal(0);
+		f.v1.should.be.equal(1);
+		f.parentNode.should.be.equal("a");
+		f.neighbors.should.be.equal("b");
+		f.leafEdgeUvs.length.should.be.equal(4);
+		f.cachedEdgeUvs.length.should.be.equal(0);
+
+	});
+
+});
+
+describe("verb.eval.nurbs.AdaptiveRefinementNode.getEdgeUvs",function(){
+
+	it('returns expected result for node without children', function(){
+
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, null, null );
+
+		f.getEdgeUvs( 0 ).should.be.eql( [[0,0]] );
+		f.getEdgeUvs( 1 ).should.be.eql( [[1,0]] );
+		f.getEdgeUvs( 2 ).should.be.eql( [[1,1]] );
+		f.getEdgeUvs( 3 ).should.be.eql( [[0,1]] );
+
+	});
+
+	it('returns expected result for node with singly children', function(){
+
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, null, [null, null, null, null] );
+
+		f.divide({ minDepth : 1 });
+		f.children.length.should.be.equal( 4 );
+
+		f.getEdgeUvs(0).should.be.eql( [ [ 0, 0 ], [ 0.5, 0 ] ] );
+		f.getEdgeUvs(1).should.be.eql( [ [ 1, 0 ], [ 1, 0.5 ] ] );
+		f.getEdgeUvs(2).should.be.eql( [ [ 1, 1 ], [ 0.5, 1 ] ] );
+		f.getEdgeUvs(3).should.be.eql( [ [ 0, 1 ], [ 0, 0.5 ] ] );
+
+	});
+
+	it('returns expected result for node with singly children', function(){
+
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, null, [null, null, null, null] );
+
+		f.divide({ minDepth : 2 });
+		f.children.length.should.be.equal( 4 );
+
+		f.getEdgeUvs(0).should.be.eql( [ [ 0, 0 ], [ 0.25, 0 ], [ 0.5, 0 ], [ 0.75, 0 ] ] );
+		f.getEdgeUvs(1).should.be.eql( [ [ 1, 0 ], [ 1, 0.25 ], [ 1, 0.5 ], [ 1, 0.75 ] ] );
+		f.getEdgeUvs(2).should.be.eql( [ [ 1, 1 ], [ 0.75, 1 ], [ 0.5, 1 ], [ 0.25, 1 ] ] );
+		f.getEdgeUvs(3).should.be.eql( [ [ 0, 1 ], [ 0, 0.75 ], [ 0, 0.5 ], [ 0, 0.25 ] ] );
+
+	});
+
+});
+
+describe("verb.eval.nurbs.AdaptiveRefinementNode.getAllEdgeUvs",function(){
+
+	it('returns expected result for edge with more vertices on opposite side', function(){
+
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, null, [null, null, null, null] );
+
+		f.divide({ minDepth : 1 }); // now f is split in 4
+
+		f.children[0].divide({ minDepth : 1 }); //  f[0] is split in 4
+		f.children[1].divide({ minDepth : 1 }); //  f[1] is split in 4
+		f.children[1].children[3].divide({ minDepth : 1 }); //  f[1][3] is split in 4
+
+		f.children[0].getAllEdgeUvs(1).should.eql( [ [ 0.5, 0 ], [ 0.5, 0.25 ], [ 0.5, 0.375 ] ] );
+		f.children[0].children[2].getAllEdgeUvs(2).should.eql( [ [ 0.5, 0.5 ] ] );
+		
+	});
+
+	it('returns expected result for edge with neighbors that has with lesser number of vertices on opposite side', function(){
+
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, null, [null, null, null, null] );
+
+		f.divide({ minDepth : 1 }); // now f is split in 4
+
+		f.children[0].divide({ minDepth : 1 }); //  f[0] is split in 4
+		f.children[1].divide({ minDepth : 1 }); //  f[1] is split in 4
+		f.children[1].children[3].divide({ minDepth : 1 }); //  f[1][3] is split in 4
+
+		f.children[1].children[3].children[3].getAllEdgeUvs(3).should.eql( [ [ 0.5, 0.5 ] ] );
+
+	});
+
+});
+
 

@@ -31,10 +31,20 @@
 		camera.position.z = 1;
 		camera.position.y = -1;
 		camera.position.x = 2;
+		camera.up.set( 0, 0, 1 );
 
 		var renderer = new THREE.WebGLRenderer();
 		renderer.setSize( window.innerWidth, window.innerHeight );
 		document.body.appendChild( renderer.domElement );
+
+		// add subtle ambient lighting
+		var ambientLight = new THREE.AmbientLight(0x222222);
+		scene.add(ambientLight);
+
+		// directional lighting
+		var directionalLight = new THREE.DirectionalLight(0xffffff);
+		directionalLight.position.set(1, 1, 1).normalize();
+		scene.add(directionalLight);
 
 		var controls = new THREE.OrbitControls(camera, renderer.domElement);
 
@@ -88,9 +98,9 @@
 
 		}
 
-		function addMeshToScene(mesh){
+		function addMeshToScene(mesh, wireframe){
 
-			var material = new THREE.MeshNormalMaterial( { wireframe: true, shading: THREE.SmoothShading, side: THREE.DoubleSide } );
+			var material = new THREE.MeshNormalMaterial( { wireframe: wireframe, transparent: true, side: THREE.DoubleSide, opacity: 0.4, shading: THREE.SmoothShading, side: THREE.DoubleSide } );
 			// var material = new THREE.MeshPhongMaterial( { color: 0x444444, side: THREE.DoubleSide, shading: THREE.SmoothShading } );
 			var tm = new THREE.Mesh( mesh, material );
 
@@ -103,7 +113,7 @@
 			var hexString = Math.floor(Math.random()*16777215).toString(16);
 			var hex = parseInt(hexString, 16);
 
-			var lineMat = new THREE.LineBasicMaterial({ linewidth: 2, color: 0xffffff });
+			var lineMat = new THREE.LineBasicMaterial({ linewidth: 2, color: hex});
 			var l = new THREE.Line( geom, lineMat );
 
 			scene.add( l );
@@ -298,6 +308,65 @@
 
 		}
 
+		function exampleGlancingPlaneCylinderSuccess(){
+
+			var axis = [0,0,1]
+				, xaxis = [1,0,0]
+				, base = [0,0,0]
+				, height = 5
+				, radius = 3;
+
+			srf1 = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
+
+			var axis2 = [1,0,0]
+				, xaxis2 = [0,1,0]
+				, base2 = [0,0,-1]
+				, height2 = 10
+				, radius2 = 3;
+
+			srf2 = new verb.geom.Cylinder( axis2, xaxis2, base2, height2, radius2 );
+
+			udivs0 = 60;
+			vdivs0 = 60;
+
+			udivs1 = 60;
+			vdivs1 = 60;
+
+		}
+
+		function exampleNurbsSurfacePlane(){
+		
+			var degree = 3
+				, knots = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
+				, pts = [ 	[ [0, 0, -10], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] , 	[40, 0, 0], [50, 0, 9] ],
+							[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] , [40, -10, 0], [50, -10, 0]	],
+							[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] , [40, -20, -2], [50, -20, 0] 	],
+							[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] , [40, -30, 0], [50, -30, 0]     ],  
+							[ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , [40, -40, -20], [50, -40, 0]     ],  
+							[ [0, -50, 12], [10, -50, 0], 	[20, -50, 0], 	[30, -50, 0] , [50, -50, 0], [50, -50, 15]     ],     ]
+				, wts = [ 	[ 1, 1, 1, 1, 1, 1],
+							[ 1, 1, 1, 1, 1, 1],
+							[ 1, 1, 1, 1, 1, 1],
+							[ 1, 1, 1, 1, 1, 1],
+							[ 1, 1, 1, 1, 1, 1],
+							[ 1, 1, 1, 1, 1, 1] ];
+
+			srf1 = new verb.geom.NurbsSurface( degree, knots, degree, knots, pts, wts );
+
+			var p5 = [50,-50,3]
+				, p6 = [50,0,3]
+				, p7 = [0,0,3]
+				, p8 = [0,-50,3];
+
+			srf2 = new verb.geom.FourPointSurface( p5, p6, p7, p8 );
+
+			udivs0 =60;
+			vdivs0 =60;
+
+			udivs1 = 2;
+			vdivs1 = 2;
+
+		}
 
 		verb.init();
 
@@ -307,11 +376,12 @@
 		//exampleTorusCylinderSuccess();
 		// exampleGlancingPlaneCylinderSuccess();
 		//exampleTorusCylinderSuccess2();
-		exampleTorusCylinderSuccess3();
+		// exampleTorusCylinderSuccess3();
 		//examplePlanePlaneSuccess();
+		exampleNurbsSurfacePlane();
 
 		addMeshToScene( tessellate(srf1, udivs0, vdivs0) );
-		addMeshToScene( tessellate(srf2, udivs1, vdivs1) );
+		addMeshToScene( tessellate(srf2, udivs1, vdivs1), true );
 
 		var tess1 = srf1.tessellate({ minDivsU: udivs0, minDivsV: vdivs0 });
 		var tess2 = srf2.tessellate({ minDivsU: udivs1, minDivsV: vdivs1 });
