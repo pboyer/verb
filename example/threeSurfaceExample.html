@@ -29,8 +29,9 @@
 		var scene = new THREE.Scene();
 		var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
 		camera.position.z = 20;
+		camera.up.set( 0, 0, 1 );
 
-		var renderer = new THREE.WebGLRenderer();
+		var renderer = new THREE.WebGLRenderer({ antialias: true });
 		renderer.setSize( window.innerWidth, window.innerHeight );
 		document.body.appendChild( renderer.domElement );
 
@@ -46,12 +47,12 @@
 
 			var degree = 3
 				, knots = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
-				, pts = [ 	[ [0, 0, -10], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] , 	[40, 0, 0], [50, 0, 9] ],
+				, pts = [ 	[ [0, 0, -10], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] , 	[40, 0, 0], [50, 0, 0] ],
 							[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] , [40, -10, 0], [50, -10, 0]	],
 							[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] , [40, -20, -2], [50, -20, 0] 	],
 							[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] , [40, -30, 0], [50, -30, 0]     ],  
 							[ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , [40, -40, -20], [50, -40, 0]     ],  
-							[ [0, -50, 12], [10, -50, 0], 	[20, -50, 0], 	[30, -50, 0] , [50, -50, 0], [50, -50, 15]     ],     ]
+							[ [0, -50, 12], [10, -50, 0], 	[20, -50, 0], 	[30, -50, 0] , [50, -50, 0], [50, -50, -15]     ],     ]
 				, wts = [ 	[ 1, 1, 1, 1, 1, 1],
 							[ 1, 1, 1, 1, 1, 1],
 							[ 1, 1, 1, 1, 1, 1],
@@ -119,10 +120,15 @@
 
 		var geometry = tessellate(srf, mesh);
 
-		var material = new THREE.MeshNormalMaterial( { side: THREE.DoubleSide, wireframe: false, shading: THREE.SmoothShading } );
+		var material = new THREE.MeshNormalMaterial( { side: THREE.DoubleSide, wireframe: false, shading: THREE.SmoothShading, transparent: true, opacity: 0.8 } );
 		var mesh = new THREE.Mesh( geometry, material );
 
 		scene.add( mesh );
+
+		var material2 = new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide, wireframe: true } );
+		var mesh2 = new THREE.Mesh( geometry, material2 );
+
+		scene.add( mesh2 );
 
 		var controls = new THREE.OrbitControls(camera, renderer.domElement);
 
