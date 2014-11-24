@@ -2070,7 +2070,6 @@ verb.eval.nurbs.rational_curve_adaptive_sample_range = function( degree, knots, 
 //
 verb.eval.nurbs.three_points_are_flat = function( p1, p2, p3, tol ) {
 
-
 	// find the area of the triangle without using a square root
 	var p2mp1 = numeric.sub( p2, p1 )
 		, p3mp1 = numeric.sub( p3, p1 )
@@ -2181,16 +2180,24 @@ verb.eval.nurbs.divide_rational_surface_adaptive = function( degree_u, knots_u, 
 
 }
 
-verb.eval.nurbs.is_rational_surface_domain_flat = function(srf, u0, u1, v0, v1 ){
+verb.eval.nurbs.is_rational_surface_domain_flat = function(srf, u0, u1, v0, v1, options ){
 
-	var eval_srf = verb.eval.nurbs.rational_surface_point
-		, u_half_step = (u[1] - u[0] / 2) * ( Math.random() * 0.1 + 1 )
-		, v_half_step = (v[1] - v[0] / 2) * ( Math.random() * 0.1 + 1 )
-		, p1 = eval_srf( srf.degree_u, srf.knots_u, srf.degree_v, srf.knots_v, srf.homo_control_points, u[0], v[0] )
-		, p2 = eval_srf( srf.degree_u, srf.knots_u, srf.degree_v, srf.knots_v, srf.homo_control_points, u[0] + u_half_step, v[0] + v_half_step )
-		, p3 = eval_srf( srf.degree_u, srf.knots_u, srf.degree_v, srf.knots_v, srf.homo_control_points, u[1], v[1] );
+	// TODO: this is a hack! need a more robust metric to determine if we should
+	// 			 divide or not
 
-	return verb.eval.nurbs.three_points_are_flat( p1, p2 , p3, tol );
+	var eval_srf = function(u,v){ return verb.eval.nurbs.rational_surface_point(srf.degree_u, srf.knots_u, 
+																		srf.degree_v, srf.knots_v, srf.homo_control_points, u, v ); }
+		, t = 0.5 + 0.2 * Math.random()
+		, mid_u = u0 + (u1 - u0) * t
+		, mid_v = v0 + (v1 - v0) * t;
+
+	var p1 = eval_srf( u0, v0 )
+		, p2 = eval_srf( mid_u, mid_v )
+		, p3 = eval_srf( u1, v1 );
+
+	var res = verb.eval.nurbs.three_points_are_flat( p1, p2, p3, options.tol != undefined ? options.tol : verb.TOLERANCE );
+
+	return res;
 
 }
 
@@ -2211,7 +2218,7 @@ verb.eval.nurbs.tessellate_rational_surface_adaptive = function( degree_u, knots
 	// triangulation step
 	var res = verb.eval.nurbs.triangulate_adaptive_refinement_node_tree( arrTree );
 
-	// TODO not sure actually what is the problem here
+	// TODO: this technique produces duplicate points - do we want to remove them here?
 	return verb.eval.nurbs.unique_mesh( res );
 
 }
@@ -2263,19 +2270,19 @@ verb.eval.nurbs.AdaptiveRefinementNode = function( srf, u0, u1, v0, v1, parentNo
 	//
 
 	this.srf = srf;
-	this.u0 = u0;
-	this.u1 = u1;
-	this.v0 = v0;
-	this.v1 = v1;
+	this.u0 = u0 != undefined ? u0 : srf.knots_u[0];
+	this.u1 = u1 != undefined ? u1 : verb.last( srf.knots_u );
+	this.v0 = v0 != undefined ? v0 : srf.knots_v[0];
+	this.v1 = v1 != undefined ? v1 : verb.last( srf.knots_v );
 	this.parentNode = parentNode;
-	this.neighbors = neighbors;
-	this.leafEdgeUvs = [[ u0, v0 ], [ u1, v0 ], [ u1, v1 ], [ u0, v1 ]];
+	this.neighbors = neighbors || [null, null, null, null];
+	this.leafEdgeUvs = [[ this.u0, this.v0 ], [ this.u1, this.v0 ], [ this.u1, this.v1 ], [ this.u0, this.v1 ]];
 	this.cachedEdgeUvs = [];
 
 }
 
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.isLeaf = function(){
-	return (this.children === undefined);
+	return this.children === undefined;
 };
 
 
@@ -2287,11 +2294,9 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalSurface = function( uv ){
 																												this.srf.knots_v, 
 																												this.srf.homo_control_points, 
 																												1, 
-																												pt_u, 
-																												pt_v );
+																												uv[0], 
+																												uv[1] );
 	var pt = derivs[0][0];
-	points.push( pt );
-
 	var normal = numeric.cross(  derivs[0][1], derivs[1][0] );
 
 	return { point: pt, normal: normal };
@@ -2314,7 +2319,9 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.getAllEdgeUvs = function( edgeI
 
 	var baseArr = [ this.leafEdgeUvs[edgeIndex] ];
 
-	if ( this.neighbors[edgeIndex] === null ) return baseArr;
+	if ( !this.neighbors[edgeIndex] ) {
+		return baseArr;
+	}
 
 	// get opposite edges uvs
 	var uvs = this.neighbors[edgeIndex].getEdgeUvs( ( edgeIndex + 2 ) % 4 );
@@ -2336,60 +2343,67 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.getAllEdgeUvs = function( edgeI
 
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulateLeaf = function( mesh ){
 
-		var baseIndex = mesh.points.length - 1;
+	var baseIndex = mesh.points.length - 1;
+	var uvs = [];
 
-		var uvs = [];
+	// enumerate all uvs in counter clockwise direction
+	for (var i = 0; i < 4; i++){
+		uvs = uvs.concat( this.getAllEdgeUvs(i) ); 
+	}
 
-		// enumerate all uvs in counter clockwise direction
-		for (var i = 0; i < 4; i++){
-			uvs.concat( this.getAllEdgeUvs(i) ); 
-		}
+	uvs.forEach(function(x){
+		mesh.uvs.push(x);
 
-		uvs.forEach(function(x){
-			mesh.uvs.push(x);
-			var point = this.evalSurface( x );
+		var point = this.evalSurface( x );
 
-			mesh.points.push( point.point );
-			mesh.normals.push( point.normal );
+		mesh.points.push( point.point );
+		mesh.normals.push( point.normal );
+	}.bind(this));
 
-		});
+	if (uvs.length === 4){
 
-		if (uvs.length === 4){
+		// if the number of points is 4, we're just doing a
+		// rectangle - just build the basic triangulated square
+		mesh.faces.push( [ baseIndex + 1, baseIndex + 4, baseIndex + 2 ] );
+		mesh.faces.push( [ baseIndex + 4, baseIndex + 3, baseIndex + 2 ] );
 
-			// if the number of points is 4, we're just doing a
-			// rectangle - just build the basic triangulated square
-			mesh.faces.push( [ baseIndex + 1, baseIndex + 4, baseIndex + 2 ] );
-			mesh.faces.push( [ baseIndex + 4, baseIndex + 3, baseIndex + 2 ] );
+		// all done ;)
+		return mesh;
 
-			// all done ;)
-			return;
+	}
 
-		}
+	this.u05 = this.u05 || (this.u0 + this.u1) / 2;
+	this.v05 = this.v05 || (this.v0 + this.v1) / 2;
 
-		this.u05 = this.u05 || (this.u0 + this.u1) / 2;
-		this.v05 = this.v05 || (this.v0 + this.v1) / 2;
+	// make point at center of face
+	mesh.uvs.push( [  this.u05, this.v05 ] );
+	var center = this.evalSurface( [ this.u05, this.v05 ] );
+	mesh.points.push( center.point );
+	mesh.normals.push( center.normal );
 
-		// make point at center of face
-		mesh.uvs.push( [  this.u05, this.v05 ] );
-		var center = this.evalSurface( [ this.u05, this.v05 ] );
-		mesh.points.push( center.point );
-		mesh.normals.push( center.normal );
+	// get index 
+	var centerIndex = mesh.points.length - 1;
 
-		// get index 
-		var centerIndex = mesh.points.length - 1;
+	// build triangle fan from center
+	for (var i = 0; i < uvs.length; i++){
 
-		// build triangle fan from center
-		for (var i = 0; i < uvs.length; i++){
+		console.log( [centerIndex, 
+												(baseIndex + i + 2) % uvs.length, 
+												(baseIndex + i + 1) % uvs.length   ] );
 
-			mesh.faces.push( [	centerIndex, 
-													(baseIndex + i + 2) % uvs.length, 
-													(baseIndex + i + 1) % uvs.length   ]);
+		mesh.faces.push( [	centerIndex, 
+												(baseIndex + i + 2) % uvs.length, 
+												(baseIndex + i + 1) % uvs.length   ]);
 
-		}
+	}
+
+	return mesh;
 
 };
 
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulate = function( mesh ){
+
+	mesh = mesh || { faces: [], points: [], uvs: [], normals: [] };
 
 	if ( this.isLeaf() ) return this.triangulateLeaf( mesh );
 
@@ -2399,11 +2413,13 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulate = function( mesh ){
 		x.triangulate( mesh );
 	});
 
+	return mesh;
+
 };
 
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.shouldDivide = function( options, currentDepth ){
 
-	if ( options.minDepth && currentDepth < options.minDepth ){
+	if ( options.minDepth != undefined && currentDepth < options.minDepth ){
 		return true;
 	} else if ( this.srf && !verb.eval.nurbs.is_rational_surface_domain_flat( this.srf, this.u0, this.u1, this.v0, this.v1, options ) ){
 		return true;

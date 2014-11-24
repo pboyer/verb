@@ -5478,26 +5478,144 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.divide",function(){
 
 		f.divide();
 
-		// not division is done
+		// no division is done
 		should.equal( f.children, null);
 
 	});
 
-	it('can produce a non-uniformly nested tree', function(){
+	// it('can produce a non-uniformly nested tree', function(){
 
-		
 
-	});
+
+	// });
 
 	// more tests for options as they're implemented
 
 });
 
+describe("verb.eval.nurbs.AdaptiveRefinementNode.evalSurface",function(){
+
+	it('works as expected', function(){
+
+		verb.init();
+
+		var p1 = [0,0,0]
+			, p2 = [1,0,0]
+			, p3 = [1,1,0]
+			, p4 = [0,1,0];
+
+		var srf = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
+
+		var srfObj = {
+			degree_u : srf.get('degreeU'),
+			degree_v : srf.get('degreeV'),
+			knots_u : srf.get('knotsU'),
+			knots_v : srf.get('knotsV'),
+			homo_control_points : srf.homogenize()
+		};
+
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(srfObj);
+
+		var res = f.evalSurface( [0,0] );
+
+		vecShouldBe( [0,0,0], res.point );
+		vecShouldBe( [0,0,-1], res.normal );
+
+		res = f.evalSurface( [1,0] );
+
+		vecShouldBe( [1,0,0], res.point );
+		vecShouldBe( [0,0,-1], res.normal );
+
+		res = f.evalSurface( [1,1] );
+
+		vecShouldBe( [1,1,0], res.point );
+		vecShouldBe( [0,0,-1], res.normal );
+
+	});
+
+});
+
 describe("verb.eval.nurbs.AdaptiveRefinementNode.triangulate",function(){
 
-	it('can triangulate a leaf with no edges', function(){
+	function getPlane(){ 
 
+		verb.init();
 
+		var p1 = [0,0,0]
+			, p2 = [1,0,0]
+			, p3 = [1,1,0]
+			, p4 = [0,1,0];
+
+		var srf = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
+
+		var srfObj = {
+			degree_u : srf.get('degreeU'),
+			degree_v : srf.get('degreeV'),
+			knots_u : srf.get('knotsU'),
+			knots_v : srf.get('knotsV'),
+			homo_control_points : srf.homogenize()
+		};
+
+		return srfObj;
+
+	}
+
+	function getWarpedPlane(){ 
+
+		verb.init();
+
+		var p1 = [0,0,0]
+			, p2 = [1,0,0]
+			, p3 = [1,1,1]
+			, p4 = [0,1,0];
+
+		var srf = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
+
+		var srfObj = {
+			degree_u : srf.get('degreeU'),
+			degree_v : srf.get('degreeV'),
+			knots_u : srf.get('knotsU'),
+			knots_v : srf.get('knotsV'),
+			homo_control_points : srf.homogenize()
+		};
+
+		return srfObj;
+
+	}
+
+	it('can triangulate a square, planar surface with no options defined', function(){
+
+		var srf = getPlane();
+
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
+
+		f.divide();
+		var mesh = f.triangulate();
+
+		// console.log(mesh)
+
+		mesh.faces.should.eql( [ [ 0, 3, 1 ], [ 3, 2, 1 ]  ]);
+		mesh.points.should.eql([ [ 0, 0, 0 ], [ 1, 0, 0 ], [ 1, 1, 0 ], [ 0, 1, 0 ] ]);
+		mesh.uvs.should.eql([ [ 0, 0 ], [ 1, 0 ], [ 1, 1 ], [ 0, 1 ] ]);
+		mesh.normals.should.eql( [ [ 0, 0, -1 ], [ 0, 0, -1 ], [ 0, 0, -1 ], [ 0, 0, -1 ] ] );
+
+	});
+
+	it('can triangulate a warped surface with no options defined', function(){
+
+		var srf = getWarpedPlane();
+
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
+
+		f.divide();
+		var mesh = f.triangulate();
+
+		// console.log(mesh)
+
+		// mesh.faces.should.eql( [ [ 0, 3, 1 ], [ 3, 2, 1 ]  ]);
+		// mesh.points.should.eql([ [ 0, 0, 0 ], [ 1, 0, 0 ], [ 1, 1, 0 ], [ 0, 1, 0 ] ]);
+		// mesh.uvs.should.eql([ [ 0, 0 ], [ 1, 0 ], [ 1, 1 ], [ 0, 1 ] ]);
+		// mesh.normals.should.eql( [ [ 0, 0, -1 ], [ 0, 0, -1 ], [ 0, 0, -1 ], [ 0, 0, -1 ] ] );
 
 	});
 
@@ -5524,15 +5642,6 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.triangulate",function(){
 });
 
 
-describe("verb.eval.nurbs.AdaptiveRefinementNode.evalSurface",function(){
-
-	it('works as expected', function(){
-
-
-	});
-
-});
-
 describe("verb.eval.nurbs.divide_rational_surface_adaptive",function(){
 
 	it('divides the domain according to minDivsU, minDivsV', function(){
@@ -5545,9 +5654,6 @@ describe("verb.eval.nurbs.is_rational_surface_domain_flat",function(){
 
 	it('evaluates as expected for different tolerances', function(){
 
-
-
-
 	});
 
 });
@@ -5558,7 +5664,6 @@ describe("verb.eval.nurbs.triangulate_adaptive_refinement_node_tree",function(){
 
 
 	});
-
 
 	it('produces a mesh from a non-uniformly divided surface', function(){
 
