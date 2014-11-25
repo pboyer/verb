@@ -3585,9 +3585,33 @@ verb.eval.nurbs.refine_rational_surface_intersect_point = function(uv1, uv2, deg
 
 verb.eval.nurbs.intersect_rational_surface_surface_by_aabb_refine = function( degree_u1, knots_u1, degree_v1, knots_v1, homo_control_points_srf1, degree_u2, knots_u2, degree_v2, knots_v2, homo_control_points_srf2, tol, divs_u, divs_v ) {
 
+	var srfObj1 = {
+		degree_u : degree_u1,
+		degree_v : degree_v1,
+		knots_u : knots_u1,
+		knots_v : knots_v1,
+		homo_control_points : homo_control_points_srf1
+	};
+
+	var f1 = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj1 );
+	f1.divide({ tol: 1e-1 });
+	var tess1 = f1.triangulate();
+
+	var srfObj2 = {
+		degree_u : degree_u2,
+		degree_v : degree_v2,
+		knots_u : knots_u2,
+		knots_v : knots_v2,
+		homo_control_points : homo_control_points_srf2
+	};
+
+	var f2 = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj2 );
+	f2.divide({ tol: 1e-1 });
+	var tess2 = f2.triangulate();
+
 	// 1) tessellate the meshes to get the approximate intersections
-	var tess1 = verb.eval.nurbs.tessellate_rational_surface_naive( degree_u1, knots_u1, degree_v1, knots_v1, homo_control_points_srf1, divs_u, divs_v );
-	var tess2 = verb.eval.nurbs.tessellate_rational_surface_naive( degree_u2, knots_u2, degree_v2, knots_v2, homo_control_points_srf2, divs_u, divs_v );
+	// var tess1 = verb.eval.nurbs.tessellate_rational_surface_naive( degree_u1, knots_u1, degree_v1, knots_v1, homo_control_points_srf1, divs_u, divs_v );
+	// var tess2 = verb.eval.nurbs.tessellate_rational_surface_naive( degree_u2, knots_u2, degree_v2, knots_v2, homo_control_points_srf2, divs_u, divs_v );
 	var resApprox = verb.eval.mesh.intersect_meshes_by_aabb( tess1.points, tess1.faces, tess1.uvs, tess2.points, tess2.faces, tess2.uvs );
 
 	// 2) refine the intersection points so that they lie on both surfaces

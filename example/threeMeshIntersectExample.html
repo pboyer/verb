@@ -68,7 +68,19 @@
 		// verb.NurbsSurface -> THREE.Geometry
 		function tessellate(srf, udivs, vdivs) {
 
-			var tess = srf.tessellate({ minDivsU: udivs, minDivsV: vdivs });
+			var srfObj = {
+				degree_u : srf.get('degreeU'),
+				degree_v : srf.get('degreeV'),
+				knots_u : srf.get('knotsU'),
+				knots_v : srf.get('knotsV'),
+				homo_control_points : srf.homogenize()
+			};
+
+			var f = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj );
+			f.divide({ tol: 1e-1 });
+			var tess = f.triangulate();
+
+			// var tess = srf.tessellate({ minDivsU: udivs, minDivsV: vdivs });
 
 			var geometry = new THREE.Geometry();
 
