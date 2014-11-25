@@ -844,7 +844,7 @@ verb.eval.geom.intersect_segments = function( a0, a1, b0, b1, tol ) {
 // + *Array*, direction of ray 1, assumed normalized
 // 
 // **returns** 
-// + *Array*, [param, pt]
+// + *Array*, pt
 //
 
 verb.eval.geom.closest_point_on_ray = function( pt, o, r ) {
@@ -856,6 +856,30 @@ verb.eval.geom.closest_point_on_ray = function( pt, o, r ) {
 		return proj;
 
  }
+
+//
+// ####dist_to_ray( pt, o, r )
+//
+// Find the distance of a point to a ray
+//
+// **params**
+// + *Array*, point to project
+// + *Array*, origin for ray
+// + *Array*, direction of ray 1, assumed normalized
+// 
+// **returns** 
+// + *Number*, the distance
+//
+
+verb.eval.geom.dist_to_ray = function( pt, o, r ) {
+
+	var d = verb.eval.geom.closest_point_on_ray( pt, o, r );
+	var dif = numeric.sub( d, pt );
+
+	return numeric.norm2( dif );
+
+ }
+
 
 //
 // ####intersect_rays( a0, a, b0, b )
@@ -913,32 +937,6 @@ verb.eval.geom.intersect_3_planes = function(n0, d0, n1, d1, n2, d2){
 }
 
 verb.eval.nurbs.refine_rational_surface_intersect_point = function(uv1, uv2, degree_u1, knots_u1, degree_v1, knots_v1, homo_control_points1, degree_u2, knots_u2, degree_v2, knots_v2, homo_control_points2, tol){
-
-	// var start = false;
-	// var objective = function(x) { 
-
-	// 	var p1 = verb.eval.nurbs.rational_surface_point( degree_u1, knots_u1,  degree_v1, knots_v1, homo_control_points1, x[0], x[1] )
-	// 		, p2 = verb.eval.nurbs.rational_surface_point( degree_u2, knots_u2,  degree_v2, knots_v2, homo_control_points2, x[2], x[3] )
-	// 		, p1_p2 = numeric.sub(p1, p2);
-
-	// 	var d = numeric.dot(p1_p2, p1_p2);
-
-	// 	if (!start){
-	// 		console.log("dstart", d);
-	// 		start = true;
-	// 	}
-	// 	return d;
-	// }
-
-	// var sol_obj = numeric.uncmin( objective, [uv1[0], uv1[1], uv2[0], uv2[1]], 1e-4);
-	// var sol = sol_obj.solution;
-
-	// console.log("DONE")
-	// console.log( sol_obj.f );
-
-	// var p = verb.eval.nurbs.rational_surface_point( degree_u1, knots_u1,  degree_v1, knots_v1, homo_control_points1, sol[0], sol[1])
-
-	// return {uv1: [ sol[0], sol[1] ], uv2: [ sol[2], sol[3] ], pt: p, d: sol_obj.f };
 
  var pds, p, pn, pu, pv, pd, qds, q, qn, qu, qv, qd, dist;
  var maxits = 1;

@@ -969,7 +969,7 @@ verb.eval.geom.intersect_segments = function( a0, a1, b0, b1, tol ) {
 // + *Array*, direction of ray 1, assumed normalized
 // 
 // **returns** 
-// + *Array*, [param, pt]
+// + *Array*, pt
 //
 
 verb.eval.geom.closest_point_on_ray = function( pt, o, r ) {
@@ -981,6 +981,30 @@ verb.eval.geom.closest_point_on_ray = function( pt, o, r ) {
 		return proj;
 
  }
+
+//
+// ####dist_to_ray( pt, o, r )
+//
+// Find the distance of a point to a ray
+//
+// **params**
+// + *Array*, point to project
+// + *Array*, origin for ray
+// + *Array*, direction of ray 1, assumed normalized
+// 
+// **returns** 
+// + *Number*, the distance
+//
+
+verb.eval.geom.dist_to_ray = function( pt, o, r ) {
+
+	var d = verb.eval.geom.closest_point_on_ray( pt, o, r );
+	var dif = numeric.sub( d, pt );
+
+	return numeric.norm2( dif );
+
+ }
+
 
 //
 // ####intersect_rays( a0, a, b0, b )
@@ -1038,32 +1062,6 @@ verb.eval.geom.intersect_3_planes = function(n0, d0, n1, d1, n2, d2){
 }
 
 verb.eval.nurbs.refine_rational_surface_intersect_point = function(uv1, uv2, degree_u1, knots_u1, degree_v1, knots_v1, homo_control_points1, degree_u2, knots_u2, degree_v2, knots_v2, homo_control_points2, tol){
-
-	// var start = false;
-	// var objective = function(x) { 
-
-	// 	var p1 = verb.eval.nurbs.rational_surface_point( degree_u1, knots_u1,  degree_v1, knots_v1, homo_control_points1, x[0], x[1] )
-	// 		, p2 = verb.eval.nurbs.rational_surface_point( degree_u2, knots_u2,  degree_v2, knots_v2, homo_control_points2, x[2], x[3] )
-	// 		, p1_p2 = numeric.sub(p1, p2);
-
-	// 	var d = numeric.dot(p1_p2, p1_p2);
-
-	// 	if (!start){
-	// 		console.log("dstart", d);
-	// 		start = true;
-	// 	}
-	// 	return d;
-	// }
-
-	// var sol_obj = numeric.uncmin( objective, [uv1[0], uv1[1], uv2[0], uv2[1]], 1e-4);
-	// var sol = sol_obj.solution;
-
-	// console.log("DONE")
-	// console.log( sol_obj.f );
-
-	// var p = verb.eval.nurbs.rational_surface_point( degree_u1, knots_u1,  degree_v1, knots_v1, homo_control_points1, sol[0], sol[1])
-
-	// return {uv1: [ sol[0], sol[1] ], uv2: [ sol[2], sol[3] ], pt: p, d: sol_obj.f };
 
  var pds, p, pn, pu, pv, pd, qds, q, qn, qu, qv, qd, dist;
  var maxits = 1;
@@ -2180,24 +2178,64 @@ verb.eval.nurbs.divide_rational_surface_adaptive = function( degree_u, knots_u, 
 
 }
 
-verb.eval.nurbs.is_rational_surface_domain_flat = function(srf, u0, u1, v0, v1, options ){
+verb.eval.nurbs.is_rational_surface_domain_flat2 = function(srf, u0, u1, v0, v1, options ){
 
-	// TODO: this is a hack! need a more robust metric to determine if we should
-	// 			 divide or not
+	var tol = options.tol != undefined ? options.tol : verb.TOLERANCE;
 
 	var eval_srf = function(u,v){ return verb.eval.nurbs.rational_surface_point(srf.degree_u, srf.knots_u, 
 																		srf.degree_v, srf.knots_v, srf.homo_control_points, u, v ); }
 		, t = 0.5 + 0.2 * Math.random()
 		, mid_u = u0 + (u1 - u0) * t
-		, mid_v = v0 + (v1 - v0) * t;
+		, mid_v = v0 + (v1 - v0) * t
+		, p1 = eval_srf( u0, v0 )
+		, p2 = eval_srf( mid_u, mid_v )
+		, p3 = eval_srf( u1, v1 )
+		, r1 = numeric.normalized( numeric.sub( p3, p1 ) )
+		, o1 = p1
+		, d1 = verb.eval.geom.dist_to_ray( p2, o1, r1 );
 
-	var p1 = eval_srf( u0, v0 )
+	if ( d1 > tol ) return false;
+
+	var t2 = 0.5 + 0.2 * Math.random()
+		, mid_u1 = u0 + (u1 - u0) * t2
+		, mid_v1 = v1 + (v0 - v1) * t2
+		, p21 = eval_srf( u0, v1 )
+		, p22 = eval_srf( mid_u1, mid_v1 )
+		, p23 = eval_srf( u1, v0 )
+		, r2 = numeric.normalized( numeric.sub( p23, p21 ) )
+		, o2 = p21
+		, d2 = verb.eval.geom.dist_to_ray( p22, o2, r2 );
+
+	return d2 < tol;
+
+}
+
+verb.eval.nurbs.is_rational_surface_domain_flat = function(srf, u0, u1, v0, v1, options ){
+
+	var tol = options.tol != undefined ? options.tol : verb.TOLERANCE;
+
+	var eval_srf = function(u,v){ return verb.eval.nurbs.rational_surface_point(srf.degree_u, srf.knots_u, 
+																		srf.degree_v, srf.knots_v, srf.homo_control_points, u, v ); }
+		, t = 0.5 + 0.2 * Math.random()
+		, mid_u = u0 + (u1 - u0) * t
+		, mid_v = v0 + (v1 - v0) * t
+		, p1 = eval_srf( u0, v0 )
 		, p2 = eval_srf( mid_u, mid_v )
 		, p3 = eval_srf( u1, v1 );
 
-	var res = verb.eval.nurbs.three_points_are_flat( p1, p2, p3, options.tol != undefined ? options.tol : verb.TOLERANCE );
+	// how to make scale dependent?
 
-	return res;
+	if ( !verb.eval.nurbs.three_points_are_flat( p1, p2, p3, tol ) ) return false;
+
+	// try the other diagonal
+	var t2 = 0.5 + 0.2 * Math.random()
+		, mid_u1 = u0 + (u1 - u0) * t2
+		, mid_v1 = v1 + (v0 - v1) * t2
+		, p21 = eval_srf( u0, v1 )
+		, p22 = eval_srf( mid_u1, mid_v1 )
+		, p23 = eval_srf( u1, v0 );
+
+	return verb.eval.nurbs.three_points_are_flat( p21, p22, p23, tol );
 
 }
 
@@ -2216,16 +2254,7 @@ verb.eval.nurbs.tessellate_rational_surface_adaptive = function( degree_u, knots
 	var arrArray = verb.eval.nurbs.divide_rational_surface_adaptive( degree_u, knots_u, degree_v, knots_v, homo_control_points, options );
 
 	// triangulation step
-	var res = verb.eval.nurbs.triangulate_adaptive_refinement_node_tree( arrTree );
-
-	// TODO: this technique produces duplicate points - do we want to remove them here?
-	return verb.eval.nurbs.unique_mesh( res );
-
-}
-
-verb.eval.nurbs.unique_mesh = function( mesh ) {
-
-	return mesh;
+	return verb.eval.nurbs.triangulate_adaptive_refinement_node_tree( arrTree );
 
 }
 
@@ -2364,12 +2393,11 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulateLeaf = function( mes
 
 		// if the number of points is 4, we're just doing a
 		// rectangle - just build the basic triangulated square
-		mesh.faces.push( [ baseIndex + 0, baseIndex + 3, baseIndex + 1 ] );
+		mesh.faces.push( [ baseIndex, 	  baseIndex + 3, baseIndex + 1 ] );
 		mesh.faces.push( [ baseIndex + 3, baseIndex + 2, baseIndex + 1 ] );
 
-		// all done ;)
+		// all done 
 		return mesh;
-
 	}
 
 	this.u05 = this.u05 || (this.u0 + this.u1) / 2;
@@ -2386,14 +2414,7 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulateLeaf = function( mes
 
 	// build triangle fan from center
 	for (var i = 0, j = uvs.length-1; i < uvs.length; j = i++){
-		console.log( [centerIndex, 
-												baseIndex + j, 
-												baseIndex + i   ] );
-
-		mesh.faces.push( [	centerIndex, 
-												baseIndex + j, 
-												baseIndex + i   ]);
-
+		mesh.faces.push( [	centerIndex, baseIndex + j, baseIndex + i   ]);
 	}
 
 	return mesh;
@@ -2417,8 +2438,10 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulate = function( mesh ){
 };
 
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.shouldDivide = function( options, currentDepth ){
-	if ( options.minDepth != undefined && currentDepth < options.minDepth ){
+	if ( options.minDepth != undefined && currentDepth < options.minDepth){
 		return true;
+	} else if (options.maxDepth != undefined && options.maxDepth >= currentDepth) {
+		 return false;  
 	} else if ( this.srf ){
 		return !verb.eval.nurbs.is_rational_surface_domain_flat( this.srf, this.u0, this.u1, this.v0, this.v1, options )
 	}

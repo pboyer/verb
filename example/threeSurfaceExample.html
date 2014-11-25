@@ -85,8 +85,14 @@
 
 		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
 
+		var d1 = Date.now();
+
 		f.divide({ tol: 1e-1 });
 		var mesh = f.triangulate();
+
+		var d2 = Date.now();
+
+		console.log( d2 - d1 );
 
 		// verb.NurbsSurface -> THREE.Geometry
 		function tessellate(srf, tess) {
@@ -125,10 +131,10 @@
 
 		scene.add( mesh );
 
-		var material2 = new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide, wireframe: true } );
-		var mesh2 = new THREE.Mesh( geometry, material2 );
+		// var material2 = new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide, wireframe: true } );
+		// var mesh2 = new THREE.Mesh( geometry, material2 );
 
-		scene.add( mesh2 );
+		// scene.add( mesh2 );
 
 		var controls = new THREE.OrbitControls(camera, renderer.domElement);
 

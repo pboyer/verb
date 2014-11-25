@@ -1114,6 +1114,22 @@ describe("verb.eval.geom.closest_point_on_ray",function(){
 
 });
 
+describe("verb.eval.geom.dist_to_ray",function(){
+
+	it('returns correct result for xaxis and 3d pt', function(){
+
+		var r = [1,0,0]
+			, o = [0,0,0]
+			, pt = [3,4,-1];
+
+		var d = verb.eval.geom.dist_to_ray(pt, o, r);
+
+		d.should.be.approximately( Math.sqrt( 17 ), verb.TOLERANCE );
+
+	});
+
+});
+
 describe("verb.eval.nurbs.get_arc",function(){
 
 	it('returns correct result for unit arc from 0 to 90 deg', function(){
