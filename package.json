@@ -23,6 +23,7 @@
     "numeric": "1.2.6"
   },
   "devDependencies": {
+    "benchmark": "^1.0.0",
     "grunt": "0.4.2",
     "grunt-contrib-concat": "0.1.2",
     "grunt-contrib-uglify": "0.1.1",
