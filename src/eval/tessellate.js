@@ -652,20 +652,6 @@ verb.eval.nurbs.tessellate_rational_surface_adaptive = function( degree_u, knots
 
 }
 
-Array.prototype.where = function( predicate ){
-
-	if (this.length === 0) return this;
-
-	var res = [];
-
-	for (var i = 0; i < this.length; i++){
-		if ( predicate( this[i] ) ) res.push( this[i] );
-	}
-
-	return res;
-
-}
-
 verb.eval.nurbs.AdaptiveRefinementNode = function( srf, u0, u1, v0, v1, parentNode, neighbors ) {
 
 	// 
@@ -708,6 +694,10 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.isLeaf = function(){
 	return this.children === undefined;
 };
 
+verb.geom.PointNormal = function(point, normal){
+	this.point = point;
+	this.normal = normal;
+}
 
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalSurface = function( uv ){
 
@@ -722,10 +712,9 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalSurface = function( uv ){
 	var pt = derivs[0][0];
 	var normal = numeric.cross(  derivs[0][1], derivs[1][0] );
 
-	return { point: pt, normal: normal };
+	return new verb.geom.PointNormal(pt, normal );
 
 };
-
 
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.getEdgeUvs = function( edgeIndex ){
 
@@ -760,7 +749,7 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.getAllEdgeUvs = function( edgeI
 	];
 
 	// clip the range of uvs to match this one
-	return baseArr.concat( uvs.where( rangeFuncMap[ funcIndex ] ).reverse() ) ;
+	return baseArr.concat( uvs.filter( rangeFuncMap[ funcIndex ] ).reverse() ) ;
 
 };
 
@@ -815,9 +804,22 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulateLeaf = function( mes
 
 };
 
+verb.geom.TriMesh = function(faces, points, uvs, normals){
+
+	this.faces = faces;
+	this.points = points;
+	this.uvs = uvs;
+	this.normals = normals;
+
+}
+
+verb.geom.TriMesh.empty = function(){
+	return new verb.geom.TriMesh([],[],[],[]);
+}
+
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulate = function( mesh ){
 
-	mesh = mesh || { faces: [], points: [], uvs: [], normals: [] };
+	mesh = mesh || verb.geom.TriMesh.empty();
 
 	if ( this.isLeaf() ) return this.triangulateLeaf( mesh );
 

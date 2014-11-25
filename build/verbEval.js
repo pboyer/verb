@@ -2278,20 +2278,6 @@ verb.eval.nurbs.tessellate_rational_surface_adaptive = function( degree_u, knots
 
 }
 
-Array.prototype.where = function( predicate ){
-
-	if (this.length === 0) return this;
-
-	var res = [];
-
-	for (var i = 0; i < this.length; i++){
-		if ( predicate( this[i] ) ) res.push( this[i] );
-	}
-
-	return res;
-
-}
-
 verb.eval.nurbs.AdaptiveRefinementNode = function( srf, u0, u1, v0, v1, parentNode, neighbors ) {
 
 	// 
@@ -2334,6 +2320,10 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.isLeaf = function(){
 	return this.children === undefined;
 };
 
+verb.geom.PointNormal = function(point, normal){
+	this.point = point;
+	this.normal = normal;
+}
 
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalSurface = function( uv ){
 
@@ -2348,10 +2338,9 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalSurface = function( uv ){
 	var pt = derivs[0][0];
 	var normal = numeric.cross(  derivs[0][1], derivs[1][0] );
 
-	return { point: pt, normal: normal };
+	return new verb.geom.PointNormal(pt, normal );
 
 };
-
 
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.getEdgeUvs = function( edgeIndex ){
 
@@ -2386,7 +2375,7 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.getAllEdgeUvs = function( edgeI
 	];
 
 	// clip the range of uvs to match this one
-	return baseArr.concat( uvs.where( rangeFuncMap[ funcIndex ] ).reverse() ) ;
+	return baseArr.concat( uvs.filter( rangeFuncMap[ funcIndex ] ).reverse() ) ;
 
 };
 
@@ -2441,9 +2430,22 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulateLeaf = function( mes
 
 };
 
+verb.geom.TriMesh = function(faces, points, uvs, normals){
+
+	this.faces = faces;
+	this.points = points;
+	this.uvs = uvs;
+	this.normals = normals;
+
+}
+
+verb.geom.TriMesh.empty = function(){
+	return new verb.geom.TriMesh([],[],[],[]);
+}
+
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulate = function( mesh ){
 
-	mesh = mesh || { faces: [], points: [], uvs: [], normals: [] };
+	mesh = mesh || verb.geom.TriMesh.empty();
 
 	if ( this.isLeaf() ) return this.triangulateLeaf( mesh );
 
@@ -3503,7 +3505,6 @@ verb.eval.nurbs.rational_surface_curvature = function( degree_u, knots_u, degree
 	// pos  du  vuu
 	// dv   duv
   // dvv 
-
  
   var du = derivs[0][1];
   var dv = derivs[1][0];
@@ -4076,6 +4077,7 @@ verb.eval.nurbs.volume_point_given_n_m_l = function( n, degree_u, knots_u, m, de
 	}
 
 	var dim = control_points[0][0][0].length
+
 		, knot_span_index_u = verb.eval.nurbs.knot_span_given_n( n, degree_u, u, knots_u )
 		, knot_span_index_v = verb.eval.nurbs.knot_span_given_n( m, degree_v, v, knots_v )
 		, knot_span_index_w = verb.eval.nurbs.knot_span_given_n( l, degree_w, w, knots_w )
@@ -4104,18 +4106,15 @@ verb.eval.nurbs.volume_point_given_n_m_l = function( n, degree_u, knots_u, m, de
 			for (k = 0; k <= degree_u; k++) {	
 
 				// sample u isoline
-				temp = numeric.add( temp, 
-														numeric.mul( u_basis_vals[k], control_points[uind+k][vind][wind] ));
+				temp = numeric.add( temp, numeric.mul( u_basis_vals[k], control_points[uind+k][vind][wind] ));
 			}
 
 			// add weighted contribution of u isoline
-			temp2 = numeric.add( temp2, 
-													numeric.mul( v_basis_vals[j], temp ) );
+			temp2 = numeric.add( temp2, numeric.mul( v_basis_vals[j], temp ) );
 		}
 
 		// add weighted contribution from uv isosurfaces
-		position = numeric.add( position, 
-														numeric.mul( w_basis_vals[i], temp2 ) );
+		position = numeric.add( position,  numeric.mul( w_basis_vals[i], temp2 ) );
 
 	}
 
@@ -4259,9 +4258,7 @@ verb.eval.nurbs.curve_derivs_given_n = function( n, degree, knots, control_point
 //
 
 verb.eval.nurbs.are_valid_relations = function( degree, num_control_points, knots_length ) {
-
 	return ( num_control_points + degree + 1 - knots_length ) === 0 ? true : false;
-
 }		
 
 //

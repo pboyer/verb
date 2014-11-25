@@ -62,7 +62,7 @@ Function.method('inherits', function (parent) {
 
 // ####Array.flatten()
 //
-// Extend methods to collapse multidimensional arrays to 1d
+// Collapse a multidimensional arrays to a 1d
 //
 Array.prototype.flatten = function(){
 
