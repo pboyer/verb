@@ -54,6 +54,12 @@ module.exports = function(grunt) {
       }
     },
 
+    benchmark: {
+      all: {
+        src: ['benchmark/*.js']
+      }
+    },
+
     // docs
     docco: {
       debug: {
@@ -70,11 +76,13 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-docco');
+  grunt.loadNpmTasks('grunt-benchmark');
 
   var build_steps = ['concat', 'uglify', 'docco'];
   grunt.registerTask('default', build_steps );
   grunt.registerTask('build', build_steps);
   grunt.registerTask('test', ['concat', 'mochaTest']);
+  grunt.registerTask('test', ['concat', 'benchmark']);
 
 
 };
