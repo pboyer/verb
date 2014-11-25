@@ -4782,7 +4782,7 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.getAllEdgeUvs = function( edgeI
 
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulateLeaf = function( mesh ){
 
-	var baseIndex = mesh.points.length - 1;
+	var baseIndex = mesh.points.length;
 	var uvs = [];
 
 	// enumerate all uvs in counter clockwise direction
@@ -4803,8 +4803,8 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulateLeaf = function( mes
 
 		// if the number of points is 4, we're just doing a
 		// rectangle - just build the basic triangulated square
-		mesh.faces.push( [ baseIndex + 1, baseIndex + 4, baseIndex + 2 ] );
-		mesh.faces.push( [ baseIndex + 4, baseIndex + 3, baseIndex + 2 ] );
+		mesh.faces.push( [ baseIndex + 0, baseIndex + 3, baseIndex + 1 ] );
+		mesh.faces.push( [ baseIndex + 3, baseIndex + 2, baseIndex + 1 ] );
 
 		// all done ;)
 		return mesh;
@@ -4824,15 +4824,14 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulateLeaf = function( mes
 	var centerIndex = mesh.points.length - 1;
 
 	// build triangle fan from center
-	for (var i = 0; i < uvs.length; i++){
-
+	for (var i = 0, j = uvs.length-1; i < uvs.length; j = i++){
 		console.log( [centerIndex, 
-												(baseIndex + i + 2) % uvs.length, 
-												(baseIndex + i + 1) % uvs.length   ] );
+												baseIndex + j, 
+												baseIndex + i   ] );
 
 		mesh.faces.push( [	centerIndex, 
-												(baseIndex + i + 2) % uvs.length, 
-												(baseIndex + i + 1) % uvs.length   ]);
+												baseIndex + j, 
+												baseIndex + i   ]);
 
 	}
 
@@ -4857,15 +4856,13 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulate = function( mesh ){
 };
 
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.shouldDivide = function( options, currentDepth ){
-
 	if ( options.minDepth != undefined && currentDepth < options.minDepth ){
 		return true;
-	} else if ( this.srf && !verb.eval.nurbs.is_rational_surface_domain_flat( this.srf, this.u0, this.u1, this.v0, this.v1, options ) ){
-		return true;
+	} else if ( this.srf ){
+		return !verb.eval.nurbs.is_rational_surface_domain_flat( this.srf, this.u0, this.u1, this.v0, this.v1, options )
 	}
 
 	return false;
-
 }
 
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.divide = function( options, currentDepth ){

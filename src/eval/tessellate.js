@@ -759,9 +759,8 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulateLeaf = function( mes
 		mesh.faces.push( [ baseIndex + 0, baseIndex + 3, baseIndex + 1 ] );
 		mesh.faces.push( [ baseIndex + 3, baseIndex + 2, baseIndex + 1 ] );
 
-		// all done ;)
+		// all done 
 		return mesh;
-
 	}
 
 	this.u05 = this.u05 || (this.u0 + this.u1) / 2;
@@ -778,14 +777,7 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulateLeaf = function( mes
 
 	// build triangle fan from center
 	for (var i = 0, j = uvs.length-1; i < uvs.length; j = i++){
-		console.log( [centerIndex, 
-												baseIndex + j, 
-												baseIndex + i   ] );
-
-		mesh.faces.push( [	centerIndex, 
-												baseIndex + j, 
-												baseIndex + i   ]);
-
+		mesh.faces.push( [	centerIndex, baseIndex + j, baseIndex + i   ]);
 	}
 
 	return mesh;
@@ -809,15 +801,13 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulate = function( mesh ){
 };
 
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.shouldDivide = function( options, currentDepth ){
-
 	if ( options.minDepth != undefined && currentDepth < options.minDepth ){
 		return true;
-	} else if ( this.srf && !verb.eval.nurbs.is_rational_surface_domain_flat( this.srf, this.u0, this.u1, this.v0, this.v1, options ) ){
-		return true;
+	} else if ( this.srf ){
+		return !verb.eval.nurbs.is_rational_surface_domain_flat( this.srf, this.u0, this.u1, this.v0, this.v1, options )
 	}
 
 	return false;
-
 }
 
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.divide = function( options, currentDepth ){
