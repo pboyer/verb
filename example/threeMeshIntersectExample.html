@@ -99,9 +99,7 @@
 					return new THREE.Vector3( vn[0], vn[1], vn[2] );
 				});
 
-				// console.log(normals)
-
-				return new THREE.Face3(faceIndices[0],faceIndices[1],faceIndices[2], normals[0]);
+				return new THREE.Face3(faceIndices[0],faceIndices[1],faceIndices[2], normals);
 			});
 
 			geometry.faces.push.apply(geometry.faces, threeFaces);
@@ -112,7 +110,7 @@
 
 		function addMeshToScene(mesh, wireframe){
 
-			var material = new THREE.MeshNormalMaterial( { wireframe: wireframe, transparent: true, side: THREE.DoubleSide, opacity: 0.4, shading: THREE.SmoothShading, side: THREE.DoubleSide } );
+			var material = new THREE.MeshNormalMaterial( { wireframe: wireframe, transparent: false, side: THREE.DoubleSide, opacity: 0.4, shading: THREE.SmoothShading, side: THREE.DoubleSide } );
 			// var material = new THREE.MeshPhongMaterial( { color: 0x444444, side: THREE.DoubleSide, shading: THREE.SmoothShading } );
 			var tm = new THREE.Mesh( mesh, material );
 
@@ -294,33 +292,7 @@
 
 		}
 
-		function exampleGlancingPlaneCylinderSuccess(){
-
-			var axis = [0,0,1]
-				, xaxis = [1,0,0]
-				, base = [0,0,0]
-				, height = 5
-				, radius = 3;
-
-			srf1 = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
-
-			var axis2 = [1,0,0]
-				, xaxis2 = [0,1,0]
-				, base2 = [0,0,-1]
-				, height2 = 10
-				, radius2 = 3;
-
-			srf2 = new verb.geom.Cylinder( axis2, xaxis2, base2, height2, radius2 );
-
-			udivs0 = 60;
-			vdivs0 = 60;
-
-			udivs1 = 60;
-			vdivs1 = 60;
-
-		}
-
-		function exampleGlancingPlaneCylinderSuccess(){
+		function exampleCylinderCylinderSuccess(){
 
 			var axis = [0,0,1]
 				, xaxis = [1,0,0]
@@ -384,16 +356,16 @@
 
 		var srf1, srf2;
 
-		//exampleTorusCylinderSuccess();
-		//exampleTorusCylinderSuccess();
+		exampleTorusCylinderSuccess();
 		// exampleGlancingPlaneCylinderSuccess();
+		//examplePlanePlaneSuccess();
 		//exampleTorusCylinderSuccess2();
 		// exampleTorusCylinderSuccess3();
 		//examplePlanePlaneSuccess();
-		exampleNurbsSurfacePlane();
+		// exampleNurbsSurfacePlane();
 
 		addMeshToScene( tessellate(srf1, udivs0, vdivs0) );
-		addMeshToScene( tessellate(srf2, udivs1, vdivs1), true );
+		addMeshToScene( tessellate(srf2, udivs1, vdivs1) );
 
 		var tess1 = srf1.tessellate({ minDivsU: udivs0, minDivsV: vdivs0 });
 		var tess2 = srf2.tessellate({ minDivsU: udivs1, minDivsV: vdivs1 });

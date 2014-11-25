@@ -1144,8 +1144,9 @@ verb.eval.nurbs.refine_rational_surface_intersect_point = function(uv1, uv2, deg
 
 }
 
-verb.eval.nurbs.intersect_rational_surface_surface_by_aabb_refine = function( degree_u1, knots_u1, degree_v1, knots_v1, homo_control_points_srf1, degree_u2, knots_u2, degree_v2, knots_v2, homo_control_points_srf2, tol, divs_u, divs_v ) {
+verb.eval.nurbs.intersect_rational_surface_surface_by_aabb_refine = function( degree_u1, knots_u1, degree_v1, knots_v1, homo_control_points_srf1, degree_u2, knots_u2, degree_v2, knots_v2, homo_control_points_srf2, tol ) {
 
+	// 1) tessellate the meshes to get the approximate intersections
 	var srfObj1 = {
 		degree_u : degree_u1,
 		degree_v : degree_v1,
@@ -1169,10 +1170,6 @@ verb.eval.nurbs.intersect_rational_surface_surface_by_aabb_refine = function( de
 	var f2 = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj2 );
 	f2.divide({ tol: 1e-1 });
 	var tess2 = f2.triangulate();
-
-	// 1) tessellate the meshes to get the approximate intersections
-	// var tess1 = verb.eval.nurbs.tessellate_rational_surface_naive( degree_u1, knots_u1, degree_v1, knots_v1, homo_control_points_srf1, divs_u, divs_v );
-	// var tess2 = verb.eval.nurbs.tessellate_rational_surface_naive( degree_u2, knots_u2, degree_v2, knots_v2, homo_control_points_srf2, divs_u, divs_v );
 	var resApprox = verb.eval.mesh.intersect_meshes_by_aabb( tess1.points, tess1.faces, tess1.uvs, tess2.points, tess2.faces, tess2.uvs );
 
 	// 2) refine the intersection points so that they lie on both surfaces
@@ -1190,7 +1187,6 @@ verb.eval.nurbs.intersect_rational_surface_surface_by_aabb_refine = function( de
 
 	// TODO: represent this in uv space
 	// TODO: refine between initial points
-	// TODO: use adaptive sampling of surfaces
 
 }
 
@@ -4338,15 +4334,7 @@ verb.eval.nurbs.curve_point_given_n = function( n, degree, knots, control_points
 //
 
 verb.eval.nurbs.zeros_1d = function(size) {
-  size = size > 0 ? size : 0;
-
-  var arr = [];
-
-  while(size--) {
-    arr.push(0);
-  }
-
-  return arr;
+  return numeric.rep([size], 0);
 }
 
 //
@@ -4366,20 +4354,7 @@ verb.eval.nurbs.zeros_2d = function(rows, cols) {
   cols = cols > 0 ? cols : 0;
   rows = rows > 0 ? rows : 0;
 
-  var arr = [];
-  var cols_temp = cols;
-  var rows_temp = rows;
-
-  while(rows--) {
-    arr.push([]);
-
-    while(cols_temp--) {
-      arr[rows_temp-rows-1].push(0);
-    }
-    cols_temp = cols;
-  }
-
-  return arr;
+  return numeric.rep([rows, cols], 0);
 }
 
 //
@@ -4400,20 +4375,7 @@ verb.eval.nurbs.zeros_3d = function(rows, cols, dim) {
   cols = cols > 0 ? cols : 0;
   rows = rows > 0 ? rows : 0;
 
-  var arr = [];
-  var cols_temp = cols;
-  var rows_temp = rows;
-
-  while(rows--) {
-    arr.push([]);
-
-    while(cols_temp--) {
-      arr[rows_temp-rows-1].push( verb.eval.nurbs.zeros_1d(dim) );
-    }
-    cols_temp = cols;
-  }
-
-  return arr;
+  return numeric.rep([rows, cols, dim], 0);
 }
 
 //

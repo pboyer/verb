@@ -1212,15 +1212,7 @@ verb.eval.nurbs.curve_point_given_n = function( n, degree, knots, control_points
 //
 
 verb.eval.nurbs.zeros_1d = function(size) {
-  size = size > 0 ? size : 0;
-
-  var arr = [];
-
-  while(size--) {
-    arr.push(0);
-  }
-
-  return arr;
+  return numeric.rep([size], 0);
 }
 
 //
@@ -1240,20 +1232,7 @@ verb.eval.nurbs.zeros_2d = function(rows, cols) {
   cols = cols > 0 ? cols : 0;
   rows = rows > 0 ? rows : 0;
 
-  var arr = [];
-  var cols_temp = cols;
-  var rows_temp = rows;
-
-  while(rows--) {
-    arr.push([]);
-
-    while(cols_temp--) {
-      arr[rows_temp-rows-1].push(0);
-    }
-    cols_temp = cols;
-  }
-
-  return arr;
+  return numeric.rep([rows, cols], 0);
 }
 
 //
@@ -1274,20 +1253,7 @@ verb.eval.nurbs.zeros_3d = function(rows, cols, dim) {
   cols = cols > 0 ? cols : 0;
   rows = rows > 0 ? rows : 0;
 
-  var arr = [];
-  var cols_temp = cols;
-  var rows_temp = rows;
-
-  while(rows--) {
-    arr.push([]);
-
-    while(cols_temp--) {
-      arr[rows_temp-rows-1].push( verb.eval.nurbs.zeros_1d(dim) );
-    }
-    cols_temp = cols;
-  }
-
-  return arr;
+  return numeric.rep([rows, cols, dim], 0);
 }
 
 //
