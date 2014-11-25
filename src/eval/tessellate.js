@@ -617,8 +617,6 @@ verb.eval.nurbs.is_rational_surface_domain_flat = function(srf, u0, u1, v0, v1, 
 		, p2 = eval_srf( mid_u, mid_v )
 		, p3 = eval_srf( u1, v1 );
 
-	// how to make scale dependent?
-
 	if ( !verb.eval.nurbs.three_points_are_flat( p1, p2, p3, tol ) ) return false;
 
 	// try the other diagonal
@@ -698,6 +696,13 @@ verb.geom.PointNormal = function(point, normal){
 	this.point = point;
 	this.normal = normal;
 }
+
+// opportunities for optimizations
+// 
+// 1) cache division check evals when dividing
+// 2) hand srf evals to children when dividing
+// 3) you don't need to divide both directions, sometimes you can just go in one direction
+//
 
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalSurface = function( uv ){
 
