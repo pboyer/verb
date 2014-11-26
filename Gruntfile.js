@@ -82,7 +82,7 @@ module.exports = function(grunt) {
   grunt.registerTask('default', build_steps );
   grunt.registerTask('build', build_steps);
   grunt.registerTask('test', ['concat', 'mochaTest']);
-  grunt.registerTask('test', ['concat', 'benchmark']);
+  grunt.registerTask('benchmarks', ['concat', 'benchmark']);
 
 
 };

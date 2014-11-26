@@ -62,13 +62,6 @@
 
 			srf = new verb.geom.NurbsSurface( degree, knots, degree, knots, pts, wts );
 
-			// var p1 = [0,0,0]
-			// 	, p2 = [1,0,0]
-			// 	, p3 = [1,1,3]
-			// 	, p4 = [0,1,0];
-
-			// srf = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
-
 			var srfObj = {
 				degree_u : srf.get('degreeU'),
 				degree_v : srf.get('degreeV'),
@@ -83,10 +76,9 @@
 
 		var srf = getWarpedPlane();
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
-
 		var d1 = Date.now();
 
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
 		f.divide({ tol: 2 });
 		var mesh = f.triangulate();
 

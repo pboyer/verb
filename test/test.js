@@ -5386,15 +5386,15 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.constructor",function(){
 
 	it('can be instantiated', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, "a", "b" );
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null,[], "a", "b" );
 
-		f.u0.should.be.equal(0);
-		f.u1.should.be.equal(1);
-		f.v0.should.be.equal(0);
-		f.v1.should.be.equal(1);
+		f.umin().should.be.equal(0);
+		f.umax().should.be.equal(1);
+		f.vmin().should.be.equal(0);
+		f.vmax().should.be.equal(1);
 		f.parentNode.should.be.equal("a");
 		f.neighbors.should.be.equal("b");
-		f.leafEdgeUvs.length.should.be.equal(4);
+		f.corners.length.should.be.equal(4);
 		f.cachedEdgeUvs.length.should.be.equal(0);
 
 	});
@@ -5509,7 +5509,7 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.divide",function(){
 
 });
 
-describe("verb.eval.nurbs.AdaptiveRefinementNode.evalSurface",function(){
+describe("verb.eval.nurbs.AdaptiveRefinementNode.evalSrf",function(){
 
 	it('works as expected', function(){
 
@@ -5532,17 +5532,17 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.evalSurface",function(){
 
 		var f = new verb.eval.nurbs.AdaptiveRefinementNode(srfObj);
 
-		var res = f.evalSurface( [0,0] );
+		var res = f.evalSrf( [0,0] );
 
 		vecShouldBe( [0,0,0], res.point );
 		vecShouldBe( [0,0,-1], res.normal );
 
-		res = f.evalSurface( [1,0] );
+		res = f.evalSrf( [1,0] );
 
 		vecShouldBe( [1,0,0], res.point );
 		vecShouldBe( [0,0,-1], res.normal );
 
-		res = f.evalSurface( [1,1] );
+		res = f.evalSrf( [1,1] );
 
 		vecShouldBe( [1,1,0], res.point );
 		vecShouldBe( [0,0,-1], res.normal );

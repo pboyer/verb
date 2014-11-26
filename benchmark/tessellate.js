@@ -36,10 +36,17 @@ function getComplexSurface(){
 var srf = getComplexSurface();
 
 module.exports = function() {
-	var fn = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
-	fn.divide({ tol: 2 });
-	fn.triangulate();
+	// var d1 = Date.now();
 
-	console.log('hi')
+	var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
+	f.divide({ tol: 1 });
+	var mesh = f.triangulate();
+
+	console.log(mesh.points.length)
+
+	// var d2 = Date.now();
+
+	// console.log( d2 - d1 );
+
 }
 
