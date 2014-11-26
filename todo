@@ -1,11 +1,10 @@
-NurbsSurface split
-	see above
+NurbsSurface split - similar to curve knot insertion but on surfaces
 Curve interpolation with tangents
 Curve interpolation with sparse matrices
 Curve approximation
 
 Surface-Surface intersection
-	Integrate results of intersect_aabb_trees into single polyline result
+	improved accuracy
 
 Surface lofting
 Finish sweep (it's incorrect)

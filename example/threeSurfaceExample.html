@@ -78,9 +78,13 @@
 
 		var d1 = Date.now();
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
-		f.divide({ tol: 2 });
-		var mesh = f.triangulate();
+		for (var i = 0; i < 100; i++){
+
+			var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
+			f.divide({ tol: 2 });
+			var mesh = f.triangulate();
+
+		}
 
 		var d2 = Date.now();
 

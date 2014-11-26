@@ -4637,65 +4637,6 @@ verb.eval.nurbs.divide_rational_surface_adaptive = function( degree_u, knots_u, 
 
 }
 
-verb.eval.nurbs.is_rational_surface_domain_flat2 = function(srf, u0, u1, v0, v1, options ){
-
-	var tol = options.tol != undefined ? options.tol : verb.TOLERANCE;
-
-	var eval_srf = function(u,v){ return verb.eval.nurbs.rational_surface_point(srf.degree_u, srf.knots_u, 
-																		srf.degree_v, srf.knots_v, srf.homo_control_points, u, v ); }
-		, t = 0.5 + 0.2 * Math.random()
-		, mid_u = u0 + (u1 - u0) * t
-		, mid_v = v0 + (v1 - v0) * t
-		, p1 = eval_srf( u0, v0 )
-		, p2 = eval_srf( mid_u, mid_v )
-		, p3 = eval_srf( u1, v1 )
-		, r1 = numeric.normalized( numeric.sub( p3, p1 ) )
-		, o1 = p1
-		, d1 = verb.eval.geom.dist_to_ray( p2, o1, r1 );
-
-	if ( d1 > tol ) return false;
-
-	var t2 = 0.5 + 0.2 * Math.random()
-		, mid_u1 = u0 + (u1 - u0) * t2
-		, mid_v1 = v1 + (v0 - v1) * t2
-		, p21 = eval_srf( u0, v1 )
-		, p22 = eval_srf( mid_u1, mid_v1 )
-		, p23 = eval_srf( u1, v0 )
-		, r2 = numeric.normalized( numeric.sub( p23, p21 ) )
-		, o2 = p21
-		, d2 = verb.eval.geom.dist_to_ray( p22, o2, r2 );
-
-	return d2 < tol;
-
-}
-
-verb.eval.nurbs.is_rational_surface_domain_flat = function(srf, u0, u1, v0, v1, options ){
-
-	var tol = options.tol != undefined ? options.tol : verb.TOLERANCE;
-
-	var eval_srf = function(u,v){ return verb.eval.nurbs.rational_surface_point(srf.degree_u, srf.knots_u, 
-																		srf.degree_v, srf.knots_v, srf.homo_control_points, u, v ); }
-		, t = 0.5 + 0.2 * Math.random()
-		, mid_u = u0 + (u1 - u0) * t
-		, mid_v = v0 + (v1 - v0) * t
-		, p1 = eval_srf( u0, v0 )
-		, p2 = eval_srf( mid_u, mid_v )
-		, p3 = eval_srf( u1, v1 );
-
-	if ( !verb.eval.nurbs.three_points_are_flat( p1, p2, p3, tol ) ) return false;
-
-	// try the other diagonal
-	var t2 = 0.5 + 0.2 * Math.random()
-		, mid_u1 = u0 + (u1 - u0) * t2
-		, mid_v1 = v1 + (v0 - v1) * t2
-		, p21 = eval_srf( u0, v1 )
-		, p22 = eval_srf( mid_u1, mid_v1 )
-		, p23 = eval_srf( u1, v0 );
-
-	return verb.eval.nurbs.three_points_are_flat( p21, p22, p23, tol );
-
-}
-
 verb.eval.nurbs.triangulate_adaptive_refinement_node_tree = function( arrTree ){
 
 	// triangulate all of the nodes of the tree
@@ -4771,10 +4712,10 @@ verb.eval.nurbs.AdaptiveRefinementNode = function( srf, corners, parentNode, nei
 	// if no corners, we need to construct initial corners from the surface
 	if (!corners){
 
-		var u0 = srf ? srf.knots_u[0] : 0;
-		var u1 = srf ? verb.last( srf.knots_u ) : 1;
-		var v0 = srf ? srf.knots_v[0] : 0;
-		var v1 = srf ? verb.last( srf.knots_v ) : 1;
+		var u0 = srf ? srf.knots_u[0] : null;
+		var u1 = srf ? verb.last( srf.knots_u ) : null;
+		var v0 = srf ? srf.knots_v[0] : null;
+		var v1 = srf ? verb.last( srf.knots_v ) : null;
 
 		corners = [ verb.geom.SurfacePoint.fromUv( u0, v0 ),
 								verb.geom.SurfacePoint.fromUv( u1, v0 ),
@@ -4877,10 +4818,6 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.getEdgeUvs = function( edgeInde
 	return this.cachedEdgeUvs[edgeIndex];
 };
 
-verb.within = function(value, startRange, endRange){
-	return value > startRange + verb.EPSILON && value < endRange - verb.EPSILON; 
-}
-
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.getAllEdgeUvs = function( edgeIndex ){
 
 	var baseArr = [ this.corners[edgeIndex] ];
@@ -4896,10 +4833,15 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.getAllEdgeUvs = function( edgeI
 
 	var that = this;
 
+	var umin = this.umin();
+	var umax = this.umax();
+	var vmin = this.vmin();
+	var vmax = this.vmax();
+
 	// range clipping functions
 	var rangeFuncMap = [
-		function(corner){ return verb.within( corner.uv[0], this.umin(), this.umax() ); }.bind(this),
-		function(corner){ return verb.within( corner.uv[1], this.vmin(), this.vmax() ); }.bind(this),
+		function(corner){ return corner.uv[0] > umin + verb.EPSILON && corner.uv[0] < umax - verb.EPSILON;  },
+		function(corner){ return corner.uv[1] > vmin + verb.EPSILON && corner.uv[1] < vmax - verb.EPSILON;  },
 	];
 
 	// clip the range of uvs to match this one
@@ -4916,21 +4858,6 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.isFlat = function(options){
 
 }
 
-verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulate = function( mesh ){
-
-	mesh = mesh || verb.geom.TriMesh.empty();
-
-	if ( this.isLeaf() ) return this.triangulateLeaf( mesh );
-
-	// recurse on the children
-	this.children.forEach(function(x){
-		if (!x) return;
-		x.triangulate( mesh );
-	});
-
-	return mesh;
-
-};
 
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.shouldDivide = function( options, currentDepth ){
 
@@ -4979,6 +4906,23 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.divide = function( options, cur
 
 	// divide all children recursively
 	this.children.forEach(function(x){ x.divide( options,currentDepth ); })
+
+};
+
+
+verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulate = function( mesh ){
+
+	mesh = mesh || verb.geom.TriMesh.empty();
+
+	if ( this.isLeaf() ) return this.triangulateLeaf( mesh );
+
+	// recurse on the children
+	this.children.forEach(function(x){
+		if (!x) return;
+		x.triangulate( mesh );
+	});
+
+	return mesh;
 
 };
 

@@ -33,20 +33,22 @@ function getComplexSurface(){
 	return srfObj;
 }
 
-var srf = getComplexSurface();
+var srfObj = getComplexSurface();
 
-module.exports = function() {
-	// var d1 = Date.now();
-
-	var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
-	f.divide({ tol: 1 });
-	var mesh = f.triangulate();
-
-	console.log(mesh.points.length)
-
-	// var d2 = Date.now();
-
-	// console.log( d2 - d1 );
-
-}
-
+module.exports = {
+  name: 'Surface tessellation',
+  tests: {
+    'adaptive (tol: 1)': function() {
+			var f = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj );
+			f.divide({ tol: 1 });
+			var mesh = f.triangulate();
+    },
+    'adaptive - just divide (tol: 1)': function() {
+			var f = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj );
+			f.divide({ tol: 1 });
+    },
+    'uniform (30 x 30)': function() {
+      mesh = srf.tessellate({ minDivsU: 30, minDivsV: 30 });
+    }
+  }
+};
