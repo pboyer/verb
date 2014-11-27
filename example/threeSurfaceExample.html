@@ -62,6 +62,8 @@
 
 			srf = new verb.geom.NurbsSurface( degree, knots, degree, knots, pts, wts );
 
+			// mesh = srf.tessellate({minDivsU: 30, minDivsV: 30})
+
 			var srfObj = {
 				degree_u : srf.get('degreeU'),
 				degree_v : srf.get('degreeV'),
@@ -76,25 +78,24 @@
 
 		var srf = getWarpedPlane();
 
-			// 		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
-			// f.divide({ tol: 1 });
-			// var mesh = f.triangulate();
-			
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
+		f.divide({ tol: 5e-2 });
+		var mesh = f.triangulate();
+
 		var d1 = Date.now();
-
-
 
 		for (var i = 0; i < 1; i++){
 
 			var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
-			f.divide({ tol: 1 });
+			f.divide({ tol: 5e-2 });
 			var mesh = f.triangulate();
 
 		}
 
 		var d2 = Date.now();
 
-		console.log( d2 - d1 );
+
+		console.log( d2 - d1, " ms to make ", mesh.faces.length, " triangles " );
 
 		// verb.NurbsSurface -> THREE.Geometry
 		function tessellate(srf, tess) {

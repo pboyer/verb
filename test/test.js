@@ -5381,74 +5381,99 @@ describe("verb.eval.mesh.intersect_meshes_by_aabb",function(){
 
 });
 
+function makeFlatSrf(){
+
+	verb.init();
+
+	var p1 = [0,0,0]
+		, p2 = [1,0,0]
+		, p3 = [1,1,0]
+		, p4 = [0,1,0];
+
+	var srf = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
+
+	var srfObj = {
+		degree_u : srf.get('degreeU'),
+		degree_v : srf.get('degreeV'),
+		knots_u : srf.get('knotsU'),
+		knots_v : srf.get('knotsV'),
+		homo_control_points : srf.homogenize()
+	};
+
+	return srfObj;
+
+}
+
+
 
 describe("verb.eval.nurbs.AdaptiveRefinementNode.constructor",function(){
 
 	it('can be instantiated', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null,[], "a", "b" );
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(makeFlatSrf(),null, "a", "b" );
 
-		f.umin().should.be.equal(0);
-		f.umax().should.be.equal(1);
-		f.vmin().should.be.equal(0);
-		f.vmax().should.be.equal(1);
+		f.corners[0].uv[0].should.be.equal(0);
+		f.corners[2].uv[0].should.be.equal(1);
+		f.corners[0].uv[1].should.be.equal(0);
+		f.corners[2].uv[1].should.be.equal(1);
 		f.parentNode.should.be.equal("a");
 		f.neighbors.should.be.equal("b");
 		f.corners.length.should.be.equal(4);
-		f.cachedEdgeUvs.length.should.be.equal(0);
 
 	});
 
 });
 
-describe("verb.eval.nurbs.AdaptiveRefinementNode.getEdgeUvs",function(){
+function extractUv(x){ return x.uv; }
+
+describe("verb.eval.nurbs.AdaptiveRefinementNode.getEdgeCorners",function(){
 
 	it('returns expected result for node without children', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, null, null );
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(makeFlatSrf());
 
-		f.getEdgeUvs( 0 ).should.be.eql( [[0,0]] );
-		f.getEdgeUvs( 1 ).should.be.eql( [[1,0]] );
-		f.getEdgeUvs( 2 ).should.be.eql( [[1,1]] );
-		f.getEdgeUvs( 3 ).should.be.eql( [[0,1]] );
+		f.getEdgeCorners( 0 ).map(extractUv).should.be.eql( [[0,0]] );
+		f.getEdgeCorners( 1 ).map(extractUv).should.be.eql( [[1,0]] );
+		f.getEdgeCorners( 2 ).map(extractUv).should.be.eql( [[1,1]] );
+		f.getEdgeCorners( 3 ).map(extractUv).should.be.eql( [[0,1]] );
 
 	});
 
-	it('returns expected result for node with singly children', function(){
+	it('returns expected result for node with children', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, null, [null, null, null, null] );
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(makeFlatSrf());
 
 		f.divide({ minDepth : 1 });
 		f.children.length.should.be.equal( 4 );
 
-		f.getEdgeUvs(0).should.be.eql( [ [ 0, 0 ], [ 0.5, 0 ] ] );
-		f.getEdgeUvs(1).should.be.eql( [ [ 1, 0 ], [ 1, 0.5 ] ] );
-		f.getEdgeUvs(2).should.be.eql( [ [ 1, 1 ], [ 0.5, 1 ] ] );
-		f.getEdgeUvs(3).should.be.eql( [ [ 0, 1 ], [ 0, 0.5 ] ] );
+		f.getEdgeCorners(0).map(extractUv).should.be.eql( [ [ 0, 0 ], [ 0.5, 0 ] ] );
+		f.getEdgeCorners(1).map(extractUv).should.be.eql( [ [ 1, 0 ], [ 1, 0.5 ] ] );
+		f.getEdgeCorners(2).map(extractUv).should.be.eql( [ [ 1, 1 ], [ 0.5, 1 ] ] );
+		f.getEdgeCorners(3).map(extractUv).should.be.eql( [ [ 0, 1 ], [ 0, 0.5 ] ] );
 
 	});
 
-	it('returns expected result for node with singly children', function(){
+	it('returns expected result for node with nested children', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, null, [null, null, null, null] );
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(makeFlatSrf());
 
 		f.divide({ minDepth : 2 });
 		f.children.length.should.be.equal( 4 );
 
-		f.getEdgeUvs(0).should.be.eql( [ [ 0, 0 ], [ 0.25, 0 ], [ 0.5, 0 ], [ 0.75, 0 ] ] );
-		f.getEdgeUvs(1).should.be.eql( [ [ 1, 0 ], [ 1, 0.25 ], [ 1, 0.5 ], [ 1, 0.75 ] ] );
-		f.getEdgeUvs(2).should.be.eql( [ [ 1, 1 ], [ 0.75, 1 ], [ 0.5, 1 ], [ 0.25, 1 ] ] );
-		f.getEdgeUvs(3).should.be.eql( [ [ 0, 1 ], [ 0, 0.75 ], [ 0, 0.5 ], [ 0, 0.25 ] ] );
+		f.getEdgeCorners(0).map(extractUv).should.be.eql( [ [ 0, 0 ], [ 0.25, 0 ], [ 0.5, 0 ], [ 0.75, 0 ] ] );
+		f.getEdgeCorners(1).map(extractUv).should.be.eql( [ [ 1, 0 ], [ 1, 0.25 ], [ 1, 0.5 ], [ 1, 0.75 ] ] );
+		f.getEdgeCorners(2).map(extractUv).should.be.eql( [ [ 1, 1 ], [ 0.75, 1 ], [ 0.5, 1 ], [ 0.25, 1 ] ] );
+		f.getEdgeCorners(3).map(extractUv).should.be.eql( [ [ 0, 1 ], [ 0, 0.75 ], [ 0, 0.5 ], [ 0, 0.25 ] ] );
 
 	});
 
 });
 
-describe("verb.eval.nurbs.AdaptiveRefinementNode.getAllEdgeUvs",function(){
+describe("verb.eval.nurbs.AdaptiveRefinementNode.getAllCorners",function(){
 
 	it('returns expected result for edge with more vertices on opposite side', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, null, [null, null, null, null] );
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(makeFlatSrf());
 
 		f.divide({ minDepth : 1 }); // now f is split in 4
 
@@ -5456,14 +5481,14 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.getAllEdgeUvs",function(){
 		f.children[1].divide({ minDepth : 1 }); //  f[1] is split in 4
 		f.children[1].children[3].divide({ minDepth : 1 }); //  f[1][3] is split in 4
 
-		f.children[0].getAllEdgeUvs(1).should.eql( [ [ 0.5, 0 ], [ 0.5, 0.25 ], [ 0.5, 0.375 ] ] );
-		f.children[0].children[2].getAllEdgeUvs(2).should.eql( [ [ 0.5, 0.5 ] ] );
+		f.children[0].getAllCorners(1).map(extractUv).should.eql( [ [ 0.5, 0 ], [ 0.5, 0.25 ], [ 0.5, 0.375 ] ] );
+		f.children[0].children[2].getAllCorners(2).map(extractUv).should.eql( [ [ 0.5, 0.5 ] ] );
 		
 	});
 
 	it('returns expected result for edge with neighbors that has with lesser number of vertices on opposite side', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, null, [null, null, null, null] );
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(makeFlatSrf());
 
 		f.divide({ minDepth : 1 }); // now f is split in 4
 
@@ -5471,7 +5496,7 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.getAllEdgeUvs",function(){
 		f.children[1].divide({ minDepth : 1 }); //  f[1] is split in 4
 		f.children[1].children[3].divide({ minDepth : 1 }); //  f[1][3] is split in 4
 
-		f.children[1].children[3].children[3].getAllEdgeUvs(3).should.eql( [ [ 0.5, 0.5 ] ] );
+		f.children[1].children[3].children[3].getAllCorners(3).map(extractUv).should.eql( [ [ 0.5, 0.5 ] ] );
 
 	});
 
@@ -5481,7 +5506,7 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.divide",function(){
 
 	it('can be called with options.minDepth', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, null, [null, null, null, null] );
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(makeFlatSrf());
 
 		f.divide({ minDepth : 2 });
 		f.children.length.should.be.equal( 4 );
@@ -5490,7 +5515,7 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.divide",function(){
 
 	it('can be called with no options provided', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(null, 0, 1, 0, 1, null, [null, null, null, null] );
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(makeFlatSrf());
 
 		f.divide();
 
@@ -5513,36 +5538,19 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.evalSrf",function(){
 
 	it('works as expected', function(){
 
-		verb.init();
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(makeFlatSrf());
 
-		var p1 = [0,0,0]
-			, p2 = [1,0,0]
-			, p3 = [1,1,0]
-			, p4 = [0,1,0];
-
-		var srf = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
-
-		var srfObj = {
-			degree_u : srf.get('degreeU'),
-			degree_v : srf.get('degreeV'),
-			knots_u : srf.get('knotsU'),
-			knots_v : srf.get('knotsV'),
-			homo_control_points : srf.homogenize()
-		};
-
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(srfObj);
-
-		var res = f.evalSrf( [0,0] );
+		var res = f.evalSrf( 0, 0 );
 
 		vecShouldBe( [0,0,0], res.point );
 		vecShouldBe( [0,0,-1], res.normal );
 
-		res = f.evalSrf( [1,0] );
+		res = f.evalSrf( 1,0 );
 
 		vecShouldBe( [1,0,0], res.point );
 		vecShouldBe( [0,0,-1], res.normal );
 
-		res = f.evalSrf( [1,1] );
+		res = f.evalSrf( 1,1 );
 
 		vecShouldBe( [1,1,0], res.point );
 		vecShouldBe( [0,0,-1], res.normal );
@@ -5607,8 +5615,6 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.triangulate",function(){
 
 		f.divide();
 		var mesh = f.triangulate();
-
-		// console.log(mesh)
 
 		mesh.faces.should.eql( [ [ 0, 3, 1 ], [ 3, 2, 1 ]  ]);
 		mesh.points.should.eql([ [ 0, 0, 0 ], [ 1, 0, 0 ], [ 1, 1, 0 ], [ 0, 1, 0 ] ]);

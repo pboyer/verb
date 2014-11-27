@@ -77,8 +77,10 @@
 			};
 
 			var f = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj );
-			f.divide({ minDepth: 2, tol: 1e-1 });
+			f.divide({ minDepth: 2, tol: 5e-2 });
 			var tess = f.triangulate();
+
+			// var tess = srf.tessellate({ minDivsU: udivs, minDivsV: vdivs });
 
 			var geometry = new THREE.Geometry();
 
@@ -106,17 +108,13 @@
 
 		}
 
-		function addMeshToScene(geometry, wireframe){
+		function addMeshToScene(mesh, wireframe){
 
-			var material = new THREE.MeshNormalMaterial( { side: THREE.DoubleSide, wireframe: false, shading: THREE.SmoothShading, transparent: true, opacity: 0.8 } );
-			var mesh = new THREE.Mesh( geometry, material );
+			var material = new THREE.MeshNormalMaterial( { wireframe: wireframe, transparent: false, side: THREE.DoubleSide, opacity: 0.4, shading: THREE.SmoothShading, side: THREE.DoubleSide } );
+			// var material = new THREE.MeshPhongMaterial( { color: 0x444444, side: THREE.DoubleSide, shading: THREE.SmoothShading } );
+			var tm = new THREE.Mesh( mesh, material );
 
-			scene.add( mesh );
-
-			var material2 = new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide, wireframe: true } );
-			var mesh2 = new THREE.Mesh( geometry, material2 );
-
-			scene.add( mesh2 );
+			scene.add( tm );
 
 		}
 
@@ -358,13 +356,13 @@
 
 		var srf1, srf2;
 
-		exampleTorusCylinderSuccess();
+		// exampleTorusCylinderSuccess();
 		// exampleGlancingPlaneCylinderSuccess();
 		//examplePlanePlaneSuccess();
 		//exampleTorusCylinderSuccess2();
 		// exampleTorusCylinderSuccess3();
 		//examplePlanePlaneSuccess();
-		// exampleNurbsSurfacePlane();
+		exampleNurbsSurfacePlane();
 
 		addMeshToScene( tessellate(srf1, udivs0, vdivs0), true );
 		addMeshToScene( tessellate(srf2, udivs1, vdivs1), true);
@@ -375,7 +373,7 @@
 		// var res = verb.eval.mesh.intersect_meshes_by_aabb( tess1.points, tess1.faces, 
 		// 	tess1.uvs, tess2.points, tess2.faces, tess2.uvs );
 
-		var ref = verb.eval.nurbs.intersect_rational_surface_surface_by_aabb_refine(srf1.get('degreeU'), srf1.get('knotsU'), srf1.get('degreeV'), srf1.get('knotsV'), srf1.homogenize(), srf2.get('degreeU'), srf2.get('knotsU'), srf2.get('degreeV'), srf2.get('knotsV'), srf2.homogenize(), 1e-6, 40, 40);
+		var ref = verb.eval.nurbs.intersect_rational_surface_surface_by_aabb_refine(srf1.get('degreeU'), srf1.get('knotsU'), srf1.get('degreeV'), srf1.get('knotsV'), srf1.homogenize(), srf2.get('degreeU'), srf2.get('knotsU'), srf2.get('degreeV'), srf2.get('knotsV'), srf2.homogenize(), 1e-6);
 
 		for (var i = 0; i < ref.length; i++){
 

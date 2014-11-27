@@ -1100,7 +1100,6 @@ verb.eval.nurbs.refine_rational_surface_intersect_point = function(uv1, uv2, deg
 
 		
 		if (dist < tol) {
-			console.log("distf = ", dist);
 			break;
 		}
 
@@ -1156,7 +1155,7 @@ verb.eval.nurbs.intersect_rational_surface_surface_by_aabb_refine = function( de
 	};
 
 	var f1 = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj1 );
-	f1.divide({ tol: 1e-1 });
+	f1.divide({ minDepth: 2, tol: 5e-2 });
 	var tess1 = f1.triangulate();
 
 	var srfObj2 = {
@@ -1168,7 +1167,7 @@ verb.eval.nurbs.intersect_rational_surface_surface_by_aabb_refine = function( de
 	};
 
 	var f2 = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj2 );
-	f2.divide({ tol: 1e-1 });
+	f2.divide({ minDepth: 2, tol: 5e-2 });
 	var tess2 = f2.triangulate();
 	var resApprox = verb.eval.mesh.intersect_meshes_by_aabb( tess1.points, tess1.faces, tess1.uvs, tess2.points, tess2.faces, tess2.uvs );
 
@@ -1881,7 +1880,7 @@ verb.eval.nurbs.tessellate_rational_surface_naive = function( degree_u, knots_u,
 
 			points.push( pt );
 
-			var normal = numeric.cross(  derivs[0][1], derivs[1][0] );
+			var normal = numeric.normalized( numeric.cross(  derivs[0][1], derivs[1][0] ) );
 			normals.push( normal );
 
 		}
@@ -2272,7 +2271,6 @@ verb.eval.nurbs.AdaptiveRefinementNode = function( srf, corners, parentNode, nei
 
 	// if no corners, we need to construct initial corners from the surface
 	if (!corners){
-
 		var u0 = srf ? srf.knots_u[0] : null;
 		var u1 = srf ? verb.last( srf.knots_u ) : null;
 		var v0 = srf ? srf.knots_v[0] : null;
@@ -2286,7 +2284,6 @@ verb.eval.nurbs.AdaptiveRefinementNode = function( srf, corners, parentNode, nei
 	}
 
 	this.corners = corners;
-	this.cachedEdgeUvs = [];
 
 }
 
@@ -2304,7 +2301,6 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalCorners = function(){
 
 	// eval all of the corners
 	for (var i = 0; i < 4; i++) {
-
 		// if it's not already evaluated
 		if ( !this.corners[i].point ){
 			// evaluate it
@@ -2316,12 +2312,10 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalCorners = function(){
 
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalMidPoints = function(){
 
-	this.midpoints = [null, null, null, null];
-	this.midpoints[0] = this.evalSrf( this.u05, this.corners[0].uv[1] );
-	this.midpoints[1] = this.evalSrf( this.corners[1].uv[0], this.v05 );
-	this.midpoints[2] = this.evalSrf( this.u05, this.corners[2].uv[1] );
-	this.midpoints[3] = this.evalSrf( this.corners[0].uv[0], this.v05 );
-
+	this.midpoints = [this.evalSrf( this.u05, this.corners[0].uv[1] ), 
+										this.evalSrf( this.corners[1].uv[0], this.v05 ), 
+										this.evalSrf( this.u05, this.corners[2].uv[1] ), 
+										this.evalSrf( this.corners[0].uv[0], this.v05 )];
 }
 
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalSrf = function( u, v, srfPt ){
@@ -2335,7 +2329,7 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalSrf = function( u, v, srfPt
 																												u, 
 																												v );
 	var pt = derivs[0][0];
-	var norm = numeric.cross(  derivs[0][1], derivs[1][0] );
+	var norm = numeric.normalized( numeric.cross(  derivs[0][1], derivs[1][0] ) );
 
 	if (srfPt){
 		srfPt.point = pt;
@@ -2347,18 +2341,19 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalSrf = function( u, v, srfPt
 
 };
 
-verb.eval.nurbs.AdaptiveRefinementNode.prototype.getEdgeUvs = function( edgeIndex ){
+verb.eval.nurbs.AdaptiveRefinementNode.prototype.getEdgeCorners = function( edgeIndex ){
 
 	// if its a leaf, there are no children to obtain uvs from
 	if ( this.isLeaf() ) return [ this.corners[ edgeIndex ] ]
 
 	// get the uvs owned by the children along this edge
-	this.cachedEdgeUvs[edgeIndex] = this.cachedEdgeUvs[edgeIndex] || this.children[ edgeIndex ].getEdgeUvs( edgeIndex )
-																						 												.concat( this.children[ (edgeIndex + 1) % 4 ].getEdgeUvs( edgeIndex ));
-	return this.cachedEdgeUvs[edgeIndex];
+	return this.children[ edgeIndex ]
+							.getEdgeCorners( edgeIndex )
+							.concat( this.children[ (edgeIndex + 1) % 4 ].getEdgeCorners( edgeIndex ));
+
 };
 
-verb.eval.nurbs.AdaptiveRefinementNode.prototype.getAllEdgeUvs = function( edgeIndex ){
+verb.eval.nurbs.AdaptiveRefinementNode.prototype.getAllCorners = function( edgeIndex ){
 
 	var baseArr = [ this.corners[edgeIndex] ];
 
@@ -2367,7 +2362,7 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.getAllEdgeUvs = function( edgeI
 	}
 
 	// get opposite edges uvs
-	var corners = this.neighbors[edgeIndex].getEdgeUvs( ( edgeIndex + 2 ) % 4 );
+	var corners = this.neighbors[edgeIndex].getEdgeCorners( ( edgeIndex + 2 ) % 4 );
 
 	var funcIndex = edgeIndex % 2;
 
@@ -2387,38 +2382,37 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.getAllEdgeUvs = function( edgeI
 
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.shouldDivide = function( options, currentDepth ){
 
-	if ( options.minDepth != undefined && currentDepth < options.minDepth){
-		return true;
-	} else if (options.maxDepth != undefined && options.maxDepth >= currentDepth) {
-		 return false;  
-	} else if ( this.srf ){
+	if ( currentDepth < options.minDepth ) return true;
+	if ( currentDepth >= options.maxDepth ) return false;
 
-		// if tolerance isn't defined
-		var tol = options.tol != undefined ? options.tol : verb.TOLERANCE;
-
-		// the default test
-		return !(verb.eval.nurbs.three_points_are_flat( this.corners[0].point, this.center.point, this.corners[2].point, tol ) &&
-					verb.eval.nurbs.three_points_are_flat( this.corners[1].point, this.center.point, this.corners[3].point, tol ));
-	}
-
-	return false;
+	return numeric.norm2Squared( numeric.sub( this.center.normal, this.corners[0].normal ) ) > options.tol ||
+				 numeric.norm2Squared( numeric.sub( this.center.normal, this.corners[1].normal ) ) > options.tol || 
+				 numeric.norm2Squared( numeric.sub( this.center.normal, this.corners[2].normal ) ) > options.tol || 
+				 numeric.norm2Squared( numeric.sub( this.center.normal, this.corners[3].normal ) ) > options.tol;
 }
 
-verb.eval.nurbs.AdaptiveRefinementNode.prototype.divide = function( options, currentDepth ){
+verb.eval.nurbs.AdaptiveRefinementNode.prototype.divide = function( options ){
 
-	// initialize currentDepth if it's not present
-	if (currentDepth === undefined) currentDepth = 0;
 	options = options || {};
+	options.tol = options.tol || 5e-2;
+	options.minDepth = options.minDepth || 0;
+	options.maxDepth = options.maxDepth || 10;
 
-	if ( this.srf ) this.evalCorners();
+	this._divide( options, 0 );
 
-	if ( !this.shouldDivide( options, currentDepth )  ) return;
+};
 
-	if ( this.srf ) this.evalMidPoints();
+verb.eval.nurbs.AdaptiveRefinementNode.prototype._divide = function( options, currentDepth ){
 
-	// increment the depth
+	this.evalCorners();
+	if ( !this.shouldDivide( options, currentDepth )  ) {
+		return;
+	}
+	this.evalMidPoints();
+
 	currentDepth++;
 
+	// define the children's corners
 	var corners0 = [ this.corners[0], this.midpoints[0], this.center, this.midpoints[3] ];
 	var corners1 = [ this.midpoints[0], this.corners[1], this.midpoints[1], this.center ];
 	var corners2 = [ this.center, this.midpoints[1], this.corners[2], this.midpoints[2] ];
@@ -2437,10 +2431,9 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.divide = function( options, cur
 	this.children[3].neighbors = [ this.children[0], this.children[2], this.neighbors[2], this.neighbors[3] ];
 
 	// divide all children recursively
-	this.children.forEach(function(x){ x.divide( options,currentDepth ); })
+	this.children.forEach(function(x){ x._divide( options, currentDepth ); })
 
 };
-
 
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulate = function( mesh ){
 
@@ -2460,19 +2453,27 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulate = function( mesh ){
 
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulateLeaf = function( mesh ){
 
-	var baseIndex = mesh.points.length;
-	var uvs = [];
-	var ids = [];
+	var baseIndex = mesh.points.length 
+		, uvs = []
+		, ids = []
+		, i = 0
+		, corner
+		, l
+		, j
+		, centerIndex;
 
 	// enumerate all uvs in counter clockwise direction
-	for (var i = 0; i < 4; i++){
-		uvs = uvs.concat( this.getAllEdgeUvs(i) ); 
+	for (i = 0; i < 4; i++){
+		uvs = uvs.concat( this.getAllCorners(i) ); 
 	}
 
-	uvs.forEach(function(corner){
+	for (i = 0, l = uvs.length; i < l; i++){
+		corner = uvs[i];
 
+		// if the id is defined, we can just push it and continue
 		if (corner.id != undefined){
-			return ids.push(corner.id);
+			ids.push(corner.id);
+			continue;
 		}
 
 		mesh.uvs.push( corner.uv );
@@ -2483,8 +2484,7 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulateLeaf = function( mes
 		ids.push( baseIndex );
 
 		baseIndex++;
-
-	}.bind(this));
+	}
 
 	if (uvs.length === 4){
 
@@ -2503,10 +2503,10 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulateLeaf = function( mes
 	mesh.normals.push( this.center.normal );
 
 	// get index 
-	var centerIndex = mesh.points.length - 1;
+	centerIndex = mesh.points.length - 1;
 
 	// build triangle fan from center
-	for (var i = 0, j = uvs.length-1; i < uvs.length; j = i++){
+	for (i = 0, j = uvs.length-1; i < uvs.length; j = i++){
 		mesh.faces.push( [	centerIndex, ids[j], ids[i]   ]);
 	}
 
