@@ -5381,7 +5381,7 @@ describe("verb.eval.mesh.intersect_meshes_by_aabb",function(){
 
 });
 
-function makeFlatSrf(){
+function getFlatSurface(){
 
 	verb.init();
 
@@ -5410,7 +5410,7 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.constructor",function(){
 
 	it('can be instantiated', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(makeFlatSrf(),null, "a", "b" );
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface(),null, "a", "b" );
 
 		f.corners[0].uv[0].should.be.equal(0);
 		f.corners[2].uv[0].should.be.equal(1);
@@ -5430,7 +5430,7 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.getEdgeCorners",function(){
 
 	it('returns expected result for node without children', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(makeFlatSrf());
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
 
 		f.getEdgeCorners( 0 ).map(extractUv).should.be.eql( [[0,0]] );
 		f.getEdgeCorners( 1 ).map(extractUv).should.be.eql( [[1,0]] );
@@ -5441,7 +5441,7 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.getEdgeCorners",function(){
 
 	it('returns expected result for node with children', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(makeFlatSrf());
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
 
 		f.divide({ minDepth : 1 });
 		f.children.length.should.be.equal( 4 );
@@ -5455,7 +5455,7 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.getEdgeCorners",function(){
 
 	it('returns expected result for node with nested children', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(makeFlatSrf());
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
 
 		f.divide({ minDepth : 2 });
 		f.children.length.should.be.equal( 4 );
@@ -5473,7 +5473,7 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.getAllCorners",function(){
 
 	it('returns expected result for edge with more vertices on opposite side', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(makeFlatSrf());
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
 
 		f.divide({ minDepth : 1 }); // now f is split in 4
 
@@ -5488,7 +5488,7 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.getAllCorners",function(){
 
 	it('returns expected result for edge with neighbors that has with lesser number of vertices on opposite side', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(makeFlatSrf());
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
 
 		f.divide({ minDepth : 1 }); // now f is split in 4
 
@@ -5506,7 +5506,7 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.divide",function(){
 
 	it('can be called with options.minDepth', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(makeFlatSrf());
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
 
 		f.divide({ minDepth : 2 });
 		f.children.length.should.be.equal( 4 );
@@ -5515,7 +5515,7 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.divide",function(){
 
 	it('can be called with no options provided', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(makeFlatSrf());
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
 
 		f.divide();
 
@@ -5524,21 +5524,13 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.divide",function(){
 
 	});
 
-	// it('can produce a non-uniformly nested tree', function(){
-
-
-
-	// });
-
-	// more tests for options as they're implemented
-
 });
 
 describe("verb.eval.nurbs.AdaptiveRefinementNode.evalSrf",function(){
 
 	it('works as expected', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(makeFlatSrf());
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
 
 		var res = f.evalSrf( 0, 0 );
 
@@ -5561,30 +5553,7 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.evalSrf",function(){
 
 describe("verb.eval.nurbs.AdaptiveRefinementNode.triangulate",function(){
 
-	function getPlane(){ 
-
-		verb.init();
-
-		var p1 = [0,0,0]
-			, p2 = [1,0,0]
-			, p3 = [1,1,0]
-			, p4 = [0,1,0];
-
-		var srf = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
-
-		var srfObj = {
-			degree_u : srf.get('degreeU'),
-			degree_v : srf.get('degreeV'),
-			knots_u : srf.get('knotsU'),
-			knots_v : srf.get('knotsV'),
-			homo_control_points : srf.homogenize()
-		};
-
-		return srfObj;
-
-	}
-
-	function getWarpedPlane(){ 
+	function getWarpedSurface(){ 
 
 		verb.init();
 
@@ -5609,10 +5578,9 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.triangulate",function(){
 
 	it('can triangulate a square, planar surface with no options defined', function(){
 
-		var srf = getPlane();
+		var srf = getFlatSurface();
 
 		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
-
 		f.divide();
 		var mesh = f.triangulate();
 
@@ -5625,82 +5593,147 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.triangulate",function(){
 
 	it('can triangulate a warped surface with no options defined', function(){
 
-		var srf = getWarpedPlane();
+		var srf = getWarpedSurface();
 
 		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
 
 		f.divide();
 		var mesh = f.triangulate();
 
-		// console.log(mesh)
-
-		// mesh.faces.should.eql( [ [ 0, 3, 1 ], [ 3, 2, 1 ]  ]);
-		// mesh.points.should.eql([ [ 0, 0, 0 ], [ 1, 0, 0 ], [ 1, 1, 0 ], [ 0, 1, 0 ] ]);
-		// mesh.uvs.should.eql([ [ 0, 0 ], [ 1, 0 ], [ 1, 1 ], [ 0, 1 ] ]);
-		// mesh.normals.should.eql( [ [ 0, 0, -1 ], [ 0, 0, -1 ], [ 0, 0, -1 ], [ 0, 0, -1 ] ] );
+		mesh.faces.length.should.be.greaterThan( 4 );
+		mesh.points.length.should.be.greaterThan( 4 );
+		mesh.points.forEach(function(x){ x.length.should.be.equal( 3 ); })
+		mesh.points.length.should.be.equal( mesh.normals.length );
+		mesh.uvs.length.should.be.equal( mesh.normals.length );
 
 	});
 
 	it('can triangulate a node with children', function(){
+
+		var srf = getFlatSurface();
+
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
+
+		f.divide({ minDepth: 1 });
+		var mesh = f.triangulate();
+
+		mesh.faces.length.should.be.greaterThan( 4 );
+		mesh.points.length.should.be.greaterThan( 4 );
+		mesh.points.forEach(function(x){ x.length.should.be.equal( 3 ); })
+		mesh.points.length.should.be.equal( mesh.normals.length );
+		mesh.uvs.length.should.be.equal( mesh.normals.length );
 
 
 	});
 
 	it('can triangulate a node with children and un-nested neighbors', function(){
 
+		var srf = getFlatSurface();
+
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
+
+		f.divide({ minDepth: 1 });
+		f.children[0].divide({ minDepth: 1 });
+
+		var mesh = f.triangulate();
+
+		mesh.faces.length.should.be.greaterThan( 4 );
+		mesh.points.length.should.be.greaterThan( 4 );
+		mesh.points.forEach(function(x){ x.length.should.be.equal( 3 ); })
+		mesh.points.length.should.be.equal( mesh.normals.length );
+		mesh.uvs.length.should.be.equal( mesh.normals.length );
 
 	});
 
 	it('can triangulate a node with children and equally nested neighbors', function(){
 
+		var srf = getFlatSurface();
+
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
+
+		f.divide({ minDepth: 2 });
+		
+		var mesh = f.triangulate();
+
+		mesh.faces.length.should.be.equal( 32 );
+		mesh.points.length.should.be.greaterThan( 4 );
+		mesh.points.forEach(function(x){ x.length.should.be.equal( 3 ); })
+		mesh.points.length.should.be.equal( mesh.normals.length );
+		mesh.uvs.length.should.be.equal( mesh.normals.length );
 
 	});
 
 	it('can triangulate a node with children and more nested neighbors', function(){
 
+		var srf = getFlatSurface();
+
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
+
+		f.divide({ minDepth: 3 });
+		
+		var mesh = f.triangulate();
+
+		mesh.faces.length.should.be.equal( 128 );
+		mesh.points.length.should.be.greaterThan( 4 );
+		mesh.points.forEach(function(x){ x.length.should.be.equal( 3 ); })
+		mesh.points.length.should.be.equal( mesh.normals.length );
+		mesh.uvs.length.should.be.equal( mesh.normals.length );
 
 	});
 
 });
 
+describe("verb.eval.nurbs.tessellate_rational_surface_adaptive",function(){
 
-describe("verb.eval.nurbs.divide_rational_surface_adaptive",function(){
+	function getComplexSurface(){ 
 
-	it('divides the domain according to minDivsU, minDivsV', function(){
+		verb.init();
 
-	});
+		var degree = 3
+			, knots = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
+			, pts = [ 	[ [0, 0, -10], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] , 	[40, 0, 0], [50, 0, 0] ],
+						[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] , [40, -10, 0], [50, -10, 0]	],
+						[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] , [40, -20, -2], [50, -20, 0] 	],
+						[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, -23], 	[30, -30, 0] , [40, -30, 0], [50, -30, 0]     ],  
+						[ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , [40, -40, -20], [50, -40, 0]     ],  
+						[ [0, -50, 12], [10, -50, 0], 	[20, -50, 0], 	[30, -50, 0] , [50, -50, 0], [50, -50, -15]     ],     ]
+			, wts = [ 	[ 1, 1, 1, 1, 1, 1],
+						[ 1, 1, 1, 1, 1, 1],
+						[ 1, 1, 1, 1, 1, 1],
+						[ 1, 1, 1, 1, 1, 1],
+						[ 1, 1, 1, 1, 1, 1],
+						[ 1, 1, 1, 1, 1, 1] ];
 
-});
+		srf = new verb.geom.NurbsSurface( degree, knots, degree, knots, pts, wts );
 
-describe("verb.eval.nurbs.is_rational_surface_domain_flat",function(){
+		var srfObj = {
+			degree_u : srf.get('degreeU'),
+			degree_v : srf.get('degreeV'),
+			knots_u : srf.get('knotsU'),
+			knots_v : srf.get('knotsV'),
+			homo_control_points : srf.homogenize()
+		};
 
-	it('evaluates as expected for different tolerances', function(){
-
-	});
-
-});
-
-describe("verb.eval.nurbs.triangulate_adaptive_refinement_node_tree",function(){
-
-	it('produces a mesh from a uniform divided surface', function(){
-
-
-	});
-
-	it('produces a mesh from a non-uniformly divided surface', function(){
-
-
-	});
-
-});
-
-describe("verb.eval.nurbs.tesselate_rational_surface_adaptive",function(){
+		return srfObj;
+	}
 
 	it('produces a mesh from a divided surface', function(){
 
+		var srf = getComplexSurface();
+
+		var mesh = verb.eval.nurbs.tessellate_rational_surface_adaptive( srf.degree_u,
+			srf.knots_u,
+			srf.degree_v,
+			srf.knots_v, 
+			srf.homo_control_points, 
+			{ minDivsU: 1, minDivsV: 4 } );
+
+		mesh.faces.length.should.be.greaterThan( 8 );
+		mesh.points.forEach(function(x){ x.length.should.be.equal( 3 ); })
+		mesh.points.length.should.be.equal( mesh.normals.length );
+		mesh.uvs.length.should.be.equal( mesh.normals.length );
 
 	});
-
 });
 
 

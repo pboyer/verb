@@ -2097,49 +2097,11 @@ verb.eval.nurbs.three_points_are_flat = function( p1, p2, p3, tol ) {
 
 }
 
-function getEastNeighbor(index, i, j, min_divs_u, min_divs_v, divs){
-	
-	if (j === min_divs_v - 1){
-		return null;
-	}
-
-	return divs[ index + 1 ];
-
-}
-
-function getNorthNeighbor(index, i, j, min_divs_u, min_divs_v, divs){
-
-	if (i === 0){
-		return null;
-	}
-
-	return divs[ index - min_divs_v ];
-
-}
-
-function getSouthNeighbor(index, i, j, min_divs_u, min_divs_v, divs){
-
-	if (i === min_divs_u - 1){
-		return null;
-	}
-
-	return divs[ index + min_divs_v ];
-
-}
-
-function getWestNeighbor(index, i, j, min_divs_u, min_divs_v, divs){
-
-	if (j === 0){
-		return null;
-	}
-
-	return divs[ index - 1 ];
-
-}
 
 verb.eval.nurbs.divide_rational_surface_adaptive = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, options ) {
 
-	// degree_u, knots_u, degree_v, knots_v, homo_control_points, 
+	var i, j;
+
 	var srf = {
 		degree_u: degree_u,
 		knots_u: knots_u,
@@ -2148,48 +2110,50 @@ verb.eval.nurbs.divide_rational_surface_adaptive = function( degree_u, knots_u, 
 		homo_control_points: homo_control_points
 	};
 
-	var min_divs_u = options.minDivsU;
-	var min_divs_v = options.minDivsV;
+	var divsU = options.minDivsU;
+	var divsV = options.minDivsV;
 
 	// get necessary intervals
-	var max_u = verb.last(knots_u);
-	var min_u = knots_u[0];
-	var max_v = verb.last(knots_v);
-	var min_v = knots_v[0];
+	var umax = verb.last(knots_u);
+	var umin = knots_u[0];
+	var vmax = verb.last(knots_v);
+	var vmin = knots_v[0];
 
-	var u_interval = (max_u - min_u) / min_divs_u
-		, v_interval = (max_v - min_v) / min_divs_v;
+	var du = (umax - umin) / divsU
+		, dv = (vmax - vmin) / divsV;
 
 	var divs = [];
 
 	// make all of the nodes
-	for (var i = 0; i < min_divs_u; i++){
-		for (var j = 0; j < min_divs_v; j++){
+	for (i = 0; i < divsV; i++){
+		for (j = 0; j < divsU; j++){
 
-			var u0 = min_u + u_interval * i
-				, u1 = min_u + u_interval * (i + 1)
-				, v0 = min_v + v_interval * j
-				, v1 = min_v + v_interval * (j + 1);
+			var u0 = umin + du * j
+				, u1 = umin + du * (j + 1)
+				, v0 = vmax - dv * (i + 1)
+				, v1 = vmax - dv * i;
 
-		  divs.push( new verb.eval.nurbs.AdaptiveRefinementNode( srf, u0, u1, v0, v1, null, null ) );
+			var corners = [ verb.geom.SurfacePoint.fromUv(u0, v0),
+											 verb.geom.SurfacePoint.fromUv(u1, v0),
+											 verb.geom.SurfacePoint.fromUv(u1, v1),
+											 verb.geom.SurfacePoint.fromUv(u0, v1)	 ];
 
+		  divs.push( new verb.eval.nurbs.AdaptiveRefinementNode( srf, corners ) );
 		}
 	}
 
 	// assign all of the neighbors and divide
-	for (var i = 0; i < min_divs_u; i++){
-		for (var j = 0; j < min_divs_v; j++){
+	for (i = 0; i < divsV; i++){
+		for (j = 0; j < divsU; j++){
 
-			var index = i * min_divs_v + j
-				, n = getNorthNeighbor( index, i, j, min_divs_u, min_divs_v, divs )
-				, e = getEastNeighbor( index, i, j, min_divs_u, min_divs_v, divs  )
-				, s = getSouthNeighbor( index, i, j, min_divs_u, min_divs_v, divs )
-				, w = getWestNeighbor( index, i, j, min_divs_u, min_divs_v, divs  );
+			var ci = i * divsU + j
+				, n = verb.north( ci, i, j, divsU, divsV, divs )
+				, e = verb.east( ci, i, j, divsU, divsV, divs  )
+				, s = verb.south( ci, i, j, divsU, divsV, divs )
+				, w = verb.west( ci, i, j, divsU, divsV, divs  );
 
-		  divs[index].neighbors = [ n, e, s, w ];
-
-		  divs.divide( options );
-
+		  divs[ci].neighbors = [ s, e, n, w ];
+		  divs[ci].divide( options );
 		}
 	}
 
@@ -2197,22 +2161,42 @@ verb.eval.nurbs.divide_rational_surface_adaptive = function( degree_u, knots_u, 
 
 }
 
+verb.north = function(index, i, j, divsU, divsV, divs){
+	if (i === 0) return null;
+	return divs[ index - divsU ];
+}
+
+verb.south = function(index, i, j, divsU, divsV, divs){
+	if (i === divsV - 1) return null;
+	return divs[ index + divsU ];
+}
+
+verb.east = function(index, i, j, divsU, divsV, divs){
+	if (j === divsU - 1) return null;
+	return divs[ index + 1 ];
+}
+
+verb.west = function(index, i, j, divsU, divsV, divs){
+	if (j === 0) return null;		
+	return divs[ index - 1 ];
+}
+
 verb.eval.nurbs.triangulate_adaptive_refinement_node_tree = function( arrTree ){
 
 	// triangulate all of the nodes of the tree
-	var mesh = { uvs : [], points : [], normals : [], faces : [] };
-	mesh.faces = arrTree.map(function(x){  x.triangulate( mesh ); }).flatten();
+	var mesh = verb.geom.TriMesh.empty();
+	arrTree.forEach(function(x){  x.triangulate( mesh ); });
 	return mesh;
 
-};
+}
 
 verb.eval.nurbs.tessellate_rational_surface_adaptive = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, options ) {
 
-	// division step
-	var arrArray = verb.eval.nurbs.divide_rational_surface_adaptive( degree_u, knots_u, degree_v, knots_v, homo_control_points, options );
+	// adaptive divide
+	var arrTrees = verb.eval.nurbs.divide_rational_surface_adaptive( degree_u, knots_u, degree_v, knots_v, homo_control_points, options );
 
-	// triangulation step
-	return verb.eval.nurbs.triangulate_adaptive_refinement_node_tree( arrTree );
+	// triangulation
+	return verb.eval.nurbs.triangulate_adaptive_refinement_node_tree( arrTrees );
 
 }
 
@@ -2243,25 +2227,25 @@ verb.eval.nurbs.AdaptiveRefinementNode = function( srf, corners, parentNode, nei
 	// 
 	// Structure of the child nodes
 	// in the adaptive refinement tree
-  //      
-  //  +--> u
-  //  |
-  //  v
-  //  v
-  // 
-  //                        neighbors[0]
   //
-	//                (u0,v0)---(u05,v0)---(u1,v0)
+  //  v
+  //  ^
+  //  | 
+  //  +--> u
+  // 
+  //                        neighbors[2]
+  //
+	//                (u0,v1)---(u05,v1)---(u1,v1)
 	//                  |           |          |
-	//                  |     0     |     1    |
+	//                  |     3     |     2    |
 	//                  |           |          |
 	// neighbors[3]   (u0,v05)--(u05,v05)--(u1,v05)   neighbors[1] 
 	//                  |           |          | 
-	//                  |     3     |     2    |
+	//                  |     0     |     1    |
 	//                  |           |          |
-	//                (u0,v1)---(u05,v1)---(u1,v1)
+	//                (u0,v0)---(u05,v0)---(u1,v0)
 	//
-	//                        neighbors[2]
+	//                        neighbors[0]
 	//
 
 	this.srf = srf;
@@ -2395,8 +2379,8 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.divide = function( options ){
 
 	options = options || {};
 	options.tol = options.tol || 5e-2;
-	options.minDepth = options.minDepth || 0;
-	options.maxDepth = options.maxDepth || 10;
+	options.minDepth = options.minDepth != undefined ? options.minDepth : 0;
+	options.maxDepth = options.maxDepth != undefined ? options.maxDepth : 20;
 
 	this._divide( options, 0 );
 

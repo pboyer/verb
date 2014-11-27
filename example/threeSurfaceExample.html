@@ -76,9 +76,9 @@
 
 		}
 
-		var srf = getWarpedPlane();
+		var srfObj = getWarpedPlane();
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
+		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj );
 		f.divide({ tol: 5e-2 });
 		var mesh = f.triangulate();
 
@@ -86,9 +86,16 @@
 
 		for (var i = 0; i < 1; i++){
 
-			var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
-			f.divide({ tol: 5e-2 });
-			var mesh = f.triangulate();
+			var mesh = verb.eval.nurbs.tessellate_rational_surface_adaptive( srf.get('degreeU'),
+				srf.get('knotsU'),
+				srf.get('degreeV'),
+				srf.get('knotsV'), 
+				srf.homogenize(), 
+				{ minDivsU: 3, minDivsV: 3 } );
+
+			// var f = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj );
+			// f.divide({ tol: 5e-2 });
+			// var mesh = f.triangulate();
 
 		}
 
