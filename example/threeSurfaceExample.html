@@ -76,12 +76,18 @@
 
 		var srf = getWarpedPlane();
 
+			// 		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
+			// f.divide({ tol: 1 });
+			// var mesh = f.triangulate();
+			
 		var d1 = Date.now();
+
+
 
 		for (var i = 0; i < 1; i++){
 
 			var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
-			f.divide({ tol: 2 });
+			f.divide({ tol: 1 });
 			var mesh = f.triangulate();
 
 		}

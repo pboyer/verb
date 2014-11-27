@@ -77,10 +77,8 @@
 			};
 
 			var f = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj );
-			f.divide({ tol: 1e-1 });
+			f.divide({ minDepth: 2, tol: 1e-1 });
 			var tess = f.triangulate();
-
-			// var tess = srf.tessellate({ minDivsU: udivs, minDivsV: vdivs });
 
 			var geometry = new THREE.Geometry();
 
@@ -108,13 +106,17 @@
 
 		}
 
-		function addMeshToScene(mesh, wireframe){
+		function addMeshToScene(geometry, wireframe){
 
-			var material = new THREE.MeshNormalMaterial( { wireframe: wireframe, transparent: false, side: THREE.DoubleSide, opacity: 0.4, shading: THREE.SmoothShading, side: THREE.DoubleSide } );
-			// var material = new THREE.MeshPhongMaterial( { color: 0x444444, side: THREE.DoubleSide, shading: THREE.SmoothShading } );
-			var tm = new THREE.Mesh( mesh, material );
+			var material = new THREE.MeshNormalMaterial( { side: THREE.DoubleSide, wireframe: false, shading: THREE.SmoothShading, transparent: true, opacity: 0.8 } );
+			var mesh = new THREE.Mesh( geometry, material );
 
-			scene.add( tm );
+			scene.add( mesh );
+
+			var material2 = new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide, wireframe: true } );
+			var mesh2 = new THREE.Mesh( geometry, material2 );
+
+			scene.add( mesh2 );
 
 		}
 
@@ -364,8 +366,8 @@
 		//examplePlanePlaneSuccess();
 		// exampleNurbsSurfacePlane();
 
-		addMeshToScene( tessellate(srf1, udivs0, vdivs0) );
-		addMeshToScene( tessellate(srf2, udivs1, vdivs1) );
+		addMeshToScene( tessellate(srf1, udivs0, vdivs0), true );
+		addMeshToScene( tessellate(srf2, udivs1, vdivs1), true);
 
 		var tess1 = srf1.tessellate({ minDivsU: udivs0, minDivsV: vdivs0 });
 		var tess2 = srf2.tessellate({ minDivsU: udivs1, minDivsV: vdivs1 });

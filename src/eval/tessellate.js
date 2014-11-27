@@ -664,28 +664,27 @@ verb.eval.nurbs.AdaptiveRefinementNode = function( srf, corners, parentNode, nei
 
 }
 
-verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalCorner = function(id){
-	if ( !this.corners[id].point ){
-		this.evalSrf( this.corners[id].uv[0], this.corners[id].uv[1], this.corners[id] )
-	}
+verb.eval.nurbs.AdaptiveRefinementNode.prototype.isLeaf = function(){
+	return this.children === undefined;
+};
 
-	return this.corners[id];
-}
+verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalCorners = function(){
 
-verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalCenter = function(id){
+	// eval the center
 	this.u05 = this.u05 || (this.corners[0].uv[0] + this.corners[2].uv[0]) / 2;
 	this.v05 = this.v05 || (this.corners[0].uv[1] + this.corners[2].uv[1]) / 2;
 
 	this.center = this.center || this.evalSrf( this.u05, this.v05 );
 
-	return this.center;
-}
-
-verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalCorners = function(){
-	this.evalCenter();
-
+	// eval all of the corners
 	for (var i = 0; i < 4; i++) {
-		this.evalCorner(i);
+
+		// if it's not already evaluated
+		if ( !this.corners[i].point ){
+			// evaluate it
+			var c = this.corners[i];
+			this.evalSrf( c.uv[0], c.uv[1], c )
+		}
 	}
 }
 
@@ -698,26 +697,6 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalMidPoints = function(){
 	this.midpoints[3] = this.evalSrf( this.corners[0].uv[0], this.v05 );
 
 }
-
-verb.eval.nurbs.AdaptiveRefinementNode.prototype.umin = function(){
-	return this.corners[0].uv[0];
-};
-
-verb.eval.nurbs.AdaptiveRefinementNode.prototype.umax = function(){
-	return this.corners[2].uv[0];
-};
-
-verb.eval.nurbs.AdaptiveRefinementNode.prototype.vmin = function(){
-	return this.corners[0].uv[1];
-};
-
-verb.eval.nurbs.AdaptiveRefinementNode.prototype.vmax = function(){
-	return this.corners[2].uv[1];
-};
-
-verb.eval.nurbs.AdaptiveRefinementNode.prototype.isLeaf = function(){
-	return this.children === undefined;
-};
 
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalSrf = function( u, v, srfPt ){
 
@@ -766,33 +745,19 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.getAllEdgeUvs = function( edgeI
 
 	var funcIndex = edgeIndex % 2;
 
+	var e = verb.EPSILON;
 	var that = this;
-
-	var umin = this.umin();
-	var umax = this.umax();
-	var vmin = this.vmin();
-	var vmax = this.vmax();
 
 	// range clipping functions
 	var rangeFuncMap = [
-		function(corner){ return corner.uv[0] > umin + verb.EPSILON && corner.uv[0] < umax - verb.EPSILON;  },
-		function(corner){ return corner.uv[1] > vmin + verb.EPSILON && corner.uv[1] < vmax - verb.EPSILON;  },
+		function(c){ return c.uv[0] > that.corners[0].uv[0] + e && c.uv[0] < that.corners[2].uv[0] - e;  },
+		function(c){ return c.uv[1] > that.corners[0].uv[1] + e && c.uv[1] < that.corners[2].uv[1] - e;  },
 	];
 
 	// clip the range of uvs to match this one
 	return baseArr.concat( corners.filter( rangeFuncMap[ funcIndex ] ).reverse() ) ;
 
 };
-
-verb.eval.nurbs.AdaptiveRefinementNode.prototype.isFlat = function(options){
-
-	var tol = options.tol != undefined ? options.tol : verb.TOLERANCE;
-
-	return verb.eval.nurbs.three_points_are_flat( this.corners[0].point, this.center.point, this.corners[2].point, tol ) &&
-					verb.eval.nurbs.three_points_are_flat( this.corners[1].point, this.center.point, this.corners[3].point, tol );
-
-}
-
 
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.shouldDivide = function( options, currentDepth ){
 
@@ -801,7 +766,13 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.shouldDivide = function( option
 	} else if (options.maxDepth != undefined && options.maxDepth >= currentDepth) {
 		 return false;  
 	} else if ( this.srf ){
-		return !this.isFlat( options );
+
+		// if tolerance isn't defined
+		var tol = options.tol != undefined ? options.tol : verb.TOLERANCE;
+
+		// the default test
+		return !(verb.eval.nurbs.three_points_are_flat( this.corners[0].point, this.center.point, this.corners[2].point, tol ) &&
+					verb.eval.nurbs.three_points_are_flat( this.corners[1].point, this.center.point, this.corners[3].point, tol ));
 	}
 
 	return false;
