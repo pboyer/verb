@@ -4453,56 +4453,6 @@ describe("NurbsCurve.split",function(){
 });
 
 
-describe("verb.eval.nurbs.compute_rational_surface_deriv2_bounds",function(){
-
-	it('determines tight bound on second derivatives for cubic surface', function(){
-
-		// attempt
-
-		var p = 3
-			, q = 3
-			, u = [0, 0, 0, 0, 1, 1, 1, 1]
-			, v =	[0, 0, 0, 0, 1, 1, 1, 1]
-			, pts = [ 	[ [0, 0, 100, 1], 		[10, 0, 0, 1], 		[20, 0, 0, 1], 		[30, 0, 0, 1] 		],
-									[ [0, -10, 0, 1], 	[10, -10, 10, 1], 	[20, -10, 10, 1], 	[30, -10, 0, 1] 	],
-									[ [0, -20, 0, 1], 	[10, -20, 10, 1], 	[20, -20, 10, 1], 	[30, -20, 0, 1] 	],
-									[ [0, -30, 0, 1], 	[10, -30, 0, 1], 	[20, -30, 0, 1], 	[30, -30, 1000, 1] 	] ];
-
-		var p2 = verb.eval.nurbs.compute_rational_surface_deriv2_bounds( p, u, q, v, pts );
-
-		for (var i = 0; i < 1.0; i += 0.05){
-			for (var j = 0; j < 1.0; j += 0.05){
-
-				var val = verb.eval.nurbs.surface_derivs( p, u, q, v, pts, 2, i, j);
-
-				numeric.norm2( val[0][2] ).should.be.lessThan( p2[0] + verb.EPSILON );
-				numeric.norm2( val[2][0] ).should.be.lessThan( p2[1] + verb.EPSILON );
-				numeric.norm2( val[1][1] ).should.be.lessThan( p2[2] + verb.EPSILON );
-
-			}
-		}
-		
-	});
-});
-
-describe("verb.eval.nurbs.compute_rational_surface_max_edge_length",function(){
-
-	it('not sure how to test this yet :|', function(){
-
-		var p = 3
-			, q = 3
-			, u = [0, 0, 0, 0, 1, 1, 1, 1]
-			, v =	[0, 0, 0, 0, 1, 1, 1, 1]
-			, pts = [ 	[ [0, 0, 5, 1], 		[10, 0, 0, 1], 		[20, 0, 0, 1], 		[30, 0, 0, 1] 		],
-									[ [0, -10, 0, 1], 	[10, -10, 5, 1], 	[20, -10, 5, 1], 	[30, -10, 0, 1] 	],
-									[ [0, -20, 0, 1], 	[10, -20, 5, 1], 	[20, -20, 5, 1], 	[30, -20, 0, 1] 	],
-									[ [0, -30, 0, 1], 	[10, -30, 0, 1], 	[20, -30, 0, 1], 	[30, -30, 5, 1] 	] ];
-
-		var p2 = verb.eval.nurbs.compute_rational_surface_max_edge_length( p, u, q, v, pts, 0.4 );
-		
-	});
-});
-
 describe("verb.eval.nurbs.rational_interp_curve",function(){
 
 	function shouldInterpPoints(pts, degree){
