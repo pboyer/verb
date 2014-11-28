@@ -76,9 +76,18 @@
 				homo_control_points : srf.homogenize()
 			};
 
-			var f = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj );
-			f.divide({ minDepth: 2, tol: 5e-2 });
-			var tess = f.triangulate();
+			var tessOptions = { minDivsU: 20, minDivsV: 20, tol: 5e-2 };
+
+			var tess = verb.eval.nurbs.tessellate_rational_surface_adaptive( srfObj.degree_u,
+				srfObj.knots_u,
+				srfObj.degree_v,
+				srfObj.knots_v, 
+				srfObj.homo_control_points, 
+				tessOptions );
+
+			// var f = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj );
+			// f.divide({ minDepth: 2, tol: 5e-2 });
+			// var tess = f.triangulate();
 
 			// var tess = srf.tessellate({ minDivsU: udivs, minDivsV: vdivs });
 

@@ -268,7 +268,7 @@ verb.eval.nurbs.three_points_are_flat = function( p1, p2, p3, tol ) {
 
 verb.eval.nurbs.divide_rational_surface_adaptive = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, options ) {
 
-	var i, j;
+	var i, j, li, lj;
 
 	var srf = {
 		degree_u: degree_u,
@@ -278,8 +278,9 @@ verb.eval.nurbs.divide_rational_surface_adaptive = function( degree_u, knots_u, 
 		homo_control_points: homo_control_points
 	};
 
-	var divsU = options.minDivsU;
-	var divsV = options.minDivsV;
+	options = options || {};
+	var divsU = options.minDivsU || 1;
+	var divsV = options.minDivsV || 1;
 
 	// get necessary intervals
 	var umax = verb.last(knots_u);
@@ -291,26 +292,46 @@ verb.eval.nurbs.divide_rational_surface_adaptive = function( degree_u, knots_u, 
 		, dv = (vmax - vmin) / divsV;
 
 	var divs = [];
+	var pts = [];
 
-	// make all of the nodes
+	// 1) evaluate all of the corners
+	for (i = 0, li = divsV + 1; i < li; i++){
+		var ptrow = [];
+		for (j = 0, lj = divsU + 1; j < lj; j++){
+
+			var u = umin + du * j
+				, v = vmin + dv * i;
+
+			// todo: make this faster by specifying n,m
+			var ds = verb.eval.nurbs.rational_surface_derivs( degree_u, 
+																												knots_u, 
+																												degree_v, 
+																												knots_v, 
+																												homo_control_points, 
+																												1, 
+																												u, 
+																												v );
+
+		  ptrow.push( new verb.geom.SurfacePoint( ds[0][0], 
+		  																				numeric.normalized( numeric.cross(  ds[0][1], ds[1][0] ) ), 
+		  																				[u,v] ) );
+		}
+		pts.push( ptrow );
+	}
+
+	// 2) make all of the nodes
 	for (i = 0; i < divsV; i++){
 		for (j = 0; j < divsU; j++){
-
-			var u0 = umin + du * j
-				, u1 = umin + du * (j + 1)
-				, v0 = vmax - dv * (i + 1)
-				, v1 = vmax - dv * i;
-
-			var corners = [ verb.geom.SurfacePoint.fromUv(u0, v0),
-											 verb.geom.SurfacePoint.fromUv(u1, v0),
-											 verb.geom.SurfacePoint.fromUv(u1, v1),
-											 verb.geom.SurfacePoint.fromUv(u0, v1)	 ];
+			var corners = [ pts[divsV - i - 1][j],
+											pts[divsV - i - 1][j+1],
+											pts[divsV - i][j+1],
+											pts[divsV - i][j] ];
 
 		  divs.push( new verb.eval.nurbs.AdaptiveRefinementNode( srf, corners ) );
 		}
 	}
 
-	// assign all of the neighbors and divide
+	// 3) assign all of the neighbors and divide
 	for (i = 0; i < divsV; i++){
 		for (j = 0; j < divsU; j++){
 
@@ -458,7 +479,7 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalCorners = function(){
 			// evaluate it
 			var c = this.corners[i];
 			this.evalSrf( c.uv[0], c.uv[1], c )
-		}
+		} 
 	}
 }
 
@@ -469,6 +490,7 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalMidPoints = function(){
 										this.evalSrf( this.u05, this.corners[2].uv[1] ), 
 										this.evalSrf( this.corners[0].uv[0], this.v05 )];
 }
+
 
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalSrf = function( u, v, srfPt ){
 

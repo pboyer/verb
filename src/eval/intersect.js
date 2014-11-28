@@ -1029,9 +1029,15 @@ verb.eval.nurbs.intersect_rational_surface_surface_by_aabb_refine = function( de
 		homo_control_points : homo_control_points_srf1
 	};
 
-	var f1 = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj1 );
-	f1.divide({ minDepth: 2, tol: 5e-2 });
-	var tess1 = f1.triangulate();
+	// todo: need to be able to predict the number of divisions
+	var tessOptions = { minDivsU: 20, minDivsV: 20, tol: 5e-2 };
+
+	var tess1 = verb.eval.nurbs.tessellate_rational_surface_adaptive( srfObj1.degree_u,
+		srfObj1.knots_u,
+		srfObj1.degree_v,
+		srfObj1.knots_v, 
+		srfObj1.homo_control_points, 
+		tessOptions );
 
 	var srfObj2 = {
 		degree_u : degree_u2,
@@ -1041,9 +1047,13 @@ verb.eval.nurbs.intersect_rational_surface_surface_by_aabb_refine = function( de
 		homo_control_points : homo_control_points_srf2
 	};
 
-	var f2 = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj2 );
-	f2.divide({ minDepth: 2, tol: 5e-2 });
-	var tess2 = f2.triangulate();
+	var tess2 = verb.eval.nurbs.tessellate_rational_surface_adaptive( srfObj2.degree_u,
+		srfObj2.knots_u,
+		srfObj2.degree_v,
+		srfObj2.knots_v, 
+		srfObj2.homo_control_points, 
+		tessOptions );
+
 	var resApprox = verb.eval.mesh.intersect_meshes_by_aabb( tess1.points, tess1.faces, tess1.uvs, tess2.points, tess2.faces, tess2.uvs );
 
 	// 2) refine the intersection points so that they lie on both surfaces
@@ -1056,7 +1066,7 @@ verb.eval.nurbs.intersect_rational_surface_surface_by_aabb_refine = function( de
 
 	// 3) perform cubic interpolation
 	return exactPls.map(function(x){
-		return verb.eval.nurbs.rational_interp_curve( x.map(function(x){ return x.pt; }), 3 ); 
+		return verb.eval.nurbs.rational_interp_curve( x.map(function(x){ return x.pt; }), 2 ); 
 	});
 
 	// TODO: represent this in uv space

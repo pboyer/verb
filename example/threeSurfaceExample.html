@@ -62,8 +62,6 @@
 
 			srf = new verb.geom.NurbsSurface( degree, knots, degree, knots, pts, wts );
 
-			// mesh = srf.tessellate({minDivsU: 30, minDivsV: 30})
-
 			var srfObj = {
 				degree_u : srf.get('degreeU'),
 				degree_v : srf.get('degreeV'),
@@ -78,9 +76,12 @@
 
 		var srfObj = getWarpedPlane();
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj );
-		f.divide({ tol: 5e-2 });
-		var mesh = f.triangulate();
+		var mesh = verb.eval.nurbs.tessellate_rational_surface_adaptive( srf.get('degreeU'),
+			srf.get('knotsU'),
+			srf.get('degreeV'),
+			srf.get('knotsV'), 
+			srf.homogenize(), 
+			{ minDivsU: 20, minDivsV: 20 } );
 
 		var d1 = Date.now();
 
@@ -91,7 +92,7 @@
 				srf.get('degreeV'),
 				srf.get('knotsV'), 
 				srf.homogenize(), 
-				{ minDivsU: 3, minDivsV: 3 } );
+				{} );
 
 			// var f = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj );
 			// f.divide({ tol: 5e-2 });

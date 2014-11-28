@@ -1154,9 +1154,15 @@ verb.eval.nurbs.intersect_rational_surface_surface_by_aabb_refine = function( de
 		homo_control_points : homo_control_points_srf1
 	};
 
-	var f1 = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj1 );
-	f1.divide({ minDepth: 2, tol: 5e-2 });
-	var tess1 = f1.triangulate();
+	// todo: need to be able to predict the number of divisions
+	var tessOptions = { minDivsU: 20, minDivsV: 20, tol: 5e-2 };
+
+	var tess1 = verb.eval.nurbs.tessellate_rational_surface_adaptive( srfObj1.degree_u,
+		srfObj1.knots_u,
+		srfObj1.degree_v,
+		srfObj1.knots_v, 
+		srfObj1.homo_control_points, 
+		tessOptions );
 
 	var srfObj2 = {
 		degree_u : degree_u2,
@@ -1166,9 +1172,13 @@ verb.eval.nurbs.intersect_rational_surface_surface_by_aabb_refine = function( de
 		homo_control_points : homo_control_points_srf2
 	};
 
-	var f2 = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj2 );
-	f2.divide({ minDepth: 2, tol: 5e-2 });
-	var tess2 = f2.triangulate();
+	var tess2 = verb.eval.nurbs.tessellate_rational_surface_adaptive( srfObj2.degree_u,
+		srfObj2.knots_u,
+		srfObj2.degree_v,
+		srfObj2.knots_v, 
+		srfObj2.homo_control_points, 
+		tessOptions );
+
 	var resApprox = verb.eval.mesh.intersect_meshes_by_aabb( tess1.points, tess1.faces, tess1.uvs, tess2.points, tess2.faces, tess2.uvs );
 
 	// 2) refine the intersection points so that they lie on both surfaces
@@ -1181,7 +1191,7 @@ verb.eval.nurbs.intersect_rational_surface_surface_by_aabb_refine = function( de
 
 	// 3) perform cubic interpolation
 	return exactPls.map(function(x){
-		return verb.eval.nurbs.rational_interp_curve( x.map(function(x){ return x.pt; }), 3 ); 
+		return verb.eval.nurbs.rational_interp_curve( x.map(function(x){ return x.pt; }), 2 ); 
 	});
 
 	// TODO: represent this in uv space
@@ -1893,7 +1903,7 @@ verb.eval.nurbs.three_points_are_flat = function( p1, p2, p3, tol ) {
 
 verb.eval.nurbs.divide_rational_surface_adaptive = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, options ) {
 
-	var i, j;
+	var i, j, li, lj;
 
 	var srf = {
 		degree_u: degree_u,
@@ -1903,8 +1913,9 @@ verb.eval.nurbs.divide_rational_surface_adaptive = function( degree_u, knots_u, 
 		homo_control_points: homo_control_points
 	};
 
-	var divsU = options.minDivsU;
-	var divsV = options.minDivsV;
+	options = options || {};
+	var divsU = options.minDivsU || 1;
+	var divsV = options.minDivsV || 1;
 
 	// get necessary intervals
 	var umax = verb.last(knots_u);
@@ -1916,26 +1927,46 @@ verb.eval.nurbs.divide_rational_surface_adaptive = function( degree_u, knots_u, 
 		, dv = (vmax - vmin) / divsV;
 
 	var divs = [];
+	var pts = [];
 
-	// make all of the nodes
+	// 1) evaluate all of the corners
+	for (i = 0, li = divsV + 1; i < li; i++){
+		var ptrow = [];
+		for (j = 0, lj = divsU + 1; j < lj; j++){
+
+			var u = umin + du * j
+				, v = vmin + dv * i;
+
+			// todo: make this faster by specifying n,m
+			var ds = verb.eval.nurbs.rational_surface_derivs( degree_u, 
+																												knots_u, 
+																												degree_v, 
+																												knots_v, 
+																												homo_control_points, 
+																												1, 
+																												u, 
+																												v );
+
+		  ptrow.push( new verb.geom.SurfacePoint( ds[0][0], 
+		  																				numeric.normalized( numeric.cross(  ds[0][1], ds[1][0] ) ), 
+		  																				[u,v] ) );
+		}
+		pts.push( ptrow );
+	}
+
+	// 2) make all of the nodes
 	for (i = 0; i < divsV; i++){
 		for (j = 0; j < divsU; j++){
-
-			var u0 = umin + du * j
-				, u1 = umin + du * (j + 1)
-				, v0 = vmax - dv * (i + 1)
-				, v1 = vmax - dv * i;
-
-			var corners = [ verb.geom.SurfacePoint.fromUv(u0, v0),
-											 verb.geom.SurfacePoint.fromUv(u1, v0),
-											 verb.geom.SurfacePoint.fromUv(u1, v1),
-											 verb.geom.SurfacePoint.fromUv(u0, v1)	 ];
+			var corners = [ pts[divsV - i - 1][j],
+											pts[divsV - i - 1][j+1],
+											pts[divsV - i][j+1],
+											pts[divsV - i][j] ];
 
 		  divs.push( new verb.eval.nurbs.AdaptiveRefinementNode( srf, corners ) );
 		}
 	}
 
-	// assign all of the neighbors and divide
+	// 3) assign all of the neighbors and divide
 	for (i = 0; i < divsV; i++){
 		for (j = 0; j < divsU; j++){
 
@@ -1951,6 +1982,87 @@ verb.eval.nurbs.divide_rational_surface_adaptive = function( degree_u, knots_u, 
 	}
 
 	return divs;
+
+
+	// var i, j;
+
+	// var divsU = options.minDivsU;
+	// var divsV = options.minDivsV;
+
+	// // get necessary intervals
+	// var umax = verb.last(knots_u);
+	// var umin = knots_u[0];
+	// var vmax = verb.last(knots_v);
+	// var vmin = knots_v[0];
+
+	// var du = (umax - umin) / divsU
+	// 	, dv = (vmax - vmin) / divsV;
+
+	// var pts = [];
+	// var divs = [];
+
+	// // evaluate all of the corners
+	// for (i = 0; i < divsV + 1; i++){
+	// 	var ptrow = [];
+	// 	for (j = 0; j < divsU + 1; j++){
+
+	// 		var u = umin + du * j
+	// 			, v = vmax + dv * i;
+
+	// 		// todo: make this faster by specifying n,m
+	// 		var ds = verb.eval.nurbs.rational_surface_derivs( degree_u, 
+	// 																											knots_u, 
+	// 																											degree_v, 
+	// 																											knots_v, 
+	// 																											homo_control_points, 
+	// 																											1, 
+	// 																											u, 
+	// 																											v );
+
+	// 	  ptrow.push( new verb.geom.SurfacePoint( ds[0][0], 
+	// 	  																				numeric.normalized( numeric.cross(  ds[0][1], ds[1][0] ) ), 
+	// 	  																				[u,v] ) );
+	// 	}
+	// 	pts.push( ptrow );
+	// }
+
+	// var srf = {
+	// 	degree_u: degree_u,
+	// 	knots_u: knots_u,
+	// 	degree_v: degree_v,
+	// 	knots_v: knots_v,
+	// 	homo_control_points: homo_control_points
+	// };
+
+	// // make all of the nodes
+	// for (i = 0; i < divsV; i++){
+	// 	for (j = 0; j < divsU; j++){
+
+	// 		var corners = [ pts[i][j],
+	// 										pts[i][j+1],
+	// 										pts[i+1][j+1],
+	// 										pts[i+1][j] ];
+
+	// 	  divs.push( new verb.eval.nurbs.AdaptiveRefinementNode( srf, corners ) );
+	// 	}
+	// }
+
+	// // assign all of the neighbors and divide
+	// for (i = 0; i < divsV; i++){
+	// 	for (j = 0; j < divsU; j++){
+
+	// 		var ci = i * divsU + j
+	// 			, n = verb.north( ci, i, j, divsU, divsV, divs )
+	// 			, e = verb.east( ci, i, j, divsU, divsV, divs  )
+	// 			, s = verb.south( ci, i, j, divsU, divsV, divs )
+	// 			, w = verb.west( ci, i, j, divsU, divsV, divs  );
+
+	// 	  divs[ci].neighbors = [ s, e, n, w ];
+	// 	  divs[ci].divide( options );
+	// 	}
+	// }
+
+	// return divs;
 
 }
 
@@ -2083,7 +2195,7 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalCorners = function(){
 			// evaluate it
 			var c = this.corners[i];
 			this.evalSrf( c.uv[0], c.uv[1], c )
-		}
+		} 
 	}
 }
 
@@ -2094,6 +2206,7 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalMidPoints = function(){
 										this.evalSrf( this.u05, this.corners[2].uv[1] ), 
 										this.evalSrf( this.corners[0].uv[0], this.v05 )];
 }
+
 
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalSrf = function( u, v, srfPt ){
 
