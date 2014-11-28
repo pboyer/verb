@@ -49,10 +49,10 @@
 				, knots = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
 				, pts = [ 	[ [0, 0, -10], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] , 	[40, 0, 0], [50, 0, 0] ],
 							[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] , [40, -10, 0], [50, -10, 0]	],
-							[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] , [40, -20, -2], [50, -20, 0] 	],
+							[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] , [40, -20, -2], [50, -20, -12] 	],
 							[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, -23], 	[30, -30, 0] , [40, -30, 0], [50, -30, 0]     ],  
 							[ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , [40, -40, -20], [50, -40, 0]     ],  
-							[ [0, -50, 12], [10, -50, 0], 	[20, -50, 0], 	[30, -50, 0] , [50, -50, 0], [50, -50, -15]     ],     ]
+							[ [0, -50, 12], [10, -50, 0], 	[20, -50, 20], 	[30, -50, 0] , [50, -50, -10], [50, -50, -15]     ],     ]
 				, wts = [ 	[ 1, 1, 1, 1, 1, 1],
 							[ 1, 1, 1, 1, 1, 1],
 							[ 1, 1, 1, 1, 1, 1],
@@ -71,17 +71,12 @@
 			};
 
 			return srfObj;
-
 		}
 
 		var srfObj = getWarpedPlane();
 
-		var mesh = verb.eval.nurbs.tessellate_rational_surface_adaptive( srf.get('degreeU'),
-			srf.get('knotsU'),
-			srf.get('degreeV'),
-			srf.get('knotsV'), 
-			srf.homogenize(), 
-			{ minDivsU: 20, minDivsV: 20 } );
+		var du = (srfObj.homo_control_points.length - 1) * 2;
+		var dv = (srfObj.homo_control_points[0].length - 1) * 2;
 
 		var d1 = Date.now();
 
@@ -92,7 +87,7 @@
 				srf.get('degreeV'),
 				srf.get('knotsV'), 
 				srf.homogenize(), 
-				{} );
+				{ minDivsU: du, minDivsV : dv, tol: 5e-2} );
 
 			// var f = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj );
 			// f.divide({ tol: 5e-2 });

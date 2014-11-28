@@ -265,7 +265,6 @@ verb.eval.nurbs.three_points_are_flat = function( p1, p2, p3, tol ) {
 
 }
 
-
 verb.eval.nurbs.divide_rational_surface_adaptive = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, options ) {
 
 	var i, j, li, lj;
@@ -279,8 +278,11 @@ verb.eval.nurbs.divide_rational_surface_adaptive = function( degree_u, knots_u, 
 	};
 
 	options = options || {};
-	var divsU = options.minDivsU || 1;
-	var divsV = options.minDivsV || 1;
+	var divsU = options.minDivsU || knots_u.length - 2 * degree_u;
+	var divsV = options.minDivsV || knots_v.length - 2 * degree_v;
+
+	options.minDivsU = Math.max( options.minDivsU, (homo_control_points.length - 1) * 2 );
+	options.minDivsV = Math.max( options.minDivsV, (homo_control_points.length - 1) * 2 );
 
 	// get necessary intervals
 	var umax = verb.last(knots_u);
@@ -579,9 +581,7 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.divide = function( options ){
 verb.eval.nurbs.AdaptiveRefinementNode.prototype._divide = function( options, currentDepth ){
 
 	this.evalCorners();
-	if ( !this.shouldDivide( options, currentDepth )  ) {
-		return;
-	}
+	if ( !this.shouldDivide( options, currentDepth )  ) return;
 	this.evalMidPoints();
 
 	currentDepth++;
