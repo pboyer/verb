@@ -60,7 +60,17 @@
 							[ 1, 1, 1, 1, 1, 1],
 							[ 1, 1, 1, 1, 1, 1] ];
 
+			var axis = [-1,0,0]
+				, xaxis = [0,0,1]
+				, base = [8,0,0]
+				, height = 20
+				, radius = 2;
+
+			//srf = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
+
 			srf = new verb.geom.NurbsSurface( degree, knots, degree, knots, pts, wts );
+
+			// srf = new verb.geom.Sphere( [0,0,0], 10 );
 
 			var srfObj = {
 				degree_u : srf.get('degreeU'),
@@ -75,30 +85,37 @@
 
 		var srfObj = getWarpedPlane();
 
+			var mesh = verb.eval.nurbs.tessellate_rational_surface_adaptive( srf.get('degreeU'),
+				srf.get('knotsU'),
+				srf.get('degreeV'),
+				srf.get('knotsV'), 
+				srf.homogenize(), 
+				{ minDivsU: du, minDivsV : dv, edgeTol: 0.01 } );
+
 		var du = (srfObj.homo_control_points.length - 1) * 2;
 		var dv = (srfObj.homo_control_points[0].length - 1) * 2;
 
 		var d1 = Date.now();
 
-		for (var i = 0; i < 1; i++){
+		var runs = 5;
+
+		for (var i = 0; i < runs; i++){
 
 			var mesh = verb.eval.nurbs.tessellate_rational_surface_adaptive( srf.get('degreeU'),
 				srf.get('knotsU'),
 				srf.get('degreeV'),
 				srf.get('knotsV'), 
 				srf.homogenize(), 
-				{ minDivsU: du, minDivsV : dv, tol: 5e-2} );
+				{ normTol: 0.08 } );
 
 			// var f = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj );
-			// f.divide({ tol: 5e-2 });
+			// f.divide({ edgeTol: 5e-2 });
 			// var mesh = f.triangulate();
-
 		}
 
 		var d2 = Date.now();
 
-
-		console.log( d2 - d1, " ms to make ", mesh.faces.length, " triangles " );
+		console.log( (d2 - d1) / runs, " ms to make ", mesh.faces.length, " triangles " );
 
 		// verb.NurbsSurface -> THREE.Geometry
 		function tessellate(srf, tess) {

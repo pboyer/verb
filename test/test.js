@@ -5265,426 +5265,436 @@ describe("verb.eval.mesh.kdtree_from_segs",function(){
 
 });
 
-describe("verb.eval.mesh.intersect_meshes_by_aabb",function(){
+// describe("verb.eval.mesh.intersect_meshes_by_aabb",function(){
 
-	it('is correct for two intersecting triangles', function(){
+// 	it('is correct for two intersecting triangles', function(){
 		
-		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
-		var tris1 = [[ 0, 1, 2 ]];
-		var uvs1 = [ [0,0], [2,0], [2, 2] ];
+// 		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
+// 		var tris1 = [[ 0, 1, 2 ]];
+// 		var uvs1 = [ [0,0], [2,0], [2, 2] ];
 
-		var pts2 = [ [1,1,-1], [1,1,5], [1,-5,-1] ];
-		var tris2 = [[ 0, 1, 2 ]];
-		var uvs2 = [ [0,0], [3,0], [3,3] ];
+// 		var pts2 = [ [1,1,-1], [1,1,5], [1,-5,-1] ];
+// 		var tris2 = [[ 0, 1, 2 ]];
+// 		var uvs2 = [ [0,0], [3,0], [3,3] ];
 
-		var pls = verb.eval.mesh.intersect_meshes_by_aabb( pts1, tris1, uvs1, pts2, tris2, uvs2 );
+// 		var pls = verb.eval.mesh.intersect_meshes_by_aabb( pts1, tris1, uvs1, pts2, tris2, uvs2 );
 
-		pls.length.should.be.equal( 1 );
-		pls[0].length.should.be.equal( 2 );
+// 		pls.length.should.be.equal( 1 );
+// 		pls[0].length.should.be.equal( 2 );
 
-	});
+// 	});
 
-	it('is correct for two non-intersecting triangles', function(){
+// 	it('is correct for two non-intersecting triangles', function(){
 		
-		var pts1 = [ [10,10,10], [2,10,10], [2, 2,10] ];
-		var tris1 = [[ 0, 1, 2 ]];
-		var uvs1 = [ [0,0], [2,0], [2, 2] ];
+// 		var pts1 = [ [10,10,10], [2,10,10], [2, 2,10] ];
+// 		var tris1 = [[ 0, 1, 2 ]];
+// 		var uvs1 = [ [0,0], [2,0], [2, 2] ];
 
-		var pts2 = [ [1,1,-1], [3,1,-1], [3,1,2] ];
-		var tris2 = [[ 0, 1, 2 ]];
-		var uvs2 = [ [0,0], [3,0], [3,3] ];
+// 		var pts2 = [ [1,1,-1], [3,1,-1], [3,1,2] ];
+// 		var tris2 = [[ 0, 1, 2 ]];
+// 		var uvs2 = [ [0,0], [3,0], [3,3] ];
 
-		var res = verb.eval.mesh.intersect_meshes_by_aabb( pts1, tris1, uvs1, pts2, tris2, uvs2 );
+// 		var res = verb.eval.mesh.intersect_meshes_by_aabb( pts1, tris1, uvs1, pts2, tris2, uvs2 );
 
-		res.length.should.be.equal( 0 );
+// 		res.length.should.be.equal( 0 );
 
-	});
-
-
-	it('is correct for two intersecting FourPointSurfaces', function(){
-
-		verb.init();
-
-		var p1 = [0,0,0]
-			, p2 = [1,0,0]
-			, p3 = [1,1,0]
-			, p4 = [0,1,0];
-
-		var srf1 = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
-
-		var p5 = [0.5,-0.5,-0.5]
-			, p6 = [0.5,0.5,-0.5]
-			, p7 = [0.5,0.5,0.5]
-			, p8 = [0.5,-0.5,0.5];
-
-		var srf2 = new verb.geom.FourPointSurface( p5, p6, p7, p8 );
-
-		var opts = { minDivsU: 20, minDivsV: 20 };
-		var tess1 = srf1.tessellate(opts);
-		var tess2 = srf2.tessellate(opts);
-
-		var res = verb.eval.mesh.intersect_meshes_by_aabb( tess1.points, tess1.faces, tess1.uvs, tess2.points, tess2.faces, tess2.uvs );
-
-		res.length.should.be.equal( 1 );
-
-	});
-
-});
-
-function getFlatSurface(){
-
-	verb.init();
-
-	var p1 = [0,0,0]
-		, p2 = [1,0,0]
-		, p3 = [1,1,0]
-		, p4 = [0,1,0];
-
-	var srf = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
-
-	var srfObj = {
-		degree_u : srf.get('degreeU'),
-		degree_v : srf.get('degreeV'),
-		knots_u : srf.get('knotsU'),
-		knots_v : srf.get('knotsV'),
-		homo_control_points : srf.homogenize()
-	};
-
-	return srfObj;
-
-}
+// 	});
 
 
+// 	it('is correct for two intersecting FourPointSurfaces', function(){
 
-describe("verb.eval.nurbs.AdaptiveRefinementNode.constructor",function(){
+// 		verb.init();
 
-	it('can be instantiated', function(){
+// 		var p1 = [0,0,0]
+// 			, p2 = [1,0,0]
+// 			, p3 = [1,1,0]
+// 			, p4 = [0,1,0];
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface(),null, "a", "b" );
+// 		var srf1 = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
 
-		f.corners[0].uv[0].should.be.equal(0);
-		f.corners[2].uv[0].should.be.equal(1);
-		f.corners[0].uv[1].should.be.equal(0);
-		f.corners[2].uv[1].should.be.equal(1);
-		f.parentNode.should.be.equal("a");
-		f.neighbors.should.be.equal("b");
-		f.corners.length.should.be.equal(4);
+// 		var p5 = [0.5,-0.5,-0.5]
+// 			, p6 = [0.5,0.5,-0.5]
+// 			, p7 = [0.5,0.5,0.5]
+// 			, p8 = [0.5,-0.5,0.5];
 
-	});
+// 		var srf2 = new verb.geom.FourPointSurface( p5, p6, p7, p8 );
 
-});
+// 		var opts = { minDivsU: 20, minDivsV: 20 };
+// 		var tess1 = srf1.tessellate(opts);
+// 		var tess2 = srf2.tessellate(opts);
 
-function extractUv(x){ return x.uv; }
+// 		var res = verb.eval.mesh.intersect_meshes_by_aabb( tess1.points, tess1.faces, tess1.uvs, tess2.points, tess2.faces, tess2.uvs );
 
-describe("verb.eval.nurbs.AdaptiveRefinementNode.getEdgeCorners",function(){
+// 		res.length.should.be.equal( 1 );
 
-	it('returns expected result for node without children', function(){
+// 	});
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
+// });
 
-		f.getEdgeCorners( 0 ).map(extractUv).should.be.eql( [[0,0]] );
-		f.getEdgeCorners( 1 ).map(extractUv).should.be.eql( [[1,0]] );
-		f.getEdgeCorners( 2 ).map(extractUv).should.be.eql( [[1,1]] );
-		f.getEdgeCorners( 3 ).map(extractUv).should.be.eql( [[0,1]] );
+// function getFlatSurface(){
 
-	});
+// 	verb.init();
 
-	it('returns expected result for node with children', function(){
+// 	var p1 = [0,0,0]
+// 		, p2 = [1,0,0]
+// 		, p3 = [1,1,0]
+// 		, p4 = [0,1,0];
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
+// 	var srf = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
 
-		f.divide({ minDepth : 1 });
-		f.children.length.should.be.equal( 4 );
+// 	var srfObj = {
+// 		degree_u : srf.get('degreeU'),
+// 		degree_v : srf.get('degreeV'),
+// 		knots_u : srf.get('knotsU'),
+// 		knots_v : srf.get('knotsV'),
+// 		homo_control_points : srf.homogenize()
+// 	};
 
-		f.getEdgeCorners(0).map(extractUv).should.be.eql( [ [ 0, 0 ], [ 0.5, 0 ] ] );
-		f.getEdgeCorners(1).map(extractUv).should.be.eql( [ [ 1, 0 ], [ 1, 0.5 ] ] );
-		f.getEdgeCorners(2).map(extractUv).should.be.eql( [ [ 1, 1 ], [ 0.5, 1 ] ] );
-		f.getEdgeCorners(3).map(extractUv).should.be.eql( [ [ 0, 1 ], [ 0, 0.5 ] ] );
+// 	return srfObj;
 
-	});
+// }
 
-	it('returns expected result for node with nested children', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
 
-		f.divide({ minDepth : 2 });
-		f.children.length.should.be.equal( 4 );
+// describe("verb.eval.nurbs.AdaptiveRefinementNode.constructor",function(){
 
-		f.getEdgeCorners(0).map(extractUv).should.be.eql( [ [ 0, 0 ], [ 0.25, 0 ], [ 0.5, 0 ], [ 0.75, 0 ] ] );
-		f.getEdgeCorners(1).map(extractUv).should.be.eql( [ [ 1, 0 ], [ 1, 0.25 ], [ 1, 0.5 ], [ 1, 0.75 ] ] );
-		f.getEdgeCorners(2).map(extractUv).should.be.eql( [ [ 1, 1 ], [ 0.75, 1 ], [ 0.5, 1 ], [ 0.25, 1 ] ] );
-		f.getEdgeCorners(3).map(extractUv).should.be.eql( [ [ 0, 1 ], [ 0, 0.75 ], [ 0, 0.5 ], [ 0, 0.25 ] ] );
+// 	it('can be instantiated', function(){
 
-	});
+// 		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface(),null, "a", "b" );
 
-});
+// 		f.corners[0].uv[0].should.be.equal(0);
+// 		f.corners[2].uv[0].should.be.equal(1);
+// 		f.corners[0].uv[1].should.be.equal(0);
+// 		f.corners[2].uv[1].should.be.equal(1);
+// 		f.parentNode.should.be.equal("a");
+// 		f.neighbors.should.be.equal("b");
+// 		f.corners.length.should.be.equal(4);
 
-describe("verb.eval.nurbs.AdaptiveRefinementNode.getAllCorners",function(){
+// 	});
 
-	it('returns expected result for edge with more vertices on opposite side', function(){
+// });
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
+// function extractUv(x){ return x.uv; }
 
-		f.divide({ minDepth : 1 }); // now f is split in 4
+// describe("verb.eval.nurbs.AdaptiveRefinementNode.getEdgeCorners",function(){
 
-		f.children[0].divide({ minDepth : 1 }); //  f[0] is split in 4
-		f.children[1].divide({ minDepth : 1 }); //  f[1] is split in 4
-		f.children[1].children[3].divide({ minDepth : 1 }); //  f[1][3] is split in 4
+// 	it('returns expected result for node without children', function(){
 
-		f.children[0].getAllCorners(1).map(extractUv).should.eql( [ [ 0.5, 0 ], [ 0.5, 0.25 ], [ 0.5, 0.375 ] ] );
-		f.children[0].children[2].getAllCorners(2).map(extractUv).should.eql( [ [ 0.5, 0.5 ] ] );
+// 		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
+
+// 		f.getEdgeCorners( 0 ).map(extractUv).should.be.eql( [[0,0]] );
+// 		f.getEdgeCorners( 1 ).map(extractUv).should.be.eql( [[1,0]] );
+// 		f.getEdgeCorners( 2 ).map(extractUv).should.be.eql( [[1,1]] );
+// 		f.getEdgeCorners( 3 ).map(extractUv).should.be.eql( [[0,1]] );
+
+// 	});
+
+// 	it('returns expected result for node with children', function(){
+
+// 		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
+
+// 		f.divide({ minDepth : 1 });
+// 		f.children.length.should.be.equal( 4 );
+
+// 		f.getEdgeCorners(0).map(extractUv).should.be.eql( [ [ 0, 0 ], [ 0.5, 0 ] ] );
+// 		f.getEdgeCorners(1).map(extractUv).should.be.eql( [ [ 1, 0 ], [ 1, 0.5 ] ] );
+// 		f.getEdgeCorners(2).map(extractUv).should.be.eql( [ [ 1, 1 ], [ 0.5, 1 ] ] );
+// 		f.getEdgeCorners(3).map(extractUv).should.be.eql( [ [ 0, 1 ], [ 0, 0.5 ] ] );
+
+// 	});
+
+// 	it('returns expected result for node with nested children', function(){
+
+// 		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
+
+// 		f.divide({ minDepth : 2 });
+// 		f.children.length.should.be.equal( 4 );
+
+// 		f.getEdgeCorners(0).map(extractUv).should.be.eql( [ [ 0, 0 ], [ 0.25, 0 ], [ 0.5, 0 ], [ 0.75, 0 ] ] );
+// 		f.getEdgeCorners(1).map(extractUv).should.be.eql( [ [ 1, 0 ], [ 1, 0.25 ], [ 1, 0.5 ], [ 1, 0.75 ] ] );
+// 		f.getEdgeCorners(2).map(extractUv).should.be.eql( [ [ 1, 1 ], [ 0.75, 1 ], [ 0.5, 1 ], [ 0.25, 1 ] ] );
+// 		f.getEdgeCorners(3).map(extractUv).should.be.eql( [ [ 0, 1 ], [ 0, 0.75 ], [ 0, 0.5 ], [ 0, 0.25 ] ] );
+
+// 	});
+
+// });
+
+// describe("verb.eval.nurbs.AdaptiveRefinementNode.getAllCorners",function(){
+
+// 	it('returns expected result for edge with more vertices on opposite side', function(){
+
+// 		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
+
+// 		f.divide({ minDepth : 1 }); // now f is split in 4
+
+// 		f.children[0].divide({ minDepth : 1 }); //  f[0] is split in 4
+// 		f.children[1].divide({ minDepth : 1 }); //  f[1] is split in 4
+// 		f.children[1].children[3].divide({ minDepth : 1 }); //  f[1][3] is split in 4
+
+// 		f.children[0].getAllCorners(1).map(extractUv).should.eql( [ [ 0.5, 0 ], [ 0.5, 0.25 ], [ 0.5, 0.375 ] ] );
+// 		f.children[0].children[2].getAllCorners(2).map(extractUv).should.eql( [ [ 0.5, 0.5 ] ] );
 		
-	});
+// 	});
 
-	it('returns expected result for edge with neighbors that has with lesser number of vertices on opposite side', function(){
+// 	it('returns expected result for edge with neighbors that has with lesser number of vertices on opposite side', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
+// 		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
 
-		f.divide({ minDepth : 1 }); // now f is split in 4
+// 		f.divide({ minDepth : 1 }); // now f is split in 4
 
-		f.children[0].divide({ minDepth : 1 }); //  f[0] is split in 4
-		f.children[1].divide({ minDepth : 1 }); //  f[1] is split in 4
-		f.children[1].children[3].divide({ minDepth : 1 }); //  f[1][3] is split in 4
+// 		f.children[0].divide({ minDepth : 1 }); //  f[0] is split in 4
+// 		f.children[1].divide({ minDepth : 1 }); //  f[1] is split in 4
+// 		f.children[1].children[3].divide({ minDepth : 1 }); //  f[1][3] is split in 4
 
-		f.children[1].children[3].children[3].getAllCorners(3).map(extractUv).should.eql( [ [ 0.5, 0.5 ] ] );
+// 		f.children[1].children[3].children[3].getAllCorners(3).map(extractUv).should.eql( [ [ 0.5, 0.5 ] ] );
 
-	});
+// 	});
 
-});
+// });
 
-describe("verb.eval.nurbs.AdaptiveRefinementNode.divide",function(){
+// describe("verb.eval.nurbs.AdaptiveRefinementNode.divide",function(){
 
-	it('can be called with options.minDepth', function(){
+// 	it('can be called with options.minDepth', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
+// 		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
 
-		f.divide({ minDepth : 2 });
-		f.children.length.should.be.equal( 4 );
+// 		f.divide({ minDepth : 2 });
+// 		f.children.length.should.be.equal( 4 );
 
-	});
+// 	});
 
-	it('can be called with no options provided', function(){
+// 	it('can be called with no options provided', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
+// 		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
 
-		f.divide();
+// 		f.divide();
 
-		// no division is done
-		should.equal( f.children, null);
+// 		// no division is done
+// 		should.equal( f.children, null);
 
-	});
+// 	});
 
-});
+// });
 
-describe("verb.eval.nurbs.AdaptiveRefinementNode.evalSrf",function(){
+describe("verb.eval.nurbs.dist_to_seg",function(){
 
-	it('works as expected', function(){
+	it('works for simple case', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
-
-		var res = f.evalSrf( 0, 0 );
-
-		vecShouldBe( [0,0,0], res.point );
-		vecShouldBe( [0,0,-1], res.normal );
-
-		res = f.evalSrf( 1,0 );
-
-		vecShouldBe( [1,0,0], res.point );
-		vecShouldBe( [0,0,-1], res.normal );
-
-		res = f.evalSrf( 1,1 );
-
-		vecShouldBe( [1,1,0], res.point );
-		vecShouldBe( [0,0,-1], res.normal );
+		console.log(verb.eval.nurbs.dist_to_seg([-10,0,0], [3,3,0], [2,0,0] ) )
 
 	});
 
 });
 
-describe("verb.eval.nurbs.AdaptiveRefinementNode.triangulate",function(){
+// describe("verb.eval.nurbs.AdaptiveRefinementNode.evalSrf",function(){
 
-	function getWarpedSurface(){ 
+// 	it('works as expected', function(){
 
-		verb.init();
+// 		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
 
-		var p1 = [0,0,0]
-			, p2 = [1,0,0]
-			, p3 = [1,1,1]
-			, p4 = [0,1,0];
+// 		var res = f.evalSrf( 0, 0 );
 
-		var srf = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
+// 		vecShouldBe( [0,0,0], res.point );
+// 		vecShouldBe( [0,0,-1], res.normal );
 
-		var srfObj = {
-			degree_u : srf.get('degreeU'),
-			degree_v : srf.get('degreeV'),
-			knots_u : srf.get('knotsU'),
-			knots_v : srf.get('knotsV'),
-			homo_control_points : srf.homogenize()
-		};
+// 		res = f.evalSrf( 1,0 );
 
-		return srfObj;
+// 		vecShouldBe( [1,0,0], res.point );
+// 		vecShouldBe( [0,0,-1], res.normal );
 
-	}
+// 		res = f.evalSrf( 1,1 );
 
-	it('can triangulate a square, planar surface with no options defined', function(){
+// 		vecShouldBe( [1,1,0], res.point );
+// 		vecShouldBe( [0,0,-1], res.normal );
 
-		var srf = getFlatSurface();
+// 	});
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
-		f.divide();
-		var mesh = f.triangulate();
+// });
 
-		mesh.faces.should.eql( [ [ 0, 3, 1 ], [ 3, 2, 1 ]  ]);
-		mesh.points.should.eql([ [ 0, 0, 0 ], [ 1, 0, 0 ], [ 1, 1, 0 ], [ 0, 1, 0 ] ]);
-		mesh.uvs.should.eql([ [ 0, 0 ], [ 1, 0 ], [ 1, 1 ], [ 0, 1 ] ]);
-		mesh.normals.should.eql( [ [ 0, 0, -1 ], [ 0, 0, -1 ], [ 0, 0, -1 ], [ 0, 0, -1 ] ] );
+// describe("verb.eval.nurbs.AdaptiveRefinementNode.triangulate",function(){
 
-	});
+// 	function getWarpedSurface(){ 
 
-	it('can triangulate a warped surface with no options defined', function(){
+// 		verb.init();
 
-		var srf = getWarpedSurface();
+// 		var p1 = [0,0,0]
+// 			, p2 = [1,0,0]
+// 			, p3 = [1,1,1]
+// 			, p4 = [0,1,0];
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
+// 		var srf = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
 
-		f.divide();
-		var mesh = f.triangulate();
+// 		var srfObj = {
+// 			degree_u : srf.get('degreeU'),
+// 			degree_v : srf.get('degreeV'),
+// 			knots_u : srf.get('knotsU'),
+// 			knots_v : srf.get('knotsV'),
+// 			homo_control_points : srf.homogenize()
+// 		};
 
-		mesh.faces.length.should.be.greaterThan( 4 );
-		mesh.points.length.should.be.greaterThan( 4 );
-		mesh.points.forEach(function(x){ x.length.should.be.equal( 3 ); })
-		mesh.points.length.should.be.equal( mesh.normals.length );
-		mesh.uvs.length.should.be.equal( mesh.normals.length );
+// 		return srfObj;
 
-	});
+// 	}
 
-	it('can triangulate a node with children', function(){
+// 	it('can triangulate a square, planar surface with no options defined', function(){
 
-		var srf = getFlatSurface();
+// 		var srf = getFlatSurface();
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
+// 		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
+// 		f.divide();
+// 		var mesh = f.triangulate();
 
-		f.divide({ minDepth: 1 });
-		var mesh = f.triangulate();
+// 		mesh.faces.should.eql( [ [ 0, 3, 1 ], [ 3, 2, 1 ]  ]);
+// 		mesh.points.should.eql([ [ 0, 0, 0 ], [ 1, 0, 0 ], [ 1, 1, 0 ], [ 0, 1, 0 ] ]);
+// 		mesh.uvs.should.eql([ [ 0, 0 ], [ 1, 0 ], [ 1, 1 ], [ 0, 1 ] ]);
+// 		mesh.normals.should.eql( [ [ 0, 0, -1 ], [ 0, 0, -1 ], [ 0, 0, -1 ], [ 0, 0, -1 ] ] );
 
-		mesh.faces.length.should.be.greaterThan( 4 );
-		mesh.points.length.should.be.greaterThan( 4 );
-		mesh.points.forEach(function(x){ x.length.should.be.equal( 3 ); })
-		mesh.points.length.should.be.equal( mesh.normals.length );
-		mesh.uvs.length.should.be.equal( mesh.normals.length );
+// 	});
+
+// 	it('can triangulate a warped surface with no options defined', function(){
+
+// 		var srf = getWarpedSurface();
+
+// 		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
+
+// 		f.divide();
+// 		var mesh = f.triangulate();
+
+// 		mesh.faces.length.should.be.greaterThan( 4 );
+// 		mesh.points.length.should.be.greaterThan( 4 );
+// 		mesh.points.forEach(function(x){ x.length.should.be.equal( 3 ); })
+// 		mesh.points.length.should.be.equal( mesh.normals.length );
+// 		mesh.uvs.length.should.be.equal( mesh.normals.length );
+
+// 	});
+
+// 	it('can triangulate a node with children', function(){
+
+// 		var srf = getFlatSurface();
+
+// 		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
+
+// 		f.divide({ minDepth: 1 });
+// 		var mesh = f.triangulate();
+
+// 		mesh.faces.length.should.be.greaterThan( 4 );
+// 		mesh.points.length.should.be.greaterThan( 4 );
+// 		mesh.points.forEach(function(x){ x.length.should.be.equal( 3 ); })
+// 		mesh.points.length.should.be.equal( mesh.normals.length );
+// 		mesh.uvs.length.should.be.equal( mesh.normals.length );
 
 
-	});
+// 	});
 
-	it('can triangulate a node with children and un-nested neighbors', function(){
+// 	it('can triangulate a node with children and un-nested neighbors', function(){
 
-		var srf = getFlatSurface();
+// 		var srf = getFlatSurface();
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
+// 		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
 
-		f.divide({ minDepth: 1 });
-		f.children[0].divide({ minDepth: 1 });
+// 		f.divide({ minDepth: 1 });
+// 		f.children[0].divide({ minDepth: 1 });
 
-		var mesh = f.triangulate();
+// 		var mesh = f.triangulate();
 
-		mesh.faces.length.should.be.greaterThan( 4 );
-		mesh.points.length.should.be.greaterThan( 4 );
-		mesh.points.forEach(function(x){ x.length.should.be.equal( 3 ); })
-		mesh.points.length.should.be.equal( mesh.normals.length );
-		mesh.uvs.length.should.be.equal( mesh.normals.length );
+// 		mesh.faces.length.should.be.greaterThan( 4 );
+// 		mesh.points.length.should.be.greaterThan( 4 );
+// 		mesh.points.forEach(function(x){ x.length.should.be.equal( 3 ); })
+// 		mesh.points.length.should.be.equal( mesh.normals.length );
+// 		mesh.uvs.length.should.be.equal( mesh.normals.length );
 
-	});
+// 	});
 
-	it('can triangulate a node with children and equally nested neighbors', function(){
+// 	it('can triangulate a node with children and equally nested neighbors', function(){
 
-		var srf = getFlatSurface();
+// 		var srf = getFlatSurface();
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
+// 		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
 
-		f.divide({ minDepth: 2 });
+// 		f.divide({ minDepth: 2 });
 		
-		var mesh = f.triangulate();
+// 		var mesh = f.triangulate();
 
-		mesh.faces.length.should.be.equal( 32 );
-		mesh.points.length.should.be.greaterThan( 4 );
-		mesh.points.forEach(function(x){ x.length.should.be.equal( 3 ); })
-		mesh.points.length.should.be.equal( mesh.normals.length );
-		mesh.uvs.length.should.be.equal( mesh.normals.length );
+// 		mesh.faces.length.should.be.equal( 32 );
+// 		mesh.points.length.should.be.greaterThan( 4 );
+// 		mesh.points.forEach(function(x){ x.length.should.be.equal( 3 ); })
+// 		mesh.points.length.should.be.equal( mesh.normals.length );
+// 		mesh.uvs.length.should.be.equal( mesh.normals.length );
 
-	});
+// 	});
 
-	it('can triangulate a node with children and more nested neighbors', function(){
+// 	it('can triangulate a node with children and more nested neighbors', function(){
 
-		var srf = getFlatSurface();
+// 		var srf = getFlatSurface();
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
+// 		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
 
-		f.divide({ minDepth: 3 });
+// 		f.divide({ minDepth: 3 });
 		
-		var mesh = f.triangulate();
+// 		var mesh = f.triangulate();
 
-		mesh.faces.length.should.be.equal( 128 );
-		mesh.points.length.should.be.greaterThan( 4 );
-		mesh.points.forEach(function(x){ x.length.should.be.equal( 3 ); })
-		mesh.points.length.should.be.equal( mesh.normals.length );
-		mesh.uvs.length.should.be.equal( mesh.normals.length );
+// 		mesh.faces.length.should.be.equal( 128 );
+// 		mesh.points.length.should.be.greaterThan( 4 );
+// 		mesh.points.forEach(function(x){ x.length.should.be.equal( 3 ); })
+// 		mesh.points.length.should.be.equal( mesh.normals.length );
+// 		mesh.uvs.length.should.be.equal( mesh.normals.length );
 
-	});
+// 	});
 
-});
+// });
 
-describe("verb.eval.nurbs.tessellate_rational_surface_adaptive",function(){
+// describe("verb.eval.nurbs.tessellate_rational_surface_adaptive",function(){
 
-	function getComplexSurface(){ 
+// 	function getComplexSurface(){ 
 
-		verb.init();
+// 		verb.init();
 
-		var degree = 3
-			, knots = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
-			, pts = [ 	[ [0, 0, -10], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] , 	[40, 0, 0], [50, 0, 0] ],
-						[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] , [40, -10, 0], [50, -10, 0]	],
-						[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] , [40, -20, -2], [50, -20, 0] 	],
-						[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, -23], 	[30, -30, 0] , [40, -30, 0], [50, -30, 0]     ],  
-						[ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , [40, -40, -20], [50, -40, 0]     ],  
-						[ [0, -50, 12], [10, -50, 0], 	[20, -50, 0], 	[30, -50, 0] , [50, -50, 0], [50, -50, -15]     ],     ]
-			, wts = [ 	[ 1, 1, 1, 1, 1, 1],
-						[ 1, 1, 1, 1, 1, 1],
-						[ 1, 1, 1, 1, 1, 1],
-						[ 1, 1, 1, 1, 1, 1],
-						[ 1, 1, 1, 1, 1, 1],
-						[ 1, 1, 1, 1, 1, 1] ];
+// 		var degree = 3
+// 			, knots = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
+// 			, pts = [ 	[ [0, 0, -10], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] , 	[40, 0, 0], [50, 0, 0] ],
+// 						[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] , [40, -10, 0], [50, -10, 0]	],
+// 						[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] , [40, -20, -2], [50, -20, 0] 	],
+// 						[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, -23], 	[30, -30, 0] , [40, -30, 0], [50, -30, 0]     ],  
+// 						[ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , [40, -40, -20], [50, -40, 0]     ],  
+// 						[ [0, -50, 12], [10, -50, 0], 	[20, -50, 0], 	[30, -50, 0] , [50, -50, 0], [50, -50, -15]     ],     ]
+// 			, wts = [ 	[ 1, 1, 1, 1, 1, 1],
+// 						[ 1, 1, 1, 1, 1, 1],
+// 						[ 1, 1, 1, 1, 1, 1],
+// 						[ 1, 1, 1, 1, 1, 1],
+// 						[ 1, 1, 1, 1, 1, 1],
+// 						[ 1, 1, 1, 1, 1, 1] ];
 
-		srf = new verb.geom.NurbsSurface( degree, knots, degree, knots, pts, wts );
+// 		srf = new verb.geom.NurbsSurface( degree, knots, degree, knots, pts, wts );
 
-		var srfObj = {
-			degree_u : srf.get('degreeU'),
-			degree_v : srf.get('degreeV'),
-			knots_u : srf.get('knotsU'),
-			knots_v : srf.get('knotsV'),
-			homo_control_points : srf.homogenize()
-		};
+// 		var srfObj = {
+// 			degree_u : srf.get('degreeU'),
+// 			degree_v : srf.get('degreeV'),
+// 			knots_u : srf.get('knotsU'),
+// 			knots_v : srf.get('knotsV'),
+// 			homo_control_points : srf.homogenize()
+// 		};
 
-		return srfObj;
-	}
+// 		return srfObj;
+// 	}
 
-	it('produces a mesh from a divided surface', function(){
+// 	it('produces a mesh from a divided surface', function(){
 
-		var srf = getComplexSurface();
+// 		var srf = getComplexSurface();
 
-		var mesh = verb.eval.nurbs.tessellate_rational_surface_adaptive( srf.degree_u,
-			srf.knots_u,
-			srf.degree_v,
-			srf.knots_v, 
-			srf.homo_control_points, 
-			{ minDivsU: 1, minDivsV: 4 } );
+// 		var mesh = verb.eval.nurbs.tessellate_rational_surface_adaptive( srf.degree_u,
+// 			srf.knots_u,
+// 			srf.degree_v,
+// 			srf.knots_v, 
+// 			srf.homo_control_points, 
+// 			{ minDivsU: 1, minDivsV: 4 } );
 
-		mesh.faces.length.should.be.greaterThan( 8 );
-		mesh.points.forEach(function(x){ x.length.should.be.equal( 3 ); })
-		mesh.points.length.should.be.equal( mesh.normals.length );
-		mesh.uvs.length.should.be.equal( mesh.normals.length );
+// 		mesh.faces.length.should.be.greaterThan( 8 );
+// 		mesh.points.forEach(function(x){ x.length.should.be.equal( 3 ); })
+// 		mesh.points.length.should.be.equal( mesh.normals.length );
+// 		mesh.uvs.length.should.be.equal( mesh.normals.length );
 
-	});
-});
+// 	});
+// });
 
 
 
