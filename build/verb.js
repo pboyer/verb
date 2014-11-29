@@ -4858,9 +4858,8 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulateLeaf = function( mes
 
 		// all done 
 		return mesh;
-	}
-
-	if (uvs.length === 5){
+		
+	} else if (uvs.length === 5){
 
 		// use the splitcorner to triangulate
 		var il = ids.length;
