@@ -63,7 +63,7 @@ verb.geom.NurbsSurface.prototype.point = function( u, v, callback ) {
 verb.geom.NurbsSurface.prototype.derivatives = function( u, v, num_derivs, callback ) {
 
 	return this.nurbsEngine.eval( 'rational_surface_derivs', 
-			[	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), num_derivs, u, v ], callback ); 
+			[	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), num_derivs || 1, u, v ], callback ); 
 
 };
 

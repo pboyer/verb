@@ -66,11 +66,11 @@
 				, height = 20
 				, radius = 2;
 
-			//srf = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
+			srf = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
 
-			srf = new verb.geom.NurbsSurface( degree, knots, degree, knots, pts, wts );
+			//srf = new verb.geom.NurbsSurface( degree, knots, degree, knots, pts, wts );
 
-			// srf = new verb.geom.Sphere( [0,0,0], 10 );
+			srf = new verb.geom.Sphere( [0,0,0], 10 );
 
 			var srfObj = {
 				degree_u : srf.get('degreeU'),
@@ -85,33 +85,35 @@
 
 		var srfObj = getWarpedPlane();
 
-			var mesh = verb.eval.nurbs.tessellate_rational_surface_adaptive( srf.get('degreeU'),
-				srf.get('knotsU'),
-				srf.get('degreeV'),
-				srf.get('knotsV'), 
-				srf.homogenize(), 
-				{ minDivsU: du, minDivsV : dv, edgeTol: 0.01 } );
+		var mesh = verb.eval.nurbs.tessellate_rational_surface_adaptive( srf.get('degreeU'),
+			srf.get('knotsU'),
+			srf.get('degreeV'),
+			srf.get('knotsV'), 
+			srf.homogenize(), 
+			{ minDivsU: du, minDivsV : dv, edgeTol: 0.01 } );
+
+		console.log( srf.derivatives( 1,1) )
 
 		var du = (srfObj.homo_control_points.length - 1) * 2;
 		var dv = (srfObj.homo_control_points[0].length - 1) * 2;
 
 		var d1 = Date.now();
 
-		var runs = 5;
+		var runs = 20;
 
-		for (var i = 0; i < runs; i++){
+		// for (var i = 0; i < runs; i++){
 
-			var mesh = verb.eval.nurbs.tessellate_rational_surface_adaptive( srf.get('degreeU'),
-				srf.get('knotsU'),
-				srf.get('degreeV'),
-				srf.get('knotsV'), 
-				srf.homogenize(), 
-				{ normTol: 0.08 } );
+		// 	var mesh = verb.eval.nurbs.tessellate_rational_surface_adaptive( srf.get('degreeU'),
+		// 		srf.get('knotsU'),
+		// 		srf.get('degreeV'),
+		// 		srf.get('knotsV'), 
+		// 		srf.homogenize(), 
+		// 		{ refine: true } );
 
-			// var f = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj );
-			// f.divide({ edgeTol: 5e-2 });
-			// var mesh = f.triangulate();
-		}
+		// 	// var f = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj );
+		// 	// f.divide({ edgeTol: 5e-2 });
+		// 	// var mesh = f.triangulate();
+		// }
 
 		var d2 = Date.now();
 

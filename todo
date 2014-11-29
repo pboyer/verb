@@ -1,10 +1,9 @@
+
 NurbsSurface split - similar to curve knot insertion but on surfaces
 Curve interpolation with tangents
 Curve interpolation with sparse matrices
 Curve approximation
-
-Surface-Surface intersection
-	improved accuracy
-
+Tessellation of spheres causes artifacts at start point
+Surface-Surface intersection, marching
 Surface lofting
 Finish sweep (it's incorrect)
