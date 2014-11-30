@@ -230,40 +230,61 @@ verb.unique = function( arr, comp ){
 
 }
 
-	//
-	// ####range(start, stop, step)
-	//
-	// Obtain a range of numbers
-	//
-	// Borrowed from underscore.js port of the python function
-	// of the same name
-	//
-	// **params**
-	// + *Number*, start point
-	// + *Number*, end point 
-	// + *Number*, step
-	// 
-	// **returns** 
-	// + *Array*, range array
-	//
-  verb.range = function(start, stop, step) {
-    if (arguments.length <= 1) {
-      stop = start || 0;
-      start = 0;
-    }
-    step = arguments[2] || 1;
+//
+// ####isZero(vector)
+//
+// Determine if a vector is of zero length with
+// no multiplies and no square roots
+//
+// **params**
+// + *Array*, vector
+// 
+// **returns** 
+// + *Boolean*, range array
+//
+verb.isZero = function( vec ){
 
-    var len = Math.max(Math.ceil((stop - start) / step), 0);
-    var idx = 0;
-    var range = new Array(len);
+  for (var i = 0, l = vec.length; i < l; i++){
+    if (Math.abs( vec[i] ) > verb.TOLERANCE ) return false;
+  }
 
-    while(idx < len) {
-      range[idx++] = start;
-      start += step;
-    }
+  return true;
+} 
 
-    return range;
-  };
+//
+// ####range(start, stop, step)
+//
+// Obtain a range of numbers
+//
+// Borrowed from underscore.js port of the python function
+// of the same name
+//
+// **params**
+// + *Number*, start point
+// + *Number*, end point 
+// + *Number*, step
+// 
+// **returns** 
+// + *Array*, range array
+//
+verb.range = function(start, stop, step) {
+  if (arguments.length <= 1) {
+    stop = start || 0;
+    start = 0;
+  }
+  step = arguments[2] || 1;
+
+  var len = Math.max(Math.ceil((stop - start) / step), 0);
+  var idx = 0;
+  var range = new Array(len);
+
+  while(idx < len) {
+    range[idx++] = start;
+    start += step;
+  }
+
+  return range;
+};
 
  /**
  * AUTHOR OF INITIAL JS LIBRARY

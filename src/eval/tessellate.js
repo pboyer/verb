@@ -637,15 +637,6 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.midpoint = function( index ){
 
 } 
 
-verb.isZero = function( vec ){
-
-	for (var i = 0, l = vec.length; i < l; i++){
-		if (Math.abs( vec[i] ) > verb.TOLERANCE ) return false;
-	}
-
-	return true;
-} 
-
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.hasBadNormals = function( vec ){
 	return this.corners[0].degen || this.corners[1].degen || this.corners[2].degen || this.corners[3].degen;
 } 

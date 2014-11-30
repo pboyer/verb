@@ -2268,15 +2268,6 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.midpoint = function( index ){
 
 } 
 
-verb.isZero = function( vec ){
-
-	for (var i = 0, l = vec.length; i < l; i++){
-		if (Math.abs( vec[i] ) > verb.TOLERANCE ) return false;
-	}
-
-	return true;
-} 
-
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.hasBadNormals = function( vec ){
 	return this.corners[0].degen || this.corners[1].degen || this.corners[2].degen || this.corners[3].degen;
 } 
@@ -2502,7 +2493,7 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulateLeaf = function( mes
 // ###verb.eval
 // This defines verb's core geometry library which is called by the current Engine.
 
-verb.eval.nurbs.rational_interp_curve = function( points, degree ) {
+verb.eval.nurbs.rational_interp_curve = function( points, degree, start_tangent, end_tangent ) {
 
 	// 0) build knot vector for curve by normalized chord length
 	// 1) construct effective basis function in square matrix (W)
@@ -2534,13 +2525,16 @@ verb.eval.nurbs.rational_interp_curve = function( points, degree ) {
 		us[i] = us[i] / max;
 	}
 
-	var knotsStart = numeric.rep( [ degree + 1 ], 0 ); // [ 0, 0, 0, 0 ];
-
-	var n = points.length - 1;
-	var innerKnotNum = n - degree;
+	var knotsStart = numeric.rep( [ degree + 1 ], 0 ); 
 
 
-	for (var i = 1, l = us.length - degree; i < l; i++){
+	// we need two more control points, two more knots
+
+	var hasTangents = start_tangent != undefined && end_tangent != undefined;
+	var start = hasTangents ? 0 : 1;
+	var end = hasTangents ? us.length - degree + 1 : us.length - degree;
+
+	for (var i = start, l = end; i < l; i++){
 
 		var weightSums = 0;
 		for (var j = 0; j < degree; j++){
@@ -2554,6 +2548,11 @@ verb.eval.nurbs.rational_interp_curve = function( points, degree ) {
 
 	// build matrix of basis function coeffs (TODO: use sparse rep)
 	var A = [];
+	var n = hasTangents ? points.length + 1 : points.length - 1;
+
+	var lst = hasTangents ? 1 : 0;
+	var ld = hasTangents ? points.length - (degree - 1) : points.length - (degree + 1);
+
 	for ( var i = 0; i < us.length; i++ ){
 
 		var u = us[i];
@@ -2562,19 +2561,43 @@ verb.eval.nurbs.rational_interp_curve = function( points, degree ) {
 		var basisFuncs = verb.eval.nurbs.basis_functions_given_knot_span_index( span, u, degree, knots );
 
 		var ls = span - degree;
+
 		var rowstart = verb.eval.nurbs.zeros_1d( ls );
-		var rowend = verb.eval.nurbs.zeros_1d( points.length - (degree + 1) - ls );
+		var rowend = verb.eval.nurbs.zeros_1d( ld - ls );
 
 		A.push( rowstart.concat(basisFuncs).concat(rowend) );
+	}
 
+	if (hasTangents){
+		var ln = A[0].length - 2;
+
+		var tanRow0 = [-1,1].concat( verb.eval.nurbs.zeros_1d( ln ) );
+		var tanRow1 = verb.eval.nurbs.zeros_1d( ln ).concat( [-1,1] );
+
+		A.splice( 1, 0, tanRow0 );
+		A.splice( A.length-1, 0, tanRow1 );
 	}
 
 	// for each dimension, solve
 	var dim = points[0].length;
 	var xs = [];
 
+	var mult1 = (1 - knots[knots.length - degree - 2] ) / degree;
+	var mult0 = (knots[degree + 1] ) / degree;
+
 	for (var i = 0; i < dim; i++){
-		var b = points.map(function(x){ return x[i]; });
+
+		if (!hasTangents){
+			var b = points.map(function(x){ return x[i]; });
+		} else {
+			// insert the tangents at the second and second to last index
+			var b = [ points[0][i] ];
+			b.push( mult0 * start_tangent[i]);
+			for (var j = 1; j < points.length - 1; j++) b.push( points[j][i] );
+			b.push( mult1 * end_tangent[i] );
+			b.push( verb.last(points)[i] );
+		}
+
 		var x = numeric.solve( A, b );
 
 		xs.push(x);

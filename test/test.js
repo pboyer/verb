@@ -4464,133 +4464,6 @@ describe("NurbsCurve.split",function(){
 });
 
 
-describe("verb.eval.nurbs.rational_interp_curve",function(){
-
-	function shouldInterpPoints(pts, degree){
-
-		// interpolates the end points
-		var crv = verb.eval.nurbs.rational_interp_curve( pts, degree );
-
-		crv.degree.should.be.equal( degree );
-
-		crv.control_points[0][0].should.be.approximately(pts[0][0], verb.TOLERANCE);
-		crv.control_points[0][1].should.be.approximately(pts[0][1], verb.TOLERANCE);
-
-		var last = pts.length - 1;
-
-		crv.control_points[last][0].should.be.approximately(pts[last][0], verb.TOLERANCE);
-		crv.control_points[last][1].should.be.approximately(pts[last][1], verb.TOLERANCE);
-
-		// // the internal points are interped (TODO: do this more efficiently)
-		var tess = verb.eval.nurbs.rational_curve_adaptive_sample( crv.degree, crv.knots, 
-			verb.eval.nurbs.homogenize_1d( crv.control_points, crv.weights ), 1e-8  );
-
-		for (var j = 0; j < pts.length; j++){
-
-			var min = Number.MAX_VALUE;
-			for (var i = 1; i < tess.length; i++){
-
-				var pt = pts[j];
-				var o = tess[i-1];
-				var r = numeric.normalized( numeric.sub( tess[i], tess[i-1] ) );
-
-				var res = verb.eval.geom.closest_point_on_ray( pt, o, r );
-				var dist = numeric.norm2( numeric.sub( pts[j], res ) );
-
-				if (dist < min) {
-					min = dist;
-				}
-
-			}
-
-			min.should.be.lessThan( 1e-3 );
-
-		}
-	}
-
-	it('can compute valid cubic interpolating curve for 4 points', function(){
-
-		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ]; 
-
-		shouldInterpPoints( pts, 3 );
-
-	});
-
-	it('can compute valid degree 4 interpolating curve for 4 points', function(){
-
-		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ]; 
-
-		shouldInterpPoints( pts, 4 );
-
-	});
-
-	it('can compute valid quadratic interpolating curve for 4 points', function(){
-
-		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ]; 
-
-		shouldInterpPoints( pts, 2 );
-
-	});
-
-	it('can compute valid cubic interpolating curve for 100 points', function(){
-
-		var pts = [];
-		for (var i = 0; i < 100; i++){
-
-			pts.push( [ 50 * Math.sin( (i / 100) * Math.PI ),
-									50 * Math.cos( (i / 100) * Math.PI ), 
-									0 ]);
-
-		}
-
-		shouldInterpPoints( pts, 3 );
-
-	});
-});
-
-describe("verb.geom.InterpCurve",function(){
-
-	function shouldInterpPoints(pts, degree){
-
-		var crv = new verb.geom.InterpCurve( pts, degree );
-
-		crv.get('degree').should.be.equal( degree );
-
-		// the points are interped
-		var tess = crv.tessellate();
-
-		for (var j = 0; j < pts.length; j++){
-
-			var min = Number.MAX_VALUE;
-			for (var i = 1; i < tess.length; i++){
-
-				var pt = pts[j];
-				var o = tess[i-1];
-				var r = numeric.normalized( numeric.sub( tess[i], tess[i-1] ) );
-
-				var res = verb.eval.geom.closest_point_on_ray( pt, o, r );
-				var dist = numeric.norm2( numeric.sub( pts[j], res ) );
-
-				if (dist < min) {
-					min = dist;
-				}
-
-			}
-
-			min.should.be.lessThan( 1e-3 );
-
-		}
-	}
-
-	it('can compute valid cubic interpolating curve for 4 points', function(){
-
-		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ]; 
-
-		shouldInterpPoints( pts, 2 );
-
-	});
-
-});
 
 describe("verb.eval.nurbs.knot_multiplicities",function(){
 
@@ -5892,5 +5765,188 @@ describe("verb.eval.nurbs.surface_split",function(){
 
 });
 
+describe("verb.geom.InterpCurve",function(){
 
+	function shouldInterpPointsWithTangents(pts, degree, start_tangent, end_tangent){
+
+		var crv = shouldInterpPoints(pts, degree, start_tangent, end_tangent);
+
+		var tan0 = crv.derivatives(0, 1)[1];
+		var tan1 = crv.derivatives(1, 1)[1];
+
+		console.log('hi')
+
+		vecShouldBe( start_tangent, tan0 );
+		vecShouldBe( end_tangent, tan1 );
+
+	}
+
+	function shouldInterpPoints(pts, degree, start_tangent, end_tangent){
+
+		var crv = new verb.geom.InterpCurve( pts, degree, start_tangent, end_tangent );
+
+		crv.get('degree').should.be.equal( degree );
+
+		var tess = crv.tessellate();
+
+		for (var j = 0; j < pts.length; j++){
+
+			var min = Number.MAX_VALUE;
+			for (var i = 1; i < tess.length; i++){
+
+				var pt = pts[j];
+				var o = tess[i-1];
+				var r = numeric.normalized( numeric.sub( tess[i], tess[i-1] ) );
+
+				var res = verb.eval.geom.closest_point_on_ray( pt, o, r );
+				var dist = numeric.norm2( numeric.sub( pts[j], res ) );
+
+				if (dist < min) {
+					min = dist;
+				}
+			}
+
+			min.should.be.lessThan( 1e-3 );
+
+		}
+
+		return crv;
+	}
+
+	it('can compute valid cubic interpolating curve for 5 points', function(){
+
+		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ]; 
+		shouldInterpPoints( pts, 2 );
+
+	});
+
+	it('can compute valid cubic interpolating curve for 4 points', function(){
+
+		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ]; 
+		shouldInterpPointsWithTangents(pts, 3, [1,0,0], [0,1,0] )
+
+	});
+
+});
+
+
+describe("verb.eval.nurbs.rational_interp_curve",function(){
+
+	function shouldInterpPointsWithTangents(pts, degree, start_tangent, end_tangent){
+
+		var crv = shouldInterpPoints(pts, degree, start_tangent, end_tangent);
+
+		var tan0 = verb.eval.nurbs.curve_derivs( crv.degree, crv.knots, crv.control_points, 0, 1)[1];
+		var tan1 = verb.eval.nurbs.curve_derivs( crv.degree, crv.knots, crv.control_points, 1, 1)[1];
+
+		vecShouldBe( start_tangent, tan0 );
+		vecShouldBe( end_tangent, tan1 );
+
+	}
+
+	function shouldInterpPoints(pts, degree, start_tangent, end_tangent){
+
+		var crv = verb.eval.nurbs.rational_interp_curve( pts, degree, start_tangent, end_tangent );
+
+		crv.degree.should.be.equal( degree );
+
+		crv.control_points[0][0].should.be.approximately(pts[0][0], verb.TOLERANCE);
+		crv.control_points[0][1].should.be.approximately(pts[0][1], verb.TOLERANCE);
+
+		verb.last(crv.control_points)[0].should.be.approximately(verb.last(pts)[0], verb.TOLERANCE);
+		verb.last(crv.control_points)[1].should.be.approximately(verb.last(pts)[1], verb.TOLERANCE);
+
+		// // the internal points are interped (TODO: do this more efficiently)
+		var tess = verb.eval.nurbs.rational_curve_adaptive_sample( crv.degree, crv.knots, 
+			verb.eval.nurbs.homogenize_1d( crv.control_points, crv.weights ), 1e-8  );
+
+		for (var j = 0; j < pts.length; j++){
+
+			var min = Number.MAX_VALUE;
+			for (var i = 1; i < tess.length; i++){
+
+				var pt = pts[j];
+				var o = tess[i-1];
+				var r = numeric.normalized( numeric.sub( tess[i], tess[i-1] ) );
+
+				var res = verb.eval.geom.closest_point_on_ray( pt, o, r );
+				var dist = numeric.norm2( numeric.sub( pts[j], res ) );
+
+				if (dist < min) {
+					min = dist;
+				}
+
+			}
+
+			min.should.be.lessThan( 1e-3 );
+
+		}
+
+		return crv;
+	}
+
+	it('can compute valid cubic interpolating curve for 4 points', function(){
+
+		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ]; 
+
+		shouldInterpPoints( pts, 3 );
+
+	});
+
+	it('can compute valid degree 4 interpolating curve for 4 points', function(){
+
+		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ]; 
+
+		shouldInterpPoints( pts, 4 );
+
+	});
+
+	it('can compute valid quadratic interpolating curve for 4 points', function(){
+
+		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ]; 
+
+		shouldInterpPoints( pts, 2 );
+
+	});
+
+	it('can compute valid cubic interpolating curve for 100 points', function(){
+
+		var pts = [];
+		for (var i = 0; i < 100; i++){
+
+			pts.push( [ 50 * Math.sin( (i / 100) * Math.PI ),
+									50 * Math.cos( (i / 100) * Math.PI ), 
+									0 ]);
+
+		}
+
+		shouldInterpPoints( pts, 3 );
+
+	});
+
+	it('can compute valid cubic interpolating points and tangents', function(){
+
+		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ]; 
+
+		shouldInterpPointsWithTangents( pts, 3, [1,0,0], [0,1,0] );
+
+	});
+
+	it('can compute valid quadratic curve interpolating points and tangents', function(){
+
+		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ]; 
+
+		shouldInterpPointsWithTangents( pts, 2, [1,0,0], [0,1,0] );
+
+	});
+
+	it('can compute valid quadratic curve interpolating points and tangents', function(){
+
+		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ]; 
+
+		shouldInterpPointsWithTangents( pts, 4, [1,0,0], [0,1,0] );
+
+	});
+
+});
 

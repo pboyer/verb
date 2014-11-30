@@ -57,9 +57,7 @@
 		verb.init();
 		var p1 = [0,0,0], p2 = [10,0,0], p3 = [10,10,5], p4 = [0,10,0], p5 = [5, 5, 0];
 		var pts = [p1, p2, p3, p4, p5];
-		var interpCurve = new verb.geom.InterpCurve( pts );
-
-		var splitcrvs = interpCurve.split( 0.3 );
+		var interpCurve = new verb.geom.InterpCurve( pts, 2, [0,0,-100], [0,0,100] );
 
 		var interpCurveGeom = tessellateCurve(interpCurve);
 
@@ -67,6 +65,7 @@
 		var lineMat = new THREE.LineBasicMaterial();
 		var interpCurveLine = new THREE.Line( interpCurveGeom, lineMat );
 
+		console.log( interpCurve.derivatives(0, 1) )
 		scene.add( interpCurveLine );
 
 		// splitting a curve
@@ -87,12 +86,19 @@
 		// scene.add( split1Line );
 
 		// draw the points 
-		var ptGeom = asGeometry( asVector3( pts ) );
+		var ptGeom = asGeometry( asVector3( interpCurve.get('controlPoints') ) );
 
 		var cloudMat = new THREE.PointCloudMaterial({ size: 0.3 });
 		var cloud = new THREE.PointCloud( ptGeom, cloudMat );
 
 		scene.add( cloud );
+
+		var interPtGeom = asGeometry( asVector3( pts ) );
+
+		var cloudMat2 = new THREE.PointCloudMaterial({ size: 1, color: 0xff0000 });
+		var cloud2 = new THREE.PointCloud( interPtGeom, cloudMat2 );
+
+		scene.add( cloud2 );
 	
 		function render() {
 			requestAnimationFrame( render );
