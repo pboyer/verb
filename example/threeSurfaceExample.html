@@ -89,31 +89,23 @@
 			srf.get('knotsU'),
 			srf.get('degreeV'),
 			srf.get('knotsV'), 
-			srf.homogenize(), 
-			{ minDivsU: du, minDivsV : dv, edgeTol: 0.01 } );
-
-		console.log( srf.derivatives( 1,1) )
+			srf.homogenize() );
 
 		var du = (srfObj.homo_control_points.length - 1) * 2;
 		var dv = (srfObj.homo_control_points[0].length - 1) * 2;
 
 		var d1 = Date.now();
 
-		var runs = 20;
+		var runs = 40;
 
-		// for (var i = 0; i < runs; i++){
+		for (var i = 0; i < runs; i++){
 
-		// 	var mesh = verb.eval.nurbs.tessellate_rational_surface_adaptive( srf.get('degreeU'),
-		// 		srf.get('knotsU'),
-		// 		srf.get('degreeV'),
-		// 		srf.get('knotsV'), 
-		// 		srf.homogenize(), 
-		// 		{ refine: true } );
-
-		// 	// var f = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj );
-		// 	// f.divide({ edgeTol: 5e-2 });
-		// 	// var mesh = f.triangulate();
-		// }
+			var mesh = verb.eval.nurbs.tessellate_rational_surface_adaptive( srf.get('degreeU'),
+				srf.get('knotsU'),
+				srf.get('degreeV'),
+				srf.get('knotsV'), 
+				srf.homogenize()  );
+		}
 
 		var d2 = Date.now();
 

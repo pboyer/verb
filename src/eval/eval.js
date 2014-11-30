@@ -122,6 +122,9 @@ verb.eval.nurbs.curve_split = function( degree, knots, control_points, u ) {
 
 }
 
+verb.eval.nurbs.surface_knot_refine =  function( degree_u, knots_u, degree_v, knots_v, homo_control_points, num_derivs, u, v)
+
+
 //
 // ####curve_knot_refine( degree, knots, control_points, knots_to_insert )
 //

@@ -1030,14 +1030,12 @@ verb.eval.nurbs.intersect_rational_surface_surface_by_aabb_refine = function( de
 	};
 
 	// todo: need to be able to predict the number of divisions
-	var tessOptions = { minDivsU: 20, minDivsV: 20, tol: 5e-2 };
 
 	var tess1 = verb.eval.nurbs.tessellate_rational_surface_adaptive( srfObj1.degree_u,
 		srfObj1.knots_u,
 		srfObj1.degree_v,
 		srfObj1.knots_v, 
-		srfObj1.homo_control_points, 
-		tessOptions );
+		srfObj1.homo_control_points);
 
 	var srfObj2 = {
 		degree_u : degree_u2,
@@ -1051,8 +1049,7 @@ verb.eval.nurbs.intersect_rational_surface_surface_by_aabb_refine = function( de
 		srfObj2.knots_u,
 		srfObj2.degree_v,
 		srfObj2.knots_v, 
-		srfObj2.homo_control_points, 
-		tessOptions );
+		srfObj2.homo_control_points);
 
 	var resApprox = verb.eval.mesh.intersect_meshes_by_aabb( tess1.points, tess1.faces, tess1.uvs, tess2.points, tess2.faces, tess2.uvs );
 
@@ -1066,7 +1063,7 @@ verb.eval.nurbs.intersect_rational_surface_surface_by_aabb_refine = function( de
 
 	// 3) perform cubic interpolation
 	return exactPls.map(function(x){
-		return verb.eval.nurbs.rational_interp_curve( x.map(function(x){ return x.pt; }), 2 ); 
+		return verb.eval.nurbs.rational_interp_curve( x.map(function(x){ return x.pt; }), 3 ); 
 	});
 
 	// TODO: represent this in uv space
@@ -1096,11 +1093,10 @@ verb.eval.mesh.intersect_meshes_by_aabb = function( points1, tris1, uvs1, points
 													res[1].tri2id = ids[1];
 
 													return res;
-												})
-												.filter(function(x){ return x; })
+												}).filter(function(x){ return x; })
 												.filter(function(x){ 
 													var dif = numeric.sub( x[0].pt, x[1].pt );
-													return numeric.dot( dif, dif ) > verb.TOLERANCE 
+													return numeric.dot( dif, dif ) > verb.EPSILON 
 												});
 
 	// TODO: this is too expensive and this only occurs when the intersection
@@ -1120,8 +1116,8 @@ verb.eval.mesh.intersect_meshes_by_aabb = function( points1, tris1, uvs1, points
 		var s4 = numeric.sub( a[1].uvtri1, b[0].uvtri1 );
 		var d4 = numeric.dot( s4, s4 );
 
-		return ( d1 < verb.TOLERANCE && d2 < verb.TOLERANCE ) || 
-			( d3 < verb.TOLERANCE && d4 < verb.TOLERANCE );
+		return ( d1 < verb.EPSILON && d2 < verb.EPSILON ) || 
+			( d3 < verb.EPSILON && d4 < verb.EPSILON );
 
 	});
 
@@ -1241,7 +1237,7 @@ verb.eval.mesh.lookup_adj_segment = function( segEnd, tree, numSegments ) {
 	// we expect one result to be self, one to be neighbor and no more
 	var adj = tree.nearest({ x: segEnd.pt[0], y: segEnd.pt[1], z: segEnd.pt[2] }, numResults)
 								.filter(function(r){ 
-									return segEnd != r[0].ele && r[1] < verb.TOLERANCE;
+									return segEnd != r[0].ele && r[1] < verb.EPSILON;
 								})
 								.map(function(r){ return r[0].ele; });
 

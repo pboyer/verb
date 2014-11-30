@@ -65,6 +65,24 @@
 			return geometry;
 		}
 
+		function tess(srf){
+			var srfObj = {
+				degree_u : srf.get('degreeU'),
+				degree_v : srf.get('degreeV'),
+				knots_u : srf.get('knotsU'),
+				knots_v : srf.get('knotsV'),
+				homo_control_points : srf.homogenize()
+			};
+
+			var tess = verb.eval.nurbs.tessellate_rational_surface_adaptive( srfObj.degree_u,
+				srfObj.knots_u,
+				srfObj.degree_v,
+				srfObj.knots_v, 
+				srfObj.homo_control_points);
+
+			return tess;
+		}
+
 		// verb.NurbsSurface -> THREE.Geometry
 		function tessellate(srf, udivs, vdivs) {
 
@@ -76,14 +94,11 @@
 				homo_control_points : srf.homogenize()
 			};
 
-			var tessOptions = { minDivsU: 20, minDivsV: 20, tol: 5e-2 };
-
 			var tess = verb.eval.nurbs.tessellate_rational_surface_adaptive( srfObj.degree_u,
 				srfObj.knots_u,
 				srfObj.degree_v,
 				srfObj.knots_v, 
-				srfObj.homo_control_points, 
-				tessOptions );
+				srfObj.homo_control_points );
 
 			// var f = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj );
 			// f.divide({ minDepth: 2, tol: 5e-2 });
@@ -132,7 +147,7 @@
 			var hexString = Math.floor(Math.random()*16777215).toString(16);
 			var hex = parseInt(hexString, 16);
 
-			var lineMat = new THREE.LineBasicMaterial({ linewidth: 2, color: hex});
+			var lineMat = new THREE.LineBasicMaterial({ linewidth: 2, color: 0xffffff});
 			var l = new THREE.Line( geom, lineMat );
 
 			scene.add( l );
@@ -366,23 +381,37 @@
 		var srf1, srf2;
 
 		// exampleTorusCylinderSuccess();
-		// exampleGlancingPlaneCylinderSuccess();
-		//examplePlanePlaneSuccess();
+		//exampleGlancingPlaneCylinderSuccess();
+		// examplePlanePlaneSuccess();
 		//exampleTorusCylinderSuccess2();
-		// exampleTorusCylinderSuccess3();
+		exampleTorusCylinderSuccess3();
 		//examplePlanePlaneSuccess();
-		exampleNurbsSurfacePlane();
+		//exampleNurbsSurfacePlane();
 
-		addMeshToScene( tessellate(srf1, udivs0, vdivs0), true );
-		addMeshToScene( tessellate(srf2, udivs1, vdivs1), true);
+		addMeshToScene( tessellate(srf1, udivs0, vdivs0), false );
+		addMeshToScene( tessellate(srf2, udivs1, vdivs1), false);
 
-		var tess1 = srf1.tessellate({ minDivsU: udivs0, minDivsV: vdivs0 });
-		var tess2 = srf2.tessellate({ minDivsU: udivs1, minDivsV: vdivs1 });
+		var tess1 = tess(srf1, udivs0, vdivs0);
+		var tess2 = tess(srf2, udivs1, vdivs1);
 
-		// var res = verb.eval.mesh.intersect_meshes_by_aabb( tess1.points, tess1.faces, 
-		// 	tess1.uvs, tess2.points, tess2.faces, tess2.uvs );
+		var res = verb.eval.mesh.intersect_meshes_by_aabb( tess1.points, tess1.faces, 
+			tess1.uvs, tess2.points, tess2.faces, tess2.uvs );
 
 		var ref = verb.eval.nurbs.intersect_rational_surface_surface_by_aabb_refine(srf1.get('degreeU'), srf1.get('knotsU'), srf1.get('degreeV'), srf1.get('knotsV'), srf1.homogenize(), srf2.get('degreeU'), srf2.get('knotsU'), srf2.get('degreeV'), srf2.get('knotsV'), srf2.homogenize(), 1e-6);
+
+		var runs = 10;
+
+		var d1 = Date.now();
+
+		for (var i = 0 ; i < runs; i++){
+
+		var ref = verb.eval.nurbs.intersect_rational_surface_surface_by_aabb_refine(srf1.get('degreeU'), srf1.get('knotsU'), srf1.get('degreeV'), srf1.get('knotsV'), srf1.homogenize(), srf2.get('degreeU'), srf2.get('knotsU'), srf2.get('degreeV'), srf2.get('knotsV'), srf2.homogenize(), 1e-6);
+
+		}
+
+		var d2 = Date.now();
+
+		console.log("intersected in ", (d2 - d1) / runs, "ms")
 
 		for (var i = 0; i < ref.length; i++){
 

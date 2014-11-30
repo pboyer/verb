@@ -1,10 +1,6 @@
 var should = require('should')
 	, verb = require('../build/verb.js');
 
-console.log('running from ', process.cwd() );
-console.log(verb);
-
-
 function vecShouldBe( expected, test, tol ){
 
 	if (tol === undefined) tol = verb.TOLERANCE;
@@ -1339,7 +1335,7 @@ describe("verb.eval.nurbs.get_revolved_surface",function(){
 
 });
 
-describe("verb.eval.nurbs.d_surface",function(){
+describe("verb.eval.nurbs.get_extruded_surface",function(){
 
 	it('can extrude a line into a plane', function(){
 
@@ -5697,6 +5693,14 @@ describe("verb.eval.nurbs.tessellate_rational_surface_adaptive",function(){
 		mesh.points.forEach(function(x){ x.length.should.be.equal( 3 ); })
 		mesh.points.length.should.be.equal( mesh.normals.length );
 		mesh.uvs.length.should.be.equal( mesh.normals.length );
+
+	});
+});
+
+describe("verb.eval.nurbs.tessellate_rational_surface_adaptive",function(){
+	it('produces a mesh from a divided surface', function(){
+
+		// tessellate a trim curve
 
 	});
 });

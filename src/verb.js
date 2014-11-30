@@ -26,7 +26,7 @@ verb.eval.mesh = verb.eval.mesh || {};
 // ####verb.EPSILON
 //
 // Used for numeric comparisons
-verb.EPSILON = 1e-8;
+verb.EPSILON = 1e-10;
 
 // ####verb.TOLERANCE
 //

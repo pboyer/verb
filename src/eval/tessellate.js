@@ -686,14 +686,6 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.shouldDivide = function( option
 	this.splitHoriz = numeric.norm2Squared( numeric.sub( this.corners[1].normal, this.corners[2].normal ) ) > options.normTol || 
 		numeric.norm2Squared( numeric.sub( this.corners[3].normal, this.corners[0].normal ) ) > options.normTol;
 
-	// is curved in u direction?
-	// this.splitVert = verb.eval.nurbs.dist_to_seg( this.corners[0].point, this.midpoints[0].point, this.corners[1].point ) > options.edgeTol || 
-	// 	verb.eval.nurbs.dist_to_seg( this.corners[2].point, this.midpoints[2].point, this.corners[3].point ) > options.edgeTol;
-
-	// // is curved in v direction?
-	// this.splitHoriz = verb.eval.nurbs.dist_to_seg( this.corners[1].point, this.midpoints[1].point, this.corners[2].point ) > options.edgeTol || 
-	// 	verb.eval.nurbs.dist_to_seg( this.corners[0].point, this.midpoints[3].point, this.corners[3].point ) > options.edgeTol;
-
 	if ( this.splitVert || this.splitHoriz ) return true;
 
 	var center = this.center();
