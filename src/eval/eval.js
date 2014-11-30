@@ -1,3 +1,168 @@
+verb.eval.nurbs.surface_split = function( degree_u, knots_u, degree_v, knots_v, control_points, u, dir) {
+
+	var c
+		, newPts = []
+		, knots
+		, degree
+		, newknots
+		, i;
+
+	if (dir === 0){
+
+		control_points = numeric.transpose( control_points );
+		knots = knots_u;
+		degree = degree_u;
+
+	} else {
+
+		control_points = control_points;
+		knots = knots_v;
+		degree = degree_v;
+	
+	}
+
+	var knots_to_insert = [];
+	for (i = 0; i < degree+1; i++) knots_to_insert.push(u);
+
+	var newpts0 = []
+		, newpts1 = []
+		, res;
+
+	var s = verb.eval.nurbs.knot_span( degree, u, knots );
+
+	for (i = 0; i < control_points.length; i++){
+
+		res = verb.eval.nurbs.curve_knot_refine( degree, knots, control_points[i], knots_to_insert );
+
+		var cpts0 = res.control_points.slice( 0, s + 1 );
+		var cpts1 = res.control_points.slice( s + 1 );
+
+		newpts0.push( cpts0 );
+		newpts1.push( cpts1 );
+
+	}
+	
+	var knots0 = res.knots.slice(0, s + degree + 2);
+	var knots1 = res.knots.slice( s + 1 );
+
+	if (dir === 0){
+
+		newpts0 = numeric.transpose( newpts0 );
+		newpts1 = numeric.transpose( newpts1 );
+
+		return [
+			{ degree_u: degree, 
+				knots_u: knots0, 
+
+				degree_v: degree_v, 
+				knots_v: knots_v, 
+
+				control_points: newpts0 
+			},
+			{ degree_u: degree, 
+				knots_u: knots1, 
+
+				degree_v: degree_v, 
+				knots_v: knots_v, 
+
+				control_points: newpts1 
+			}];
+
+	// v dir
+	} else {
+
+		return [
+			{ degree_u: degree_u, 
+				knots_u: knots_u, 
+
+				degree_v: degree, 
+				knots_v: knots0, 
+
+				control_points: newpts0 
+			},
+			{ degree_u: degree_u, 
+				knots_u: knots_u, 
+
+				degree_v: degree, 
+				knots_v: knots1, 
+
+				control_points: newpts1 
+			}];
+
+	}
+}
+
+verb.eval.nurbs.surface_knot_refine =  function( degree_u, knots_u, degree_v, knots_v, control_points, knots_to_insert, dir ){
+
+	// TODO: make this faster by taking advantage of repeat computations in every row
+	// 			 i.e. no reason to recompute the knot vectors on every row
+
+	var c
+		, newPts = []
+		, knots
+		, degree
+		, ctrlPts
+		, newknots;
+
+	// u dir
+	if (dir === 0){
+
+		ctrlPts = numeric.transpose( control_points );
+		knots = knots_u;
+		degree = degree_u;
+
+	// v dir
+	} else {
+
+		ctrlPts = control_points;
+		knots = knots_v;
+		degree = degree_v;
+
+	}
+
+	// do knot refinement on every row
+	for (var i = 0; i < ctrlPts.length; i++ ){
+		
+		c = verb.eval.nurbs.curve_knot_refine( degree, knots, ctrlPts[i], knots_to_insert );
+		newPts.push( c.control_points );
+
+	}
+
+	newknots = c.knots;
+
+	// u dir
+	if (dir === 0){
+
+		newPts = numeric.transpose( newPts );
+
+		return {
+			knots_u: newknots,
+			degree_u : degree,
+
+			knots_v: knots_v,
+			degree_v : degree_v,
+
+			control_points: newPts 
+		};
+
+	// v dir
+	} else {
+
+		return {
+			knots_u: knots_u,
+			degree_u : degree_u,
+
+			knots_v: newknots,
+			degree_v : degree,
+
+			control_points: newPts
+		};
+
+	}
+
+}
+
+
 //
 // ####curve_bezier_decompose( degree, knots, control_points )
 //
@@ -121,8 +286,6 @@ verb.eval.nurbs.curve_split = function( degree, knots, control_points, u ) {
 	];
 
 }
-
-verb.eval.nurbs.surface_knot_refine =  function( degree_u, knots_u, degree_v, knots_v, homo_control_points, num_derivs, u, v)
 
 
 //

@@ -5697,12 +5697,184 @@ describe("verb.eval.nurbs.tessellate_rational_surface_adaptive",function(){
 	});
 });
 
-describe("verb.eval.nurbs.tessellate_rational_surface_adaptive",function(){
-	it('produces a mesh from a divided surface', function(){
+describe("verb.eval.nurbs.surface_knot_refine",function(){
 
-		// tessellate a trim curve
+	var degree = 3
+		, knots_v = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
+		, knots_u = [0, 0, 0, 0, 0.5, 1, 1, 1, 1]
+		, control_points = [ 		
+					[ [0, 0, -10], 	[10, 0, 0], 		[20, 0, 0], 		[30, 0, 0] , 		[40, 0, 0], 		[50, 0, 0] ],
+					[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] , 	[40, -10, 0], 	[50, -10, 0]	],
+					[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] , 	[40, -20, -2],	[50, -20, 0] 	],
+					[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, -23], [30, -30, 0] , 	[40, -30, 0], 	[50, -30, 0]     ],  
+					[ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , 	[40, -40, -20],	[50, -40, 0]     ] ];
+
+	it('can add knots into a surface in the u direction', function(){
+
+		var r = 1;
+		var u = 0.2;
+		var new_knots = [];
+
+		for (var i = 0; i < r; i++){
+			new_knots.push(u);
+		}
+
+		var res = verb.eval.nurbs.surface_knot_refine( degree,
+									knots_u,
+									degree,
+									knots_v, 
+									control_points,
+									new_knots,
+									0 );
+
+		res.control_points.forEach(function(cp){ should.exist(cp); });
+		res.knots_u.forEach(function(cp){ should.exist(cp); });
+		res.knots_v.forEach(function(cp){ should.exist(cp); });
+
+		should.equal(knots_u.length + r, res.knots_u.length);
+		should.equal(control_points.length + r, res.control_points.length);
+
+		var p0 = verb.eval.nurbs.surface_point( degree, knots_u, degree, knots_v, control_points, 0.5, 0.25 );
+		var p1 = verb.eval.nurbs.surface_point( degree, res.knots_u, degree, res.knots_v, res.control_points, 0.5, 0.25);
+
+		p0[0].should.be.approximately(p1[0], verb.TOLERANCE);
+		p0[1].should.be.approximately(p1[1], verb.TOLERANCE);
+		p0[2].should.be.approximately(p1[2], verb.TOLERANCE);
+
 
 	});
+
+	it('can add knots into a surface in the v direction', function(){
+
+		var r = 1;
+		var u = 0.2;
+		var new_knots = [];
+
+		for (var i = 0; i < r; i++){
+			new_knots.push(u);
+		}
+
+		var res = verb.eval.nurbs.surface_knot_refine( degree,
+									knots_u,
+									degree,
+									knots_v, 
+									control_points,
+									new_knots,
+									1 );
+
+		res.control_points.forEach(function(cp){ should.exist(cp); });
+		res.knots_u.forEach(function(cp){ should.exist(cp); });
+		res.knots_v.forEach(function(cp){ should.exist(cp); });
+
+		should.equal(knots_v.length + r, res.knots_v.length);
+		should.equal(control_points[0].length + r, res.control_points[0].length);
+
+		var p0 = verb.eval.nurbs.surface_point( degree, knots_u, degree, knots_v, control_points, 0.5, 0.25 );
+		var p1 = verb.eval.nurbs.surface_point( degree, res.knots_u, degree, res.knots_v, res.control_points, 0.5, 0.25);
+
+		p0[0].should.be.approximately(p1[0], verb.TOLERANCE);
+		p0[1].should.be.approximately(p1[1], verb.TOLERANCE);
+		p0[2].should.be.approximately(p1[2], verb.TOLERANCE);
+
+
+	});
+});
+
+
+describe("verb.eval.nurbs.surface_split",function(){
+
+	var degree = 3
+		, knots_v = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
+		, knots_u = [0, 0, 0, 0, 0.5, 1, 1, 1, 1]
+		, control_points = [ 		
+					[ [0, 0, -10], 	[10, 0, 0], 		[20, 0, 0], 		[30, 0, 0] , 		[40, 0, 0], 		[50, 0, 0] ],
+					[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] , 	[40, -10, 0], 	[50, -10, 0]	],
+					[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] , 	[40, -20, -2],	[50, -20, 0] 	],
+					[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, -23], [30, -30, 0] , 	[40, -30, 0], 	[50, -30, 0]     ],  
+					[ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , 	[40, -40, -20],	[50, -40, 0]     ] ];
+
+	it('can split a surface in the u direction', function(){
+
+		var u = 0.2;
+
+		var res = verb.eval.nurbs.surface_split( degree,
+									knots_u,
+									degree,
+									knots_v, 
+									control_points,
+									u,
+									0 );
+
+		res[0].control_points.forEach(function(cp){ should.exist(cp); });
+		res[0].knots_u.forEach(function(cp){ should.exist(cp); });
+		res[0].knots_v.forEach(function(cp){ should.exist(cp); });
+		should.exist( res[0].degree_u );
+		should.exist( res[0].degree_v );
+
+		res[1].control_points.forEach(function(cp){ should.exist(cp); });
+		res[1].knots_u.forEach(function(cp){ should.exist(cp); });
+		res[1].knots_v.forEach(function(cp){ should.exist(cp); });
+		should.exist( res[1].degree_u );
+		should.exist( res[1].degree_v );
+
+		var p0 = verb.eval.nurbs.surface_point( degree, knots_u, degree, knots_v, control_points, 0.1, 0.1 );
+		var p1 = verb.eval.nurbs.surface_point( res[0].degree_u, res[0].knots_u, res[0].degree_v, res[0].knots_v, res[0].control_points, 0.1, 0.1);
+
+		p0[0].should.be.approximately(p1[0], verb.TOLERANCE);
+		p0[1].should.be.approximately(p1[1], verb.TOLERANCE);
+		p0[2].should.be.approximately(p1[2], verb.TOLERANCE);
+
+		p0 = verb.eval.nurbs.surface_point( degree, knots_u, degree, knots_v, control_points, 0.8, 0.8 );
+		p1 = verb.eval.nurbs.surface_point( res[1].degree_u, res[1].knots_u, res[1].degree_v, res[1].knots_v, res[1].control_points, 0.8, 0.8);
+
+		p0[0].should.be.approximately(p1[0], verb.TOLERANCE);
+		p0[1].should.be.approximately(p1[1], verb.TOLERANCE);
+		p0[2].should.be.approximately(p1[2], verb.TOLERANCE);
+
+
+	});
+
+	it('can split a surface in the v direction', function(){
+
+		var u = 0.2;
+
+		var res = verb.eval.nurbs.surface_split( degree,
+									knots_u,
+									degree,
+									knots_v, 
+									control_points,
+									u,
+									1 );
+
+		res[0].control_points.forEach(function(cp){ should.exist(cp); });
+		res[0].knots_u.forEach(function(cp){ should.exist(cp); });
+		res[0].knots_v.forEach(function(cp){ should.exist(cp); });
+		should.exist( res[0].degree_u );
+		should.exist( res[0].degree_v );
+
+		res[1].control_points.forEach(function(cp){ should.exist(cp); });
+		res[1].knots_u.forEach(function(cp){ should.exist(cp); });
+		res[1].knots_v.forEach(function(cp){ should.exist(cp); });
+		should.exist( res[1].degree_u );
+		should.exist( res[1].degree_v );
+
+		var p0 = verb.eval.nurbs.surface_point( degree, knots_u, degree, knots_v, control_points, 0.1, 0.1 );
+		var p1 = verb.eval.nurbs.surface_point( res[0].degree_u, res[0].knots_u, res[0].degree_v, res[0].knots_v, res[0].control_points, 0.1, 0.1);
+
+		p0[0].should.be.approximately(p1[0], verb.TOLERANCE);
+		p0[1].should.be.approximately(p1[1], verb.TOLERANCE);
+		p0[2].should.be.approximately(p1[2], verb.TOLERANCE);
+
+		p0 = verb.eval.nurbs.surface_point( degree, knots_u, degree, knots_v, control_points, 0.8, 0.8 );
+		p1 = verb.eval.nurbs.surface_point( res[1].degree_u, res[1].knots_u, res[1].degree_v, res[1].knots_v, res[1].control_points, 0.8, 0.8);
+
+		p0[0].should.be.approximately(p1[0], verb.TOLERANCE);
+		p0[1].should.be.approximately(p1[1], verb.TOLERANCE);
+		p0[2].should.be.approximately(p1[2], verb.TOLERANCE);
+
+
+	});
+
 });
 
 
