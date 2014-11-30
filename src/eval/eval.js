@@ -832,6 +832,26 @@ verb.eval.nurbs.weight_1d = function( homo_points ) {
 };
 
 //
+// ####weights_2d( homo_points )
+//
+// Obtain the weight from a collection of points in homogeneous space, assuming all
+// are the same dimension
+//
+// **params**
+// + *Array*, array of arrays of of points represented by an array (wi*pi, wi) with length (dim+1)
+// 
+// **returns** 
+// + *Array*,  array of arrays of points, each represented by an array pi with length (dim)
+//
+
+verb.eval.nurbs.weight_2d = function( homo_points ) {
+
+	return homo_points.map(verb.eval.nurbs.weight_1d);
+
+};
+
+
+//
 // ####dehomogenize_1d( homo_points )
 //
 // Dehomogenize a point 
@@ -845,7 +865,25 @@ verb.eval.nurbs.weight_1d = function( homo_points ) {
 
 verb.eval.nurbs.dehomogenize_1d = function( homo_points ) {
 
-	return homo_points.map(function(x){ return verb.eval.nurbs.dehomogenize( x ); });
+	return homo_points.map(verb.eval.nurbs.dehomogenize);
+
+};
+
+//
+// ####dehomogenize_2d( homo_points )
+//
+// Dehomogenize a 2d array of pts 
+//
+// **params**
+// + *Array*, array of arrays of points represented by an array (wi*pi, wi) with length (dim+1)
+// 
+// **returns** 
+// + *Array*, array of arrays of points, each of length dim
+//
+
+verb.eval.nurbs.dehomogenize_2d = function( homo_points ) {
+
+	return homo_points.map(verb.eval.nurbs.dehomogenize_1d);
 
 };
 

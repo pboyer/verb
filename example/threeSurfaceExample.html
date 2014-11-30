@@ -66,11 +66,14 @@
 				, height = 20
 				, radius = 2;
 
-			srf = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
+			//srf = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
 
-			//srf = new verb.geom.NurbsSurface( degree, knots, degree, knots, pts, wts );
+			srf = new verb.geom.NurbsSurface( degree, knots, degree, knots, pts, wts );
 
-			srf = new verb.geom.Sphere( [0,0,0], 10 );
+			var srfs = srf.split( 0.5 );
+			srf = srfs[1];
+
+			// srf = new verb.geom.Sphere( [0,0,0], 10 );
 
 			var srfObj = {
 				degree_u : srf.get('degreeU'),
@@ -96,7 +99,7 @@
 
 		var d1 = Date.now();
 
-		var runs = 40;
+		var runs = 10;
 
 		for (var i = 0; i < runs; i++){
 

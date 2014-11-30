@@ -1387,30 +1387,72 @@ verb.geom.NurbsSurface.prototype.derivatives = function( u, v, num_derivs, callb
 };
 
 //
+// ####split( u, dir [, callback] )
+//
+// Split the surface at the given parameter
+//
+// **params**
+// + *Number*, The parameter at which to split the surface
+// + *Number*, 0 for the u direction and 1 for v
+// + *Function*, Optional callback to do it async
+//
+// **returns**
+// + *Array*, Two surfaces - one at the lower end of the parameter range and one at the higher end.  
+
+verb.geom.NurbsSurface.prototype.split = function( u, dir, callback ) {
+
+	var domain = this.domain();
+	
+	var dir = dir === undefined ? 0 : dir;
+	var u = u === undefined ? (domain[dir][1] - domain[dir][0]) / 2 : u;
+
+	if ( u <= domain[dir][0] || u >= domain[dir][1] ) {
+		throw new Error("Cannot split outside of the domain of the surface!");
+	}
+
+	// transform the result from the engine into a valid pair of NurbsSurfaces
+	function asNurbsSurfaces(res){
+
+		var cpts0 = verb.eval.nurbs.dehomogenize_2d( res[0].control_points );
+		var wts0 = verb.eval.nurbs.weight_2d( res[0].control_points );
+
+		var c0 = new verb.geom.NurbsSurface( res[0].degree_u, res[0].knots_u, res[0].degree_v, res[0].knots_v, cpts0, wts0 );
+
+		var cpts1 = verb.eval.nurbs.dehomogenize_2d( res[1].control_points );
+		var wts1 = verb.eval.nurbs.weight_2d( res[1].control_points );
+
+		var c1 = new verb.geom.NurbsSurface( res[1].degree_u, res[1].knots_u, res[1].degree_v, res[1].knots_v, cpts1, wts1 );
+
+		return [c0, c1];
+	}
+
+	if (callback){
+		return this.nurbsEngine.eval( 'surface_split', [ this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), u, dir ], function(res){
+			return callback( asNurbsSurfaces(res) );
+		});
+	} 
+
+	return asNurbsSurfaces( this.nurbsEngine.eval( 'surface_split', [ this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), u, dir ]));
+
+};
+
+
+//
 // ####tessellate(options [, callback] )
 //
 // tessellate the surface
 //
 // **params**
-// + *Object*, tessellate the surface, given an options object includings a vdivs and udivs property
+// + *Object*, tessellate the surface, given an options object including minDivsU, minDivsV, refine, normTol
 //
 // **returns**
 // + *Array*, An array if called synchronously, otherwise nothing
 
 verb.geom.NurbsSurface.prototype.tessellate = function(options, callback){
 
-	var minDivsV = 20
-		, minDivsU = 20;
-
-	if (options){
-		minDivsV = options.minDivsV || minDivsV;
-		minDivsU = options.minDivsU || minDivsU;
-	}
-
-	// naive surface tesselation, for now
-	return this.nurbsEngine.eval( 'tessellate_rational_surface_naive', 
+	return this.nurbsEngine.eval( 'tessellate_rational_surface_adaptive', 
 			[	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), 
-			minDivsU, minDivsV ], callback ); 
+			options ], callback ); 
 
 };
 
@@ -4769,8 +4811,7 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.shouldDivide = function( option
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.divide = function( options ){
 
 	options = options || {};
-	options.edgeTol = options.edgeTol || 0.1;
-	options.normTol = options.normTol || 5e-2;
+	options.normTol = options.normTol || 8.5e-2;
 	options.minDepth = options.minDepth != undefined ? options.minDepth : 0;
 	options.maxDepth = options.maxDepth != undefined ? options.maxDepth : 10;
 
@@ -6388,6 +6429,26 @@ verb.eval.nurbs.weight_1d = function( homo_points ) {
 };
 
 //
+// ####weights_2d( homo_points )
+//
+// Obtain the weight from a collection of points in homogeneous space, assuming all
+// are the same dimension
+//
+// **params**
+// + *Array*, array of arrays of of points represented by an array (wi*pi, wi) with length (dim+1)
+// 
+// **returns** 
+// + *Array*,  array of arrays of points, each represented by an array pi with length (dim)
+//
+
+verb.eval.nurbs.weight_2d = function( homo_points ) {
+
+	return homo_points.map(verb.eval.nurbs.weight_1d);
+
+};
+
+
+//
 // ####dehomogenize_1d( homo_points )
 //
 // Dehomogenize a point 
@@ -6401,7 +6462,25 @@ verb.eval.nurbs.weight_1d = function( homo_points ) {
 
 verb.eval.nurbs.dehomogenize_1d = function( homo_points ) {
 
-	return homo_points.map(function(x){ return verb.eval.nurbs.dehomogenize( x ); });
+	return homo_points.map(verb.eval.nurbs.dehomogenize);
+
+};
+
+//
+// ####dehomogenize_2d( homo_points )
+//
+// Dehomogenize a 2d array of pts 
+//
+// **params**
+// + *Array*, array of arrays of points represented by an array (wi*pi, wi) with length (dim+1)
+// 
+// **returns** 
+// + *Array*, array of arrays of points, each of length dim
+//
+
+verb.eval.nurbs.dehomogenize_2d = function( homo_points ) {
+
+	return homo_points.map(verb.eval.nurbs.dehomogenize_1d);
 
 };
 

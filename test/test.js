@@ -2017,13 +2017,15 @@ describe("FourPointSurface.tessellate",function(){
 
 		var p = srf.tessellate();
 
-		p.uvs.length.should.be.equal(441);
-		p.points.length.should.be.equal(441);
-		p.faces.length.should.be.equal(800);
+		p.uvs.length.should.be.greaterThan(10);
+		p.points.length.should.be.greaterThan(10);
+		p.faces.length.should.be.greaterThan(10);
+		p.normals.length.should.be.greaterThan(10);
 
 		p.points.map(function(e){ e.length.should.be.equal(3); });
 		p.uvs.map(function(e){ e.length.should.be.equal(2); });
 		p.faces.map(function(e){ e.length.should.be.equal(3); });
+		p.normals.map(function(e){ e.length.should.be.equal(3); });
 
 
 	});
@@ -2723,13 +2725,15 @@ describe("Cone.tessellate",function(){
 
 		var p = srf.tessellate();
 
-		p.uvs.length.should.be.equal(441);
-		p.points.length.should.be.equal(441);
-		p.faces.length.should.be.equal(800);
+		p.uvs.length.should.be.greaterThan(10);
+		p.points.length.should.be.greaterThan(10);
+		p.faces.length.should.be.greaterThan(10);
+		p.normals.length.should.be.greaterThan(10);
 
 		p.points.map(function(e){ e.length.should.be.equal(3); });
 		p.uvs.map(function(e){ e.length.should.be.equal(2); });
 		p.faces.map(function(e){ e.length.should.be.equal(3); });
+		p.normals.map(function(e){ e.length.should.be.equal(3); });
 
 
 	});
@@ -2837,13 +2841,15 @@ describe("Cylinder.tessellate",function(){
 
 		var p = srf.tessellate();
 
-		p.uvs.length.should.be.equal(441);
-		p.points.length.should.be.equal(441);
-		p.faces.length.should.be.equal(800);
+		p.uvs.length.should.be.greaterThan(10);
+		p.points.length.should.be.greaterThan(10);
+		p.faces.length.should.be.greaterThan(10);
+		p.normals.length.should.be.greaterThan(10);
 
 		p.points.map(function(e){ e.length.should.be.equal(3); });
 		p.uvs.map(function(e){ e.length.should.be.equal(2); });
 		p.faces.map(function(e){ e.length.should.be.equal(3); });
+		p.normals.map(function(e){ e.length.should.be.equal(3); });
 
 
 	});
@@ -2941,13 +2947,15 @@ describe("Extrusion.tessellate",function(){
 
 		var p = srf.tessellate();
 
-		p.uvs.length.should.be.equal(441);
-		p.points.length.should.be.equal(441);
-		p.faces.length.should.be.equal(800);
+		p.uvs.length.should.be.greaterThan(10);
+		p.points.length.should.be.greaterThan(10);
+		p.faces.length.should.be.greaterThan(10);
+		p.normals.length.should.be.greaterThan(10);
 
 		p.points.map(function(e){ e.length.should.be.equal(3); });
 		p.uvs.map(function(e){ e.length.should.be.equal(2); });
 		p.faces.map(function(e){ e.length.should.be.equal(3); });
+		p.normals.map(function(e){ e.length.should.be.equal(3); });
 
 
 	});
@@ -3053,13 +3061,15 @@ describe("PlanarSurface.tessellate",function(){
 
 		var p = srf.tessellate();
 
-		p.uvs.length.should.be.equal(441);
-		p.points.length.should.be.equal(441);
-		p.faces.length.should.be.equal(800);
+		p.uvs.length.should.be.greaterThan(10);
+		p.points.length.should.be.greaterThan(10);
+		p.faces.length.should.be.greaterThan(10);
+		p.normals.length.should.be.greaterThan(10);
 
 		p.points.map(function(e){ e.length.should.be.equal(3); });
 		p.uvs.map(function(e){ e.length.should.be.equal(2); });
 		p.faces.map(function(e){ e.length.should.be.equal(3); });
+		p.normals.map(function(e){ e.length.should.be.equal(3); });
 
 
 	});
@@ -3164,13 +3174,15 @@ describe("RevolvedSurface.tessellate",function(){
 
 		var p = srf.tessellate();
 
-		p.uvs.length.should.be.equal(441);
-		p.points.length.should.be.equal(441);
-		p.faces.length.should.be.equal(800);
+		p.uvs.length.should.be.greaterThan(10);
+		p.points.length.should.be.greaterThan(10);
+		p.faces.length.should.be.greaterThan(10);
+		p.normals.length.should.be.greaterThan(10);
 
 		p.points.map(function(e){ e.length.should.be.equal(3); });
 		p.uvs.map(function(e){ e.length.should.be.equal(2); });
 		p.faces.map(function(e){ e.length.should.be.equal(3); });
+		p.normals.map(function(e){ e.length.should.be.equal(3); });
 
 
 	});
@@ -3271,13 +3283,15 @@ describe("Sphere.tessellate",function(){
 
 		var p = srf.tessellate();
 
-		p.uvs.length.should.be.equal(441);
-		p.points.length.should.be.equal(441);
-		p.faces.length.should.be.equal(800);
+		p.uvs.length.should.be.greaterThan(10);
+		p.points.length.should.be.greaterThan(10);
+		p.faces.length.should.be.greaterThan(10);
+		p.normals.length.should.be.greaterThan(10);
 
 		p.points.map(function(e){ e.length.should.be.equal(3); });
 		p.uvs.map(function(e){ e.length.should.be.equal(2); });
 		p.faces.map(function(e){ e.length.should.be.equal(3); });
+		p.normals.map(function(e){ e.length.should.be.equal(3); });
 
 
 	});
@@ -3392,14 +3406,15 @@ describe("SweepOneRail.tessellate",function(){
 
 		var p = srf.tessellate();
 
-		p.uvs.length.should.be.equal(441);
-		p.points.length.should.be.equal(441);
-		p.faces.length.should.be.equal(800);
+		p.uvs.length.should.be.greaterThan(10);
+		p.points.length.should.be.greaterThan(10);
+		p.faces.length.should.be.greaterThan(10);
+		p.normals.length.should.be.greaterThan(10);
 
 		p.points.map(function(e){ e.length.should.be.equal(3); });
 		p.uvs.map(function(e){ e.length.should.be.equal(2); });
 		p.faces.map(function(e){ e.length.should.be.equal(3); });
-
+		p.normals.map(function(e){ e.length.should.be.equal(3); });
 
 	});
 

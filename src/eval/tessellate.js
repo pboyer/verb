@@ -699,8 +699,7 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.shouldDivide = function( option
 verb.eval.nurbs.AdaptiveRefinementNode.prototype.divide = function( options ){
 
 	options = options || {};
-	options.edgeTol = options.edgeTol || 0.1;
-	options.normTol = options.normTol || 5e-2;
+	options.normTol = options.normTol || 8.5e-2;
 	options.minDepth = options.minDepth != undefined ? options.minDepth : 0;
 	options.maxDepth = options.maxDepth != undefined ? options.maxDepth : 10;
 
