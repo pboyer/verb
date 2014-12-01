@@ -501,7 +501,7 @@ verb.eval.mesh.make_mesh_aabb = function( points, tris, tri_indices ) {
 
 verb.eval.mesh.sort_tris_on_longest_axis = function( container_bb, points, tris, tri_indices ) {
 
-	var long_axis = container_bb.get_longest_axis();
+	var long_axis = container_bb.getLongestAxis();
 
 	var axis_position_map = [];
 	for (var i = tri_indices.length - 1; i >= 0; i--) {
@@ -878,7 +878,7 @@ verb.eval.geom.dist_to_ray = function( pt, o, r ) {
 
 	return numeric.norm2( dif );
 
- }
+}
 
 
 //

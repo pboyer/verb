@@ -5,70 +5,43 @@
 // **params**
 // + *Array*, Points to add, if desired.  Otherwise, will not be initialized until add is called.
 
-verb.geom.BoundingBox = function() {
+verb.geom.BoundingBox = function( pts ) {
+
 	this.initialized = false;
-	this.min = [0,0,0];
-	this.max = [0,0,0];
 
- 	var pt_args = Array.prototype.slice.call( arguments, 0);
+	this.dim = 3;
+	this.min = null;
+	this.max = null;
 
- 	if (pt_args.length === 1 && pt_args[0] instanceof Array && pt_args[0][0] instanceof Array ){
- 		this.add_elements_sync(pt_args[0]);
- 	} else {
- 		this.add_elements_sync(pt_args);
+ 	if ( pts ) {
+ 		this.addRange( pts );
  	}
 }	
 
-// ####add_elements( point_array, callback ) 
+// ####fromPoint( point ) 
 //
-// Asynchronously add an array of points to the bounding box
-//
-// **params**
-// + *Array*, An array of length-3 array of numbers 
-// + *Function*, Function to call when all of the points in array have been added.  The only parameter to this
-// callback is this bounding box.
-//
-
-verb.geom.BoundingBox.prototype.add_elements = function( point_array, callback ) 
-{
-
-	var that = this; 
-	setTimeout(function() {
-		point_array.forEach(function(elem, index) {
-			that.add(elem);
-		});
-		callback(that);
-	}, 0);
-
-};
-
-// ####add_elements_sync( point_array ) 
-//
-// Synchronously add an array of points to the bounding box
+// Create a bounding box initialized with a single element
 //
 // **params**
-// + *Array*, An array of length-3 array of numbers 
+// + *Array*, A array of numbers 
 //
 // **returns**
 // + *Object*, This BoundingBox for chaining
 //
 
-verb.geom.BoundingBox.prototype.add_elements_sync = function( point_array ) 
-{
-	var that = this; 
-	point_array.forEach( function(elem) {
-		that.add(elem);
-	});
-	return this;
-};
- 
+verb.geom.BoundingBox.fromPoint = function( pt ){
+	var bb = new verb.geom.BoundingBox();
+	bb.add( pt );
+	return bb;
+}
+
 // ####add( point ) 
 //
 // Adds a point to the bounding box, expanding the bounding box if the point is outside of it.
 // If the bounding box is not initialized, this method has that side effect.
 //
 // **params**
-// + *Array*, A length-3 array of numbers 
+// + *Array*, A length-n array of numbers 
 //
 // **returns**
 // + *Object*, This BoundingBox for chaining
@@ -78,40 +51,54 @@ verb.geom.BoundingBox.prototype.add = function( point )
 {
 	if ( !this.initialized )
 	{
+		this.dim = point.length;
 		this.min = point.slice(0);
 		this.max = point.slice(0);
 		this.initialized = true;
 		return this;
 	}
 
-	if (point[0] > this.max[0] )
-	{
-		this.max[0] = point[0];
+	var i = 0, l = this.dim;
+
+	for (i = 0; i < l; i++){
+		if (point[i] > this.max[i] ) 
+			this.max[i] = point[i];
 	}
 
-	if (point[1] > this.max[1] )
-	{
-		this.max[1] = point[1];
+	for (i = 0; i < l; i++){
+		if (point[i] < this.min[i] )
+			this.min[i] = point[i];
 	}
 
-	if (point[2] > this.max[2] )
-	{
-		this.max[2] = point[2];
-	}
+	return this;
 
-	if (point[0] < this.min[0] )
-	{
-		this.min[0] = point[0];
-	}
+};
 
-	if (point[1] < this.min[1] )
-	{
-		this.min[1] = point[1];
-	}
+// ####addRange( points, callback ) 
+//
+// Asynchronously add an array of points to the bounding box
+//
+// **params**
+// + *Array*, An array of length-n array of numbers 
+// + *Function*, Function to call when all of the points in array have been added.  The only parameter to this
+// callback is this bounding box.
+//
 
-	if (point[2] < this.min[2] )
-	{
-		this.min[2] = point[2];
+verb.geom.BoundingBox.prototype.addRange = function( points, callback ) 
+{
+	var l = points.length;
+
+	if (callback){
+		setTimeout(function() {
+			for (var i = 0; i < l; i++) {
+				this.add(points[i]);
+			}
+			callback(this);
+		}.bind(this), 0);
+	} else {
+		for (var i = 0; i < l; i++) {
+			this.add(points[i]);
+		}
 	}
 
 	return this;
@@ -139,7 +126,7 @@ verb.geom.BoundingBox.prototype.contains = function(point, tol) {
 		return false;
 	}
 
-	return this.intersects( new verb.geom.BoundingBox(point), tol );
+	return this.intersects( new verb.geom.BoundingBox([point]), tol );
 
 }
 
@@ -150,7 +137,7 @@ verb.geom.BoundingBox.prototype.contains = function(point, tol) {
 verb.geom.BoundingBox.prototype.TOLERANCE = 1e-4;
 
 
-// ####intervals_overlap( a1, a2, b1, b2 )
+// ####intervalsOverlap( a1, a2, b1, b2 )
 //
 // Determines if two intervals on the real number line intersect
 //
@@ -164,7 +151,7 @@ verb.geom.BoundingBox.prototype.TOLERANCE = 1e-4;
 // + *Boolean*, true if the two intervals overlap, otherwise false
 //
 
-verb.geom.BoundingBox.prototype.intervals_overlap = function( a1, a2, b1, b2, tol ) {
+verb.geom.BoundingBox.prototype.intervalsOverlap = function( a1, a2, b1, b2, tol ) {
 
 	var tol = tol || verb.geom.BoundingBox.prototype.TOLERANCE
 		, x1 = Math.min(a1, a2) - tol
@@ -206,9 +193,9 @@ verb.geom.BoundingBox.prototype.intersects = function( bb, tol ) {
 		, b1 = bb.min
 		, b2 = bb.max;
 
-	if ( this.intervals_overlap(a1[0], a2[0], b1[0], b2[0], tol ) 
-			&& this.intervals_overlap(a1[1], a2[1], b1[1], b2[1], tol ) 
-			&& this.intervals_overlap(a1[2], a2[2], b1[2], b2[2], tol ) )
+	if ( this.intervalsOverlap(a1[0], a2[0], b1[0], b2[0], tol ) 
+			&& this.intervalsOverlap(a1[1], a2[1], b1[1], b2[1], tol ) 
+			&& this.intervalsOverlap(a1[2], a2[2], b1[2], b2[2], tol ) )
 	{
 		return true;
 	}
@@ -219,7 +206,7 @@ verb.geom.BoundingBox.prototype.intersects = function( bb, tol ) {
 
 // ####clear( bb )
 //
-// Clear the bounding box, leaving it in an uninitialized state.  Call add, add_elements in order to 
+// Clear the bounding box, leaving it in an uninitialized state.  Call add, addRange in order to 
 // initialize
 //
 // **returns**
@@ -233,7 +220,7 @@ verb.geom.BoundingBox.prototype.clear = function( bb ) {
 
 };
 
-// ####get_longest_axis( bb )
+// ####getLongestAxis( bb )
 //
 // Get longest axis of bounding box
 //
@@ -241,17 +228,18 @@ verb.geom.BoundingBox.prototype.clear = function( bb ) {
 // + *Number*, Index of longest axis
 //
 
-verb.geom.BoundingBox.prototype.get_longest_axis = function( bb ) {
+verb.geom.BoundingBox.prototype.getLongestAxis = function( bb ) {
 
-	var axis_lengths = [ 	this.get_axis_length(0), 
-							this.get_axis_length(1), 
-							this.get_axis_length(2)];
+	var axisLengths = [];
+	for (var i = 0; i < this.dim; i++){
+		axisLengths.push( this.getAxisLength(i) );
+	}
 
-	return axis_lengths.indexOf(Math.max.apply(Math, axis_lengths));
+	return axisLengths.indexOf(Math.max.apply(Math, axisLengths));
 
 };
 
-// ####get_axis_length( i )
+// ####getAxisLength( i )
 //
 // Get length of given axis. 
 //
@@ -262,9 +250,9 @@ verb.geom.BoundingBox.prototype.get_longest_axis = function( bb ) {
 // + *Number*, Length of the given axis.  If axis is out of bounds, returns 0.
 //
 
-verb.geom.BoundingBox.prototype.get_axis_length = function( i ) {
+verb.geom.BoundingBox.prototype.getAxisLength = function( i ) {
 
-	if (i < 0 || i > 2) return 0;
+	if (i < 0 || i > this.dim-1) return 0;
 
 	return Math.abs( this.min[i] - this.max[i] );
 
@@ -297,16 +285,15 @@ verb.geom.BoundingBox.prototype.intersect = function( bb, tol ) {
 	if ( !this.intersects( bb, tol ) )
 		return null;
 
-	var xmax = Math.min( a2[0], b2[0] )
-		, xmin = Math.max( a1[0], b1[0] )
-		, ymax = Math.min( a2[1], b2[1] )
-		, ymin = Math.max( a1[1], b1[1] )
-		, zmax = Math.min( a2[2], b2[2] )
-		, zmin = Math.max( a1[2], b1[2] )
-		, max_bb = [ xmax, ymax, zmax]
-		, min_bb = [ xmin, ymin, zmin];
+	var maxbb = []
+		, minbb = [];
+		
+	for (var i = 0; i < this.dim; i++){
+		maxbb.push( Math.min( a2[i], b2[i] ) );
+		minbb.push( Math.max( a1[i], b1[i] ) );
+	}
 
-	return new verb.geom.BoundingBox(min_bb, max_bb);
+	return new verb.geom.BoundingBox([minbb, maxbb]);
 
 }
 
