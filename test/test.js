@@ -5774,8 +5774,6 @@ describe("verb.geom.InterpCurve",function(){
 		var tan0 = crv.derivatives(0, 1)[1];
 		var tan1 = crv.derivatives(1, 1)[1];
 
-		console.log('hi')
-
 		vecShouldBe( start_tangent, tan0 );
 		vecShouldBe( end_tangent, tan1 );
 
@@ -5946,6 +5944,34 @@ describe("verb.eval.nurbs.rational_interp_curve",function(){
 		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ]; 
 
 		shouldInterpPointsWithTangents( pts, 4, [1,0,0], [0,1,0] );
+
+	});
+
+});
+
+describe("verb.eval.nurbs.bezier_arc_length",function(){
+
+	it('can compute entire arc length of straight cubic bezier parameterized from 0 to 1', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,1,1,1,1]
+			, control_points = [ [0,0,0,1], [1.5,0,0,1], [2,0,0,1], [3,0,0,1] ];
+
+		var res = verb.eval.nurbs.bezier_arc_length( degree, knots, control_points, 1 );
+
+		res.should.be.approximately( 3, verb.TOLERANCE );
+
+	});
+
+	it('can compute entire arc length of straight cubic bezier parameterized from 1 to 4', function(){
+
+		var degree = 3
+			, knots = [1,1,1,1,4,4,4,4]
+			, control_points = [ [0,0,0,1], [1.5,0,0,1], [2,0,0,1], [3,0,0,1] ];
+
+		var res = verb.eval.nurbs.bezier_arc_length( degree, knots, control_points, 4 );
+
+		res.should.be.approximately( 3, verb.TOLERANCE );
 
 	});
 
