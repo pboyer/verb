@@ -12,6 +12,13 @@ verb.eval.nurbs.rational_surface_closest_point = function( degree, knots, contro
 
 }
 
+verb.eval.nurbs.rational_curve_arc_length = function(degree, knots, control_points, u){
+
+	// decompose into bezier segments
+	// sum those segments
+
+}
+
 verb.eval.nurbs.bezier_arc_length = function(degree, knots, control_points, u) {
 
   // find the interval it's in
@@ -22,7 +29,7 @@ verb.eval.nurbs.bezier_arc_length = function(degree, knots, control_points, u) {
 
     var cu = z * verb.eval.nurbs.Tvalues[degree][i] + z + knots[0];
     var tan = verb.eval.nurbs.rational_curve_derivs( degree, knots, control_points, cu, 1 );
-    
+
     sum += verb.eval.nurbs.Cvalues[degree][i] * numeric.norm2( tan[1] );
 
   }
