@@ -5010,32 +5010,49 @@ verb.eval.nurbs.rational_surface_closest_point = function( degree, knots, contro
 
 }
 
-verb.eval.nurbs.bezier_arc_length = function(degree, knots, control_points, u) {
+verb.eval.nurbs.rational_curve_arc_length = function(degree, knots, control_points, u){
 
-  // find the interval it's in
+	if (u === undefined) u = verb.last( knots );
+
+	var crvs = verb.eval.nurbs.curve_bezier_decompose( degree, knots, control_points );
+
+	var i = 0
+		, cc = crvs[i]
+		, sum = 0;
+
+	while ( cc && cc.knots[0] + verb.EPSILON < u  ){
+		sum += verb.eval.nurbs.rational_bezier_arc_length( cc.degree, cc.knots, cc.control_points, 
+			Math.min(verb.last(cc.knots), u) );
+		
+		cc = crvs[++i];
+	}
+
+	return sum;
+	
+}
+
+verb.eval.nurbs.rational_bezier_arc_length = function(degree, knots, control_points, u) {
+
   var z = (u - knots[0]) / 2;
   var sum = 0;
+  var gaussDeg = degree + 16;
 
-  console.log( z )
+  for(var i=0; i < gaussDeg; i++) {
 
-  for(var i=0; i < degree; i++) {
-
-    var cu = z * verb.eval.nurbs.Tvalues[degree][i] + z + knots[0];
+    var cu = z * verb.eval.nurbs.Tvalues[gaussDeg][i] + z + knots[0];
     var tan = verb.eval.nurbs.rational_curve_derivs( degree, knots, control_points, cu, 1 );
 
-    console.log( tan[0] );
-
-    sum += verb.eval.nurbs.Cvalues[degree][i] * numeric.norm2( tan[1] );
+    sum += verb.eval.nurbs.Cvalues[gaussDeg][i] * numeric.norm2( tan[1] );
 
   }
 
-  // z is correct here
   return z * sum;
-
 }
 
 // Legendre-Gauss abscissae (xi values, defined at i=n as the roots of the nth order Legendre polynomial Pn(x))
-verb.eval.nurbs.Tvalues = [[],[],
+verb.eval.nurbs.Tvalues = [
+	[],
+	[],
   [  -0.5773502691896257645091487805019574556476,0.5773502691896257645091487805019574556476],
   [0,-0.7745966692414833770358530799564799221665,0.7745966692414833770358530799564799221665],
   [  -0.3399810435848562648026657591032446872005,0.3399810435848562648026657591032446872005,-0.8611363115940525752239464888928095050957,0.8611363115940525752239464888928095050957],

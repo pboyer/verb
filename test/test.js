@@ -5939,17 +5939,17 @@ describe("verb.eval.nurbs.rational_interp_curve",function(){
 
 	// });
 
-	it('can compute valid quadratic curve interpolating points and tangents', function(){
+	// it('can compute valid quadratic curve interpolating points and tangents', function(){
 
-		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ]; 
+	// 	var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ]; 
 
-		shouldInterpPointsWithTangents( pts, 4, [1,0,0], [0,1,0] );
+	// 	shouldInterpPointsWithTangents( pts, 4, [1,0,0], [0,1,0] );
 
-	});
+	// });
 
 });
 
-describe("verb.eval.nurbs.bezier_arc_length",function(){
+describe("verb.eval.nurbs.rational_bezier_arc_length",function(){
 
 	it('can compute entire arc length of straight cubic bezier parameterized from 0 to 1', function(){
 
@@ -5957,7 +5957,7 @@ describe("verb.eval.nurbs.bezier_arc_length",function(){
 			, knots = [0,0,0,0,1,1,1,1]
 			, control_points = [ [0,0,0,1], [1.5,0,0,1], [2,0,0,1], [3,0,0,1] ];
 
-		var res = verb.eval.nurbs.bezier_arc_length( degree, knots, control_points, 1 );
+		var res = verb.eval.nurbs.rational_bezier_arc_length( degree, knots, control_points, 1 );
 
 		res.should.be.approximately( 3, verb.TOLERANCE );
 
@@ -5967,9 +5967,9 @@ describe("verb.eval.nurbs.bezier_arc_length",function(){
 
 		var degree = 3
 			, knots = [1,1,1,1,4,4,4,4]
-			, control_points = [ [0,0,0,1], [1.5,0,0,1], [2,0,0,1], [3,0,0,1] ];
+			, control_points = [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1] ];
 
-		var res = verb.eval.nurbs.bezier_arc_length( degree, knots, control_points, 4 );
+		var res = verb.eval.nurbs.rational_bezier_arc_length( degree, knots, control_points, 4 );
 
 		res.should.be.approximately( 3, verb.TOLERANCE );
 
@@ -5977,3 +5977,46 @@ describe("verb.eval.nurbs.bezier_arc_length",function(){
 
 });
 
+describe("verb.eval.nurbs.rational_curve_arc_length",function(){
+
+	it('can compute entire arc length of straight nurbs curve parameterized from 0 to 2', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,0.5,2,2,2,2]
+			, control_points = [ [0,0,0,1], [1.5,0,0,1], [1.8,0,0,1], [2,0,0,1], [3,0,0,1] ];
+
+		var u = 0;
+		var steps = 2;
+		var inc = (verb.last(knots) - knots[0]) / (steps-1);
+		for (var i = 0; i < steps; i++){
+
+			var pt = verb.eval.nurbs.rational_curve_point( degree, knots, control_points, u );
+			var res2 = verb.eval.nurbs.rational_curve_arc_length( degree, knots, control_points, u );
+
+			res2.should.be.approximately( numeric.norm2( pt ), verb.TOLERANCE );
+
+			u += inc;
+		}
+
+	});
+
+	it('can compute entire arc length of curved nurbs curve parameterized from 0 to 1', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,0.5,1,1,1,1]
+			, control_points = [ [1,1,1,1], [1.5,0,1,1], [1.8,0,0,1], [2,0.1,5,1], [3.1,0,0,1] ];
+
+		var gaussLen = verb.eval.nurbs.rational_curve_arc_length( degree, knots, control_points );
+
+		// sample the curve with 10,000 pts
+		var samples = verb.eval.nurbs.rational_curve_regular_sample_range( degree, knots, control_points, 0, 1, 10000 );
+
+		var red = samples.reduce(function(acc, v){
+			return { pt: v, l : acc.l + numeric.norm2( numeric.sub( acc.pt, v ) ) };
+		}, { pt: samples[0], l : 0 });
+
+		gaussLen.should.be.approximately( red.l, 1e-3 )
+
+	});
+
+});
