@@ -37,7 +37,7 @@
 
 		function threeify(srf, tess) {
 
-			var tess = tess || srf.tessellate();
+			var tess = tess || srf.tessellate({ normTol : 2e-2 });
 
 			var geometry = new THREE.Geometry();
 

@@ -5949,7 +5949,7 @@ describe("verb.eval.nurbs.rational_interp_curve",function(){
 
 });
 
-describe("verb.eval.nurbs.rational_bezier_arc_length",function(){
+describe("verb.eval.nurbs.rational_bezier_curve_arc_length",function(){
 
 	it('can compute entire arc length of straight cubic bezier parameterized from 0 to 1', function(){
 
@@ -5957,7 +5957,7 @@ describe("verb.eval.nurbs.rational_bezier_arc_length",function(){
 			, knots = [0,0,0,0,1,1,1,1]
 			, control_points = [ [0,0,0,1], [1.5,0,0,1], [2,0,0,1], [3,0,0,1] ];
 
-		var res = verb.eval.nurbs.rational_bezier_arc_length( degree, knots, control_points, 1 );
+		var res = verb.eval.nurbs.rational_bezier_curve_arc_length( degree, knots, control_points, 1 );
 
 		res.should.be.approximately( 3, verb.TOLERANCE );
 
@@ -5969,7 +5969,7 @@ describe("verb.eval.nurbs.rational_bezier_arc_length",function(){
 			, knots = [1,1,1,1,4,4,4,4]
 			, control_points = [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1] ];
 
-		var res = verb.eval.nurbs.rational_bezier_arc_length( degree, knots, control_points, 4 );
+		var res = verb.eval.nurbs.rational_bezier_curve_arc_length( degree, knots, control_points, 4 );
 
 		res.should.be.approximately( 3, verb.TOLERANCE );
 
@@ -6016,6 +6016,31 @@ describe("verb.eval.nurbs.rational_curve_arc_length",function(){
 		}, { pt: samples[0], l : 0 });
 
 		gaussLen.should.be.approximately( red.l, 1e-3 )
+
+	});
+
+});
+
+describe("verb.eval.nurbs.rational_curve_arc_length",function(){
+
+	it('can compute entire arc length of straight nurbs curve parameterized from 0 to 2', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,0.5,2,2,2,2]
+			, control_points = [ [0,0,0,1], [1.5,0,0,1], [1.8,0,0,1], [2,0,0,1], [3,0,0,1] ];
+
+		var u = 0;
+		var steps = 2;
+		var inc = (verb.last(knots) - knots[0]) / (steps-1);
+		for (var i = 0; i < steps; i++){
+
+			var pt = verb.eval.nurbs.rational_curve_point( degree, knots, control_points, u );
+			var res2 = verb.eval.nurbs.rational_curve_arc_length( degree, knots, control_points, u );
+
+			res2.should.be.approximately( numeric.norm2( pt ), verb.TOLERANCE );
+
+			u += inc;
+		}
 
 	});
 

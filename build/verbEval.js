@@ -2489,17 +2489,418 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulateLeaf = function( mes
 
 
 
-verb.eval.nurbs.rational_curve_closest_point = function( degree, knots, control_points, point ){
 
 
+verb.eval.nurbs.rational_surface_closest_point = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, point ){
 
+	// for surfaces, we try to minimize the following:
+	// 
+	// f = Su(u,v) * r = 0
+	// g = Sv(u,v) * r = 0
+	//
+	//  where r = S(u,v) - P
+	//
+	// Again, this requires newton iteration, but this time our objective function is vector valued
+	//
+	//    J d = k
+	//
+	//    d =   [ u* - u, v* - v ]
+	//		k = - [ f(u,v), g(u,v) ]
+	//		J =
+	//          |Su|^2   +  Suu * r       Su*Sv  +  Suv * r
+	//				   Su*Sv   +  Svu * r      |Sv|^2  +  Svv * r
+	//
+	//	
+	// 	we have similar halting conditions:
+	//
+	//  point coincidence
+	//
+	//		|S(u,v) - p| < e1
+	//
+	//  cosine
+	//
+	//   |Su(u,v)*(S(u,v) - P)|
+	//   ----------------------  < e2
+	//   |Su(u,v)| |S(u,v) - P|
+	//
+	//   |Sv(u,v)*(S(u,v) - P)|
+	//   ----------------------  < e2
+	//   |Sv(u,v)| |S(u,v) - P|
+	//
+	//  1) first check 2 & 3
+	// 	2) if at least one of these is not, compute new value, otherwise halt
+	// 	3) ensure the parameter stays within range
+	// 			* if not closed, don't allow outside of range a-b
+	// 			* if closed (e.g. circle), allow to move back to beginning
+	//  4)  if |(u* - u)C'(u)| < e1, halt
+	//
+	
+	var maxits = 20;
+	var i = 0
+		, e
+		, eps1 = 0.0001
+		, eps2 = 0.0001
+		, dif
+		, minu = knots_u[0]
+		, maxu = verb.last(knots_u)
+		, minv = knots_v[0]
+		, maxv = verb.last(knots_v)
+		, closed = numeric.norm2Squared( numeric.sub(control_points[0], verb.last( control_points) ) ) < verb.EPSILON
+		, cuv = uv; // todo: need good approx
+
+	function f(u){
+		return verb.nurbs.eval.rational_surface_derivs( degree_u, knots_u, degree_v, knots_v, homo_control_points, u, v, 2 );
+	}
+
+	function n(uv, e, r){
+
+		// f = Su(u,v) * r = 0
+		// g = Sv(u,v) * r = 0
+
+		var Su = e[0][1];
+		var Sv = e[1][0];
+
+		var Suu = e[0][2];
+		var Svv = e[2][0];
+
+		var Suv = e[2][0];
+
+		var f = numeric.dot( Su, r );
+		var g = numeric.dot( Sv, r );
+
+		var k = [-f, -g];
+
+		var J00 = numeric.dot( Su, Su ) + numeric.dot( Suu, r );
+		var J01 = numeric.dot( Su, Sv ) + numeric.dot( Suv, r );
+		var J10 = numeric.dot( Su, Sv ) + numeric.dot( Svu, r );
+		var J11 = numeric.dot( Sv, Sv ) + numeric.dot( Svv, r );
+
+		var J = [ [ J00, J01 ], [ J10, J11 ] ];
+
+		//    d =   [ u* - u, v* - v ]
+		//		k = - [ f(u,v), g(u,v) ]
+		//		J =
+		//          |Su|^2   +  Suu * r       Su*Sv  +  Suv * r
+		//				   Su*Sv   +  Svu * r      |Sv|^2  +  Svv * r
+		//
+
+		var d = numeric.solve( J, k );
+
+		return numeric.add( d, uv );
+
+	}
+
+	while( i < maxits ){
+
+		e = f(cuv);
+		dif = numeric.sub(e[0], p );
+	
+		//  point coincidence
+		//
+		//		|S(u,v) - p| < e1
+		var c1v = numeric.norm2( dif );
+		
+		//
+		//  cosine
+		//
+		//   |Su(u,v)*(S(u,v) - P)|
+		//   ----------------------  < e2
+		//   |Su(u,v)| |S(u,v) - P|
+		//
+		//   |Sv(u,v)*(S(u,v) - P)|
+		//   ----------------------  < e2
+		//   |Sv(u,v)| |S(u,v) - P|
+		//
+		var c2an = numeric.norm2( numeric.dot( e[1][0], dif) );
+		var c2ad = numeric.norm2( e[1][0] ) * c1;
+
+		var c2bn = numeric.norm2( numeric.dot( e[0][1], dif) );
+		var c2bd = numeric.norm2( e[0][1] ) * c1;
+
+		var c2av = c2an / c2ad;
+		var c2bv = c2bn / c2bd;
+
+		var c1 = c1v < eps1;
+		var c2a = c2av < eps2;
+		var c2b = c2bv < eps2;
+
+		// if all of the tolerance are met, we're done
+		if (c1 && c2a && c2b){
+			return cuv;
+		}
+
+		// otherwise, take a step
+		var ct = n(uv, e, dif);
+
+		// correct for exceeding bounds
+		if ( ct[0] < minu ){
+			ct = closed ? [ maxu - ( ct[0] - minu ), ct[1] ] : cuv;
+		} else if (ct[0] > maxu){
+			ct = closed ? [ minu + ( ct[0] - maxu ), ct[1] ] : cuv;
+		}
+
+		if ( ct[1] < minv ){
+			ct = closed ? [ ct[0], maxv - ( ct[1] - minv ) ] : cuv;
+		} else if (ct[1] > maxv){
+			ct = closed ? [ ct[0], minv + ( ct[0] - maxv ) ] : cuv;
+		}
+
+		// if |(u* - u)C'(u)| < e1, halt
+		var c3v0 =  numeric.norm2( numeric.mul(ct[0] - cuv[0], e[0][1] ) );
+		var c3v1 =  numeric.norm2( numeric.mul(ct[1] - cuv[1], e[1][0] ) );
+
+		if (c3v0 < eps1 || c3v1) {
+			return cuv;
+		}
+
+		cuv = ct;
+		i++;
+
+	}
+
+	return cuv;
 
 }
 
-verb.eval.nurbs.rational_surface_closest_point = function( degree, knots, control_points, point ){
+verb.eval.nurbs.rational_curve_closest_point = function( degree, knots, control_points, p ){
 
+	//  We want to solve:
+	// 
+	//   C'(u) * ( C(u) - P ) = 0 = f(u)
+	//
+	//  C(u) is the curve, p is the point, * is a dot product
+	// 
+	// We'll use newton's method:
+	// 
+	// 	 u* = u - f / f'  
+	//
+	// We use the product rule in order to form the derivative, f':
+	//
+	//	f' = C"(u) * ( C(u) - p ) + C'(u) * C'(u)
+	//
+	// What is the conversion criteria? (Piegl & Tiller suggest)
+	//
+	// |C(u) - p| < e1
+	//
+	// |C'(u)*(C(u) - P)|
+	// ------------------  < e2
+	// |C'(u)| |C(u) - P|
+	//
+	//  1) first check 2 & 3
+	// 	2) if at least one of these is not, compute new value, otherwise halt
+	// 	3) ensure the parameter stays within range
+	// 			* if not closed, don't allow outside of range a-b
+	// 			* if closed (e.g. circle), allow to move back to beginning
+	//  4)  if |(u* - u)C'(u)| < e1, halt
+	//
+
+	var maxits = 20;
+	var i = 0
+		, e
+		, eps1 = 0.0001
+		, eps2 = 0.0001
+		, dif
+		, minu = knots[0]
+		, maxu = verb.last(knots)
+		, closed = numeric.norm2Squared( numeric.sub(control_points[0], verb.last( control_points) ) ) < verb.EPSILON
+		, cu = u; // TODO approximate this
+
+	function f(u){
+		return verb.nurbs.eval.rational_curve_derivs( degree, knots, control_points, u, 2 );
+	}
+
+	function n(u, e, dif){
+
+		//   C'(u) * ( C(u) - P ) = 0 = f(u)
+		var f = numeric.dot( e[1], dif );
+
+		//	f' = C"(u) * ( C(u) - p ) + C'(u) * C'(u)
+		var s0 = numeric.dot( e[2], dif )
+			, s1 = numeric.dot( e[1], e[1] )
+			, df = s0 + s1;
+
+		return u - d / df;
+
+	}
+
+	while( i < maxits ){
+
+		e = f(cu);
+		dif = numeric.sub(e[0], p );
+
+		var c1v = numeric.norm2( dif );
+		
+		var c2n = numeric.norm2( numeric.dot( e[1], dif) );
+		var c2d = numeric.norm2( e[1] ) * c1;
+
+		var c2v = c2n / c2d;
+
+		var c1 = c1v < eps1;
+		var c2 = c2v < eps2;
+
+		if (c1 && c2){
+			return cu;
+		}
+
+		var ct = n(u, e, dif);
+
+		if ( ct < minu ){
+			ct = closed ? maxu - ( ct - minu ) : cu;
+		} else if (ct > maxu){
+			ct = closed ? minu + ( ct - maxu ) : cu;
+		}
+
+		// are we at the end of the curve?
+		var c3v =  numeric.norm2( numeric.mul(ct - cu, e[1] ) ) 
+
+		if (c3v < eps1) {
+			return cu;
+		}
+
+		cu = ct;
+		i++;
+
+	}
+
+	return cu;
+
+}
+
+verb.eval.nurbs.rational_curve_divide_curve_equally_by_arc_length = function(degree, knots, control_points, num){
+
+	var crvs = verb.eval.nurbs.curve_bezier_decompose( degree, knots, control_points )
+		, lens = crvs.forEach(function(x){ return verb.eval.nurbs.rational_bezier_curve_arc_length( x.degree, x.knots, x.control_points ); })
+		, tlen = lens.reduce(function(acc, l){ return acc + l; }, 0)
+		, pts = [ new CurvePoint( knots[0], 0 ) ];
+
+	var inc = totlen / num
+		, i = 0
+		, lc = inc
+		, runsum = 0
+		, u;
+
+	while ( i < crvs.length ){
+
+		runsum += crvlens[i];
+
+		while ( lc < runsum ){
+
+			u = verb.eval.nurbs.rational_bezier_curve_param_at_arc_length( crvs[i].degree, crvs[i].knots, crvs[i].control_points, lc, crvlens[i] );
+			pts.push( new CurvePoint( u, lc ) );
+			lc += inc;
+
+		}
+
+		i++;
+
+	}
+
+	return pts;
+
+}
+
+function CurvePoint(u, len){
+	this.u = u;
+	this.len = len;
+}
+
+verb.eval.nurbs.rational_curve_divide_curve_by_arc_length = function(degree, knots, control_points, l){
+
+	var crvs = verb.eval.nurbs.curve_bezier_decompose( degree, knots, control_points )
+		, crvlens = crvs.forEach(function(x){ return verb.eval.nurbs.rational_bezier_curve_arc_length( x.degree, x.knots, x.control_points ); })
+		, totlen = crvlens.reduce(function(acc, l){ return acc + l; }, 0)
+		, pts = [ new CurvePoint( knots[0], 0 ) ];
+
+	if (l > totlen) return pts;
+
+	var inc = Math.floor( totlen / l )
+		, i = 0
+		, lc = inc
+		, runsum = 0
+		, u;
+
+	while ( i < crvs.length ){
+
+		runsum += crvlens[i];
+
+		while ( lc < runsum ){
+
+			u = verb.eval.nurbs.rational_bezier_curve_param_at_arc_length( crvs[i].degree, crvs[i].knots, crvs[i].control_points, lc, crvlens[i] );
+			pts.push( new CurvePoint( u, lc ) );
+			lc += inc;
+
+		}
+
+		i++;
+
+	}
+
+	return pts;
+
+}
+
+verb.eval.nurbs.rational_curve_param_at_arc_length = function(degree, knots, control_points, len, beziers, bezier_lengths){
+
+	if (len < verb.EPSILON) return knots[0];
+
+	// decompose into bezier's
+	var crvs = beziers || verb.eval.nurbs.curve_bezier_decompose( degree, knots, control_points )
+		, i = 0
+		, cc = crvs[i]
+		, cl = -verb.EPSILON
+		, bezier_lengths = bezier_lengths || []
+
+	// iterate through the curves consuming the bezier's, summing their length along the way
+	for (var i = 0; cl < len && i < beziers.length; i++){
+
+		bezier_lengths[i] = bezier_lengths[i] != undefined ? bezier_lengths[i] : verb.eval.nurbs.rational_bezier_curve_arc_length( degree, knots, control_points ); 
+
+		cl += bezier_lengths[i];
+
+		if (len < cl + verb.EPSILON){
+
+			return verb.eval.nurbs.rational_bezier_curve_param_at_arc_length(degree, knots, control_points, len, bezier_lengths[i]);
+
+		}
+
+	}
 	
+	return -1;
 
+}
+
+verb.eval.nurbs.rational_bezier_curve_param_at_arc_length = function(degree, knots, control_points, len, total_len){
+
+	if (len < 0) return knots[0];
+
+	// we compute the whole length.  if desired length is outside of that, give up
+	var totalLen = total_len || verb.eval.nurbs.rational_bezier_curve_arc_length(degree, knots, control_points );
+
+	if (len > totalLen) return verb.last( knots );
+
+	// divide & conquer
+	// TODO: newton's method formulation
+	var start = { p : knots[0], l : 0 }
+		, end = { p : verb.last( knots ), l : totalLen }
+		, mid = {}
+		, tol = totalLen / 200;
+
+	while ( (start.l - end.l) > tol ){
+
+		mid.p = (start.p - end.p) / 2;
+		mid.l = verb.eval.nurbs.rational_bezier_curve_arc_length(degree, knots, control_points, mid.p );
+
+		if (mid.l > len){
+			end.p = mid.p;
+			end.l = mid.l;
+		} else {
+			start.p = mid.p;
+			start.l = mid.l;
+		}
+
+	}
+
+	return (start.p - end.p) / 2;
 
 }
 
@@ -2507,14 +2908,13 @@ verb.eval.nurbs.rational_curve_arc_length = function(degree, knots, control_poin
 
 	if (u === undefined) u = verb.last( knots );
 
-	var crvs = verb.eval.nurbs.curve_bezier_decompose( degree, knots, control_points );
-
-	var i = 0
+	var crvs = verb.eval.nurbs.curve_bezier_decompose( degree, knots, control_points )
+		, i = 0
 		, cc = crvs[i]
 		, sum = 0;
 
 	while ( cc && cc.knots[0] + verb.EPSILON < u  ){
-		sum += verb.eval.nurbs.rational_bezier_arc_length( cc.degree, cc.knots, cc.control_points, 
+		sum += verb.eval.nurbs.rational_bezier_curve_arc_length( cc.degree, cc.knots, cc.control_points, 
 			Math.min(verb.last(cc.knots), u) );
 		
 		cc = crvs[++i];
@@ -2524,16 +2924,19 @@ verb.eval.nurbs.rational_curve_arc_length = function(degree, knots, control_poin
 	
 }
 
-verb.eval.nurbs.rational_bezier_arc_length = function(degree, knots, control_points, u) {
+verb.eval.nurbs.rational_bezier_curve_arc_length = function(degree, knots, control_points, u, gaussDegIncrease) {
 
-  var z = (u - knots[0]) / 2;
-  var sum = 0;
-  var gaussDeg = degree + 16;
+  var z = (u - knots[0]) / 2
+  	, sum = 0
+  	, gaussDeg = degree + ( gaussDegIncrease != undefined ? gaussDegIncrease : 16)
+  	, i = 0
+  	, cu
+  	, tan;
 
-  for(var i=0; i < gaussDeg; i++) {
+  for(; i < gaussDeg; i++) {
 
-    var cu = z * verb.eval.nurbs.Tvalues[gaussDeg][i] + z + knots[0];
-    var tan = verb.eval.nurbs.rational_curve_derivs( degree, knots, control_points, cu, 1 );
+    cu = z * verb.eval.nurbs.Tvalues[gaussDeg][i] + z + knots[0];
+    tan = verb.eval.nurbs.rational_curve_derivs( degree, knots, control_points, cu, 1 );
 
     sum += verb.eval.nurbs.Cvalues[gaussDeg][i] * numeric.norm2( tan[1] );
 

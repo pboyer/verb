@@ -68,12 +68,12 @@
 
 			//srf = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
 
-			srf = new verb.geom.NurbsSurface( degree, knots, degree, knots, pts, wts );
+			//srf = new verb.geom.NurbsSurface( degree, knots, degree, knots, pts, wts );
 
-			var srfs = srf.split( 0.5 );
-			srf = srfs[1];
+			// var srfs = srf.split( 0.5 );
+			//srf = srfs[1];
 
-			// srf = new verb.geom.Sphere( [0,0,0], 10 );
+			srf = new verb.geom.Sphere( [0,0,0], 10 );
 
 			var srfObj = {
 				degree_u : srf.get('degreeU'),
@@ -104,7 +104,7 @@
 				srf.get('knotsU'),
 				srf.get('degreeV'),
 				srf.get('knotsV'), 
-				srf.homogenize()  );
+				srf.homogenize(), { normTol: 5e-2});
 		}
 
 		var d2 = Date.now();
@@ -143,15 +143,15 @@
 
 		var geometry = tessellate(srf, mesh);
 
-		var material = new THREE.MeshNormalMaterial( { side: THREE.DoubleSide, wireframe: false, shading: THREE.SmoothShading, transparent: true, opacity: 0.8 } );
+		var material = new THREE.MeshNormalMaterial( { side: THREE.DoubleSide, wireframe: false, shading: THREE.SmoothShading,  } );
 		var mesh = new THREE.Mesh( geometry, material );
 
 		scene.add( mesh );
 
-		var material2 = new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide, wireframe: true } );
-		var mesh2 = new THREE.Mesh( geometry, material2 );
+		// var material2 = new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide, wireframe: true } );
+		// var mesh2 = new THREE.Mesh( geometry, material2 );
 
-		scene.add( mesh2 );
+		// scene.add( mesh2 );
 
 		var controls = new THREE.OrbitControls(camera, renderer.domElement);
 
