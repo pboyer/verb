@@ -203,10 +203,6 @@ verb.eval.nurbs.rational_curve_closest_point = function( degree, knots, control_
 	//  4)  if |(u* - u)C'(u)| < e1, halt
 	//
 
-	// approximate the 
-
-	console.log( p )
-
 	var crvs = verb.eval.nurbs.curve_bezier_decompose( degree, knots, control_points );
 	var min = Number.MAX_VALUE;
 	var u = 0;
@@ -230,9 +226,6 @@ verb.eval.nurbs.rational_curve_closest_point = function( degree, knots, control_
 		}
 
 	});
-
-	console.log( min )
-	console.log( "starting u: ", u )
 
 	var maxits = 20
 		, i = 0

@@ -1152,7 +1152,7 @@ verb.geom.NurbsCurve.prototype.point = function( u, callback ) {
 // **params**
 // + *Number*, The parameter to sample the curve
 // + *Number*, The number of derivatives to obtain
-// + *Number*, The callback, if you want this async
+// + *Function*, The callback, if you want this async
 //
 // **returns**
 // + *Array*, An array if called synchronously, otherwise nothing
@@ -1164,6 +1164,106 @@ verb.geom.NurbsCurve.prototype.derivatives = function( u, num_derivs, callback )
 };
 
 //
+// ####closestPoint( point [, callback] )
+//
+// Determine the closest parameter on the curve to the given point
+//
+// **params**
+// + *Array*, A length 3 array representing the point
+// + *Function*, The callback, if you want this async
+//
+// **returns**
+// + *Number*, The parameter of the closest point
+
+verb.geom.NurbsCurve.prototype.closestPoint = function( point, callback ) {
+
+	return this.nurbsEngine.eval( 'rational_curve_closest_point', [ this.get('degree'), this.get('knots'), this.homogenize(),  point  ], callback ); 
+
+};
+
+//
+// ####length( [callback] )
+//
+// Determine the arc length of the curve
+//
+// **returns**
+// + *Number*, The length of the curve
+
+verb.geom.NurbsCurve.prototype.length = function( callback ) {
+
+	return this.nurbsEngine.eval( 'rational_curve_arc_length', [ this.get('degree'), this.get('knots'), this.homogenize()  ], callback ); 
+
+};
+
+//
+// ####lengthAtParam( u [, callback] )
+//
+// Determine the arc length of the curve at the given parameter
+//
+// **params**
+// + *Function*, The callback, if you want this async
+//
+// **returns**
+// + *Number*, The length of the curve at the given parameter
+
+verb.geom.NurbsCurve.prototype.lengthAtParam = function( u, callback ) {
+
+	return this.nurbsEngine.eval( 'rational_curve_arc_length', [ this.get('degree'), this.get('knots'), this.homogenize(), u  ], callback ); 
+
+};
+
+//
+// ####lengthAtParam( len [, callback] )
+//
+// Determine the parameter of the curve at the given arc length
+//
+// **params**
+// + *Number*, The arc length at which to determine the parameter
+//
+// **returns**
+// + *Number*, The length of the curve at the given parameter
+
+verb.geom.NurbsCurve.prototype.paramAtLength = function( len, callback ) {
+
+	return this.nurbsEngine.eval( 'rational_curve_param_at_arc_length', [ this.get('degree'), this.get('knots'), this.homogenize(), len  ], callback ); 
+
+};
+
+//
+// ####divideByEqualArcLength( divisions [, callback] )
+//
+// Determine the parameters necessary to divide the curve into equal arc length segments
+//
+// **params**
+// + *Number*, Number of divisions of the curve
+//
+// **returns**
+// + *Array*, A collection of parameters
+
+verb.geom.NurbsCurve.prototype.divideByEqualArcLength = function( divisions, callback ) {
+
+	return this.nurbsEngine.eval( 'rational_curve_divide_curve_equally_by_arc_length', [ this.get('degree'), this.get('knots'), this.homogenize(), divisions  ], callback ); 
+
+};
+
+//
+// ####divideByArcLength( divisions [, callback] )
+//
+// Given the distance to divide the curve, determine the parameters necessary to divide the curve into equal arc length segments
+//
+// **params**
+// + *Number*, Arc length of each segment
+//
+// **returns**
+// + *Array*, A collection of parameters
+
+verb.geom.NurbsCurve.prototype.divideByArcLength = function( arcLength, callback ) {
+
+	return this.nurbsEngine.eval( 'rational_curve_divide_curve_by_arc_length', [ this.get('degree'), this.get('knots'), this.homogenize(), arcLength  ], callback ); 
+
+};
+
+//
 // ####tessellate(options [, callback] )
 //
 // Tessellate a curve at a given tolerance
@@ -1171,7 +1271,7 @@ verb.geom.NurbsCurve.prototype.derivatives = function( u, num_derivs, callback )
 // **params**
 // + *Number*, The parameter to sample the curve
 // + *Number*, The number of derivatives to obtain
-// + *Number*, The callback, if you want this async
+// + *Function*, The callback, if you want this async
 //
 // **returns**
 // + *Array*, An array if called synchronously, otherwise nothing
@@ -1395,7 +1495,7 @@ verb.geom.NurbsSurface.prototype.point = function( u, v, callback ) {
 // + *Number*, The u parameter to sample the curve
 // + *Number*, The v parameter to sample the curve
 // + *Number*, The number of derivatives to obtain
-// + *Number*, The callback, if you want this async
+// + *Function*, The callback, if you want this async
 //
 // **returns**
 // + *Array*, An array if called synchronously, otherwise nothing
@@ -5202,10 +5302,6 @@ verb.eval.nurbs.rational_curve_closest_point = function( degree, knots, control_
 	//  4)  if |(u* - u)C'(u)| < e1, halt
 	//
 
-	// approximate the 
-
-	console.log( p )
-
 	var crvs = verb.eval.nurbs.curve_bezier_decompose( degree, knots, control_points );
 	var min = Number.MAX_VALUE;
 	var u = 0;
@@ -5229,9 +5325,6 @@ verb.eval.nurbs.rational_curve_closest_point = function( degree, knots, control_
 		}
 
 	});
-
-	console.log( min )
-	console.log( "starting u: ", u )
 
 	var maxits = 20
 		, i = 0
@@ -5266,7 +5359,6 @@ verb.eval.nurbs.rational_curve_closest_point = function( degree, knots, control_
 
 	while( i < maxits ){
 
-		console.log("u: ", cu )
 		e = f( cu );
 		dif = numeric.sub( e[0], p );
 
@@ -5276,13 +5368,10 @@ verb.eval.nurbs.rational_curve_closest_point = function( degree, knots, control_
 		// C'(u) * (C(u) - P)
 		// ------------------ < e2
 		// |C'(u)| |C(u) - P|
-
 		var c2n = numeric.dot( e[1], dif);
 		var c2d = numeric.norm2( e[1] ) * c1v;
 
 		var c2v = c2n / c2d;
-
-		console.log(c1v)
 
 		var c1 = c1v < eps1;
 		var c2 = c2v < eps2;

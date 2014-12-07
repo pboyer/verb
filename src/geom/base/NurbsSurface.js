@@ -55,7 +55,7 @@ verb.geom.NurbsSurface.prototype.point = function( u, v, callback ) {
 // + *Number*, The u parameter to sample the curve
 // + *Number*, The v parameter to sample the curve
 // + *Number*, The number of derivatives to obtain
-// + *Number*, The callback, if you want this async
+// + *Function*, The callback, if you want this async
 //
 // **returns**
 // + *Array*, An array if called synchronously, otherwise nothing
