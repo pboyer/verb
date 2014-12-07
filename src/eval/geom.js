@@ -277,34 +277,10 @@ verb.eval.nurbs.rational_curve_closest_point = function( degree, knots, control_
 
 verb.eval.nurbs.rational_curve_divide_curve_equally_by_arc_length = function(degree, knots, control_points, num){
 
-	var crvs = verb.eval.nurbs.curve_bezier_decompose( degree, knots, control_points )
-		, lens = crvs.forEach(function(x){ return verb.eval.nurbs.rational_bezier_curve_arc_length( x.degree, x.knots, x.control_points ); })
-		, tlen = lens.reduce(function(acc, l){ return acc + l; }, 0)
-		, pts = [ new CurvePoint( knots[0], 0 ) ];
+	var tlen = verb.eval.nurbs.rational_curve_arc_length( degree, knots, control_points );
+	var inc = tlen / num;
 
-	var inc = totlen / num
-		, i = 0
-		, lc = inc
-		, runsum = 0
-		, u;
-
-	while ( i < crvs.length ){
-
-		runsum += crvlens[i];
-
-		while ( lc < runsum ){
-
-			u = verb.eval.nurbs.rational_bezier_curve_param_at_arc_length( crvs[i].degree, crvs[i].knots, crvs[i].control_points, lc, crvlens[i] );
-			pts.push( new CurvePoint( u, lc ) );
-			lc += inc;
-
-		}
-
-		i++;
-
-	}
-
-	return pts;
+	return verb.eval.nurbs.rational_curve_divide_curve_by_arc_length(degree, knots, control_points, inc);
 
 }
 
@@ -316,29 +292,34 @@ function CurvePoint(u, len){
 verb.eval.nurbs.rational_curve_divide_curve_by_arc_length = function(degree, knots, control_points, l){
 
 	var crvs = verb.eval.nurbs.curve_bezier_decompose( degree, knots, control_points )
-		, crvlens = crvs.forEach(function(x){ return verb.eval.nurbs.rational_bezier_curve_arc_length( x.degree, x.knots, x.control_points ); })
+		, crvlens = crvs.map(function(x){ return verb.eval.nurbs.rational_bezier_curve_arc_length( x.degree, x.knots, x.control_points ); })
 		, totlen = crvlens.reduce(function(acc, l){ return acc + l; }, 0)
 		, pts = [ new CurvePoint( knots[0], 0 ) ];
 
 	if (l > totlen) return pts;
 
-	var inc = Math.floor( totlen / l )
+	var inc = l
 		, i = 0
 		, lc = inc
 		, runsum = 0
+		, runsum1 = 0
 		, u;
 
 	while ( i < crvs.length ){
 
 		runsum += crvlens[i];
 
-		while ( lc < runsum ){
+		while ( lc < runsum + verb.EPSILON ){
 
-			u = verb.eval.nurbs.rational_bezier_curve_param_at_arc_length( crvs[i].degree, crvs[i].knots, crvs[i].control_points, lc, crvlens[i] );
+			u = verb.eval.nurbs.rational_bezier_curve_param_at_arc_length( crvs[i].degree, crvs[i].knots, crvs[i].control_points, 
+				lc - runsum1, verb.TOLERANCE, crvlens[i] );
+
 			pts.push( new CurvePoint( u, lc ) );
 			lc += inc;
 
 		}
+
+		runsum1 += crvlens[i];
 
 		i++;
 
@@ -348,28 +329,27 @@ verb.eval.nurbs.rational_curve_divide_curve_by_arc_length = function(degree, kno
 
 }
 
-verb.eval.nurbs.rational_curve_param_at_arc_length = function(degree, knots, control_points, len, beziers, bezier_lengths){
+verb.eval.nurbs.rational_curve_param_at_arc_length = function(degree, knots, control_points, len, tol, beziers, bezier_lengths){
 
 	if (len < verb.EPSILON) return knots[0];
 
-	// decompose into bezier's
 	var crvs = beziers || verb.eval.nurbs.curve_bezier_decompose( degree, knots, control_points )
 		, i = 0
 		, cc = crvs[i]
 		, cl = -verb.EPSILON
-		, bezier_lengths = bezier_lengths || []
+		, bezier_lengths = bezier_lengths || [];
 
 	// iterate through the curves consuming the bezier's, summing their length along the way
-	for (var i = 0; cl < len && i < beziers.length; i++){
+	for (var i = 0; cl < len && i < crvs.length; i++){
 
-		bezier_lengths[i] = bezier_lengths[i] != undefined ? bezier_lengths[i] : verb.eval.nurbs.rational_bezier_curve_arc_length( degree, knots, control_points ); 
+		bezier_lengths[i] = bezier_lengths[i] != undefined ? 
+			bezier_lengths[i] : verb.eval.nurbs.rational_bezier_curve_arc_length( degree, knots, control_points ); 
 
 		cl += bezier_lengths[i];
 
 		if (len < cl + verb.EPSILON){
-
-			return verb.eval.nurbs.rational_bezier_curve_param_at_arc_length(degree, knots, control_points, len, bezier_lengths[i]);
-
+			return verb.eval.nurbs.rational_bezier_curve_param_at_arc_length(degree, knots, 
+				control_points, len, tol, bezier_lengths[i]);
 		}
 
 	}
@@ -378,12 +358,12 @@ verb.eval.nurbs.rational_curve_param_at_arc_length = function(degree, knots, con
 
 }
 
-verb.eval.nurbs.rational_bezier_curve_param_at_arc_length = function(degree, knots, control_points, len, total_len){
+verb.eval.nurbs.rational_bezier_curve_param_at_arc_length = function(degree, knots, control_points, len, tol, total_len){
 
 	if (len < 0) return knots[0];
 
 	// we compute the whole length.  if desired length is outside of that, give up
-	var totalLen = total_len || verb.eval.nurbs.rational_bezier_curve_arc_length(degree, knots, control_points );
+	var totalLen = total_len || verb.eval.nurbs.rational_bezier_curve_arc_length( degree, knots, control_points );
 
 	if (len > totalLen) return verb.last( knots );
 
@@ -391,12 +371,12 @@ verb.eval.nurbs.rational_bezier_curve_param_at_arc_length = function(degree, kno
 	// TODO: newton's method formulation
 	var start = { p : knots[0], l : 0 }
 		, end = { p : verb.last( knots ), l : totalLen }
-		, mid = {}
-		, tol = totalLen / 200;
+		, mid = { p : 0, l : 0 }
+		, tol = tol || verb.TOLERANCE * 2;
 
-	while ( (start.l - end.l) > tol ){
+	while ( (end.l - start.l) > tol ){
 
-		mid.p = (start.p - end.p) / 2;
+		mid.p = (start.p + end.p) / 2;
 		mid.l = verb.eval.nurbs.rational_bezier_curve_arc_length(degree, knots, control_points, mid.p );
 
 		if (mid.l > len){
@@ -409,7 +389,7 @@ verb.eval.nurbs.rational_bezier_curve_param_at_arc_length = function(degree, kno
 
 	}
 
-	return (start.p - end.p) / 2;
+	return (start.p + end.p) / 2;
 
 }
 
@@ -435,7 +415,8 @@ verb.eval.nurbs.rational_curve_arc_length = function(degree, knots, control_poin
 
 verb.eval.nurbs.rational_bezier_curve_arc_length = function(degree, knots, control_points, u, gaussDegIncrease) {
 
-  var z = (u - knots[0]) / 2
+  var u = u === undefined ? verb.last(knots) : u
+  	, z = (u - knots[0]) / 2
   	, sum = 0
   	, gaussDeg = degree + ( gaussDegIncrease != undefined ? gaussDegIncrease : 16)
   	, i = 0

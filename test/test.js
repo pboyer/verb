@@ -6030,7 +6030,7 @@ describe("verb.eval.nurbs.rational_curve_arc_length",function(){
 			, control_points = [ [0,0,0,1], [1.5,0,0,1], [1.8,0,0,1], [2,0,0,1], [3,0,0,1] ];
 
 		var u = 0;
-		var steps = 2;
+		var steps = 10;
 		var inc = (verb.last(knots) - knots[0]) / (steps-1);
 		for (var i = 0; i < steps; i++){
 
@@ -6045,3 +6045,159 @@ describe("verb.eval.nurbs.rational_curve_arc_length",function(){
 	});
 
 });
+
+describe("verb.eval.nurbs.rational_bezier_curve_param_at_arc_length",function(){
+
+	it('can compute parameter at arc length of straight bezier curve', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,1,1,1,1]
+			, control_points = [ [0,0,0,1], [1.5,0,0,1], [2,0,0,1], [3,0,0,1] ];
+
+		var tol = 1e-3;
+		var d = 0;
+		var steps = 10;
+		var inc = 3 / (steps-1);;
+
+		for (var i = 0; i < steps; i++){
+
+			var u = verb.eval.nurbs.rational_bezier_curve_param_at_arc_length(degree, knots, control_points, d, tol);
+			var len = verb.eval.nurbs.rational_bezier_curve_arc_length(degree, knots, control_points, u);
+
+			len.should.be.approximately( d, tol );
+
+			d += inc;
+		}
+
+	});
+
+	it('can compute parameter at arc length of curved bezier curve', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,1,1,1,1]
+			, control_points = [ [1,0,0,1], [1,0,-1,1], [2,0,0,1], [5,0,0,1] ];
+
+		var tol = 1e-3;
+		var d = 0;
+		var steps = 10;
+		var inc = 3 / (steps-1);
+
+		for (var i = 0; i < steps; i++){
+
+			var u = verb.eval.nurbs.rational_bezier_curve_param_at_arc_length(degree, knots, control_points, d, tol);
+			var len = verb.eval.nurbs.rational_bezier_curve_arc_length(degree, knots, control_points, u);
+
+			len.should.be.approximately( d, tol );
+
+			d += inc;
+		}
+
+	});
+
+});
+
+describe("verb.eval.nurbs.rational_curve_param_at_arc_length",function(){
+
+	it('can compute parameter at arc length of straight NURBS curve', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,0.5,1,1,1,1]
+			, control_points = [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1], [4,0,0,1] ];
+
+		var tol = 1e-3;
+		var d = 0;
+		var steps = 10;
+		var inc = 4 / (steps-1);
+
+		var u = verb.eval.nurbs.rational_curve_param_at_arc_length(degree, knots, control_points, 2, tol);
+
+		for (var i = 0; i < steps; i++){
+
+			var u = verb.eval.nurbs.rational_curve_param_at_arc_length(degree, knots, control_points, d, tol);
+			var len = verb.eval.nurbs.rational_curve_arc_length(degree, knots, control_points, u);
+
+			len.should.be.approximately( d, tol );
+
+			d += inc;
+		}
+
+	});
+
+	it('can compute parameter at arc length of curved NURBS curve', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,0.5,1,1,1,1]
+			, control_points = [ [1,0,0,1], [1,0,-1,1], [2,0,0,1], [3,0,1,1], [5,0,0,1] ];
+
+		var tol = 1e-3;
+		var d = 0;
+		var steps = 10;
+		var inc = 3 / (steps-1);
+
+		for (var i = 0; i < steps; i++){
+
+			var u = verb.eval.nurbs.rational_curve_param_at_arc_length(degree, knots, control_points, d, tol);
+			var len = verb.eval.nurbs.rational_curve_arc_length(degree, knots, control_points, u);
+
+			len.should.be.approximately( d, tol );
+
+			d += inc;
+		}
+
+	});
+
+});
+
+
+describe("verb.eval.nurbs.rational_curve_divide_curve_by_arc_length",function(){
+
+	it('can divide a straight NURBS curve', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,0.5,1,1,1,1]
+			, control_points = [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1], [4,0,0,1] ]
+			, d = 0.5
+			, tol = 1e-3;
+
+		var res = verb.eval.nurbs.rational_curve_divide_curve_by_arc_length(degree, knots, control_points, d);
+
+		var s = 0;
+		res.forEach(function(u){
+
+			var pt = verb.eval.nurbs.rational_curve_point( degree, knots, control_points, u.u );
+			u.len.should.be.approximately( s, tol );
+			s += d;
+
+		});
+
+	});
+
+});
+
+describe("verb.eval.nurbs.rational_curve_divide_curve_equally_by_arc_length",function(){
+
+	it('can divide a straight NURBS curve', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,0.5,1,1,1,1]
+			, control_points = [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1], [4,0,0,1] ]
+			, divs = 8
+			, tol = 1e-3
+			, d = 4 / divs;
+
+		var res = verb.eval.nurbs.rational_curve_divide_curve_equally_by_arc_length(degree, knots, control_points, divs );
+
+		var s = 0;
+		res.forEach(function(u){
+
+			var pt = verb.eval.nurbs.rational_curve_point( degree, knots, control_points, u.u );
+			u.len.should.be.approximately( s, tol );
+			s += d;
+
+		});
+
+	});
+
+});
+
+
