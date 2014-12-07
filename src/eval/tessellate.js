@@ -79,13 +79,14 @@ verb.eval.nurbs.tessellate_rational_surface_naive = function( degree_u, knots_u,
 //
 // ####rational_curve_regular_sample( degree, knots, control_points, num_samples [, include_u] )
 //
-// Sample a NURBS curve assuming parameterization 0 to 1, corresponds to http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf
+// Sample a NURBS curve, corresponds to http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf
 //
 // **params**
 // + *Number*, integer degree
 // + *Array*, array of nondecreasing knot values 
 // + *Array*, 1d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi) 
 // + *Number*, integer number of samples
+// + *Boolean*, whether to prefix the point with the parameter
 // 
 // **returns** 
 // + *Array*, an array of points, prepended by the point param
@@ -93,7 +94,7 @@ verb.eval.nurbs.tessellate_rational_surface_naive = function( degree_u, knots_u,
 
 verb.eval.nurbs.rational_curve_regular_sample = function( degree, knots, control_points, num_samples, include_u ) {
 
-	return verb.eval.nurbs.rational_curve_regular_sample_range( degree, knots, control_points, 0, 1.0, num_samples, include_u);
+	return verb.eval.nurbs.rational_curve_regular_sample_range( degree, knots, control_points, knots[0], verb.last(knots), num_samples, include_u);
 
 }
 

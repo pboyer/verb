@@ -4217,13 +4217,14 @@ verb.eval.nurbs.tessellate_rational_surface_naive = function( degree_u, knots_u,
 //
 // ####rational_curve_regular_sample( degree, knots, control_points, num_samples [, include_u] )
 //
-// Sample a NURBS curve assuming parameterization 0 to 1, corresponds to http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf
+// Sample a NURBS curve, corresponds to http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf
 //
 // **params**
 // + *Number*, integer degree
 // + *Array*, array of nondecreasing knot values 
 // + *Array*, 1d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi) 
 // + *Number*, integer number of samples
+// + *Boolean*, whether to prefix the point with the parameter
 // 
 // **returns** 
 // + *Array*, an array of points, prepended by the point param
@@ -4231,7 +4232,7 @@ verb.eval.nurbs.tessellate_rational_surface_naive = function( degree_u, knots_u,
 
 verb.eval.nurbs.rational_curve_regular_sample = function( degree, knots, control_points, num_samples, include_u ) {
 
-	return verb.eval.nurbs.rational_curve_regular_sample_range( degree, knots, control_points, 0, 1.0, num_samples, include_u);
+	return verb.eval.nurbs.rational_curve_regular_sample_range( degree, knots, control_points, knots[0], verb.last(knots), num_samples, include_u);
 
 }
 
@@ -5201,8 +5202,39 @@ verb.eval.nurbs.rational_curve_closest_point = function( degree, knots, control_
 	//  4)  if |(u* - u)C'(u)| < e1, halt
 	//
 
-	var maxits = 20;
-	var i = 0
+	// approximate the 
+
+	console.log( p )
+
+	var crvs = verb.eval.nurbs.curve_bezier_decompose( degree, knots, control_points );
+	var min = Number.MAX_VALUE;
+	var u = 0;
+
+	crvs.forEach(function(crv){
+
+		var pts = verb.eval.nurbs.rational_curve_regular_sample( crv.degree, crv.knots, crv.control_points, 
+			crv.knots.length * (crv.degree + 1), true );
+
+		for (var i = 0; i < pts.length; i++){
+
+			var a = pts[i][1] - p[0];
+			var b = pts[i][2] - p[1];
+			var c = pts[i][3] - p[2];
+			var d = (a * a + b * b + c * c);
+
+			if ( d < min ){
+				min = d;
+				u = pts[i][0];
+			}
+		}
+
+	});
+
+	console.log( min )
+	console.log( "starting u: ", u )
+
+	var maxits = 20
+		, i = 0
 		, e
 		, eps1 = 0.0001
 		, eps2 = 0.0001
@@ -5210,42 +5242,52 @@ verb.eval.nurbs.rational_curve_closest_point = function( degree, knots, control_
 		, minu = knots[0]
 		, maxu = verb.last(knots)
 		, closed = numeric.norm2Squared( numeric.sub(control_points[0], verb.last( control_points) ) ) < verb.EPSILON
-		, cu = u; // TODO approximate this
+		, cu = u; 
 
 	function f(u){
-		return verb.nurbs.eval.rational_curve_derivs( degree, knots, control_points, u, 2 );
+
+		return verb.eval.nurbs.rational_curve_derivs( degree, knots, control_points, u, 2 );
+
 	}
 
-	function n(u, e, dif){
+	function n(u, e, d){
 
 		//   C'(u) * ( C(u) - P ) = 0 = f(u)
-		var f = numeric.dot( e[1], dif );
+		var f = numeric.dot( e[1], d );
 
 		//	f' = C"(u) * ( C(u) - p ) + C'(u) * C'(u)
-		var s0 = numeric.dot( e[2], dif )
+		var s0 = numeric.dot( e[2], d )
 			, s1 = numeric.dot( e[1], e[1] )
 			, df = s0 + s1;
 
-		return u - d / df;
+		return u - f / df;
 
 	}
 
 	while( i < maxits ){
 
-		e = f(cu);
-		dif = numeric.sub(e[0], p );
+		console.log("u: ", cu )
+		e = f( cu );
+		dif = numeric.sub( e[0], p );
 
+		// |C(u) - p| < e1
 		var c1v = numeric.norm2( dif );
 		
-		var c2n = numeric.norm2( numeric.dot( e[1], dif) );
-		var c2d = numeric.norm2( e[1] ) * c1;
+		// C'(u) * (C(u) - P)
+		// ------------------ < e2
+		// |C'(u)| |C(u) - P|
+
+		var c2n = numeric.dot( e[1], dif);
+		var c2d = numeric.norm2( e[1] ) * c1v;
 
 		var c2v = c2n / c2d;
+
+		console.log(c1v)
 
 		var c1 = c1v < eps1;
 		var c2 = c2v < eps2;
 
-		if (c1 && c2){
+		if (c1 || c2){
 			return cu;
 		}
 

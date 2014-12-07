@@ -6200,4 +6200,23 @@ describe("verb.eval.nurbs.rational_curve_divide_curve_equally_by_arc_length",fun
 
 });
 
+describe("verb.eval.nurbs.rational_curve_closest_point",function(){
+
+	it('can get closest point to straight curve', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,0.5,1,1,1,1]
+			, control_points = [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1], [4,0,0,1] ]
+			, pt = [1,0.2,0];
+
+		var res = verb.eval.nurbs.rational_curve_closest_point(degree, knots, control_points, pt );
+
+		var p = verb.eval.nurbs.rational_curve_point( degree, knots, control_points, res );
+
+		console.log( p )
+
+	});
+
+});
+
 
