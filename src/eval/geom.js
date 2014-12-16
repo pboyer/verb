@@ -1,6 +1,6 @@
 
 
-verb.eval.nurbs.rational_surface_closest_point = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, point ){
+verb.eval.nurbs.rational_surface_closest_point = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, p ){
 
 	// for surfaces, we try to minimize the following:
 	// 
@@ -54,11 +54,29 @@ verb.eval.nurbs.rational_surface_closest_point = function( degree_u, knots_u, de
 		, maxu = verb.last(knots_u)
 		, minv = knots_v[0]
 		, maxv = verb.last(knots_v)
-		, closed = numeric.norm2Squared( numeric.sub(control_points[0], verb.last( control_points) ) ) < verb.EPSILON
-		, cuv = uv; // todo: need good approx
+		// TODO , closed = numeric.norm2Squared( numeric.sub(control_points[0], verb.last( control_points) ) ) < verb.EPSILON
+		, cuv;
 
-	function f(u){
-		return verb.nurbs.eval.rational_surface_derivs( degree_u, knots_u, degree_v, knots_v, homo_control_points, u, v, 2 );
+	// approximate closest point with tessellation
+	var tess = verb.eval.nurbs.tessellate_rational_surface_adaptive( degree_u, knots_u, degree_v, knots_v, 
+		homo_control_points, { normTol: 1e-1 } );
+
+// console.log(tess)
+
+	var dmin = Number.MAX_VALUE;
+	tess.points.forEach(function(x,i){
+
+		var d = numeric.norm2Squared( numeric.sub( p, x ) );
+
+		if ( d < dmin ){
+			dmin = d;
+			cuv = tess.uvs[i];
+		}
+
+	});
+
+	function f(uv){
+		return verb.eval.nurbs.rational_surface_derivs( degree_u, knots_u, degree_v, knots_v, homo_control_points, 2, uv[0], uv[1] );
 	}
 
 	function n(uv, e, r){
@@ -66,13 +84,16 @@ verb.eval.nurbs.rational_surface_closest_point = function( degree_u, knots_u, de
 		// f = Su(u,v) * r = 0
 		// g = Sv(u,v) * r = 0
 
-		var Su = e[0][1];
-		var Sv = e[1][0];
+		console.log(e)
 
-		var Suu = e[0][2];
-		var Svv = e[2][0];
+		var Su = e[1][0];
+		var Sv = e[0][1];
 
-		var Suv = e[2][0];
+		var Suu = e[2][0];
+		var Svv = e[0][2];
+
+		var Suv = e[1][1];
+		var Svu = e[1][1];
 
 		var f = numeric.dot( Su, r );
 		var g = numeric.dot( Sv, r );
@@ -94,7 +115,6 @@ verb.eval.nurbs.rational_surface_closest_point = function( degree_u, knots_u, de
 		//
 
 		var d = numeric.solve( J, k );
-
 		return numeric.add( d, uv );
 
 	}
@@ -102,13 +122,13 @@ verb.eval.nurbs.rational_surface_closest_point = function( degree_u, knots_u, de
 	while( i < maxits ){
 
 		e = f(cuv);
-		dif = numeric.sub(e[0], p );
+		dif = numeric.sub(e[0][0], p );
 	
 		//  point coincidence
 		//
 		//		|S(u,v) - p| < e1
 		var c1v = numeric.norm2( dif );
-		
+
 		//
 		//  cosine
 		//
@@ -139,26 +159,26 @@ verb.eval.nurbs.rational_surface_closest_point = function( degree_u, knots_u, de
 		}
 
 		// otherwise, take a step
-		var ct = n(uv, e, dif);
+		var ct = n(cuv, e, dif);
 
 		// correct for exceeding bounds
-		if ( ct[0] < minu ){
-			ct = closed ? [ maxu - ( ct[0] - minu ), ct[1] ] : cuv;
-		} else if (ct[0] > maxu){
-			ct = closed ? [ minu + ( ct[0] - maxu ), ct[1] ] : cuv;
-		}
+		// if ( ct[0] < minu ){
+		// 	ct = closed ? [ maxu - ( ct[0] - minu ), ct[1] ] : cuv;
+		// } else if (ct[0] > maxu){
+		// 	ct = closed ? [ minu + ( ct[0] - maxu ), ct[1] ] : cuv;
+		// }
 
-		if ( ct[1] < minv ){
-			ct = closed ? [ ct[0], maxv - ( ct[1] - minv ) ] : cuv;
-		} else if (ct[1] > maxv){
-			ct = closed ? [ ct[0], minv + ( ct[0] - maxv ) ] : cuv;
-		}
+		// if ( ct[1] < minv ){
+		// 	ct = closed ? [ ct[0], maxv - ( ct[1] - minv ) ] : cuv;
+		// } else if (ct[1] > maxv){
+		// 	ct = closed ? [ ct[0], minv + ( ct[0] - maxv ) ] : cuv;
+		// }
 
-		// if |(u* - u)C'(u)| < e1, halt
+		// if |(u* - u) C'(u)| < e1, halt
 		var c3v0 =  numeric.norm2( numeric.mul(ct[0] - cuv[0], e[0][1] ) );
 		var c3v1 =  numeric.norm2( numeric.mul(ct[1] - cuv[1], e[1][0] ) );
 
-		if (c3v0 < eps1 || c3v1) {
+		if (c3v0 < eps1 && c3v1 < eps1) {
 			return cuv;
 		}
 

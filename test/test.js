@@ -225,7 +225,7 @@ describe("verb.eval.nurbs.curve_derivs_given_n",function(){
 
 describe("verb.eval.nurbs.curve_derivs",function(){
 
-	it('returns correct result for simple surface', function(){
+	it('returns correct result for simple curve', function(){
 
 		// This needs to be tested better
 		var degree = 3
@@ -6401,6 +6401,33 @@ describe("NurbsCurve.closestPoint",function(){
 		var p = crv.point( res );
 
 		vecShouldBe( [1,0,0], p, 1e-3 );
+
+	});
+
+});
+
+
+describe("verb.eval.nurbs.rational_surface_closest_point",function(){
+
+	it('can get closest point to flat bezier patch', function(){
+
+		var degree_u = 3
+			, degree_v = 3
+			, knots_u = [0, 0, 0, 0, 1, 1, 1, 1]
+			, knots_v =	[0, 0, 0, 0, 1, 1, 1, 1]
+			, control_points = [ 	[ [0, 0, 0, 1], 		[10, 0, 0, 1], 		[20, 0, 0, 1], 		[30, 0, 0, 1] 		],
+														[ [0, -10, 0, 1], 	[10, -10, 0, 1], 	[20, -10, 0, 1], 	[30, -10, 0, 1] 	],
+														[ [0, -20, 0, 1], 	[10, -20, 0, 1], 	[20, -20, 0, 1], 	[30, -20, 0, 1] 	],
+														[ [0, -30, 0, 1], 	[10, -30, 0, 1], 	[20, -30, 0, 1], 	[30, -30, 0, 1] 	] ]
+			, point = [12,-20,5];
+
+		var res = verb.eval.nurbs.rational_surface_closest_point( degree_u, knots_u, degree_v, knots_v, 
+			control_points, point );
+
+		var p = verb.eval.nurbs.rational_surface_point( degree_u, knots_u, degree_v, knots_v, 
+			control_points, res[0], res[1] );
+
+		vecShouldBe( [12,-20,0], p, 1e-3 );
 
 	});
 

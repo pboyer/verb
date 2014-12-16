@@ -55,7 +55,7 @@
 
 		// use verb to construct the curve
 		verb.init();
-		var p1 = [0,0,0], p2 = [10,0,0], p3 = [10,10,0], p4 = [0,10,0], p5 = [5, 5, 0];
+		var p1 = [0,0,-5], p2 = [10,0,0], p3 = [10,10,-5], p4 = [0,10,5], p5 = [5, 5, 0];
 		var pts = [p1, p2, p3, p4, p5];
 		var interpCurve = new verb.geom.InterpCurve( pts, 3 );
 
@@ -68,19 +68,30 @@
 
 		scene.add( interpCurveLine );
 
-		for (var i = -10; i < 20; i+=2){
-			for (var j = -10; j < 20; j+=2){
+		var d1 = Date.now();
 
-				var p0 = [i, j, 0 ];
+		var w = 0;
+		for (var i = -10; i < 20; i+=4){
+			for (var j = -10; j < 20; j+=4){
+				for (var k = -10; k < 20; k+=4){
 
-				var u = interpCurve.closestPoint( p0 );
-				var p = interpCurve.point( u );
+					var p0 = [-10 + Math.random()* 20, -10 + Math.random()* 20, -10 + Math.random()* 20 ];
+					// var p0 = [i, j, k ];
 
-				var l = new THREE.Line( asGeometry( asVector3( [p0, p] )), lineMat2 );
+					var u = interpCurve.closestPoint( p0 );
+					var p = interpCurve.point( u );
 
-				scene.add( l );
+					var l = new THREE.Line( asGeometry( asVector3( [p0, p] )), lineMat2 );
+
+					scene.add( l );
+					w++;
+				}
 			}
 		}
+
+		var d2 = Date.now();
+
+		console.log( (d2 - d1) / w )
 
 		var interPtGeom = asGeometry( asVector3( pts ) );
 
