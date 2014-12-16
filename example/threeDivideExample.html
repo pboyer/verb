@@ -55,46 +55,32 @@
 
 		// use verb to construct the curve
 		verb.init();
-		var p1 = [0,0,0], p2 = [10,0,0], p3 = [10,10,5], p4 = [0,10,0], p5 = [5, 5, 0];
+		var p1 = [0,0,0], p2 = [10,0,0], p3 = [10,10,0], p4 = [0,10,0], p5 = [5, 5, 0];
 		var pts = [p1, p2, p3, p4, p5];
-		var interpCurve = new verb.geom.InterpCurve( pts, 2, [0,0,-100], [0,0,100] );
+		var interpCurve = new verb.geom.InterpCurve( pts, 3 );
 
 		var interpCurveGeom = tessellateCurve(interpCurve);
 
 		// draw the curve
 		var lineMat = new THREE.LineBasicMaterial();
+		var lineMat2 = new THREE.LineBasicMaterial({ color: 0x666666 });
 		var interpCurveLine = new THREE.Line( interpCurveGeom, lineMat );
 
 		scene.add( interpCurveLine );
 
-		// splitting a curve
-		// var splitcrvs = interpCurve.split( 0.3 );
-
-		// var split0Geom = tessellateCurve( splitcrvs[0] );
-
-		// var split0LineMat = new THREE.LineBasicMaterial({ color: 0xffbb00 });
-		// var split0Line = new THREE.Line( split0Geom, split0LineMat );
-
-		// scene.add( split0Line );
-
-		// var split1Geom = tessellateCurve( splitcrvs[1] );
-
-		// var split1LineMat = new THREE.LineBasicMaterial({ color: 0x00bbff });
-		// var split1Line = new THREE.Line( split1Geom, split1LineMat );
-
-		// scene.add( split1Line );
-
-		// draw the points 
-		// var ptGeom = asGeometry( asVector3( interpCurve.get('controlPoints') ) );
-
-		var cloudMat = new THREE.PointCloudMaterial({ size: 0.3 });
-		var cloud = new THREE.PointCloud( ptGeom, cloudMat );
-
-		scene.add( cloud );
-
 		var interPtGeom = asGeometry( asVector3( pts ) );
 
-		var cloudMat2 = new THREE.PointCloudMaterial({ size: 1, color: 0xff0000 });
+		var cloudMat2 = new THREE.PointCloudMaterial({ size: 0.1, color: 0xff0000 });
+		var cloud2 = new THREE.PointCloud( interPtGeom, cloudMat2 );
+
+		scene.add( cloud2 );
+
+		var interPtGeom = asGeometry( asVector3( 
+			interpCurve.divideByEqualArcLength( 20 ).map(function(u){ return interpCurve.point(u.u) } ) ) );
+
+		console.log(interPtGeom)
+
+		var cloudMat2 = new THREE.PointCloudMaterial({ size: 0.3, color: 0x00ffff });
 		var cloud2 = new THREE.PointCloud( interPtGeom, cloudMat2 );
 
 		scene.add( cloud2 );

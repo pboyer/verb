@@ -6200,63 +6200,6 @@ describe("verb.eval.nurbs.rational_curve_divide_curve_equally_by_arc_length",fun
 
 });
 
-describe("verb.eval.nurbs.rational_curve_closest_point",function(){
-
-	it('can get closest point to a straight curve', function(){
-
-		var degree = 3
-			, knots = [0,0,0,0,0.5,1,1,1,1]
-			, control_points = [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1], [4,0,0,1] ]
-			, pt = [1,0.2,0];
-
-		var res = verb.eval.nurbs.rational_curve_closest_point(degree, knots, control_points, [1,0.2,0] );
-		var p = verb.eval.nurbs.rational_curve_point( degree, knots, control_points, res );
-
-		vecShouldBe( [1,0,0], p, 1e-3 );
-
-		res = verb.eval.nurbs.rational_curve_closest_point(degree, knots, control_points, [2,0.2,0] );
-		p = verb.eval.nurbs.rational_curve_point( degree, knots, control_points, res );
-
-		vecShouldBe( [2,0,0], p, 1e-3 );
-
-		// before start
-		res = verb.eval.nurbs.rational_curve_closest_point(degree, knots, control_points, [-1,0.2,1] );
-		p = verb.eval.nurbs.rational_curve_point( degree, knots, control_points, res );
-
-		vecShouldBe( [0,0,0], p, 1e-3 );
-
-		// beyond end
-		res = verb.eval.nurbs.rational_curve_closest_point(degree, knots, control_points, [5,0.2,0] );
-		p = verb.eval.nurbs.rational_curve_point( degree, knots, control_points, res );
-
-		vecShouldBe( [4,0,0], p, 1e-3 );
-
-	});
-
-});
-
-describe("NurbsCurve.closestPoint",function(){
-
-	it('can get closest point to straight curve', function(){
-
-		var degree = 3
-			, knots = [0,0,0,0,0.5,1,1,1,1]
-			, control_points = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
-			, weights = [ 1, 1, 1, 1, 1 ]
-			, pt = [1,0.2,0];
-
-
-		var crv = new verb.geom.NurbsCurve( degree, control_points, weights, knots );
-		var res = crv.closestPoint(pt);
-
-		var p = crv.point( res );
-
-		vecShouldBe( [1,0,0], p, 1e-3 );
-
-
-	});
-
-});
 
 describe("NurbsCurve.lengthAtParam",function(){
 
@@ -6382,6 +6325,82 @@ describe("NurbsCurve.divideByArcLength",function(){
 			s += d;
 
 		});
+
+	});
+
+});
+
+
+describe("verb.eval.nurbs.rational_curve_closest_point",function(){
+
+	it('can get closest point to a straight curve', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,0.5,1,1,1,1]
+			, control_points = [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1], [4,0,0,1] ]
+			, pt = [1,0.2,0];
+
+		var res = verb.eval.nurbs.rational_curve_closest_point(degree, knots, control_points, [1,0.2,0] );
+		var p = verb.eval.nurbs.rational_curve_point( degree, knots, control_points, res );
+
+		vecShouldBe( [1,0,0], p, 1e-3 );
+
+		res = verb.eval.nurbs.rational_curve_closest_point(degree, knots, control_points, [2,0.2,0] );
+		p = verb.eval.nurbs.rational_curve_point( degree, knots, control_points, res );
+
+		vecShouldBe( [2,0,0], p, 1e-3 );
+
+		// before start
+		res = verb.eval.nurbs.rational_curve_closest_point(degree, knots, control_points, [-1,0.2,1] );
+		p = verb.eval.nurbs.rational_curve_point( degree, knots, control_points, res );
+
+		vecShouldBe( [0,0,0], p, 1e-3 );
+
+		// beyond end
+		res = verb.eval.nurbs.rational_curve_closest_point(degree, knots, control_points, [5,0.2,0] );
+		p = verb.eval.nurbs.rational_curve_point( degree, knots, control_points, res );
+
+		vecShouldBe( [4,0,0], p, 1e-3 );
+
+	});
+
+});
+
+describe("NurbsCurve.closestPoint",function(){
+
+	it('can get point on straight curve', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,0.5,1,1,1,1]
+			, control_points = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
+			, weights = [ 1, 1, 1, 1, 1 ]
+			, pt = [1,0,0];
+
+
+		var crv = new verb.geom.NurbsCurve( degree, control_points, weights, knots );
+		var res = crv.closestPoint(pt);
+
+		var p = crv.point( res );
+
+		vecShouldBe( [1,0,0], p, 1e-3 );
+
+	});
+
+	it('can get closest point to straight curve', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,0.5,1,1,1,1]
+			, control_points = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
+			, weights = [ 1, 1, 1, 1, 1 ]
+			, pt = [1,1,0];
+
+
+		var crv = new verb.geom.NurbsCurve( degree, control_points, weights, knots );
+		var res = crv.closestPoint(pt);
+
+		var p = crv.point( res );
+
+		vecShouldBe( [1,0,0], p, 1e-3 );
 
 	});
 

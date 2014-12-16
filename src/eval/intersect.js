@@ -834,6 +834,54 @@ verb.eval.geom.intersect_segments = function( a0, a1, b0, b1, tol ) {
  }
 
 //
+// ####closest_param_on_segment( pt, segpt0, segpt1 )
+//
+// Find the closest point on a ray
+//
+// **params**
+// + *Array*, point to project
+// + *Array*, first point of segment
+// + *Array*, second point of segment
+// + *Number*, first param of segment
+// + *Number*, second param of segment
+// 
+// **returns** 
+// + *Object* with u and pt properties
+//
+
+verb.eval.geom.closest_point_on_segment = function( pt, segpt0, segpt1, u0, u1 ) {
+
+	var dif = numeric.sub( segpt1, segpt0 )
+		, l = numeric.norm2( dif );
+
+	if (l < verb.EPSILON ) {
+		return { 	u: u0, 
+							pt : segpt0 };
+	}		
+
+	var o = segpt0
+		, r = numeric.mul( 1 / l, dif )
+		, o2pt = numeric.sub(pt, o)
+		, do2ptr = numeric.dot(o2pt, r);
+
+	if (do2ptr < 0){
+
+		return { 	u: u0, 
+							pt : segpt0 };
+
+	} else if (do2ptr > l){
+
+		return { 	u: u1, 
+							pt : segpt1 };
+
+	}
+
+	return { 	u: u0 + (u1 - u0) * do2ptr / l, 
+						pt : numeric.add(o, numeric.mul( do2ptr, r ) ) };
+
+ }
+
+//
 // ####closest_point_on_ray( pt, o, r )
 //
 // Find the closest point on a ray

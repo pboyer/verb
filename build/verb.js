@@ -3566,6 +3566,54 @@ verb.eval.geom.intersect_segments = function( a0, a1, b0, b1, tol ) {
  }
 
 //
+// ####closest_param_on_segment( pt, segpt0, segpt1 )
+//
+// Find the closest point on a ray
+//
+// **params**
+// + *Array*, point to project
+// + *Array*, first point of segment
+// + *Array*, second point of segment
+// + *Number*, first param of segment
+// + *Number*, second param of segment
+// 
+// **returns** 
+// + *Object* with u and pt properties
+//
+
+verb.eval.geom.closest_point_on_segment = function( pt, segpt0, segpt1, u0, u1 ) {
+
+	var dif = numeric.sub( segpt1, segpt0 )
+		, l = numeric.norm2( dif );
+
+	if (l < verb.EPSILON ) {
+		return { 	u: u0, 
+							pt : segpt0 };
+	}		
+
+	var o = segpt0
+		, r = numeric.mul( 1 / l, dif )
+		, o2pt = numeric.sub(pt, o)
+		, do2ptr = numeric.dot(o2pt, r);
+
+	if (do2ptr < 0){
+
+		return { 	u: u0, 
+							pt : segpt0 };
+
+	} else if (do2ptr > l){
+
+		return { 	u: u1, 
+							pt : segpt1 };
+
+	}
+
+	return { 	u: u0 + (u1 - u0) * do2ptr / l, 
+						pt : numeric.add(o, numeric.mul( do2ptr, r ) ) };
+
+ }
+
+//
 // ####closest_point_on_ray( pt, o, r )
 //
 // Find the closest point on a ray
@@ -5302,35 +5350,34 @@ verb.eval.nurbs.rational_curve_closest_point = function( degree, knots, control_
 	//  4)  if |(u* - u)C'(u)| < e1, halt
 	//
 
-	var crvs = verb.eval.nurbs.curve_bezier_decompose( degree, knots, control_points );
+	var tol = 1e-3;
 	var min = Number.MAX_VALUE;
 	var u = 0;
 
-	crvs.forEach(function(crv){
+	var pts = verb.eval.nurbs.rational_curve_adaptive_sample( degree, knots, control_points, tol, true )
 
-		var pts = verb.eval.nurbs.rational_curve_regular_sample( crv.degree, crv.knots, crv.control_points, 
-			crv.knots.length * (crv.degree + 1), true );
+	for (var i = 0; i < pts.length-1; i++){
 
-		for (var i = 0; i < pts.length; i++){
+		var u0 = pts[i][0];
+		var u1 = pts[i+1][0];
 
-			var a = pts[i][1] - p[0];
-			var b = pts[i][2] - p[1];
-			var c = pts[i][3] - p[2];
-			var d = (a * a + b * b + c * c);
+		var p0 = pts[i].slice(1);
+		var p1 = pts[i+1].slice(1);
 
-			if ( d < min ){
-				min = d;
-				u = pts[i][0];
-			}
+		var proj = verb.eval.geom.closest_point_on_segment( p, p0, p1, u0, u1 );
+		var d = numeric.norm2( numeric.sub( p, proj.pt ) );
+
+		if ( d < min ){
+			min = d;
+			u = proj.u;
 		}
+	}
 
-	});
-
-	var maxits = 20
+	var maxits = 5
 		, i = 0
 		, e
 		, eps1 = 0.0001
-		, eps2 = 0.0001
+		, eps2 = 0.0005
 		, dif
 		, minu = knots[0]
 		, maxu = verb.last(knots)
@@ -5338,9 +5385,7 @@ verb.eval.nurbs.rational_curve_closest_point = function( degree, knots, control_
 		, cu = u; 
 
 	function f(u){
-
 		return verb.eval.nurbs.rational_curve_derivs( degree, knots, control_points, u, 2 );
-
 	}
 
 	function n(u, e, d){
@@ -5374,23 +5419,24 @@ verb.eval.nurbs.rational_curve_closest_point = function( degree, knots, control_
 		var c2v = c2n / c2d;
 
 		var c1 = c1v < eps1;
-		var c2 = c2v < eps2;
+		var c2 = Math.abs(c2v) < eps2;
 
-		if (c1 || c2){
+		// if both tolerances are met
+		if (c1 && c2){
 			return cu;
 		}
 
-		var ct = n(u, e, dif);
+		var ct = n(cu, e, dif);
 
+		// are we outside of the bounds of the curve?
 		if ( ct < minu ){
 			ct = closed ? maxu - ( ct - minu ) : cu;
 		} else if (ct > maxu){
 			ct = closed ? minu + ( ct - maxu ) : cu;
 		}
 
-		// are we at the end of the curve?
-		var c3v =  numeric.norm2( numeric.mul(ct - cu, e[1] ) ) 
-
+		// will our next step force us out of the curve?
+		var c3v = numeric.norm2( numeric.mul(ct - cu, e[1] ) ) 
 		if (c3v < eps1) {
 			return cu;
 		}
