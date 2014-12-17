@@ -44,16 +44,18 @@ verb.eval.nurbs.rational_surface_closest_point = function( degree_u, knots_u, de
 	//  4)  if |(u* - u)C'(u)| < e1, halt
 	//
 	
-	var maxits = 20;
+	var maxits = 10;
 	var i = 0
 		, e
 		, eps1 = 0.0001
-		, eps2 = 0.0001
+		, eps2 = 0.0005
 		, dif
 		, minu = knots_u[0]
 		, maxu = verb.last(knots_u)
 		, minv = knots_v[0]
 		, maxv = verb.last(knots_v)
+		, closedu = false // TODO
+		, closedv = false // TODO
 		// TODO , closed = numeric.norm2Squared( numeric.sub(control_points[0], verb.last( control_points) ) ) < verb.EPSILON
 		, cuv;
 
@@ -83,8 +85,6 @@ verb.eval.nurbs.rational_surface_closest_point = function( degree_u, knots_u, de
 
 		// f = Su(u,v) * r = 0
 		// g = Sv(u,v) * r = 0
-
-		console.log(e)
 
 		var Su = e[1][0];
 		var Sv = e[0][1];
@@ -161,22 +161,30 @@ verb.eval.nurbs.rational_surface_closest_point = function( degree_u, knots_u, de
 		// otherwise, take a step
 		var ct = n(cuv, e, dif);
 
-		// correct for exceeding bounds
-		// if ( ct[0] < minu ){
-		// 	ct = closed ? [ maxu - ( ct[0] - minu ), ct[1] ] : cuv;
-		// } else if (ct[0] > maxu){
-		// 	ct = closed ? [ minu + ( ct[0] - maxu ), ct[1] ] : cuv;
-		// }
+		console.log('ct', ct)
 
-		// if ( ct[1] < minv ){
-		// 	ct = closed ? [ ct[0], maxv - ( ct[1] - minv ) ] : cuv;
-		// } else if (ct[1] > maxv){
-		// 	ct = closed ? [ ct[0], minv + ( ct[0] - maxv ) ] : cuv;
-		// }
+		// correct for exceeding bounds
+		if ( ct[0] < minu ){
+			ct = [ minu, ct[1] ];
+			// ct = closedu ? [ maxu - ( ct[0] - minu ), ct[1] ] : [ minu, ct[1] ];
+		} else if (ct[0] > maxu){
+			ct = [ maxu, ct[1] ];
+			// ct = closedu ? [ minu + ( ct[0] - maxu ), ct[1] ] : [ maxu, ct[1] ];
+		}
+
+		if ( ct[1] < minv ){
+			ct = [ ct[0], minv ];
+			// ct = closedv ? [ ct[0], maxv - ( ct[1] - minv ) ] : [ ct[0], minv ];
+		} else if (ct[1] > maxv){
+			ct = [ ct[0], maxv ];
+			// ct = closedv ? [ ct[0], minv + ( ct[0] - maxv ) ] : [ ct[0], maxv ];
+		}
+
+		console.log('corrected ct', ct)
 
 		// if |(u* - u) C'(u)| < e1, halt
-		var c3v0 =  numeric.norm2( numeric.mul(ct[0] - cuv[0], e[0][1] ) );
-		var c3v1 =  numeric.norm2( numeric.mul(ct[1] - cuv[1], e[1][0] ) );
+		var c3v0 =  numeric.norm2( numeric.mul(ct[0] - cuv[0], e[1][0] ) );
+		var c3v1 =  numeric.norm2( numeric.mul(ct[1] - cuv[1], e[0][1] ) );
 
 		if (c3v0 < eps1 && c3v1 < eps1) {
 			return cuv;
@@ -187,6 +195,7 @@ verb.eval.nurbs.rational_surface_closest_point = function( degree_u, knots_u, de
 
 	}
 
+	console.log('fail')
 	return cuv;
 
 }
@@ -303,9 +312,9 @@ verb.eval.nurbs.rational_curve_closest_point = function( degree, knots, control_
 
 		// are we outside of the bounds of the curve?
 		if ( ct < minu ){
-			ct = closed ? maxu - ( ct - minu ) : cu;
+			ct = closed ? maxu - ( ct - minu ) : minu;
 		} else if (ct > maxu){
-			ct = closed ? minu + ( ct - maxu ) : cu;
+			ct = closed ? minu + ( ct - maxu ) : maxu;
 		}
 
 		// will our next step force us out of the curve?

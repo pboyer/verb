@@ -1,0 +1,151 @@
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title></title>
+
+  <script src="js/numeric-1.2.6.min.js"></script>
+  <script src="js/binomial.js"></script>
+  <script src="js/labor.js"></script>
+  <script src="../build/verb.js"></script>
+
+	<style>
+		body {
+			margin: 0;
+		}
+	</style>
+
+</head>
+
+<body>
+
+  <script src="js/three.min.js"></script>
+  <script src="js/OrbitControls.js"></script>
+  
+	<script>
+
+		// construct the scene & camera
+		var scene = new THREE.Scene();
+		var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+		camera.position.z = 20;
+		camera.up.set( 0, 0, 1 );
+
+		var renderer = new THREE.WebGLRenderer({ antialias: true });
+		renderer.setSize( window.innerWidth, window.innerHeight );
+		document.body.appendChild( renderer.domElement );
+
+		function asVector3(pts){
+			return pts.map(function(x){
+				return new THREE.Vector3(x[0],x[1],x[2]);
+			});
+		}
+
+		function asGeometry(threePts){
+			var geometry = new THREE.Geometry();
+			geometry.vertices.push.apply( geometry.vertices, threePts );
+			return geometry;
+		}
+
+		function getWarpedPlane(){ 
+
+			verb.init();
+
+			var degree = 3
+				, knots = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
+				, pts = [ 	[ [0, 0, -5], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] , 	[40, 0, 0], [50, 0, 0] ],
+							[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] , [40, -10, 0], [50, -10, 0]	],
+							[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] , [40, -20, -2], [50, -20, -12] 	],
+							[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, -23], 	[30, -30, 0] , [40, -30, 0], [50, -30, 0]     ],  
+							[ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , [40, -40, -20], [50, -40, 0]     ],  
+							[ [0, -50, 12], [10, -50, 0], 	[20, -50, 10], 	[30, -50, 0] , [50, -50, -10], [50, -50, -15]     ],     ]
+				, wts = [ 	[ 1, 1, 1, 1, 1, 1],
+							[ 1, 1, 1, 1, 1, 1],
+							[ 1, 1, 1, 1, 1, 1],
+							[ 1, 1, 1, 1, 1, 1],
+							[ 1, 1, 1, 1, 1, 1],
+							[ 1, 1, 1, 1, 1, 1] ];
+
+			return new verb.geom.NurbsSurface( degree, knots, degree, knots, pts, wts );
+		}
+
+		var srf = getWarpedPlane();
+
+		var lineMat = new THREE.LineBasicMaterial();
+
+		var w = 0;
+		var c = 5;
+		for (var i = 2; i < 3; i++){
+			for (var j = 0; j < 1; j++){
+				// for (var k = 0; k < c; k++){
+
+					var p0 = [100 * i / (c-1) - 25, -100 + 25, 10 ];
+
+					var uv = srf.closestPoint( p0 );
+					var p = srf.point( uv[0], uv[1] );
+
+					var l = new THREE.Line( asGeometry( asVector3( [p0, p] )), lineMat );
+
+					scene.add( l );
+					w++;
+				// }
+			}
+		}
+
+		var mesh = srf.tessellate();
+
+		// verb.NurbsSurface -> THREE.Geometry
+		function tessellate(srf, tess) {
+
+			var tess = tess || srf.tessellate();
+
+			var geometry = new THREE.Geometry();
+
+			// convert vertices
+			var threePts = tess.points.map(function(x){
+				return new THREE.Vector3(x[0],x[1],x[2]);
+			});
+
+			geometry.vertices.push.apply( geometry.vertices, threePts );
+
+			// convert faces
+			var threeFaces = tess.faces.map(function(faceIndices){
+				var normals = faceIndices.map(function(x){
+					var vn = tess.normals[x];
+					return new THREE.Vector3( vn[0], vn[1], vn[2] );
+				});
+
+				return new THREE.Face3(faceIndices[0],faceIndices[1],faceIndices[2], normals);
+			});
+
+			geometry.faces.push.apply(geometry.faces, threeFaces);
+
+			return geometry;
+
+		}
+
+		var geometry = tessellate(srf, mesh);
+
+		var material = new THREE.MeshNormalMaterial( { side: THREE.DoubleSide, wireframe: false, shading: THREE.SmoothShading,  } );
+		var mesh = new THREE.Mesh( geometry, material );
+
+		scene.add( mesh );
+
+		// var material2 = new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide, wireframe: true } );
+		// var mesh2 = new THREE.Mesh( geometry, material2 );
+
+		// scene.add( mesh2 );
+
+		var controls = new THREE.OrbitControls(camera, renderer.domElement);
+
+		function render() {
+			requestAnimationFrame( render );
+			renderer.render( scene, camera );
+		}
+		render();
+
+	</script>
+
+</body>
+
+</html>

@@ -68,6 +68,25 @@ verb.geom.NurbsSurface.prototype.derivatives = function( u, v, num_derivs, callb
 };
 
 //
+// ####closestPoint( point [, callback] )
+//
+// Determine the closest parameter on the Surface to the given point
+//
+// **params**
+// + *Array*, A length 3 array representing the point
+// + *Function*, The callback, if you want this async
+//
+// **returns**
+// + *Array*, The uv parameter of the closest point
+
+verb.geom.NurbsSurface.prototype.closestPoint = function( point, callback ) {
+
+	return this.nurbsEngine.eval( 'rational_surface_closest_point', 
+		[	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(),  point  ], callback ); 
+
+};
+
+//
 // ####split( u, dir [, callback] )
 //
 // Split the surface at the given parameter
