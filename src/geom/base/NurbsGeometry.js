@@ -3,10 +3,10 @@
 // Constructor for NurbsGeometry
 //
 // NurbsGeometry is the base class for all NURBS types
-verb.geom.NurbsGeometry = function() {
+verb.NurbsGeometry = function() {
 
-	verb.geom.Geometry.call(this);
+	verb.Geometry.call(this);
 
-}.inherits( verb.geom.Geometry );
+}.inherits( verb.Geometry );
 
 

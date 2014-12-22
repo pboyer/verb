@@ -11,9 +11,9 @@
 // + *Array*, 2d array representing the surface weight structure
 //
 
-verb.geom.NurbsSurface = function( degreeU, knotsU, degreeV, knotsV, controlPoints, weights ) {
+verb.NurbsSurface = function( degreeU, knotsU, degreeV, knotsV, controlPoints, weights ) {
 
-	verb.geom.NurbsGeometry.call(this);
+	verb.NurbsGeometry.call(this);
 
 	this.setAll({
 		"controlPoints": controlPoints,
@@ -24,7 +24,7 @@ verb.geom.NurbsSurface = function( degreeU, knotsU, degreeV, knotsV, controlPoin
 		"degreeV": degreeV
 	});
 
-}.inherits( verb.geom.NurbsGeometry );
+}.inherits( verb.NurbsGeometry );
 
 //
 // ####point( u, v [, callback] )
@@ -39,7 +39,7 @@ verb.geom.NurbsSurface = function( degreeU, knotsU, degreeV, knotsV, controlPoin
 // **returns**
 // + *Array*, An array if called synchronously, otherwise nothing
 
-verb.geom.NurbsSurface.prototype.point = function( u, v, callback ) {
+verb.NurbsSurface.prototype.point = function( u, v, callback ) {
 
 	return this.nurbsEngine.eval( 'rational_surface_point', 
 							[ 	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), u, v ], callback );
@@ -60,7 +60,7 @@ verb.geom.NurbsSurface.prototype.point = function( u, v, callback ) {
 // **returns**
 // + *Array*, An array if called synchronously, otherwise nothing
 
-verb.geom.NurbsSurface.prototype.derivatives = function( u, v, num_derivs, callback ) {
+verb.NurbsSurface.prototype.derivatives = function( u, v, num_derivs, callback ) {
 
 	return this.nurbsEngine.eval( 'rational_surface_derivs', 
 			[	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), num_derivs || 1, u, v ], callback ); 
@@ -79,7 +79,7 @@ verb.geom.NurbsSurface.prototype.derivatives = function( u, v, num_derivs, callb
 // **returns**
 // + *Array*, The uv parameter of the closest point
 
-verb.geom.NurbsSurface.prototype.closestPoint = function( point, callback ) {
+verb.NurbsSurface.prototype.closestPoint = function( point, callback ) {
 
 	return this.nurbsEngine.eval( 'rational_surface_closest_point', 
 		[	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(),  point  ], callback ); 
@@ -99,7 +99,7 @@ verb.geom.NurbsSurface.prototype.closestPoint = function( point, callback ) {
 // **returns**
 // + *Array*, Two surfaces - one at the lower end of the parameter range and one at the higher end.  
 
-verb.geom.NurbsSurface.prototype.split = function( u, dir, callback ) {
+verb.NurbsSurface.prototype.split = function( u, dir, callback ) {
 
 	var domain = this.domain();
 	
@@ -113,15 +113,15 @@ verb.geom.NurbsSurface.prototype.split = function( u, dir, callback ) {
 	// transform the result from the engine into a valid pair of NurbsSurfaces
 	function asNurbsSurfaces(res){
 
-		var cpts0 = verb.eval.nurbs.dehomogenize_2d( res[0].control_points );
-		var wts0 = verb.eval.nurbs.weight_2d( res[0].control_points );
+		var cpts0 = verb.eval.dehomogenize_2d( res[0].control_points );
+		var wts0 = verb.eval.weight_2d( res[0].control_points );
 
-		var c0 = new verb.geom.NurbsSurface( res[0].degree_u, res[0].knots_u, res[0].degree_v, res[0].knots_v, cpts0, wts0 );
+		var c0 = new verb.NurbsSurface( res[0].degree_u, res[0].knots_u, res[0].degree_v, res[0].knots_v, cpts0, wts0 );
 
-		var cpts1 = verb.eval.nurbs.dehomogenize_2d( res[1].control_points );
-		var wts1 = verb.eval.nurbs.weight_2d( res[1].control_points );
+		var cpts1 = verb.eval.dehomogenize_2d( res[1].control_points );
+		var wts1 = verb.eval.weight_2d( res[1].control_points );
 
-		var c1 = new verb.geom.NurbsSurface( res[1].degree_u, res[1].knots_u, res[1].degree_v, res[1].knots_v, cpts1, wts1 );
+		var c1 = new verb.NurbsSurface( res[1].degree_u, res[1].knots_u, res[1].degree_v, res[1].knots_v, cpts1, wts1 );
 
 		return [c0, c1];
 	}
@@ -148,7 +148,7 @@ verb.geom.NurbsSurface.prototype.split = function( u, dir, callback ) {
 // **returns**
 // + *Array*, An array if called synchronously, otherwise nothing
 
-verb.geom.NurbsSurface.prototype.tessellate = function(options, callback){
+verb.NurbsSurface.prototype.tessellate = function(options, callback){
 
 	return this.nurbsEngine.eval( 'tessellate_rational_surface_adaptive', 
 			[	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(), 
@@ -165,7 +165,7 @@ verb.geom.NurbsSurface.prototype.tessellate = function(options, callback){
 // **returns**
 // + *Array*, An 2d array e.g. [[lowU, highU], [lowV, highV]]
 
-verb.geom.NurbsSurface.prototype.domain = function() {
+verb.NurbsSurface.prototype.domain = function() {
 
 	var knotsU = this.get('knotsU');
 	var knotsV = this.get('knotsV');
@@ -184,7 +184,7 @@ verb.geom.NurbsSurface.prototype.domain = function() {
 // **returns**
 // + *Array*, An array if called synchronously, otherwise nothing
 
-verb.geom.NurbsSurface.prototype.transform = function( mat ){
+verb.NurbsSurface.prototype.transform = function( mat ){
 
 	var pts = this.get("controlPoints");
 
@@ -212,7 +212,7 @@ verb.geom.NurbsSurface.prototype.transform = function( mat ){
 // **returns**
 // + *Array*, An array if called synchronously, otherwise nothing
 
-verb.geom.NurbsSurface.prototype.clone = function(){
+verb.NurbsSurface.prototype.clone = function(){
 
 	// copy the control points
 	var pts = this.get("controlPoints");
@@ -233,7 +233,7 @@ verb.geom.NurbsSurface.prototype.clone = function(){
 		weights_copy.push( weights[i].slice( 0 ) );
 	}
 
-	return new verb.geom.NurbsSurface( this.get('degreeU'), this.get('knotsU').slice(0), 
+	return new verb.NurbsSurface( this.get('degreeU'), this.get('knotsU').slice(0), 
 		this.get('degreeV'), this.get('knotsV').slice(0), pts_copy, weights_copy );
 
 };
@@ -246,9 +246,9 @@ verb.geom.NurbsSurface.prototype.clone = function(){
 // **returns**
 // + *Array*, 3d array of homogenized control points
 
-verb.geom.NurbsSurface.prototype.homogenize = function(){
+verb.NurbsSurface.prototype.homogenize = function(){
 
-	return verb.eval.nurbs.homogenize_2d( this.get('controlPoints'), this.get('weights') );
+	return verb.eval.homogenize_2d( this.get('controlPoints'), this.get('weights') );
 
 };
 
@@ -259,7 +259,7 @@ verb.geom.NurbsSurface.prototype.homogenize = function(){
 // of the curve from those parameters.  This destroys any manual changes to the Nurbs rep.
 //
 
-verb.geom.NurbsSurface.prototype.update = function(){
+verb.NurbsSurface.prototype.update = function(){
 
 	if ( !this.nurbsRep ){
 		return;

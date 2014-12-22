@@ -7,9 +7,9 @@
 // + *Array*, Length 3 representing the direction to extrude
 // + *Number*, The distance to extrude
 
-verb.geom.Extrusion = function(profile, axis, length ) {
+verb.Extrusion = function(profile, axis, length ) {
 
-	verb.geom.NurbsSurface.call(this);
+	verb.NurbsSurface.call(this);
 
 	this.setAll({ 
 		  "profile": profile,
@@ -22,12 +22,12 @@ verb.geom.Extrusion = function(profile, axis, length ) {
 	this.watchAll( ['axis', 'length' ], this.update );
 	profile.watchAll( ['knots', 'degree', 'controlPoints', 'weights'], this.update );
 
-}.inherits(verb.geom.NurbsSurface);
+}.inherits(verb.NurbsSurface);
 
 // #### nurbsRep()
 //
 // Construct the Nurbs representation
-verb.geom.Extrusion.prototype.nurbsRep = function() {
+verb.Extrusion.prototype.nurbsRep = function() {
 
   return this.nurbsEngine.eval( 'get_extruded_surface', 
 									[ this.get("axis"), 

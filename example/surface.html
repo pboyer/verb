@@ -116,7 +116,7 @@
 					{
 						v = j / v_divs;
 
-						p = verb.eval.nurbs.surface_point( degree_u, knot_vector_u, degree_v, knot_vector_v, control_points, u, v );
+						p = verb.eval.surface_point( degree_u, knot_vector_u, degree_v, knot_vector_v, control_points, u, v );
 						sphere.geometry.vertices[count].x = p[0];
 						sphere.geometry.vertices[count].y = p[1];
 						sphere.geometry.vertices[count].z = p[2];
@@ -179,7 +179,7 @@
 					{
 						v = j / v_divs;
 
-						p = verb.eval.nurbs.surface_point( degree_u, knot_vector_u, degree_v, knot_vector_v, control_points, u, v );
+						p = verb.eval.surface_point( degree_u, knot_vector_u, degree_v, knot_vector_v, control_points, u, v );
 						geometry.vertices.push( new THREE.Vector3( p[0], p[1], p[2]) ); 
 						v_indices[i].push(count++);
 

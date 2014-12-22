@@ -1,6 +1,6 @@
 
 
-verb.eval.nurbs.rational_surface_closest_point = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, p ){
+verb.eval.rational_surface_closest_point = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, p ){
 
 	// for surfaces, we try to minimize the following:
 	// 
@@ -63,7 +63,7 @@ verb.eval.nurbs.rational_surface_closest_point = function( degree_u, knots_u, de
 
 
 	// approximate closest point with tessellation
-	var tess = verb.eval.nurbs.tessellate_rational_surface_adaptive( degree_u, knots_u, degree_v, knots_v, 
+	var tess = verb.eval.tessellate_rational_surface_adaptive( degree_u, knots_u, degree_v, knots_v, 
 		homo_control_points, { normTol: 5e-2 } );
 
 	var dmin = Number.MAX_VALUE;
@@ -81,7 +81,7 @@ verb.eval.nurbs.rational_surface_closest_point = function( degree_u, knots_u, de
 	// console.log(dmin)
 
 	function f(uv){
-		var d = verb.eval.nurbs.rational_surface_derivs( degree_u, knots_u, degree_v, knots_v, homo_control_points, 2, uv[0], uv[1] );
+		var d = verb.eval.rational_surface_derivs( degree_u, knots_u, degree_v, knots_v, homo_control_points, 2, uv[0], uv[1] );
 		// console.log(d);
 		return d;
 	}
@@ -202,7 +202,7 @@ verb.eval.nurbs.rational_surface_closest_point = function( degree_u, knots_u, de
 
 }
 
-verb.eval.nurbs.rational_curve_closest_point = function( degree, knots, control_points, p ){
+verb.eval.rational_curve_closest_point = function( degree, knots, control_points, p ){
 
 	//  We want to solve:
 	// 
@@ -238,7 +238,7 @@ verb.eval.nurbs.rational_curve_closest_point = function( degree, knots, control_
 	var min = Number.MAX_VALUE;
 	var u = 0;
 
-	var pts = verb.eval.nurbs.rational_curve_adaptive_sample( degree, knots, control_points, tol, true )
+	var pts = verb.eval.rational_curve_adaptive_sample( degree, knots, control_points, tol, true )
 
 	for (var i = 0; i < pts.length-1; i++){
 
@@ -248,7 +248,7 @@ verb.eval.nurbs.rational_curve_closest_point = function( degree, knots, control_
 		var p0 = pts[i].slice(1);
 		var p1 = pts[i+1].slice(1);
 
-		var proj = verb.eval.geom.closest_point_on_segment( p, p0, p1, u0, u1 );
+		var proj = verb.eval.closest_point_on_segment( p, p0, p1, u0, u1 );
 		var d = numeric.norm2( numeric.sub( p, proj.pt ) );
 
 		if ( d < min ){
@@ -269,7 +269,7 @@ verb.eval.nurbs.rational_curve_closest_point = function( degree, knots, control_
 		, cu = u; 
 
 	function f(u){
-		return verb.eval.nurbs.rational_curve_derivs( degree, knots, control_points, u, 2 );
+		return verb.eval.rational_curve_derivs( degree, knots, control_points, u, 2 );
 	}
 
 	function n(u, e, d){
@@ -334,12 +334,12 @@ verb.eval.nurbs.rational_curve_closest_point = function( degree, knots, control_
 
 }
 
-verb.eval.nurbs.rational_curve_divide_curve_equally_by_arc_length = function(degree, knots, control_points, num){
+verb.eval.rational_curve_divide_curve_equally_by_arc_length = function(degree, knots, control_points, num){
 
-	var tlen = verb.eval.nurbs.rational_curve_arc_length( degree, knots, control_points );
+	var tlen = verb.eval.rational_curve_arc_length( degree, knots, control_points );
 	var inc = tlen / num;
 
-	return verb.eval.nurbs.rational_curve_divide_curve_by_arc_length(degree, knots, control_points, inc);
+	return verb.eval.rational_curve_divide_curve_by_arc_length(degree, knots, control_points, inc);
 
 }
 
@@ -348,10 +348,10 @@ function CurvePoint(u, len){
 	this.len = len;
 }
 
-verb.eval.nurbs.rational_curve_divide_curve_by_arc_length = function(degree, knots, control_points, l){
+verb.eval.rational_curve_divide_curve_by_arc_length = function(degree, knots, control_points, l){
 
-	var crvs = verb.eval.nurbs.curve_bezier_decompose( degree, knots, control_points )
-		, crvlens = crvs.map(function(x){ return verb.eval.nurbs.rational_bezier_curve_arc_length( x.degree, x.knots, x.control_points ); })
+	var crvs = verb.eval.curve_bezier_decompose( degree, knots, control_points )
+		, crvlens = crvs.map(function(x){ return verb.eval.rational_bezier_curve_arc_length( x.degree, x.knots, x.control_points ); })
 		, totlen = crvlens.reduce(function(acc, l){ return acc + l; }, 0)
 		, pts = [ new CurvePoint( knots[0], 0 ) ];
 
@@ -370,7 +370,7 @@ verb.eval.nurbs.rational_curve_divide_curve_by_arc_length = function(degree, kno
 
 		while ( lc < runsum + verb.EPSILON ){
 
-			u = verb.eval.nurbs.rational_bezier_curve_param_at_arc_length( crvs[i].degree, crvs[i].knots, crvs[i].control_points, 
+			u = verb.eval.rational_bezier_curve_param_at_arc_length( crvs[i].degree, crvs[i].knots, crvs[i].control_points, 
 				lc - runsum1, verb.TOLERANCE, crvlens[i] );
 
 			pts.push( new CurvePoint( u, lc ) );
@@ -388,11 +388,11 @@ verb.eval.nurbs.rational_curve_divide_curve_by_arc_length = function(degree, kno
 
 }
 
-verb.eval.nurbs.rational_curve_param_at_arc_length = function(degree, knots, control_points, len, tol, beziers, bezier_lengths){
+verb.eval.rational_curve_param_at_arc_length = function(degree, knots, control_points, len, tol, beziers, bezier_lengths){
 
 	if (len < verb.EPSILON) return knots[0];
 
-	var crvs = beziers || verb.eval.nurbs.curve_bezier_decompose( degree, knots, control_points )
+	var crvs = beziers || verb.eval.curve_bezier_decompose( degree, knots, control_points )
 		, i = 0
 		, cc = crvs[i]
 		, cl = -verb.EPSILON
@@ -402,12 +402,12 @@ verb.eval.nurbs.rational_curve_param_at_arc_length = function(degree, knots, con
 	for (var i = 0; cl < len && i < crvs.length; i++){
 
 		bezier_lengths[i] = bezier_lengths[i] != undefined ? 
-			bezier_lengths[i] : verb.eval.nurbs.rational_bezier_curve_arc_length( degree, knots, control_points ); 
+			bezier_lengths[i] : verb.eval.rational_bezier_curve_arc_length( degree, knots, control_points ); 
 
 		cl += bezier_lengths[i];
 
 		if (len < cl + verb.EPSILON){
-			return verb.eval.nurbs.rational_bezier_curve_param_at_arc_length(degree, knots, 
+			return verb.eval.rational_bezier_curve_param_at_arc_length(degree, knots, 
 				control_points, len, tol, bezier_lengths[i]);
 		}
 
@@ -417,12 +417,12 @@ verb.eval.nurbs.rational_curve_param_at_arc_length = function(degree, knots, con
 
 }
 
-verb.eval.nurbs.rational_bezier_curve_param_at_arc_length = function(degree, knots, control_points, len, tol, total_len){
+verb.eval.rational_bezier_curve_param_at_arc_length = function(degree, knots, control_points, len, tol, total_len){
 
 	if (len < 0) return knots[0];
 
 	// we compute the whole length.  if desired length is outside of that, give up
-	var totalLen = total_len || verb.eval.nurbs.rational_bezier_curve_arc_length( degree, knots, control_points );
+	var totalLen = total_len || verb.eval.rational_bezier_curve_arc_length( degree, knots, control_points );
 
 	if (len > totalLen) return verb.last( knots );
 
@@ -436,7 +436,7 @@ verb.eval.nurbs.rational_bezier_curve_param_at_arc_length = function(degree, kno
 	while ( (end.l - start.l) > tol ){
 
 		mid.p = (start.p + end.p) / 2;
-		mid.l = verb.eval.nurbs.rational_bezier_curve_arc_length(degree, knots, control_points, mid.p );
+		mid.l = verb.eval.rational_bezier_curve_arc_length(degree, knots, control_points, mid.p );
 
 		if (mid.l > len){
 			end.p = mid.p;
@@ -452,17 +452,17 @@ verb.eval.nurbs.rational_bezier_curve_param_at_arc_length = function(degree, kno
 
 }
 
-verb.eval.nurbs.rational_curve_arc_length = function(degree, knots, control_points, u){
+verb.eval.rational_curve_arc_length = function(degree, knots, control_points, u){
 
 	if (u === undefined) u = verb.last( knots );
 
-	var crvs = verb.eval.nurbs.curve_bezier_decompose( degree, knots, control_points )
+	var crvs = verb.eval.curve_bezier_decompose( degree, knots, control_points )
 		, i = 0
 		, cc = crvs[i]
 		, sum = 0;
 
 	while ( cc && cc.knots[0] + verb.EPSILON < u  ){
-		sum += verb.eval.nurbs.rational_bezier_curve_arc_length( cc.degree, cc.knots, cc.control_points, 
+		sum += verb.eval.rational_bezier_curve_arc_length( cc.degree, cc.knots, cc.control_points, 
 			Math.min(verb.last(cc.knots), u) );
 		
 		cc = crvs[++i];
@@ -472,7 +472,7 @@ verb.eval.nurbs.rational_curve_arc_length = function(degree, knots, control_poin
 	
 }
 
-verb.eval.nurbs.rational_bezier_curve_arc_length = function(degree, knots, control_points, u, gaussDegIncrease) {
+verb.eval.rational_bezier_curve_arc_length = function(degree, knots, control_points, u, gaussDegIncrease) {
 
   var u = u === undefined ? verb.last(knots) : u
   	, z = (u - knots[0]) / 2
@@ -484,10 +484,10 @@ verb.eval.nurbs.rational_bezier_curve_arc_length = function(degree, knots, contr
 
   for(; i < gaussDeg; i++) {
 
-    cu = z * verb.eval.nurbs.Tvalues[gaussDeg][i] + z + knots[0];
-    tan = verb.eval.nurbs.rational_curve_derivs( degree, knots, control_points, cu, 1 );
+    cu = z * verb.eval.Tvalues[gaussDeg][i] + z + knots[0];
+    tan = verb.eval.rational_curve_derivs( degree, knots, control_points, cu, 1 );
 
-    sum += verb.eval.nurbs.Cvalues[gaussDeg][i] * numeric.norm2( tan[1] );
+    sum += verb.eval.Cvalues[gaussDeg][i] * numeric.norm2( tan[1] );
 
   }
 
@@ -495,7 +495,7 @@ verb.eval.nurbs.rational_bezier_curve_arc_length = function(degree, knots, contr
 }
 
 // Legendre-Gauss abscissae (xi values, defined at i=n as the roots of the nth order Legendre polynomial Pn(x))
-verb.eval.nurbs.Tvalues = [
+verb.eval.Tvalues = [
 	[],
 	[],
   [  -0.5773502691896257645091487805019574556476,0.5773502691896257645091487805019574556476],
@@ -524,7 +524,7 @@ verb.eval.nurbs.Tvalues = [
 ];
 
 // Legendre-Gauss weights (wi values, defined by a function linked to in the Bezier primer article)
-verb.eval.nurbs.Cvalues = [[],[],
+verb.eval.Cvalues = [[],[],
   [1.0,1.0],
   [0.8888888888888888888888888888888888888888,0.5555555555555555555555555555555555555555,0.5555555555555555555555555555555555555555],
   [0.6521451548625461426269360507780005927646,0.6521451548625461426269360507780005927646,0.3478548451374538573730639492219994072353,0.3478548451374538573730639492219994072353],
@@ -550,7 +550,7 @@ verb.eval.nurbs.Cvalues = [[],[],
   [0.1279381953467521569740561652246953718517,0.1279381953467521569740561652246953718517,0.1258374563468282961213753825111836887264,0.1258374563468282961213753825111836887264,0.1216704729278033912044631534762624256070,0.1216704729278033912044631534762624256070,0.1155056680537256013533444839067835598622,0.1155056680537256013533444839067835598622,0.1074442701159656347825773424466062227946,0.1074442701159656347825773424466062227946,0.0976186521041138882698806644642471544279,0.0976186521041138882698806644642471544279,0.0861901615319532759171852029837426671850,0.0861901615319532759171852029837426671850,0.0733464814110803057340336152531165181193,0.0733464814110803057340336152531165181193,0.0592985849154367807463677585001085845412,0.0592985849154367807463677585001085845412,0.0442774388174198061686027482113382288593,0.0442774388174198061686027482113382288593,0.0285313886289336631813078159518782864491,0.0285313886289336631813078159518782864491,0.0123412297999871995468056670700372915759,0.0123412297999871995468056670700372915759]
 ];
 
-verb.eval.nurbs.rational_interp_curve = function( points, degree, start_tangent, end_tangent ) {
+verb.eval.rational_interp_curve = function( points, degree, start_tangent, end_tangent ) {
 
 	// 0) build knot vector for curve by normalized chord length
 	// 1) construct effective basis function in square matrix (W)
@@ -614,13 +614,13 @@ verb.eval.nurbs.rational_interp_curve = function( points, degree, start_tangent,
 
 		var u = us[i];
 
-		var span = verb.eval.nurbs.knot_span_given_n( n, degree, u, knots )
-		var basisFuncs = verb.eval.nurbs.basis_functions_given_knot_span_index( span, u, degree, knots );
+		var span = verb.eval.knot_span_given_n( n, degree, u, knots )
+		var basisFuncs = verb.eval.basis_functions_given_knot_span_index( span, u, degree, knots );
 
 		var ls = span - degree;
 
-		var rowstart = verb.eval.nurbs.zeros_1d( ls );
-		var rowend = verb.eval.nurbs.zeros_1d( ld - ls );
+		var rowstart = verb.eval.zeros_1d( ls );
+		var rowend = verb.eval.zeros_1d( ld - ls );
 
 		A.push( rowstart.concat(basisFuncs).concat(rowend) );
 	}
@@ -628,8 +628,8 @@ verb.eval.nurbs.rational_interp_curve = function( points, degree, start_tangent,
 	if (hasTangents){
 		var ln = A[0].length - 2;
 
-		var tanRow0 = [-1,1].concat( verb.eval.nurbs.zeros_1d( ln ) );
-		var tanRow1 = verb.eval.nurbs.zeros_1d( ln ).concat( [-1,1] );
+		var tanRow0 = [-1,1].concat( verb.eval.zeros_1d( ln ) );
+		var tanRow1 = verb.eval.zeros_1d( ln ).concat( [-1,1] );
 
 		A.splice( 1, 0, tanRow0 );
 		A.splice( A.length-1, 0, tanRow1 );
@@ -684,11 +684,11 @@ verb.eval.nurbs.rational_interp_curve = function( points, degree, start_tangent,
 // **returns** 
 // + *Object*, an object with the following properties: control_points, weights, knots, degree
 //
-verb.eval.nurbs.get_sweep1_surface = function( profile_knots, profile_degree, profile_control_points, profile_weights, rail_knots, rail_degree, rail_control_points, rail_weights ) {
+verb.eval.get_sweep1_surface = function( profile_knots, profile_degree, profile_control_points, profile_weights, rail_knots, rail_degree, rail_control_points, rail_weights ) {
 
 	// for each point on rail, move all of the points
-	var homo_rail = verb.eval.nurbs.homogenize_1d( rail_control_points, rail_weights )
-		, rail_start = verb.eval.nurbs.rational_curve_point( rail_degree, rail_knots, homo_rail, 0 )
+	var homo_rail = verb.eval.homogenize_1d( rail_control_points, rail_weights )
+		, rail_start = verb.eval.rational_curve_point( rail_degree, rail_knots, homo_rail, 0 )
 		, span = 1.0 / rail_control_points.length
 		, control_points = []
 		, weights = [];
@@ -696,7 +696,7 @@ verb.eval.nurbs.get_sweep1_surface = function( profile_knots, profile_degree, pr
 	for (var i = 0; i < rail_control_points.length; i++ ){
 
 		// evaluate the point on the curve, subtracting it from the first point
-		var rail_point = verb.eval.nurbs.rational_curve_point( rail_degree, rail_knots, homo_rail, i * span )
+		var rail_point = verb.eval.rational_curve_point( rail_degree, rail_knots, homo_rail, i * span )
 			, rail_offset = numeric.sub( rail_point, rail_start )
 			, row_control_points = []
 			, row_weights = [];
@@ -739,7 +739,7 @@ verb.eval.nurbs.get_sweep1_surface = function( profile_knots, profile_degree, pr
 // + *Object*, an object with the following properties: control_points, weights, knots, degree
 //
 
-verb.eval.nurbs.get_ellipse_arc = function( center, xaxis, yaxis, xradius, yradius, start_angle, end_angle ) {
+verb.eval.get_ellipse_arc = function( center, xaxis, yaxis, xradius, yradius, start_angle, end_angle ) {
 
 	// if the end angle is less than the start angle, do a circle
 	if (end_angle < start_angle) end_angle = 2 * Math.PI + start_angle;
@@ -765,11 +765,11 @@ verb.eval.nurbs.get_ellipse_arc = function( center, xaxis, yaxis, xradius, yradi
 		, w1 = Math.cos( dtheta / 2) 
 		, P0 = numeric.add( center, numeric.mul( xradius, Math.cos(start_angle), xaxis), numeric.mul( yradius, Math.sin(start_angle), yaxis ) )
 		, T0 = numeric.sub( numeric.mul( Math.cos(start_angle), yaxis ), numeric.mul( Math.sin(start_angle), xaxis) )
-		, Pw = verb.eval.nurbs.zeros_1d( narcs * 2 )
-		, U = verb.eval.nurbs.zeros_1d( 2 *narcs + 3 )
+		, Pw = verb.eval.zeros_1d( narcs * 2 )
+		, U = verb.eval.zeros_1d( 2 *narcs + 3 )
 		, index = 0
 		, angle = start_angle
-		, W = verb.eval.nurbs.zeros_1d( narcs * 2 );
+		, W = verb.eval.zeros_1d( narcs * 2 );
 
 	Pw[0] = P0;
 	W[0] = 1;
@@ -784,7 +784,7 @@ verb.eval.nurbs.get_ellipse_arc = function( center, xaxis, yaxis, xradius, yradi
 
 		var T2 = numeric.sub( numeric.mul( Math.cos(angle), yaxis ), numeric.mul( Math.sin(angle), xaxis) )
 
-		var params = verb.eval.geom.intersect_rays(P0, numeric.mul( 1 / numeric.norm2(T0), T0), P2, numeric.mul( 1 / numeric.norm2(T2), T2));
+		var params = verb.eval.intersect_rays(P0, numeric.mul( 1 / numeric.norm2(T0), T0), P2, numeric.mul( 1 / numeric.norm2(T2), T2));
 		var P1 = numeric.add( P0, numeric.mul(T0, params[0]));
 
 		W[index+1] = w1;
@@ -834,11 +834,11 @@ verb.eval.nurbs.get_ellipse_arc = function( center, xaxis, yaxis, xradius, yradi
 // + *Object*, an object with the following properties: control_points, weights, knots_u, knots_v, degree_u, degree_v
 //
 
-verb.eval.nurbs.get_sphere_surface = function( center, axis, xaxis, radius ){
+verb.eval.get_sphere_surface = function( center, axis, xaxis, radius ){
 
-	var arc = verb.eval.nurbs.get_arc(center, numeric.mul(axis, -1), xaxis, radius, 0, Math.PI );
+	var arc = verb.eval.get_arc(center, numeric.mul(axis, -1), xaxis, radius, 0, Math.PI );
 
-	return verb.eval.nurbs.get_revolved_surface( center, axis, 2 * Math.PI, arc.knots, arc.degree, arc.control_points, arc.weights );
+	return verb.eval.get_revolved_surface( center, axis, 2 * Math.PI, arc.knots, arc.degree, arc.control_points, arc.weights );
 
 }
 
@@ -855,7 +855,7 @@ verb.eval.nurbs.get_sphere_surface = function( center, axis, xaxis, radius ){
 // + *Object*, an object with the following properties: control_points, weights, knots, degree
 //
 
-verb.eval.nurbs.get_polyline_curve = function( pts ){
+verb.eval.get_polyline_curve = function( pts ){
 
 	var num_spans = pts.length - 1
 		, span = 1.0 / num_spans
@@ -898,7 +898,7 @@ verb.eval.nurbs.get_polyline_curve = function( pts ){
 // + *Object*, an object with the following properties: control_points, weights, knots_u, knots_v, degree_u, degree_v
 //
 
-verb.eval.nurbs.get_4pt_surface = function( p1, p2, p3, p4 ){
+verb.eval.get_4pt_surface = function( p1, p2, p3, p4 ){
 
 	var p1p4 = numeric.mul( 0.5, numeric.add( p1, p4 ));
 	var p2p3 = numeric.mul( 0.5, numeric.add( p2, p3 ));
@@ -935,13 +935,13 @@ verb.eval.nurbs.get_4pt_surface = function( p1, p2, p3, p4 ){
 // + *Object*, an object with the following properties: control_points, weights, knots_u, knots_v, degree_u, degree_v
 //
 
-verb.eval.nurbs.get_cylinder_surface = function( axis, xaxis, base, height, radius ){
+verb.eval.get_cylinder_surface = function( axis, xaxis, base, height, radius ){
 
 	var yaxis = crossprod( axis, xaxis )
 		, angle = 2 * Math.PI
-		, circ = verb.eval.nurbs.get_arc( base, xaxis, yaxis, radius, 0, 2 * Math.PI );
+		, circ = verb.eval.get_arc( base, xaxis, yaxis, radius, 0, 2 * Math.PI );
 
-	return verb.eval.nurbs.get_extruded_surface( axis, height, circ.knots, circ.degree, circ.control_points, circ.weights );
+	return verb.eval.get_extruded_surface( axis, height, circ.knots, circ.degree, circ.control_points, circ.weights );
 
 }
 
@@ -960,7 +960,7 @@ verb.eval.nurbs.get_cylinder_surface = function( axis, xaxis, base, height, radi
 // + *Object*, an object with the following properties: control_points, weights, knots, degree
 //
 
-verb.eval.nurbs.get_cone_surface = function( axis, xaxis, base, height, radius ){
+verb.eval.get_cone_surface = function( axis, xaxis, base, height, radius ){
 
 	var angle = 2 * Math.PI
 		, prof_degree = 1
@@ -968,7 +968,7 @@ verb.eval.nurbs.get_cone_surface = function( axis, xaxis, base, height, radius )
 		, prof_knots = [0,0,1,1]
 		, prof_weights = [1,1];
 
-	return verb.eval.nurbs.get_revolved_surface(base, axis, angle, prof_knots, prof_degree, prof_ctrl_pts, prof_weights);
+	return verb.eval.get_revolved_surface(base, axis, angle, prof_knots, prof_degree, prof_ctrl_pts, prof_weights);
 
 }
 
@@ -988,10 +988,10 @@ verb.eval.nurbs.get_cone_surface = function( axis, xaxis, base, height, radius )
 // + *Object*, an object with the following properties: control_points, weights, knots, degree
 //
 
-verb.eval.nurbs.get_extruded_surface = function( axis, length, prof_knots, prof_degree, prof_control_points, prof_weights){
+verb.eval.get_extruded_surface = function( axis, length, prof_knots, prof_degree, prof_control_points, prof_weights){
 
-	var control_points = verb.eval.nurbs.zeros_2d( 3, prof_control_points.length )
-		, weights = verb.eval.nurbs.zeros_2d( 3, prof_control_points.length );
+	var control_points = verb.eval.zeros_2d( 3, prof_control_points.length )
+		, weights = verb.eval.zeros_2d( 3, prof_control_points.length );
 
 	var translation = numeric.mul(axis, length);
 	var halfTranslation = numeric.mul(axis, 0.5 * length);
@@ -1040,26 +1040,26 @@ function crossprod(u,v) {
   return [u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
 }
 
-verb.eval.nurbs.get_revolved_surface = function( center, axis, theta, prof_knots, prof_degree, prof_control_points, prof_weights){
+verb.eval.get_revolved_surface = function( center, axis, theta, prof_knots, prof_degree, prof_control_points, prof_weights){
 
 	var narcs, knots_u, control_points, weights;
 
 	if (theta <= Math.PI / 2) { // less than 90
 		narcs = 1;
-		knots_u = verb.eval.nurbs.zeros_1d( 6 + 2  * (narcs-1) );
+		knots_u = verb.eval.zeros_1d( 6 + 2  * (narcs-1) );
 	} else {
 		if (theta <= Math.PI){  // between 90 and 180
 			narcs = 2;
-			knots_u = verb.eval.nurbs.zeros_1d( 6 + 2 * (narcs-1) );
+			knots_u = verb.eval.zeros_1d( 6 + 2 * (narcs-1) );
 			knots_u[3]= knots_u[4] = 0.5;
 		} else if (theta <= 3 * Math.PI / 2){ // between 180 and 270
 			narcs = 3;
-			knots_u = verb.eval.nurbs.zeros_1d( 6 + 2 * (narcs-1) );
+			knots_u = verb.eval.zeros_1d( 6 + 2 * (narcs-1) );
 			knots_u[3]= knots_u[4] = 1/3;
 			knots_u[5]= knots_u[6] = 2/3;
 		} else { // between 270 and 360
 			narcs = 4;
-			knots_u = verb.eval.nurbs.zeros_1d( 6 + 2 * (narcs-1) );
+			knots_u = verb.eval.zeros_1d( 6 + 2 * (narcs-1) );
 			knots_u[3]= knots_u[4] = 1/4;
 			knots_u[5]= knots_u[6] = 1/2;
 			knots_u[7]= knots_u[8] = 3/4;
@@ -1081,10 +1081,10 @@ verb.eval.nurbs.get_revolved_surface = function( center, axis, theta, prof_knots
 	var n = 2 * narcs 
 		, wm = Math.cos( dtheta/2.0 )
 		, angle = 0.0
-		, sines = verb.eval.nurbs.zeros_1d( narcs + 1)
-		, cosines = verb.eval.nurbs.zeros_1d( narcs + 1)
-		, control_points = verb.eval.nurbs.zeros_2d( 2*narcs + 1, prof_control_points.length )
-		, weights = verb.eval.nurbs.zeros_2d( 2*narcs + 1, prof_control_points.length );
+		, sines = verb.eval.zeros_1d( narcs + 1)
+		, cosines = verb.eval.zeros_1d( narcs + 1)
+		, control_points = verb.eval.zeros_2d( 2*narcs + 1, prof_control_points.length )
+		, weights = verb.eval.zeros_2d( 2*narcs + 1, prof_control_points.length );
 
 	// initialize the sines and cosines
 	for (var i = 1; i <= narcs; i++){
@@ -1098,7 +1098,7 @@ verb.eval.nurbs.get_revolved_surface = function( center, axis, theta, prof_knots
 	for (j = 0; j < prof_control_points.length; j++){
 
 		// get the closest point of the generatrix point on the axis
-		var O = verb.eval.geom.closest_point_on_ray(prof_control_points[j], center, axis)
+		var O = verb.eval.closest_point_on_ray(prof_control_points[j], center, axis)
 			// X is the vector from the axis to generatrix control pt
 			, X = numeric.sub( prof_control_points[j], O )
 			// radius at that height
@@ -1138,7 +1138,7 @@ verb.eval.nurbs.get_revolved_surface = function( center, axis, theta, prof_knots
 			if (r == 0){
 				control_points[index+1][j] = O;
 			} else {
-				var params = verb.eval.geom.intersect_rays(P0, numeric.mul( 1 / numeric.norm2(T0), T0), P2, numeric.mul( 1 / numeric.norm2(T2), T2));
+				var params = verb.eval.intersect_rays(P0, numeric.mul( 1 / numeric.norm2(T0), T0), P2, numeric.mul( 1 / numeric.norm2(T2), T2));
 				var P1 = numeric.add( P0, numeric.mul(T0, params[0]));
 
 				control_points[index+1][j] = P1;
@@ -1187,9 +1187,9 @@ verb.eval.nurbs.get_revolved_surface = function( center, axis, theta, prof_knots
 // + *Object*, an object with the following properties: control_points, weights, knots, degree
 //
 
-verb.eval.nurbs.get_arc = function( center, xaxis, yaxis, radius, start_angle, end_angle ) {
+verb.eval.get_arc = function( center, xaxis, yaxis, radius, start_angle, end_angle ) {
 
-	return verb.eval.nurbs.get_ellipse_arc( center, xaxis, yaxis, radius, radius, start_angle, end_angle );
+	return verb.eval.get_ellipse_arc( center, xaxis, yaxis, radius, radius, start_angle, end_angle );
 
 }
 

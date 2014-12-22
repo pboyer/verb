@@ -38,7 +38,7 @@
 		// construct a nurbs surface
 		// verb.init();
 		// var p1 = [0,0,0], p2 = [10,0,0], p3 = [10,10,5], p4 = [0,10,0];
-		// var srf = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
+		// var srf = new verb.FourPointSurface( p1, p2, p3, p4 );
 		// var srf;
 
 		function getWarpedPlane(){ 
@@ -66,14 +66,14 @@
 				, height = 20
 				, radius = 2;
 
-			//srf = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
+			//srf = new verb.Cylinder( axis, xaxis, base, height, radius );
 
-			//srf = new verb.geom.NurbsSurface( degree, knots, degree, knots, pts, wts );
+			//srf = new verb.NurbsSurface( degree, knots, degree, knots, pts, wts );
 
 			// var srfs = srf.split( 0.5 );
 			//srf = srfs[1];
 
-			srf = new verb.geom.Sphere( [0,0,0], 10 );
+			srf = new verb.Sphere( [0,0,0], 10 );
 
 			var srfObj = {
 				degree_u : srf.get('degreeU'),
@@ -88,7 +88,7 @@
 
 		var srfObj = getWarpedPlane();
 
-		var mesh = verb.eval.nurbs.tessellate_rational_surface_adaptive( srf.get('degreeU'),
+		var mesh = verb.eval.tessellate_rational_surface_adaptive( srf.get('degreeU'),
 			srf.get('knotsU'),
 			srf.get('degreeV'),
 			srf.get('knotsV'), 
@@ -100,7 +100,7 @@
 
 		for (var i = 0; i < runs; i++){
 
-			var mesh = verb.eval.nurbs.tessellate_rational_surface_adaptive( srf.get('degreeU'),
+			var mesh = verb.eval.tessellate_rational_surface_adaptive( srf.get('degreeU'),
 				srf.get('knotsU'),
 				srf.get('degreeV'),
 				srf.get('knotsV'), 

@@ -9,9 +9,9 @@
 // + *Number*, Radius of the arc
 // + *Interval*, Interval object representing the interval of the arc
 
-verb.geom.Arc = function(center, xaxis, yaxis, radius, interval) {
+verb.Arc = function(center, xaxis, yaxis, radius, interval) {
 
-	verb.geom.NurbsCurve.call(this);
+	verb.NurbsCurve.call(this);
 
 	this.setAll( {
 		"center": center,
@@ -24,12 +24,12 @@ verb.geom.Arc = function(center, xaxis, yaxis, radius, interval) {
 	this.update();
 	this.watchAll( ['center', 'xaxis', 'yaxis', 'radius', 'interval'], this.update );
 
-}.inherits(verb.geom.NurbsCurve);
+}.inherits(verb.NurbsCurve);
 
 // #### nurbsRep()
 //
 // Construct the Nurbs representation
-verb.geom.Arc.prototype.nurbsRep = function(){
+verb.Arc.prototype.nurbsRep = function(){
 
 	return this.nurbsEngine.eval( 'get_arc', [ this.get("center"), 
 													 this.get("xaxis"), 

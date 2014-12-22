@@ -6,9 +6,9 @@
 // + *Array*, Length 3 array representing the start point
 // + *Array*, Length 3 array representing the end point
 //
-verb.geom.Line = function(start, end) {
+verb.Line = function(start, end) {
 
-	verb.geom.NurbsCurve.call(this);
+	verb.NurbsCurve.call(this);
 
 	this.setAll({ 
 		"start": start,
@@ -19,12 +19,12 @@ verb.geom.Line = function(start, end) {
 
 	this.watchAll(['start', 'end'], this.update );
 
-}.inherits(verb.geom.NurbsCurve);
+}.inherits(verb.NurbsCurve);
 
 // #### nurbsRep()
 //
 // Construct the Nurbs representation
-verb.geom.Line.prototype.nurbsRep = function(){
+verb.Line.prototype.nurbsRep = function(){
 
 	return {
 			knots: [0,0,1,1], 

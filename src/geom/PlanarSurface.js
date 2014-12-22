@@ -9,9 +9,9 @@
 // + *Number*, Length in the u direction 
 // + *Number*, Length in the v direction
 //
-verb.geom.PlanarSurface = function( base, uaxis, vaxis, ulength, vlength ) {
+verb.PlanarSurface = function( base, uaxis, vaxis, ulength, vlength ) {
 
-	verb.geom.NurbsSurface.call(this);
+	verb.NurbsSurface.call(this);
 
 	this.setAll({
 		"base": base,
@@ -25,12 +25,12 @@ verb.geom.PlanarSurface = function( base, uaxis, vaxis, ulength, vlength ) {
 
 	this.watchAll( ['base', 'uaxis', 'vaxis', 'ulength', 'vlength'], this.update );
 
-}.inherits(verb.geom.NurbsSurface);
+}.inherits(verb.NurbsSurface);
 
 // #### nurbsRep()
 //
 // Construct the Nurbs representation
-verb.geom.PlanarSurface.prototype.nurbsRep = function(){
+verb.PlanarSurface.prototype.nurbsRep = function(){
 
 	var p1 = this.get('base')
 		, uedge = numeric.mul( this.get('uaxis'), this.get('ulength'))

@@ -10,9 +10,9 @@
 // + *Array*, No default. The tangent vector (first derivative) at the start of the curve.
 // + *Array*, No default. The tangent vector (second derivative) at the end of the curve.
 //
-verb.geom.InterpCurve = function(points, degree, startTangent, endTangent ) {
+verb.InterpCurve = function(points, degree, startTangent, endTangent ) {
 
-	verb.geom.NurbsCurve.call(this);
+	verb.NurbsCurve.call(this);
 
 	var atts = {
 		"pts": points ? points.slice(0) : [],
@@ -37,12 +37,12 @@ verb.geom.InterpCurve = function(points, degree, startTangent, endTangent ) {
 
 	this.watchAll( watchList, this.update );
 
-}.inherits(verb.geom.NurbsCurve);
+}.inherits(verb.NurbsCurve);
 
 // #### nurbsRep()
 //
 // Construct the Nurbs representation
-verb.geom.InterpCurve.prototype.nurbsRep = function(){
+verb.InterpCurve.prototype.nurbsRep = function(){
 
 	return this.nurbsEngine.eval( 'rational_interp_curve', [ this.get("pts"), this.get('degree'), this.get('startTangent'), this.get('endTangent')]);
 

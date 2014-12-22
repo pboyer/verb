@@ -15,7 +15,7 @@
 // + *Array*, first element of array is an array of positions, second element are 3-tuple of triangle windings, third element is the 
 // uvs
 
-verb.eval.nurbs.tessellate_rational_surface_naive = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, divs_u, divs_v ) {
+verb.eval.tessellate_rational_surface_naive = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, divs_u, divs_v ) {
 
 	if ( divs_u < 1 ) {
 		divs_u = 1;
@@ -43,7 +43,7 @@ verb.eval.nurbs.tessellate_rational_surface_naive = function( degree_u, knots_u,
 
 			uvs.push( [pt_u, pt_v] );
 
-			var derivs = verb.eval.nurbs.rational_surface_derivs( degree_u, knots_u, degree_v, knots_v, homo_control_points, 1, pt_u, pt_v );
+			var derivs = verb.eval.rational_surface_derivs( degree_u, knots_u, degree_v, knots_v, homo_control_points, 1, pt_u, pt_v );
 			var pt = derivs[0][0];
 
 			points.push( pt );
@@ -92,9 +92,9 @@ verb.eval.nurbs.tessellate_rational_surface_naive = function( degree_u, knots_u,
 // + *Array*, an array of points, prepended by the point param
 //
 
-verb.eval.nurbs.rational_curve_regular_sample = function( degree, knots, control_points, num_samples, include_u ) {
+verb.eval.rational_curve_regular_sample = function( degree, knots, control_points, num_samples, include_u ) {
 
-	return verb.eval.nurbs.rational_curve_regular_sample_range( degree, knots, control_points, knots[0], verb.last(knots), num_samples, include_u);
+	return verb.eval.rational_curve_regular_sample_range( degree, knots, control_points, knots[0], verb.last(knots), num_samples, include_u);
 
 }
 
@@ -116,7 +116,7 @@ verb.eval.nurbs.rational_curve_regular_sample = function( degree, knots, control
 // + *Array*, an dictionary of parameter - point pairs
 //
 
-verb.eval.nurbs.rational_curve_regular_sample_range = function( degree, knots, control_points, start_u, end_u, num_samples, include_u ) {
+verb.eval.rational_curve_regular_sample_range = function( degree, knots, control_points, start_u, end_u, num_samples, include_u ) {
 
 	if (num_samples < 1){
 		num_samples = 2;
@@ -130,9 +130,9 @@ verb.eval.nurbs.rational_curve_regular_sample_range = function( degree, knots, c
 
 		u = start_u + span * i;
 		if ( include_u ){
-			p.push( [u].concat( verb.eval.nurbs.rational_curve_point(degree, knots, control_points, u) ) );
+			p.push( [u].concat( verb.eval.rational_curve_point(degree, knots, control_points, u) ) );
 		} else {
-			p.push( verb.eval.nurbs.rational_curve_point(degree, knots, control_points, u) );
+			p.push( verb.eval.rational_curve_point(degree, knots, control_points, u) );
 		}
 	
 	}
@@ -158,21 +158,21 @@ verb.eval.nurbs.rational_curve_regular_sample_range = function( degree, knots, c
 // + *Array*, an array of dim + 1 length where the first element is the param where it was sampled and the remaining the pt
 //
 
-verb.eval.nurbs.rational_curve_adaptive_sample = function( degree, knots, control_points, tol, include_u ) {
+verb.eval.rational_curve_adaptive_sample = function( degree, knots, control_points, tol, include_u ) {
 
 	// if degree is 1, just return the dehomogenized control points
 	if (degree === 1){ 
 		if ( !include_u ) {
-			return control_points.map( verb.eval.nurbs.dehomogenize );
+			return control_points.map( verb.eval.dehomogenize );
 		} else {
 			// the first element of each array is the parameter
 			return control_points.map(function(x, i){
-				return [ knots[i+1] ].concat( verb.eval.nurbs.dehomogenize( x ) );
+				return [ knots[i+1] ].concat( verb.eval.dehomogenize( x ) );
 			});
 		}
 	}
 
-	return verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knots, control_points, knots[0], knots[knots.length-1], tol, include_u );
+	return verb.eval.rational_curve_adaptive_sample_range( degree, knots, control_points, knots[0], knots[knots.length-1], tol, include_u );
 
 }
 
@@ -194,28 +194,28 @@ verb.eval.nurbs.rational_curve_adaptive_sample = function( degree, knots, contro
 // + *Array*, an array of dim + 1 length where the first element is the param where it was sampled and the remaining the pt
 //
 
-verb.eval.nurbs.rational_curve_adaptive_sample_range = function( degree, knots, control_points, start_u, end_u, tol, include_u ) {
+verb.eval.rational_curve_adaptive_sample_range = function( degree, knots, control_points, start_u, end_u, tol, include_u ) {
 
 	// sample curve at three pts
-	var p1 = verb.eval.nurbs.rational_curve_point(degree, knots, control_points, start_u),
-		p3 = verb.eval.nurbs.rational_curve_point(degree, knots, control_points, end_u),
+	var p1 = verb.eval.rational_curve_point(degree, knots, control_points, start_u),
+		p3 = verb.eval.rational_curve_point(degree, knots, control_points, end_u),
 		t = 0.5 + 0.2 * Math.random(),
 		mid_u = start_u + (end_u - start_u) * t,
-		p2 = verb.eval.nurbs.rational_curve_point(degree, knots, control_points, mid_u);
+		p2 = verb.eval.rational_curve_point(degree, knots, control_points, mid_u);
 
 	// if the two end control points are coincident, the three point test will always return 0, let's split the curve
 	var diff = numeric.sub( p1, p3);
 	var diff2 = numeric.sub( p1, p2);
 
 	// the first condition checks if the curve makes up a loop, if so, we will need to continue evaluation
-	if ( ( numeric.dot( diff, diff ) < tol && numeric.dot( diff2, diff2 ) > tol ) || !verb.eval.nurbs.three_points_are_flat( p1, p2, p3, tol ) ) {
+	if ( ( numeric.dot( diff, diff ) < tol && numeric.dot( diff2, diff2 ) > tol ) || !verb.eval.three_points_are_flat( p1, p2, p3, tol ) ) {
 
 		// get the exact middle
 		var exact_mid_u = start_u + (end_u - start_u) * 0.5;
 
 		// recurse on the two halves
-		var left_pts = verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knots, control_points, start_u, exact_mid_u, tol, include_u )
-			, right_pts = verb.eval.nurbs.rational_curve_adaptive_sample_range( degree, knots, control_points, exact_mid_u, end_u, tol, include_u );
+		var left_pts = verb.eval.rational_curve_adaptive_sample_range( degree, knots, control_points, start_u, exact_mid_u, tol, include_u )
+			, right_pts = verb.eval.rational_curve_adaptive_sample_range( degree, knots, control_points, exact_mid_u, end_u, tol, include_u );
 
 		// concatenate the two		
 		return left_pts.slice(0, -1).concat(right_pts);
@@ -253,7 +253,7 @@ verb.eval.nurbs.rational_curve_adaptive_sample_range = function( degree, knots, 
 // **returns** 
 // + *Number*, Whether the triangle passes the test
 //
-verb.eval.nurbs.three_points_are_flat = function( p1, p2, p3, tol ) {
+verb.eval.three_points_are_flat = function( p1, p2, p3, tol ) {
 
 	// find the area of the triangle without using a square root
 	var p2mp1 = numeric.sub( p2, p1 )
@@ -265,7 +265,7 @@ verb.eval.nurbs.three_points_are_flat = function( p1, p2, p3, tol ) {
 
 }
 
-verb.eval.nurbs.divide_rational_surface_adaptive = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, options ) {
+verb.eval.divide_rational_surface_adaptive = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, options ) {
 
 	var i, j, li, lj;
 
@@ -306,7 +306,7 @@ verb.eval.nurbs.divide_rational_surface_adaptive = function( degree_u, knots_u, 
 				, v = vmin + dv * i;
 
 			// todo: make this faster by specifying n,m
-			var ds = verb.eval.nurbs.rational_surface_derivs( degree_u, 
+			var ds = verb.eval.rational_surface_derivs( degree_u, 
 																												knots_u, 
 																												degree_v, 
 																												knots_v, 
@@ -316,7 +316,7 @@ verb.eval.nurbs.divide_rational_surface_adaptive = function( degree_u, knots_u, 
 																												v );
 
 			var norm = numeric.normalized( numeric.cross(  ds[0][1], ds[1][0] ) );
-		  ptrow.push( new verb.geom.SurfacePoint( ds[0][0], 
+		  ptrow.push( new verb.SurfacePoint( ds[0][0], 
 		  																				norm, 
 		  																				[u,v],
 		  																				null, 
@@ -333,7 +333,7 @@ verb.eval.nurbs.divide_rational_surface_adaptive = function( degree_u, knots_u, 
 											pts[divsV - i][j+1],
 											pts[divsV - i][j] ];
 
-		  divs.push( new verb.eval.nurbs.AdaptiveRefinementNode( srf, corners ) );
+		  divs.push( new verb.eval.AdaptiveRefinementNode( srf, corners ) );
 		}
 	}
 
@@ -378,25 +378,25 @@ verb.west = function(index, i, j, divsU, divsV, divs){
 	return divs[ index - 1 ];
 }
 
-verb.eval.nurbs.triangulate_adaptive_refinement_node_tree = function( arrTree ){
+verb.eval.triangulate_adaptive_refinement_node_tree = function( arrTree ){
 
 	// triangulate all of the nodes of the tree
-	var mesh = verb.geom.TriMesh.empty();
+	var mesh = verb.TriMesh.empty();
 	arrTree.forEach(function(x){  x.triangulate( mesh ); });
 	return mesh;
 
 }
 
-verb.eval.nurbs.tessellate_rational_surface_adaptive = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, options ) {
+verb.eval.tessellate_rational_surface_adaptive = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, options ) {
 
 	// adaptive divide
-	var arrTrees = verb.eval.nurbs.divide_rational_surface_adaptive( degree_u, knots_u, degree_v, knots_v, homo_control_points, options );
+	var arrTrees = verb.eval.divide_rational_surface_adaptive( degree_u, knots_u, degree_v, knots_v, homo_control_points, options );
 
 	// triangulation
-	return verb.eval.nurbs.triangulate_adaptive_refinement_node_tree( arrTrees );
+	return verb.eval.triangulate_adaptive_refinement_node_tree( arrTrees );
 }
 
-verb.eval.nurbs.dist_to_seg = function(a, b, c){
+verb.eval.dist_to_seg = function(a, b, c){
 
 	// check if ac is zero length
 	var acv = numeric.sub( c, a );
@@ -423,7 +423,7 @@ verb.eval.nurbs.dist_to_seg = function(a, b, c){
 
 }
 
-verb.geom.SurfacePoint = function(point, normal, uv, id, degen){
+verb.SurfacePoint = function(point, normal, uv, id, degen){
 	this.uv = uv;
 	this.point = point;
 	this.normal = normal;
@@ -431,22 +431,22 @@ verb.geom.SurfacePoint = function(point, normal, uv, id, degen){
 	this.degen = degen;
 }
 
-verb.geom.SurfacePoint.fromUv = function(u,v){
-	return new verb.geom.SurfacePoint(null, null, [u,v], null, null);
+verb.SurfacePoint.fromUv = function(u,v){
+	return new verb.SurfacePoint(null, null, [u,v], null, null);
 }
 
-verb.geom.TriMesh = function(faces, points, uvs, normals){
+verb.TriMesh = function(faces, points, uvs, normals){
 	this.faces = faces;
 	this.points = points;
 	this.uvs = uvs;
 	this.normals = normals;
 }
 
-verb.geom.TriMesh.empty = function(){
-	return new verb.geom.TriMesh([],[],[],[]);
+verb.TriMesh.empty = function(){
+	return new verb.TriMesh([],[],[],[]);
 }
 
-verb.eval.nurbs.AdaptiveRefinementNode = function( srf, corners, parentNode, neighbors ) {
+verb.eval.AdaptiveRefinementNode = function( srf, corners, parentNode, neighbors ) {
 
 	// 
 	// Structure of the child nodes
@@ -484,10 +484,10 @@ verb.eval.nurbs.AdaptiveRefinementNode = function( srf, corners, parentNode, nei
 		var v0 = srf ? srf.knots_v[0] : null;
 		var v1 = srf ? verb.last( srf.knots_v ) : null;
 
-		corners = [ verb.geom.SurfacePoint.fromUv( u0, v0 ),
-								verb.geom.SurfacePoint.fromUv( u1, v0 ),
-								verb.geom.SurfacePoint.fromUv( u1, v1 ),
-								verb.geom.SurfacePoint.fromUv( u0, v1 ) ];
+		corners = [ verb.SurfacePoint.fromUv( u0, v0 ),
+								verb.SurfacePoint.fromUv( u1, v0 ),
+								verb.SurfacePoint.fromUv( u1, v1 ),
+								verb.SurfacePoint.fromUv( u0, v1 ) ];
 
 	}
 
@@ -495,15 +495,15 @@ verb.eval.nurbs.AdaptiveRefinementNode = function( srf, corners, parentNode, nei
 
 }
 
-verb.eval.nurbs.AdaptiveRefinementNode.prototype.isLeaf = function(){
+verb.eval.AdaptiveRefinementNode.prototype.isLeaf = function(){
 	return this.children === undefined;
 };
 
-verb.eval.nurbs.AdaptiveRefinementNode.prototype.center = function(){
+verb.eval.AdaptiveRefinementNode.prototype.center = function(){
 	return this.centerPoint || this.evalSrf( this.u05, this.v05 );
 }
 
-verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalCorners = function(){
+verb.eval.AdaptiveRefinementNode.prototype.evalCorners = function(){
 
 	// eval the center
 	this.u05 = this.u05 || (this.corners[0].uv[0] + this.corners[2].uv[0]) / 2;
@@ -520,9 +520,9 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalCorners = function(){
 	}
 }
 
-verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalSrf = function( u, v, srfPt ){
+verb.eval.AdaptiveRefinementNode.prototype.evalSrf = function( u, v, srfPt ){
 
-	var derivs = verb.eval.nurbs.rational_surface_derivs( this.srf.degree_u, 
+	var derivs = verb.eval.rational_surface_derivs( this.srf.degree_u, 
 																												this.srf.knots_u, 
 																												this.srf.degree_v, 
 																												this.srf.knots_v, 
@@ -542,12 +542,12 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.evalSrf = function( u, v, srfPt
 		srfPt.normal = norm;
 		return srfPt;
 	} else {
-		return new verb.geom.SurfacePoint( pt, norm, [u,v], null, degen );
+		return new verb.SurfacePoint( pt, norm, [u,v], null, degen );
 	}
 
 };
 
-verb.eval.nurbs.AdaptiveRefinementNode.prototype.getEdgeCorners = function( edgeIndex ){
+verb.eval.AdaptiveRefinementNode.prototype.getEdgeCorners = function( edgeIndex ){
 
 	// if its a leaf, there are no children to obtain uvs from
 	if ( this.isLeaf() ) return [ this.corners[ edgeIndex ] ]
@@ -587,7 +587,7 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.getEdgeCorners = function( edge
 
 };
 
-verb.eval.nurbs.AdaptiveRefinementNode.prototype.getAllCorners = function( edgeIndex ){
+verb.eval.AdaptiveRefinementNode.prototype.getAllCorners = function( edgeIndex ){
 
 	var baseArr = [ this.corners[edgeIndex] ];
 
@@ -614,7 +614,7 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.getAllCorners = function( edgeI
 
 };
 
-verb.eval.nurbs.AdaptiveRefinementNode.prototype.midpoint = function( index ){
+verb.eval.AdaptiveRefinementNode.prototype.midpoint = function( index ){
 
 	if (!this.midPoints) this.midpoints = [null, null, null, null];
 	if (this.midpoints[index]) return this.midpoints[index];
@@ -638,11 +638,11 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.midpoint = function( index ){
 
 } 
 
-verb.eval.nurbs.AdaptiveRefinementNode.prototype.hasBadNormals = function( vec ){
+verb.eval.AdaptiveRefinementNode.prototype.hasBadNormals = function( vec ){
 	return this.corners[0].degen || this.corners[1].degen || this.corners[2].degen || this.corners[3].degen;
 } 
 
-verb.eval.nurbs.AdaptiveRefinementNode.prototype.fixNormals = function(){
+verb.eval.AdaptiveRefinementNode.prototype.fixNormals = function(){
 	for (var i = 0, l = this.corners.length; i < l; i++){
 		
 		var corn = this.corners[i];
@@ -661,7 +661,7 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.fixNormals = function(){
 	}
 } 
 
-verb.eval.nurbs.AdaptiveRefinementNode.prototype.shouldDivide = function( options, currentDepth ){
+verb.eval.AdaptiveRefinementNode.prototype.shouldDivide = function( options, currentDepth ){
 
 	if ( currentDepth < options.minDepth ) return true;
 	if ( currentDepth >= options.maxDepth ) return false;
@@ -688,7 +688,7 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.shouldDivide = function( option
 				 numeric.norm2Squared( numeric.sub( center.normal, this.corners[3].normal ) ) > options.normTol;
 }
 
-verb.eval.nurbs.AdaptiveRefinementNode.prototype.divide = function( options ){
+verb.eval.AdaptiveRefinementNode.prototype.divide = function( options ){
 
 	options = options || {};
 	options.normTol = options.normTol || 8.5e-2;
@@ -699,7 +699,7 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.divide = function( options ){
 
 };
 
-verb.eval.nurbs.AdaptiveRefinementNode.prototype._divide = function( options, currentDepth, horiz ){
+verb.eval.AdaptiveRefinementNode.prototype._divide = function( options, currentDepth, horiz ){
 
 	this.evalCorners();
 
@@ -721,8 +721,8 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype._divide = function( options, cu
 		var bott = 	[ this.corners[0], this.corners[1], this.midpoint(1), this.midpoint(3)  ];
 		var top = 	[ this.midpoint(3), this.midpoint(1), this.corners[2], this.corners[3]  ];
 
-		this.children = [ 	new verb.eval.nurbs.AdaptiveRefinementNode( this.srf, bott, this ),
-												new verb.eval.nurbs.AdaptiveRefinementNode( this.srf, top, this ) ];
+		this.children = [ 	new verb.eval.AdaptiveRefinementNode( this.srf, bott, this ),
+												new verb.eval.AdaptiveRefinementNode( this.srf, top, this ) ];
 
 		// assign neighbors to bottom node
 		this.children[0].neighbors = [ this.neighbors[0], this.neighbors[1], this.children[1], this.neighbors[3] ];
@@ -735,8 +735,8 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype._divide = function( options, cu
 		var left = [ this.corners[0], this.midpoint(0), this.midpoint(2), this.corners[3]  ];
 		var right = [ this.midpoint(0), this.corners[1], this.corners[2], this.midpoint(2)  ];
 
-		this.children = [ 	new verb.eval.nurbs.AdaptiveRefinementNode( this.srf, left, this ),
-												new verb.eval.nurbs.AdaptiveRefinementNode( this.srf, right, this ) ];
+		this.children = [ 	new verb.eval.AdaptiveRefinementNode( this.srf, left, this ),
+												new verb.eval.AdaptiveRefinementNode( this.srf, right, this ) ];
 
 		this.children[0].neighbors = [ this.neighbors[0], this.children[1], this.neighbors[2], this.neighbors[3] ];
 		this.children[1].neighbors = [ this.neighbors[0], this.neighbors[1], this.neighbors[2], this.children[0] ];
@@ -748,9 +748,9 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype._divide = function( options, cu
 
 };
 
-verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulate = function( mesh ){
+verb.eval.AdaptiveRefinementNode.prototype.triangulate = function( mesh ){
 
-	mesh = mesh || verb.geom.TriMesh.empty();
+	mesh = mesh || verb.TriMesh.empty();
 
 	if ( this.isLeaf() ) return this.triangulateLeaf( mesh );
 
@@ -764,7 +764,7 @@ verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulate = function( mesh ){
 
 };
 
-verb.eval.nurbs.AdaptiveRefinementNode.prototype.triangulateLeaf = function( mesh ){
+verb.eval.AdaptiveRefinementNode.prototype.triangulateLeaf = function( mesh ){
 
 	var baseIndex = mesh.points.length 
 		, uvs = []

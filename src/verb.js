@@ -15,13 +15,13 @@ if ( typeof exports != 'object' || exports === undefined )
 }
 
 // Initialize the verb namespace objects
-verb.geom = verb.geom || {};
+verb = verb || {};
 verb.core = verb.core || {};
 verb.eval = verb.eval || {};
 verb.intersect = verb.intersect || {};
-verb.eval.nurbs = verb.eval.nurbs || {};
-verb.eval.geom = verb.eval.geom || {};
-verb.eval.mesh = verb.eval.mesh || {};
+verb.eval = verb.eval || {};
+verb.eval = verb.eval || {};
+verb.eval = verb.eval || {};
 
 // ####verb.EPSILON
 //
@@ -39,8 +39,8 @@ verb.TOLERANCE = 1e-6;
 // Start a default Engine
 //
 verb.init = function() {
-	verb.nurbsEngine = new verb.core.Engine( verb.eval.nurbs );
-	verb.geom.NurbsGeometry.prototype.nurbsEngine = verb.nurbsEngine;
+	verb.nurbsEngine = new verb.core.Engine( verb.eval );
+	verb.NurbsGeometry.prototype.nurbsEngine = verb.nurbsEngine;
 }
 
 // ####Douglas Crockford's "method"

@@ -9,9 +9,9 @@
 // + *Number*, Height of the cone
 // + *Number*, Radius of the cone
 
-verb.geom.Cone = function(axis, xaxis, base, height, radius ) {
+verb.Cone = function(axis, xaxis, base, height, radius ) {
 
-	verb.geom.NurbsSurface.call(this);
+	verb.NurbsSurface.call(this);
 
 	this.setAll({
 		"axis": axis,
@@ -23,16 +23,16 @@ verb.geom.Cone = function(axis, xaxis, base, height, radius ) {
 
 	var surface_props = this.nurbsRep();
 
-	verb.geom.NurbsSurface.call(this, surface_props.degree_u, surface_props.knots_u, surface_props.degree_v, surface_props.knots_v, surface_props.control_points, surface_props.weights );
+	verb.NurbsSurface.call(this, surface_props.degree_u, surface_props.knots_u, surface_props.degree_v, surface_props.knots_v, surface_props.control_points, surface_props.weights );
 
 	this.watchAll( ['axis', 'xaxis', 'base', 'height', 'radius'], this.update );
 
-}.inherits(verb.geom.NurbsSurface);
+}.inherits(verb.NurbsSurface);
 
 // #### nurbsRep()
 //
 // Construct the Nurbs representation
-verb.geom.Cone.prototype.nurbsRep = function(){
+verb.Cone.prototype.nurbsRep = function(){
 
 	return this.nurbsEngine.eval( 'get_cone_surface', [ this.get("axis"), 
 															 this.get("xaxis"), 

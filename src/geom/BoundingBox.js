@@ -5,7 +5,7 @@
 // **params**
 // + *Array*, Points to add, if desired.  Otherwise, will not be initialized until add is called.
 
-verb.geom.BoundingBox = function( pts ) {
+verb.BoundingBox = function( pts ) {
 
 	this.initialized = false;
 
@@ -29,8 +29,8 @@ verb.geom.BoundingBox = function( pts ) {
 // + *Object*, This BoundingBox for chaining
 //
 
-verb.geom.BoundingBox.fromPoint = function( pt ){
-	var bb = new verb.geom.BoundingBox();
+verb.BoundingBox.fromPoint = function( pt ){
+	var bb = new verb.BoundingBox();
 	bb.add( pt );
 	return bb;
 }
@@ -47,7 +47,7 @@ verb.geom.BoundingBox.fromPoint = function( pt ){
 // + *Object*, This BoundingBox for chaining
 //
 
-verb.geom.BoundingBox.prototype.add = function( point ) 
+verb.BoundingBox.prototype.add = function( point ) 
 {
 	if ( !this.initialized )
 	{
@@ -84,7 +84,7 @@ verb.geom.BoundingBox.prototype.add = function( point )
 // callback is this bounding box.
 //
 
-verb.geom.BoundingBox.prototype.addRange = function( points, callback ) 
+verb.BoundingBox.prototype.addRange = function( points, callback ) 
 {
 	var l = points.length;
 
@@ -119,14 +119,14 @@ verb.geom.BoundingBox.prototype.addRange = function( points, callback )
 // + *Boolean*, true if the two intervals overlap, otherwise false
 //
 
-verb.geom.BoundingBox.prototype.contains = function(point, tol) {
+verb.BoundingBox.prototype.contains = function(point, tol) {
 
 	if ( !this.initialized )
 	{
 		return false;
 	}
 
-	return this.intersects( new verb.geom.BoundingBox([point]), tol );
+	return this.intersects( new verb.BoundingBox([point]), tol );
 
 }
 
@@ -134,7 +134,7 @@ verb.geom.BoundingBox.prototype.contains = function(point, tol) {
 //
 // Defines the tolerance for bounding box operations
 
-verb.geom.BoundingBox.prototype.TOLERANCE = 1e-4;
+verb.BoundingBox.prototype.TOLERANCE = 1e-4;
 
 
 // ####intervalsOverlap( a1, a2, b1, b2 )
@@ -151,9 +151,9 @@ verb.geom.BoundingBox.prototype.TOLERANCE = 1e-4;
 // + *Boolean*, true if the two intervals overlap, otherwise false
 //
 
-verb.geom.BoundingBox.prototype.intervalsOverlap = function( a1, a2, b1, b2, tol ) {
+verb.BoundingBox.prototype.intervalsOverlap = function( a1, a2, b1, b2, tol ) {
 
-	var tol = tol || verb.geom.BoundingBox.prototype.TOLERANCE
+	var tol = tol || verb.BoundingBox.prototype.TOLERANCE
 		, x1 = Math.min(a1, a2) - tol
 		, x2 = Math.max(a1, a2) + tol
 		, y1 = Math.min(b1, b2) - tol
@@ -181,7 +181,7 @@ verb.geom.BoundingBox.prototype.intervalsOverlap = function( a1, a2, b1, b2, tol
 // + *Boolean*, true if the two bounding boxes intersect, otherwise false
 //
 
-verb.geom.BoundingBox.prototype.intersects = function( bb, tol ) {
+verb.BoundingBox.prototype.intersects = function( bb, tol ) {
 
 	if ( !this.initialized || !bb.initialized )
 	{
@@ -213,7 +213,7 @@ verb.geom.BoundingBox.prototype.intersects = function( bb, tol ) {
 // + *Object*, this BoundingBox for chaining
 //
 
-verb.geom.BoundingBox.prototype.clear = function( bb ) {
+verb.BoundingBox.prototype.clear = function( bb ) {
 
 	this.initialized = false;
 	return this;
@@ -228,7 +228,7 @@ verb.geom.BoundingBox.prototype.clear = function( bb ) {
 // + *Number*, Index of longest axis
 //
 
-verb.geom.BoundingBox.prototype.getLongestAxis = function( bb ) {
+verb.BoundingBox.prototype.getLongestAxis = function( bb ) {
 
 	var axisLengths = [];
 	for (var i = 0; i < this.dim; i++){
@@ -250,7 +250,7 @@ verb.geom.BoundingBox.prototype.getLongestAxis = function( bb ) {
 // + *Number*, Length of the given axis.  If axis is out of bounds, returns 0.
 //
 
-verb.geom.BoundingBox.prototype.getAxisLength = function( i ) {
+verb.BoundingBox.prototype.getAxisLength = function( i ) {
 
 	if (i < 0 || i > this.dim-1) return 0;
 
@@ -270,7 +270,7 @@ verb.geom.BoundingBox.prototype.getAxisLength = function( i ) {
 // + *Object*, The bounding box formed by the intersection or null if there is no intersection.
 //
 
-verb.geom.BoundingBox.prototype.intersect = function( bb, tol ) {
+verb.BoundingBox.prototype.intersect = function( bb, tol ) {
 
 	if ( !this.initialized )
 	{
@@ -293,7 +293,7 @@ verb.geom.BoundingBox.prototype.intersect = function( bb, tol ) {
 		minbb.push( Math.max( a1[i], b1[i] ) );
 	}
 
-	return new verb.geom.BoundingBox([minbb, maxbb]);
+	return new verb.BoundingBox([minbb, maxbb]);
 
 }
 

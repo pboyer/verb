@@ -14,7 +14,7 @@ verb.core.Engine = function(options) {
 	var _num_threads = options.num_workers || 2;
 	var _tolerance = options.tolerance || 1e-4;
 	var _url = options.url || 'js/verbEval.js';
-	var _lib = options.library || verb.eval.nurbs;
+	var _lib = options.library || verb.eval;
 	var _error_handler = options.error_handler || ( function( message ) { console.warn( message ); } );
 	var _pool = undefined;
 

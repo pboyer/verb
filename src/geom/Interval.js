@@ -6,7 +6,7 @@
 // + *Number*, Start of interval 
 // + *Number*, End of the interval 
 //
-verb.geom.Interval = function(min, max) {
+verb.Interval = function(min, max) {
 
 	verb.core.WatchObject.call(this);
 	

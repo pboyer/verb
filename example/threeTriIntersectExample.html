@@ -108,19 +108,19 @@
 		var tri2 = [ 0, 1, 2 ];
 		var uvs2 = [ [0,0], [3,0], [3,3] ];
 
-		var res = verb.eval.geom.intersect_tris( pts1, tri1, uvs1, pts2, tri2, uvs2 );
+		var res = verb.eval.intersect_tris( pts1, tri1, uvs1, pts2, tri2, uvs2 );
 
 		addMeshToScene( tessToGeom( { points: pts1, faces: [ tri1 ], uvs: uvs1 } ));
 		addMeshToScene( tessToGeom( { points: pts2, faces: [ tri2 ], uvs: uvs2 } ));
 
 		// 0) get the plane rep of the two triangles
-		var n0 = verb.eval.geom.get_tri_norm( pts1, tri1 );
-		var n1 = verb.eval.geom.get_tri_norm( pts2, tri2 );
+		var n0 = verb.eval.get_tri_norm( pts1, tri1 );
+		var n1 = verb.eval.get_tri_norm( pts2, tri2 );
 		var o0 = pts1[ tri1[0] ];
 		var o1 = pts2[ tri2[0] ];
 
 		// 1) intersect with planes to yield ray of intersection
-		var ray = verb.eval.geom.intersect_planes(o0, n0, o1, n1);
+		var ray = verb.eval.intersect_planes(o0, n0, o1, n1);
 
 		console.log(ray)
 

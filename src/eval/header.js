@@ -11,14 +11,14 @@ else // node.js context
 
 var verb = verb || {};
 verb.eval = verb.eval || {};
-verb.eval.nurbs = verb.eval.nurbs || {};
-verb.eval.mesh = verb.eval.mesh || {};
-verb.eval.geom = verb.eval.geom || {};
-verb.geom = verb.geom || {};
+verb.eval = verb.eval || {};
+verb.eval = verb.eval || {};
+verb.eval = verb.eval || {};
+verb = verb || {};
 verb.EPSILON = 1e-8;
 verb.TOLERANCE = 1e-3;
 
-var router = new labor.Router(verb.eval.nurbs);
+var router = new labor.Router(verb.eval);
 
 numeric.normalized = function(arr){
 	return numeric.div( arr, numeric.norm2(arr) );

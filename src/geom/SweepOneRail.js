@@ -6,9 +6,9 @@
 // + *NurbsCurve*, The path to sweep on
 // + *NurbsCurve*, The profile to sweep
 //
-verb.geom.SweepOneRail = function( rail, profile ) {
+verb.SweepOneRail = function( rail, profile ) {
 
-	verb.geom.NurbsSurface.call(this);
+	verb.NurbsSurface.call(this);
 
 	this.setAll({
 		"rail": rail,
@@ -19,12 +19,12 @@ verb.geom.SweepOneRail = function( rail, profile ) {
 
 	this.watchAll( ['rail', 'profile'], this.update );
 
-}.inherits(verb.geom.NurbsSurface);
+}.inherits(verb.NurbsSurface);
 
 // #### nurbsRep()
 //
 // Construct the Nurbs representation
-verb.geom.SweepOneRail.prototype.nurbsRep = function(){
+verb.SweepOneRail.prototype.nurbsRep = function(){
 	
   return this.nurbsEngine.eval( 'get_sweep1_surface', 
 										[ this.get("profile").get("knots"), 

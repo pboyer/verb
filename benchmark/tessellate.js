@@ -20,7 +20,7 @@ function getComplexSurface(){
 								[ 1, 1, 1, 1, 1, 1],
 								[ 1, 1, 1, 1, 1, 1] ];
 
-	srf = new verb.geom.NurbsSurface( degree, knots, degree, knots, pts, wts );
+	srf = new verb.NurbsSurface( degree, knots, degree, knots, pts, wts );
 
 	var srfObj = {
 		degree_u : srf.get('degreeU'),
@@ -35,19 +35,19 @@ function getComplexSurface(){
 
 var srfObj = getComplexSurface();
 
-var fdiv = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj );
+var fdiv = new verb.eval.AdaptiveRefinementNode( srfObj );
 fdiv.divide({ tol: 5e-2 });
 
 module.exports = {
   name: 'Surface tessellation',
   tests: {
     'adaptive (tol: 5e-2)': function() {
-			var f = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj );
+			var f = new verb.eval.AdaptiveRefinementNode( srfObj );
 			f.divide({ tol: 5e-2 });
 			var mesh = f.triangulate();
     },
    //  'adaptive - just divide (tol: 5e-2)': function() {
-			// var f = new verb.eval.nurbs.AdaptiveRefinementNode( srfObj );
+			// var f = new verb.eval.AdaptiveRefinementNode( srfObj );
 			// f.divide({ tol: 5e-2 });
    //  },
    //  'adaptive - just triangulate (tol: 5e-2)': function() {

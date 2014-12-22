@@ -9,9 +9,9 @@
 // + *Number*, Radius of the arc in the x direction
 // + *Number*, Radius of the arc in the y direction
 
-verb.geom.Ellipse = function(center, xaxis, yaxis, xradius, yradius) {
+verb.Ellipse = function(center, xaxis, yaxis, xradius, yradius) {
 
-	verb.geom.NurbsCurve.call(this);
+	verb.NurbsCurve.call(this);
 
 	this.setAll({
 		"center": center,
@@ -25,12 +25,12 @@ verb.geom.Ellipse = function(center, xaxis, yaxis, xradius, yradius) {
 
 	this.watchAll( ['center', 'xaxis', 'yaxis', 'xradius', 'yradius'], this.update );
 
-}.inherits(verb.geom.NurbsCurve);
+}.inherits(verb.NurbsCurve);
 
 // #### nurbsRep()
 //
 // Construct the Nurbs representation
-verb.geom.Ellipse.prototype.nurbsRep = function(){
+verb.Ellipse.prototype.nurbsRep = function(){
 
 	return this.nurbsEngine.eval( 'get_ellipse_arc', [ this.get("center"), 
 															 this.get("xaxis"), 

@@ -8,9 +8,9 @@
 // + *Array*, The angle to revolve on
 // + *NurbsCurve*, The curve to revolve
 //
-verb.geom.RevolvedSurface = function( center, axis, angle, profile ) {
+verb.RevolvedSurface = function( center, axis, angle, profile ) {
 
-	verb.geom.NurbsSurface.call(this);
+	verb.NurbsSurface.call(this);
 
 	this.setAll({
 		"center": center,
@@ -23,12 +23,12 @@ verb.geom.RevolvedSurface = function( center, axis, angle, profile ) {
 
 	this.watchAll( ['center', 'axis', 'angle', 'profile'], this.update );
 
-}.inherits(verb.geom.NurbsSurface);
+}.inherits(verb.NurbsSurface);
 
 // #### nurbsRep()
 //
 // Construct the Nurbs representation
-verb.geom.RevolvedSurface.prototype.nurbsRep = function(){
+verb.RevolvedSurface.prototype.nurbsRep = function(){
 
 	  return this.nurbsEngine.eval( 'get_revolved_surface', 
 									[ this.get("center"), 

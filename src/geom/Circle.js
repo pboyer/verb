@@ -8,9 +8,9 @@
 // + *Array*, Length 3 array representing the perpendicular yaxis
 // + *Number*, Radius
 
-verb.geom.Circle = function(center, xaxis, yaxis, radius) {
+verb.Circle = function(center, xaxis, yaxis, radius) {
 
-	verb.geom.NurbsCurve.call(this);
+	verb.NurbsCurve.call(this);
 	
 	this.setAll({
 		"center": center,
@@ -23,12 +23,12 @@ verb.geom.Circle = function(center, xaxis, yaxis, radius) {
 
 	this.watchAll( ['center', 'xaxis', 'yaxis', 'radius'], this.update );
 
-}.inherits(verb.geom.NurbsCurve);
+}.inherits(verb.NurbsCurve);
 
 // #### nurbsRep()
 //
 // Construct the Nurbs representation
-verb.geom.Circle.prototype.nurbsRep = function(){
+verb.Circle.prototype.nurbsRep = function(){
 
 	return this.nurbsEngine.eval( 'get_arc', [  this.get("center"), 
 																									 this.get("xaxis"), 

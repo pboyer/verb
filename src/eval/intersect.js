@@ -29,12 +29,12 @@
 // 	- a "face" the index of the face where the intersection took place
 //
 
-verb.eval.nurbs.intersect_rational_curve_surface_by_aabb_refine = function( degree_u, knots_u, degree_v, 
+verb.eval.intersect_rational_curve_surface_by_aabb_refine = function( degree_u, knots_u, degree_v, 
 	knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, sample_tol, tol, 
 	divs_u, divs_v ) {
 
 	// get the approximate intersections
-	var ints = verb.eval.nurbs.intersect_rational_curve_surface_by_aabb( degree_u, knots_u, degree_v, 
+	var ints = verb.eval.intersect_rational_curve_surface_by_aabb( degree_u, knots_u, degree_v, 
 		knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, sample_tol, tol, 
 		divs_u, divs_v );
 
@@ -45,7 +45,7 @@ verb.eval.nurbs.intersect_rational_curve_surface_by_aabb_refine = function( degr
 		var start_params = [inter.p, inter.uv[0], inter.uv[1] ]
 
 		// refine the parameters
-			, refined_params = verb.eval.nurbs.refine_rational_curve_surface_intersection( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, start_params );
+			, refined_params = verb.eval.refine_rational_curve_surface_intersection( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, start_params );
 	
 		// update the inter object
 		inter.p = refined_params[0];
@@ -83,12 +83,12 @@ verb.eval.nurbs.intersect_rational_curve_surface_by_aabb_refine = function( degr
 // + *Array*, a length 3 array containing the [ u_crv, u_srf, v_srf, final_distance ]
 //
 
-verb.eval.nurbs.refine_rational_curve_surface_intersection = function( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, start_params ) {
+verb.eval.refine_rational_curve_surface_intersection = function( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, start_params ) {
 
 	var objective = function(x) { 
 
-		var p1 = verb.eval.nurbs.rational_curve_point(degree_crv, knots_crv, homo_control_points_crv, x[0])
-			, p2 = verb.eval.nurbs.rational_surface_point( degree_u, knots_u,  degree_v, knots_v, homo_control_points_srf, x[1], x[2] )
+		var p1 = verb.eval.rational_curve_point(degree_crv, knots_crv, homo_control_points_crv, x[0])
+			, p2 = verb.eval.rational_surface_point( degree_u, knots_u,  degree_v, knots_v, homo_control_points_srf, x[1], x[2] )
 			, p1_p2 = numeric.sub(p1, p2);
 
 		return numeric.dot(p1_p2, p1_p2);
@@ -131,20 +131,20 @@ verb.eval.nurbs.refine_rational_curve_surface_intersection = function( degree_u,
 // 	- a "face" the index of the face where the intersection took place
 //
 
-verb.eval.nurbs.intersect_rational_curve_surface_by_aabb = function( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, sample_tol, tol, divs_u, divs_v ) {
+verb.eval.intersect_rational_curve_surface_by_aabb = function( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, sample_tol, tol, divs_u, divs_v ) {
 
 	// tessellate the curve
-	var crv = verb.eval.nurbs.rational_curve_adaptive_sample( degree_crv, knots_crv, homo_control_points_crv, sample_tol, true)
+	var crv = verb.eval.rational_curve_adaptive_sample( degree_crv, knots_crv, homo_control_points_crv, sample_tol, true)
 
 	// tessellate the surface
-		, mesh = verb.eval.nurbs.tessellate_rational_surface_naive( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, divs_u, divs_v )
+		, mesh = verb.eval.tessellate_rational_surface_naive( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, divs_u, divs_v )
 
 	// separate parameters from points in the polyline (params are the first index in the array)
 		, u1 = crv.map( function(el) { return el[0]; })
 		, p1 = crv.map( function(el) { return el.slice(1) })
 
 	// perform intersection
-		, res = verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb( p1, u1, mesh, verb.range(mesh.faces.length), tol );
+		, res = verb.eval.intersect_parametric_polyline_mesh_by_aabb( p1, u1, mesh, verb.range(mesh.faces.length), tol );
 
 	// eliminate duplicate intersections
 	return verb.unique( res, function(a, b){
@@ -173,12 +173,12 @@ verb.eval.nurbs.intersect_rational_curve_surface_by_aabb = function( degree_u, k
 // 	- a "face" the index of the face where the intersection took place
 //
 
-verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb = function( crv_points, crv_param_points, mesh, included_faces, tol ) {
+verb.eval.intersect_parametric_polyline_mesh_by_aabb = function( crv_points, crv_param_points, mesh, included_faces, tol ) {
 
 	// check if two bounding boxes intersect
-	var pl_bb = new verb.geom.BoundingBox( crv_points )
-		, mesh_bb = verb.eval.mesh.make_mesh_aabb( mesh.points, mesh.faces, included_faces )
-		, rec = verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb;
+	var pl_bb = new verb.BoundingBox( crv_points )
+		, mesh_bb = verb.eval.make_mesh_aabb( mesh.points, mesh.faces, included_faces )
+		, rec = verb.eval.intersect_parametric_polyline_mesh_by_aabb;
 
 	// if bounding boxes do not intersect, return empty array
 	if ( !pl_bb.intersects( mesh_bb, tol ) ) {
@@ -189,7 +189,7 @@ verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb = function( crv_point
 
 			// intersect segment and triangle
 
-			var inter = verb.eval.geom.intersect_segment_with_tri( crv_points[0], crv_points[1], mesh.points, mesh.faces[ included_faces[0] ] );
+			var inter = verb.eval.intersect_segment_with_tri( crv_points[0], crv_points[1], mesh.points, mesh.faces[ included_faces[0] ] );
 
 			if ( inter != null ){
 
@@ -231,7 +231,7 @@ verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb = function( crv_point
 		// intersect mesh >2 faces and line
 
 		// divide mesh in "half" by first sorting then dividing array in half
-		var sorted_included_faces = verb.eval.mesh.sort_tris_on_longest_axis( mesh_bb, mesh.points, mesh.faces, included_faces )
+		var sorted_included_faces = verb.eval.sort_tris_on_longest_axis( mesh_bb, mesh.points, mesh.faces, included_faces )
 			, included_faces_a = verb.left( sorted_included_faces )
 			, included_faces_b = verb.right( sorted_included_faces );
 
@@ -244,7 +244,7 @@ verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb = function( crv_point
 		// intersect mesh with >2 faces and polyline
 
 		// divide mesh in "half"
-		var sorted_included_faces = verb.eval.mesh.sort_tris_on_longest_axis( mesh_bb, mesh.points, mesh.faces, included_faces )
+		var sorted_included_faces = verb.eval.sort_tris_on_longest_axis( mesh_bb, mesh.points, mesh.faces, included_faces )
 			, included_faces_a = verb.left( sorted_included_faces )
 			, included_faces_b = verb.right( sorted_included_faces );
 
@@ -283,7 +283,7 @@ verb.eval.nurbs.intersect_parametric_polyline_mesh_by_aabb = function( crv_point
 // where the intersection took place, and "p" property representing the parameter along the segment
 //
 
-verb.eval.geom.intersect_segment_with_tri = function( p0, p1, points, tri ) {
+verb.eval.intersect_segment_with_tri = function( p0, p1, points, tri ) {
 
 	var v0 = points[ tri[0] ]
 		, v1 = points[ tri[1] ]
@@ -349,7 +349,7 @@ verb.eval.geom.intersect_segment_with_tri = function( p0, p1, points, tri ) {
 // null or an object with a p property representing the param on the segment
 //
 
-verb.eval.geom.intersect_segment_with_plane = function( p0, p1, v0, n ) {
+verb.eval.intersect_segment_with_plane = function( p0, p1, v0, n ) {
 
 	var denom = numeric.dot( n, numeric.sub(p0,p1) );
 
@@ -381,11 +381,11 @@ verb.eval.geom.intersect_segment_with_plane = function( p0, p1, v0, n ) {
 // + *Array*, a list of pairs of triangle indices for mesh1 and mesh2 that are intersecting
 //
 
-verb.eval.geom.intersect_aabb_trees = function( points1, tris1, points2, tris2, aabb_tree1, aabb_tree2 ) {
+verb.eval.intersect_aabb_trees = function( points1, tris1, points2, tris2, aabb_tree1, aabb_tree2 ) {
 
   var intersects = aabb_tree1.bounding_box.intersects( aabb_tree2.bounding_box );
 
-  var recur = verb.eval.geom.intersect_aabb_trees;
+  var recur = verb.eval.intersect_aabb_trees;
 
   if (!intersects){
   	return [];
@@ -430,10 +430,10 @@ verb.eval.geom.intersect_aabb_trees = function( points1, tris1, points2, tris2, 
 // + *Array*, a point represented by an array of length (dim)
 //
 
-verb.eval.mesh.make_mesh_aabb_tree = function( points, tris, tri_indices ) {
+verb.eval.make_mesh_aabb_tree = function( points, tris, tri_indices ) {
 
 	// build bb
-	var aabb = { 	bounding_box: verb.eval.mesh.make_mesh_aabb( points, tris, tri_indices ), 
+	var aabb = { 	bounding_box: verb.eval.make_mesh_aabb( points, tris, tri_indices ), 
 								children: [] };
 
 	// if only one ele, terminate recursion and store the triangles
@@ -443,13 +443,13 @@ verb.eval.mesh.make_mesh_aabb_tree = function( points, tris, tri_indices ) {
 	}
 
 	// sort triangles in sub mesh
-	var sorted_tri_indices = verb.eval.mesh.sort_tris_on_longest_axis( aabb.bounding_box, points, tris, tri_indices )
+	var sorted_tri_indices = verb.eval.sort_tris_on_longest_axis( aabb.bounding_box, points, tris, tri_indices )
 		, tri_indices_a = sorted_tri_indices.slice( 0, Math.floor( sorted_tri_indices.length / 2 ) )
 		, tri_indices_b = sorted_tri_indices.slice( Math.floor( sorted_tri_indices.length / 2 ), sorted_tri_indices.length );
 
 	// recurse 
-	aabb.children = [ verb.eval.mesh.make_mesh_aabb_tree(points, tris, tri_indices_a), 
-										verb.eval.mesh.make_mesh_aabb_tree(points, tris, tri_indices_b) ];
+	aabb.children = [ verb.eval.make_mesh_aabb_tree(points, tris, tri_indices_a), 
+										verb.eval.make_mesh_aabb_tree(points, tris, tri_indices_b) ];
 
 	// return result
 	return aabb;
@@ -470,9 +470,9 @@ verb.eval.mesh.make_mesh_aabb_tree = function( points, tris, tri_indices ) {
 // + *Array*, a point represented by an array of length (dim)
 //
 
-verb.eval.mesh.make_mesh_aabb = function( points, tris, tri_indices ) {
+verb.eval.make_mesh_aabb = function( points, tris, tri_indices ) {
 
-	var bb = new verb.geom.BoundingBox();
+	var bb = new verb.BoundingBox();
 
 	tri_indices.forEach(function(x){
 		bb.add( points[ tris[ x ][0] ] );
@@ -499,7 +499,7 @@ verb.eval.mesh.make_mesh_aabb = function( points, tris, tri_indices ) {
 // + *Array*, a point represented by an array of length (dim)
 //
 
-verb.eval.mesh.sort_tris_on_longest_axis = function( container_bb, points, tris, tri_indices ) {
+verb.eval.sort_tris_on_longest_axis = function( container_bb, points, tris, tri_indices ) {
 
 	var long_axis = container_bb.getLongestAxis();
 
@@ -507,7 +507,7 @@ verb.eval.mesh.sort_tris_on_longest_axis = function( container_bb, points, tris,
 	for (var i = tri_indices.length - 1; i >= 0; i--) {
 
 		var tri_i = tri_indices[i],
-			tri_min = verb.eval.mesh.get_min_coordinate_on_axis( points, tris[ tri_i ], long_axis );
+			tri_min = verb.eval.get_min_coordinate_on_axis( points, tris[ tri_i ], long_axis );
 
 		axis_position_map.push( [ tri_min, tri_i ] );
 
@@ -537,7 +537,7 @@ verb.eval.mesh.sort_tris_on_longest_axis = function( container_bb, points, tris,
 // + *Number*, a point represented by an array of length 3
 //
 
-verb.eval.mesh.get_min_coordinate_on_axis = function( points, tri, axis ) {
+verb.eval.get_min_coordinate_on_axis = function( points, tri, axis ) {
 
 	var axis_coords = [];
 
@@ -561,7 +561,7 @@ verb.eval.mesh.get_min_coordinate_on_axis = function( points, tri, axis ) {
 // + *Array*, a point represented by an array of length 3
 //
 
-verb.eval.geom.get_tri_centroid = function( points, tri ) {
+verb.eval.get_tri_centroid = function( points, tri ) {
 
 	var centroid = [0,0,0];
 
@@ -592,7 +592,7 @@ verb.eval.geom.get_tri_centroid = function( points, tri ) {
 // + *Array*, a normal vector represented by an array of length 3
 //
 
-verb.eval.geom.get_tri_norm = function( points, tri ) {
+verb.eval.get_tri_norm = function( points, tri ) {
 
 	var v0 = points[ tri[0] ]
 		, v1 = points[ tri[1] ]
@@ -623,12 +623,12 @@ verb.eval.geom.get_tri_norm = function( points, tri ) {
 // + *Array*, a 2d array specifying the intersections on u params of intersections on curve 1 and cruve 2
 //
 
-verb.eval.nurbs.intersect_rational_curves_by_aabb_refine = function( degree1, knots1, homo_control_points1, degree2, knots2, homo_control_points2, sample_tol, tol ) {
+verb.eval.intersect_rational_curves_by_aabb_refine = function( degree1, knots1, homo_control_points1, degree2, knots2, homo_control_points2, sample_tol, tol ) {
 
-	var ints = verb.eval.nurbs.intersect_rational_curves_by_aabb( degree1, knots1, homo_control_points1, degree2, knots2, homo_control_points2, sample_tol, tol );
+	var ints = verb.eval.intersect_rational_curves_by_aabb( degree1, knots1, homo_control_points1, degree2, knots2, homo_control_points2, sample_tol, tol );
 
 	return ints.map(function(start_params){
-		return verb.eval.nurbs.refine_rational_curve_intersection( degree1, knots1, homo_control_points1, degree2, knots2, homo_control_points2, start_params )
+		return verb.eval.refine_rational_curve_intersection( degree1, knots1, homo_control_points1, degree2, knots2, homo_control_points2, start_params )
 	});
 
 }
@@ -655,12 +655,12 @@ verb.eval.nurbs.intersect_rational_curves_by_aabb_refine = function( degree1, kn
 // + *Array*, a length 3 array containing the [ distance// distance, u1, u2 ]
 //
 
-verb.eval.nurbs.refine_rational_curve_intersection = function( degree1, knots1, control_points1, degree2, knots2, control_points2, start_params ) {
+verb.eval.refine_rational_curve_intersection = function( degree1, knots1, control_points1, degree2, knots2, control_points2, start_params ) {
 
 	var objective = function(x) { 
 
-		var p1 = verb.eval.nurbs.rational_curve_point(degree1, knots1, control_points1, x[0])
-			, p2 = verb.eval.nurbs.rational_curve_point(degree2, knots2, control_points2, x[1])
+		var p1 = verb.eval.rational_curve_point(degree1, knots1, control_points1, x[0])
+			, p2 = verb.eval.rational_curve_point(degree2, knots2, control_points2, x[1])
 			, p1_p2 = numeric.sub(p1, p2);
 
 		return numeric.dot(p1_p2, p1_p2);
@@ -689,16 +689,16 @@ verb.eval.nurbs.refine_rational_curve_intersection = function( degree1, knots1, 
 // + *Array*, array of parameter pairs representing the intersection of the two parameteric polylines
 //
 
-verb.eval.nurbs.intersect_rational_curves_by_aabb = function( degree1, knots1, homo_control_points1, degree2, knots2, homo_control_points2, sample_tol, tol ) {
+verb.eval.intersect_rational_curves_by_aabb = function( degree1, knots1, homo_control_points1, degree2, knots2, homo_control_points2, sample_tol, tol ) {
 
-	var up1 = verb.eval.nurbs.rational_curve_adaptive_sample( degree1, knots1, homo_control_points1, sample_tol, true)
-		, up2 = verb.eval.nurbs.rational_curve_adaptive_sample( degree2, knots2, homo_control_points2, sample_tol, true)
+	var up1 = verb.eval.rational_curve_adaptive_sample( degree1, knots1, homo_control_points1, sample_tol, true)
+		, up2 = verb.eval.rational_curve_adaptive_sample( degree2, knots2, homo_control_points2, sample_tol, true)
 		, u1 = up1.map( function(el) { return el[0]; })
 		, u2 = up2.map( function(el) { return el[0]; })
 		, p1 = up1.map( function(el) { return el.slice(1) })
 		, p2 = up2.map( function(el) { return el.slice(1) });
 
-	return verb.eval.nurbs.intersect_parametric_polylines_by_aabb( p1, p2, u1, u2, tol );
+	return verb.eval.intersect_parametric_polylines_by_aabb( p1, p2, u1, u2, tol );
 
 }
 
@@ -718,10 +718,10 @@ verb.eval.nurbs.intersect_rational_curves_by_aabb = function( degree1, knots1, h
 // + *Array*, array of parameter pairs representing the intersection of the two parameteric polylines
 //
 
-verb.eval.nurbs.intersect_parametric_polylines_by_aabb = function( p1, p2, u1, u2, tol ) {
+verb.eval.intersect_parametric_polylines_by_aabb = function( p1, p2, u1, u2, tol ) {
 
-	var bb1 = new verb.geom.BoundingBox(p1)
-		, bb2 = new verb.geom.BoundingBox(p2);
+	var bb1 = new verb.BoundingBox(p1)
+		, bb2 = new verb.BoundingBox(p2);
 
 	if ( !bb1.intersects(bb2, tol) ) {
 		return [];
@@ -729,7 +729,7 @@ verb.eval.nurbs.intersect_parametric_polylines_by_aabb = function( p1, p2, u1, u
 
 	if (p1.length === 2 && p2.length === 2 ){
 
-			var inter = verb.eval.geom.intersect_segments(p1[0],p1[1], p2[0], p2[1], tol);
+			var inter = verb.eval.intersect_segments(p1[0],p1[1], p2[0], p2[1], tol);
 
 			if ( inter != null ){
 
@@ -749,8 +749,8 @@ verb.eval.nurbs.intersect_parametric_polylines_by_aabb = function( p1, p2, u1, u
 				u2_a = u2.slice( 0, p2_mid ),
 				u2_b = u2.slice( p2_mid-1 );
 
-		return 	 verb.eval.nurbs.intersect_parametric_polylines_by_aabb(p1, p2_a, u1, u2_a, tol)
-		.concat( verb.eval.nurbs.intersect_parametric_polylines_by_aabb(p1, p2_b, u1, u2_b, tol) );
+		return 	 verb.eval.intersect_parametric_polylines_by_aabb(p1, p2_a, u1, u2_a, tol)
+		.concat( verb.eval.intersect_parametric_polylines_by_aabb(p1, p2_b, u1, u2_b, tol) );
 
 	} else if (p2.length === 2) {
 
@@ -760,8 +760,8 @@ verb.eval.nurbs.intersect_parametric_polylines_by_aabb = function( p1, p2, u1, u
 				u1_a = u1.slice( 0, p1_mid ),
 				u1_b = u1.slice( p1_mid-1 );
 
-		return 		 verb.eval.nurbs.intersect_parametric_polylines_by_aabb(p1_a, p2, u1_a, u2, tol)
-			.concat( verb.eval.nurbs.intersect_parametric_polylines_by_aabb(p1_b, p2, u1_b, u2, tol) );
+		return 		 verb.eval.intersect_parametric_polylines_by_aabb(p1_a, p2, u1_a, u2, tol)
+			.concat( verb.eval.intersect_parametric_polylines_by_aabb(p1_b, p2, u1_b, u2, tol) );
 
 	} else {
 
@@ -777,10 +777,10 @@ verb.eval.nurbs.intersect_parametric_polylines_by_aabb = function( p1, p2, u1, u
 				u2_a = u2.slice( 0, p2_mid ),
 				u2_b = u2.slice( p2_mid-1 );
 
-		return 		 verb.eval.nurbs.intersect_parametric_polylines_by_aabb(p1_a, p2_a, u1_a, u2_a, tol)
-			.concat( verb.eval.nurbs.intersect_parametric_polylines_by_aabb(p1_a, p2_b, u1_a, u2_b, tol) )
-			.concat( verb.eval.nurbs.intersect_parametric_polylines_by_aabb(p1_b, p2_a, u1_b, u2_a, tol) )
-			.concat( verb.eval.nurbs.intersect_parametric_polylines_by_aabb(p1_b, p2_b, u1_b, u2_b, tol) );
+		return 		 verb.eval.intersect_parametric_polylines_by_aabb(p1_a, p2_a, u1_a, u2_a, tol)
+			.concat( verb.eval.intersect_parametric_polylines_by_aabb(p1_a, p2_b, u1_a, u2_b, tol) )
+			.concat( verb.eval.intersect_parametric_polylines_by_aabb(p1_b, p2_a, u1_b, u2_a, tol) )
+			.concat( verb.eval.intersect_parametric_polylines_by_aabb(p1_b, p2_b, u1_b, u2_b, tol) );
 
 	}
 
@@ -804,7 +804,7 @@ verb.eval.nurbs.intersect_parametric_polylines_by_aabb = function( p1, p2, u1, u
 // + *Array*, a 2d array specifying the intersections on u params of intersections on curve 1 and cruve 2
 //
 
-verb.eval.geom.intersect_segments = function( a0, a1, b0, b1, tol ) {
+verb.eval.intersect_segments = function( a0, a1, b0, b1, tol ) {
 
 	// get axis and length of segments
 	var a1ma0 = numeric.sub(a1, a0),
@@ -813,7 +813,7 @@ verb.eval.geom.intersect_segments = function( a0, a1, b0, b1, tol ) {
 			b1mb0 = numeric.sub(b1, b0),
 			bN = Math.sqrt( numeric.dot(b1mb0, b1mb0) ),
 			b = numeric.mul( 1 / bN, b1mb0 ),
-			int_params = verb.eval.geom.intersect_rays(a0, a, b0, b);
+			int_params = verb.eval.intersect_rays(a0, a, b0, b);
 
 	if ( int_params != null ) {
 
@@ -849,7 +849,7 @@ verb.eval.geom.intersect_segments = function( a0, a1, b0, b1, tol ) {
 // + *Object* with u and pt properties
 //
 
-verb.eval.geom.closest_point_on_segment = function( pt, segpt0, segpt1, u0, u1 ) {
+verb.eval.closest_point_on_segment = function( pt, segpt0, segpt1, u0, u1 ) {
 
 	var dif = numeric.sub( segpt1, segpt0 )
 		, l = numeric.norm2( dif );
@@ -895,7 +895,7 @@ verb.eval.geom.closest_point_on_segment = function( pt, segpt0, segpt1, u0, u1 )
 // + *Array*, pt
 //
 
-verb.eval.geom.closest_point_on_ray = function( pt, o, r ) {
+verb.eval.closest_point_on_ray = function( pt, o, r ) {
 
 		var o2pt = numeric.sub(pt,o)
 			, do2ptr = numeric.dot(o2pt, r)
@@ -919,9 +919,9 @@ verb.eval.geom.closest_point_on_ray = function( pt, o, r ) {
 // + *Number*, the distance
 //
 
-verb.eval.geom.dist_to_ray = function( pt, o, r ) {
+verb.eval.dist_to_ray = function( pt, o, r ) {
 
-	var d = verb.eval.geom.closest_point_on_ray( pt, o, r );
+	var d = verb.eval.closest_point_on_ray( pt, o, r );
 	var dif = numeric.sub( d, pt );
 
 	return numeric.norm2( dif );
@@ -944,7 +944,7 @@ verb.eval.geom.dist_to_ray = function( pt, o, r ) {
 // + *Array*, a 2d array specifying the intersections on u params of intersections on curve 1 and curve 2
 //
 
-verb.eval.geom.intersect_rays = function( a0, a, b0, b ) {
+verb.eval.intersect_rays = function( a0, a, b0, b ) {
 
    var dab = numeric.dot( a, b ),
 		   dab0 = numeric.dot( a, b0 ),
@@ -968,7 +968,7 @@ verb.eval.geom.intersect_rays = function( a0, a, b0, b ) {
 
 }
 
-verb.eval.geom.intersect_3_planes = function(n0, d0, n1, d1, n2, d2){
+verb.eval.intersect_3_planes = function(n0, d0, n1, d1, n2, d2){
 
 	var u = numeric.cross( n1, n2 );
 	var den = numeric.dot( n0, u );
@@ -984,19 +984,19 @@ verb.eval.geom.intersect_3_planes = function(n0, d0, n1, d1, n2, d2){
 
 }
 
-verb.eval.nurbs.refine_rational_surface_intersect_point = function(uv1, uv2, degree_u1, knots_u1, degree_v1, knots_v1, homo_control_points1, degree_u2, knots_u2, degree_v2, knots_v2, homo_control_points2, tol){
+verb.eval.refine_rational_surface_intersect_point = function(uv1, uv2, degree_u1, knots_u1, degree_v1, knots_v1, homo_control_points1, degree_u2, knots_u2, degree_v2, knots_v2, homo_control_points2, tol){
 
  var pds, p, pn, pu, pv, pd, qds, q, qn, qu, qv, qd, dist;
  var maxits = 1;
  var its = 0;
 
  var r = function(u, v){
- 	return verb.eval.nurbs.rational_surface_derivs( degree_u1, knots_u1, degree_v1, knots_v1, 
+ 	return verb.eval.rational_surface_derivs( degree_u1, knots_u1, degree_v1, knots_v1, 
 			homo_control_points1, 1, u, v );
  }
 
  var s = function(u, v){
- 	return verb.eval.nurbs.rational_surface_derivs( degree_u2, knots_u2, degree_v2, knots_v2, 
+ 	return verb.eval.rational_surface_derivs( degree_u2, knots_u2, degree_v2, knots_v2, 
 			homo_control_points2, 1, u, v );
  }
 
@@ -1032,7 +1032,7 @@ verb.eval.nurbs.refine_rational_surface_intersect_point = function(uv1, uv2, deg
 		var fd = numeric.dot( fn, p );
 
  	// 3) x = intersection of all 3 planes
-		var x = verb.eval.geom.intersect_3_planes( pn, pd, qn, qd, fn, fd );
+		var x = verb.eval.intersect_3_planes( pn, pd, qn, qd, fn, fd );
 
 		if (x === null) throw new Error("panic!")
 
@@ -1066,7 +1066,7 @@ verb.eval.nurbs.refine_rational_surface_intersect_point = function(uv1, uv2, deg
 
 }
 
-verb.eval.nurbs.intersect_rational_surface_surface_by_aabb_refine = function( degree_u1, knots_u1, degree_v1, knots_v1, homo_control_points_srf1, degree_u2, knots_u2, degree_v2, knots_v2, homo_control_points_srf2, tol ) {
+verb.eval.intersect_rational_surface_surface_by_aabb_refine = function( degree_u1, knots_u1, degree_v1, knots_v1, homo_control_points_srf1, degree_u2, knots_u2, degree_v2, knots_v2, homo_control_points_srf2, tol ) {
 
 	// 1) tessellate the meshes to get the approximate intersections
 	var srfObj1 = {
@@ -1079,7 +1079,7 @@ verb.eval.nurbs.intersect_rational_surface_surface_by_aabb_refine = function( de
 
 	// todo: need to be able to predict the number of divisions
 
-	var tess1 = verb.eval.nurbs.tessellate_rational_surface_adaptive( srfObj1.degree_u,
+	var tess1 = verb.eval.tessellate_rational_surface_adaptive( srfObj1.degree_u,
 		srfObj1.knots_u,
 		srfObj1.degree_v,
 		srfObj1.knots_v, 
@@ -1093,25 +1093,25 @@ verb.eval.nurbs.intersect_rational_surface_surface_by_aabb_refine = function( de
 		homo_control_points : homo_control_points_srf2
 	};
 
-	var tess2 = verb.eval.nurbs.tessellate_rational_surface_adaptive( srfObj2.degree_u,
+	var tess2 = verb.eval.tessellate_rational_surface_adaptive( srfObj2.degree_u,
 		srfObj2.knots_u,
 		srfObj2.degree_v,
 		srfObj2.knots_v, 
 		srfObj2.homo_control_points);
 
-	var resApprox = verb.eval.mesh.intersect_meshes_by_aabb( tess1.points, tess1.faces, tess1.uvs, tess2.points, tess2.faces, tess2.uvs );
+	var resApprox = verb.eval.intersect_meshes_by_aabb( tess1.points, tess1.faces, tess1.uvs, tess2.points, tess2.faces, tess2.uvs );
 
 	// 2) refine the intersection points so that they lie on both surfaces
 	var exactPls = resApprox.map(function(pl){
 		return pl.map( function(inter){
-			return verb.eval.nurbs.refine_rational_surface_intersect_point(inter.uvtri1, inter.uvtri2, degree_u1, knots_u1, degree_v1, knots_v1, homo_control_points_srf1, 
+			return verb.eval.refine_rational_surface_intersect_point(inter.uvtri1, inter.uvtri2, degree_u1, knots_u1, degree_v1, knots_v1, homo_control_points_srf1, 
 				degree_u2, knots_u2, degree_v2, knots_v2, homo_control_points_srf2, tol );
 		});
 	});
 
 	// 3) perform cubic interpolation
 	return exactPls.map(function(x){
-		return verb.eval.nurbs.rational_interp_curve( x.map(function(x){ return x.pt; }), 3 ); 
+		return verb.eval.rational_interp_curve( x.map(function(x){ return x.pt; }), 3 ); 
 	});
 
 	// TODO: represent this in uv space
@@ -1119,20 +1119,20 @@ verb.eval.nurbs.intersect_rational_surface_surface_by_aabb_refine = function( de
 
 }
 
-verb.eval.mesh.intersect_meshes_by_aabb = function( points1, tris1, uvs1, points2, tris2, uvs2 ) {
+verb.eval.intersect_meshes_by_aabb = function( points1, tris1, uvs1, points2, tris2, uvs2 ) {
 
 	// build aabb for each mesh
 	var tri_indices1 = verb.range(tris1.length)
 	  , tri_indices2 = verb.range(tris2.length)
-	  , aabb1 = verb.eval.mesh.make_mesh_aabb_tree( points1, tris1, tri_indices1 )
-	  , aabb2 = verb.eval.mesh.make_mesh_aabb_tree( points2, tris2, tri_indices2 );
+	  , aabb1 = verb.eval.make_mesh_aabb_tree( points1, tris1, tri_indices1 )
+	  , aabb2 = verb.eval.make_mesh_aabb_tree( points2, tris2, tri_indices2 );
 
   // intersect and get the pairs of triangle intersctions
-	var bbints = verb.eval.geom.intersect_aabb_trees( points1, tris1, points2, tris2, aabb1, aabb2 );
+	var bbints = verb.eval.intersect_aabb_trees( points1, tris1, points2, tris2, aabb1, aabb2 );
 
 	// get the segments of the intersection crv with uvs
 	var segments = bbints.map(function(ids){
-													var res = verb.eval.geom.intersect_tris( points1, tris1[ ids[0] ], uvs1, points2, tris2[ ids[1] ], uvs2 );
+													var res = verb.eval.intersect_tris( points1, tris1[ ids[0] ], uvs1, points2, tris2[ ids[1] ], uvs2 );
 													if (!res) return res;
 
 													res[0].tri1id = ids[0];
@@ -1171,12 +1171,12 @@ verb.eval.mesh.intersect_meshes_by_aabb = function( points1, tris1, uvs1, points
 
 	if (segments.length === 0) return [];
 
-	return verb.eval.mesh.make_intersect_polylines( segments );
+	return verb.eval.make_intersect_polylines( segments );
 
 }
 
 
-verb.eval.mesh.make_intersect_polylines = function( segments ) {
+verb.eval.make_intersect_polylines = function( segments ) {
 
 	// debug (return all segments)
 	// return segments;
@@ -1188,7 +1188,7 @@ verb.eval.mesh.make_intersect_polylines = function( segments ) {
 	});
 
 	// construct a tree for fast lookup 
-	var tree = verb.eval.mesh.kdtree_from_segs( segments );
+	var tree = verb.eval.kdtree_from_segs( segments );
 
 	// flatten everything, we no longer need the segments
 	var ends = segments.flatten();
@@ -1198,7 +1198,7 @@ verb.eval.mesh.make_intersect_polylines = function( segments ) {
 
 			if (segEnd.adj) return;
 
-			var adjEnd = verb.eval.mesh.lookup_adj_segment( segEnd, tree, segments.length );
+			var adjEnd = verb.eval.lookup_adj_segment( segEnd, tree, segments.length );
 
 			if (adjEnd && !adjEnd.adj){
 
@@ -1258,11 +1258,11 @@ verb.eval.mesh.make_intersect_polylines = function( segments ) {
 
 }
 
-verb.eval.mesh.pt_dist = function(a, b){
+verb.eval.pt_dist = function(a, b){
   return Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2) + Math.pow(a.z - b.z, 2);
 };
 
-verb.eval.mesh.kdtree_from_segs = function( segments ){
+verb.eval.kdtree_from_segs = function( segments ){
 
 	var treePoints = [];
 
@@ -1273,11 +1273,11 @@ verb.eval.mesh.kdtree_from_segs = function( segments ){
 	});
 
 	// make our tree
-	return new KdTree(treePoints, verb.eval.mesh.pt_dist, ["x", "y", "z"]);
+	return new KdTree(treePoints, verb.eval.pt_dist, ["x", "y", "z"]);
 
 }
 
-verb.eval.mesh.lookup_adj_segment = function( segEnd, tree, numSegments ) {
+verb.eval.lookup_adj_segment = function( segEnd, tree, numSegments ) {
 
 	var numResults = numSegments ? Math.min( numSegments, 3 ) : 3;
 
@@ -1311,11 +1311,11 @@ verb.eval.mesh.lookup_adj_segment = function( segEnd, tree, numSegments ) {
 // + *Array*, a point represented by an array of length (dim)
 //
 
-verb.eval.geom.intersect_tris = function( points1, tri1, uvs1, points2, tri2, uvs2 ){
+verb.eval.intersect_tris = function( points1, tri1, uvs1, points2, tri2, uvs2 ){
 
 	// 0) get the plane rep of the two triangles
-	var n0 = verb.eval.geom.get_tri_norm( points1, tri1 );
-	var n1 = verb.eval.geom.get_tri_norm( points2, tri2 );
+	var n0 = verb.eval.get_tri_norm( points1, tri1 );
+	var n1 = verb.eval.get_tri_norm( points2, tri2 );
 	var o0 = points1[ tri1[0] ];
 	var o1 = points2[ tri2[0] ];
 
@@ -1323,19 +1323,19 @@ verb.eval.geom.intersect_tris = function( points1, tri1, uvs1, points2, tri2, uv
 // TODO: mark appropriately if the intersection is along an edge
 	
 	// 1) intersect with planes to yield ray of intersection
-	var ray = verb.eval.geom.intersect_planes(o0, n0, o1, n1);
+	var ray = verb.eval.intersect_planes(o0, n0, o1, n1);
 	if (!ray.intersects) return null;
 
 	// 2) clip the ray within tri1
-	var clip1 = verb.eval.geom.clip_ray_in_coplanar_tri( ray.origin, ray.dir, points1, tri1, uvs1 );
+	var clip1 = verb.eval.clip_ray_in_coplanar_tri( ray.origin, ray.dir, points1, tri1, uvs1 );
 	if (clip1 === null) return null;
 
 	// 3) clip the ray within tri2
-	var clip2 = verb.eval.geom.clip_ray_in_coplanar_tri( ray.origin, ray.dir, points2, tri2, uvs2 );
+	var clip2 = verb.eval.clip_ray_in_coplanar_tri( ray.origin, ray.dir, points2, tri2, uvs2 );
 	if (clip2 === null) return null;
 
 	// 4) find the interval that overlaps
-	var merged = verb.eval.geom.merge_tri_clip_intervals(clip1, clip2, points1, tri1, uvs1, points2, tri2, uvs2 );
+	var merged = verb.eval.merge_tri_clip_intervals(clip1, clip2, points1, tri1, uvs1, points2, tri2, uvs2 );
 	if (merged === null) return null;
 
 	return [ 	{ uvtri1 : merged.uv1tri1, uvtri2: merged.uv1tri2, pt: merged.pt1 }, 
@@ -1343,7 +1343,7 @@ verb.eval.geom.intersect_tris = function( points1, tri1, uvs1, points2, tri2, uv
 
 }
 
-verb.eval.geom.clip_ray_in_coplanar_tri = function(o1, d1, points, tri, uvs ){
+verb.eval.clip_ray_in_coplanar_tri = function(o1, d1, points, tri, uvs ){
 
 	// 0) construct rays for each edge of the triangle
 	var o = [ points[ tri[0] ], points[ tri[1] ], points[ tri[2] ] ]
@@ -1368,7 +1368,7 @@ verb.eval.geom.clip_ray_in_coplanar_tri = function(o1, d1, points, tri, uvs ){
 		var o0 = o[i];
 		var d0 = d[i];
 
-		var res = verb.eval.geom.intersect_rays( o0, d0, o1, d1 );
+		var res = verb.eval.intersect_rays( o0, d0, o1, d1 );
 
 		// the rays are parallel
 		if (res === null) {
@@ -1384,14 +1384,14 @@ verb.eval.geom.clip_ray_in_coplanar_tri = function(o1, d1, points, tri, uvs ){
 		// if inside interval
 		if (minU === null || uray < minU.u){
 			minU = { 	u: uray, 
-								pt: verb.eval.geom.point_on_ray( o1, d1, uray ),
+								pt: verb.eval.point_on_ray( o1, d1, uray ),
 								uv: numeric.add( uvs[i], numeric.mul( useg / l[i], uvd[i] ) ) };
 
 		}
 
 		if (maxU === null || uray > maxU.u){
 			maxU = { 	u: uray, 
-								pt: verb.eval.geom.point_on_ray( o1, d1, uray ),
+								pt: verb.eval.point_on_ray( o1, d1, uray ),
 								uv: numeric.add( uvs[i], numeric.mul( useg / l[i], uvd[i] ) ) };
 
 		}
@@ -1406,13 +1406,13 @@ verb.eval.geom.clip_ray_in_coplanar_tri = function(o1, d1, points, tri, uvs ){
 	
 }
 
-verb.eval.geom.point_on_ray = function(o, d, u){
+verb.eval.point_on_ray = function(o, d, u){
 
 	return numeric.add( o, numeric.mul( u, d ));
 
 }
 
-verb.eval.geom.merge_tri_clip_intervals = function(clip1, clip2, points1, tri1, uvs1, points2, tri2, uvs2){
+verb.eval.merge_tri_clip_intervals = function(clip1, clip2, points1, tri1, uvs1, points2, tri2, uvs2){
 
 	// if the intervals dont overlap, fail
 	if (clip2.min.u > clip1.max.u + verb.EPSILON 
@@ -1436,11 +1436,11 @@ verb.eval.geom.merge_tri_clip_intervals = function(clip1, clip2, points1, tri1, 
 	if (min.tri === 0){
 
 		res.uv1tri1 = min.uv;
-		res.uv1tri2 = verb.eval.geom.tri_uv_from_point( points2, tri2, uvs2, min.pt );
+		res.uv1tri2 = verb.eval.tri_uv_from_point( points2, tri2, uvs2, min.pt );
 
 	} else {
 
-		res.uv1tri1 = verb.eval.geom.tri_uv_from_point( points1, tri1, uvs1, min.pt );
+		res.uv1tri1 = verb.eval.tri_uv_from_point( points1, tri1, uvs1, min.pt );
 		res.uv1tri2 = min.uv;
 
 	}
@@ -1450,11 +1450,11 @@ verb.eval.geom.merge_tri_clip_intervals = function(clip1, clip2, points1, tri1, 
 	if (max.tri === 0){
 
 		res.uv2tri1 = max.uv;
-		res.uv2tri2 = verb.eval.geom.tri_uv_from_point( points2, tri2, uvs2, max.pt );
+		res.uv2tri2 = verb.eval.tri_uv_from_point( points2, tri2, uvs2, max.pt );
 
 	} else {
 
-		res.uv2tri1 = verb.eval.geom.tri_uv_from_point( points1, tri1, uvs1, max.pt );
+		res.uv2tri1 = verb.eval.tri_uv_from_point( points1, tri1, uvs1, max.pt );
 		res.uv2tri2 = max.uv;
 
 	}
@@ -1465,7 +1465,7 @@ verb.eval.geom.merge_tri_clip_intervals = function(clip1, clip2, points1, tri1, 
 
 }
 
-verb.eval.geom.intersect_planes = function(o1, n1, o2, n2){
+verb.eval.intersect_planes = function(o1, n1, o2, n2){
 
 	var d = numeric.cross(n1, n2);
 
@@ -1528,7 +1528,7 @@ verb.eval.geom.intersect_planes = function(o1, n1, o2, n2){
 
 }
 
-verb.eval.geom.tri_uv_from_point = function( points, tri, uvs, f ){
+verb.eval.tri_uv_from_point = function( points, tri, uvs, f ){
 
 	var p1 = points[ tri[0] ];
 	var p2 = points[ tri[1] ];

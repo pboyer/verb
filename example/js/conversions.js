@@ -28,7 +28,7 @@ var makeGLMeshFromTesselation = function(gl, s){
 
 };
 
-verb.geom.NurbsCurve.prototype.toGlType = function(gl, callback) {
+verb.NurbsCurve.prototype.toGlType = function(gl, callback) {
   
   if (callback){
     this.tesselate({}, function(s){
@@ -41,7 +41,7 @@ verb.geom.NurbsCurve.prototype.toGlType = function(gl, callback) {
 
 };
 
-verb.geom.NurbsSurface.prototype.toGlType = function(gl, callback) {
+verb.NurbsSurface.prototype.toGlType = function(gl, callback) {
 
   if (callback){
     this.tesselate({ minDivsV: 10, minDivsU: 10 }, function(s){

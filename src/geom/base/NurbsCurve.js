@@ -8,9 +8,9 @@
 // + *Array*, Array of numbers representing the control point weights
 // + *Array*, Array of numbers representing the knot structure
 
-verb.geom.NurbsCurve = function( degree, controlPoints, weights, knots ) {
+verb.NurbsCurve = function( degree, controlPoints, weights, knots ) {
 
-	verb.geom.NurbsGeometry.call(this);
+	verb.NurbsGeometry.call(this);
 
 	this.setAll({
 		"controlPoints": controlPoints,
@@ -19,7 +19,7 @@ verb.geom.NurbsCurve = function( degree, controlPoints, weights, knots ) {
 		"degree": degree
 	});
 
-}.inherits( verb.geom.NurbsGeometry );
+}.inherits( verb.NurbsGeometry );
 
 //
 // ####point( u [, callback] )
@@ -33,7 +33,7 @@ verb.geom.NurbsCurve = function( degree, controlPoints, weights, knots ) {
 // **returns**
 // + *Array*, An array if called synchronously, otherwise nothing
 
-verb.geom.NurbsCurve.prototype.point = function( u, callback ) {
+verb.NurbsCurve.prototype.point = function( u, callback ) {
 
 	return this.nurbsEngine.eval( 'rational_curve_point', [ this.get('degree'), this.get('knots'), this.homogenize(),  u ], callback ); 
 
@@ -52,7 +52,7 @@ verb.geom.NurbsCurve.prototype.point = function( u, callback ) {
 // **returns**
 // + *Array*, An array if called synchronously, otherwise nothing
 
-verb.geom.NurbsCurve.prototype.derivatives = function( u, num_derivs, callback ) {
+verb.NurbsCurve.prototype.derivatives = function( u, num_derivs, callback ) {
 
 	return this.nurbsEngine.eval( 'rational_curve_derivs', [ this.get('degree'), this.get('knots'), this.homogenize(),  u, num_derivs || 1  ], callback ); 
 
@@ -70,7 +70,7 @@ verb.geom.NurbsCurve.prototype.derivatives = function( u, num_derivs, callback )
 // **returns**
 // + *Number*, The parameter of the closest point
 
-verb.geom.NurbsCurve.prototype.closestPoint = function( point, callback ) {
+verb.NurbsCurve.prototype.closestPoint = function( point, callback ) {
 
 	return this.nurbsEngine.eval( 'rational_curve_closest_point', [ this.get('degree'), this.get('knots'), this.homogenize(),  point  ], callback ); 
 
@@ -84,7 +84,7 @@ verb.geom.NurbsCurve.prototype.closestPoint = function( point, callback ) {
 // **returns**
 // + *Number*, The length of the curve
 
-verb.geom.NurbsCurve.prototype.length = function( callback ) {
+verb.NurbsCurve.prototype.length = function( callback ) {
 
 	return this.nurbsEngine.eval( 'rational_curve_arc_length', [ this.get('degree'), this.get('knots'), this.homogenize()  ], callback ); 
 
@@ -101,7 +101,7 @@ verb.geom.NurbsCurve.prototype.length = function( callback ) {
 // **returns**
 // + *Number*, The length of the curve at the given parameter
 
-verb.geom.NurbsCurve.prototype.lengthAtParam = function( u, callback ) {
+verb.NurbsCurve.prototype.lengthAtParam = function( u, callback ) {
 
 	return this.nurbsEngine.eval( 'rational_curve_arc_length', [ this.get('degree'), this.get('knots'), this.homogenize(), u  ], callback ); 
 
@@ -118,7 +118,7 @@ verb.geom.NurbsCurve.prototype.lengthAtParam = function( u, callback ) {
 // **returns**
 // + *Number*, The length of the curve at the given parameter
 
-verb.geom.NurbsCurve.prototype.paramAtLength = function( len, callback ) {
+verb.NurbsCurve.prototype.paramAtLength = function( len, callback ) {
 
 	return this.nurbsEngine.eval( 'rational_curve_param_at_arc_length', [ this.get('degree'), this.get('knots'), this.homogenize(), len  ], callback ); 
 
@@ -135,7 +135,7 @@ verb.geom.NurbsCurve.prototype.paramAtLength = function( len, callback ) {
 // **returns**
 // + *Array*, A collection of parameters
 
-verb.geom.NurbsCurve.prototype.divideByEqualArcLength = function( divisions, callback ) {
+verb.NurbsCurve.prototype.divideByEqualArcLength = function( divisions, callback ) {
 
 	return this.nurbsEngine.eval( 'rational_curve_divide_curve_equally_by_arc_length', [ this.get('degree'), this.get('knots'), this.homogenize(), divisions  ], callback ); 
 
@@ -152,7 +152,7 @@ verb.geom.NurbsCurve.prototype.divideByEqualArcLength = function( divisions, cal
 // **returns**
 // + *Array*, A collection of parameters
 
-verb.geom.NurbsCurve.prototype.divideByArcLength = function( arcLength, callback ) {
+verb.NurbsCurve.prototype.divideByArcLength = function( arcLength, callback ) {
 
 	return this.nurbsEngine.eval( 'rational_curve_divide_curve_by_arc_length', [ this.get('degree'), this.get('knots'), this.homogenize(), arcLength  ], callback ); 
 
@@ -171,7 +171,7 @@ verb.geom.NurbsCurve.prototype.divideByArcLength = function( arcLength, callback
 // **returns**
 // + *Array*, An array if called synchronously, otherwise nothing
 
-verb.geom.NurbsCurve.prototype.tessellate = function(options, callback){
+verb.NurbsCurve.prototype.tessellate = function(options, callback){
 
 	var options = options || {};
 	options.tolerance = options.tolerance || verb.EPSILON;
@@ -192,7 +192,7 @@ verb.geom.NurbsCurve.prototype.tessellate = function(options, callback){
 // **returns**
 // + *Array*, Two curves - one at the lower end of the parameter range and one at the higher end.  
 
-verb.geom.NurbsCurve.prototype.split = function( u, callback ) {
+verb.NurbsCurve.prototype.split = function( u, callback ) {
 
 	var domain = this.domain();
 
@@ -203,15 +203,15 @@ verb.geom.NurbsCurve.prototype.split = function( u, callback ) {
 	// transform the result from the engine into a valid pair of NurbsCurves
 	function asNurbsCurves(res){
 
-		var cpts0 = verb.eval.nurbs.dehomogenize_1d( res[0].control_points );
-		var wts0 = verb.eval.nurbs.weight_1d( res[0].control_points );
+		var cpts0 = verb.eval.dehomogenize_1d( res[0].control_points );
+		var wts0 = verb.eval.weight_1d( res[0].control_points );
 
-		var c0 = new verb.geom.NurbsCurve( res[0].degree, cpts0, wts0, res[0].knots );
+		var c0 = new verb.NurbsCurve( res[0].degree, cpts0, wts0, res[0].knots );
 
-		var cpts1 = verb.eval.nurbs.dehomogenize_1d( res[1].control_points );
-		var wts1 = verb.eval.nurbs.weight_1d( res[1].control_points );
+		var cpts1 = verb.eval.dehomogenize_1d( res[1].control_points );
+		var wts1 = verb.eval.weight_1d( res[1].control_points );
 
-		var c1 = new verb.geom.NurbsCurve( res[1].degree, cpts1, wts1, res[1].knots );
+		var c1 = new verb.NurbsCurve( res[1].degree, cpts1, wts1, res[1].knots );
 
 		return [c0, c1];
 	}
@@ -236,7 +236,7 @@ verb.geom.NurbsCurve.prototype.split = function( u, callback ) {
 // **returns**
 // + *Array*, An array representing the high and end point of the domain of the curve 
 
-verb.geom.NurbsCurve.prototype.domain = function() {
+verb.NurbsCurve.prototype.domain = function() {
 
 	var knots = this.get('knots');
 	return [ knots[0], knots[knots.length-1] ];
@@ -254,7 +254,7 @@ verb.geom.NurbsCurve.prototype.domain = function() {
 // **returns**
 // + *Array*, An array if called synchronously, otherwise nothing
 
-verb.geom.NurbsCurve.prototype.transform = function( mat ){
+verb.NurbsCurve.prototype.transform = function( mat ){
 
 	var pts = this.get("controlPoints");
 
@@ -281,7 +281,7 @@ verb.geom.NurbsCurve.prototype.transform = function( mat ){
 // **returns**
 // + *Array*, An array if called synchronously, otherwise nothing
 
-verb.geom.NurbsCurve.prototype.clone = function(){
+verb.NurbsCurve.prototype.clone = function(){
 
 	// copy the control points
 	var pts = this.get("controlPoints");
@@ -292,7 +292,7 @@ verb.geom.NurbsCurve.prototype.clone = function(){
 		pts_copy.push( pts[i].slice(0) );
 	}
 
-	return new verb.geom.NurbsCurve( this.get('degree'), pts_copy, this.get('weights').slice(0), this.get('knots').slice );
+	return new verb.NurbsCurve( this.get('degree'), pts_copy, this.get('weights').slice(0), this.get('knots').slice );
 
 };
 
@@ -304,9 +304,9 @@ verb.geom.NurbsCurve.prototype.clone = function(){
 // **returns**
 // + *Array*, 2d array of homogenized control points
 
-verb.geom.NurbsCurve.prototype.homogenize = function(){
+verb.NurbsCurve.prototype.homogenize = function(){
 
-	return verb.eval.nurbs.homogenize_1d( this.get('controlPoints'), this.get('weights') );
+	return verb.eval.homogenize_1d( this.get('controlPoints'), this.get('weights') );
 
 };
 
@@ -316,7 +316,7 @@ verb.geom.NurbsCurve.prototype.homogenize = function(){
 //
 // If this is a subtype of the NurbsCurve, this method will update the Nurbs representation
 // of the curve from those parameters.  This destroys any manual changes to the Nurbs rep.
-verb.geom.NurbsCurve.prototype.update = function(){
+verb.NurbsCurve.prototype.update = function(){
 
 	if ( !this.nurbsRep ){
 		return;

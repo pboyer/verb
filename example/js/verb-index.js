@@ -18,7 +18,7 @@ var degreeU = 3
 setControlPoints(Date.now(), controlPoints)
 
  
-var srf = new verb.geom.NurbsSurface( degreeU, knotsU, degreeV, knotsV, controlPoints, weights);
+var srf = new verb.NurbsSurface( degreeU, knotsU, degreeV, knotsV, controlPoints, weights);
 
 // add the title viewer
 var width = document.getElementById("header").offsetWidth;
@@ -122,16 +122,16 @@ window.requestAnimationFrame(update);
 var geom = [];
 
 // extrusion
-var extrusionProfile = new verb.geom.BezierCurve( [ [-0.5, -0.5, 0], [0, -0.5, 0], [-1, 1,0], [0.5,0.5,0] ] )
-geom.push( new verb.geom.Extrusion( extrusionProfile, [0,0,1], 1 ) );
+var extrusionProfile = new verb.BezierCurve( [ [-0.5, -0.5, 0], [0, -0.5, 0], [-1, 1,0], [0.5,0.5,0] ] )
+geom.push( new verb.Extrusion( extrusionProfile, [0,0,1], 1 ) );
 
 // revolved surface
 var base = [0,0,0]
   , axis = [0,0,1]
   , angle = Math.PI * 2
-  , profile = new verb.geom.BezierCurve( [ [0.1, 0, 1.0], [0.5, 0, 0.5], [-0.5, 0, 0.5], [0.5, 0, -0.5] ]);
+  , profile = new verb.BezierCurve( [ [0.1, 0, 1.0], [0.5, 0, 0.5], [-0.5, 0, 0.5], [0.5, 0, -0.5] ]);
 
-geom.push( new verb.geom.RevolvedSurface( base, axis, angle, profile ) );
+geom.push( new verb.RevolvedSurface( base, axis, angle, profile ) );
 
 // nurbs curve
 var p1 = [-0.5,-0.5,0.25]
@@ -139,7 +139,7 @@ var p1 = [-0.5,-0.5,0.25]
   , p3 = [0.5,-0.5,-2]
   , p4 = [1,0.25,0];
 
-geom.push( new verb.geom.BezierCurve( [p1, p2, p3, p4] ) );
+geom.push( new verb.BezierCurve( [p1, p2, p3, p4] ) );
 
 geom.map(function(g){
   addViewer(new Viewer( g, 270, 270, 2.2 ) );

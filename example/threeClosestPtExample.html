@@ -57,7 +57,7 @@
 		verb.init();
 		var p1 = [0,0,-5], p2 = [10,0,0], p3 = [10,10,-5], p4 = [0,10,5], p5 = [5, 5, 0];
 		var pts = [p1, p2, p3, p4, p5];
-		var interpCurve = new verb.geom.InterpCurve( pts, 3 );
+		var interpCurve = new verb.InterpCurve( pts, 3 );
 
 		var interpCurveGeom = tessellateCurve(interpCurve);
 
@@ -71,8 +71,9 @@
 		var d1 = Date.now();
 
 		var w = 0;
-		// for (var i = -10; i < 20; i+=4){
-		// 	for (var j = -10; j < 20; j+=4){
+		for (var i = -10; i < 20; i+=4){
+			for (var j = -10; j < 20; j+=4){
+				for (var k = -10; k < 20; k+=4){
 
 					var p0 = [-10 + Math.random()* 20, -10 + Math.random()* 20, -10 + Math.random()* 20 ];
 					// var p0 = [i, j, k ];
@@ -84,9 +85,9 @@
 
 					scene.add( l );
 					w++;
-		// 		}
-		// 	}
-		// }
+				}
+			}
+		}
 
 		var d2 = Date.now();
 

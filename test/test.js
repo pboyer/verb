@@ -43,7 +43,7 @@ describe("Array.flatten",function(){
 	});
 });
 
-describe("verb.eval.nurbs.knot_span_given_n",function(){
+describe("verb.eval.knot_span_given_n",function(){
 
 	it('returns correct result', function(){
 
@@ -51,39 +51,39 @@ describe("verb.eval.nurbs.knot_span_given_n",function(){
 			, degree = 2
 			, knots = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5];
 
-		should.equal( 4, verb.eval.nurbs.knot_span_given_n( n, degree, 2.5, knots ) );
-		should.equal( 3, verb.eval.nurbs.knot_span_given_n( n, degree, 1, knots ) );
-		should.equal( 3, verb.eval.nurbs.knot_span_given_n( n, degree, 1.5, knots ) );
-		should.equal( 7, verb.eval.nurbs.knot_span_given_n( n, degree, 4.9, knots ) );
-		should.equal( 7, verb.eval.nurbs.knot_span_given_n( n, degree, 10, knots ) );
-		should.equal( 7, verb.eval.nurbs.knot_span_given_n( n, degree, 5, knots ) );
-		should.equal( 2, verb.eval.nurbs.knot_span_given_n( n, degree, 0, knots ) );
-		should.equal( 2, verb.eval.nurbs.knot_span_given_n( n, degree, -1, knots ) );
+		should.equal( 4, verb.eval.knot_span_given_n( n, degree, 2.5, knots ) );
+		should.equal( 3, verb.eval.knot_span_given_n( n, degree, 1, knots ) );
+		should.equal( 3, verb.eval.knot_span_given_n( n, degree, 1.5, knots ) );
+		should.equal( 7, verb.eval.knot_span_given_n( n, degree, 4.9, knots ) );
+		should.equal( 7, verb.eval.knot_span_given_n( n, degree, 10, knots ) );
+		should.equal( 7, verb.eval.knot_span_given_n( n, degree, 5, knots ) );
+		should.equal( 2, verb.eval.knot_span_given_n( n, degree, 0, knots ) );
+		should.equal( 2, verb.eval.knot_span_given_n( n, degree, -1, knots ) );
 
 	});
 
 });
 
-describe("verb.eval.nurbs.knot_span",function(){
+describe("verb.eval.knot_span",function(){
 
 	it('returns correct result for degree 2 curve', function(){
 
 		var degree = 2
 			, knots = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5];
 
-		should.equal( 4, verb.eval.nurbs.knot_span( degree, 2.5, knots ) );
-		should.equal( 3, verb.eval.nurbs.knot_span( degree, 1, knots ) );
-		should.equal( 3, verb.eval.nurbs.knot_span( degree, 1.5, knots ) );
-		should.equal( 7, verb.eval.nurbs.knot_span( degree, 4.9, knots ) );
-		should.equal( 7, verb.eval.nurbs.knot_span( degree, 10, knots ) ); // above span
-		should.equal( 7, verb.eval.nurbs.knot_span( degree, 5, knots ) ); // top of span
-		should.equal( 2, verb.eval.nurbs.knot_span( degree, 0, knots ) ); // bottom span
+		should.equal( 4, verb.eval.knot_span( degree, 2.5, knots ) );
+		should.equal( 3, verb.eval.knot_span( degree, 1, knots ) );
+		should.equal( 3, verb.eval.knot_span( degree, 1.5, knots ) );
+		should.equal( 7, verb.eval.knot_span( degree, 4.9, knots ) );
+		should.equal( 7, verb.eval.knot_span( degree, 10, knots ) ); // above span
+		should.equal( 7, verb.eval.knot_span( degree, 5, knots ) ); // top of span
+		should.equal( 2, verb.eval.knot_span( degree, 0, knots ) ); // bottom span
 
 	});
 
 });
 
-describe("verb.eval.nurbs.basis_functions, basis_functions_given_knot_span_index",function(){
+describe("verb.eval.basis_functions, basis_functions_given_knot_span_index",function(){
 
 	it('return correct results', function(){
 
@@ -91,13 +91,13 @@ describe("verb.eval.nurbs.basis_functions, basis_functions_given_knot_span_index
 			, span = 4
 			, knots = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5];
 
-		var N1 = verb.eval.nurbs.basis_functions_given_knot_span_index( 4, 2.5, degree, knots );
+		var N1 = verb.eval.basis_functions_given_knot_span_index( 4, 2.5, degree, knots );
 		should.equal( 3, N1.length );
 		should.equal( 0.125, N1[0] );
 		should.equal( 0.75, N1[1] );
 		should.equal( 0.125, N1[2] );
 
-		var N2 = verb.eval.nurbs.basis_functions( 2.5, degree, knots );
+		var N2 = verb.eval.basis_functions( 2.5, degree, knots );
 		should.equal( 3, N2.length );
 		should.equal( 0.125, N2[0] );
 		should.equal( 0.75, N2[1] );
@@ -107,7 +107,7 @@ describe("verb.eval.nurbs.basis_functions, basis_functions_given_knot_span_index
 
 });
 
-describe("verb.eval.nurbs.deriv_basis_functions_given_n_i",function(){
+describe("verb.eval.deriv_basis_functions_given_n_i",function(){
 
 	it('returns correct results', function(){
 
@@ -117,7 +117,7 @@ describe("verb.eval.nurbs.deriv_basis_functions_given_n_i",function(){
 			, span = 4
 			, knots = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5];
 
-		var N1 = verb.eval.nurbs.deriv_basis_functions_given_n_i( span, 2.5, degree, n, knots );
+		var N1 = verb.eval.deriv_basis_functions_given_n_i( span, 2.5, degree, n, knots );
 		// weights
 		should.equal( 0.125, N1[0][0] );
 		should.equal( 0.75, N1[0][1] );
@@ -139,7 +139,7 @@ describe("verb.eval.nurbs.deriv_basis_functions_given_n_i",function(){
 
 });
 
-describe("verb.eval.nurbs.curve_point",function(){
+describe("verb.eval.curve_point",function(){
 
 	it('returns correct result for simple curve', function(){
 
@@ -148,17 +148,17 @@ describe("verb.eval.nurbs.curve_point",function(){
 			, knots = [0, 0, 0, 1, 2, 3, 4, 5, 5, 5]
 			, control_points = [ [10, 0], [20, 10], [30, 20], [40, 30], [50, 40], [60, 30], [70, 80]];
 
-		var p = verb.eval.nurbs.curve_point_given_n( n, degree, knots, control_points, 2.5);
+		var p = verb.eval.curve_point_given_n( n, degree, knots, control_points, 2.5);
 
 		should.equal( p[0], 40 );
 		should.equal( p[1], 30 );
 
-		var p_start = verb.eval.nurbs.curve_point_given_n( n, degree, knots, control_points, 0);
+		var p_start = verb.eval.curve_point_given_n( n, degree, knots, control_points, 0);
 
 		should.equal( p_start[0], 10 );
 		should.equal( p_start[1], 0 );
 
-		var p_end = verb.eval.nurbs.curve_point_given_n( n, degree, knots, control_points, 5);
+		var p_end = verb.eval.curve_point_given_n( n, degree, knots, control_points, 5);
 
 		should.equal( p_end[0], 70 );
 		should.equal( p_end[1], 80 );
@@ -166,17 +166,17 @@ describe("verb.eval.nurbs.curve_point",function(){
 	});
 });
 
-describe("verb.eval.nurbs.are_valid_relations",function(){
+describe("verb.eval.are_valid_relations",function(){
 
 	it('returns correct result for two cases', function(){
 
-		should.equal( false, verb.eval.nurbs.are_valid_relations( 0, 0, 0 ) );
-		should.equal( true, verb.eval.nurbs.are_valid_relations( 2, 2, 5 ) );
+		should.equal( false, verb.eval.are_valid_relations( 0, 0, 0 ) );
+		should.equal( true, verb.eval.are_valid_relations( 2, 2, 5 ) );
 
 	});
 });
 
-describe("verb.eval.nurbs.curve_point",function(){
+describe("verb.eval.curve_point",function(){
 
 	it('returns correct result for simple curve', function(){
 
@@ -186,12 +186,12 @@ describe("verb.eval.nurbs.curve_point",function(){
 			, knots = [0, 0, 0, 0, 1, 1, 1, 1]
 			, control_points = [ [10, 0], [20, 10], [30, 20], [50, 50] ];
 
-		var p = verb.eval.nurbs.curve_point( degree, knots, control_points, u);
+		var p = verb.eval.curve_point( degree, knots, control_points, u);
 
 		should.equal( p[0], 10 );
 		should.equal( p[1], 0 );
 
-		var p2 = verb.eval.nurbs.curve_point( degree, knots, control_points, 1.0);
+		var p2 = verb.eval.curve_point( degree, knots, control_points, 1.0);
 
 		should.equal( p2[0], 50 );
 		should.equal( p2[1], 50 );
@@ -201,7 +201,7 @@ describe("verb.eval.nurbs.curve_point",function(){
 
 });
 
-describe("verb.eval.nurbs.curve_derivs_given_n",function(){
+describe("verb.eval.curve_derivs_given_n",function(){
 
 	it('returns correct result for simple curve', function(){
 
@@ -213,7 +213,7 @@ describe("verb.eval.nurbs.curve_derivs_given_n",function(){
 			, control_points = [ [10, 0], [20, 10], [30, 20], [50, 50] ]
 			, num_derivs = 2;
 
-		var p = verb.eval.nurbs.curve_derivs_given_n( n, degree, knots, control_points, u, num_derivs ) ;
+		var p = verb.eval.curve_derivs_given_n( n, degree, knots, control_points, u, num_derivs ) ;
 
 		should.equal( p[0][0], 10 );
 		should.equal( p[0][1], 0 );
@@ -223,7 +223,7 @@ describe("verb.eval.nurbs.curve_derivs_given_n",function(){
 
 });
 
-describe("verb.eval.nurbs.curve_derivs",function(){
+describe("verb.eval.curve_derivs",function(){
 
 	it('returns correct result for simple curve', function(){
 
@@ -234,7 +234,7 @@ describe("verb.eval.nurbs.curve_derivs",function(){
 			, control_points = [ [10, 0], [20, 10], [30, 20], [50, 50] ]
 			, num_derivs = 2;
 
-		var p = verb.eval.nurbs.curve_derivs( degree, knots, control_points, u, num_derivs ) ;
+		var p = verb.eval.curve_derivs( degree, knots, control_points, u, num_derivs ) ;
 
 		should.equal( p[0][0], 10 );
 		should.equal( p[0][1], 0 );
@@ -245,7 +245,7 @@ describe("verb.eval.nurbs.curve_derivs",function(){
 
 });
 
-describe("verb.eval.nurbs.surface_point_given_n_m",function(){
+describe("verb.eval.surface_point_given_n_m",function(){
 
 	it('returns correct result for simple surface', function(){
 
@@ -261,13 +261,13 @@ describe("verb.eval.nurbs.surface_point_given_n_m",function(){
 			, n = 3
 			, m = 3;
 
-		var p = verb.eval.nurbs.surface_point_given_n_m( n, degree_u, knots_u, m, degree_v, knots_v, control_points, 0, 0 );
+		var p = verb.eval.surface_point_given_n_m( n, degree_u, knots_u, m, degree_v, knots_v, control_points, 0, 0 );
 		
 		should.equal( p[0], 0 );
 		should.equal( p[1], 0 );
 		should.equal( p[2], 50 );
 
-		p = verb.eval.nurbs.surface_point_given_n_m( n, degree_u, knots_u, m, degree_v, knots_v, control_points, 1, 1 );
+		p = verb.eval.surface_point_given_n_m( n, degree_u, knots_u, m, degree_v, knots_v, control_points, 1, 1 );
 
 		should.equal( p[0], 30 );
 		should.equal( p[1], -30 );
@@ -277,7 +277,7 @@ describe("verb.eval.nurbs.surface_point_given_n_m",function(){
 
 });
 
-describe("verb.eval.nurbs.surface_point",function(){
+describe("verb.eval.surface_point",function(){
 
 	it('returns correct result for simple surface', function(){
 
@@ -291,13 +291,13 @@ describe("verb.eval.nurbs.surface_point",function(){
 														[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] 	],
 														[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ];
 
-		var p = verb.eval.nurbs.surface_point( degree_u, knots_u, degree_v, knots_v, control_points, 0, 0 );
+		var p = verb.eval.surface_point( degree_u, knots_u, degree_v, knots_v, control_points, 0, 0 );
 
 		should.equal( p[0], 0 );
 		should.equal( p[1], 0 );
 		should.equal( p[2], 50 );
 
-		p = verb.eval.nurbs.surface_point( degree_u, knots_u, degree_v, knots_v, control_points, 1, 1 );
+		p = verb.eval.surface_point( degree_u, knots_u, degree_v, knots_v, control_points, 1, 1 );
 
 		should.equal( p[0], 30 );
 		should.equal( p[1], -30 );
@@ -314,7 +314,7 @@ describe("verb.eval.nurbs.surface_point",function(){
 			, control_points = [ 	[ [0, 0, 50], 		[10, 0, 0], 		[20, 0, 0], 		[30, 0, 0] 		],
 														[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] 	] ];
 
-		var p = verb.eval.nurbs.surface_point( degree_u, knots_u, degree_v, knots_v, control_points, 0, 0 );
+		var p = verb.eval.surface_point( degree_u, knots_u, degree_v, knots_v, control_points, 0, 0 );
 
 		should.equal( p[0], 0 );
 		should.equal( p[1], 0 );
@@ -324,7 +324,7 @@ describe("verb.eval.nurbs.surface_point",function(){
 
 });
 
-describe("verb.eval.nurbs.surface_derivs_given_n_m",function(){
+describe("verb.eval.surface_derivs_given_n_m",function(){
 
 	it('returns correct derivatives for simple surface', function(){
 
@@ -342,7 +342,7 @@ describe("verb.eval.nurbs.surface_derivs_given_n_m",function(){
 			, m = 3
 			, num_derivatives = 1;
 
-		var p = verb.eval.nurbs.surface_derivs_given_n_m( n, degree_u, knots_u, m, degree_v, knots_v, control_points, num_derivatives, 0, 0 );
+		var p = verb.eval.surface_derivs_given_n_m( n, degree_u, knots_u, m, degree_v, knots_v, control_points, num_derivatives, 0, 0 );
 
 		// 0th derivative with respect to u & v
 		should.equal( p[0][0][0], 0 );
@@ -366,7 +366,7 @@ describe("verb.eval.nurbs.surface_derivs_given_n_m",function(){
 	});
 });
 
-describe("verb.eval.nurbs.surface_derivs",function(){
+describe("verb.eval.surface_derivs",function(){
 
 	it('returns correct derivatives for simple surface', function(){
 
@@ -384,7 +384,7 @@ describe("verb.eval.nurbs.surface_derivs",function(){
 			, m = 3
 			, num_derivatives = 1;
 
-		var p = verb.eval.nurbs.surface_derivs( degree_u, knots_u, degree_v, knots_v, control_points, num_derivatives, 0, 0 );
+		var p = verb.eval.surface_derivs( degree_u, knots_u, degree_v, knots_v, control_points, num_derivatives, 0, 0 );
 
 		// 0th derivative with respect to u & v
 		should.equal( p[0][0][0], 0 );
@@ -409,13 +409,13 @@ describe("verb.eval.nurbs.surface_derivs",function(){
 
 });
 
-describe("verb.eval.nurbs.homogenize_1d",function(){
+describe("verb.eval.homogenize_1d",function(){
 
 	it('returns correct results', function(){
 
 		var weights = [1, 2, 3, 4]
 			, control_points = [ [10, 0], [20, 10], [30, 20], [50, 50] ]
-			, homo_control_points = verb.eval.nurbs.homogenize_1d( control_points, weights);
+			, homo_control_points = verb.eval.homogenize_1d( control_points, weights);
 
 		for (var i = 0; i < control_points.length; i++)
 		{
@@ -426,7 +426,7 @@ describe("verb.eval.nurbs.homogenize_1d",function(){
 
 		weights = [1, 2, 3, 4];
 		control_points = [ [10, 0, 4], [20, 10, 3], [30, 20, 0], [50, 50, 10] ];
-		homo_control_points = verb.eval.nurbs.homogenize_1d( control_points, weights);
+		homo_control_points = verb.eval.homogenize_1d( control_points, weights);
 
 		for (var i = 0; i < control_points.length; i++)
 		{
@@ -440,7 +440,7 @@ describe("verb.eval.nurbs.homogenize_1d",function(){
 
 });
 
-describe("verb.eval.nurbs.homogenize_2d",function(){
+describe("verb.eval.homogenize_2d",function(){
 
 	it('homogenize_2d', function(){
 
@@ -452,7 +452,7 @@ describe("verb.eval.nurbs.homogenize_2d",function(){
 														[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] 	],
 														[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] 	],
 														[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
-			, homo_control_points = verb.eval.nurbs.homogenize_2d( control_points, weights)
+			, homo_control_points = verb.eval.homogenize_2d( control_points, weights)
 			, j = 0;
 
 		for (var i = 0; i < control_points.length; i++)
@@ -470,7 +470,7 @@ describe("verb.eval.nurbs.homogenize_2d",function(){
 
 });
 
-describe("verb.eval.nurbs.dehomogenize",function(){
+describe("verb.eval.dehomogenize",function(){
 
 	it('returns correct result', function(){
 
@@ -482,7 +482,7 @@ describe("verb.eval.nurbs.dehomogenize",function(){
 														[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] 	],
 														[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] 	],
 														[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
-			, homo_control_points = verb.eval.nurbs.homogenize_2d( control_points, weights)
+			, homo_control_points = verb.eval.homogenize_2d( control_points, weights)
 			, j = 0
 			, dehomo_pt = [];
 
@@ -490,7 +490,7 @@ describe("verb.eval.nurbs.dehomogenize",function(){
 		{
 			for (j = 0; j < control_points[i].length; j++)
 			{
-				dehomo_pt = verb.eval.nurbs.dehomogenize( homo_control_points[i][j] );
+				dehomo_pt = verb.eval.dehomogenize( homo_control_points[i][j] );
 				should.equal( dehomo_pt.length, control_points[i][j].length );
 				should.equal( dehomo_pt[0], control_points[i][j][0] );
 				should.equal( dehomo_pt[1], control_points[i][j][1] );
@@ -502,7 +502,7 @@ describe("verb.eval.nurbs.dehomogenize",function(){
 
 });
 
-describe("verb.eval.nurbs.rational_curve_point",function(){
+describe("verb.eval.rational_curve_point",function(){
 
 	it('returns correct result for quarter circle', function(){
 
@@ -512,17 +512,17 @@ describe("verb.eval.nurbs.rational_curve_point",function(){
 			, weights = [1, 1, 2]
 			, control_points = [ [1, 0], [1,1], [0,1] ];
 
-		var p = verb.eval.nurbs.rational_curve_point( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights) , 0);
+		var p = verb.eval.rational_curve_point( degree, knots, verb.eval.homogenize_1d( control_points, weights) , 0);
 
 		should.equal( p[0], 1 );
 		should.equal( p[1], 0 );
 
-		p = verb.eval.nurbs.rational_curve_point( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights) , 0.5);
+		p = verb.eval.rational_curve_point( degree, knots, verb.eval.homogenize_1d( control_points, weights) , 0.5);
 
 		should.equal( p[0], 0.6 );
 		should.equal( p[1], 0.8 );
 
-		p = verb.eval.nurbs.rational_curve_point( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights) , 1);
+		p = verb.eval.rational_curve_point( degree, knots, verb.eval.homogenize_1d( control_points, weights) , 1);
 
 		should.equal( p[0], 0 );
 		should.equal( p[1], 1 );
@@ -531,7 +531,7 @@ describe("verb.eval.nurbs.rational_curve_point",function(){
 
 });
 
-describe("verb.eval.nurbs.rational_curve_point",function(){
+describe("verb.eval.rational_curve_point",function(){
 
 	it('returns correct result for cylinder patch', function(){
 
@@ -543,19 +543,19 @@ describe("verb.eval.nurbs.rational_curve_point",function(){
 			, homo_control_points = [ [ [1, 1, 0, 1], 	[1, 1, 1, 1], [2, 0, 2, 2] ],
 													 		  [ [-1, 1, 0, 1], 	[-1, 1, 1, 1], [-2, 0, 2, 2] ] ];
 
-		var p = verb.eval.nurbs.rational_surface_point( degree_u, knots_u,  degree_v, knots_v, homo_control_points, 0, 0 );
+		var p = verb.eval.rational_surface_point( degree_u, knots_u,  degree_v, knots_v, homo_control_points, 0, 0 );
 
 		should.equal( p[0], 1 );
 		should.equal( p[1], 1 );
 		should.equal( p[2], 0 );
 
-		p = verb.eval.nurbs.rational_surface_point( degree_u, knots_u,  degree_v, knots_v, homo_control_points, 0.5, 0.5 );
+		p = verb.eval.rational_surface_point( degree_u, knots_u,  degree_v, knots_v, homo_control_points, 0.5, 0.5 );
 
 		should.equal( p[0], 0 );
 		should.equal( p[1], 0.6 );
 		should.equal( p[2], 0.8 );
 
-		p = verb.eval.nurbs.rational_surface_point( degree_u, knots_u,  degree_v, knots_v, homo_control_points, 1, 1 );
+		p = verb.eval.rational_surface_point( degree_u, knots_u,  degree_v, knots_v, homo_control_points, 1, 1 );
 
 		should.equal( p[0], -1 );
 		should.equal( p[1], 0 );
@@ -564,12 +564,12 @@ describe("verb.eval.nurbs.rational_curve_point",function(){
 	});
 });
 
-describe("verb.eval.nurbs.separate_homo_derivs_1d",function(){
+describe("verb.eval.separate_homo_derivs_1d",function(){
 
 	it('returns expected results', function(){
 
 		var CK = [ [1, 1, 0, 1], [1, 1, 1, 1], [2, 0, 2, 2] ]
-			, ders = verb.eval.nurbs.separate_homo_derivs_1d( CK )
+			, ders = verb.eval.separate_homo_derivs_1d( CK )
 			, Aders = ders[0]
 			, wders = ders[1];
 
@@ -590,13 +590,13 @@ describe("verb.eval.nurbs.separate_homo_derivs_1d",function(){
 
 });
 
-describe("verb.eval.nurbs.separate_homo_derivs_2d",function(){
+describe("verb.eval.separate_homo_derivs_2d",function(){
 
 	it('returns expected results', function(){
 
 		var SKL = [ [ [1, 1, 0, 1], 	[1, 1, 1, 1], [2, 0, 2, 2] ],
 								[ [-1, 1, 0, 1], 	[-1, 1, 1, 1], [-2, 0, 2, 2] ] ]
-			, ders = verb.eval.nurbs.separate_homo_derivs_2d( SKL )
+			, ders = verb.eval.separate_homo_derivs_2d( SKL )
 			, Aders = ders[0]
 			, wders = ders[1];
 		
@@ -620,7 +620,7 @@ describe("verb.eval.nurbs.separate_homo_derivs_2d",function(){
 
 });
 
-describe("verb.eval.nurbs.rational_curve_derivs",function(){
+describe("verb.eval.rational_curve_derivs",function(){
 
 	it('returns expected results', function(){
 
@@ -630,7 +630,7 @@ describe("verb.eval.nurbs.rational_curve_derivs",function(){
 			, weights = [1, 1, 2]
 			, control_points = [ [1, 0], [1,1], [0,1] ];
 
-		var p = verb.eval.nurbs.rational_curve_derivs( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights), 0, 2);
+		var p = verb.eval.rational_curve_derivs( degree, knots, verb.eval.homogenize_1d( control_points, weights), 0, 2);
 
 		should.equal( p[0][0], 1 );
 		should.equal( p[0][1], 0 );
@@ -641,7 +641,7 @@ describe("verb.eval.nurbs.rational_curve_derivs",function(){
 		should.equal( p[2][0], -4 );
 		should.equal( p[2][1], 0 );
 
-		p = verb.eval.nurbs.rational_curve_derivs( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights), 1, 2);
+		p = verb.eval.rational_curve_derivs( degree, knots, verb.eval.homogenize_1d( control_points, weights), 1, 2);
 
 		should.equal( p[0][0], 0 );
 		should.equal( p[0][1], 1 );
@@ -657,7 +657,7 @@ describe("verb.eval.nurbs.rational_curve_derivs",function(){
 
 });
 
-describe("verb.eval.nurbs.rational_surface_derivs",function(){
+describe("verb.eval.rational_surface_derivs",function(){
 
 	it('returns expected results', function(){
 
@@ -670,7 +670,7 @@ describe("verb.eval.nurbs.rational_surface_derivs",function(){
 													 		  [ [-1, 1, 0, 1], 	[-1, 1, 1, 1], [-2, 0, 2, 2] ] ]
 			, num_derivatives = 1;
 
-		var p = verb.eval.nurbs.rational_surface_derivs( degree_u, knots_u, degree_v, knots_v, homo_control_points, num_derivatives, 0, 0);
+		var p = verb.eval.rational_surface_derivs( degree_u, knots_u, degree_v, knots_v, homo_control_points, num_derivatives, 0, 0);
 
 		should.equal( p[0][0][0], 1 );
 		should.equal( p[0][0][1], 1 );
@@ -684,7 +684,7 @@ describe("verb.eval.nurbs.rational_surface_derivs",function(){
 		should.equal( p[1][0][1], 0 );
 		should.equal( p[1][0][2], 0 );
 
-		p = verb.eval.nurbs.rational_surface_derivs( degree_u, knots_u, degree_v, knots_v, homo_control_points, num_derivatives, 1, 1);
+		p = verb.eval.rational_surface_derivs( degree_u, knots_u, degree_v, knots_v, homo_control_points, num_derivatives, 1, 1);
 
 		should.equal( p[0][0][0], -1 );
 		should.equal( p[0][0][1], 0 );
@@ -702,7 +702,7 @@ describe("verb.eval.nurbs.rational_surface_derivs",function(){
 });
 
 
-describe("verb.eval.geom.three_points_are_flat",function(){
+describe("verb.eval.three_points_are_flat",function(){
 
 	it('should identify flat line by returning true', function(){
 
@@ -711,13 +711,13 @@ describe("verb.eval.geom.three_points_are_flat",function(){
 			p2 = [0,2,0],
 			p3 = [0,4,0];
 
-		should.equal(true, verb.eval.nurbs.three_points_are_flat(p1,p2,p3,1e-5));
+		should.equal(true, verb.eval.three_points_are_flat(p1,p2,p3,1e-5));
 
 	});
 
 });
 
-describe("verb.eval.nurbs.rational_curve_point",function(){
+describe("verb.eval.rational_curve_point",function(){
 
 	it('returns correct results for a line', function(){
 
@@ -729,9 +729,9 @@ describe("verb.eval.nurbs.rational_curve_point",function(){
 			, u2 = 0.5
 			, u3 = 1.0;
 
-		var p1 = verb.eval.nurbs.rational_curve_point( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights), u1);
-		var p2 = verb.eval.nurbs.rational_curve_point( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights), u2);
-		var p3 = verb.eval.nurbs.rational_curve_point( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights), u3);
+		var p1 = verb.eval.rational_curve_point( degree, knots, verb.eval.homogenize_1d( control_points, weights), u1);
+		var p2 = verb.eval.rational_curve_point( degree, knots, verb.eval.homogenize_1d( control_points, weights), u2);
+		var p3 = verb.eval.rational_curve_point( degree, knots, verb.eval.homogenize_1d( control_points, weights), u3);
 		
 		should.equal(p1[0], 0);
 		should.equal(p2[0], 5);
@@ -741,7 +741,7 @@ describe("verb.eval.nurbs.rational_curve_point",function(){
 
 });
 
-describe("verb.eval.nurbs.rational_curve_adaptive_sample",function(){
+describe("verb.eval.rational_curve_adaptive_sample",function(){
 
 	it('returns two end points for a line', function(){
 
@@ -750,7 +750,7 @@ describe("verb.eval.nurbs.rational_curve_adaptive_sample",function(){
 			, control_points = [ [0, 0, 0], [10, 0, 0] ]
 			, weights = [1, 1];
 
-		var p = verb.eval.nurbs.rational_curve_adaptive_sample( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights), 1e-5);	
+		var p = verb.eval.rational_curve_adaptive_sample( degree, knots, verb.eval.homogenize_1d( control_points, weights), 1e-5);	
 		
 		should.equal(p[0][0], 0);
 		should.equal(p[1][0], 10);
@@ -766,7 +766,7 @@ describe("verb.eval.nurbs.rational_curve_adaptive_sample",function(){
 			, control_points = [ [0, 0, 0], [10, 10, 0], [14, 20, 0], [10, 32, 4], [12, 16, 22] ]
 			, weights = [1, 1, 1, 1, 1];
 
-		var p = verb.eval.nurbs.rational_curve_adaptive_sample( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights), 1e-5);	
+		var p = verb.eval.rational_curve_adaptive_sample( degree, knots, verb.eval.homogenize_1d( control_points, weights), 1e-5);	
 		
 		p.should.be.instanceof(Array).and.have.lengthOf(5);
 		p[0].should.be.instanceof(Array).and.have.lengthOf(3);
@@ -784,8 +784,8 @@ describe("verb.eval.nurbs.rational_curve_adaptive_sample",function(){
 			, weights = [1, Math.sqrt(2) / 2, 1]
 			, control_points = [ [1, 0, 0], [1, 1, 0], [0, 1, 0] ];
 
-		var p = verb.eval.nurbs.rational_curve_adaptive_sample( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights), 1e-8, true);	
-		var p2 = verb.eval.nurbs.rational_curve_adaptive_sample( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights), 1e-4, true);	
+		var p = verb.eval.rational_curve_adaptive_sample( degree, knots, verb.eval.homogenize_1d( control_points, weights), 1e-8, true);	
+		var p2 = verb.eval.rational_curve_adaptive_sample( degree, knots, verb.eval.homogenize_1d( control_points, weights), 1e-4, true);	
 		
 		var prev = - 1e-8;
 		for (var i = 0; i < p.length; i++){
@@ -808,7 +808,7 @@ describe("verb.eval.nurbs.rational_curve_adaptive_sample",function(){
 
 });
 
-describe("verb.eval.nurbs.rational_curve_regular_sample",function(){
+describe("verb.eval.rational_curve_regular_sample",function(){
 
 	it('should return 10 samples when asked to', function(){
 
@@ -818,7 +818,7 @@ describe("verb.eval.nurbs.rational_curve_regular_sample",function(){
 			, control_points = [ [1, 0, 0], [1, 1, 0], [0, 1, 0] ]
 			, numSamples = 10;
 
-		var p = verb.eval.nurbs.rational_curve_regular_sample( degree, knots, verb.eval.nurbs.homogenize_1d( control_points, weights), numSamples);	
+		var p = verb.eval.rational_curve_regular_sample( degree, knots, verb.eval.homogenize_1d( control_points, weights), numSamples);	
 
 		should.equal(p.length, 10);
 
@@ -828,13 +828,13 @@ describe("verb.eval.nurbs.rational_curve_regular_sample",function(){
 			
 });
 
-describe("verb.eval.mesh.get_tri_centroid",function(){
+describe("verb.eval.get_tri_centroid",function(){
 
 	it('should return origin for zeroed triangle', function(){
 
 		var points = [[0,0,0],[0,0,0],[0,0,0]]
 			, tri = [0,1,2]
-			, centroid = verb.eval.geom.get_tri_centroid( points, tri );
+			, centroid = verb.eval.get_tri_centroid( points, tri );
 
 		should.equal( 0, centroid[0] );
 		should.equal( 0, centroid[1] );
@@ -846,7 +846,7 @@ describe("verb.eval.mesh.get_tri_centroid",function(){
 
 		var points = [[5,10,2],[3,-4,5],[-10,-3, 10]]
 			, tri = [0,1,2]
-			, centroid = verb.eval.geom.get_tri_centroid( points, tri );
+			, centroid = verb.eval.get_tri_centroid( points, tri );
 
 		should.equal( -2/3, centroid[0] );
 		should.equal( 1, centroid[1] );
@@ -856,15 +856,15 @@ describe("verb.eval.mesh.get_tri_centroid",function(){
 
 });
 
-describe("verb.eval.mesh.get_min_coordinate_on_axis",function(){
+describe("verb.eval.get_min_coordinate_on_axis",function(){
 
 	it('should return correct value', function(){
 
 		var points = [[5,10,2],[3,-4,5],[-10,-3, 10]]
 			, tri = [0,1,2]
-			, a1 = verb.eval.mesh.get_min_coordinate_on_axis( points, tri, 0 )
-			, a2 = verb.eval.mesh.get_min_coordinate_on_axis( points, tri, 1 )
-			, a3 = verb.eval.mesh.get_min_coordinate_on_axis( points, tri, 2 );
+			, a1 = verb.eval.get_min_coordinate_on_axis( points, tri, 0 )
+			, a2 = verb.eval.get_min_coordinate_on_axis( points, tri, 1 )
+			, a3 = verb.eval.get_min_coordinate_on_axis( points, tri, 2 );
 
 		should.equal( -10, a1 );
 		should.equal( -4, a2 );
@@ -874,7 +874,7 @@ describe("verb.eval.mesh.get_min_coordinate_on_axis",function(){
 
 });
 
-describe("verb.eval.mesh.sort_tris_on_longest_axis",function(){
+describe("verb.eval.sort_tris_on_longest_axis",function(){
 
 	it('should return correct result with y axis regular array', function(){
 
@@ -889,8 +889,8 @@ describe("verb.eval.mesh.sort_tris_on_longest_axis",function(){
 		var points = [ [0,0,0], [1,-0.2,0], [0, -1, 0 ], [1, -1.2, 0], [0, -2, 0], [1, -2.2, 0]]
 			, tris = [[0,2,1], [2,4,5], [2,5,3], [1,2,3]]
 			, tri_indices = [0,1,2,3]
-			, aabb = verb.eval.mesh.make_mesh_aabb(points, tris, tri_indices)
-			, sort_tri_indices = verb.eval.mesh.sort_tris_on_longest_axis( aabb, points, tris, tri_indices );
+			, aabb = verb.eval.make_mesh_aabb(points, tris, tri_indices)
+			, sort_tri_indices = verb.eval.sort_tris_on_longest_axis( aabb, points, tris, tri_indices );
 
 		should.equal( 2, sort_tri_indices[0] );
 		should.equal( 1, sort_tri_indices[1] );
@@ -901,7 +901,7 @@ describe("verb.eval.mesh.sort_tris_on_longest_axis",function(){
 
 });
 
-describe("verb.eval.mesh.sort_tris_on_longest_axis",function(){
+describe("verb.eval.sort_tris_on_longest_axis",function(){
 
 	it('should return correct result', function(){
 
@@ -914,8 +914,8 @@ describe("verb.eval.mesh.sort_tris_on_longest_axis",function(){
 		var points = [ [0,10,0], [0,5,0], [0, 0, 0 ], [0, -5, 0], [0, -2, 0], [1, -2.2, 0]]
 			, tris = [[0,1,4], [2,3,4], [1,2,4]]
 			, tri_indices = [0,1,2]
-			, aabb = verb.eval.mesh.make_mesh_aabb(points, tris, tri_indices)
-			, sort_tri_indices = verb.eval.mesh.sort_tris_on_longest_axis( aabb, points, tris, tri_indices );
+			, aabb = verb.eval.make_mesh_aabb(points, tris, tri_indices)
+			, sort_tri_indices = verb.eval.sort_tris_on_longest_axis( aabb, points, tris, tri_indices );
 
 		should.equal( 1, sort_tri_indices[0] );
 		should.equal( 2, sort_tri_indices[1] );
@@ -929,7 +929,7 @@ describe("BoundingBox.init() ",function(){
 
 	it('should allow array of point arguments', function(){
 
-		var bb1 = new verb.geom.BoundingBox([[5,5,5], [10,10,10]]);
+		var bb1 = new verb.BoundingBox([[5,5,5], [10,10,10]]);
 
 		should.equal( bb1.min[0], 5 );
 		should.equal( bb1.min[1], 5 );
@@ -947,9 +947,9 @@ describe("BoundingBox.intersects",function(){
 
 	it('returns expected results', function(){
 
-		var bb1 = new verb.geom.BoundingBox([ [5,5,5], [10,10,10] ])
-			, bb2 = new verb.geom.BoundingBox([ [0,0,0], [10,10,10] ])
-			, bb3 = new verb.geom.BoundingBox([ [-2,-2,-2], [-1,-1,-1] ]);
+		var bb1 = new verb.BoundingBox([ [5,5,5], [10,10,10] ])
+			, bb2 = new verb.BoundingBox([ [0,0,0], [10,10,10] ])
+			, bb3 = new verb.BoundingBox([ [-2,-2,-2], [-1,-1,-1] ]);
 
 		should.equal( bb1.intersects(bb2), true );
 		should.equal( bb1.intersects(bb3), false );
@@ -964,9 +964,9 @@ describe("BoundingBox.intersect",function(){
 	it('returns expected results', function(){
 
 		// initialize a bounding box
-		var bb1 = new verb.geom.BoundingBox([ [5,5,5], [10,10,10] ])
-			, bb2 = new verb.geom.BoundingBox([ [0,0,0], [10,10,10] ])
-			, bb3 = new verb.geom.BoundingBox([ [-2,-2,-2], [-1,-1,-1] ]);
+		var bb1 = new verb.BoundingBox([ [5,5,5], [10,10,10] ])
+			, bb2 = new verb.BoundingBox([ [0,0,0], [10,10,10] ])
+			, bb3 = new verb.BoundingBox([ [-2,-2,-2], [-1,-1,-1] ]);
 
 		// intersect bounding boxes
 		var int_bb1_bb2 = bb1.intersect(bb2)
@@ -991,10 +991,10 @@ describe("BoundingBox.intervalsOverlap",function(){
 
 	it('returns expected results', function(){
 
-		should.equal( verb.geom.BoundingBox.prototype.intervalsOverlap( 0, 1, 0, 10 ), true );
-		should.equal( verb.geom.BoundingBox.prototype.intervalsOverlap( 0, 1, 1, 10 ), true );
-		should.equal( verb.geom.BoundingBox.prototype.intervalsOverlap( 0, 1, 1+1e-3, 10 ), false );
-		should.equal( verb.geom.BoundingBox.prototype.intervalsOverlap( 0, 1, 2, 10 ), false );
+		should.equal( verb.BoundingBox.prototype.intervalsOverlap( 0, 1, 0, 10 ), true );
+		should.equal( verb.BoundingBox.prototype.intervalsOverlap( 0, 1, 1, 10 ), true );
+		should.equal( verb.BoundingBox.prototype.intervalsOverlap( 0, 1, 1+1e-3, 10 ), false );
+		should.equal( verb.BoundingBox.prototype.intervalsOverlap( 0, 1, 2, 10 ), false );
 
 	});
 
@@ -1004,8 +1004,8 @@ describe("BoundingBox.contains",function(){
 
 	it('returns expected results', function(){
 
-		var bb4 = new verb.geom.BoundingBox([ [0,0,0], [1,1,1] ])
-			, bb5 = new verb.geom.BoundingBox();
+		var bb4 = new verb.BoundingBox([ [0,0,0], [1,1,1] ])
+			, bb5 = new verb.BoundingBox();
 
 		should.equal( bb4.contains( [0,0,0] ), true );
 		should.equal( bb4.contains( [1,1,1] ), true );
@@ -1021,7 +1021,7 @@ describe("BoundingBox.contains",function(){
 
 	it('BoundingBox.clear', function(){
 
-		var bb1 = new verb.geom.BoundingBox([ [5,5,5], [10,10,10] ]);
+		var bb1 = new verb.BoundingBox([ [5,5,5], [10,10,10] ]);
 		bb1.clear();
 		should.equal( bb1.initialized, false );
 
@@ -1032,7 +1032,7 @@ describe("BoundingBox.getAxisLength",function(){
 
 	it('should return correct value', function(){
 
-		var bb1 = new verb.geom.BoundingBox([ [-1,2,3], [10,10,10] ]);
+		var bb1 = new verb.BoundingBox([ [-1,2,3], [10,10,10] ]);
 		should.equal( bb1.getAxisLength(0), 11 );
 		should.equal( bb1.getAxisLength(1), 8 );
 		should.equal( bb1.getAxisLength(2), 7 );
@@ -1045,7 +1045,7 @@ describe("BoundingBox.getLongestAxis",function(){
 
 	it('should return correct value', function(){
 
-		var bb1 = new verb.geom.BoundingBox([ [-1,2,3], [10,10,10] ]);
+		var bb1 = new verb.BoundingBox([ [-1,2,3], [10,10,10] ]);
 		should.equal( bb1.getLongestAxis(0), 0 );
 
 	});
@@ -1056,7 +1056,7 @@ describe("BoundingBox.getAxisLength",function(){
 
 	it('should return 0 when given out of bounds index', function(){
 
-		var bb1 = new verb.geom.BoundingBox([ [-1,2,3], [10,10,10] ]);
+		var bb1 = new verb.BoundingBox([ [-1,2,3], [10,10,10] ]);
 		should.equal( bb1.getAxisLength(8), 0 );
 		should.equal( bb1.getAxisLength(-1), 0 );
 		should.equal( bb1.getAxisLength(4), 0 );
@@ -1070,7 +1070,7 @@ describe("BoundingBox.getAxisLength",function(){
 
 	it('should return 0 when given out of bounds index', function(){
 
-		var bb1 = new verb.geom.BoundingBox([ [-1,2,3], [10,10,10] ]);
+		var bb1 = new verb.BoundingBox([ [-1,2,3], [10,10,10] ]);
 		should.equal( bb1.getAxisLength(8), 0 );
 		should.equal( bb1.getAxisLength(-1), 0 );
 		should.equal( bb1.getAxisLength(4), 0 );
@@ -1084,7 +1084,7 @@ describe("BoundingBox.clear",function(){
 
 	it('should set initialized to false', function(){
 
-		var bb1 = new verb.geom.BoundingBox([ [5,5,5], [10,10,10] ]);
+		var bb1 = new verb.BoundingBox([ [5,5,5], [10,10,10] ]);
 		bb1.clear();
 		should.equal( bb1.initialized, false );
 
@@ -1092,7 +1092,7 @@ describe("BoundingBox.clear",function(){
 
 });
 
-describe("verb.eval.geom.closest_point_on_ray",function(){
+describe("verb.eval.closest_point_on_ray",function(){
 
 	it('returns correct result for xaxis and 3d pt', function(){
 
@@ -1100,7 +1100,7 @@ describe("verb.eval.geom.closest_point_on_ray",function(){
 			, o = [0,0,0]
 			, pt = [3,4,-1];
 
-		var proj = verb.eval.geom.closest_point_on_ray(pt, o, r);
+		var proj = verb.eval.closest_point_on_ray(pt, o, r);
 
 		should.equal( Math.abs( proj[0] - 3 ) < verb.EPSILON, true );
 		should.equal( Math.abs( proj[1] ) < verb.EPSILON, true );
@@ -1110,7 +1110,7 @@ describe("verb.eval.geom.closest_point_on_ray",function(){
 
 });
 
-describe("verb.eval.geom.dist_to_ray",function(){
+describe("verb.eval.dist_to_ray",function(){
 
 	it('returns correct result for xaxis and 3d pt', function(){
 
@@ -1118,7 +1118,7 @@ describe("verb.eval.geom.dist_to_ray",function(){
 			, o = [0,0,0]
 			, pt = [3,4,-1];
 
-		var d = verb.eval.geom.dist_to_ray(pt, o, r);
+		var d = verb.eval.dist_to_ray(pt, o, r);
 
 		d.should.be.approximately( Math.sqrt( 17 ), verb.TOLERANCE );
 
@@ -1126,7 +1126,7 @@ describe("verb.eval.geom.dist_to_ray",function(){
 
 });
 
-describe("verb.eval.nurbs.get_arc",function(){
+describe("verb.eval.get_arc",function(){
 
 	it('returns correct result for unit arc from 0 to 90 deg', function(){
 
@@ -1137,9 +1137,9 @@ describe("verb.eval.nurbs.get_arc",function(){
 			, start = 0
 			, end = Math.PI/2;
 
-		var arc_components = verb.eval.nurbs.get_arc(center, x, y, 1, start, end);
+		var arc_components = verb.eval.get_arc(center, x, y, 1, start, end);
 
-		var p = verb.eval.nurbs.rational_curve_point( arc_components.degree, arc_components.knots, verb.eval.nurbs.homogenize_1d( arc_components.control_points, arc_components.weights), 0.5);
+		var p = verb.eval.rational_curve_point( arc_components.degree, arc_components.knots, verb.eval.homogenize_1d( arc_components.control_points, arc_components.weights), 0.5);
 
 		should.equal( Math.abs( p[0] - Math.sqrt(2)/2 ) < verb.EPSILON, true );
 		should.equal( Math.abs( p[1] - Math.sqrt(2)/2 ) < verb.EPSILON, true );
@@ -1156,9 +1156,9 @@ describe("verb.eval.nurbs.get_arc",function(){
 			, start = 0
 			, end = Math.PI/4;
 
-		var arc_components = verb.eval.nurbs.get_arc(center, x, y, 1, start, end);
+		var arc_components = verb.eval.get_arc(center, x, y, 1, start, end);
 
-		var p = verb.eval.nurbs.rational_curve_point( arc_components.degree, arc_components.knots, verb.eval.nurbs.homogenize_1d( arc_components.control_points, arc_components.weights), 1);
+		var p = verb.eval.rational_curve_point( arc_components.degree, arc_components.knots, verb.eval.homogenize_1d( arc_components.control_points, arc_components.weights), 1);
 
 		should.equal( Math.abs( p[0] - Math.sqrt(2)/2 ) < verb.EPSILON, true );
 		should.equal( Math.abs( p[1] - Math.sqrt(2)/2 ) < verb.EPSILON, true );
@@ -1175,9 +1175,9 @@ describe("verb.eval.nurbs.get_arc",function(){
 			, start = Math.PI/4
 			, end = 3*Math.PI/4;
 
-		var arc_components = verb.eval.nurbs.get_arc(center, x, y, 1, start, end);
+		var arc_components = verb.eval.get_arc(center, x, y, 1, start, end);
 
-		var p = verb.eval.nurbs.rational_curve_point( arc_components.degree, arc_components.knots, verb.eval.nurbs.homogenize_1d( arc_components.control_points, arc_components.weights), 0.5);
+		var p = verb.eval.rational_curve_point( arc_components.degree, arc_components.knots, verb.eval.homogenize_1d( arc_components.control_points, arc_components.weights), 0.5);
 
 		should.equal( Math.abs( p[0] ) < verb.EPSILON, true );
 		should.equal( Math.abs( p[1] - 1 ) < verb.EPSILON, true );
@@ -1194,9 +1194,9 @@ describe("verb.eval.nurbs.get_arc",function(){
 			, start = 0
 			, end = Math.PI;
 
-		var arc_components = verb.eval.nurbs.get_arc(center, x, y, r, start, end);
+		var arc_components = verb.eval.get_arc(center, x, y, r, start, end);
 
-		var p = verb.eval.nurbs.rational_curve_point( arc_components.degree, arc_components.knots, verb.eval.nurbs.homogenize_1d( arc_components.control_points, arc_components.weights), 0.5);
+		var p = verb.eval.rational_curve_point( arc_components.degree, arc_components.knots, verb.eval.homogenize_1d( arc_components.control_points, arc_components.weights), 0.5);
 
 		p[0].should.be.approximately( 0, verb.EPSILON );
 		p[1].should.be.approximately( 5 , verb.EPSILON);
@@ -1213,9 +1213,9 @@ describe("verb.eval.nurbs.get_arc",function(){
 			, start = 0
 			, end = Math.PI * 2;
 
-		var arc_components = verb.eval.nurbs.get_arc(center, x, y, 1, start, end);
+		var arc_components = verb.eval.get_arc(center, x, y, 1, start, end);
 
-		var p = verb.eval.nurbs.rational_curve_point( arc_components.degree, arc_components.knots, verb.eval.nurbs.homogenize_1d( arc_components.control_points, arc_components.weights), 0.5);
+		var p = verb.eval.rational_curve_point( arc_components.degree, arc_components.knots, verb.eval.homogenize_1d( arc_components.control_points, arc_components.weights), 0.5);
 
 		should.equal( Math.abs( p[0] + 1) < verb.EPSILON, true );
 		should.equal( Math.abs( p[1] ) < verb.EPSILON, true );
@@ -1225,7 +1225,7 @@ describe("verb.eval.nurbs.get_arc",function(){
 
 });
 
-describe("verb.eval.nurbs.get_revolved_surface",function(){
+describe("verb.eval.get_revolved_surface",function(){
 
 	it('creates a 90 degree cone with the given line for a profile', function(){
 
@@ -1237,7 +1237,7 @@ describe("verb.eval.nurbs.get_revolved_surface",function(){
 			, prof_knots = [0,0,1,1]
 			, prof_weights = [1,1];
 
-		var comps = verb.eval.nurbs.get_revolved_surface(center, axis, angle, prof_knots, prof_degree, prof_ctrl_pts, prof_weights);
+		var comps = verb.eval.get_revolved_surface(center, axis, angle, prof_knots, prof_degree, prof_ctrl_pts, prof_weights);
 
 		// the first row are the profile control pts
 		should.equal( 0, comps.control_points[0][0][0] );
@@ -1248,11 +1248,11 @@ describe("verb.eval.nurbs.get_revolved_surface",function(){
 		should.equal( 0, comps.control_points[0][1][1] );
 		should.equal( 0, comps.control_points[0][1][2] );
 
-		var p = verb.eval.nurbs.rational_surface_point( 2, 
+		var p = verb.eval.rational_surface_point( 2, 
 														comps.knots_u, 
 														1, 
 														comps.knots_v, 
-														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														verb.eval.homogenize_2d( comps.control_points, comps.weights), 
 														0.5, 
 														0.5);
 
@@ -1272,7 +1272,7 @@ describe("verb.eval.nurbs.get_revolved_surface",function(){
 			, prof_knots = [0,0,1,1]
 			, prof_weights = [1,1];
 
-		var comps = verb.eval.nurbs.get_revolved_surface(center, axis, angle, prof_knots, prof_degree, prof_ctrl_pts, prof_weights);
+		var comps = verb.eval.get_revolved_surface(center, axis, angle, prof_knots, prof_degree, prof_ctrl_pts, prof_weights);
 
 		// the first row are the profile control pts
 		should.equal( 0, comps.control_points[0][0][0] );
@@ -1283,11 +1283,11 @@ describe("verb.eval.nurbs.get_revolved_surface",function(){
 		should.equal( 0, comps.control_points[0][1][1] );
 		should.equal( 0, comps.control_points[0][1][2] );
 
-		var p = verb.eval.nurbs.rational_surface_point( 2, 
+		var p = verb.eval.rational_surface_point( 2, 
 														comps.knots_u, 
 														1, 
 														comps.knots_v, 
-														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														verb.eval.homogenize_2d( comps.control_points, comps.weights), 
 														0.5, 
 														0.5);
 
@@ -1308,7 +1308,7 @@ describe("verb.eval.nurbs.get_revolved_surface",function(){
 			, prof_knots = [0,0,1,1]
 			, prof_weights = [1,1];
 
-		var comps = verb.eval.nurbs.get_revolved_surface(center, axis, angle, prof_knots, prof_degree, prof_ctrl_pts, prof_weights);
+		var comps = verb.eval.get_revolved_surface(center, axis, angle, prof_knots, prof_degree, prof_ctrl_pts, prof_weights);
 
 		// the first row are the profile control pts
 		should.equal( 0, comps.control_points[0][0][0] );
@@ -1319,11 +1319,11 @@ describe("verb.eval.nurbs.get_revolved_surface",function(){
 		should.equal( 0, comps.control_points[0][1][1] );
 		should.equal( 0, comps.control_points[0][1][2] );
 
-		var p = verb.eval.nurbs.rational_surface_point( 2, 
+		var p = verb.eval.rational_surface_point( 2, 
 														comps.knots_u, 
 														1, 
 														comps.knots_v, 
-														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														verb.eval.homogenize_2d( comps.control_points, comps.weights), 
 														0.5, 
 														0.5);
 
@@ -1335,7 +1335,7 @@ describe("verb.eval.nurbs.get_revolved_surface",function(){
 
 });
 
-describe("verb.eval.nurbs.get_extruded_surface",function(){
+describe("verb.eval.get_extruded_surface",function(){
 
 	it('can extrude a line into a plane', function(){
 
@@ -1346,7 +1346,7 @@ describe("verb.eval.nurbs.get_extruded_surface",function(){
 			, prof_knots = [0,0,1,1]
 			, prof_weights = [1,1];
 
-		var comps = verb.eval.nurbs.get_extruded_surface(axis, length, prof_knots, prof_degree, prof_ctrl_pts, prof_weights);
+		var comps = verb.eval.get_extruded_surface(axis, length, prof_knots, prof_degree, prof_ctrl_pts, prof_weights);
 
 		// the first row are the profile control pts
 		should.equal( 0, comps.control_points[2][0][0] );
@@ -1358,11 +1358,11 @@ describe("verb.eval.nurbs.get_extruded_surface",function(){
 		should.equal( 0, comps.control_points[2][1][2] );
 
 		// sample at the center
-		var p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
+		var p = verb.eval.rational_surface_point( comps.degree_u,
 														comps.knots_u, 
 														comps.degree_v,
 														comps.knots_v, 
-														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														verb.eval.homogenize_2d( comps.control_points, comps.weights), 
 														0.5, 
 														0.5);
  
@@ -1381,7 +1381,7 @@ describe("verb.eval.nurbs.get_extruded_surface",function(){
 			, prof_knots = [0,0,0,1,1,1]
 			, prof_weights = [1, Math.sqrt(2) / 2, 1];
 
-		var comps = verb.eval.nurbs.get_extruded_surface(axis, length, prof_knots, prof_degree, prof_ctrl_pts, prof_weights);
+		var comps = verb.eval.get_extruded_surface(axis, length, prof_knots, prof_degree, prof_ctrl_pts, prof_weights);
 
 		// the first row are the profile control pts
 		should.equal( 0, comps.control_points[2][0][0] );
@@ -1397,11 +1397,11 @@ describe("verb.eval.nurbs.get_extruded_surface",function(){
 		should.equal( 0, comps.control_points[2][2][2] );
 
 		// sample at the center
-		var p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
+		var p = verb.eval.rational_surface_point( comps.degree_u,
 														comps.knots_u, 
 														comps.degree_v,
 														comps.knots_v, 
-														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														verb.eval.homogenize_2d( comps.control_points, comps.weights), 
 														0.5, 
 														0.5);
 
@@ -1413,7 +1413,7 @@ describe("verb.eval.nurbs.get_extruded_surface",function(){
 
 });
 
-describe("verb.eval.nurbs.get_cylinder_surface",function(){
+describe("verb.eval.get_cylinder_surface",function(){
 
 	it('can create a cylinder', function(){
 
@@ -1423,17 +1423,17 @@ describe("verb.eval.nurbs.get_cylinder_surface",function(){
 			, height = 5
 			, radius = 5;
 
-		var comps = verb.eval.nurbs.get_cylinder_surface(axis, xaxis, base, height, radius);
+		var comps = verb.eval.get_cylinder_surface(axis, xaxis, base, height, radius);
 
 		comps.degree_u.should.equal(2);
 		comps.degree_v.should.equal(2);
 
 		// sample at the center
-		var p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
+		var p = verb.eval.rational_surface_point( comps.degree_u,
 														comps.knots_u, 
 														comps.degree_v,
 														comps.knots_v, 
-														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														verb.eval.homogenize_2d( comps.control_points, comps.weights), 
 														0.5, 
 														0.5);
 
@@ -1441,11 +1441,11 @@ describe("verb.eval.nurbs.get_cylinder_surface",function(){
 		p[1].should.be.approximately(0, verb.EPSILON);
 		p[2].should.be.approximately(radius/2, verb.EPSILON);
 
-		p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
+		p = verb.eval.rational_surface_point( comps.degree_u,
 														comps.knots_u, 
 														comps.degree_v,
 														comps.knots_v, 
-														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														verb.eval.homogenize_2d( comps.control_points, comps.weights), 
 														0, 
 														0);
 
@@ -1453,11 +1453,11 @@ describe("verb.eval.nurbs.get_cylinder_surface",function(){
 		p[1].should.be.approximately(0, verb.EPSILON);
 		p[2].should.be.approximately(height, verb.EPSILON);
 
-		p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
+		p = verb.eval.rational_surface_point( comps.degree_u,
 														comps.knots_u, 
 														comps.degree_v,
 														comps.knots_v, 
-														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														verb.eval.homogenize_2d( comps.control_points, comps.weights), 
 														1, 
 														0);
 
@@ -1465,11 +1465,11 @@ describe("verb.eval.nurbs.get_cylinder_surface",function(){
 		p[1].should.be.approximately(0, verb.EPSILON);
 		p[2].should.be.approximately(0, verb.EPSILON);
 
-		p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
+		p = verb.eval.rational_surface_point( comps.degree_u,
 														comps.knots_u, 
 														comps.degree_v,
 														comps.knots_v, 
-														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														verb.eval.homogenize_2d( comps.control_points, comps.weights), 
 														0, 
 														1);
 		
@@ -1481,7 +1481,7 @@ describe("verb.eval.nurbs.get_cylinder_surface",function(){
 
 });
 
-describe("verb.eval.nurbs.get_polyline_curve",function(){
+describe("verb.eval.get_polyline_curve",function(){
 
 	it('can create a polyline with correct structure', function(){
 
@@ -1490,7 +1490,7 @@ describe("verb.eval.nurbs.get_polyline_curve",function(){
 			, control_points = [ [0, 0, 0], [10, 10, 0], [14, 20, 0], [10, 32, 4], [12, 16, 22] ]
 			, weights = [1, 1, 1, 1, 1];
 
-		var comps = verb.eval.nurbs.get_polyline_curve( control_points );
+		var comps = verb.eval.get_polyline_curve( control_points );
 
 		comps.degree.should.equal(degree);
 		comps.knots.should.eql(knots);
@@ -1501,7 +1501,7 @@ describe("verb.eval.nurbs.get_polyline_curve",function(){
 
 });
 
-describe("verb.eval.nurbs.get_cone_surface",function(){
+describe("verb.eval.get_cone_surface",function(){
 
 	it('can create a cone', function(){
 
@@ -1511,17 +1511,17 @@ describe("verb.eval.nurbs.get_cone_surface",function(){
 			, height = 5
 			, radius = 10;
 
-		var comps = verb.eval.nurbs.get_cone_surface(axis, xaxis, base, height, radius);
+		var comps = verb.eval.get_cone_surface(axis, xaxis, base, height, radius);
 
 		comps.degree_u.should.equal(2);
 		comps.degree_v.should.equal(1);
 
 		// sample at the center
-		var p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
+		var p = verb.eval.rational_surface_point( comps.degree_u,
 														comps.knots_u, 
 														comps.degree_v,
 														comps.knots_v, 
-														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														verb.eval.homogenize_2d( comps.control_points, comps.weights), 
 														0.5, 
 														0.5);
 
@@ -1529,11 +1529,11 @@ describe("verb.eval.nurbs.get_cone_surface",function(){
 		p[1].should.be.approximately(0, verb.EPSILON);
 		p[2].should.be.approximately(height/2, verb.EPSILON);
 
-		p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
+		p = verb.eval.rational_surface_point( comps.degree_u,
 														comps.knots_u, 
 														comps.degree_v,
 														comps.knots_v, 
-														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														verb.eval.homogenize_2d( comps.control_points, comps.weights), 
 														0, 
 														0);
 
@@ -1541,11 +1541,11 @@ describe("verb.eval.nurbs.get_cone_surface",function(){
 		p[1].should.be.approximately(0, verb.EPSILON);
 		p[2].should.be.approximately(height, verb.EPSILON);
 
-		p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
+		p = verb.eval.rational_surface_point( comps.degree_u,
 														comps.knots_u, 
 														comps.degree_v,
 														comps.knots_v, 
-														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														verb.eval.homogenize_2d( comps.control_points, comps.weights), 
 														1, 
 														0);
 
@@ -1553,11 +1553,11 @@ describe("verb.eval.nurbs.get_cone_surface",function(){
 		p[1].should.be.approximately(0, verb.EPSILON);
 		p[2].should.be.approximately(height, verb.EPSILON);
 
-		p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
+		p = verb.eval.rational_surface_point( comps.degree_u,
 														comps.knots_u, 
 														comps.degree_v,
 														comps.knots_v, 
-														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														verb.eval.homogenize_2d( comps.control_points, comps.weights), 
 														0, 
 														1);
 		
@@ -1569,7 +1569,7 @@ describe("verb.eval.nurbs.get_cone_surface",function(){
 });
 
 
-describe("verb.eval.nurbs.get_4pt_surface",function(){
+describe("verb.eval.get_4pt_surface",function(){
 
 	it('can create an inclined plane', function(){
 
@@ -1578,17 +1578,17 @@ describe("verb.eval.nurbs.get_4pt_surface",function(){
 			, p3 = [1,1,1]
 			, p4 = [0,1,1];
 
-		var comps = verb.eval.nurbs.get_4pt_surface(p1, p2, p3, p4);
+		var comps = verb.eval.get_4pt_surface(p1, p2, p3, p4);
 
 		comps.degree_u.should.equal(2);
 		comps.degree_v.should.equal(2);
 
 		// sample at the center
-		var p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
+		var p = verb.eval.rational_surface_point( comps.degree_u,
 														comps.knots_u, 
 														comps.degree_v,
 														comps.knots_v, 
-														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														verb.eval.homogenize_2d( comps.control_points, comps.weights), 
 														0.5, 
 														0.5);
 
@@ -1605,17 +1605,17 @@ describe("verb.eval.nurbs.get_4pt_surface",function(){
 			, p3 = [1,1,1]
 			, p4 = [0,1,0];
 
-		var comps = verb.eval.nurbs.get_4pt_surface(p1, p2, p3, p4);
+		var comps = verb.eval.get_4pt_surface(p1, p2, p3, p4);
 
 		comps.degree_u.should.equal(2);
 		comps.degree_v.should.equal(2);
 
 		// sample at the center
-		var p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
+		var p = verb.eval.rational_surface_point( comps.degree_u,
 														comps.knots_u, 
 														comps.degree_v,
 														comps.knots_v, 
-														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														verb.eval.homogenize_2d( comps.control_points, comps.weights), 
 														0.5, 
 														0.5);
 
@@ -1624,11 +1624,11 @@ describe("verb.eval.nurbs.get_4pt_surface",function(){
 		p[2].should.be.approximately(0.5, verb.EPSILON );
 
 		// bottom left
-		p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
+		p = verb.eval.rational_surface_point( comps.degree_u,
 														comps.knots_u, 
 														comps.degree_v,
 														comps.knots_v, 
-														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														verb.eval.homogenize_2d( comps.control_points, comps.weights), 
 														0, 
 														0);
 
@@ -1637,11 +1637,11 @@ describe("verb.eval.nurbs.get_4pt_surface",function(){
 		p[2].should.be.approximately(1, verb.EPSILON );
 
 		// bottom right
-		p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
+		p = verb.eval.rational_surface_point( comps.degree_u,
 														comps.knots_u, 
 														comps.degree_v,
 														comps.knots_v, 
-														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														verb.eval.homogenize_2d( comps.control_points, comps.weights), 
 														1, 
 														0);
 
@@ -1653,7 +1653,7 @@ describe("verb.eval.nurbs.get_4pt_surface",function(){
 
 });
 
-describe("verb.eval.nurbs.get_sphere_surface",function(){
+describe("verb.eval.get_sphere_surface",function(){
 
 	it('can create a unit sphere', function(){
 
@@ -1662,17 +1662,17 @@ describe("verb.eval.nurbs.get_sphere_surface",function(){
 			, xaxis = [1,0,0]
 			, radius = 1;
 
-		var comps = verb.eval.nurbs.get_sphere_surface(center, axis, xaxis, radius);
+		var comps = verb.eval.get_sphere_surface(center, axis, xaxis, radius);
 
 		comps.degree_u.should.equal(2);
 		comps.degree_v.should.equal(2);
 
 		// sample at the center
-		var p = verb.eval.nurbs.rational_surface_point( comps.degree_u,
+		var p = verb.eval.rational_surface_point( comps.degree_u,
 														comps.knots_u, 
 														comps.degree_v,
 														comps.knots_v, 
-														verb.eval.nurbs.homogenize_2d( comps.control_points, comps.weights), 
+														verb.eval.homogenize_2d( comps.control_points, comps.weights), 
 														0.5, 
 														0.5);
 
@@ -1685,7 +1685,7 @@ describe("verb.eval.nurbs.get_sphere_surface",function(){
 });
 
 
-describe("verb.eval.nurbs.get_ellipse_arc",function(){
+describe("verb.eval.get_ellipse_arc",function(){
 
 	it('returns correct result for unit arc from 0 to 90 deg', function(){
 
@@ -1697,25 +1697,25 @@ describe("verb.eval.nurbs.get_ellipse_arc",function(){
 			, start = 0
 			, end = Math.PI/2;
 
-		var ellipse = verb.eval.nurbs.get_ellipse_arc(center, x, y, rx, ry, start, end);
+		var ellipse = verb.eval.get_ellipse_arc(center, x, y, rx, ry, start, end);
 
 		// the typical parametric rep of an ellipse
 		var xmid = rx * Math.cos( Math.PI / 4 )
 			, ymid = ry * Math.sin( Math.PI / 4 );
 
-		var p = verb.eval.nurbs.rational_curve_point( ellipse.degree, ellipse.knots, verb.eval.nurbs.homogenize_1d( ellipse.control_points, ellipse.weights), 0.5);
+		var p = verb.eval.rational_curve_point( ellipse.degree, ellipse.knots, verb.eval.homogenize_1d( ellipse.control_points, ellipse.weights), 0.5);
 
 		p[0].should.be.approximately( xmid, verb.EPSILON );
 		p[1].should.be.approximately( ymid, verb.EPSILON );
 		p[2].should.be.approximately( 0, verb.EPSILON );
 
-		p = verb.eval.nurbs.rational_curve_point( ellipse.degree, ellipse.knots, verb.eval.nurbs.homogenize_1d( ellipse.control_points, ellipse.weights), 1);
+		p = verb.eval.rational_curve_point( ellipse.degree, ellipse.knots, verb.eval.homogenize_1d( ellipse.control_points, ellipse.weights), 1);
 
 		p[0].should.be.approximately( 0, verb.EPSILON );
 		p[1].should.be.approximately( ry, verb.EPSILON );
 		p[2].should.be.approximately( 0, verb.EPSILON );
 
-		p = verb.eval.nurbs.rational_curve_point( ellipse.degree, ellipse.knots, verb.eval.nurbs.homogenize_1d( ellipse.control_points, ellipse.weights), 0);
+		p = verb.eval.rational_curve_point( ellipse.degree, ellipse.knots, verb.eval.homogenize_1d( ellipse.control_points, ellipse.weights), 0);
 
 		p[0].should.be.approximately( rx, verb.EPSILON );
 		p[1].should.be.approximately( 0, verb.EPSILON );
@@ -1733,9 +1733,9 @@ describe("verb.eval.nurbs.get_ellipse_arc",function(){
 			, start = 0
 			, end = Math.PI / 2;
 
-		var arc_components = verb.eval.nurbs.get_ellipse_arc(center, x, y, rx, ry, start, end);
+		var arc_components = verb.eval.get_ellipse_arc(center, x, y, rx, ry, start, end);
 
-		var p = verb.eval.nurbs.rational_curve_point( arc_components.degree, arc_components.knots, verb.eval.nurbs.homogenize_1d( arc_components.control_points, arc_components.weights), 1);
+		var p = verb.eval.rational_curve_point( arc_components.degree, arc_components.knots, verb.eval.homogenize_1d( arc_components.control_points, arc_components.weights), 1);
 		
 		p[0].should.be.approximately( 0, verb.EPSILON );
 		p[1].should.be.approximately( ry, verb.EPSILON );
@@ -1753,9 +1753,9 @@ describe("verb.eval.nurbs.get_ellipse_arc",function(){
 			, start = Math.PI/4
 			, end = 3 * Math.PI/4;
 
-		var arc_components = verb.eval.nurbs.get_ellipse_arc(center, x, y, rx, ry, start, end);
+		var arc_components = verb.eval.get_ellipse_arc(center, x, y, rx, ry, start, end);
 
-		var p = verb.eval.nurbs.rational_curve_point( arc_components.degree, arc_components.knots, verb.eval.nurbs.homogenize_1d( arc_components.control_points, arc_components.weights), 1);
+		var p = verb.eval.rational_curve_point( arc_components.degree, arc_components.knots, verb.eval.homogenize_1d( arc_components.control_points, arc_components.weights), 1);
 		
 		// the typical parametric rep of an ellipse
 		var xmid = rx * Math.cos( 3 * Math.PI / 4 )
@@ -1777,31 +1777,31 @@ describe("verb.eval.nurbs.get_ellipse_arc",function(){
 			, start = 0
 			, end = Math.PI * 2;
 
-		var ellipse = verb.eval.nurbs.get_ellipse_arc(center, x, y, rx, ry, start, end);
+		var ellipse = verb.eval.get_ellipse_arc(center, x, y, rx, ry, start, end);
 
 		// the typical parametric rep of an ellipse
 		var xmid = rx * Math.cos( Math.PI / 4 )
 			, ymid = ry * Math.sin( Math.PI / 4 );
 
-		var p = verb.eval.nurbs.rational_curve_point( ellipse.degree, ellipse.knots, verb.eval.nurbs.homogenize_1d( ellipse.control_points, ellipse.weights), 0.125);
+		var p = verb.eval.rational_curve_point( ellipse.degree, ellipse.knots, verb.eval.homogenize_1d( ellipse.control_points, ellipse.weights), 0.125);
 
 		p[0].should.be.approximately( xmid, verb.EPSILON );
 		p[1].should.be.approximately( ymid, verb.EPSILON );
 		p[2].should.be.approximately( 0, verb.EPSILON );
 
-		p = verb.eval.nurbs.rational_curve_point( ellipse.degree, ellipse.knots, verb.eval.nurbs.homogenize_1d( ellipse.control_points, ellipse.weights), 0.25);
+		p = verb.eval.rational_curve_point( ellipse.degree, ellipse.knots, verb.eval.homogenize_1d( ellipse.control_points, ellipse.weights), 0.25);
 
 		p[0].should.be.approximately( 0, verb.EPSILON );
 		p[1].should.be.approximately( ry, verb.EPSILON );
 		p[2].should.be.approximately( 0, verb.EPSILON );
 
-		p = verb.eval.nurbs.rational_curve_point( ellipse.degree, ellipse.knots, verb.eval.nurbs.homogenize_1d( ellipse.control_points, ellipse.weights), 0.5);
+		p = verb.eval.rational_curve_point( ellipse.degree, ellipse.knots, verb.eval.homogenize_1d( ellipse.control_points, ellipse.weights), 0.5);
 
 		p[0].should.be.approximately( -rx, verb.EPSILON );
 		p[1].should.be.approximately( 0, verb.EPSILON );
 		p[2].should.be.approximately( 0, verb.EPSILON );
 
-		p = verb.eval.nurbs.rational_curve_point( ellipse.degree, ellipse.knots, verb.eval.nurbs.homogenize_1d( ellipse.control_points, ellipse.weights), 0);
+		p = verb.eval.rational_curve_point( ellipse.degree, ellipse.knots, verb.eval.homogenize_1d( ellipse.control_points, ellipse.weights), 0);
 
 		p[0].should.be.approximately( rx, verb.EPSILON );
 		p[1].should.be.approximately( 0, verb.EPSILON );
@@ -1826,7 +1826,7 @@ describe("Interval",function(){
 
 	it('can be created by its constructor', function(){
 
-		var interval = new verb.geom.Interval( 0, 0.5);
+		var interval = new verb.Interval( 0, 0.5);
 		should.exist(interval)
 		interval.get("min").should.equal( 0 );
 		interval.get("max").should.equal( 0.5 );
@@ -1841,7 +1841,7 @@ describe("verb.init",function(){
 
 		verb.init();
 
-		verb.geom.NurbsGeometry.prototype.nurbsEngine.should.be.instanceof(verb.core.Engine);
+		verb.NurbsGeometry.prototype.nurbsEngine.should.be.instanceof(verb.core.Engine);
 
 	});
 
@@ -1852,7 +1852,7 @@ describe("Arc.constructor",function(){
 	it('has correct properties', function(){
 
 		verb.init();
-		var arc = new verb.geom.Arc([0,0,0], [1,0,0], [0,1,0], 5, new verb.geom.Interval(0, Math.PI/ 2) );
+		var arc = new verb.Arc([0,0,0], [1,0,0], [0,1,0], 5, new verb.Interval(0, Math.PI/ 2) );
 
 		should.exist( arc );
 
@@ -1873,7 +1873,7 @@ describe("Arc.point",function(){
 
 		verb.init();
 
-		var arc = new verb.geom.Arc([0,0,1], [1,0,0], [0,1,0], 1, new verb.geom.Interval(0, Math.PI/ 2) );
+		var arc = new verb.Arc([0,0,1], [1,0,0], [0,1,0], 1, new verb.Interval(0, Math.PI/ 2) );
 		var p1 = arc.point(0);
 		var p2 = arc.point(0.5);
 		var p3 = arc.point(1);
@@ -1898,7 +1898,7 @@ describe("Arc.point",function(){
 
 		verb.init();
 		
-		var arc = new verb.geom.Arc([0,0,1], [1,0,0], [0,1,0], 1, new verb.geom.Interval(0, Math.PI/ 2) );
+		var arc = new verb.Arc([0,0,1], [1,0,0], [0,1,0], 1, new verb.Interval(0, Math.PI/ 2) );
 		
 		arc.point(0.5, function(res){	 
 
@@ -1920,7 +1920,7 @@ describe("Arc.tessellate",function(){
 
 		verb.init();
 
-		var arc = new verb.geom.Arc([0,0,1], [1,0,0], [0,1,0], 1, new verb.geom.Interval(0, Math.PI/ 2) );
+		var arc = new verb.Arc([0,0,1], [1,0,0], [0,1,0], 1, new verb.Interval(0, Math.PI/ 2) );
 		var pts = arc.tessellate();
 
 		pts.length.should.be.greaterThan(2);
@@ -1942,7 +1942,7 @@ describe("FourPointSurface.constructor",function(){
 			, p3 = [1,1,1]
 			, p4 = [0,1,0];
 
-		var srf = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
+		var srf = new verb.FourPointSurface( p1, p2, p3, p4 );
 
 		should.exist(srf);
 
@@ -1961,7 +1961,7 @@ describe("FourPointSurface.point",function(){
 			, p3 = [1,1,1]
 			, p4 = [0,1,0];
 
-		var srf = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
+		var srf = new verb.FourPointSurface( p1, p2, p3, p4 );
 
 		should.exist(srf);
 
@@ -1986,7 +1986,7 @@ describe("FourPointSurface.derivatives",function(){
 			, p3 = [1,1,1]
 			, p4 = [0,1,0];
 
-		var srf = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
+		var srf = new verb.FourPointSurface( p1, p2, p3, p4 );
 
 		should.exist(srf);
 
@@ -2011,7 +2011,7 @@ describe("FourPointSurface.tessellate",function(){
 			, p3 = [1,1,1]
 			, p4 = [0,1,0];
 
-		var srf = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
+		var srf = new verb.FourPointSurface( p1, p2, p3, p4 );
 
 		should.exist(srf);
 
@@ -2042,7 +2042,7 @@ describe("Line.constructor",function(){
 		var p1 = [0,0,1]
 			, p2 = [1,0,0];
 
-		var c = new verb.geom.Line( p1, p2 );
+		var c = new verb.Line( p1, p2 );
 
 		should.exist(c);
 
@@ -2059,7 +2059,7 @@ describe("Line.point",function(){
 		var p1 = [0,0,0]
 			, p2 = [1,1,1];
 
-		var c = new verb.geom.Line( p1, p2 );
+		var c = new verb.Line( p1, p2 );
 
 		should.exist(c);
 
@@ -2082,7 +2082,7 @@ describe("Line.derivatives",function(){
 		var p1 = [0,0,0]
 			, p2 = [1,1,1];
 
-		var c = new verb.geom.Line( p1, p2 );
+		var c = new verb.Line( p1, p2 );
 
 		should.exist(c);
 
@@ -2104,7 +2104,7 @@ describe("Line.tessellate",function(){
 		var p1 = [0,0,0]
 			, p2 = [1,1,1];
 
-		var c = new verb.geom.Line( p1, p2 );
+		var c = new verb.Line( p1, p2 );
 
 		should.exist(c);
 
@@ -2129,7 +2129,7 @@ describe("BezierCurve.constructor",function(){
 			, p3 = [2,0,-1]
 			, p4 = [3,0,0];
 
-		var c = new verb.geom.BezierCurve( [p1, p2, p3, p4] );
+		var c = new verb.BezierCurve( [p1, p2, p3, p4] );
 
 		should.exist(c);
 
@@ -2148,7 +2148,7 @@ describe("BezierCurve.point",function(){
 			, p3 = [2,0,-1]
 			, p4 = [3,0,0];
 
-		var c = new verb.geom.BezierCurve( [p1, p2, p3, p4] );
+		var c = new verb.BezierCurve( [p1, p2, p3, p4] );
 
 		should.exist(c);
 
@@ -2172,7 +2172,7 @@ describe("BezierCurve.derivatives",function(){
 			, p3 = [2,0,-1]
 			, p4 = [3,0,0];
 
-		var c = new verb.geom.BezierCurve( [p1, p2, p3, p4] );
+		var c = new verb.BezierCurve( [p1, p2, p3, p4] );
 
 		should.exist(c);
 
@@ -2196,7 +2196,7 @@ describe("BezierCurve.tessellate",function(){
 			, p3 = [2,0,-1]
 			, p4 = [3,0,0];
 
-		var c = new verb.geom.BezierCurve( [p1, p2, p3, p4] );
+		var c = new verb.BezierCurve( [p1, p2, p3, p4] );
 
 		should.exist(c);
 
@@ -2216,7 +2216,7 @@ describe("Circle.constructor",function(){
 
 		verb.init();
 
-		var c = new verb.geom.Circle([0,0,0], [1,0,0], [0,1,0], 5);
+		var c = new verb.Circle([0,0,0], [1,0,0], [0,1,0], 5);
 
 		should.exist(c);
 
@@ -2230,7 +2230,7 @@ describe("Circle.point",function(){
 
 		verb.init();
 
-		var c = new verb.geom.Circle([0,0,0], [1,0,0], [0,1,0], 5);
+		var c = new verb.Circle([0,0,0], [1,0,0], [0,1,0], 5);
 
 		should.exist(c);
 
@@ -2250,7 +2250,7 @@ describe("Circle.derivatives",function(){
 
 		verb.init();
 
-		var c = new verb.geom.Circle([0,0,0], [1,0,0], [0,1,0], 5);
+		var c = new verb.Circle([0,0,0], [1,0,0], [0,1,0], 5);
 
 		should.exist(c);
 
@@ -2277,7 +2277,7 @@ describe("Circle.tessellate",function(){
 
 		verb.init();
 
-		var c = new verb.geom.Circle([0,0,0], [1,0,0], [0,1,0], 5);
+		var c = new verb.Circle([0,0,0], [1,0,0], [0,1,0], 5);
 
 		should.exist(c);
 
@@ -2298,7 +2298,7 @@ describe("Ellipse.constructor",function(){
 
 		verb.init();
 
-		var c = new verb.geom.Ellipse([0,0,0], [1,0,0], [0,1,0], 5, 10);
+		var c = new verb.Ellipse([0,0,0], [1,0,0], [0,1,0], 5, 10);
 
 		should.exist(c);
 
@@ -2312,7 +2312,7 @@ describe("Ellipse.point",function(){
 
 		verb.init();
 
-		var c = new verb.geom.Ellipse([0,0,0], [1,0,0], [0,1,0], 5, 10);
+		var c = new verb.Ellipse([0,0,0], [1,0,0], [0,1,0], 5, 10);
 
 		should.exist(c);
 
@@ -2338,7 +2338,7 @@ describe("Ellipse.derivatives",function(){
 
 		verb.init();
 
-		var c = new verb.geom.Ellipse([0,0,0], [1,0,0], [0,1,0], 5, 10);
+		var c = new verb.Ellipse([0,0,0], [1,0,0], [0,1,0], 5, 10);
 
 		should.exist(c);
 
@@ -2378,7 +2378,7 @@ describe("Ellipse.tessellate",function(){
 
 		verb.init();
 
-		var c = new verb.geom.Ellipse([0,0,0], [1,0,0], [0,1,0], 5, 10);
+		var c = new verb.Ellipse([0,0,0], [1,0,0], [0,1,0], 5, 10);
 
 		should.exist(c);
 
@@ -2397,7 +2397,7 @@ describe("EllipseArc.constructor",function(){
 
 		verb.init();
 
-		var c = new verb.geom.EllipseArc([0,0,0], [1,0,0], [0,1,0], 5, 10, new verb.geom.Interval(0, Math.PI));
+		var c = new verb.EllipseArc([0,0,0], [1,0,0], [0,1,0], 5, 10, new verb.Interval(0, Math.PI));
 
 		should.exist(c);
 
@@ -2411,7 +2411,7 @@ describe("EllipseArc.point",function(){
 
 		verb.init();
 
-		var c = new verb.geom.EllipseArc([0,0,0], [1,0,0], [0,1,0], 5, 10, new verb.geom.Interval(0, Math.PI));
+		var c = new verb.EllipseArc([0,0,0], [1,0,0], [0,1,0], 5, 10, new verb.Interval(0, Math.PI));
 
 		should.exist(c);
 
@@ -2431,7 +2431,7 @@ describe("EllipseArc.derivatives",function(){
 
 		verb.init();
 
-		var c = new verb.geom.EllipseArc([0,0,0], [1,0,0], [0,1,0], 5, 10, new verb.geom.Interval(0, Math.PI));
+		var c = new verb.EllipseArc([0,0,0], [1,0,0], [0,1,0], 5, 10, new verb.Interval(0, Math.PI));
 
 		should.exist(c);
 
@@ -2458,7 +2458,7 @@ describe("EllipseArc.tessellate",function(){
 
 		verb.init();
 
-		var c = new verb.geom.EllipseArc([0,0,0], [1,0,0], [0,1,0], 5, 10, new verb.geom.Interval(0, Math.PI));
+		var c = new verb.EllipseArc([0,0,0], [1,0,0], [0,1,0], 5, 10, new verb.Interval(0, Math.PI));
 
 		should.exist(c);
 
@@ -2477,7 +2477,7 @@ describe("PolyLine.constructor",function(){
 
 		verb.init();
 
-		var c = new verb.geom.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
+		var c = new verb.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
 
 		should.exist(c);
 
@@ -2491,7 +2491,7 @@ describe("PolyLine.point",function(){
 
 		verb.init();
 
-		var c = new verb.geom.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
+		var c = new verb.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
 
 		should.exist(c);
 
@@ -2509,7 +2509,7 @@ describe("PolyLine.derivatives",function(){
 
 		verb.init();
 
-		var c = new verb.geom.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
+		var c = new verb.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
 
 		should.exist(c);
 
@@ -2534,7 +2534,7 @@ describe("PolyLine.tessellate",function(){
 
 		verb.init();
 
-		var c = new verb.geom.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
+		var c = new verb.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
 
 		should.exist(c);
 
@@ -2554,7 +2554,7 @@ describe("PolyLine.constructor",function(){
 
 		verb.init();
 
-		var c = new verb.geom.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
+		var c = new verb.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
 
 		should.exist(c);
 
@@ -2568,7 +2568,7 @@ describe("PolyLine.point",function(){
 
 		verb.init();
 
-		var c = new verb.geom.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
+		var c = new verb.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
 
 		should.exist(c);
 
@@ -2586,7 +2586,7 @@ describe("PolyLine.derivatives",function(){
 
 		verb.init();
 
-		var c = new verb.geom.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
+		var c = new verb.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
 
 		should.exist(c);
 
@@ -2611,7 +2611,7 @@ describe("PolyLine.tessellate",function(){
 
 		verb.init();
 
-		var c = new verb.geom.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
+		var c = new verb.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
 
 		should.exist(c);
 
@@ -2636,7 +2636,7 @@ describe("Cone.constructor",function(){
 			, height = 5
 			, radius = 3;
 
-		var srf = new verb.geom.Cone( axis, xaxis, base, height, radius );
+		var srf = new verb.Cone( axis, xaxis, base, height, radius );
 
 		should.exist(srf);
 
@@ -2656,7 +2656,7 @@ describe("Cone.point",function(){
 			, height = 5
 			, radius = 3;
 
-		var srf = new verb.geom.Cone( axis, xaxis, base, height, radius );
+		var srf = new verb.Cone( axis, xaxis, base, height, radius );
 
 		should.exist(srf);
 
@@ -2682,7 +2682,7 @@ describe("Cone.derivatives",function(){
 			, height = 5
 			, radius = 3;
 
-		var srf = new verb.geom.Cone( axis, xaxis, base, height, radius );
+		var srf = new verb.Cone( axis, xaxis, base, height, radius );
 
 		should.exist(srf);
 
@@ -2719,7 +2719,7 @@ describe("Cone.tessellate",function(){
 			, height = 5
 			, radius = 3;
 
-		var srf = new verb.geom.Cone( axis, xaxis, base, height, radius );
+		var srf = new verb.Cone( axis, xaxis, base, height, radius );
 
 		should.exist(srf);
 
@@ -2752,7 +2752,7 @@ describe("Cylinder.constructor",function(){
 			, height = 5
 			, radius = 3;
 
-		var srf = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
+		var srf = new verb.Cylinder( axis, xaxis, base, height, radius );
 
 		should.exist(srf);
 
@@ -2772,7 +2772,7 @@ describe("Cylinder.point",function(){
 			, height = 5
 			, radius = 3;
 
-		var srf = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
+		var srf = new verb.Cylinder( axis, xaxis, base, height, radius );
 
 		should.exist(srf);
 
@@ -2798,7 +2798,7 @@ describe("Cylinder.derivatives",function(){
 			, height = 5
 			, radius = 3;
 
-		var srf = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
+		var srf = new verb.Cylinder( axis, xaxis, base, height, radius );
 
 		should.exist(srf);
 
@@ -2835,7 +2835,7 @@ describe("Cylinder.tessellate",function(){
 			, height = 5
 			, radius = 3;
 
-		var srf = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
+		var srf = new verb.Cylinder( axis, xaxis, base, height, radius );
 
 		should.exist(srf);
 
@@ -2862,11 +2862,11 @@ describe("Extrusion.constructor",function(){
 
 		verb.init();
 
-		var profile = new verb.geom.Line( [0,0,0], [1,1,1] )
+		var profile = new verb.Line( [0,0,0], [1,1,1] )
 			, axis = [0,0,1]
 			, length = 3;
 
-		var srf = new verb.geom.Extrusion( profile, axis, length);
+		var srf = new verb.Extrusion( profile, axis, length);
 
 		should.exist(srf);
 
@@ -2880,11 +2880,11 @@ describe("Extrusion.point",function(){
 
 		verb.init();
 
-		var profile = new verb.geom.Line( [0,0,0], [1,1,0] )
+		var profile = new verb.Line( [0,0,0], [1,1,0] )
 			, axis = [0,0,1]
 			, length = 3;
 
-		var srf = new verb.geom.Extrusion( profile, axis, length);
+		var srf = new verb.Extrusion( profile, axis, length);
 
 		should.exist(srf);
 
@@ -2904,11 +2904,11 @@ describe("Extrusion.derivatives",function(){
 
 		verb.init();
 
-		var profile = new verb.geom.Line( [0,0,0], [1,1,0] )
+		var profile = new verb.Line( [0,0,0], [1,1,0] )
 			, axis = [0,0,1]
 			, length = 3;
 
-		var srf = new verb.geom.Extrusion( profile, axis, length);
+		var srf = new verb.Extrusion( profile, axis, length);
 
 		should.exist(srf);
 
@@ -2937,11 +2937,11 @@ describe("Extrusion.tessellate",function(){
 
 		verb.init();
 
-		var profile = new verb.geom.Line( [0,0,0], [1,1,0] )
+		var profile = new verb.Line( [0,0,0], [1,1,0] )
 			, axis = [0,0,1]
 			, length = 3;
 
-		var srf = new verb.geom.Extrusion( profile, axis, length);
+		var srf = new verb.Extrusion( profile, axis, length);
 
 		should.exist(srf);
 
@@ -2974,7 +2974,7 @@ describe("PlanarSurface.constructor",function(){
 			, ulength = 10
 			, vlength = 4;
 
-		var srf = new verb.geom.PlanarSurface( base, uaxis, vaxis, ulength, vlength );
+		var srf = new verb.PlanarSurface( base, uaxis, vaxis, ulength, vlength );
 
 		should.exist(srf);
 
@@ -2994,7 +2994,7 @@ describe("PlanarSurface.point",function(){
 			, ulength = 10
 			, vlength = 4;
 
-		var srf = new verb.geom.PlanarSurface( base, uaxis, vaxis, ulength, vlength );
+		var srf = new verb.PlanarSurface( base, uaxis, vaxis, ulength, vlength );
 
 		should.exist(srf);
 
@@ -3020,7 +3020,7 @@ describe("PlanarSurface.derivatives",function(){
 			, ulength = 10
 			, vlength = 4;
 
-		var srf = new verb.geom.PlanarSurface( base, uaxis, vaxis, ulength, vlength );
+		var srf = new verb.PlanarSurface( base, uaxis, vaxis, ulength, vlength );
 
 		should.exist(srf);
 
@@ -3055,7 +3055,7 @@ describe("PlanarSurface.tessellate",function(){
 			, ulength = 10
 			, vlength = 4;
 
-		var srf = new verb.geom.PlanarSurface( base, uaxis, vaxis, ulength, vlength );
+		var srf = new verb.PlanarSurface( base, uaxis, vaxis, ulength, vlength );
 
 		should.exist(srf);
 
@@ -3085,9 +3085,9 @@ describe("RevolvedSurface.constructor",function(){
 		var base = [0,0,0]
 			, axis = [0,0,1]
 			, angle = Math.PI
-			, profile = new verb.geom.Line( [1, 0, 10], [10, 0, 1] );
+			, profile = new verb.Line( [1, 0, 10], [10, 0, 1] );
 
-		var srf = new verb.geom.RevolvedSurface( base, axis, angle, profile );
+		var srf = new verb.RevolvedSurface( base, axis, angle, profile );
 
 		should.exist(srf);
 
@@ -3104,9 +3104,9 @@ describe("RevolvedSurface.point",function(){
 		var base = [0,0,0]
 			, axis = [0,0,1]
 			, angle = Math.PI
-			, profile = new verb.geom.Line( [1, 0, 10], [10, 0, 1] );
+			, profile = new verb.Line( [1, 0, 10], [10, 0, 1] );
 
-		var srf = new verb.geom.RevolvedSurface( base, axis, angle, profile );
+		var srf = new verb.RevolvedSurface( base, axis, angle, profile );
 
 		should.exist(srf);
 
@@ -3129,9 +3129,9 @@ describe("RevolvedSurface.derivatives",function(){
 		var base = [0,0,0]
 			, axis = [0,0,1]
 			, angle = Math.PI
-			, profile = new verb.geom.Line( [1, 0, 10], [10, 0, 1] );
+			, profile = new verb.Line( [1, 0, 10], [10, 0, 1] );
 
-		var srf = new verb.geom.RevolvedSurface( base, axis, angle, profile );
+		var srf = new verb.RevolvedSurface( base, axis, angle, profile );
 
 		should.exist(srf);
 
@@ -3166,9 +3166,9 @@ describe("RevolvedSurface.tessellate",function(){
 		var base = [0,0,0]
 			, axis = [0,0,1]
 			, angle = Math.PI
-			, profile = new verb.geom.Line( [1, 0, 10], [10, 0, 1] );
+			, profile = new verb.Line( [1, 0, 10], [10, 0, 1] );
 
-		var srf = new verb.geom.RevolvedSurface( base, axis, angle, profile );
+		var srf = new verb.RevolvedSurface( base, axis, angle, profile );
 
 		should.exist(srf);
 
@@ -3201,7 +3201,7 @@ describe("Sphere.constructor",function(){
 		var center = [0,0,0]
 			, radius = 5;
 
-		var srf = new verb.geom.Sphere( center, radius );
+		var srf = new verb.Sphere( center, radius );
 
 		should.exist(srf);
 
@@ -3218,7 +3218,7 @@ describe("Sphere.point",function(){
 		var center = [0,0,0]
 			, radius = 5;
 
-		var srf = new verb.geom.Sphere( center, radius );
+		var srf = new verb.Sphere( center, radius );
 
 		should.exist(srf);
 
@@ -3241,7 +3241,7 @@ describe("Sphere.derivatives",function(){
 		var center = [0,0,0]
 			, radius = 5;
 
-		var srf = new verb.geom.Sphere( center, radius );
+		var srf = new verb.Sphere( center, radius );
 
 		should.exist(srf);
 
@@ -3277,7 +3277,7 @@ describe("Sphere.tessellate",function(){
 		var center = [0,0,0]
 			, radius = 5;
 
-		var srf = new verb.geom.Sphere( center, radius );
+		var srf = new verb.Sphere( center, radius );
 
 		should.exist(srf);
 
@@ -3308,10 +3308,10 @@ describe("SweepOneRail.constructor",function(){
 			, p3 = [2,0,-1]
 			, p4 = [3,0,0];
 
-		var rail = new verb.geom.BezierCurve( [p1, p2, p3, p4] )
-			, profile = new verb.geom.Line( [0,1,0], [0,-1,0]  );
+		var rail = new verb.BezierCurve( [p1, p2, p3, p4] )
+			, profile = new verb.Line( [0,1,0], [0,-1,0]  );
 
-		var srf = new verb.geom.SweepOneRail( rail, profile );
+		var srf = new verb.SweepOneRail( rail, profile );
 
 		should.exist(srf);
 
@@ -3330,10 +3330,10 @@ describe("SweepOneRail.point",function(){
 			, p3 = [2,0,-1]
 			, p4 = [3,0,0];
 
-		var rail = new verb.geom.BezierCurve( [p1, p2, p3, p4] )
-			, profile = new verb.geom.Line( [0,1,0], [0,-1,0]  )
+		var rail = new verb.BezierCurve( [p1, p2, p3, p4] )
+			, profile = new verb.Line( [0,1,0], [0,-1,0]  )
 
-		var srf = new verb.geom.SweepOneRail( rail, profile );
+		var srf = new verb.SweepOneRail( rail, profile );
 
 		should.exist(srf);
 
@@ -3360,10 +3360,10 @@ describe("SweepOneRail.derivatives",function(){
 			, p3 = [2,0,-1]
 			, p4 = [3,0,0];
 
-		var rail = new verb.geom.BezierCurve( [p1, p2, p3, p4] )
-			, profile = new verb.geom.Line( [0,1,0], [0,-1,0]  )
+		var rail = new verb.BezierCurve( [p1, p2, p3, p4] )
+			, profile = new verb.Line( [0,1,0], [0,-1,0]  )
 
-		var srf = new verb.geom.SweepOneRail( rail, profile );
+		var srf = new verb.SweepOneRail( rail, profile );
 
 		should.exist(srf);
 
@@ -3397,10 +3397,10 @@ describe("SweepOneRail.tessellate",function(){
 			, p3 = [2,0,-1]
 			, p4 = [3,0,0];
 
-		var rail = new verb.geom.BezierCurve( [p1, p2, p3, p4] )
-			, profile = new verb.geom.Line( [0,1,0], [0,-1,0]  )
+		var rail = new verb.BezierCurve( [p1, p2, p3, p4] )
+			, profile = new verb.Line( [0,1,0], [0,-1,0]  )
 
-		var srf = new verb.geom.SweepOneRail( rail, profile );
+		var srf = new verb.SweepOneRail( rail, profile );
 
 		should.exist(srf);
 
@@ -3421,7 +3421,7 @@ describe("SweepOneRail.tessellate",function(){
 
 });
 
-describe("verb.eval.nurbs.intersect_rational_curves_by_aabb",function(){
+describe("verb.eval.intersect_rational_curves_by_aabb",function(){
 
 	it('gives valid result for two planar lines', function(){
 
@@ -3434,7 +3434,7 @@ describe("verb.eval.nurbs.intersect_rational_curves_by_aabb",function(){
 				sample_tol = 1e-6,
 				tol = 0.0001;
 
-		var res = verb.eval.nurbs.intersect_rational_curves_by_aabb( 	degree1, 
+		var res = verb.eval.intersect_rational_curves_by_aabb( 	degree1, 
 																																	knots1, 
 																																	control_points1, 
 																																	degree2, 
@@ -3459,7 +3459,7 @@ describe("verb.eval.nurbs.intersect_rational_curves_by_aabb",function(){
 				sample_tol = 1e-6,
 				tol = 0.0001;
 
-		var res = verb.eval.nurbs.intersect_rational_curves_by_aabb( 	degree1, 
+		var res = verb.eval.intersect_rational_curves_by_aabb( 	degree1, 
 																																	knots1, 
 																																	control_points1, 
 																																	degree2, 
@@ -3485,7 +3485,7 @@ describe("verb.eval.nurbs.intersect_rational_curves_by_aabb",function(){
 				sample_tol = 1e-6,
 				tol = 0.0001;
 
-		var res = verb.eval.nurbs.intersect_rational_curves_by_aabb( 	degree2, 
+		var res = verb.eval.intersect_rational_curves_by_aabb( 	degree2, 
 																																	knots2, 
 																																	control_points2, 
 																																	degree1, 
@@ -3512,7 +3512,7 @@ describe("verb.eval.nurbs.intersect_rational_curves_by_aabb",function(){
 				sample_tol = 1e-6,
 				tol = 0.0001;
 
-		var res = verb.eval.nurbs.intersect_rational_curves_by_aabb( 	degree1, 
+		var res = verb.eval.intersect_rational_curves_by_aabb( 	degree1, 
 																																	knots1, 
 																																	control_points1, 
 																																	degree2, 
@@ -3530,7 +3530,7 @@ describe("verb.eval.nurbs.intersect_rational_curves_by_aabb",function(){
 
 });
 
-describe("verb.eval.nurbs.refine_rational_curve_intersection",function(){
+describe("verb.eval.refine_rational_curve_intersection",function(){
 
 	it('gives valid result for two lines', function(){
 
@@ -3542,7 +3542,7 @@ describe("verb.eval.nurbs.refine_rational_curve_intersection",function(){
 				control_points2 = [[0.5,0.5,0,1], [0.5,-1.5,0,1]],
 				start_params = [0.26, 0.24 ];
 
-		var res = verb.eval.nurbs.refine_rational_curve_intersection( degree1, knots1, control_points1, degree2, knots2, control_points2, start_params );
+		var res = verb.eval.refine_rational_curve_intersection( degree1, knots1, control_points1, degree2, knots2, control_points2, start_params );
 
 		res[0].should.be.approximately(0.25, verb.TOLERANCE );
 		res[1].should.be.approximately(0.25, verb.TOLERANCE );
@@ -3559,7 +3559,7 @@ describe("verb.eval.nurbs.refine_rational_curve_intersection",function(){
 				control_points2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]]
 				start_params = [0.29, 0.36 ];
 
-		var res = verb.eval.nurbs.refine_rational_curve_intersection( degree1, knots1, control_points1, degree2, knots2, control_points2, start_params );
+		var res = verb.eval.refine_rational_curve_intersection( degree1, knots1, control_points1, degree2, knots2, control_points2, start_params );
 
 		res[0].should.be.approximately(0.2964101616038012, verb.TOLERANCE );
 		res[1].should.be.approximately(0.3660254038069307, verb.TOLERANCE );
@@ -3576,7 +3576,7 @@ describe("verb.eval.nurbs.refine_rational_curve_intersection",function(){
 				control_points2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]],
 				start_params = [ 0.36, 0.29 ];
 
-		var res = verb.eval.nurbs.refine_rational_curve_intersection( 	degree2, 
+		var res = verb.eval.refine_rational_curve_intersection( 	degree2, 
 																																	knots2, 
 																																	control_points2, 
 																																	degree1, 
@@ -3599,7 +3599,7 @@ describe("verb.eval.nurbs.refine_rational_curve_intersection",function(){
 				control_points2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]],
 				start_params = [ 0.41, 0.33 ];
 
-		var res = verb.eval.nurbs.refine_rational_curve_intersection( degree1, knots1, control_points1, degree2, knots2, control_points2, start_params );
+		var res = verb.eval.refine_rational_curve_intersection( degree1, knots1, control_points1, degree2, knots2, control_points2, start_params );
 
 		
 		res[0].should.be.approximately(0.416208132514572, verb.TOLERANCE );
@@ -3609,7 +3609,7 @@ describe("verb.eval.nurbs.refine_rational_curve_intersection",function(){
 
 });
 
-describe("verb.eval.nurbs.intersect_rational_curves_by_aabb_refine",function(){
+describe("verb.eval.intersect_rational_curves_by_aabb_refine",function(){
 
 	it('gives valid result for two planar lines', function(){
 
@@ -3622,7 +3622,7 @@ describe("verb.eval.nurbs.intersect_rational_curves_by_aabb_refine",function(){
 				sample_tol = 1e-6,
 				tol = 0.0001;
 
-		var res = verb.eval.nurbs.intersect_rational_curves_by_aabb_refine( 	degree1, 
+		var res = verb.eval.intersect_rational_curves_by_aabb_refine( 	degree1, 
 																																	knots1, 
 																																	control_points1, 
 																																	degree2, 
@@ -3647,7 +3647,7 @@ describe("verb.eval.nurbs.intersect_rational_curves_by_aabb_refine",function(){
 				sample_tol = 1e-6,
 				tol = 0.0001;
 
-		var res = verb.eval.nurbs.intersect_rational_curves_by_aabb_refine( 	degree1, 
+		var res = verb.eval.intersect_rational_curves_by_aabb_refine( 	degree1, 
 																																	knots1, 
 																																	control_points1, 
 																																	degree2, 
@@ -3672,7 +3672,7 @@ describe("verb.eval.nurbs.intersect_rational_curves_by_aabb_refine",function(){
 				sample_tol = 1e-6,
 				tol = 0.0001;
 
-		var res = verb.eval.nurbs.intersect_rational_curves_by_aabb_refine( 	degree2, 
+		var res = verb.eval.intersect_rational_curves_by_aabb_refine( 	degree2, 
 																																	knots2, 
 																																	control_points2, 
 																																	degree1, 
@@ -3697,7 +3697,7 @@ describe("verb.eval.nurbs.intersect_rational_curves_by_aabb_refine",function(){
 				sample_tol = 1e-6,
 				tol = 0.0001;
 
-		var res = verb.eval.nurbs.intersect_rational_curves_by_aabb_refine( 	degree1, 
+		var res = verb.eval.intersect_rational_curves_by_aabb_refine( 	degree1, 
 																																	knots1, 
 																																	control_points1, 
 																																	degree2, 
@@ -3727,7 +3727,7 @@ describe("verb.intersect.curveCurve",function(){
 			, p3 = [2,0,1]
 			, p4 = [3,0,0];
 
-		var curve1 = new verb.geom.BezierCurve( [p1, p2, p3, p4] );
+		var curve1 = new verb.BezierCurve( [p1, p2, p3, p4] );
 
 		// build another
 		var c1 = [-5,0,3]
@@ -3735,7 +3735,7 @@ describe("verb.intersect.curveCurve",function(){
 			, c3 = [2,0,0]
 			, c4 = [3,0,1];
 
-		var curve2 = new verb.geom.BezierCurve( [c1, c2, c3, c4] );
+		var curve2 = new verb.BezierCurve( [c1, c2, c3, c4] );
 
 		// make sync work
 		var res = verb.intersect.curveCurve( curve1, curve2 );
@@ -3755,7 +3755,7 @@ describe("verb.intersect.curveCurve",function(){
 
 });
 
-describe("verb.eval.nurbs.intersect_rational_curve_surface_by_aabb",function(){
+describe("verb.eval.intersect_rational_curve_surface_by_aabb",function(){
 
 	it('gives valid result for planar surface and line', function(){
 
@@ -3776,7 +3776,7 @@ describe("verb.eval.nurbs.intersect_rational_curve_surface_by_aabb",function(){
 			, divs_u = 3
 			, divs_v = 3;
 
-		var res =  verb.eval.nurbs.intersect_rational_curve_surface_by_aabb( 	degree_u, 
+		var res =  verb.eval.intersect_rational_curve_surface_by_aabb( 	degree_u, 
 																																					knots_u, 
 																																					degree_v, 
 																																					knots_v, 
@@ -3817,7 +3817,7 @@ describe("verb.eval.nurbs.intersect_rational_curve_surface_by_aabb",function(){
 			, divs_u = 2
 			, divs_v = 2;
 
-		var res =  verb.eval.nurbs.intersect_rational_curve_surface_by_aabb( 	degree_u, 
+		var res =  verb.eval.intersect_rational_curve_surface_by_aabb( 	degree_u, 
 																																					knots_u, 
 																																					degree_v, 
 																																					knots_v, 
@@ -3858,7 +3858,7 @@ describe("verb.eval.nurbs.intersect_rational_curve_surface_by_aabb",function(){
 			, divs_u = 3
 			, divs_v = 3;
 
-		var res =  verb.eval.nurbs.intersect_rational_curve_surface_by_aabb( 	degree_u, 
+		var res =  verb.eval.intersect_rational_curve_surface_by_aabb( 	degree_u, 
 																																					knots_u, 
 																																					degree_v, 
 																																					knots_v, 
@@ -3899,7 +3899,7 @@ describe("verb.eval.nurbs.intersect_rational_curve_surface_by_aabb",function(){
 			, divs_u = 3
 			, divs_v = 3;
 
-		var res =  verb.eval.nurbs.intersect_rational_curve_surface_by_aabb( 	degree_u, 
+		var res =  verb.eval.intersect_rational_curve_surface_by_aabb( 	degree_u, 
 																																					knots_u, 
 																																					degree_v, 
 																																					knots_v, 
@@ -3921,7 +3921,7 @@ describe("verb.eval.nurbs.intersect_rational_curve_surface_by_aabb",function(){
 
 });
 
-describe("verb.eval.geom.intersect_segment_with_tri",function(){
+describe("verb.eval.intersect_segment_with_tri",function(){
 
 	it('gives correct result for intersecting axis aligned segment and triangle ', function(){
 
@@ -3931,7 +3931,7 @@ describe("verb.eval.geom.intersect_segment_with_tri",function(){
 			, points = [ [0,0,0], [10,0,0], [5,10,1] ]
 			, tri = [ 0, 1, 2 ];
 
-		var res = verb.eval.geom.intersect_segment_with_tri( p0, p1, points, tri );
+		var res = verb.eval.intersect_segment_with_tri( p0, p1, points, tri );
 
 		res.p.should.be.approximately(0.3, verb.TOLERANCE);
 		res.s.should.be.approximately(0.25, verb.TOLERANCE);
@@ -3953,7 +3953,7 @@ describe("verb.eval.geom.intersect_segment_with_tri",function(){
 			, points = [ [0,0,0], [10,0,0], [5,10,0] ]
 			, tri = [ 0, 1, 2 ];
 
-		var res = verb.eval.geom.intersect_segment_with_tri( p0, p1, points, tri );
+		var res = verb.eval.intersect_segment_with_tri( p0, p1, points, tri );
 
 		res.p.should.be.approximately(0.333333333333, verb.TOLERANCE);
 		res.s.should.be.approximately(0.25, verb.TOLERANCE);
@@ -3977,7 +3977,7 @@ describe("verb.eval.geom.intersect_segment_with_tri",function(){
 			, points = [ [0,0,0], [10,0,0], [5,10,0] ]
 			, tri = [ 0, 1, 2 ];
 
-		var res = verb.eval.geom.intersect_segment_with_tri( p0, p1, points, tri );
+		var res = verb.eval.intersect_segment_with_tri( p0, p1, points, tri );
 
 		(null === res).should.be.true;
 
@@ -3986,7 +3986,7 @@ describe("verb.eval.geom.intersect_segment_with_tri",function(){
 });
 
 
-describe("verb.eval.nurbs.refine_rational_curve_surface_intersection",function(){
+describe("verb.eval.refine_rational_curve_surface_intersection",function(){
 
 	it('gives valid result for planar surface and degree 2 bezier', function(){
 
@@ -4002,7 +4002,7 @@ describe("verb.eval.nurbs.refine_rational_curve_surface_intersection",function()
 
 		var start_params = [ 0.45, 0.25, 0.55 ];
 
-		var res = verb.eval.nurbs.refine_rational_curve_surface_intersection( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, start_params );
+		var res = verb.eval.refine_rational_curve_surface_intersection( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, start_params );
 
 		res[0].should.be.approximately(0.5, verb.TOLERANCE);
 		res[1].should.be.approximately(0.265, verb.TOLERANCE);
@@ -4012,7 +4012,7 @@ describe("verb.eval.nurbs.refine_rational_curve_surface_intersection",function()
 
 });
 
-describe("verb.eval.nurbs.intersect_rational_curve_surface_by_aabb_refine",function(){
+describe("verb.eval.intersect_rational_curve_surface_by_aabb_refine",function(){
 
 	it('gives valid result for planar surface and degree 2 bezier', function(){
 
@@ -4031,7 +4031,7 @@ describe("verb.eval.nurbs.intersect_rational_curve_surface_by_aabb_refine",funct
 			, divs_u = 3
 			, divs_v = 3;
 
-		var res = verb.eval.nurbs.intersect_rational_curve_surface_by_aabb_refine( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, sample_tol, tol, divs_u, divs_v );
+		var res = verb.eval.intersect_rational_curve_surface_by_aabb_refine( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, sample_tol, tol, divs_u, divs_v );
 
 		res.length.should.be.equal( 1 );
 		res[0].p.should.be.approximately(0.5, verb.TOLERANCE);
@@ -4054,8 +4054,8 @@ describe("verb.intersect.curveSurface",function(){
 			, ulength = 20
 			, vlength = 10;
 
-		var srf = new verb.geom.PlanarSurface( base, uaxis, vaxis, ulength, vlength );
-		var crv = new verb.geom.BezierCurve( [ [5.2,5.2,5], [5.4,4.8,0], [5.2,5.2,-5] ] );
+		var srf = new verb.PlanarSurface( base, uaxis, vaxis, ulength, vlength );
+		var crv = new verb.BezierCurve( [ [5.2,5.2,5], [5.4,4.8,0], [5.2,5.2,-5] ] );
 
 		var options = {
 			sampleTolerance: 1e-12,
@@ -4076,7 +4076,7 @@ describe("verb.intersect.curveSurface",function(){
 });
 
 
-describe("verb.eval.nurbs.volume_point",function(){
+describe("verb.eval.volume_point",function(){
 
 	it('gives valid result for uniform 3x3x3 cube', function(){
 
@@ -4111,7 +4111,7 @@ describe("verb.eval.nurbs.volume_point",function(){
 		for (var i = 0; i < 10; i++){
 
 			var u = Math.random(), v = Math.random(), w = Math.random()
-			var result = verb.eval.nurbs.volume_point( degree_u, knots_u, degree_v, knots_v, degree_w, knots_w, control_points, u, v, w );
+			var result = verb.eval.volume_point( degree_u, knots_u, degree_v, knots_v, degree_w, knots_w, control_points, u, v, w );
 
 			result[0].should.be.approximately( u, verb.TOLERANCE );
 			result[1].should.be.approximately( v, verb.TOLERANCE );
@@ -4123,7 +4123,7 @@ describe("verb.eval.nurbs.volume_point",function(){
 
 });
 
-describe("verb.eval.nurbs.rational_surface_curvature ",function(){
+describe("verb.eval.rational_surface_curvature ",function(){
 
 	it('returns expected result for cylinder', function(){
 
@@ -4135,9 +4135,9 @@ describe("verb.eval.nurbs.rational_surface_curvature ",function(){
 			, height = 1
 			, radius = 1;
 
-		var srf = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
+		var srf = new verb.Cylinder( axis, xaxis, base, height, radius );
 
-		var res = verb.eval.nurbs.rational_surface_curvature( srf.get('degreeU'), 
+		var res = verb.eval.rational_surface_curvature( srf.get('degreeU'), 
 																													srf.get('knotsU'), 
 																													srf.get('degreeV'), 
 																													srf.get('knotsV'), 
@@ -4176,9 +4176,9 @@ describe("verb.eval.nurbs.rational_surface_curvature ",function(){
 		var center = [0,0,0]
 			, radius = 1;
 
-		var srf = new verb.geom.Sphere( center, radius );
+		var srf = new verb.Sphere( center, radius );
 
-		var res = verb.eval.nurbs.rational_surface_curvature( srf.get('degreeU'), 
+		var res = verb.eval.rational_surface_curvature( srf.get('degreeU'), 
 																													srf.get('knotsU'), 
 																													srf.get('degreeV'), 
 																													srf.get('knotsV'), 
@@ -4213,7 +4213,7 @@ describe("verb.eval.nurbs.rational_surface_curvature ",function(){
 });
 
 
-describe("verb.eval.nurbs.curve_knot_insert",function(){
+describe("verb.eval.curve_knot_insert",function(){
 
 	it('returns expected results when inserting 1 knot in the middle of a non-rational, cubic b-spline', function(){
 
@@ -4225,7 +4225,7 @@ describe("verb.eval.nurbs.curve_knot_insert",function(){
 		var control_points = [];
 		for (var i = 0; i < 8; i++) control_points.push([i, 0, 0]);
 
-		var after = verb.eval.nurbs.curve_knot_insert( degree, knots, control_points, u, r );
+		var after = verb.eval.curve_knot_insert( degree, knots, control_points, u, r );
 
 		after.control_points.forEach(function(cp){ should.exist(cp); });
 		after.knots.forEach(function(cp){ should.exist(cp); });
@@ -4237,9 +4237,9 @@ describe("verb.eval.nurbs.curve_knot_insert",function(){
 		after.control_points[4][0].should.be.approximately( 3.5, verb.TOLERANCE );
 		after.control_points[5][0].should.be.approximately( 4.1666666666, verb.TOLERANCE );
 
-		var p0 = verb.eval.nurbs.curve_point( degree, knots, control_points, 2.5);
+		var p0 = verb.eval.curve_point( degree, knots, control_points, 2.5);
 
-		var p1 = verb.eval.nurbs.curve_point( degree, after.knots, after.control_points, 2.5);
+		var p1 = verb.eval.curve_point( degree, after.knots, after.control_points, 2.5);
 
 		p0[0].should.be.approximately(p1[0], verb.TOLERANCE);
 		p0[1].should.be.approximately(p1[1], verb.TOLERANCE);
@@ -4257,7 +4257,7 @@ describe("verb.eval.nurbs.curve_knot_insert",function(){
 		var control_points = [];
 		for (var i = 0; i < 8; i++) control_points.push([i, 0, 0]);
 
-		var after = verb.eval.nurbs.curve_knot_insert( degree, knots, control_points, u, r );
+		var after = verb.eval.curve_knot_insert( degree, knots, control_points, u, r );
 
 		after.control_points.forEach(function(cp){ should.exist(cp); });
 		after.knots.forEach(function(cp){ should.exist(cp); });
@@ -4265,8 +4265,8 @@ describe("verb.eval.nurbs.curve_knot_insert",function(){
 		should.equal(knots.length + r, after.knots.length);
 		should.equal(control_points.length + r, after.control_points.length);
 
-		var p0 = verb.eval.nurbs.curve_point( degree, knots, control_points, 2.5);
-		var p1 = verb.eval.nurbs.curve_point( degree, after.knots, after.control_points, 2.5);
+		var p0 = verb.eval.curve_point( degree, knots, control_points, 2.5);
+		var p1 = verb.eval.curve_point( degree, after.knots, after.control_points, 2.5);
 
 		p0[0].should.be.approximately(p1[0], verb.TOLERANCE);
 		p0[1].should.be.approximately(p1[1], verb.TOLERANCE);
@@ -4284,7 +4284,7 @@ describe("verb.eval.nurbs.curve_knot_insert",function(){
 		var control_points = [];
 		for (var i = 0; i < 8; i++) control_points.push([i, 0, 0]);
 
-		var after = verb.eval.nurbs.curve_knot_insert( degree, knots, control_points, u, r );
+		var after = verb.eval.curve_knot_insert( degree, knots, control_points, u, r );
 
 		after.control_points.forEach(function(cp){ should.exist(cp); });
 		after.knots.forEach(function(cp){ should.exist(cp); });
@@ -4292,8 +4292,8 @@ describe("verb.eval.nurbs.curve_knot_insert",function(){
 		should.equal(knots.length + r, after.knots.length);
 		should.equal(control_points.length + r, after.control_points.length);
 
-		var p0 = verb.eval.nurbs.curve_point( degree, knots, control_points, 2.5);
-		var p1 = verb.eval.nurbs.curve_point( degree, after.knots, after.control_points, 2.5);
+		var p0 = verb.eval.curve_point( degree, knots, control_points, 2.5);
+		var p1 = verb.eval.curve_point( degree, after.knots, after.control_points, 2.5);
 
 		p0[0].should.be.approximately(p1[0], verb.TOLERANCE);
 		p0[1].should.be.approximately(p1[1], verb.TOLERANCE);
@@ -4311,7 +4311,7 @@ describe("verb.eval.nurbs.curve_knot_insert",function(){
 		var control_points = [];
 		for (var i = 0; i < 6; i++) control_points.push([i, 0, 0]);
 
-		var after = verb.eval.nurbs.curve_knot_insert( degree, knots, control_points, u, r );
+		var after = verb.eval.curve_knot_insert( degree, knots, control_points, u, r );
 
 		after.control_points.forEach(function(cp){ should.exist(cp); });
 		after.knots.forEach(function(cp){ should.exist(cp); });
@@ -4319,8 +4319,8 @@ describe("verb.eval.nurbs.curve_knot_insert",function(){
 		should.equal(knots.length + r, after.knots.length);
 		should.equal(control_points.length + r, after.control_points.length);
 
-		var p0 = verb.eval.nurbs.curve_point( degree, knots, control_points, 2.5);
-		var p1 = verb.eval.nurbs.curve_point( degree, after.knots, after.control_points, 2.5);
+		var p0 = verb.eval.curve_point( degree, knots, control_points, 2.5);
+		var p1 = verb.eval.curve_point( degree, after.knots, after.control_points, 2.5);
 
 		p0[0].should.be.approximately(p1[0], verb.TOLERANCE);
 		p0[1].should.be.approximately(p1[1], verb.TOLERANCE);
@@ -4331,7 +4331,7 @@ describe("verb.eval.nurbs.curve_knot_insert",function(){
 
 });
 
-describe("verb.eval.nurbs.curve_knot_refine",function(){
+describe("verb.eval.curve_knot_refine",function(){
 
 	function cubicInsert(u, r){
 		
@@ -4346,7 +4346,7 @@ describe("verb.eval.nurbs.curve_knot_refine",function(){
 		var control_points = [];
 		for (var i = 0; i < 8; i++) control_points.push([i, 0, 0]);
 
-		var after = verb.eval.nurbs.curve_knot_refine( degree, knots, control_points, new_knots );
+		var after = verb.eval.curve_knot_refine( degree, knots, control_points, new_knots );
 
 		after.control_points.forEach(function(cp){ should.exist(cp); });
 		after.knots.forEach(function(cp){ should.exist(cp); });
@@ -4354,9 +4354,9 @@ describe("verb.eval.nurbs.curve_knot_refine",function(){
 		should.equal(knots.length + r, after.knots.length);
 		should.equal(control_points.length + r, after.control_points.length);
 
-		var p0 = verb.eval.nurbs.curve_point( degree, knots, control_points, 2.5);
+		var p0 = verb.eval.curve_point( degree, knots, control_points, 2.5);
 
-		var p1 = verb.eval.nurbs.curve_point( degree, after.knots, after.control_points, 2.5);
+		var p1 = verb.eval.curve_point( degree, after.knots, after.control_points, 2.5);
 
 		p0[0].should.be.approximately(p1[0], verb.TOLERANCE);
 		p0[1].should.be.approximately(p1[1], verb.TOLERANCE);
@@ -4383,7 +4383,7 @@ describe("verb.eval.nurbs.curve_knot_refine",function(){
 
 });
 
-describe("verb.eval.nurbs.curve_knot_split",function(){
+describe("verb.eval.curve_knot_split",function(){
 
 	function cubicSplit(u){
 		
@@ -4393,7 +4393,7 @@ describe("verb.eval.nurbs.curve_knot_split",function(){
 		var control_points = [];
 		for (var i = 0; i < 8; i++) control_points.push([i, 0, 0, 1]);
 
-		var after = verb.eval.nurbs.curve_split( degree, knots, control_points, u );
+		var after = verb.eval.curve_split( degree, knots, control_points, u );
 
 		for (var i = 0; i < degree + 1; i++ ){
 			var d = after[0].knots.length - (degree+1);
@@ -4406,8 +4406,8 @@ describe("verb.eval.nurbs.curve_knot_split",function(){
 		}
 
 		// a point evaluated on each curve is the same
-		var p0 = verb.eval.nurbs.curve_point( after[0].degree, after[0].knots, after[0].control_points, after[0].knots[ after[0].knots.length-1] );
-		var p1 = verb.eval.nurbs.curve_point( after[1].degree, after[1].knots, after[1].control_points, after[1].knots[ 0] );
+		var p0 = verb.eval.curve_point( after[0].degree, after[0].knots, after[0].control_points, after[0].knots[ after[0].knots.length-1] );
+		var p1 = verb.eval.curve_point( after[1].degree, after[1].knots, after[1].control_points, after[1].knots[ 0] );
 
 		p0[0].should.be.approximately(p1[0], verb.TOLERANCE);
 		p0[1].should.be.approximately(p1[1], verb.TOLERANCE);
@@ -4438,7 +4438,7 @@ describe("NurbsCurve.split",function(){
 			control_points.push([i, 0, 0]);
 		} 
 
-		var crv = new verb.geom.NurbsCurve( degree, control_points, weights, knots );
+		var crv = new verb.NurbsCurve( degree, control_points, weights, knots );
 		var res = crv.split(0.5);
 
 		var crv0 = res[0];
@@ -4465,11 +4465,11 @@ describe("NurbsCurve.split",function(){
 
 
 
-describe("verb.eval.nurbs.knot_multiplicities",function(){
+describe("verb.eval.knot_multiplicities",function(){
 
 	it('is correct for a basic example', function(){
 
-		var res = verb.eval.nurbs.knot_multiplicities( [ 0, 0, 0, 0, 1, 1, 2, 2, 2, 3, 3.3] );
+		var res = verb.eval.knot_multiplicities( [ 0, 0, 0, 0, 1, 1, 2, 2, 2, 3, 3.3] );
 
 		res.length.should.be.equal( 5 );
 
@@ -4491,7 +4491,7 @@ describe("verb.eval.nurbs.knot_multiplicities",function(){
 	});
 });
 
-describe("verb.eval.nurbs.curve_bezier_decompose",function(){
+describe("verb.eval.curve_bezier_decompose",function(){
 
 	it('is correct for a basic example', function(){
 
@@ -4503,7 +4503,7 @@ describe("verb.eval.nurbs.curve_bezier_decompose",function(){
 			control_points.push([i, 0, 0]);
 		} 
 
-		var res = verb.eval.nurbs.curve_bezier_decompose( degree, knots, control_points );
+		var res = verb.eval.curve_bezier_decompose( degree, knots, control_points );
 
 		res.length.should.be.equal( 5 );
 
@@ -4511,8 +4511,8 @@ describe("verb.eval.nurbs.curve_bezier_decompose",function(){
 			
 			var u0 = x.knots[0];
 
-			var pt0 = verb.eval.nurbs.curve_point( x.degree, x.knots, x.control_points, u0);
-			var pt1 = verb.eval.nurbs.curve_point( degree, knots, control_points, u0);
+			var pt0 = verb.eval.curve_point( x.degree, x.knots, x.control_points, u0);
+			var pt1 = verb.eval.curve_point( degree, knots, control_points, u0);
 
 			( numeric.norm2(numeric.sub(pt0, pt1))).should.be.approximately(0, verb.TOLERANCE );
 
@@ -4521,7 +4521,7 @@ describe("verb.eval.nurbs.curve_bezier_decompose",function(){
 	});
 });
 
-describe("verb.eval.geom.tri_uv_from_point",function(){
+describe("verb.eval.tri_uv_from_point",function(){
 
 	it('is correct for a basic example', function(){
 
@@ -4530,7 +4530,7 @@ describe("verb.eval.geom.tri_uv_from_point",function(){
 		var tri = [ 0, 1, 2 ];
 		var pt = [0.5, 0.25, 0];
 
-		var uv = verb.eval.geom.tri_uv_from_point( pts, tri, uvs, pt );
+		var uv = verb.eval.tri_uv_from_point( pts, tri, uvs, pt );
 
 		uv[0].should.be.approximately( pt[0], verb.TOLERANCE );
 		uv[1].should.be.approximately( pt[1], verb.TOLERANCE );
@@ -4539,7 +4539,7 @@ describe("verb.eval.geom.tri_uv_from_point",function(){
 });
 
 
-describe("verb.eval.mesh.make_mesh_aabb",function(){
+describe("verb.eval.make_mesh_aabb",function(){
 
 	it('should return correct result for planar mesh', function(){
 
@@ -4554,7 +4554,7 @@ describe("verb.eval.mesh.make_mesh_aabb",function(){
 		var points = [ [0,0,0], [1,0,0], [0, -1, 0 ], [2, -1, 0], [0, -2, 0], [1, -2, 0] ]
 			, tris = [ [0,2,1], [1,2,3], [2,4,5], [2,5,3] ]
 			, tri_indices = [0,1,2,3]
-			, aabb = verb.eval.mesh.make_mesh_aabb(points, tris, tri_indices);
+			, aabb = verb.eval.make_mesh_aabb(points, tris, tri_indices);
 
 		should.equal( 2, aabb.max[0] );
 		should.equal( 0, aabb.min[0] );
@@ -4567,7 +4567,7 @@ describe("verb.eval.mesh.make_mesh_aabb",function(){
 
 });
 
-describe("verb.eval.mesh.make_mesh_aabb",function(){
+describe("verb.eval.make_mesh_aabb",function(){
 
 	it('make_mesh_aabb should return correct result for non-planar mesh', function(){
 
@@ -4582,7 +4582,7 @@ describe("verb.eval.mesh.make_mesh_aabb",function(){
 		var points = [ [0,0,-5], [1,0,0], [0, -1, 0 ], [2, -1, 0], [0, -2, 0], [1, -2, 4] ]
 			, tris = [ [0,2,1], [1,2,3], [2,4,5], [2,5,3] ]
 			, tri_indices = [0,1,2,3]
-			, aabb = verb.eval.mesh.make_mesh_aabb(points, tris, tri_indices);
+			, aabb = verb.eval.make_mesh_aabb(points, tris, tri_indices);
 
 		should.equal( 2, aabb.max[0] );
 		should.equal( 0, aabb.min[0] );
@@ -4595,7 +4595,7 @@ describe("verb.eval.mesh.make_mesh_aabb",function(){
 
 });
 
-describe("verb.eval.mesh.make_mesh_aabb_tree",function(){
+describe("verb.eval.make_mesh_aabb_tree",function(){
 
 	it('make_mesh_aabb_tree should have the correct structure', function(){
 
@@ -4610,7 +4610,7 @@ describe("verb.eval.mesh.make_mesh_aabb_tree",function(){
 		var points = [ [0,0,0], [1,0,0], [0, -1, 0 ], [2, -1, 0], [0, -2, 0], [1, -2, 0] ]
 			, tris = [ [0,2,1], [1,2,3], [2,4,5], [2,5,3] ]
 			, tri_indices = [0,1,2,3]
-			, root = verb.eval.mesh.make_mesh_aabb_tree( points, tris, tri_indices );
+			, root = verb.eval.make_mesh_aabb_tree( points, tris, tri_indices );
 
 		// root bb is correct
 		should.equal( 2, root.bounding_box.max[0] );
@@ -4653,7 +4653,7 @@ describe("verb.eval.mesh.make_mesh_aabb_tree",function(){
 
 });
 
-describe("verb.eval.mesh.intersect_aabb_trees",function(){
+describe("verb.eval.intersect_aabb_trees",function(){
 
 	it('intersect_aabb_trees should have the correct result', function(){
 
@@ -4668,13 +4668,13 @@ describe("verb.eval.mesh.intersect_aabb_trees",function(){
 		var points1 = [ [0,0,0], [1,0,0], [0, -1, 0 ], [2, -1, 0], [0, -2, 0], [1, -2, 0] ]
 			, tris1 = [ [0,2,1], [1,2,3], [2,4,5], [2,5,3] ]
 			, tri_indices1 = [0,1,2,3]
-			, aabb1 = verb.eval.mesh.make_mesh_aabb_tree( points1, tris1, tri_indices1 )
+			, aabb1 = verb.eval.make_mesh_aabb_tree( points1, tris1, tri_indices1 )
 
 			, points2 = [ [0.5,-2,0.5], [0.5,-2,-1], [1,0.5,-1 ] ]
 			, tris2 = [ [0,1,2] ]
 			, tri_indices2 = [0]
-			, aabb2 = verb.eval.mesh.make_mesh_aabb_tree( points2, tris2, tri_indices2 )
-			, inter_result = verb.eval.geom.intersect_aabb_trees( points1, tris1, points2, tris2, aabb1, aabb2 );
+			, aabb2 = verb.eval.make_mesh_aabb_tree( points2, tris2, tri_indices2 )
+			, inter_result = verb.eval.intersect_aabb_trees( points1, tris1, points2, tris2, aabb1, aabb2 );
 
 		// find all 4 triangle intersections
 		should.equal( 4, inter_result.length );
@@ -4697,7 +4697,7 @@ describe("verb.eval.mesh.intersect_aabb_trees",function(){
 });
 
 
-describe("verb.eval.geom.intersect_3_planes",function(){
+describe("verb.eval.intersect_3_planes",function(){
 
 	it('is correct for intersection of 3 basis planes', function(){
 
@@ -4708,7 +4708,7 @@ describe("verb.eval.geom.intersect_3_planes",function(){
 		var d3 = [0,0,0];
 		var n3 = [0,0,1];
 
-		var res = verb.eval.geom.intersect_3_planes(n1, d1, n2, d2, n3, d3);
+		var res = verb.eval.intersect_3_planes(n1, d1, n2, d2, n3, d3);
 		res.should.be.eql( [0,0,0] );
 
 	});
@@ -4726,7 +4726,7 @@ describe("verb.eval.geom.intersect_3_planes",function(){
 			d2 = (Math.random() - 0.5) * 10000;
 			d3 = (Math.random() - 0.5) * 10000;
 
-			res = verb.eval.geom.intersect_3_planes(n1, d1, n2, d2, n3, d3);
+			res = verb.eval.intersect_3_planes(n1, d1, n2, d2, n3, d3);
 
 			res[0].should.be.approximately( d1, verb.EPSILON );
 			res[1].should.be.approximately( d2, verb.EPSILON );
@@ -4745,14 +4745,14 @@ describe("verb.eval.geom.intersect_3_planes",function(){
 		var d3 = 10;
 		var n3 = [0,0,1];
 
-		var res = verb.eval.geom.intersect_3_planes(n1, d1, n2, d2, n3, d3);
+		var res = verb.eval.intersect_3_planes(n1, d1, n2, d2, n3, d3);
 		should.equal( res, null ); //non-intersect is null
 
 	});
 
 });
 
-describe("verb.eval.geom.intersect_planes",function(){
+describe("verb.eval.intersect_planes",function(){
 
 	it('is correct for intersection of xz and yz planes', function(){
 
@@ -4761,7 +4761,7 @@ describe("verb.eval.geom.intersect_planes",function(){
 		var o2 = [0,0,0];
 		var n2 = [0,1,0];
 
-		var res = verb.eval.geom.intersect_planes(o1, n1, o2, n2);
+		var res = verb.eval.intersect_planes(o1, n1, o2, n2);
 
 		res.origin.should.be.eql( [0,0,0] );
 		res.dir.should.be.eql( [0,0,1] );
@@ -4775,7 +4775,7 @@ describe("verb.eval.geom.intersect_planes",function(){
 		var o2 = [0,0,0];
 		var n2 = [0,1,0];
 
-		var res = verb.eval.geom.intersect_planes(o1, n1, o2, n2);
+		var res = verb.eval.intersect_planes(o1, n1, o2, n2);
 
 		res.origin.should.be.eql( [20,0,0] );
 		res.dir.should.be.eql( [0,0,1] );
@@ -4790,7 +4790,7 @@ describe("verb.eval.geom.intersect_planes",function(){
 		var n2 = [0,1,0];
 
 		// should be z-axis
-		var res = verb.eval.geom.intersect_planes(o1, n1, o2, n2);
+		var res = verb.eval.intersect_planes(o1, n1, o2, n2);
 
 		res.origin.should.be.eql( [0,20,0] );
 		res.dir.should.be.eql( [0,0,1] );
@@ -4799,14 +4799,14 @@ describe("verb.eval.geom.intersect_planes",function(){
 
 });
 
-describe("verb.eval.geom.point_on_ray",function(){
+describe("verb.eval.point_on_ray",function(){
 
 	it('is correct for a basic example', function(){
 
 		var o = [1,2,3];
 		var d = [1,1,1];
 		var u = 2;
-		var res = verb.eval.geom.point_on_ray(o, d, u);
+		var res = verb.eval.point_on_ray(o, d, u);
 
 		res.should.eql( [3, 4, 5] );
 
@@ -4814,7 +4814,7 @@ describe("verb.eval.geom.point_on_ray",function(){
 
 });
 
-describe("verb.eval.geom.clip_ray_in_coplanar_tri",function(){
+describe("verb.eval.clip_ray_in_coplanar_tri",function(){
 
 	it('is correct for a basic example 1', function(){
 
@@ -4825,7 +4825,7 @@ describe("verb.eval.geom.clip_ray_in_coplanar_tri",function(){
 		var tri = [ 0, 1, 2 ];
 		var uvs = [ [0,0], [2,0], [2, 2] ];
 
-		var res = verb.eval.geom.clip_ray_in_coplanar_tri(o, d, pts, tri, uvs );
+		var res = verb.eval.clip_ray_in_coplanar_tri(o, d, pts, tri, uvs );
 
 		res.min.u.should.be.approximately(1, verb.TOLERANCE);
 		res.max.u.should.be.approximately(2, verb.TOLERANCE);
@@ -4847,7 +4847,7 @@ describe("verb.eval.geom.clip_ray_in_coplanar_tri",function(){
 		var tri = [ 0, 1, 2 ];
 		var uvs = [ [0,0], [2,0], [2, 2] ];
 
-		var res = verb.eval.geom.clip_ray_in_coplanar_tri(o, d, pts, tri, uvs );
+		var res = verb.eval.clip_ray_in_coplanar_tri(o, d, pts, tri, uvs );
 
 		res.min.u.should.be.approximately(0.5, verb.TOLERANCE);
 		res.max.u.should.be.approximately(1, verb.TOLERANCE);
@@ -4869,7 +4869,7 @@ describe("verb.eval.geom.clip_ray_in_coplanar_tri",function(){
 		var tri = [ 0, 1, 2 ];
 		var uvs = [ [0,0], [2,0], [2, 2] ];
 
-		var res = verb.eval.geom.clip_ray_in_coplanar_tri(o, d, pts, tri, uvs );
+		var res = verb.eval.clip_ray_in_coplanar_tri(o, d, pts, tri, uvs );
 
 		res.min.u.should.be.approximately(Math.sqrt(2)/2, verb.TOLERANCE);
 		res.max.u.should.be.approximately(3 * Math.sqrt(2)/2, verb.TOLERANCE);
@@ -4891,7 +4891,7 @@ describe("verb.eval.geom.clip_ray_in_coplanar_tri",function(){
 		var tri = [ 0, 1, 2 ];
 		var uvs = [ [0,0], [2,0], [2, 2] ];
 
-		var res = verb.eval.geom.clip_ray_in_coplanar_tri(o, d, pts, tri, uvs );
+		var res = verb.eval.clip_ray_in_coplanar_tri(o, d, pts, tri, uvs );
 
 		res.min.u.should.be.approximately(Math.sqrt(2), verb.TOLERANCE);
 		res.max.u.should.be.approximately(2 * Math.sqrt(2), verb.TOLERANCE);
@@ -4913,7 +4913,7 @@ describe("verb.eval.geom.clip_ray_in_coplanar_tri",function(){
 		var tri = [ 0, 1, 2 ];
 		var uvs = [ [0,0], [2,0], [2, 2] ];
 
-		var res = verb.eval.geom.clip_ray_in_coplanar_tri(o, d, pts, tri, uvs );
+		var res = verb.eval.clip_ray_in_coplanar_tri(o, d, pts, tri, uvs );
 
 		res.min.u.should.be.approximately(0, verb.TOLERANCE);
 		res.max.u.should.be.approximately(Math.sqrt(2), verb.TOLERANCE);
@@ -4935,7 +4935,7 @@ describe("verb.eval.geom.clip_ray_in_coplanar_tri",function(){
 		var tri = [ 0, 1, 2 ];
 		var uvs = [ [0,0], [2,0], [2, 2] ];
 
-		var res = verb.eval.geom.clip_ray_in_coplanar_tri(o, d, pts, tri, uvs );
+		var res = verb.eval.clip_ray_in_coplanar_tri(o, d, pts, tri, uvs );
 
 		res.min.u.should.be.approximately(1, verb.TOLERANCE);
 		res.max.u.should.be.approximately(2, verb.TOLERANCE);
@@ -4950,7 +4950,7 @@ describe("verb.eval.geom.clip_ray_in_coplanar_tri",function(){
 
 });
 
-describe("verb.eval.geom.merge_tri_clip_intervals",function(){
+describe("verb.eval.merge_tri_clip_intervals",function(){
 
 	it('is correct for a basic example', function(){
 
@@ -4961,14 +4961,14 @@ describe("verb.eval.geom.merge_tri_clip_intervals",function(){
 		var tri1 = [ 0, 1, 2 ];
 		var uvs1 = [ [0,0], [2,0], [2, 2] ];
 
-		var clip1 = verb.eval.geom.clip_ray_in_coplanar_tri(o, d, pts1, tri1, uvs1 );
+		var clip1 = verb.eval.clip_ray_in_coplanar_tri(o, d, pts1, tri1, uvs1 );
 
 		var pts2 = [ [1,0.5,-1], [1,2.5,-1], [1,0.5,1] ];
 		var tri2 = [ 0, 1, 2 ];
 		var uvs2 = [ [0,0], [2,0], [0,2] ];
-		var clip2 = verb.eval.geom.clip_ray_in_coplanar_tri(o, d, pts2, tri2, uvs2 );
+		var clip2 = verb.eval.clip_ray_in_coplanar_tri(o, d, pts2, tri2, uvs2 );
 
-		var res = verb.eval.geom.merge_tri_clip_intervals(clip1, clip2, pts1, tri1, uvs1, pts2, tri2, uvs2);
+		var res = verb.eval.merge_tri_clip_intervals(clip1, clip2, pts1, tri1, uvs1, pts2, tri2, uvs2);
 
 		vecShouldBe( [1, 0.5], res.uv1tri1 );
 		vecShouldBe( [0, 1], res.uv1tri2 );
@@ -4989,14 +4989,14 @@ describe("verb.eval.geom.merge_tri_clip_intervals",function(){
 		var tri1 = [ 0, 1, 2 ];
 		var uvs1 = [ [0,0], [2,0], [2, 2] ];
 
-		var clip1 = verb.eval.geom.clip_ray_in_coplanar_tri(o, d, pts1, tri1, uvs1 );
+		var clip1 = verb.eval.clip_ray_in_coplanar_tri(o, d, pts1, tri1, uvs1 );
 
 		var pts2 = [ [2,0,0], [2, 2, 0], [2, 0, 2] ];
 		var tri2 = [ 0, 1, 2 ];
 		var uvs2 = [ [0,0], [2,0], [0,2] ];
-		var clip2 = verb.eval.geom.clip_ray_in_coplanar_tri(o, d, pts2, tri2, uvs2 );
+		var clip2 = verb.eval.clip_ray_in_coplanar_tri(o, d, pts2, tri2, uvs2 );
 
-		var res = verb.eval.geom.merge_tri_clip_intervals(clip1, clip2, pts1, tri1, uvs1, pts2, tri2, uvs2);
+		var res = verb.eval.merge_tri_clip_intervals(clip1, clip2, pts1, tri1, uvs1, pts2, tri2, uvs2);
 
 		vecShouldBe( [2, 0], res.uv1tri1 );
 		vecShouldBe( [0, 0], res.uv1tri2 );
@@ -5010,7 +5010,7 @@ describe("verb.eval.geom.merge_tri_clip_intervals",function(){
 
 });
 
-describe("verb.eval.mesh.lookup_adj_segment",function(){
+describe("verb.eval.lookup_adj_segment",function(){
 
 	it('returns null when only nearest is argument itself', function(){
 
@@ -5024,8 +5024,8 @@ describe("verb.eval.mesh.lookup_adj_segment",function(){
 
 		var end = segs[0][0];
 
-		var tree = verb.eval.mesh.kdtree_from_segs( segs );
-		var nearest = verb.eval.mesh.lookup_adj_segment( end, tree );
+		var tree = verb.eval.kdtree_from_segs( segs );
+		var nearest = verb.eval.lookup_adj_segment( end, tree );
 
 		should.equal( nearest, null );
 
@@ -5043,8 +5043,8 @@ describe("verb.eval.mesh.lookup_adj_segment",function(){
 
 		var end = { pt: [1,2,3], key: "g" }; // same pos, but different object
 
-		var tree = verb.eval.mesh.kdtree_from_segs( segs );
-		var nearest = verb.eval.mesh.lookup_adj_segment( end, tree );
+		var tree = verb.eval.kdtree_from_segs( segs );
+		var nearest = verb.eval.lookup_adj_segment( end, tree );
 
 		nearest.should.be.equal(segs[0][0])
 
@@ -5052,7 +5052,7 @@ describe("verb.eval.mesh.lookup_adj_segment",function(){
 
 });
 
-describe("verb.eval.mesh.make_intersect_polylines ",function(){
+describe("verb.eval.make_intersect_polylines ",function(){
 
 	it('is correct for a basic example', function(){
 		
@@ -5065,7 +5065,7 @@ describe("verb.eval.mesh.make_intersect_polylines ",function(){
 				[ 	{ pt: [5,0,0], key: "e" }, 
 						{ pt: [0,10,0], key: "f" } ] ];
 
-		var pls = verb.eval.mesh.make_intersect_polylines( segs );
+		var pls = verb.eval.make_intersect_polylines( segs );
 
 		// discovers one continuous polyline
 		pls.length.should.be.equal( 1 );
@@ -5079,7 +5079,7 @@ describe("verb.eval.mesh.make_intersect_polylines ",function(){
 
 });
 
-describe("verb.eval.geom.intersect_tris",function(){
+describe("verb.eval.intersect_tris",function(){
 
 	it('is correct for a basic example', function(){
 		
@@ -5091,7 +5091,7 @@ describe("verb.eval.geom.intersect_tris",function(){
 		var tri2 = [ 0, 1, 2 ];
 		var uvs2 = [ [0,0], [2,0], [0,2] ];
 
-		var res = verb.eval.geom.intersect_tris( pts1, tri1, uvs1, pts2, tri2, uvs2 );
+		var res = verb.eval.intersect_tris( pts1, tri1, uvs1, pts2, tri2, uvs2 );
 
 		vecShouldBe( [1, 0.5], res[0].uvtri1 );
 		vecShouldBe( [0, 1], res[0].uvtri2 );
@@ -5113,7 +5113,7 @@ describe("verb.eval.geom.intersect_tris",function(){
 		var tri2 = [ 0, 1, 2 ];
 		var uvs2 = [ [0,0], [2,0], [0,2] ];
 
-		var res = verb.eval.geom.intersect_tris( pts1, tri1, uvs1, pts2, tri2, uvs2 );
+		var res = verb.eval.intersect_tris( pts1, tri1, uvs1, pts2, tri2, uvs2 );
 
 		vecShouldBe( [2,0], res[0].uvtri1 );
 		vecShouldBe( [0,0], res[0].uvtri2 );
@@ -5128,7 +5128,7 @@ describe("verb.eval.geom.intersect_tris",function(){
 
 });
 
-describe("verb.eval.mesh.kdtree_from_segs",function(){
+describe("verb.eval.kdtree_from_segs",function(){
 
 	it('is correct for a basic example', function(){
 
@@ -5141,7 +5141,7 @@ describe("verb.eval.mesh.kdtree_from_segs",function(){
 				[ 	{ pt: [3,2,3] }, 
 						{ pt: [7,6,7] } ] ];
 
-		var tree = verb.eval.mesh.kdtree_from_segs( segs );
+		var tree = verb.eval.kdtree_from_segs( segs );
 
 		tree.should.not.be.null;
 
@@ -5149,7 +5149,7 @@ describe("verb.eval.mesh.kdtree_from_segs",function(){
 
 });
 
-describe("verb.eval.mesh.intersect_meshes_by_aabb",function(){
+describe("verb.eval.intersect_meshes_by_aabb",function(){
 
 	it('is correct for two intersecting triangles', function(){
 		
@@ -5161,7 +5161,7 @@ describe("verb.eval.mesh.intersect_meshes_by_aabb",function(){
 		var tris2 = [[ 0, 1, 2 ]];
 		var uvs2 = [ [0,0], [3,0], [3,3] ];
 
-		var pls = verb.eval.mesh.intersect_meshes_by_aabb( pts1, tris1, uvs1, pts2, tris2, uvs2 );
+		var pls = verb.eval.intersect_meshes_by_aabb( pts1, tris1, uvs1, pts2, tris2, uvs2 );
 
 		pls.length.should.be.equal( 1 );
 		pls[0].length.should.be.equal( 2 );
@@ -5178,7 +5178,7 @@ describe("verb.eval.mesh.intersect_meshes_by_aabb",function(){
 		var tris2 = [[ 0, 1, 2 ]];
 		var uvs2 = [ [0,0], [3,0], [3,3] ];
 
-		var res = verb.eval.mesh.intersect_meshes_by_aabb( pts1, tris1, uvs1, pts2, tris2, uvs2 );
+		var res = verb.eval.intersect_meshes_by_aabb( pts1, tris1, uvs1, pts2, tris2, uvs2 );
 
 		res.length.should.be.equal( 0 );
 
@@ -5194,20 +5194,20 @@ describe("verb.eval.mesh.intersect_meshes_by_aabb",function(){
 			, p3 = [1,1,0]
 			, p4 = [0,1,0];
 
-		var srf1 = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
+		var srf1 = new verb.FourPointSurface( p1, p2, p3, p4 );
 
 		var p5 = [0.5,-0.5,-0.5]
 			, p6 = [0.5,0.5,-0.5]
 			, p7 = [0.5,0.5,0.5]
 			, p8 = [0.5,-0.5,0.5];
 
-		var srf2 = new verb.geom.FourPointSurface( p5, p6, p7, p8 );
+		var srf2 = new verb.FourPointSurface( p5, p6, p7, p8 );
 
 		var opts = { minDivsU: 20, minDivsV: 20 };
 		var tess1 = srf1.tessellate(opts);
 		var tess2 = srf2.tessellate(opts);
 
-		var res = verb.eval.mesh.intersect_meshes_by_aabb( tess1.points, tess1.faces, tess1.uvs, tess2.points, tess2.faces, tess2.uvs );
+		var res = verb.eval.intersect_meshes_by_aabb( tess1.points, tess1.faces, tess1.uvs, tess2.points, tess2.faces, tess2.uvs );
 
 		res.length.should.be.equal( 1 );
 
@@ -5224,7 +5224,7 @@ function getFlatSurface(){
 		, p3 = [1,1,0]
 		, p4 = [0,1,0];
 
-	var srf = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
+	var srf = new verb.FourPointSurface( p1, p2, p3, p4 );
 
 	var srfObj = {
 		degree_u : srf.get('degreeU'),
@@ -5240,11 +5240,11 @@ function getFlatSurface(){
 
 
 
-describe("verb.eval.nurbs.AdaptiveRefinementNode.constructor",function(){
+describe("verb.eval.AdaptiveRefinementNode.constructor",function(){
 
 	it('can be instantiated', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface(),null, "a", "b" );
+		var f = new verb.eval.AdaptiveRefinementNode(getFlatSurface(),null, "a", "b" );
 
 		f.corners[0].uv[0].should.be.equal(0);
 		f.corners[2].uv[0].should.be.equal(1);
@@ -5260,11 +5260,11 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.constructor",function(){
 
 function extractUv(x){ return x.uv; }
 
-describe("verb.eval.nurbs.AdaptiveRefinementNode.getEdgeCorners",function(){
+describe("verb.eval.AdaptiveRefinementNode.getEdgeCorners",function(){
 
 	it('returns expected result for node without children', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
+		var f = new verb.eval.AdaptiveRefinementNode(getFlatSurface());
 
 		f.getEdgeCorners( 0 ).map(extractUv).should.be.eql( [[0,0]] );
 		f.getEdgeCorners( 1 ).map(extractUv).should.be.eql( [[1,0]] );
@@ -5275,7 +5275,7 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.getEdgeCorners",function(){
 
 	it('returns expected result for node with children', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
+		var f = new verb.eval.AdaptiveRefinementNode(getFlatSurface());
 
 		f.divide({ minDepth : 1 });
 		f.children.length.should.be.equal( 2 );
@@ -5290,7 +5290,7 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.getEdgeCorners",function(){
 
 	it('returns expected result for node with nested children', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
+		var f = new verb.eval.AdaptiveRefinementNode(getFlatSurface());
 
 		f.divide({ minDepth : 2 });
 		f.children.length.should.be.equal( 2 );
@@ -5306,11 +5306,11 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.getEdgeCorners",function(){
 
 });
 
-describe("verb.eval.nurbs.AdaptiveRefinementNode.getAllCorners",function(){
+describe("verb.eval.AdaptiveRefinementNode.getAllCorners",function(){
 
 	it('returns expected result for edge with more vertices on opposite side', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
+		var f = new verb.eval.AdaptiveRefinementNode(getFlatSurface());
 
 		f.divide({ minDepth : 1 }); // now f is split in 2 horizontally
 
@@ -5325,7 +5325,7 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.getAllCorners",function(){
 
 	it('returns expected result for edge with neighbors that has with lesser number of vertices on opposite side', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
+		var f = new verb.eval.AdaptiveRefinementNode(getFlatSurface());
 
 		f.divide({ minDepth : 1 });  // now f is split in 2 horizontally
 
@@ -5339,11 +5339,11 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.getAllCorners",function(){
 
 });
 
-describe("verb.eval.nurbs.AdaptiveRefinementNode.divide",function(){
+describe("verb.eval.AdaptiveRefinementNode.divide",function(){
 
 	it('can be called with options.minDepth', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
+		var f = new verb.eval.AdaptiveRefinementNode(getFlatSurface());
 
 		f.divide({ minDepth : 2 });
 		f.children.length.should.be.equal( 2 );
@@ -5354,7 +5354,7 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.divide",function(){
 
 	it('can be called with no options provided', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
+		var f = new verb.eval.AdaptiveRefinementNode(getFlatSurface());
 
 		f.divide();
 
@@ -5365,21 +5365,21 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.divide",function(){
 
 });
 
-describe("verb.eval.nurbs.dist_to_seg",function(){
+describe("verb.eval.dist_to_seg",function(){
 
 	it('works for simple case', function(){
 
-		verb.eval.nurbs.dist_to_seg([-10,0,0], [3,3,0], [2,0,0] ).should.be.equal( 3 );
+		verb.eval.dist_to_seg([-10,0,0], [3,3,0], [2,0,0] ).should.be.equal( 3 );
 
 	});
 
 });
 
-describe("verb.eval.nurbs.AdaptiveRefinementNode.evalSrf",function(){
+describe("verb.eval.AdaptiveRefinementNode.evalSrf",function(){
 
 	it('works as expected', function(){
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode(getFlatSurface());
+		var f = new verb.eval.AdaptiveRefinementNode(getFlatSurface());
 
 		var res = f.evalSrf( 0, 0 );
 
@@ -5400,7 +5400,7 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.evalSrf",function(){
 
 });
 
-describe("verb.eval.nurbs.AdaptiveRefinementNode.triangulate",function(){
+describe("verb.eval.AdaptiveRefinementNode.triangulate",function(){
 
 	function getWarpedSurface(){ 
 
@@ -5411,7 +5411,7 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.triangulate",function(){
 			, p3 = [1,1,1]
 			, p4 = [0,1,0];
 
-		var srf = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
+		var srf = new verb.FourPointSurface( p1, p2, p3, p4 );
 
 		var srfObj = {
 			degree_u : srf.get('degreeU'),
@@ -5429,7 +5429,7 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.triangulate",function(){
 
 		var srf = getFlatSurface();
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
+		var f = new verb.eval.AdaptiveRefinementNode( srf );
 		f.divide();
 		var mesh = f.triangulate();
 
@@ -5444,7 +5444,7 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.triangulate",function(){
 
 		var srf = getWarpedSurface();
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
+		var f = new verb.eval.AdaptiveRefinementNode( srf );
 
 		f.divide();
 		var mesh = f.triangulate();
@@ -5461,7 +5461,7 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.triangulate",function(){
 
 		var srf = getFlatSurface();
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
+		var f = new verb.eval.AdaptiveRefinementNode( srf );
 
 		f.divide({ minDepth: 1 });
 		var mesh = f.triangulate();
@@ -5479,7 +5479,7 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.triangulate",function(){
 
 		var srf = getFlatSurface();
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
+		var f = new verb.eval.AdaptiveRefinementNode( srf );
 
 		f.divide({ minDepth: 1 });
 		f.children[0].divide({ minDepth: 1 });
@@ -5498,7 +5498,7 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.triangulate",function(){
 
 		var srf = getFlatSurface();
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
+		var f = new verb.eval.AdaptiveRefinementNode( srf );
 
 		f.divide({ minDepth: 2 });
 		
@@ -5516,7 +5516,7 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.triangulate",function(){
 
 		var srf = getFlatSurface();
 
-		var f = new verb.eval.nurbs.AdaptiveRefinementNode( srf );
+		var f = new verb.eval.AdaptiveRefinementNode( srf );
 
 		f.divide({ minDepth: 3 });
 		
@@ -5532,7 +5532,7 @@ describe("verb.eval.nurbs.AdaptiveRefinementNode.triangulate",function(){
 
 });
 
-describe("verb.eval.nurbs.tessellate_rational_surface_adaptive",function(){
+describe("verb.eval.tessellate_rational_surface_adaptive",function(){
 
 	function getComplexSurface(){ 
 
@@ -5553,7 +5553,7 @@ describe("verb.eval.nurbs.tessellate_rational_surface_adaptive",function(){
 						[ 1, 1, 1, 1, 1, 1],
 						[ 1, 1, 1, 1, 1, 1] ];
 
-		srf = new verb.geom.NurbsSurface( degree, knots, degree, knots, pts, wts );
+		srf = new verb.NurbsSurface( degree, knots, degree, knots, pts, wts );
 
 		var srfObj = {
 			degree_u : srf.get('degreeU'),
@@ -5570,7 +5570,7 @@ describe("verb.eval.nurbs.tessellate_rational_surface_adaptive",function(){
 
 		var srf = getComplexSurface();
 
-		var mesh = verb.eval.nurbs.tessellate_rational_surface_adaptive( srf.degree_u,
+		var mesh = verb.eval.tessellate_rational_surface_adaptive( srf.degree_u,
 			srf.knots_u,
 			srf.degree_v,
 			srf.knots_v, 
@@ -5585,7 +5585,7 @@ describe("verb.eval.nurbs.tessellate_rational_surface_adaptive",function(){
 	});
 });
 
-describe("verb.eval.nurbs.surface_knot_refine",function(){
+describe("verb.eval.surface_knot_refine",function(){
 
 	var degree = 3
 		, knots_v = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
@@ -5607,7 +5607,7 @@ describe("verb.eval.nurbs.surface_knot_refine",function(){
 			new_knots.push(u);
 		}
 
-		var res = verb.eval.nurbs.surface_knot_refine( degree,
+		var res = verb.eval.surface_knot_refine( degree,
 									knots_u,
 									degree,
 									knots_v, 
@@ -5622,8 +5622,8 @@ describe("verb.eval.nurbs.surface_knot_refine",function(){
 		should.equal(knots_u.length + r, res.knots_u.length);
 		should.equal(control_points.length + r, res.control_points.length);
 
-		var p0 = verb.eval.nurbs.surface_point( degree, knots_u, degree, knots_v, control_points, 0.5, 0.25 );
-		var p1 = verb.eval.nurbs.surface_point( degree, res.knots_u, degree, res.knots_v, res.control_points, 0.5, 0.25);
+		var p0 = verb.eval.surface_point( degree, knots_u, degree, knots_v, control_points, 0.5, 0.25 );
+		var p1 = verb.eval.surface_point( degree, res.knots_u, degree, res.knots_v, res.control_points, 0.5, 0.25);
 
 		p0[0].should.be.approximately(p1[0], verb.TOLERANCE);
 		p0[1].should.be.approximately(p1[1], verb.TOLERANCE);
@@ -5642,7 +5642,7 @@ describe("verb.eval.nurbs.surface_knot_refine",function(){
 			new_knots.push(u);
 		}
 
-		var res = verb.eval.nurbs.surface_knot_refine( degree,
+		var res = verb.eval.surface_knot_refine( degree,
 									knots_u,
 									degree,
 									knots_v, 
@@ -5657,8 +5657,8 @@ describe("verb.eval.nurbs.surface_knot_refine",function(){
 		should.equal(knots_v.length + r, res.knots_v.length);
 		should.equal(control_points[0].length + r, res.control_points[0].length);
 
-		var p0 = verb.eval.nurbs.surface_point( degree, knots_u, degree, knots_v, control_points, 0.5, 0.25 );
-		var p1 = verb.eval.nurbs.surface_point( degree, res.knots_u, degree, res.knots_v, res.control_points, 0.5, 0.25);
+		var p0 = verb.eval.surface_point( degree, knots_u, degree, knots_v, control_points, 0.5, 0.25 );
+		var p1 = verb.eval.surface_point( degree, res.knots_u, degree, res.knots_v, res.control_points, 0.5, 0.25);
 
 		p0[0].should.be.approximately(p1[0], verb.TOLERANCE);
 		p0[1].should.be.approximately(p1[1], verb.TOLERANCE);
@@ -5669,7 +5669,7 @@ describe("verb.eval.nurbs.surface_knot_refine",function(){
 });
 
 
-describe("verb.eval.nurbs.surface_split",function(){
+describe("verb.eval.surface_split",function(){
 
 	var degree = 3
 		, knots_v = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
@@ -5685,7 +5685,7 @@ describe("verb.eval.nurbs.surface_split",function(){
 
 		var u = 0.2;
 
-		var res = verb.eval.nurbs.surface_split( degree,
+		var res = verb.eval.surface_split( degree,
 									knots_u,
 									degree,
 									knots_v, 
@@ -5705,15 +5705,15 @@ describe("verb.eval.nurbs.surface_split",function(){
 		should.exist( res[1].degree_u );
 		should.exist( res[1].degree_v );
 
-		var p0 = verb.eval.nurbs.surface_point( degree, knots_u, degree, knots_v, control_points, 0.1, 0.1 );
-		var p1 = verb.eval.nurbs.surface_point( res[0].degree_u, res[0].knots_u, res[0].degree_v, res[0].knots_v, res[0].control_points, 0.1, 0.1);
+		var p0 = verb.eval.surface_point( degree, knots_u, degree, knots_v, control_points, 0.1, 0.1 );
+		var p1 = verb.eval.surface_point( res[0].degree_u, res[0].knots_u, res[0].degree_v, res[0].knots_v, res[0].control_points, 0.1, 0.1);
 
 		p0[0].should.be.approximately(p1[0], verb.TOLERANCE);
 		p0[1].should.be.approximately(p1[1], verb.TOLERANCE);
 		p0[2].should.be.approximately(p1[2], verb.TOLERANCE);
 
-		p0 = verb.eval.nurbs.surface_point( degree, knots_u, degree, knots_v, control_points, 0.8, 0.8 );
-		p1 = verb.eval.nurbs.surface_point( res[1].degree_u, res[1].knots_u, res[1].degree_v, res[1].knots_v, res[1].control_points, 0.8, 0.8);
+		p0 = verb.eval.surface_point( degree, knots_u, degree, knots_v, control_points, 0.8, 0.8 );
+		p1 = verb.eval.surface_point( res[1].degree_u, res[1].knots_u, res[1].degree_v, res[1].knots_v, res[1].control_points, 0.8, 0.8);
 
 		p0[0].should.be.approximately(p1[0], verb.TOLERANCE);
 		p0[1].should.be.approximately(p1[1], verb.TOLERANCE);
@@ -5726,7 +5726,7 @@ describe("verb.eval.nurbs.surface_split",function(){
 
 		var u = 0.2;
 
-		var res = verb.eval.nurbs.surface_split( degree,
+		var res = verb.eval.surface_split( degree,
 									knots_u,
 									degree,
 									knots_v, 
@@ -5746,15 +5746,15 @@ describe("verb.eval.nurbs.surface_split",function(){
 		should.exist( res[1].degree_u );
 		should.exist( res[1].degree_v );
 
-		var p0 = verb.eval.nurbs.surface_point( degree, knots_u, degree, knots_v, control_points, 0.1, 0.1 );
-		var p1 = verb.eval.nurbs.surface_point( res[0].degree_u, res[0].knots_u, res[0].degree_v, res[0].knots_v, res[0].control_points, 0.1, 0.1);
+		var p0 = verb.eval.surface_point( degree, knots_u, degree, knots_v, control_points, 0.1, 0.1 );
+		var p1 = verb.eval.surface_point( res[0].degree_u, res[0].knots_u, res[0].degree_v, res[0].knots_v, res[0].control_points, 0.1, 0.1);
 
 		p0[0].should.be.approximately(p1[0], verb.TOLERANCE);
 		p0[1].should.be.approximately(p1[1], verb.TOLERANCE);
 		p0[2].should.be.approximately(p1[2], verb.TOLERANCE);
 
-		p0 = verb.eval.nurbs.surface_point( degree, knots_u, degree, knots_v, control_points, 0.8, 0.8 );
-		p1 = verb.eval.nurbs.surface_point( res[1].degree_u, res[1].knots_u, res[1].degree_v, res[1].knots_v, res[1].control_points, 0.8, 0.8);
+		p0 = verb.eval.surface_point( degree, knots_u, degree, knots_v, control_points, 0.8, 0.8 );
+		p1 = verb.eval.surface_point( res[1].degree_u, res[1].knots_u, res[1].degree_v, res[1].knots_v, res[1].control_points, 0.8, 0.8);
 
 		p0[0].should.be.approximately(p1[0], verb.TOLERANCE);
 		p0[1].should.be.approximately(p1[1], verb.TOLERANCE);
@@ -5765,7 +5765,7 @@ describe("verb.eval.nurbs.surface_split",function(){
 
 });
 
-describe("verb.geom.InterpCurve",function(){
+describe("verb.InterpCurve",function(){
 
 	function shouldInterpPointsWithTangents(pts, degree, start_tangent, end_tangent){
 
@@ -5781,7 +5781,7 @@ describe("verb.geom.InterpCurve",function(){
 
 	function shouldInterpPoints(pts, degree, start_tangent, end_tangent){
 
-		var crv = new verb.geom.InterpCurve( pts, degree, start_tangent, end_tangent );
+		var crv = new verb.InterpCurve( pts, degree, start_tangent, end_tangent );
 
 		crv.get('degree').should.be.equal( degree );
 
@@ -5796,7 +5796,7 @@ describe("verb.geom.InterpCurve",function(){
 				var o = tess[i-1];
 				var r = numeric.normalized( numeric.sub( tess[i], tess[i-1] ) );
 
-				var res = verb.eval.geom.closest_point_on_ray( pt, o, r );
+				var res = verb.eval.closest_point_on_ray( pt, o, r );
 				var dist = numeric.norm2( numeric.sub( pts[j], res ) );
 
 				if (dist < min) {
@@ -5828,14 +5828,14 @@ describe("verb.geom.InterpCurve",function(){
 });
 
 
-describe("verb.eval.nurbs.rational_interp_curve",function(){
+describe("verb.eval.rational_interp_curve",function(){
 
 	function shouldInterpPointsWithTangents(pts, degree, start_tangent, end_tangent){
 
 		var crv = shouldInterpPoints(pts, degree, start_tangent, end_tangent);
 
-		var tan0 = verb.eval.nurbs.curve_derivs( crv.degree, crv.knots, crv.control_points, 0, 1)[1];
-		var tan1 = verb.eval.nurbs.curve_derivs( crv.degree, crv.knots, crv.control_points, 1, 1)[1];
+		var tan0 = verb.eval.curve_derivs( crv.degree, crv.knots, crv.control_points, 0, 1)[1];
+		var tan1 = verb.eval.curve_derivs( crv.degree, crv.knots, crv.control_points, 1, 1)[1];
 
 		vecShouldBe( start_tangent, tan0 );
 		vecShouldBe( end_tangent, tan1 );
@@ -5844,7 +5844,7 @@ describe("verb.eval.nurbs.rational_interp_curve",function(){
 
 	function shouldInterpPoints(pts, degree, start_tangent, end_tangent){
 
-		var crv = verb.eval.nurbs.rational_interp_curve( pts, degree, start_tangent, end_tangent );
+		var crv = verb.eval.rational_interp_curve( pts, degree, start_tangent, end_tangent );
 
 		crv.degree.should.be.equal( degree );
 
@@ -5855,8 +5855,8 @@ describe("verb.eval.nurbs.rational_interp_curve",function(){
 		verb.last(crv.control_points)[1].should.be.approximately(verb.last(pts)[1], verb.TOLERANCE);
 
 		// // the internal points are interped (TODO: do this more efficiently)
-		var tess = verb.eval.nurbs.rational_curve_adaptive_sample( crv.degree, crv.knots, 
-			verb.eval.nurbs.homogenize_1d( crv.control_points, crv.weights ), 1e-8  );
+		var tess = verb.eval.rational_curve_adaptive_sample( crv.degree, crv.knots, 
+			verb.eval.homogenize_1d( crv.control_points, crv.weights ), 1e-8  );
 
 		for (var j = 0; j < pts.length; j++){
 
@@ -5867,7 +5867,7 @@ describe("verb.eval.nurbs.rational_interp_curve",function(){
 				var o = tess[i-1];
 				var r = numeric.normalized( numeric.sub( tess[i], tess[i-1] ) );
 
-				var res = verb.eval.geom.closest_point_on_ray( pt, o, r );
+				var res = verb.eval.closest_point_on_ray( pt, o, r );
 				var dist = numeric.norm2( numeric.sub( pts[j], res ) );
 
 				if (dist < min) {
@@ -5949,7 +5949,7 @@ describe("verb.eval.nurbs.rational_interp_curve",function(){
 
 });
 
-describe("verb.eval.nurbs.rational_bezier_curve_arc_length",function(){
+describe("verb.eval.rational_bezier_curve_arc_length",function(){
 
 	it('can compute entire arc length of straight cubic bezier parameterized from 0 to 1', function(){
 
@@ -5957,7 +5957,7 @@ describe("verb.eval.nurbs.rational_bezier_curve_arc_length",function(){
 			, knots = [0,0,0,0,1,1,1,1]
 			, control_points = [ [0,0,0,1], [1.5,0,0,1], [2,0,0,1], [3,0,0,1] ];
 
-		var res = verb.eval.nurbs.rational_bezier_curve_arc_length( degree, knots, control_points, 1 );
+		var res = verb.eval.rational_bezier_curve_arc_length( degree, knots, control_points, 1 );
 
 		res.should.be.approximately( 3, verb.TOLERANCE );
 
@@ -5969,7 +5969,7 @@ describe("verb.eval.nurbs.rational_bezier_curve_arc_length",function(){
 			, knots = [1,1,1,1,4,4,4,4]
 			, control_points = [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1] ];
 
-		var res = verb.eval.nurbs.rational_bezier_curve_arc_length( degree, knots, control_points, 4 );
+		var res = verb.eval.rational_bezier_curve_arc_length( degree, knots, control_points, 4 );
 
 		res.should.be.approximately( 3, verb.TOLERANCE );
 
@@ -5977,7 +5977,7 @@ describe("verb.eval.nurbs.rational_bezier_curve_arc_length",function(){
 
 });
 
-describe("verb.eval.nurbs.rational_curve_arc_length",function(){
+describe("verb.eval.rational_curve_arc_length",function(){
 
 	it('can compute entire arc length of straight nurbs curve parameterized from 0 to 2', function(){
 
@@ -5990,8 +5990,8 @@ describe("verb.eval.nurbs.rational_curve_arc_length",function(){
 		var inc = (verb.last(knots) - knots[0]) / (steps-1);
 		for (var i = 0; i < steps; i++){
 
-			var pt = verb.eval.nurbs.rational_curve_point( degree, knots, control_points, u );
-			var res2 = verb.eval.nurbs.rational_curve_arc_length( degree, knots, control_points, u );
+			var pt = verb.eval.rational_curve_point( degree, knots, control_points, u );
+			var res2 = verb.eval.rational_curve_arc_length( degree, knots, control_points, u );
 
 			res2.should.be.approximately( numeric.norm2( pt ), verb.TOLERANCE );
 
@@ -6006,10 +6006,10 @@ describe("verb.eval.nurbs.rational_curve_arc_length",function(){
 			, knots = [0,0,0,0,0.5,1,1,1,1]
 			, control_points = [ [1,1,1,1], [1.5,0,1,1], [1.8,0,0,1], [2,0.1,5,1], [3.1,0,0,1] ];
 
-		var gaussLen = verb.eval.nurbs.rational_curve_arc_length( degree, knots, control_points );
+		var gaussLen = verb.eval.rational_curve_arc_length( degree, knots, control_points );
 
 		// sample the curve with 10,000 pts
-		var samples = verb.eval.nurbs.rational_curve_regular_sample_range( degree, knots, control_points, 0, 1, 10000 );
+		var samples = verb.eval.rational_curve_regular_sample_range( degree, knots, control_points, 0, 1, 10000 );
 
 		var red = samples.reduce(function(acc, v){
 			return { pt: v, l : acc.l + numeric.norm2( numeric.sub( acc.pt, v ) ) };
@@ -6021,7 +6021,7 @@ describe("verb.eval.nurbs.rational_curve_arc_length",function(){
 
 });
 
-describe("verb.eval.nurbs.rational_curve_arc_length",function(){
+describe("verb.eval.rational_curve_arc_length",function(){
 
 	it('can compute entire arc length of straight nurbs curve parameterized from 0 to 2', function(){
 
@@ -6034,8 +6034,8 @@ describe("verb.eval.nurbs.rational_curve_arc_length",function(){
 		var inc = (verb.last(knots) - knots[0]) / (steps-1);
 		for (var i = 0; i < steps; i++){
 
-			var pt = verb.eval.nurbs.rational_curve_point( degree, knots, control_points, u );
-			var res2 = verb.eval.nurbs.rational_curve_arc_length( degree, knots, control_points, u );
+			var pt = verb.eval.rational_curve_point( degree, knots, control_points, u );
+			var res2 = verb.eval.rational_curve_arc_length( degree, knots, control_points, u );
 
 			res2.should.be.approximately( numeric.norm2( pt ), verb.TOLERANCE );
 
@@ -6046,7 +6046,7 @@ describe("verb.eval.nurbs.rational_curve_arc_length",function(){
 
 });
 
-describe("verb.eval.nurbs.rational_bezier_curve_param_at_arc_length",function(){
+describe("verb.eval.rational_bezier_curve_param_at_arc_length",function(){
 
 	it('can compute parameter at arc length of straight bezier curve', function(){
 
@@ -6061,8 +6061,8 @@ describe("verb.eval.nurbs.rational_bezier_curve_param_at_arc_length",function(){
 
 		for (var i = 0; i < steps; i++){
 
-			var u = verb.eval.nurbs.rational_bezier_curve_param_at_arc_length(degree, knots, control_points, d, tol);
-			var len = verb.eval.nurbs.rational_bezier_curve_arc_length(degree, knots, control_points, u);
+			var u = verb.eval.rational_bezier_curve_param_at_arc_length(degree, knots, control_points, d, tol);
+			var len = verb.eval.rational_bezier_curve_arc_length(degree, knots, control_points, u);
 
 			len.should.be.approximately( d, tol );
 
@@ -6084,8 +6084,8 @@ describe("verb.eval.nurbs.rational_bezier_curve_param_at_arc_length",function(){
 
 		for (var i = 0; i < steps; i++){
 
-			var u = verb.eval.nurbs.rational_bezier_curve_param_at_arc_length(degree, knots, control_points, d, tol);
-			var len = verb.eval.nurbs.rational_bezier_curve_arc_length(degree, knots, control_points, u);
+			var u = verb.eval.rational_bezier_curve_param_at_arc_length(degree, knots, control_points, d, tol);
+			var len = verb.eval.rational_bezier_curve_arc_length(degree, knots, control_points, u);
 
 			len.should.be.approximately( d, tol );
 
@@ -6096,7 +6096,7 @@ describe("verb.eval.nurbs.rational_bezier_curve_param_at_arc_length",function(){
 
 });
 
-describe("verb.eval.nurbs.rational_curve_param_at_arc_length",function(){
+describe("verb.eval.rational_curve_param_at_arc_length",function(){
 
 	it('can compute parameter at arc length of straight NURBS curve', function(){
 
@@ -6109,12 +6109,12 @@ describe("verb.eval.nurbs.rational_curve_param_at_arc_length",function(){
 		var steps = 10;
 		var inc = 4 / (steps-1);
 
-		var u = verb.eval.nurbs.rational_curve_param_at_arc_length(degree, knots, control_points, 2, tol);
+		var u = verb.eval.rational_curve_param_at_arc_length(degree, knots, control_points, 2, tol);
 
 		for (var i = 0; i < steps; i++){
 
-			var u = verb.eval.nurbs.rational_curve_param_at_arc_length(degree, knots, control_points, d, tol);
-			var len = verb.eval.nurbs.rational_curve_arc_length(degree, knots, control_points, u);
+			var u = verb.eval.rational_curve_param_at_arc_length(degree, knots, control_points, d, tol);
+			var len = verb.eval.rational_curve_arc_length(degree, knots, control_points, u);
 
 			len.should.be.approximately( d, tol );
 
@@ -6136,8 +6136,8 @@ describe("verb.eval.nurbs.rational_curve_param_at_arc_length",function(){
 
 		for (var i = 0; i < steps; i++){
 
-			var u = verb.eval.nurbs.rational_curve_param_at_arc_length(degree, knots, control_points, d, tol);
-			var len = verb.eval.nurbs.rational_curve_arc_length(degree, knots, control_points, u);
+			var u = verb.eval.rational_curve_param_at_arc_length(degree, knots, control_points, d, tol);
+			var len = verb.eval.rational_curve_arc_length(degree, knots, control_points, u);
 
 			len.should.be.approximately( d, tol );
 
@@ -6149,7 +6149,7 @@ describe("verb.eval.nurbs.rational_curve_param_at_arc_length",function(){
 });
 
 
-describe("verb.eval.nurbs.rational_curve_divide_curve_by_arc_length",function(){
+describe("verb.eval.rational_curve_divide_curve_by_arc_length",function(){
 
 	it('can divide a straight NURBS curve', function(){
 
@@ -6159,12 +6159,12 @@ describe("verb.eval.nurbs.rational_curve_divide_curve_by_arc_length",function(){
 			, d = 0.5
 			, tol = 1e-3;
 
-		var res = verb.eval.nurbs.rational_curve_divide_curve_by_arc_length(degree, knots, control_points, d);
+		var res = verb.eval.rational_curve_divide_curve_by_arc_length(degree, knots, control_points, d);
 
 		var s = 0;
 		res.forEach(function(u){
 
-			var pt = verb.eval.nurbs.rational_curve_point( degree, knots, control_points, u.u );
+			var pt = verb.eval.rational_curve_point( degree, knots, control_points, u.u );
 			u.len.should.be.approximately( s, tol );
 			s += d;
 
@@ -6174,7 +6174,7 @@ describe("verb.eval.nurbs.rational_curve_divide_curve_by_arc_length",function(){
 
 });
 
-describe("verb.eval.nurbs.rational_curve_divide_curve_equally_by_arc_length",function(){
+describe("verb.eval.rational_curve_divide_curve_equally_by_arc_length",function(){
 
 	it('can divide a straight NURBS curve', function(){
 
@@ -6185,12 +6185,12 @@ describe("verb.eval.nurbs.rational_curve_divide_curve_equally_by_arc_length",fun
 			, tol = 1e-3
 			, d = 4 / divs;
 
-		var res = verb.eval.nurbs.rational_curve_divide_curve_equally_by_arc_length(degree, knots, control_points, divs );
+		var res = verb.eval.rational_curve_divide_curve_equally_by_arc_length(degree, knots, control_points, divs );
 
 		var s = 0;
 		res.forEach(function(u){
 
-			var pt = verb.eval.nurbs.rational_curve_point( degree, knots, control_points, u.u );
+			var pt = verb.eval.rational_curve_point( degree, knots, control_points, u.u );
 			u.len.should.be.approximately( s, tol );
 			s += d;
 
@@ -6212,7 +6212,7 @@ describe("NurbsCurve.lengthAtParam",function(){
 			, pt = [1,0.2,0.1];
 
 
-		var crv = new verb.geom.NurbsCurve( degree, control_points, weights, knots );
+		var crv = new verb.NurbsCurve( degree, control_points, weights, knots );
 		var res = crv.lengthAtParam( 1 );
 
 		res.should.be.approximately(4, 1e-3 )
@@ -6232,7 +6232,7 @@ describe("NurbsCurve.paramAtLength",function(){
 			, weights = [ 1, 1, 1, 1, 1 ]
 			, pt = [1,0.2,0];
 
-		var crv = new verb.geom.NurbsCurve( degree, control_points, weights, knots );
+		var crv = new verb.NurbsCurve( degree, control_points, weights, knots );
 		var res = crv.paramAtLength( 2 );
 
 		var p = crv.point( res );
@@ -6254,7 +6254,7 @@ describe("NurbsCurve.divideByEqualArcLength",function(){
 			, divs = 10
 			, d = 4 / divs;
 
-		var crv = new verb.geom.NurbsCurve( degree, control_points, weights, knots );
+		var crv = new verb.NurbsCurve( degree, control_points, weights, knots );
 		var res = crv.divideByEqualArcLength( divs );
 
 		var s = 0;
@@ -6283,7 +6283,7 @@ describe("NurbsCurve.divideByEqualArcLength",function(){
 			, divs = 10
 			, d = 4 / divs;
 
-		var crv = new verb.geom.NurbsCurve( degree, control_points, weights, knots );
+		var crv = new verb.NurbsCurve( degree, control_points, weights, knots );
 		var res = crv.divideByEqualArcLength( divs );
 
 		var s = 0;
@@ -6312,7 +6312,7 @@ describe("NurbsCurve.divideByArcLength",function(){
 			, divs = 10
 			, d = 4 / divs;
 
-		var crv = new verb.geom.NurbsCurve( degree, control_points, weights, knots );
+		var crv = new verb.NurbsCurve( degree, control_points, weights, knots );
 		var res = crv.divideByArcLength( d );
 
 		var s = 0;
@@ -6331,7 +6331,7 @@ describe("NurbsCurve.divideByArcLength",function(){
 });
 
 
-describe("verb.eval.nurbs.rational_curve_closest_point",function(){
+describe("verb.eval.rational_curve_closest_point",function(){
 
 	it('can get closest point to a straight curve', function(){
 
@@ -6340,25 +6340,25 @@ describe("verb.eval.nurbs.rational_curve_closest_point",function(){
 			, control_points = [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1], [4,0,0,1] ]
 			, pt = [1,0.2,0];
 
-		var res = verb.eval.nurbs.rational_curve_closest_point(degree, knots, control_points, [1,0.2,0] );
-		var p = verb.eval.nurbs.rational_curve_point( degree, knots, control_points, res );
+		var res = verb.eval.rational_curve_closest_point(degree, knots, control_points, [1,0.2,0] );
+		var p = verb.eval.rational_curve_point( degree, knots, control_points, res );
 
 		vecShouldBe( [1,0,0], p, 1e-3 );
 
-		res = verb.eval.nurbs.rational_curve_closest_point(degree, knots, control_points, [2,0.2,0] );
-		p = verb.eval.nurbs.rational_curve_point( degree, knots, control_points, res );
+		res = verb.eval.rational_curve_closest_point(degree, knots, control_points, [2,0.2,0] );
+		p = verb.eval.rational_curve_point( degree, knots, control_points, res );
 
 		vecShouldBe( [2,0,0], p, 1e-3 );
 
 		// before start
-		res = verb.eval.nurbs.rational_curve_closest_point(degree, knots, control_points, [-1,0.2,1] );
-		p = verb.eval.nurbs.rational_curve_point( degree, knots, control_points, res );
+		res = verb.eval.rational_curve_closest_point(degree, knots, control_points, [-1,0.2,1] );
+		p = verb.eval.rational_curve_point( degree, knots, control_points, res );
 
 		vecShouldBe( [0,0,0], p, 1e-3 );
 
 		// beyond end
-		res = verb.eval.nurbs.rational_curve_closest_point(degree, knots, control_points, [5,0.2,0] );
-		p = verb.eval.nurbs.rational_curve_point( degree, knots, control_points, res );
+		res = verb.eval.rational_curve_closest_point(degree, knots, control_points, [5,0.2,0] );
+		p = verb.eval.rational_curve_point( degree, knots, control_points, res );
 
 		vecShouldBe( [4,0,0], p, 1e-3 );
 
@@ -6377,7 +6377,7 @@ describe("NurbsCurve.closestPoint",function(){
 			, pt = [1,0,0];
 
 
-		var crv = new verb.geom.NurbsCurve( degree, control_points, weights, knots );
+		var crv = new verb.NurbsCurve( degree, control_points, weights, knots );
 		var res = crv.closestPoint(pt);
 
 		var p = crv.point( res );
@@ -6395,7 +6395,7 @@ describe("NurbsCurve.closestPoint",function(){
 			, pt = [1,1,0];
 
 
-		var crv = new verb.geom.NurbsCurve( degree, control_points, weights, knots );
+		var crv = new verb.NurbsCurve( degree, control_points, weights, knots );
 		var res = crv.closestPoint(pt);
 
 		var p = crv.point( res );
@@ -6407,7 +6407,7 @@ describe("NurbsCurve.closestPoint",function(){
 });
 
 
-describe("verb.eval.nurbs.rational_surface_closest_point",function(){
+describe("verb.eval.rational_surface_closest_point",function(){
 
 	it('can get closest point to flat bezier patch', function(){
 
@@ -6421,10 +6421,10 @@ describe("verb.eval.nurbs.rational_surface_closest_point",function(){
 														[ [0, -30, 0, 1], 	[10, -30, 0, 1], 	[20, -30, 0, 1], 	[30, -30, 0, 1] 	] ]
 			, point = [12,-20,5];
 
-		var res = verb.eval.nurbs.rational_surface_closest_point( degree_u, knots_u, degree_v, knots_v, 
+		var res = verb.eval.rational_surface_closest_point( degree_u, knots_u, degree_v, knots_v, 
 			control_points, point );
 
-		var p = verb.eval.nurbs.rational_surface_point( degree_u, knots_u, degree_v, knots_v, 
+		var p = verb.eval.rational_surface_point( degree_u, knots_u, degree_v, knots_v, 
 			control_points, res[0], res[1] );
 
 		vecShouldBe( [12,-20,0], p, 1e-3 );

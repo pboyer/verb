@@ -63,16 +63,16 @@
 				For curves, these include lines, cicles, arcs, polylines, and ellipses.  
 			</p>
 
-			<div class="viewer" id="0"><b>Extrusion</b><pre>new verb.geom.Extrusion( profile, axis, distance);</pre></div>
-			<div class="viewer" id="1"><b>RevolveSurface</b><pre>new verb.geom.RevolveSurface( profile );</pre></div>
-			<div class="viewer" id="2"><b>BezierCurve</b><pre>new verb.geom.BezierCurve( points );</pre></div>
+			<div class="viewer" id="0"><b>Extrusion</b><pre>new verb.Extrusion( profile, axis, distance);</pre></div>
+			<div class="viewer" id="1"><b>RevolveSurface</b><pre>new verb.RevolveSurface( profile );</pre></div>
+			<div class="viewer" id="2"><b>BezierCurve</b><pre>new verb.BezierCurve( points );</pre></div>
 			
 
 			<h4>Evaluation</h4>
 
 			<p> verb supplies methods for evaluation of points and arbitrary derivatives on NURBS curves and surfaces.</p>
 
-			<pre>var curve = new verb.geom.BezierCurve( [p1, p2, p3, p4] );
+			<pre>var curve = new verb.BezierCurve( [p1, p2, p3, p4] );
 
 var numDerivs = 1
 	, u = 0.5;
@@ -88,7 +88,7 @@ var derivs = curve.derivatives( u, numDerivs );</pre>
 			<p>A NURBS curve or surface is an analytical function.  In order to visualize it, it must be "tessellated" into a collection of lines or triangles.  verb supplies naive and adaptive tessellation routines for curves and surfaces at arbitrary tolerance.</p>
 
 			<pre>
-var surface = new verb.geom.NurbsSurface(  );
+var surface = new verb.NurbsSurface(  );
 
 surface.tessellate( tessellationOptions, function(tessellation){
 	...
@@ -103,8 +103,8 @@ surface.tessellate( tessellationOptions, function(tessellation){
 			<p> <strong> Intersecting a curve and surface </strong> </p>
 
 				<pre>
-var srf = new verb.geom.PlanarSurface( base, uaxis, vaxis, ulength, vlength );
-var crv = new verb.geom.BezierCurve( [ [5.2,5.2,5], [5.4,4.8,0], [5.2,5.2,-5] ] );
+var srf = new verb.PlanarSurface( base, uaxis, vaxis, ulength, vlength );
+var crv = new verb.BezierCurve( [ [5.2,5.2,5], [5.4,4.8,0], [5.2,5.2,-5] ] );
 var options = { tolerance: 1e-5 };
 
 var res = verb.intersect.curveSurface( crv, srf, options );</pre>
@@ -121,7 +121,7 @@ var res = verb.intersect.curveSurface( crv, srf, options );</pre>
 				verb's core geometry library can be called either asynchronously or synchronously.  This allows verb to be extended for multi-threading and remote evaluation.  
 			</p>
 
-			<pre>var curve = new verb.geom.BezierCurve( [p1, p2, p3, p4] );
+			<pre>var curve = new verb.BezierCurve( [p1, p2, p3, p4] );
 
 // tessellate the curve synchronously with default options
 var pointsSync = curve.tessellate();
@@ -170,7 +170,7 @@ engine.eval('rational_curve_derivs', [degree, control_points, weights, knots, u,
 				</p>
 
 				<pre>
-var l = new verb.geom.BezierCurve( [p1, p2, p3, p4] );
+var l = new verb.BezierCurve( [p1, p2, p3, p4] );
 
 var watcherId = l.watch('controlPoints', function(changeData) {
 	l.tessellate(function(tessellation){

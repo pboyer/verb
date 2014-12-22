@@ -5,9 +5,9 @@
 // **params**
 // + *Array*, Array of length-3 arrays representing the points
 //
-verb.geom.PolyLine = function( points ) {
+verb.PolyLine = function( points ) {
 
-	verb.geom.NurbsCurve.call(this);
+	verb.NurbsCurve.call(this);
 
 	this.setAll( {
 		"control_points": points ? points.slice(0) : []
@@ -15,12 +15,12 @@ verb.geom.PolyLine = function( points ) {
 
 	this.update();
 
-}.inherits(verb.geom.NurbsCurve);
+}.inherits(verb.NurbsCurve);
 
 // #### nurbsRep()
 //
 // Construct the Nurbs representation
-verb.geom.PolyLine.prototype.nurbsRep = function(){
+verb.PolyLine.prototype.nurbsRep = function(){
 
 	return this.nurbsEngine.eval( 'get_polyline_curve', [ this.get("control_points") ]);
 
