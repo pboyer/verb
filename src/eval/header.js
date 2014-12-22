@@ -11,10 +11,6 @@ else // node.js context
 
 var verb = verb || {};
 verb.eval = verb.eval || {};
-verb.eval = verb.eval || {};
-verb.eval = verb.eval || {};
-verb.eval = verb.eval || {};
-verb = verb || {};
 verb.EPSILON = 1e-8;
 verb.TOLERANCE = 1e-3;
 

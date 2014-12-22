@@ -18,10 +18,6 @@ if ( typeof exports != 'object' || exports === undefined )
 verb = verb || {};
 verb.core = verb.core || {};
 verb.eval = verb.eval || {};
-verb.intersect = verb.intersect || {};
-verb.eval = verb.eval || {};
-verb.eval = verb.eval || {};
-verb.eval = verb.eval || {};
 
 // ####verb.EPSILON
 //
@@ -2724,14 +2720,14 @@ verb.SweepOneRail.prototype.nurbsRep = function(){
 										  this.get("rail").get("weights")] );
 
 };
-verb.intersect.curveCurve = function( curve1, curve2, callback ){
+verb.intersectCurves = function( curve1, curve2, callback ){
 
 	return verb.nurbsEngine.eval( 'intersect_rational_curves_by_aabb_refine', 
 							[ 	curve1.get('degree'), curve1.get('knots'), curve1.homogenize(), 
 							curve2.get('degree'), curve2.get('knots'), 
 							curve2.homogenize(), verb.TOLERANCE, verb.TOLERANCE ], callback );
 }
-verb.intersect.curveSurface = function( curve, surface, options, callback ){
+verb.intersectCurveSurface = function( curve, surface, options, callback ){
 
 	options = options || { tolerance: verb.TOLERANCE, sampleTolerance: verb.TOLERANCE, uDivs: 20, vDivs: 20 };
 

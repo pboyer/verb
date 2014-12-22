@@ -1,4 +1,4 @@
-verb.intersect.curveSurface = function( curve, surface, options, callback ){
+verb.intersectCurveSurface = function( curve, surface, options, callback ){
 
 	options = options || { tolerance: verb.TOLERANCE, sampleTolerance: verb.TOLERANCE, uDivs: 20, vDivs: 20 };
 

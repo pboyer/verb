@@ -3715,7 +3715,7 @@ describe("verb.eval.intersect_rational_curves_by_aabb_refine",function(){
 
 });
 
-describe("verb.intersect.curveCurve",function(){
+describe("verb.intersectCurves",function(){
 
 	it('gives valid result for 2 planar degree 2 beziers', function(){
 
@@ -3738,7 +3738,7 @@ describe("verb.intersect.curveCurve",function(){
 		var curve2 = new verb.BezierCurve( [c1, c2, c3, c4] );
 
 		// make sync work
-		var res = verb.intersect.curveCurve( curve1, curve2 );
+		var res = verb.intersectCurves( curve1, curve2 );
 
 		res.length.should.be.equal(2);
 		res[0].length.should.be.equal(3);
@@ -4042,7 +4042,7 @@ describe("verb.eval.intersect_rational_curve_surface_by_aabb_refine",function(){
 
 });
 
-describe("verb.intersect.curveSurface",function(){
+describe("verb.intersectCurveSurface",function(){
 
 	it('gives valid result for planar surface and degree 2 bezier', function(){
 
@@ -4064,7 +4064,7 @@ describe("verb.intersect.curveSurface",function(){
 			vDivs: 15
 		};
 
-		var res = verb.intersect.curveSurface( crv, srf, options );
+		var res = verb.intersectCurveSurface( crv, srf, options );
 
 		res.length.should.be.equal( 1 );
 		res[0].p.should.be.approximately(0.5, verb.TOLERANCE);
