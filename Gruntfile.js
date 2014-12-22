@@ -60,6 +60,12 @@ module.exports = function(grunt) {
       }
     },
 
+    haxe: {
+        hxml_example: {
+            hxml: 'build.hxml'
+        }
+    },
+
     // docs
     docco: {
       debug: {
@@ -72,6 +78,7 @@ module.exports = function(grunt) {
 
   });
 
+  grunt.loadNpmTasks('grunt-haxe');
   grunt.loadNpmTasks('grunt-mocha-test');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-concat');
