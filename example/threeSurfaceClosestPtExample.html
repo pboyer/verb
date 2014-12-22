@@ -67,6 +67,17 @@
 							[ 1, 1, 1, 1, 1, 1] ];
 
 			return new verb.geom.NurbsSurface( degree, knots, degree, knots, pts, wts );
+
+
+			var axis = [-1,0,0]
+				, xaxis = [0,0,1]
+				, base = [8,0,0]
+				, height = 20
+				, radius = 2;
+
+			return new verb.geom.Cylinder( axis, xaxis, base, height, radius );
+
+			return new verb.geom.NurbsSurface( degree, knots, degree, knots, pts, wts );
 		}
 
 		var srf = getWarpedPlane();
@@ -74,12 +85,12 @@
 		var lineMat = new THREE.LineBasicMaterial();
 
 		var w = 0;
-		var c = 5;
-		for (var i = 2; i < 3; i++){
-			for (var j = 0; j < 1; j++){
-				// for (var k = 0; k < c; k++){
+		var c = 20;
+		// var i = 15, j = 16;
+		for (var i = 0; i < c; i++){
+			for (var j = 0; j < c; j++){
 
-					var p0 = [100 * i / (c-1) - 25, -100 + 25, 10 ];
+					var p0 = [60 * i / (c-1) - 10, -60 * j / (c-1) + 10, 7 ];
 
 					var uv = srf.closestPoint( p0 );
 					var p = srf.point( uv[0], uv[1] );
@@ -88,7 +99,6 @@
 
 					scene.add( l );
 					w++;
-				// }
 			}
 		}
 

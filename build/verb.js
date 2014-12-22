@@ -5210,7 +5210,7 @@ verb.eval.nurbs.rational_surface_closest_point = function( degree_u, knots_u, de
 	//  4)  if |(u* - u)C'(u)| < e1, halt
 	//
 	
-	var maxits = 10;
+	var maxits = 5;
 	var i = 0
 		, e
 		, eps1 = 0.0001
@@ -5220,16 +5220,17 @@ verb.eval.nurbs.rational_surface_closest_point = function( degree_u, knots_u, de
 		, maxu = verb.last(knots_u)
 		, minv = knots_v[0]
 		, maxv = verb.last(knots_v)
-		, closedu = false // TODO
-		, closedv = false // TODO
-		// TODO , closed = numeric.norm2Squared( numeric.sub(control_points[0], verb.last( control_points) ) ) < verb.EPSILON
+		, closedu = homo_control_points[0].reduce(function(acc,x,i){ return acc && numeric.norm2Squared( numeric.sub(x, verb.last(homo_control_points)[i] ) ) < verb.EPSILON; })
+		, transposed = numeric.transpose( homo_control_points )
+		, closedv = transposed[0].reduce(function(acc, x,i){ return acc && numeric.norm2Squared( numeric.sub(x, verb.last(transposed)[i] ) ) < verb.EPSILON; })
 		, cuv;
+
+	// console.log(closedu, closedv)
+
 
 	// approximate closest point with tessellation
 	var tess = verb.eval.nurbs.tessellate_rational_surface_adaptive( degree_u, knots_u, degree_v, knots_v, 
-		homo_control_points, { normTol: 1e-1 } );
-
-// console.log(tess)
+		homo_control_points, { normTol: 5e-2 } );
 
 	var dmin = Number.MAX_VALUE;
 	tess.points.forEach(function(x,i){
@@ -5243,8 +5244,12 @@ verb.eval.nurbs.rational_surface_closest_point = function( degree_u, knots_u, de
 
 	});
 
+	// console.log(dmin)
+
 	function f(uv){
-		return verb.eval.nurbs.rational_surface_derivs( degree_u, knots_u, degree_v, knots_v, homo_control_points, 2, uv[0], uv[1] );
+		var d = verb.eval.nurbs.rational_surface_derivs( degree_u, knots_u, degree_v, knots_v, homo_control_points, 2, uv[0], uv[1] );
+		// console.log(d);
+		return d;
 	}
 
 	function n(uv, e, r){
@@ -5281,6 +5286,7 @@ verb.eval.nurbs.rational_surface_closest_point = function( degree_u, knots_u, de
 		//
 
 		var d = numeric.solve( J, k );
+
 		return numeric.add( d, uv );
 
 	}
@@ -5290,6 +5296,9 @@ verb.eval.nurbs.rational_surface_closest_point = function( degree_u, knots_u, de
 		e = f(cuv);
 		dif = numeric.sub(e[0][0], p );
 	
+		// console.log('dist', numeric.norm2Squared(dif))
+		// console.log('uv', cuv)
+
 		//  point coincidence
 		//
 		//		|S(u,v) - p| < e1
@@ -5327,32 +5336,26 @@ verb.eval.nurbs.rational_surface_closest_point = function( degree_u, knots_u, de
 		// otherwise, take a step
 		var ct = n(cuv, e, dif);
 
-		console.log('ct', ct)
+		// console.log('ct prop', ct)
 
 		// correct for exceeding bounds
 		if ( ct[0] < minu ){
-			ct = [ minu, ct[1] ];
-			// ct = closedu ? [ maxu - ( ct[0] - minu ), ct[1] ] : [ minu, ct[1] ];
+			ct = closedu ? [ maxu - ( ct[0] - minu ), ct[1] ] : [ minu + verb.EPSILON, ct[1] ];
 		} else if (ct[0] > maxu){
-			ct = [ maxu, ct[1] ];
-			// ct = closedu ? [ minu + ( ct[0] - maxu ), ct[1] ] : [ maxu, ct[1] ];
+			ct = closedu ? [ minu + ( ct[0] - maxu ), ct[1] ] : [ maxu - verb.EPSILON, ct[1] ];
 		}
 
 		if ( ct[1] < minv ){
-			ct = [ ct[0], minv ];
-			// ct = closedv ? [ ct[0], maxv - ( ct[1] - minv ) ] : [ ct[0], minv ];
+			ct = closedv ? [ ct[0], maxv - ( ct[1] - minv ) ] : [ ct[0], minv + verb.EPSILON ];
 		} else if (ct[1] > maxv){
-			ct = [ ct[0], maxv ];
-			// ct = closedv ? [ ct[0], minv + ( ct[0] - maxv ) ] : [ ct[0], maxv ];
+			ct = closedv ? [ ct[0], minv + ( ct[0] - maxv ) ] : [ ct[0], maxv - verb.EPSILON ];
 		}
-
-		console.log('corrected ct', ct)
 
 		// if |(u* - u) C'(u)| < e1, halt
 		var c3v0 =  numeric.norm2( numeric.mul(ct[0] - cuv[0], e[1][0] ) );
 		var c3v1 =  numeric.norm2( numeric.mul(ct[1] - cuv[1], e[0][1] ) );
 
-		if (c3v0 < eps1 && c3v1 < eps1) {
+		if (c3v0 + c3v1 < eps1) {
 			return cuv;
 		}
 
@@ -5361,7 +5364,6 @@ verb.eval.nurbs.rational_surface_closest_point = function( degree_u, knots_u, de
 
 	}
 
-	console.log('fail')
 	return cuv;
 
 }
@@ -5484,7 +5486,7 @@ verb.eval.nurbs.rational_curve_closest_point = function( degree, knots, control_
 		}
 
 		// will our next step force us out of the curve?
-		var c3v = numeric.norm2( numeric.mul(ct - cu, e[1] ) ) 
+		var c3v = numeric.norm2( numeric.mul(ct - cu, e[1] ) );
 		if (c3v < eps1) {
 			return cu;
 		}
