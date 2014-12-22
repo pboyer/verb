@@ -16,7 +16,7 @@ else // node.js context
 }
 
 verb = {};
-verb.intersect = verb.intersect || {};
+verb = verb || {};
 verb.core = {};
 verb.eval = {};
 
@@ -1443,7 +1443,7 @@ verb.SweepOneRail.prototype.nurbsRep = function(){
 
 
 
-verb.intersect.curveCurve = function( curve1, curve2, callback ){
+verb.intersectCurves = function( curve1, curve2, callback ){
 
 	if (curve1 instanceof verb.NurbsCurve && curve2 instanceof verb.NurbsCurve ){
 

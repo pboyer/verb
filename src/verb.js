@@ -18,10 +18,6 @@ if ( typeof exports != 'object' || exports === undefined )
 verb = verb || {};
 verb.core = verb.core || {};
 verb.eval = verb.eval || {};
-verb.intersect = verb.intersect || {};
-verb.eval = verb.eval || {};
-verb.eval = verb.eval || {};
-verb.eval = verb.eval || {};
 
 // ####verb.EPSILON
 //
