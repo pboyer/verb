@@ -1,3 +1,4 @@
--main src/exp/HelloWorld
- 
--js build/haxe.js
+-main Init
+-cp src/eval_hx
+-js build/verbEvalHaxe.js
+-dce std

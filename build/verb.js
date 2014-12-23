@@ -16,7 +16,7 @@ if ( typeof exports != 'object' || exports === undefined )
 
 // Initialize the verb namespace objects
 verb = verb || {};
-verb.core = verb.core || {};
+verb = verb || {};
 verb.eval = verb.eval || {};
 
 // ####verb.EPSILON
@@ -35,7 +35,7 @@ verb.TOLERANCE = 1e-6;
 // Start a default Engine
 //
 verb.init = function() {
-	verb.nurbsEngine = new verb.core.Engine( verb.eval );
+	verb.nurbsEngine = new verb.Engine( verb.eval );
 	verb.NurbsGeometry.prototype.nurbsEngine = verb.nurbsEngine;
 }
 

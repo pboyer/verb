@@ -1815,7 +1815,7 @@ describe("WatchObject",function(){
 
 	it('can be created by its constructor', function(){
 
-		var wo = new verb.core.WatchObject();
+		var wo = new verb.WatchObject();
 		should.exist(wo);
 
 	});
@@ -1841,7 +1841,7 @@ describe("verb.init",function(){
 
 		verb.init();
 
-		verb.NurbsGeometry.prototype.nurbsEngine.should.be.instanceof(verb.core.Engine);
+		verb.NurbsGeometry.prototype.nurbsEngine.should.be.instanceof(verb.Engine);
 
 	});
 

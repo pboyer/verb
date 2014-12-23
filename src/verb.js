@@ -16,7 +16,6 @@ if ( typeof exports != 'object' || exports === undefined )
 
 // Initialize the verb namespace objects
 verb = verb || {};
-verb.core = verb.core || {};
 verb.eval = verb.eval || {};
 
 // ####verb.EPSILON
@@ -35,16 +34,9 @@ verb.TOLERANCE = 1e-6;
 // Start a default Engine
 //
 verb.init = function() {
-	verb.nurbsEngine = new verb.core.Engine( verb.eval );
+	verb.nurbsEngine = new verb.Engine( verb.eval );
 	verb.NurbsGeometry.prototype.nurbsEngine = verb.nurbsEngine;
 }
-
-// ####Douglas Crockford's "method"
-//
-Function.prototype.method = function (name, func) {
-    this.prototype[name] = func;
-    return this;
-};
 
 // ####Douglas Crockford's "inherits"
 //

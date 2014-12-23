@@ -61,7 +61,7 @@ module.exports = function(grunt) {
     },
 
     haxe: {
-        hxml_example: {
+        hxml: {
             hxml: 'build.hxml'
         }
     },
