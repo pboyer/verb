@@ -5,7 +5,7 @@
 // **returns**
 // + *Number*, The id
 
-verb.core.uid = (function(){
+verb.uid = (function(){
 	var id = 0;
 	return function() {
 		return id++;

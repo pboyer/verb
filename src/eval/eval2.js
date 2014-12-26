@@ -9,7 +9,7 @@ public static function surface_split( degree_u, knots_u, degree_v, knots_v, cont
 
 	if (dir === 0){
 
-		control_points = numeric.transpose( control_points );
+		control_points = Vec.transpose( control_points );
 		knots = knots_u;
 		degree = degree_u;
 
@@ -47,8 +47,8 @@ public static function surface_split( degree_u, knots_u, degree_v, knots_v, cont
 
 	if (dir === 0){
 
-		newpts0 = numeric.transpose( newpts0 );
-		newpts1 = numeric.transpose( newpts1 );
+		newpts0 = Vec.transpose( newpts0 );
+		newpts1 = Vec.transpose( newpts1 );
 
 		return [
 			{ degree_u: degree,
@@ -107,7 +107,7 @@ public static function surface_knot_refine =  function( degree_u, knots_u, degre
 	// u dir
 	if (dir === 0){
 
-		ctrlPts = numeric.transpose( control_points );
+		ctrlPts = Vec.transpose( control_points );
 		knots = knots_u;
 		degree = degree_u;
 
@@ -133,7 +133,7 @@ public static function surface_knot_refine =  function( degree_u, knots_u, degre
 	// u dir
 	if (dir === 0){
 
-		newPts = numeric.transpose( newPts );
+		newPts = Vec.transpose( newPts );
 
 		return {
 			knots_u: newknots,
@@ -191,7 +191,7 @@ public static function curve_bezier_decompose( degree, knots, control_points ) {
 	for (var i = 0; i < mults.length; i++){
 		if ( mults[i][1] < reqMult ){
 
-			var knotsInsert = numeric.rep( [ reqMult - mults[i][1] ], mults[i][0] );
+			var knotsInsert = Vec.rep( [ reqMult - mults[i][1] ], mults[i][0] );
 			var res = refine( degree, knots, control_points, knotsInsert );
 
 			knots = res.knots;
@@ -361,9 +361,9 @@ public static function curve_knot_refine( degree, knots, control_points, knots_t
 			} else {
 				alfa = alfa / (knots_post[k+l] - knots[i-degree+l]);
 				control_points_post[ind-1] =
-									numeric.add(
-										numeric.mul( alfa, control_points_post[ind-1] ),
-										numeric.mul( (1.0 - alfa), control_points_post[ind])
+									Vec.add(
+										Vec.mul( alfa, control_points_post[ind-1] ),
+										Vec.mul( (1.0 - alfa), control_points_post[ind])
 									);
 			}
 
@@ -464,9 +464,9 @@ public static function curve_knot_insert( degree, knots, control_points, u, r ) 
 			alpha = ( u - knots[L+i] ) / ( knots[i+k+1] - knots[L+i] );
 
 			control_points_temp[i] =
-				numeric.add(
-					numeric.mul( alpha, control_points_temp[i+1] ),
-					numeric.mul( (1.0 - alpha), control_points_temp[i])
+				Vec.add(
+					Vec.mul( alpha, control_points_temp[i+1] ),
+					Vec.mul( (1.0 - alpha), control_points_temp[i])
 				);
 
 
@@ -554,14 +554,14 @@ public static function rational_surface_curvature( degree_u, knots_u, degree_v, 
   var dvv = derivs[2][0];
   var duv = derivs[1][1];
 
-  var n = numeric.cross( du, dv );
-  var L = numeric.dot( duu, n );
-  var M = numeric.dot( duv, n );
-  var N = numeric.dot( dvv, n );
+  var n = Vec.cross( du, dv );
+  var L = Vec.dot( duu, n );
+  var M = Vec.dot( duv, n );
+  var N = Vec.dot( dvv, n );
 
   var shapeOperator = [ [ L, M ], [ M, N ] ];
 
-	var eigs = numeric.eig( shapeOperator );
+	var eigs = Vec.eig( shapeOperator );
 
 	// contains: lambda - x
 	// 			     E - x
@@ -570,8 +570,8 @@ public static function rational_surface_curvature( degree_u, knots_u, degree_v, 
 	var k2 = eigs.lambda.x[1];
 	var mean = 0.5 * ( k1 + k2 );
 	var gaussian = k1 * k2;
-	var p1 = numeric.add( numeric.mul( eigs.E.x[0][0], du ), numeric.mul( eigs.E.x[0][1], dv ) );
-	var p2 = numeric.add( numeric.mul( eigs.E.x[1][0], du ), numeric.mul( eigs.E.x[1][1], dv ) );
+	var p1 = Vec.add( Vec.mul( eigs.E.x[0][0], du ), Vec.mul( eigs.E.x[0][1], dv ) );
+	var p2 = Vec.add( Vec.mul( eigs.E.x[1][0], du ), Vec.mul( eigs.E.x[1][1], dv ) );
 
 	return { point: derivs[0][0], normal: n, mean: mean, gaussian: gaussian, shapeOperator: shapeOperator, k1: k1, k2: k2, p1: p1, p2: p2, p1p : eigs.E.x[0], p2p: eigs.E.x[1]  };
 
@@ -618,22 +618,22 @@ public static function rational_surface_derivs( degree_u, knots_u, degree_v, kno
 
 			var v = Aders[k][l];
 			for (j=1; j <= l; j++) {
-				v = numeric.sub( v, numeric.mul( numeric.mul( binomial.get(l, j), wders[0][j] ), SKL[k][l-j] ) );
+				v = Vec.sub( v, Vec.mul( Vec.mul( binomial.get(l, j), wders[0][j] ), SKL[k][l-j] ) );
 			}
 
 			for (i = 1; i <= k; i++) {
-				v = numeric.sub( v, numeric.mul( numeric.mul( binomial.get(k, i), wders[i][0] ), SKL[k-i][l] ) );
+				v = Vec.sub( v, Vec.mul( Vec.mul( binomial.get(k, i), wders[i][0] ), SKL[k-i][l] ) );
 
 				var v2 = public static function zeros_1d(dim);
 
 				for (j = 1; j <= l; j++) {
-					v2 = numeric.add( v2, numeric.mul( numeric.mul( binomial.get(l, j), wders[i][j] ), SKL[k-i][l-j] ) );
+					v2 = Vec.add( v2, Vec.mul( Vec.mul( binomial.get(l, j), wders[i][j] ), SKL[k-i][l-j] ) );
 				}
 
-				v = numeric.sub( v, numeric.mul( binomial.get(k, i), v2) );
+				v = Vec.sub( v, Vec.mul( binomial.get(k, i), v2) );
 
 			}
-			SKL[k].push( numeric.mul(1/wders[0][0], v )); // demogenize
+			SKL[k].push( Vec.mul(1/wders[0][0], v )); // demogenize
 
 		}
 	}
@@ -697,9 +697,9 @@ public static function rational_curve_derivs( degree, knots, homo_control_points
 		var v = Aders[k];
 
 		for (i = 1; i <= k; i++) {
-			v = numeric.sub( v, numeric.mul( numeric.mul( binomial.get(k, i), wders[i] ), CK[k-i] ) );
+			v = Vec.sub( v, Vec.mul( Vec.mul( binomial.get(k, i), wders[i] ), CK[k-i] ) );
 		}
-		CK.push( numeric.mul(1/wders[0], v )); // demogenize
+		CK.push( Vec.mul(1/wders[0], v )); // demogenize
 	}
 
 	return CK;
@@ -1043,7 +1043,7 @@ public static function surface_derivs_given_n_m( n, degree_u, knots_u, m, degree
 			temp[s] = public static function zeros_1d( dim );
 
 			for (r = 0; r <= degree_u; r++) {
-				temp[s] = numeric.add( temp[s], numeric.mul( uders[k][r], control_points[knot_span_index_u-degree_u+r][knot_span_index_v-degree_v+s]) );
+				temp[s] = Vec.add( temp[s], Vec.mul( uders[k][r], control_points[knot_span_index_u-degree_u+r][knot_span_index_v-degree_v+s]) );
 			}
 		}
 
@@ -1053,7 +1053,7 @@ public static function surface_derivs_given_n_m( n, degree_u, knots_u, m, degree
 			SKL[k][l] = public static function zeros_1d( dim );
 
 			for (s = 0; s <= degree_v; s++) {
-				SKL[k][l] = numeric.add( SKL[k][l], numeric.mul( vders[l][s], temp[s] ) );
+				SKL[k][l] = Vec.add( SKL[k][l], Vec.mul( vders[l][s], temp[s] ) );
 			}
 		}
 	}
@@ -1186,15 +1186,15 @@ public static function volume_point_given_n_m_l( n, degree_u, knots_u, m, degree
 			for (k = 0; k <= degree_u; k++) {
 
 				// sample u isoline
-				temp = numeric.add( temp, numeric.mul( u_basis_vals[k], control_points[uind+k][vind][wind] ));
+				temp = Vec.add( temp, Vec.mul( u_basis_vals[k], control_points[uind+k][vind][wind] ));
 			}
 
 			// add weighted contribution of u isoline
-			temp2 = numeric.add( temp2, numeric.mul( v_basis_vals[j], temp ) );
+			temp2 = Vec.add( temp2, Vec.mul( v_basis_vals[j], temp ) );
 		}
 
 		// add weighted contribution from uv isosurfaces
-		position = numeric.add( position,  numeric.mul( w_basis_vals[i], temp2 ) );
+		position = Vec.add( position,  Vec.mul( w_basis_vals[i], temp2 ) );
 
 	}
 
@@ -1249,11 +1249,11 @@ public static function surface_point_given_n_m( n, degree_u, knots_u, m, degree_
 
 		// sample u isoline
 		for (k = 0; k <= degree_u; k++) {
-			temp = numeric.add( temp, numeric.mul( u_basis_vals[k], control_points[uind+k][vind]) );
+			temp = Vec.add( temp, Vec.mul( u_basis_vals[k], control_points[uind+k][vind]) );
 		}
 
 		// add point from u isoline
-		position = numeric.add( position, numeric.mul(v_basis_vals[l], temp) );
+		position = Vec.add( position, Vec.mul(v_basis_vals[l], temp) );
 	}
 
 	return position;
@@ -1315,7 +1315,7 @@ public static function curve_derivs_given_n( n, degree, knots, control_points, u
 
 	for (k = 0; k <= du; k++) {
 		for (j = 0; j <= degree; j++) {
-			CK[k] = numeric.add( CK[k], numeric.mul( nders[k][j], control_points[ knot_span_index - degree + j ] ) )
+			CK[k] = Vec.add( CK[k], Vec.mul( nders[k][j], control_points[ knot_span_index - degree + j ] ) )
 		}
 	}
 	return CK;
@@ -1392,7 +1392,7 @@ public static function curve_point_given_n( n, degree, knots, control_points, u)
 		, position = public static function zeros_1d( control_points[0].length );
 
 		for (var j = 0; j <= degree; j++ )	{
-			position = numeric.add( position, numeric.mul( basis_values[j], control_points[ knot_span_index - degree + j ] ) );
+			position = Vec.add( position, Vec.mul( basis_values[j], control_points[ knot_span_index - degree + j ] ) );
 		}
 
 		return position;
@@ -1411,7 +1411,7 @@ public static function curve_point_given_n( n, degree, knots, control_points, u)
 //
 
 public static function zeros_1d(size) {
-  return numeric.rep([size], 0);
+  return Vec.rep([size], 0);
 }
 
 //
@@ -1431,7 +1431,7 @@ public static function zeros_2d(rows, cols) {
   cols = cols > 0 ? cols : 0;
   rows = rows > 0 ? rows : 0;
 
-  return numeric.rep([rows, cols], 0);
+  return Vec.rep([rows, cols], 0);
 }
 
 //
@@ -1452,7 +1452,7 @@ public static function zeros_3d(rows, cols, dim) {
   cols = cols > 0 ? cols : 0;
   rows = rows > 0 ? rows : 0;
 
-  return numeric.rep([rows, cols, dim], 0);
+  return Vec.rep([rows, cols, dim], 0);
 }
 
 //

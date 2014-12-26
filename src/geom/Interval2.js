@@ -10,11 +10,11 @@
 //
 verb.Interval2 = function(minu, maxu, minv, maxv) {
 
-	verb.core.WatchObject.call(this);
+	verb.WatchObject.call(this);
 	
 	this.setAll({ 
 		"uinterval": new verb.Interval(minu, maxu),
 		"vinterval": new verb.Interval(minv, maxv)
 	});
 
-}.inherits(verb.core.WatchObject);
+}.inherits(verb.WatchObject);

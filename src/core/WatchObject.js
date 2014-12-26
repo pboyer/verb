@@ -6,7 +6,7 @@
 // when these properties change
 //
 
-verb.core.WatchObject = function() {
+verb.WatchObject = function() {
 
 	// name -> { id -> callback }
 	var watchers = { "change" : {} };

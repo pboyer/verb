@@ -7,7 +7,7 @@
 // + *Object*, An options object defining the library location, number of threads to use, tolerance of the worker, etc.
 //
 
-verb.core.Engine = function(options) {
+verb.Engine = function(options) {
 
 	// private properties
 	var _use_pool = ( typeof Worker === 'function' ) && ( options.use_pool || options.use_pool === undefined );

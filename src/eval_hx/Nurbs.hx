@@ -1,12 +1,12 @@
-import haxe.ds.Vector;
 typedef Point = Array<Float>;
-typedef KnotVector = Array<Float>;
+typedef KnotArray = Array<Float>;
+typedef CurvePointArray = Array<Point>;
 
 @:expose("CurveData")
 class CurveData {
-	var degree : Int;
-	var controlPoints : Array<Point>;
-	var knots : Array<Float>;
+	public var degree : Int;
+	public var controlPoints : Array<Point>;
+	public var knots : Array<Float>;
 
 	public function new(degree, controlPoints, knots){
 		this.degree = degree;
@@ -17,11 +17,11 @@ class CurveData {
 
 @:expose("SurfaceData")
 class SurfaceData {
-	var degreeU : Int;
-	var degreeV : Int;
-	var knotsU : Array<Float>;
-	var knotsV : Array<Float>;
-	var controlPoints : Array<Array<Point>>;
+	public var degreeU : Int;
+	public var degreeV : Int;
+	public var knotsU : Array<Float>;
+	public var knotsV : Array<Float>;
+	public var controlPoints : Array<Array<Point>>;
 
 	public function new(degreeU, degreeV, knotsU, knotsV, controlPoints){
 		this.degreeU = degreeU;
@@ -34,6 +34,45 @@ class SurfaceData {
 
 @:expose("Nurbs")
 class Nurbs {
+
+	//
+	// ####curve_point( degree, knots, control_points, u)
+	//
+	// Compute a point on a non-uniform, non-rational b-spline curve
+	//
+	// **params**
+	// + integer degree of curve
+	// + array of nondecreasing knot values
+	// + 2d array of control points, where each control point is an array of length (dim)
+	// + parameter on the curve at which the point is to be evaluated
+	//
+	// **returns**
+	// + a point represented by an array of length (dim)
+	//
+
+	public static function curve_point( curve : CurveData, u : Float) {
+		var n = curve.knots.length - curve.degree - 2;
+		return curve_point_given_n( n, curve, u);
+	}
+
+	//
+	// ####are_valid_relations( degree, num_control_points, knots_length )
+	//
+	// Confirm the relations between degree (p), number of control points(n+1), and the number of knots (m+1)
+	// via The NURBS Book (section 3.2, Second Edition)
+	//
+	// **params**
+	// + integer degree
+	// + integer number of control points
+	// + integer length of the knot Array (including duplicate knots)
+	//
+	// **returns**
+	// + whether the values are correct
+	//
+
+	public static function are_valid_relations( degree : Int, num_control_points : Int, knots_length : Int ) : Bool {
+		return ( num_control_points + degree + 1 - knots_length ) == 0 ? true : false;
+	}
 
 	//
 	// ####curve_point_given_n( n, degree, knots, control_points, u)
@@ -52,28 +91,28 @@ class Nurbs {
 	// + a point represented by an array of length (dim)
 	//
 
-//	public static function curve_point_given_n( n : Int, curve : CurveData, u : Float) : Point {
-//
-//		var degree = curve.degree
-//			, control_points = curve.controlPoints
-//			, knots = curve.knots;
-//
-//		if ( !are_valid_relations( degree, controlPoints.length, knots.length ) ) {
-//			console.error('Invalid relations between control points, knot vector, and n');
-//			return null;
-//		}
-//
-//		var knot_span_index = knot_span_given_n( n, degree, u, knots )
-//		, basis_values = basis_functions_given_knot_span_index( knot_span_index, u, degree, knots )
-//		, position = Utils.zeros_1d( control_points[0].length );
-//
-//		for (j in 0...degree+1)
-////		for (var j = 0; j <= degree; j++ )	{
-//			position = numeric.add( position, numeric.mul( basis_values[j], control_points[ knot_span_index - degree + j ] ) );
-//		}
-//
-//		return position;
-//	}
+	public static function curve_point_given_n( n : Int, curve : CurveData, u : Float) : Point {
+		var degree = curve.degree
+			, control_points = curve.controlPoints
+			, knots = curve.knots;
+
+		if ( !are_valid_relations( degree, control_points.length, knots.length ) ) {
+			trace('Invalid relations between control points, knot Array, and n');
+			return null;
+		}
+
+		var knot_span_index = knot_span_given_n( n, degree, u, knots );
+		var basis_values = basis_functions_given_knot_span_index( knot_span_index, u, degree, knots );
+		var position = Vec.zeros1d( control_points[0].length );
+
+		for (j in 0...degree+1){
+			position = Vec.add( position,
+								Vec.mul( basis_values[j],
+										control_points[ knot_span_index - degree + j ] ) );
+		}
+
+		return position;
+	}
 
 	//
 	// ####deriv_basis_functions( u, degree, knots )
@@ -90,7 +129,7 @@ class Nurbs {
 	//
 
 	@:expose("deriv_basis_functions")
-	public static function deriv_basis_functions( u : Float, degree : Int, knots : KnotVector ): Vector<Vector<Float>>
+	public static function deriv_basis_functions( u : Float, degree : Int, knots : KnotArray ): Array<Array<Float>>
 	{
 		var knot_span_index = knot_span( degree, u, knots )
 		, m = knots.length - 1
@@ -118,26 +157,22 @@ class Nurbs {
 
 	@:expose("deriv_basis_functions_given_n_i")
 	public static function deriv_basis_functions_given_n_i( knot_span_index : Int, u : Float, p : Int,
-															n : Int, knots : KnotVector ) : Vector<Vector<Float>>
+															n : Int, knots : KnotArray ) : Array<Array<Float>>
 	{
-		var ndu = Utils.zeros_2d(p+1, p+1)
-		, left = new Vector<Float>( p + 1 )
-		, right = new Vector<Float>( p + 1 )
+		var ndu = Vec.zeros2d( p+1, p+1 )
+		, left = Vec.zeros1d( p + 1 )
+		, right = Vec.zeros1d( p + 1 )
 		, saved = 0.0
 		, temp = 0.0;
 
 		ndu[0][0] = 1.0;
 
 		for(j in 1...p+1){
-//		for(j = 1; j <= p; j++) {
-
 			left[j] = u - knots[knot_span_index+1-j];
 			right[j] = knots[knot_span_index+j] - u;
 			saved = 0.0;
 
 			for (r in 0...j){
-//			for (r = 0; r < j; r++) {
-
 				ndu[j][r] = right[r+1] + left[j-r];
 				temp = ndu[r][j-1] / ndu[j][r];
 
@@ -148,8 +183,8 @@ class Nurbs {
 			ndu[j][j] = saved;
 		}
 
-		var ders = Utils.zeros_2d(n+1, p+1)
-			, a = Utils.zeros_2d(2, p+1)
+		var ders = Vec.zeros2d(n+1, p+1)
+			, a = Vec.zeros2d(2, p+1)
 			, s1 : Int = 0
 			, s2 : Int = 1
 			, d : Float = 0.0
@@ -159,18 +194,15 @@ class Nurbs {
 			, j2 : Int = 0;
 
 		for (j in 0...p+1){
-//		for(j = 0; j <= p; j++) {
 			ders[0][j] = ndu[j][p];
 		}
 
 		for (r in 0...p+1){
-//		for (r = 0; r<=p; r++) {
 			s1 = 0;
 			s2 = 1;
 			a[0][0] = 1.0;
 
 			for (k in 1...n+1)
-//			for (k=1; k<=n ;k++)
 			{
 				d = 0.0;
 				rk = r - k;
@@ -194,7 +226,6 @@ class Nurbs {
 				}
 
 				for (j in j1...j2+1) {
-//				for (j = j1; j <= j2; j++) {
 					a[s2][j] = ( a[s1][j] - a[s1][ j - 1 ] ) / ndu[ pk + 1 ][ rk + j ];
 					d += a[s2][j]*ndu[rk+j][pk];
 				}
@@ -214,9 +245,7 @@ class Nurbs {
 
 		var acc = p;
 		for (k in 1...n+1) {
-//		for (k = 1; k <= n; k++) {
 			for (j in 0...p+1){
-//			for (j = 0; j <= p; j++) {
 				ders[k][j] *= acc;
 			}
 			acc *= (p-k);
@@ -239,7 +268,7 @@ class Nurbs {
 	// + list of non-vanishing basis functions
 	//
 	@:expose("basis_functions")
-	public static function basis_functions( degree : Int, u : Float, knots : KnotVector)
+	public static function basis_functions( degree : Int, u : Float, knots : KnotArray)
 	{
 		var knot_span_index = knot_span(degree, u, knots);
 		return basis_functions_given_knot_span_index( knot_span_index, u, degree, knots );
@@ -264,11 +293,11 @@ class Nurbs {
 	public static function basis_functions_given_knot_span_index( knot_span_index : Int,
 																  u : Float,
 																  degree : Int,
-																  knots : KnotVector )
+																  knots : KnotArray )
 	{
-		var basis_functions = new Vector<Float>( degree + 1 );
-		var left = new Vector<Float>( degree + 1 );
-		var right = new Vector<Float>( degree + 1 );
+		var basis_functions = Vec.zeros1d( degree + 1 );
+		var left = Vec.zeros1d( degree + 1 );
+		var right = Vec.zeros1d( degree + 1 );
 		var saved : Float = 0;
 		var temp : Float = 0;
 
@@ -295,7 +324,7 @@ class Nurbs {
 	//
 	// ####knot_span( degree, u, knots )
 	//
-	// Find the span on the knot vector without supplying n
+	// Find the span on the knot Array without supplying n
 	//
 	// **params**
 	// + integer degree of function
@@ -317,7 +346,7 @@ class Nurbs {
 	//
 	// ####knot_span_given_n( n, degree, u, knots )
 	//
-	// Find the span on the knot vector knots of the given parameter
+	// Find the span on the knot Array knots of the given parameter
 	// (corresponds to algorithm 2.1 from The NURBS book, Piegl & Tiller 2nd edition)
 	//
 	// **params**

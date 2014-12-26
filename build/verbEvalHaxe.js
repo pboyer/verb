@@ -17,6 +17,8 @@ Intersect.ok = function() {
 };
 var Mesh = $hx_exports.Mesh = function() {
 };
+var Modify = $hx_exports.Modify = function() {
+};
 var CurveData = $hx_exports.CurveData = function(degree,controlPoints,knots) {
 	this.degree = degree;
 	this.controlPoints = controlPoints;
@@ -30,6 +32,32 @@ var SurfaceData = $hx_exports.SurfaceData = function(degreeU,degreeV,knotsU,knot
 	this.controlPoints = controlPoints;
 };
 var Nurbs = $hx_exports.Nurbs = function() { };
+Nurbs.curve_point = function(curve,u) {
+	var n = curve.knots.length - curve.degree - 2;
+	return Nurbs.curve_point_given_n(n,curve,u);
+};
+Nurbs.are_valid_relations = function(degree,num_control_points,knots_length) {
+	if(num_control_points + degree + 1 - knots_length == 0) return true; else return false;
+};
+Nurbs.curve_point_given_n = function(n,curve,u) {
+	var degree = curve.degree;
+	var control_points = curve.controlPoints;
+	var knots = curve.knots;
+	if(!Nurbs.are_valid_relations(degree,control_points.length,knots.length)) {
+		console.log("Invalid relations between control points, knot Array, and n");
+		return null;
+	}
+	var knot_span_index = Nurbs.knot_span_given_n(n,degree,u,knots);
+	var basis_values = Nurbs.basis_functions_given_knot_span_index(knot_span_index,u,degree,knots);
+	var position = Vec.zeros1d(control_points[0].length);
+	var _g1 = 0;
+	var _g = degree + 1;
+	while(_g1 < _g) {
+		var j = _g1++;
+		position = Vec.add(position,Vec.mul(basis_values[j],control_points[knot_span_index - degree + j]));
+	}
+	return position;
+};
 Nurbs.deriv_basis_functions = $hx_exports.deriv_basis_functions = function(u,degree,knots) {
 	var knot_span_index = Nurbs.knot_span(degree,u,knots);
 	var m = knots.length - 1;
@@ -37,15 +65,9 @@ Nurbs.deriv_basis_functions = $hx_exports.deriv_basis_functions = function(u,deg
 	return Nurbs.deriv_basis_functions_given_n_i(knot_span_index,u,degree,n,knots);
 };
 Nurbs.deriv_basis_functions_given_n_i = $hx_exports.deriv_basis_functions_given_n_i = function(knot_span_index,u,p,n,knots) {
-	var ndu = Utils.zeros_2d(p + 1,p + 1);
-	var left;
-	var this1;
-	this1 = new Array(p + 1);
-	left = this1;
-	var right;
-	var this2;
-	this2 = new Array(p + 1);
-	right = this2;
+	var ndu = Vec.zeros2d(p + 1,p + 1);
+	var left = Vec.zeros1d(p + 1);
+	var right = Vec.zeros1d(p + 1);
 	var saved = 0.0;
 	var temp = 0.0;
 	ndu[0][0] = 1.0;
@@ -66,8 +88,8 @@ Nurbs.deriv_basis_functions_given_n_i = $hx_exports.deriv_basis_functions_given_
 		}
 		ndu[j][j] = saved;
 	}
-	var ders = Utils.zeros_2d(n + 1,p + 1);
-	var a = Utils.zeros_2d(2,p + 1);
+	var ders = Vec.zeros2d(n + 1,p + 1);
+	var a = Vec.zeros2d(2,p + 1);
 	var s1 = 0;
 	var s2 = 1;
 	var d = 0.0;
@@ -127,8 +149,7 @@ Nurbs.deriv_basis_functions_given_n_i = $hx_exports.deriv_basis_functions_given_
 		var _g22 = p + 1;
 		while(_g32 < _g22) {
 			var j5 = _g32++;
-			var _g42 = j5;
-			ders[k1][_g42] = ders[k1][_g42] * acc;
+			ders[k1][j5] *= acc;
 		}
 		acc *= p - k1;
 	}
@@ -139,18 +160,9 @@ Nurbs.basis_functions = $hx_exports.basis_functions = function(degree,u,knots) {
 	return Nurbs.basis_functions_given_knot_span_index(knot_span_index,u,degree,knots);
 };
 Nurbs.basis_functions_given_knot_span_index = $hx_exports.knot_span = function(knot_span_index,u,degree,knots) {
-	var basis_functions;
-	var this1;
-	this1 = new Array(degree + 1);
-	basis_functions = this1;
-	var left;
-	var this2;
-	this2 = new Array(degree + 1);
-	left = this2;
-	var right;
-	var this3;
-	this3 = new Array(degree + 1);
-	right = this3;
+	var basis_functions = Vec.zeros1d(degree + 1);
+	var left = Vec.zeros1d(degree + 1);
+	var right = Vec.zeros1d(degree + 1);
 	var saved = 0;
 	var temp = 0;
 	basis_functions[0] = 1.0;
@@ -194,49 +206,63 @@ Tessellate.ok = function() {
 	return 5;
 };
 var Utils = function() { };
-Utils.zeros_1d = function(rows) {
-	if(rows > 0) rows = rows; else rows = 0;
-	var l;
-	var this1;
-	this1 = new Array(rows);
-	l = this1;
-	var i = 0;
-	while(i < rows) {
-		l[i] = 0.0;
-		i++;
+var Vec = function() { };
+Vec.zeros1d = function(rows) {
+	var _g = [];
+	var _g1 = 0;
+	while(_g1 < rows) {
+		var i = _g1++;
+		_g.push(0.0);
 	}
-	return l;
+	return _g;
 };
-Utils.zeros_2d = function(rows,cols) {
-	if(cols > 0) cols = cols; else cols = 0;
-	if(rows > 0) rows = rows; else rows = 0;
-	var l;
-	var this1;
-	this1 = new Array(rows);
-	l = this1;
-	var i = 0;
-	while(i < rows) {
-		var val = Utils.zeros_1d(cols);
-		l[i] = val;
-		i++;
+Vec.zeros2d = function(rows,cols) {
+	var _g = [];
+	var _g1 = 0;
+	while(_g1 < rows) {
+		var i = _g1++;
+		_g.push(Vec.zeros1d(cols));
 	}
-	return l;
+	return _g;
 };
-Utils.zeros_3d = function(rows,cols,depth) {
-	if(cols > 0) cols = cols; else cols = 0;
-	if(rows > 0) rows = rows; else rows = 0;
-	if(depth > 0) depth = depth; else depth = 0;
-	var l;
-	var this1;
-	this1 = new Array(rows);
-	l = this1;
-	var i = 0;
-	while(i < rows) {
-		var val = Utils.zeros_2d(cols,depth);
-		l[i] = val;
-		i++;
+Vec.zeros3d = function(rows,cols,depth) {
+	var _g = [];
+	var _g1 = 0;
+	while(_g1 < rows) {
+		var i = _g1++;
+		_g.push(Vec.zeros2d(cols,depth));
 	}
-	return l;
+	return _g;
+};
+Vec.add = function(a,b) {
+	var _g = [];
+	var _g2 = 0;
+	var _g1 = a.length;
+	while(_g2 < _g1) {
+		var i = _g2++;
+		_g.push(a[i] + b[i]);
+	}
+	return _g;
+};
+Vec.mul = function(a,b) {
+	var _g = [];
+	var _g2 = 0;
+	var _g1 = b.length;
+	while(_g2 < _g1) {
+		var i = _g2++;
+		_g.push(a * b[i]);
+	}
+	return _g;
+};
+Vec.sub = function(a,b) {
+	var _g = [];
+	var _g2 = 0;
+	var _g1 = a.length;
+	while(_g2 < _g1) {
+		var i = _g2++;
+		_g.push(a[i] - b[i]);
+	}
+	return _g;
 };
 Math.NaN = Number.NaN;
 Math.NEGATIVE_INFINITY = Number.NEGATIVE_INFINITY;

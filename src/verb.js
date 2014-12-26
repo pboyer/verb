@@ -1,7 +1,7 @@
 "use strict";
 
 // browser context
-if ( typeof exports != 'object' || exports === undefined )  
+if ( typeof exports != 'object' || exports === undefined )
 {
 	var verb = {}
 		, numeric = window.numeric
@@ -25,7 +25,7 @@ verb.EPSILON = 1e-10;
 
 // ####verb.TOLERANCE
 //
-// Default tolerance for geometric operations - defines "close enough" 
+// Default tolerance for geometric operations - defines "close enough"
 // for tesselation, intersection, and more
 verb.TOLERANCE = 1e-6;
 
@@ -38,13 +38,20 @@ verb.init = function() {
 	verb.NurbsGeometry.prototype.nurbsEngine = verb.nurbsEngine;
 }
 
+// ####Douglas Crockford's "method"
+
+ Function.prototype.method = function (name, func) {
+    this.prototype[name] = func;
+    return this;
+};
+
 // ####Douglas Crockford's "inherits"
 //
 Function.method('inherits', function (parent) {
     this.prototype = new parent();
-    var d = {}, 
+    var d = {},
         p = this.prototype;
-    this.prototype.constructor = parent; 
+    this.prototype.constructor = parent;
     return this;
 });
 
@@ -109,14 +116,14 @@ numeric.cross = function(u, v){
 //
 // **params**
 // + *Array*, array of stuff
-// 
-// **returns** 
+//
+// **returns**
 // + *Array*, the left half
 //
 
-verb.left = function(arr){ 
+verb.left = function(arr){
 	if (arr.length === 0) return [];
-	var len = Math.ceil( arr.length / 2 ); 
+	var len = Math.ceil( arr.length / 2 );
 	return arr.slice( 0, len );
 }
 
@@ -127,8 +134,8 @@ verb.left = function(arr){
 //
 // **params**
 // + *Array*, array of stuff
-// 
-// **returns** 
+//
+// **returns**
 // + *Array*, the right half
 //
 
@@ -145,8 +152,8 @@ verb.right = function(arr){
 //
 // **params**
 // + *Array*, array of stuff
-// 
-// **returns** 
+//
+// **returns**
 // + *Something*, the last element of the array
 //
 
@@ -165,8 +172,8 @@ verb.last = function(arr){
 //
 // **params**
 // + *Array*, array of stuff
-// 
-// **returns** 
+//
+// **returns**
 // + *Array*, the right half
 //
 
@@ -184,9 +191,9 @@ verb.rightWithPivot = function(arr){
 // **params**
 // + *Array*, array of stuff
 // + *Function*, a function that receives two arguments (two objects from the array).  Returning true indicates
-// the objects are equal.  
-// 
-// **returns** 
+// the objects are equal.
+//
+// **returns**
 // + *Array*, array of unique elements
 //
 
@@ -226,8 +233,8 @@ verb.unique = function( arr, comp ){
 //
 // **params**
 // + *Array*, vector
-// 
-// **returns** 
+//
+// **returns**
 // + *Boolean*, range array
 //
 verb.isZero = function( vec ){
@@ -237,7 +244,7 @@ verb.isZero = function( vec ){
   }
 
   return true;
-} 
+}
 
 //
 // ####range(start, stop, step)
@@ -249,10 +256,10 @@ verb.isZero = function( vec ){
 //
 // **params**
 // + *Number*, start point
-// + *Number*, end point 
+// + *Number*, end point
 // + *Number*, step
-// 
-// **returns** 
+//
+// **returns**
 // + *Array*, range array
 //
 verb.range = function(start, stop, step) {
@@ -298,7 +305,7 @@ function Node(obj, dimension, parent) {
 function KdTree(points, metric, dimensions) {
 
   var self = this;
-  
+
   function buildTree(points, depth, parent) {
     var dim = depth % dimensions.length,
       median,

@@ -5412,6 +5412,8 @@ verb.eval.basis_functions_given_knot_span_index = function( knot_span_index, u, 
 // + *Number*, the index of the knot span
 //
 
+//DONE
+
 verb.eval.knot_span = function( degree, u, knots )
 {
 
@@ -5437,6 +5439,8 @@ verb.eval.knot_span = function( degree, u, knots )
 // **returns** 
 // + *Number*, the index of the knot span
 //
+
+//DONE
 
 verb.eval.knot_span_given_n = function( n, degree, u, knots )
 {

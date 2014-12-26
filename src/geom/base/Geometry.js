@@ -5,12 +5,12 @@
 // Geometry is the base class for all Geometry types
 verb.Geometry = function() { 
 
-	verb.core.WatchObject.call(this);
+	verb.WatchObject.call(this);
 
-	var id = verb.core.uid();
+	var id = verb.uid();
 	
 	this.uniqueId = function() {
 		return id;
 	};
 
-}.inherits(verb.core.WatchObject);
+}.inherits(verb.WatchObject);

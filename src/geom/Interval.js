@@ -8,11 +8,11 @@
 //
 verb.Interval = function(min, max) {
 
-	verb.core.WatchObject.call(this);
+	verb.WatchObject.call(this);
 	
 	this.setAll({ 
 		"min": min,
 		"max": max 
 	});
 
-}.inherits(verb.core.WatchObject);
+}.inherits(verb.WatchObject);
