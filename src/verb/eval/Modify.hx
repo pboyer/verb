@@ -4,7 +4,7 @@ import verb.eval.types.CurveData;
 import verb.eval.types.CurveData;
 import verb.eval.types.SurfaceData;
 
-@:expose("KnotMultiplicity")
+@:expose("eval.KnotMultiplicity")
 class KnotMultiplicity {
     public var knot : Float;
     public var mult : Int;
@@ -19,7 +19,7 @@ class KnotMultiplicity {
     }
 }
 
-@:expose("Modify")
+@:expose("eval.Modify")
 class Modify {
 
     public static function surface_knot_refine( surface : SurfaceData, knots_to_insert : Array<Float>, useV : Bool ) : SurfaceData {

@@ -2,7 +2,7 @@ package verb.eval.types;
 
 import verb.eval.types.CurveData;
 
-@:expose("SurfaceData")
+@:expose("eval.SurfaceData")
 class SurfaceData {
 
     // integer degree of surface in u direction

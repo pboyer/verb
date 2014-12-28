@@ -4,7 +4,7 @@ typedef Point = Array<Float>;
 typedef KnotArray = Array<Float>;
 typedef CurvePointArray = Array<Point>;
 
-@:expose("CurveData")
+@:expose("eval.CurveData")
 class CurveData {
 
 // integer degree of curve

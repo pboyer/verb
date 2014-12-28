@@ -5,7 +5,7 @@ import verb.eval.types.CurveData;
 
 import verb.eval.Binomial;
 
-@:expose("Nurbs")
+@:expose("eval.Nurbs")
 class Nurbs {
 
 	// Compute the derivatives at a point on a NURBS surface

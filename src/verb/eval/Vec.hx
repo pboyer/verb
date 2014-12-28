@@ -2,7 +2,7 @@ package verb.eval;
 
 using Lambda;
 
-@:expose("Vec")
+@:expose("eval.Vec")
 class Vec {
 
     public static function transpose<T>(a : Array<Array<T>>) : Array<Array<T>> {

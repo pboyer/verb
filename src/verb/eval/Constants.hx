@@ -1,6 +1,6 @@
 package verb.eval;
 
-@:expose("Constants")
+@:expose("eval.Constants")
 class Constants {
     @:expose("TOLERANCE")
     public static var TOLERANCE = 1e-6;
