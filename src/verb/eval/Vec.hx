@@ -77,4 +77,13 @@ class Vec {
     public static function sub(a : Array<Float>, b : Array<Float>) : Array<Float>{
         return [ for (i in 0...a.length) a[i] - b[i] ];
     }
+
+    public static function isZero( vec : Array<Float> ){
+
+        for (i in 0...vec.length){
+            if (Math.abs( vec[i] ) > verb.eval.Constants.TOLERANCE ) return false;
+        }
+
+        return true;
+    }
 }

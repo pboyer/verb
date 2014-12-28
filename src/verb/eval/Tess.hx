@@ -2,6 +2,11 @@ package verb.eval;
 
 using verb.eval.Utils;
 
+import verb.eval.types.SurfacePoint;
+import verb.eval.types.MeshData;
+import verb.eval.types.AdaptiveRefinementNode;
+import verb.eval.types.SurfaceData;
+
 import verb.eval.types.CurveData;
 
 @:expose("eval.Tess")
@@ -140,5 +145,199 @@ class Tess {
 		}
 	}
 
-}
+	//
+	// Tessellate a NURBS surface on equal spaced intervals in the parametric domain
+	//
+	// **params**
+	// + SurfaceData object
+	// + number of divisions in the u direction
+	// + number of divisions in the v direction
+	//
+	// **returns**
+	// + MeshData object
+	//
 
+	public static function tessellate_rational_surface_naive( surface : SurfaceData, divs_u : Int, divs_v : Int ) : MeshData {
+
+		if ( divs_u < 1 ) { divs_u = 1; }
+		if ( divs_v < 1 ) { divs_v = 1; }
+
+		var degree_u = surface.degreeU
+		, degreeV = surface.degreeV
+		, control_points = surface.controlPoints
+		, knotsU = surface.knotsU
+		, knotsV = surface.knotsV;
+
+		var u_span = knotsU.last() - knotsU[0];
+		var v_span = knotsV.last() - knotsV[0];
+
+		var span_u = u_span / divs_u,
+		span_v = v_span / divs_v;
+
+		var points = [];
+		var uvs = [];
+		var normals = [];
+
+		for (i in 0...divs_u+1){
+			for (j in 0...divs_v+1){
+
+				var pt_u = i * span_u,
+				pt_v = j * span_v;
+
+				uvs.push( [pt_u, pt_v] );
+
+				var derivs = Nurbs.rational_surface_derivs( surface, 1, pt_u, pt_v );
+				var pt = derivs[0][0];
+
+				points.push( pt );
+
+				var normal = Vec.normalized( Vec.cross(  derivs[1][0], derivs[0][1] ) );
+				normals.push( normal );
+			}
+		}
+
+		var faces = [];
+
+		for (i in 0...divs_u){
+			for (j in 0...divs_v){
+				var a_i = i * (divs_v + 1) + j,
+				b_i = (i + 1) * (divs_v + 1) + j,
+				c_i = b_i + 1,
+				d_i = a_i + 1,
+				abc = [a_i, b_i, c_i],
+				acd = [a_i, c_i, d_i];
+
+				faces.push(abc);
+				faces.push(acd);
+			}
+		}
+
+		return new MeshData( faces, points, normals, uvs );
+
+	}
+
+	//
+	// Divide a NURBS surface int equal spaced intervals in the parametric domain as AdaptiveRefinementNodes
+	//
+	// **params**
+	// + SurfaceData object
+	// + SurfaceDivideOptions object
+	//
+	// **returns**
+	// + MeshData object
+	//
+
+	public static function divide_rational_surface_adaptive( surface : SurfaceData, options : AdaptiveRefinementOptions = null ): Array<AdaptiveRefinementNode> {
+
+		if (options == null) options = new AdaptiveRefinementOptions();
+
+		options.minDivsU = options.minDivsU != null ? options.minDivsU : 1;
+		options.minDivsU = options.minDivsV != null ? options.minDivsV : 1;
+		options.refine = options.refine != null ? options.refine : true;
+
+		var minU = (surface.controlPoints.length - 1) * 3;
+		var minV = (surface.controlPoints[0].length - 1) * 3;
+
+		var divsU = options.minDivsU = options.minDivsU > minU ? options.minDivsU : minU;
+		var divsV = options.minDivsV = options.minDivsV > minV ? options.minDivsV : minV;
+
+		// get necessary intervals
+		var umax = surface.knotsU.last();
+		var umin = surface.knotsU[0];
+		var vmax =	surface.knotsV.last();
+		var vmin = surface.knotsV[0];
+
+		var du = (umax - umin) / divsU
+		, dv = (vmax - vmin) / divsV;
+
+		var divs = [];
+		var pts = [];
+
+		// 1) evaluate all of the corners
+		for( i in 0...divsV + 1){
+			var ptrow = [];
+			for (j in 0...divsU + 1){
+
+				var u = umin + du * j
+				, v = vmin + dv * i;
+
+				// todo: make this faster by specifying n,m
+				var ds = Nurbs.rational_surface_derivs( surface, 1, u, v );
+
+				var norm = Vec.normalized( Vec.cross(  ds[0][1], ds[1][0] ) );
+				ptrow.push( new SurfacePoint( ds[0][0], norm, [u,v], -1, Vec.isZero( norm ) ) );
+			}
+			pts.push( ptrow );
+		}
+
+		// 2) make all of the nodes
+		for (i in 0...divsV){
+			for (j in 0...divsU){
+				var corners = [ pts[divsV - i - 1][j],
+				pts[divsV - i - 1][j+1],
+				pts[divsV - i][j+1],
+				pts[divsV - i][j] ];
+
+				divs.push( new AdaptiveRefinementNode( surface, corners ) );
+			}
+		}
+
+		if (!options.refine) return divs;
+
+		// 3) assign all of the neighbors and divide
+		for (i in 0...divsV){
+			for (j in 0...divsU){
+
+				var ci = i * divsU + j
+				, n = north( ci, i, j, divsU, divsV, divs )
+				, e = east( ci, i, j, divsU, divsV, divs  )
+				, s = south( ci, i, j, divsU, divsV, divs )
+				, w = west( ci, i, j, divsU, divsV, divs  );
+
+				divs[ci].neighbors = [ s, e, n, w ];
+				divs[ci].divide( options );
+			}
+		}
+
+		return divs;
+	}
+
+	private static function north(index, i, j, divsU, divsV, divs){
+		if (i == 0) return null;
+		return divs[ index - divsU ];
+	}
+	
+	private static function south(index, i, j, divsU, divsV, divs){
+		if (i == divsV - 1) return null;
+		return divs[ index + divsU ];
+	}
+	
+	private static function east(index, i, j, divsU, divsV, divs){
+		if (j == divsU - 1) return null;
+		return divs[ index + 1 ];
+	}
+	
+	private static function west(index, i, j, divsU, divsV, divs){
+		if (j == 0) return null;
+		return divs[ index - 1 ];
+	}
+
+	private static function triangulate_adaptive_refinement_node_tree( arrTree : Array<AdaptiveRefinementNode> ) : MeshData {
+
+		// triangulate all of the nodes of the tree
+		var mesh = MeshData.empty();
+		for (x in arrTree)  x.triangulate( mesh );
+		return mesh;
+
+	}
+
+	public static function tessellate_rational_surface_adaptive( surface : SurfaceData, options : AdaptiveRefinementOptions ) : MeshData {
+
+		// adaptive divide
+		var arrTrees = divide_rational_surface_adaptive( surface, options );
+
+		// triangulation
+		return triangulate_adaptive_refinement_node_tree( arrTrees );
+	}
+
+}

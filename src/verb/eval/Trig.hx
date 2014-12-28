@@ -1,7 +1,35 @@
 package verb.eval;
 
+import verb.eval.types.CurveData.Point;
 @:expose("eval.Trig")
 class Trig {
+
+    public static function dist_to_seg(a : Point, b : Point, c : Point){
+
+        // check if ac is zero length
+        var acv = Vec.sub( c, a );
+        var acl = Vec.norm( acv );
+
+        // subtract b from a
+        var bma = Vec.sub(b, a);
+
+        if ( acl < Constants.TOLERANCE ){
+            return Vec.norm( bma );
+        }
+
+        // normalized ac
+        var ac = Vec.mul( 1 / acl, acv );
+
+        // project b - a to ac = p
+        var p = Vec.dot( bma, ac );
+
+        // multiply ac by d = acd
+        var acd = Vec.add( a, Vec.mul( p, ac ) );
+
+        // subtract acd from adp
+        return Vec.dist( acd, b );
+
+    }
 
     // Determine if three points form a straight line within a given tolerance for their 2 * squared area
     //
