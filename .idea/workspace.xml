@@ -2,33 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="938890c0-f1ce-4fbd-8322-63610af7f5e6" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/verb/eval/Modify.hx" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/verb/eval/Nurbs.hx" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/verb.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/verb.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/verbEval.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/verbEval.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/verbEvalHaxe.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/eval_hx/Analyze.hx" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/eval_hx/Create.hx" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/eval_hx/Init.hx" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/eval_hx/Mesh.hx" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/eval_hx/Modify.hx" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/eval_hx/Nurbs.hx" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/eval_hx/Tessellate.hx" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/core/Engine.js" afterPath="$PROJECT_DIR$/src/geom/Engine.js" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/core/WatchObject.js" afterPath="$PROJECT_DIR$/src/geom/WatchObject.js" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/core/uid.js" afterPath="$PROJECT_DIR$/src/geom/uid.js" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/eval_hx/Intersect.hx" afterPath="$PROJECT_DIR$/src/verb/eval/Intersect.hx" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/eval_hx/Utils.hx" afterPath="$PROJECT_DIR$/src/verb/eval/Utils.hx" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/eval_hx/Vec.hx" afterPath="$PROJECT_DIR$/src/verb/eval/Vec.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Gruntfile.js" afterPath="$PROJECT_DIR$/Gruntfile.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build.hxml" afterPath="$PROJECT_DIR$/build.hxml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/eval/eval2.js" afterPath="$PROJECT_DIR$/src/eval/eval2.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/example/index.html" afterPath="$PROJECT_DIR$/example/index.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/package.json" afterPath="$PROJECT_DIR$/package.json" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/test.js" afterPath="$PROJECT_DIR$/test/test.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/verb.html" afterPath="$PROJECT_DIR$/docs/verb.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="verb.iws" />
@@ -67,8 +41,8 @@
       <file leaf-file-name="verbCore.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/build/verbCore.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1155" max-vertical-offset="9360">
-              <caret line="89" column="2" selection-start-line="89" selection-start-column="2" selection-end-line="89" selection-end-column="2" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="2205" max-vertical-offset="10425">
+              <caret line="159" column="2" selection-start-line="159" selection-start-column="2" selection-end-line="159" selection-end-column="2" />
               <folding />
             </state>
           </provider>
@@ -77,8 +51,8 @@
       <file leaf-file-name="test.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/test/test.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.35907337" vertical-offset="9081" max-vertical-offset="96135">
-              <caret line="624" column="2" selection-start-line="624" selection-start-column="2" selection-end-line="624" selection-end-column="2" />
+            <state vertical-scroll-proportion="0.5173745" vertical-offset="9378" max-vertical-offset="96195">
+              <caret line="652" column="38" selection-start-line="652" selection-start-column="38" selection-end-line="652" selection-end-column="38" />
               <folding />
             </state>
           </provider>
@@ -183,7 +157,6 @@
         <option value="$PROJECT_DIR$/src/eval/eval2.js" />
         <option value="$PROJECT_DIR$/src/eval_hx/Init.hx" />
         <option value="$PROJECT_DIR$/src/eval_hx/Binomial.hx" />
-        <option value="$PROJECT_DIR$/test/test.js" />
         <option value="$PROJECT_DIR$/src/eval_hx/types/TypeDefs.hx" />
         <option value="$PROJECT_DIR$/src/eval_hx/types/CurveData.hx" />
         <option value="$PROJECT_DIR$/src/eval_hx/types/SurfaceData.hx" />
@@ -208,6 +181,7 @@
         <option value="$PROJECT_DIR$/src/verb/eval/Nurbs.hx" />
         <option value="$PROJECT_DIR$/src/verb/eval/types/SurfaceData.hx" />
         <option value="$PROJECT_DIR$/src/verb/eval/Modify.hx" />
+        <option value="$PROJECT_DIR$/test/test.js" />
       </list>
     </option>
   </component>
@@ -984,16 +958,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/build/verbCore.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1155" max-vertical-offset="9360">
-          <caret line="89" column="2" selection-start-line="89" selection-start-column="2" selection-end-line="89" selection-end-column="2" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="2205" max-vertical-offset="10425">
+          <caret line="159" column="2" selection-start-line="159" selection-start-column="2" selection-end-line="159" selection-end-column="2" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test/test.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.35907337" vertical-offset="9081" max-vertical-offset="96135">
-          <caret line="624" column="2" selection-start-line="624" selection-start-column="2" selection-end-line="624" selection-end-column="2" />
+        <state vertical-scroll-proportion="0.5173745" vertical-offset="9378" max-vertical-offset="96195">
+          <caret line="652" column="38" selection-start-line="652" selection-start-column="38" selection-end-line="652" selection-end-column="38" />
           <folding />
         </state>
       </provider>
