@@ -1,5 +1,6 @@
 package verb.eval;
 
+import verb.eval.Constants;
 import verb.eval.Utils;
 import verb.eval.Nurbs;
 import verb.eval.Mesh;

@@ -71,6 +71,7 @@ verb.eval.Binomial.memoize = function(n,k,val) {
 	if(!verb.eval.Binomial.memo.exists(n)) verb.eval.Binomial.memo.set(n,new haxe.ds.IntMap());
 	verb.eval.Binomial.memo.get(n).set(k,val);
 };
+verb.eval.Constants = $hx_exports.Constants = function() { };
 verb.eval.Create = function() { };
 verb.eval.Create.ok = function() {
 	return verb.eval.Tessellate.ok();
@@ -85,7 +86,7 @@ verb.eval.Intersect.ok = function() {
 };
 verb.eval.Mesh = function() {
 };
-verb.eval.Modify = function() { };
+verb.eval.Modify = $hx_exports.Modify = function() { };
 verb.eval.Modify.curve_knot_insert = function(curve,u,r) {
 	var degree = curve.degree;
 	var control_points = curve.controlPoints;
@@ -158,8 +159,8 @@ verb.eval.Modify.curve_knot_insert = function(curve,u,r) {
 	}
 	return new verb.eval.types.CurveData(degree,knots_post,control_points_post);
 };
-verb.eval.Nurbs = function() { };
-verb.eval.Nurbs.rational_surface_derivs = $hx_exports.rational_surface_derivs = function(surface,num_derivs,u,v) {
+verb.eval.Nurbs = $hx_exports.Nurbs = function() { };
+verb.eval.Nurbs.rational_surface_derivs = function(surface,num_derivs,u,v) {
 	var ders = verb.eval.Nurbs.surface_derivs(surface,num_derivs,u,v);
 	var Aders = verb.eval.Nurbs.rational_2d(ders);
 	var wders = verb.eval.Nurbs.weight_2d(ders);
@@ -200,10 +201,10 @@ verb.eval.Nurbs.rational_surface_derivs = $hx_exports.rational_surface_derivs = 
 	}
 	return SKL;
 };
-verb.eval.Nurbs.rational_surface_point = $hx_exports.rational_surface_point = function(surface,u,v) {
+verb.eval.Nurbs.rational_surface_point = function(surface,u,v) {
 	return verb.eval.Nurbs.dehomogenize(verb.eval.Nurbs.surface_point(surface,u,v));
 };
-verb.eval.Nurbs.rational_curve_derivs = $hx_exports.rational_curve_derivs = function(curve,u,num_derivs) {
+verb.eval.Nurbs.rational_curve_derivs = function(curve,u,num_derivs) {
 	var ders = verb.eval.Nurbs.curve_derivs(curve,u,num_derivs);
 	var Aders = verb.eval.Nurbs.rational_1d(ders);
 	var wders = verb.eval.Nurbs.weight_1d(ders);
@@ -225,10 +226,10 @@ verb.eval.Nurbs.rational_curve_derivs = $hx_exports.rational_curve_derivs = func
 	}
 	return CK;
 };
-verb.eval.Nurbs.rational_curve_point = $hx_exports.rational_curve_point = function(curve,u) {
+verb.eval.Nurbs.rational_curve_point = function(curve,u) {
 	return verb.eval.Nurbs.dehomogenize(verb.eval.Nurbs.curve_point(curve,u));
 };
-verb.eval.Nurbs.dehomogenize = $hx_exports.dehomogenize = function(homo_point) {
+verb.eval.Nurbs.dehomogenize = function(homo_point) {
 	var dim = homo_point.length;
 	var point = [];
 	var wt = homo_point[dim - 1];
@@ -240,31 +241,31 @@ verb.eval.Nurbs.dehomogenize = $hx_exports.dehomogenize = function(homo_point) {
 	}
 	return point;
 };
-verb.eval.Nurbs.rational_1d = $hx_exports.rational_1d = function(homo_points) {
+verb.eval.Nurbs.rational_1d = function(homo_points) {
 	var dim = homo_points[0].length - 1;
 	return homo_points.map(function(x) {
 		return x.slice(0,dim);
 	});
 };
-verb.eval.Nurbs.rational_2d = $hx_exports.rational_2d = function(homo_points) {
+verb.eval.Nurbs.rational_2d = function(homo_points) {
 	return homo_points.map(verb.eval.Nurbs.rational_1d);
 };
-verb.eval.Nurbs.weight_1d = $hx_exports.weight_1d = function(homo_points) {
+verb.eval.Nurbs.weight_1d = function(homo_points) {
 	var dim = homo_points[0].length - 1;
 	return homo_points.map(function(x) {
 		return x[dim];
 	});
 };
-verb.eval.Nurbs.weight_2d = $hx_exports.weight_2d = function(homo_points) {
+verb.eval.Nurbs.weight_2d = function(homo_points) {
 	return homo_points.map(verb.eval.Nurbs.weight_1d);
 };
-verb.eval.Nurbs.dehomogenize_1d = $hx_exports.dehomogenize_1d = function(homo_points) {
+verb.eval.Nurbs.dehomogenize_1d = function(homo_points) {
 	return homo_points.map(verb.eval.Nurbs.dehomogenize);
 };
-verb.eval.Nurbs.dehomogenize_2d = $hx_exports.dehomogenize_2d = function(homo_points) {
+verb.eval.Nurbs.dehomogenize_2d = function(homo_points) {
 	return homo_points.map(verb.eval.Nurbs.dehomogenize_1d);
 };
-verb.eval.Nurbs.homogenize_1d = $hx_exports.homogenize_1d = function(control_points,weights) {
+verb.eval.Nurbs.homogenize_1d = function(control_points,weights) {
 	var rows = control_points.length;
 	var dim = control_points[0].length;
 	var homo_control_points = new Array();
@@ -286,7 +287,7 @@ verb.eval.Nurbs.homogenize_1d = $hx_exports.homogenize_1d = function(control_poi
 	}
 	return homo_control_points;
 };
-verb.eval.Nurbs.homogenize_2d = $hx_exports.homogenize_2d = function(control_points,weights) {
+verb.eval.Nurbs.homogenize_2d = function(control_points,weights) {
 	var rows = control_points.length;
 	var homo_control_points = new Array();
 	var _g = 0;
@@ -296,12 +297,12 @@ verb.eval.Nurbs.homogenize_2d = $hx_exports.homogenize_2d = function(control_poi
 	}
 	return homo_control_points;
 };
-verb.eval.Nurbs.surface_derivs = $hx_exports.surface_derivs = function(surface,num_derivatives,u,v) {
+verb.eval.Nurbs.surface_derivs = function(surface,num_derivatives,u,v) {
 	var n = surface.knotsU.length - surface.degreeU - 2;
 	var m = surface.knotsV.length - surface.degreeV - 2;
 	return verb.eval.Nurbs.surface_derivs_given_n_m(n,m,surface,num_derivatives,u,v);
 };
-verb.eval.Nurbs.surface_derivs_given_n_m = $hx_exports.surface_derivs_given_n_m = function(n,m,surface,num_derivatives,u,v) {
+verb.eval.Nurbs.surface_derivs_given_n_m = function(n,m,surface,num_derivatives,u,v) {
 	var degree_u = surface.degreeU;
 	var degree_v = surface.degreeV;
 	var control_points = surface.controlPoints;
@@ -353,12 +354,12 @@ verb.eval.Nurbs.surface_derivs_given_n_m = $hx_exports.surface_derivs_given_n_m 
 	}
 	return SKL;
 };
-verb.eval.Nurbs.surface_point = $hx_exports.surface_point = function(surface,u,v) {
+verb.eval.Nurbs.surface_point = function(surface,u,v) {
 	var n = surface.knotsU.length - surface.degreeU - 2;
 	var m = surface.knotsV.length - surface.degreeV - 2;
 	return verb.eval.Nurbs.surface_point_given_n_m(n,m,surface,u,v);
 };
-verb.eval.Nurbs.surface_point_given_n_m = $hx_exports.surface_point_given_n_m = function(n,m,surface,u,v) {
+verb.eval.Nurbs.surface_point_given_n_m = function(n,m,surface,u,v) {
 	var degree_u = surface.degreeU;
 	var degree_v = surface.degreeV;
 	var control_points = surface.controlPoints;
@@ -390,11 +391,11 @@ verb.eval.Nurbs.surface_point_given_n_m = $hx_exports.surface_point_given_n_m = 
 	}
 	return position;
 };
-verb.eval.Nurbs.curve_derivs = $hx_exports.curve_derivs = function(crv,u,num_derivs) {
+verb.eval.Nurbs.curve_derivs = function(crv,u,num_derivs) {
 	var n = crv.knots.length - crv.degree - 2;
 	return verb.eval.Nurbs.curve_derivs_given_n(n,crv,u,num_derivs);
 };
-verb.eval.Nurbs.curve_derivs_given_n = $hx_exports.curve_derivs_given_n = function(n,curve,u,num_derivatives) {
+verb.eval.Nurbs.curve_derivs_given_n = function(n,curve,u,num_derivatives) {
 	var degree = curve.degree;
 	var control_points = curve.controlPoints;
 	var knots = curve.knots;
@@ -420,14 +421,14 @@ verb.eval.Nurbs.curve_derivs_given_n = $hx_exports.curve_derivs_given_n = functi
 	}
 	return CK;
 };
-verb.eval.Nurbs.curve_point = $hx_exports.curve_point = function(curve,u) {
+verb.eval.Nurbs.curve_point = function(curve,u) {
 	var n = curve.knots.length - curve.degree - 2;
 	return verb.eval.Nurbs.curve_point_given_n(n,curve,u);
 };
-verb.eval.Nurbs.are_valid_relations = $hx_exports.are_valid_relations = function(degree,num_control_points,knots_length) {
+verb.eval.Nurbs.are_valid_relations = function(degree,num_control_points,knots_length) {
 	return num_control_points + degree + 1 - knots_length == 0;
 };
-verb.eval.Nurbs.curve_point_given_n = $hx_exports.curve_point_given_n = function(n,curve,u) {
+verb.eval.Nurbs.curve_point_given_n = function(n,curve,u) {
 	var degree = curve.degree;
 	var control_points = curve.controlPoints;
 	var knots = curve.knots;
@@ -446,13 +447,13 @@ verb.eval.Nurbs.curve_point_given_n = $hx_exports.curve_point_given_n = function
 	}
 	return position;
 };
-verb.eval.Nurbs.deriv_basis_functions = $hx_exports.deriv_basis_functions = function(u,degree,knots) {
+verb.eval.Nurbs.deriv_basis_functions = function(u,degree,knots) {
 	var knot_span_index = verb.eval.Nurbs.knot_span(degree,u,knots);
 	var m = knots.length - 1;
 	var n = m - degree - 1;
 	return verb.eval.Nurbs.deriv_basis_functions_given_n_i(knot_span_index,u,degree,n,knots);
 };
-verb.eval.Nurbs.deriv_basis_functions_given_n_i = $hx_exports.deriv_basis_functions_given_n_i = function(knot_span_index,u,p,n,knots) {
+verb.eval.Nurbs.deriv_basis_functions_given_n_i = function(knot_span_index,u,p,n,knots) {
 	var ndu = verb.eval.Vec.zeros2d(p + 1,p + 1);
 	var left = verb.eval.Vec.zeros1d(p + 1);
 	var right = verb.eval.Vec.zeros1d(p + 1);
@@ -543,11 +544,11 @@ verb.eval.Nurbs.deriv_basis_functions_given_n_i = $hx_exports.deriv_basis_functi
 	}
 	return ders;
 };
-verb.eval.Nurbs.basis_functions = $hx_exports.basis_functions = function(u,degree,knots) {
+verb.eval.Nurbs.basis_functions = function(u,degree,knots) {
 	var knot_span_index = verb.eval.Nurbs.knot_span(degree,u,knots);
 	return verb.eval.Nurbs.basis_functions_given_knot_span_index(knot_span_index,u,degree,knots);
 };
-verb.eval.Nurbs.basis_functions_given_knot_span_index = $hx_exports.basis_functions_given_knot_span_index = function(knot_span_index,u,degree,knots) {
+verb.eval.Nurbs.basis_functions_given_knot_span_index = function(knot_span_index,u,degree,knots) {
 	var basis_functions = verb.eval.Vec.zeros1d(degree + 1);
 	var left = verb.eval.Vec.zeros1d(degree + 1);
 	var right = verb.eval.Vec.zeros1d(degree + 1);
@@ -572,12 +573,12 @@ verb.eval.Nurbs.basis_functions_given_knot_span_index = $hx_exports.basis_functi
 	}
 	return basis_functions;
 };
-verb.eval.Nurbs.knot_span = $hx_exports.knot_span = function(degree,u,knots) {
+verb.eval.Nurbs.knot_span = function(degree,u,knots) {
 	var m = knots.length - 1;
 	var n = m - degree - 1;
 	return verb.eval.Nurbs.knot_span_given_n(n,degree,u,knots);
 };
-verb.eval.Nurbs.knot_span_given_n = $hx_exports.knot_span_given_n = function(n,degree,u,knots) {
+verb.eval.Nurbs.knot_span_given_n = function(n,degree,u,knots) {
 	if(u >= knots[n + 1]) return n;
 	if(u < knots[degree]) return degree;
 	var low = degree;
@@ -685,5 +686,7 @@ if(Array.prototype.map == null) Array.prototype.map = function(f) {
 	return a;
 };
 verb.eval.Binomial.memo = new haxe.ds.IntMap();
+verb.eval.Constants.TOLERANCE = 1e-6;
+verb.eval.Constants.EPSILON = 1e-10;
 verb.eval.Init.main();
 })(typeof window != "undefined" ? window : exports);

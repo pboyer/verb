@@ -5,6 +5,7 @@ import verb.eval.types.CurveData;
 
 import verb.eval.Binomial;
 
+@:expose("Nurbs")
 class Nurbs {
 
 	// Compute the derivatives at a point on a NURBS surface
@@ -19,7 +20,6 @@ class Nurbs {
 	// + a point represented by an array of length (dim)
 	//
 
-	@:expose("rational_surface_derivs")
 	public static function rational_surface_derivs( surface : SurfaceData,
 													num_derivs : Int,
 													u : Float,
@@ -80,7 +80,6 @@ class Nurbs {
 	// + a point represented by an array of length (dim)
 	//
 
-	@:expose("rational_surface_point")
 	public static function rational_surface_point( surface : SurfaceData, u : Float, v : Float ) : Point {
 		return dehomogenize( surface_point( surface, u, v ) );
 	}
@@ -96,7 +95,6 @@ class Nurbs {
 	// + a point represented by an array of length (dim)
 	//
 
-	@:expose("rational_curve_derivs")
 	public static function rational_curve_derivs( curve : CurveData, u : Float, num_derivs : Int ) : Array<Point> {
 
 		var ders = curve_derivs( curve, u, num_derivs )
@@ -132,7 +130,7 @@ class Nurbs {
 	// + a point represented by an array of length (dim)
 	//
 
-	@:expose("rational_curve_point")
+	
 	public static function rational_curve_point( curve : CurveData, u : Float) : Point {
 		return dehomogenize( curve_point( curve, u) );
 	}
@@ -146,7 +144,7 @@ class Nurbs {
 	// + a point represented by an array pi with length (dim)
 	//
 
-	@:expose("dehomogenize")
+	
 	public static function dehomogenize( homo_point : Point ) : Point {
 
 		var dim = homo_point.length
@@ -171,7 +169,7 @@ class Nurbs {
 	// + array of points represented by an array (wi*pi) with length (dim)
 	//
 
-	@:expose("rational_1d")
+	
 	public static function rational_1d( homo_points : Array<Point> ) : Array<Point> {
 		var dim = homo_points[0].length - 1;
 		return homo_points.map(function(x : Point){ return x.slice(0,dim); });
@@ -187,7 +185,7 @@ class Nurbs {
 	// +  array of arrays of points, each represented by an array pi with length (dim)
 	//
 
-	@:expose("rational_2d")
+	
 	public static function rational_2d( homo_points : Array<Array<Point>> ) : Array<Array<Point>> {
 		return homo_points.map(rational_1d);
 	}
@@ -202,7 +200,7 @@ class Nurbs {
 	// + a point represented by an array pi with length (dim)
 	//
 
-	@:expose("weight_1d")
+	
 	public static function weight_1d( homo_points : Array<Point> ) : Array<Float> {
 		var dim = homo_points[0].length - 1;
 		return homo_points.map(function(x){ return x[dim]; });
@@ -218,7 +216,7 @@ class Nurbs {
 	// +  array of arrays of points, each represented by an array pi with length (dim)
 	//
 
-	@:expose("weight_2d")
+	
 	public static function weight_2d( homo_points : Array<Array<Point>> ) : Array<Array<Float>> {
 		return homo_points.map(weight_1d);
 	}
@@ -233,7 +231,7 @@ class Nurbs {
 	// + an array of points, each of length dim
 	//
 
-	@:expose("dehomogenize_1d")
+	
 	public static function dehomogenize_1d( homo_points : Array<Point> ) : Array<Point>{
 		return homo_points.map(dehomogenize);
 	}
@@ -247,7 +245,7 @@ class Nurbs {
 	// + array of arrays of points, each of length dim
 	//
 
-	@:expose("dehomogenize_2d")
+	
 	public static function dehomogenize_2d( homo_points : Array<Array<Point>> ) : Array<Array<Point>> {
 		return homo_points.map(dehomogenize_1d);
 	}
@@ -264,7 +262,7 @@ class Nurbs {
 	// hence the dimension of the point is dim + 1
 	//
 
-	@:expose("homogenize_1d")
+	
 	public static function homogenize_1d( control_points : Array<Point>, weights : Array<Float>) : Array<Point> {
 
 		var rows = control_points.length
@@ -303,7 +301,7 @@ class Nurbs {
 	// (m x n x dim+1)
 	//
 
-	@:expose("homogenize_2d")
+	
 	public static function homogenize_2d( control_points : Array<Array<Point>>,
 										  weights: Array<Array<Float>>) : Array<Array<Point>> {
 		var rows = control_points.length
@@ -329,7 +327,7 @@ class Nurbs {
 	// + a 2d jagged array representing the derivatives - u derivatives increase by row, v by column
 	//
 
-	@:expose("surface_derivs")
+	
 	public static function surface_derivs( surface : SurfaceData, num_derivatives : Int, u : Float, v : Float ) : Array<Array<Point>> {
 
 		var n = surface.knotsU.length - surface.degreeU - 2
@@ -353,7 +351,7 @@ class Nurbs {
 	// + a 2d jagged array representing the derivatives - u derivatives increase by row, v by column
 	//
 
-	@:expose("surface_derivs_given_n_m")
+	
 	public static function surface_derivs_given_n_m( n : Int,
 													 m : Int,
 													 surface : SurfaceData,
@@ -420,7 +418,7 @@ class Nurbs {
 	// + a point represented by an array of length (dim)
 	//
 
-	@:expose("surface_point")
+	
 	public static function surface_point( surface : SurfaceData, u : Float, v : Float) : Point {
 
 		var n = surface.knotsU.length - surface.degreeU - 2
@@ -444,7 +442,7 @@ class Nurbs {
 	// + a point represented by an array of length (dim)
 	//
 
-	@:expose("surface_point_given_n_m")
+	
 	public static function surface_point_given_n_m( n : Int, m : Int, surface : SurfaceData, u : Float, v : Float ) : Point {
 
 		var degree_u = surface.degreeU
@@ -498,7 +496,7 @@ class Nurbs {
 	// + a point represented by an array of length (dim)
 	//
 
-	@:expose("curve_derivs")
+	
 	public static function curve_derivs( crv : CurveData, u : Float, num_derivs : Int ) : Array<Point> {
 
 		var n = crv.knots.length - crv.degree - 2;
@@ -518,7 +516,7 @@ class Nurbs {
 	// + a point represented by an array of length (dim)
 	//
 
-	@:expose("curve_derivs_given_n")
+	
 	public static function curve_derivs_given_n( n : Int, curve : CurveData, u : Float, num_derivatives : Int ) : Array<Point> {
 
 		var degree = curve.degree
@@ -555,7 +553,7 @@ class Nurbs {
 	// + a point represented by an array of length (dim)
 	//
 
-	@:expose("curve_point")
+	
 	public static function curve_point( curve : CurveData, u : Float) {
 		var n = curve.knots.length - curve.degree - 2;
 		return curve_point_given_n( n, curve, u);
@@ -573,7 +571,7 @@ class Nurbs {
 	// + whether the values are correct
 	//
 
-	@:expose("are_valid_relations")
+	
 	public static function are_valid_relations( degree : Int, num_control_points : Int, knots_length : Int ) : Bool {
 		return num_control_points + degree + 1 - knots_length == 0;
 	}
@@ -590,7 +588,7 @@ class Nurbs {
 	// + a point represented by an array of length (dim)
 	//
 
-	@:expose("curve_point_given_n")
+	
 	public static function curve_point_given_n( n : Int, curve : CurveData, u : Float) : Point {
 
 		var degree = curve.degree
@@ -626,7 +624,7 @@ class Nurbs {
 	// + 2d array of basis and derivative values of size (n+1, p+1) The nth row is the nth derivative and the first row is made up of the basis function values.
 	//
 
-	@:expose("deriv_basis_functions")
+	
 	public static function deriv_basis_functions( u : Float, degree : Int, knots : KnotArray ): Array<Array<Float>>
 	{
 		var knot_span_index = knot_span( degree, u, knots )
@@ -650,7 +648,7 @@ class Nurbs {
 	// + 2d array of basis and derivative values of size (n+1, p+1) The nth row is the nth derivative and the first row is made up of the basis function values.
 	//
 
-	@:expose("deriv_basis_functions_given_n_i")
+	
 	public static function deriv_basis_functions_given_n_i( knot_span_index : Int, u : Float, p : Int,
 															n : Int, knots : KnotArray ) : Array<Array<Float>>
 	{
@@ -760,7 +758,7 @@ class Nurbs {
 	// **returns**
 	// + list of non-vanishing basis functions
 	//
-	@:expose("basis_functions")
+	
 	public static function basis_functions( u : Float, degree : Int, knots : KnotArray)
 	{
 		var knot_span_index = knot_span(degree, u, knots);
@@ -779,7 +777,7 @@ class Nurbs {
 	// **returns**
 	// + *Array*, list of non-vanishing basis functions
 	//
-	@:expose("basis_functions_given_knot_span_index")
+	
 	public static function basis_functions_given_knot_span_index( knot_span_index : Int,
 																  u : Float,
 																  degree : Int,
@@ -821,7 +819,7 @@ class Nurbs {
 	// **returns** 
 	// + the index of the knot span
 	//
-	@:expose("knot_span")
+	
 	public static function knot_span( degree : Int, u : Float, knots : Array<Float> ) : Int
 	{
 		var m = knots.length - 1
@@ -842,7 +840,7 @@ class Nurbs {
 	// **returns** 
 	// + the index of the knot span
 	//
-	@:expose("knot_span_given_n")
+	
 	public static function knot_span_given_n( n : Int, degree : Int, u : Float, knots : Array<Float> ) : Int
 	{
 		if ( u >= knots[n+1] )

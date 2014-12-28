@@ -1,6 +1,8 @@
 package verb.eval;
 
 import verb.eval.types.CurveData;
+
+@:expose("Modify")
 class Modify {
 
 //    public static function surface_split( surface : SurfaceData, u : Float, dir : Bool) : Array<SurfaceData> {
