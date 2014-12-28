@@ -2,11 +2,12 @@ package verb;
 
 import verb.BoundingBox;
 import verb.eval.Constants;
+import verb.eval.Trig;
 import verb.eval.Utils;
 import verb.eval.Nurbs;
 import verb.eval.Mesh;
 import verb.eval.Intersect;
-import verb.eval.Tessellate;
+import verb.eval.Tess;
 import verb.eval.Create;
 import verb.eval.Modify;
 import verb.eval.Analyze;

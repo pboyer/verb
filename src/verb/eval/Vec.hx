@@ -5,6 +5,14 @@ using Lambda;
 @:expose("eval.Vec")
 class Vec {
 
+    public static function normalized( arr : Array<Float> ){
+        return div( arr, normSquared(arr) );
+    }
+
+    public static function cross(u : Array<Float>, v : Array<Float>) : Array<Float>{
+        return [u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
+    }
+
     public static function transpose<T>(a : Array<Array<T>>) : Array<Array<T>> {
         if (a.length == 0) return [];
         return [ for (i in 0...a[0].length) [for (j in 0...a.length) a[j][i] ]  ];
@@ -46,15 +54,27 @@ class Vec {
         return [ for (i in 0...rows) zeros2d(cols, depth) ];
     }
 
-    public static function add(a : Array<Float>, b : Array<Float>){
+    public static function dot(a : Array<Float>, b : Array<Float>) : Float {
+        var sum : Float = 0;
+        for (i in 0...a.length){
+            sum += a[i] * b[i];
+        }
+        return sum;
+    }
+
+    public static function add(a : Array<Float>, b : Array<Float>) : Array<Float>{
         return [ for (i in 0...a.length) a[i] + b[i] ];
     }
 
-    public static function mul(a : Float, b : Array<Float>){
+    public static function mul(a : Float, b : Array<Float>) : Array<Float>{
         return [ for (i in 0...b.length) a * b[i] ];
     }
 
-    public static function sub(a : Array<Float>, b : Array<Float>){
+    public static function div(a : Array<Float>, b : Float ) : Array<Float>{
+        return [ for (i in 0...a.length) a[i] / b ];
+    }
+
+    public static function sub(a : Array<Float>, b : Array<Float>) : Array<Float>{
         return [ for (i in 0...a.length) a[i] - b[i] ];
     }
 }
