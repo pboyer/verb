@@ -1,3 +1,5 @@
+package verb.eval;
+
 class Vec {
     public static function zeros1d(rows : Int) : Array<Float> {
         return [ for (i in 0...rows) 0.0 ];

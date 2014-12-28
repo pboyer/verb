@@ -1,5 +1,6 @@
-@:expose("Analyze")
-class Analyze {
+package verb.eval;
+
+class Create {
 	public static function ok() : Int {
 		return Tessellate.ok();
 	}

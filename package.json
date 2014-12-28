@@ -31,6 +31,7 @@
     "grunt-docco": "0.3.0",
     "grunt-haxe": "^0.1.12",
     "grunt-mocha-test": "^0.12.2",
+    "grunt-text-replace": "^0.4.0",
     "mocha": "^2.0.1",
     "should": "2.1.0"
   },

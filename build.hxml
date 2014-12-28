@@ -1,4 +1,4 @@
--main Init
--cp src/eval_hx
--js build/verbEvalHaxe.js
+-main verb.eval.Init
+-cp src
+-js build/verbHaxe.js
 -dce std

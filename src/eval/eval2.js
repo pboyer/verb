@@ -624,7 +624,7 @@ public static function rational_surface_derivs( degree_u, knots_u, degree_v, kno
 			for (i = 1; i <= k; i++) {
 				v = Vec.sub( v, Vec.mul( Vec.mul( binomial.get(k, i), wders[i][0] ), SKL[k-i][l] ) );
 
-				var v2 = public static function zeros_1d(dim);
+				var v2 = public static function zeros1d(dim);
 
 				for (j = 1; j <= l; j++) {
 					v2 = Vec.add( v2, Vec.mul( Vec.mul( binomial.get(l, j), wders[i][j] ), SKL[k-i][l-j] ) );
@@ -1026,12 +1026,12 @@ public static function surface_derivs_given_n_m( n, degree_u, knots_u, m, degree
 	var dim = control_points[0][0].length
 		, du = Math.min(num_derivatives, degree_u)
 		, dv = Math.min(num_derivatives, degree_v)
-		, SKL = public static function zeros_3d( du+1, dv+1, dim )
+		, SKL = public static function zeros3d( du+1, dv+1, dim )
 		, knot_span_index_u = public static function knot_span_given_n( n, degree_u, u, knots_u )
 		, knot_span_index_v = public static function knot_span_given_n( m, degree_v, v, knots_v )
 		, uders = public static function deriv_basis_functions_given_n_i( knot_span_index_u, u, degree_u, n, knots_u )
 		, vders = public static function deriv_basis_functions_given_n_i( knot_span_index_v, v, degree_v, m, knots_v )
-		, temp = public static function zeros_2d( degree_v+1, dim )
+		, temp = public static function zeros2d( degree_v+1, dim )
 		, k = 0
 		, s = 0
 		, r = 0
@@ -1040,7 +1040,7 @@ public static function surface_derivs_given_n_m( n, degree_u, knots_u, m, degree
 
 	for (k = 0; k <= du; k++) {
 		for (s = 0; s <= degree_v; s++) {
-			temp[s] = public static function zeros_1d( dim );
+			temp[s] = public static function zeros1d( dim );
 
 			for (r = 0; r <= degree_u; r++) {
 				temp[s] = Vec.add( temp[s], Vec.mul( uders[k][r], control_points[knot_span_index_u-degree_u+r][knot_span_index_v-degree_v+s]) );
@@ -1050,7 +1050,7 @@ public static function surface_derivs_given_n_m( n, degree_u, knots_u, m, degree
 		dd = Math.min(num_derivatives-k, dv);
 
 		for (l = 0; l <= dd; l++) {
-			SKL[k][l] = public static function zeros_1d( dim );
+			SKL[k][l] = public static function zeros1d( dim );
 
 			for (s = 0; s <= degree_v; s++) {
 				SKL[k][l] = Vec.add( SKL[k][l], Vec.mul( vders[l][s], temp[s] ) );
@@ -1061,33 +1061,6 @@ public static function surface_derivs_given_n_m( n, degree_u, knots_u, m, degree
 	return SKL;
 }
 
-//
-// ####surface_point( degree_u, knots_u, degree_v, knots_v, control_points, u, v)
-//
-// Compute a point on a non-uniform, non-rational B-spline surface
-//
-// **params**
-// + integer degree of surface in u direction
-// + array of nondecreasing knot values in u direction
-// + integer degree of surface in v direction
-// + array of nondecreasing knot values in v direction
-// + 3d array of control points, where rows are the u dir, and columns run along the positive v direction,
-// and where each control point is an array of length (dim)
-// + u parameter at which to evaluate the surface point
-// + v parameter at which to evaluate the surface point
-//
-// **returns**
-// + a point represented by an array of length (dim)
-//
-
-public static function surface_point( degree_u, knots_u, degree_v, knots_v, control_points, u, v) {
-
-	var n = knots_u.length - degree_u - 2
-		, m = knots_v.length - degree_v - 2;
-
-	return 	public static function surface_point_given_n_m( n, degree_u, knots_u, m, degree_v, knots_v, control_points, u, v );
-
-}
 
 //
 // ####volume_point( degree_u, knots_u, degree_v, knots_v, degree_w, knots_w, control_points, u, v, w  )
@@ -1167,20 +1140,20 @@ public static function volume_point_given_n_m_l( n, degree_u, knots_u, m, degree
 		, uind = knot_span_index_u - degree_u
 		, vind = knot_span_index_v
 		, wind = knot_span_index_w
-		, position = public static function zeros_1d( dim )
-		, temp = public static function zeros_1d( dim )
-		, temp2 = public static function zeros_1d( dim )
+		, position = public static function zeros1d( dim )
+		, temp = public static function zeros1d( dim )
+		, temp2 = public static function zeros1d( dim )
 		, j = 0
 		, k = 0;
 
 	for (var i = 0; i <= degree_w; i++){
 
-		temp2 = public static function zeros_1d( dim );
+		temp2 = public static function zeros1d( dim );
 		wind = knot_span_index_w - degree_w + i;
 
 		for (j = 0; j <= degree_v; j++) {
 
-			temp = public static function zeros_1d( dim );
+			temp = public static function zeros1d( dim );
 			vind = knot_span_index_v  - degree_v + j;
 
 			for (k = 0; k <= degree_u; k++) {
@@ -1199,6 +1172,35 @@ public static function volume_point_given_n_m_l( n, degree_u, knots_u, m, degree
 	}
 
 	return position;
+}
+
+
+//
+// ####surface_point( degree_u, knots_u, degree_v, knots_v, control_points, u, v)
+//
+// Compute a point on a non-uniform, non-rational B-spline surface
+//
+// **params**
+// + integer degree of surface in u direction
+// + array of nondecreasing knot values in u direction
+// + integer degree of surface in v direction
+// + array of nondecreasing knot values in v direction
+// + 3d array of control points, where rows are the u dir, and columns run along the positive v direction,
+// and where each control point is an array of length (dim)
+// + u parameter at which to evaluate the surface point
+// + v parameter at which to evaluate the surface point
+//
+// **returns**
+// + a point represented by an array of length (dim)
+//
+
+public static function surface_point( degree_u, knots_u, degree_v, knots_v, control_points, u, v) {
+
+	var n = knots_u.length - degree_u - 2
+		, m = knots_v.length - degree_v - 2;
+
+	return 	public static function surface_point_given_n_m( n, degree_u, knots_u, m, degree_v, knots_v, control_points, u, v );
+
 }
 
 //
@@ -1237,14 +1239,14 @@ public static function surface_point_given_n_m( n, degree_u, knots_u, m, degree_
 		, v_basis_vals = public static function basis_functions_given_knot_span_index( knot_span_index_v, v, degree_v, knots_v )
 		, uind = knot_span_index_u - degree_u
 		, vind = knot_span_index_v
-		, position = public static function zeros_1d( dim )
-		, temp = public static function zeros_1d( dim )
+		, position = public static function zeros1d( dim )
+		, temp = public static function zeros1d( dim )
 		, l = 0
 		, k = 0;
 
 	for (l = 0; l <= degree_v; l++) {
 
-		temp = public static function zeros_1d( dim );
+		temp = public static function zeros1d( dim );
 		vind = knot_span_index_v - degree_v + l;
 
 		// sample u isoline
@@ -1307,7 +1309,7 @@ public static function curve_derivs_given_n( n, degree, knots, control_points, u
 
 	var dim = control_points[0].length
 		, du = Math.min(num_derivatives, degree)
-		, CK = public static function zeros_2d( du+1, dim )
+		, CK = public static function zeros2d( du+1, dim )
 		, knot_span_index = public static function knot_span_given_n( n, degree, u, knots )
 		, nders = public static function deriv_basis_functions_given_n_i( knot_span_index, u, degree, du, knots )
 		, k = 0
@@ -1389,7 +1391,7 @@ public static function curve_point_given_n( n, degree, knots, control_points, u)
 
 	var knot_span_index = public static function knot_span_given_n( n, degree, u, knots )
 		, basis_values = public static function basis_functions_given_knot_span_index( knot_span_index, u, degree, knots )
-		, position = public static function zeros_1d( control_points[0].length );
+		, position = public static function zeros1d( control_points[0].length );
 
 		for (var j = 0; j <= degree; j++ )	{
 			position = Vec.add( position, Vec.mul( basis_values[j], control_points[ knot_span_index - degree + j ] ) );
@@ -1399,7 +1401,7 @@ public static function curve_point_given_n( n, degree, knots, control_points, u)
 }
 
 //
-// ####zeros_1d(size)
+// ####zeros1d(size)
 //
 // Generate a 1d array of zeros
 //
@@ -1410,12 +1412,12 @@ public static function curve_point_given_n( n, degree, knots, control_points, u)
 // + 1d array of given size
 //
 
-public static function zeros_1d(size) {
+public static function zeros1d(size) {
   return Vec.rep([size], 0);
 }
 
 //
-// ####zeros_2d(rows, cols)
+// ####zeros2d(rows, cols)
 //
 // Generate a 2D array of zeros
 //
@@ -1427,7 +1429,7 @@ public static function zeros_1d(size) {
 // + 2d array of given size
 //
 
-public static function zeros_2d(rows, cols) {
+public static function zeros2d(rows, cols) {
   cols = cols > 0 ? cols : 0;
   rows = rows > 0 ? rows : 0;
 
@@ -1435,7 +1437,7 @@ public static function zeros_2d(rows, cols) {
 }
 
 //
-// ####zeros_3d(rows, cols, dim)
+// ####zeros3d(rows, cols, dim)
 //
 // Generate a 3D array of zeros
 //
@@ -1448,7 +1450,7 @@ public static function zeros_2d(rows, cols) {
 // + 3d array of given size
 //
 
-public static function zeros_3d(rows, cols, dim) {
+public static function zeros3d(rows, cols, dim) {
   cols = cols > 0 ? cols : 0;
   rows = rows > 0 ? rows : 0;
 
@@ -1497,7 +1499,7 @@ public static function deriv_basis_functions( u, degree, knots )
 
 public static function deriv_basis_functions_given_n_i( knot_span_index, u, p, n, knots )
 {
-	var ndu = public static function zeros_2d(p+1, p+1)
+	var ndu = public static function zeros2d(p+1, p+1)
 		, left = new Array( p + 1 )
 		, right = new Array( p + 1 )
 		, saved = 0
@@ -1526,8 +1528,8 @@ public static function deriv_basis_functions_given_n_i( knot_span_index, u, p, n
 	}
 
 
-	var ders = public static function zeros_2d(n+1, p+1)
-		, a = public static function zeros_2d(2, p+1)
+	var ders = public static function zeros2d(n+1, p+1)
+		, a = public static function zeros2d(2, p+1)
 		, k = 1
 		, s1 = 0
 		, s2 = 1

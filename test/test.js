@@ -1,5 +1,7 @@
 var should = require('should')
-	, verb = require('../build/verb.js');
+	, verb = {};
+
+verb.eval = require('../build/verbCore.js');
 
 function vecShouldBe( expected, test, tol ){
 
@@ -13,35 +15,37 @@ function vecShouldBe( expected, test, tol ){
 
 }
 
-describe("Array.flatten",function(){
+console.log(verb)
 
-	it('returns a flattened version of a nested array', function(){
-
-		var arr = [ [1,2] , 1, [1, 2, 3, 4], [1, [1,2]]];
-		var flattened = arr.flatten();
-
-		flattened.should.eql([1,2,1,1,2,3,4,1,1,2]);
-
-	});
-
-	it('returns an empty array when asked to flatten an empty array', function(){
-
-		var arr = [];
-		var flattened = arr.flatten();
-
-		flattened.should.eql([]);
-
-	});
-
-	it('returns a 1d array when asked to flatten a 1d array', function(){
-
-		var arr = [1,2,3,4];
-		var flattened = arr.flatten();
-
-		flattened.should.eql([1,2,3,4]);
-
-	});
-});
+//describe("Array.flatten",function(){
+//
+//	it('returns a flattened version of a nested array', function(){
+//
+//		var arr = [ [1,2] , 1, [1, 2, 3, 4], [1, [1,2]]];
+//		var flattened = arr.flatten();
+//
+//		flattened.should.eql([1,2,1,1,2,3,4,1,1,2]);
+//
+//	});
+//
+//	it('returns an empty array when asked to flatten an empty array', function(){
+//
+//		var arr = [];
+//		var flattened = arr.flatten();
+//
+//		flattened.should.eql([]);
+//
+//	});
+//
+//	it('returns a 1d array when asked to flatten a 1d array', function(){
+//
+//		var arr = [1,2,3,4];
+//		var flattened = arr.flatten();
+//
+//		flattened.should.eql([1,2,3,4]);
+//
+//	});
+//});
 
 describe("verb.eval.knot_span_given_n",function(){
 
@@ -107,6 +111,68 @@ describe("verb.eval.basis_functions, basis_functions_given_knot_span_index",func
 
 });
 
+describe("verb.eval.curve_point",function(){
+
+	it('returns correct result for simple curve', function(){
+
+		var degree = 2
+			, n = 6
+			, knots = [0, 0, 0, 1, 2, 3, 4, 5, 5, 5]
+			, control_points = [ [10, 0], [20, 10], [30, 20], [40, 30], [50, 40], [60, 30], [70, 80]]
+			, crv = new verb.eval.CurveData( degree, knots, control_points  );
+
+		var p = verb.eval.curve_point_given_n( n, crv, 2.5);
+
+		should.equal( p[0], 40 );
+		should.equal( p[1], 30 );
+
+		var p_start = verb.eval.curve_point_given_n( n, crv, 0);
+
+		should.equal( p_start[0], 10 );
+		should.equal( p_start[1], 0 );
+
+		var p_end = verb.eval.curve_point_given_n( n, crv, 5);
+
+		should.equal( p_end[0], 70 );
+		should.equal( p_end[1], 80 );
+
+	});
+
+	it('returns correct result for simple curve', function(){
+
+		var degree = 3
+			, n = 4
+			, u = 0
+			, knots = [0, 0, 0, 0, 1, 1, 1, 1]
+			, control_points = [ [10, 0], [20, 10], [30, 20], [50, 50] ]
+			, crv = new verb.eval.CurveData( degree, knots, control_points );
+
+		var p = verb.eval.curve_point( crv, u);
+
+		should.equal( p[0], 10 );
+		should.equal( p[1], 0 );
+
+		var p2 = verb.eval.curve_point( crv, 1.0);
+
+		should.equal( p2[0], 50 );
+		should.equal( p2[1], 50 );
+
+
+	});
+});
+
+describe("verb.eval.are_valid_relations",function(){
+
+	it('returns correct result for two cases', function(){
+
+		should.equal( false, verb.eval.are_valid_relations( 0, 0, 0 ) );
+		should.equal( true, verb.eval.are_valid_relations( 2, 2, 5 ) );
+
+	});
+});
+
+
+
 describe("verb.eval.deriv_basis_functions_given_n_i",function(){
 
 	it('returns correct results', function(){
@@ -131,7 +197,7 @@ describe("verb.eval.deriv_basis_functions_given_n_i",function(){
 		should.equal( 0.5, N1[1][2] );
 		should.equal( 1, N1[2][2] );
 
-		// length 
+		// length
 		should.equal( n + 1, N1.length );
 		should.equal( degree + 1, N1[0].length );
 
@@ -139,81 +205,21 @@ describe("verb.eval.deriv_basis_functions_given_n_i",function(){
 
 });
 
-describe("verb.eval.curve_point",function(){
 
-	it('returns correct result for simple curve', function(){
-
-		var degree = 2
-			, n = 6
-			, knots = [0, 0, 0, 1, 2, 3, 4, 5, 5, 5]
-			, control_points = [ [10, 0], [20, 10], [30, 20], [40, 30], [50, 40], [60, 30], [70, 80]];
-
-		var p = verb.eval.curve_point_given_n( n, degree, knots, control_points, 2.5);
-
-		should.equal( p[0], 40 );
-		should.equal( p[1], 30 );
-
-		var p_start = verb.eval.curve_point_given_n( n, degree, knots, control_points, 0);
-
-		should.equal( p_start[0], 10 );
-		should.equal( p_start[1], 0 );
-
-		var p_end = verb.eval.curve_point_given_n( n, degree, knots, control_points, 5);
-
-		should.equal( p_end[0], 70 );
-		should.equal( p_end[1], 80 );
-
-	});
-});
-
-describe("verb.eval.are_valid_relations",function(){
-
-	it('returns correct result for two cases', function(){
-
-		should.equal( false, verb.eval.are_valid_relations( 0, 0, 0 ) );
-		should.equal( true, verb.eval.are_valid_relations( 2, 2, 5 ) );
-
-	});
-});
-
-describe("verb.eval.curve_point",function(){
-
-	it('returns correct result for simple curve', function(){
-
-		var degree = 3
-			, n = 4
-			, u = 0
-			, knots = [0, 0, 0, 0, 1, 1, 1, 1]
-			, control_points = [ [10, 0], [20, 10], [30, 20], [50, 50] ];
-
-		var p = verb.eval.curve_point( degree, knots, control_points, u);
-
-		should.equal( p[0], 10 );
-		should.equal( p[1], 0 );
-
-		var p2 = verb.eval.curve_point( degree, knots, control_points, 1.0);
-
-		should.equal( p2[0], 50 );
-		should.equal( p2[1], 50 );
-
-
-	});
-
-});
 
 describe("verb.eval.curve_derivs_given_n",function(){
 
 	it('returns correct result for simple curve', function(){
 
-		// This needs to be tested better
 		var degree = 3
 			, n = 3
 			, u = 0
 			, knots = [0, 0, 0, 0, 1, 1, 1, 1]
 			, control_points = [ [10, 0], [20, 10], [30, 20], [50, 50] ]
-			, num_derivs = 2;
+			, num_derivs = 2
+			, crv = new verb.eval.CurveData( degree, knots, control_points );
 
-		var p = verb.eval.curve_derivs_given_n( n, degree, knots, control_points, u, num_derivs ) ;
+		var p = verb.eval.curve_derivs_given_n( n, crv, u, num_derivs ) ;
 
 		should.equal( p[0][0], 10 );
 		should.equal( p[0][1], 0 );
@@ -222,6 +228,8 @@ describe("verb.eval.curve_derivs_given_n",function(){
 	});
 
 });
+
+
 
 describe("verb.eval.curve_derivs",function(){
 
@@ -232,9 +240,10 @@ describe("verb.eval.curve_derivs",function(){
 			, u = 0
 			, knots = [0, 0, 0, 0, 1, 1, 1, 1]
 			, control_points = [ [10, 0], [20, 10], [30, 20], [50, 50] ]
-			, num_derivs = 2;
+			, num_derivs = 2
+			, crv = new verb.eval.CurveData( degree, knots, control_points );
 
-		var p = verb.eval.curve_derivs( degree, knots, control_points, u, num_derivs ) ;
+		var p = verb.eval.curve_derivs( crv, u, num_derivs ) ;
 
 		should.equal( p[0][0], 10 );
 		should.equal( p[0][1], 0 );
@@ -244,6 +253,8 @@ describe("verb.eval.curve_derivs",function(){
 	});
 
 });
+
+
 
 describe("verb.eval.surface_point_given_n_m",function(){
 
@@ -258,16 +269,17 @@ describe("verb.eval.surface_point_given_n_m",function(){
 														[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] 	],
 														[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] 	],
 														[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
+			, surface = new verb.eval.SurfaceData( degree_u, degree_v, knots_u, knots_v, control_points )
 			, n = 3
 			, m = 3;
 
-		var p = verb.eval.surface_point_given_n_m( n, degree_u, knots_u, m, degree_v, knots_v, control_points, 0, 0 );
+		var p = verb.eval.surface_point_given_n_m( n, m, surface, 0, 0 );
 		
 		should.equal( p[0], 0 );
 		should.equal( p[1], 0 );
 		should.equal( p[2], 50 );
 
-		p = verb.eval.surface_point_given_n_m( n, degree_u, knots_u, m, degree_v, knots_v, control_points, 1, 1 );
+		p = verb.eval.surface_point_given_n_m( n, m, surface, 1, 1 );
 
 		should.equal( p[0], 30 );
 		should.equal( p[1], -30 );
@@ -287,17 +299,18 @@ describe("verb.eval.surface_point",function(){
 			, knots_u = [0, 0, 0, 0, 1, 1, 1, 1]
 			, knots_v =	[0, 0, 0, 0, 1, 1, 1, 1]
 			, control_points = [ 	[ [0, 0, 50], 		[10, 0, 0], 		[20, 0, 0], 		[30, 0, 0] 		],
-														[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] 	],
-														[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] 	],
-														[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ];
+									[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] 	],
+									[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] 	],
+									[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
+			, surface = new verb.eval.SurfaceData( degree_u, degree_v, knots_u, knots_v, control_points );
 
-		var p = verb.eval.surface_point( degree_u, knots_u, degree_v, knots_v, control_points, 0, 0 );
+		var p = verb.eval.surface_point( surface, 0, 0 );
 
 		should.equal( p[0], 0 );
 		should.equal( p[1], 0 );
 		should.equal( p[2], 50 );
 
-		p = verb.eval.surface_point( degree_u, knots_u, degree_v, knots_v, control_points, 1, 1 );
+		p = verb.eval.surface_point( surface, 1, 1 );
 
 		should.equal( p[0], 30 );
 		should.equal( p[1], -30 );
@@ -312,9 +325,10 @@ describe("verb.eval.surface_point",function(){
 			, knots_u = [0, 0, 1, 1 ]
 			, knots_v =	[0, 0, 0, 0, 1, 1, 1, 1]
 			, control_points = [ 	[ [0, 0, 50], 		[10, 0, 0], 		[20, 0, 0], 		[30, 0, 0] 		],
-														[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] 	] ];
+									[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] 	] ]
+			, surface = new verb.eval.SurfaceData( degree_u, degree_v, knots_u, knots_v, control_points );
 
-		var p = verb.eval.surface_point( degree_u, knots_u, degree_v, knots_v, control_points, 0, 0 );
+		var p = verb.eval.surface_point( surface, 0, 0 );
 
 		should.equal( p[0], 0 );
 		should.equal( p[1], 0 );
@@ -323,6 +337,8 @@ describe("verb.eval.surface_point",function(){
 	});
 
 });
+
+
 
 describe("verb.eval.surface_derivs_given_n_m",function(){
 
@@ -340,9 +356,10 @@ describe("verb.eval.surface_derivs_given_n_m",function(){
 														[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
 			, n = 3
 			, m = 3
-			, num_derivatives = 1;
+			, num_derivatives = 1
+			, surface = new verb.eval.SurfaceData( degree_u, degree_v, knots_u, knots_v, control_points );
 
-		var p = verb.eval.surface_derivs_given_n_m( n, degree_u, knots_u, m, degree_v, knots_v, control_points, num_derivatives, 0, 0 );
+		var p = verb.eval.surface_derivs_given_n_m( n, m, surface, num_derivatives, 0, 0 );
 
 		// 0th derivative with respect to u & v
 		should.equal( p[0][0][0], 0 );
@@ -382,9 +399,10 @@ describe("verb.eval.surface_derivs",function(){
 														[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
 			, n = 3
 			, m = 3
-			, num_derivatives = 1;
+			, num_derivatives = 1
+			, surface = new verb.eval.SurfaceData( degree_u, degree_v, knots_u, knots_v, control_points );
 
-		var p = verb.eval.surface_derivs( degree_u, knots_u, degree_v, knots_v, control_points, num_derivatives, 0, 0 );
+		var p = verb.eval.surface_derivs( surface, num_derivatives, 0, 0 );
 
 		// 0th derivative with respect to u & v
 		should.equal( p[0][0][0], 0 );
@@ -502,6 +520,7 @@ describe("verb.eval.dehomogenize",function(){
 
 });
 
+
 describe("verb.eval.rational_curve_point",function(){
 
 	it('returns correct result for quarter circle', function(){
@@ -509,20 +528,20 @@ describe("verb.eval.rational_curve_point",function(){
 		// this represents a single quarter arc, using a rational bezier curve
 		var degree = 2
 			, knots = [0, 0, 0, 1, 1, 1 ]
-			, weights = [1, 1, 2]
-			, control_points = [ [1, 0], [1,1], [0,1] ];
+			, control_points = [ [1, 0, 1], [1,1,1], [0,2,2] ]
+			, crv = new verb.eval.CurveData( degree, knots, control_points );
 
-		var p = verb.eval.rational_curve_point( degree, knots, verb.eval.homogenize_1d( control_points, weights) , 0);
+		var p = verb.eval.rational_curve_point( crv, 0);
 
 		should.equal( p[0], 1 );
 		should.equal( p[1], 0 );
 
-		p = verb.eval.rational_curve_point( degree, knots, verb.eval.homogenize_1d( control_points, weights) , 0.5);
+		p = verb.eval.rational_curve_point( crv, 0.5);
 
 		should.equal( p[0], 0.6 );
 		should.equal( p[1], 0.8 );
 
-		p = verb.eval.rational_curve_point( degree, knots, verb.eval.homogenize_1d( control_points, weights) , 1);
+		p = verb.eval.rational_curve_point( crv, 1);
 
 		should.equal( p[0], 0 );
 		should.equal( p[1], 1 );
@@ -531,7 +550,7 @@ describe("verb.eval.rational_curve_point",function(){
 
 });
 
-describe("verb.eval.rational_curve_point",function(){
+describe("verb.eval.rational_surface_point",function(){
 
 	it('returns correct result for cylinder patch', function(){
 
@@ -540,22 +559,23 @@ describe("verb.eval.rational_curve_point",function(){
 			, degree_v = 2
 			, knots_u = [0, 0, 1, 1 ]
 			, knots_v = [0, 0, 0, 1, 1, 1 ]
-			, homo_control_points = [ [ [1, 1, 0, 1], 	[1, 1, 1, 1], [2, 0, 2, 2] ],
-													 		  [ [-1, 1, 0, 1], 	[-1, 1, 1, 1], [-2, 0, 2, 2] ] ];
+			, control_points = [ [ [1, 1, 0, 1], 	[1, 1, 1, 1], [2, 0, 2, 2] ],
+													 		  [ [-1, 1, 0, 1], 	[-1, 1, 1, 1], [-2, 0, 2, 2] ] ]
+			, surface = new verb.eval.SurfaceData( degree_u, degree_v, knots_u, knots_v, control_points );
 
-		var p = verb.eval.rational_surface_point( degree_u, knots_u,  degree_v, knots_v, homo_control_points, 0, 0 );
+		var p = verb.eval.rational_surface_point( surface, 0, 0 );
 
 		should.equal( p[0], 1 );
 		should.equal( p[1], 1 );
 		should.equal( p[2], 0 );
 
-		p = verb.eval.rational_surface_point( degree_u, knots_u,  degree_v, knots_v, homo_control_points, 0.5, 0.5 );
+		p = verb.eval.rational_surface_point( surface, 0.5, 0.5 );
 
 		should.equal( p[0], 0 );
 		should.equal( p[1], 0.6 );
 		should.equal( p[2], 0.8 );
 
-		p = verb.eval.rational_surface_point( degree_u, knots_u,  degree_v, knots_v, homo_control_points, 1, 1 );
+		p = verb.eval.rational_surface_point( surface, 1, 1 );
 
 		should.equal( p[0], -1 );
 		should.equal( p[1], 0 );
@@ -564,61 +584,7 @@ describe("verb.eval.rational_curve_point",function(){
 	});
 });
 
-describe("verb.eval.separate_homo_derivs_1d",function(){
 
-	it('returns expected results', function(){
-
-		var CK = [ [1, 1, 0, 1], [1, 1, 1, 1], [2, 0, 2, 2] ]
-			, ders = verb.eval.separate_homo_derivs_1d( CK )
-			, Aders = ders[0]
-			, wders = ders[1];
-
-		should.equal( Aders.length, wders.length );
-		should.equal( CK.length, wders.length );
-
-		for (var i = 0, l = Aders.length; i < l; i++)
-		{
-			should.equal( Aders[i].length, 3);
-			should.equal( CK[i][0], Aders[i][0] );
-			should.equal( CK[i][1], Aders[i][1] );
-			should.equal( CK[i][2], Aders[i][2] );
-			should.equal( CK[i][3], wders[i] );
-
-		}
-
-	});
-
-});
-
-describe("verb.eval.separate_homo_derivs_2d",function(){
-
-	it('returns expected results', function(){
-
-		var SKL = [ [ [1, 1, 0, 1], 	[1, 1, 1, 1], [2, 0, 2, 2] ],
-								[ [-1, 1, 0, 1], 	[-1, 1, 1, 1], [-2, 0, 2, 2] ] ]
-			, ders = verb.eval.separate_homo_derivs_2d( SKL )
-			, Aders = ders[0]
-			, wders = ders[1];
-		
-		should.equal( Aders.length, wders.length );
-		should.equal( SKL.length, wders.length );
-
-		for (var i = 0, rows = SKL.length, j = 0, cols = 0; i < rows; i++) {
-			should.equal( Aders[i].length, wders[i].length );
-			should.equal( wders[i].length, SKL[i].length );
-
-			for (j = 0, cols = SKL[i].length; j < cols ; j++) {
-				should.equal( Aders[i][j].length, 3);
-				should.equal( SKL[i][j][0], Aders[i][j][0] );
-				should.equal( SKL[i][j][1], Aders[i][j][1] );
-				should.equal( SKL[i][j][2], Aders[i][j][2] );
-				should.equal( SKL[i][j][3], wders[i][j] );
-			}
-		}
-	
-	});
-
-});
 
 describe("verb.eval.rational_curve_derivs",function(){
 
@@ -627,10 +593,10 @@ describe("verb.eval.rational_curve_derivs",function(){
 		// this represents a single quarter arc, using a rational bezier curve
 		var degree = 2
 			, knots = [0, 0, 0, 1, 1, 1 ]
-			, weights = [1, 1, 2]
-			, control_points = [ [1, 0], [1,1], [0,1] ];
+			, control_points = [ [1,0,1], [1,1,1], [0,2,2] ]
+			, crv = new verb.eval.CurveData( degree, knots, control_points );
 
-		var p = verb.eval.rational_curve_derivs( degree, knots, verb.eval.homogenize_1d( control_points, weights), 0, 2);
+		var p = verb.eval.rational_curve_derivs( crv, 0, 2);
 
 		should.equal( p[0][0], 1 );
 		should.equal( p[0][1], 0 );
@@ -641,7 +607,7 @@ describe("verb.eval.rational_curve_derivs",function(){
 		should.equal( p[2][0], -4 );
 		should.equal( p[2][1], 0 );
 
-		p = verb.eval.rational_curve_derivs( degree, knots, verb.eval.homogenize_1d( control_points, weights), 1, 2);
+		p = verb.eval.rational_curve_derivs( crv, 1, 2);
 
 		should.equal( p[0][0], 0 );
 		should.equal( p[0][1], 1 );
@@ -649,13 +615,15 @@ describe("verb.eval.rational_curve_derivs",function(){
 		should.equal( p[1][0], -1 );
 		should.equal( p[1][1], 0 );
 
-		// TODO: need additional checks here
 		should.equal( p[2][0], 1 );
 		should.equal( p[2][1], -1 );
 
 	});
 
 });
+
+/*
+
 
 describe("verb.eval.rational_surface_derivs",function(){
 
@@ -6432,3 +6400,5 @@ describe("verb.eval.rational_surface_closest_point",function(){
 	});
 
 });
+
+*/

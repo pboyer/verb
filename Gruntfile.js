@@ -9,23 +9,25 @@ module.exports = function(grunt) {
     concat: {
       build: {
         files: {
-          'build/<%= pkg.name %>.js': [ 'src/verb.js', 
-                                        'src/core/*.js', 
-                                        'src/geom/base/Geometry.js', 
-                                        'src/geom/base/NurbsGeometry.js', 
-                                        'src/geom/base/NurbsCurve.js', 
-                                        'src/geom/base/NurbsSurface.js', 
-                                        'src/geom/*.js', 
-                                        'src/intersect/*.js', 
-                                        'src/eval/intersect.js',
-                                        'src/eval/tessellate.js',
-                                        'src/eval/geom.js',
-                                        'src/eval/eval.js' ],
-          'build/<%= pkg.name %>Eval.js': [ 'src/eval/header.js', 
-                                            'src/eval/intersect.js', 
-                                            'src/eval/tessellate.js', 
-                                            'src/eval/geom.js', 
-                                            'src/eval/eval.js']
+//          'build/<%= pkg.name %>.js': [ 'src/verb.js',
+//                                        'src/core/*.js',
+//                                        'src/geom/base/Geometry.js',
+//                                        'src/geom/base/NurbsGeometry.js',
+//                                        'src/geom/base/NurbsCurve.js',
+//                                        'src/geom/base/NurbsSurface.js',
+//                                        'src/geom/*.js',
+//                                        'src/intersect/*.js',
+//                                        'src/eval/intersect.js',
+//                                        'src/eval/tessellate.js',
+//                                        'src/eval/geom.js',
+//                                        'src/eval/eval.js' ],
+//          'build/<%= pkg.name %>Eval.js': [ 'src/eval/header.js',
+//                                            'src/eval/intersect.js',
+//                                            'src/eval/tessellate.js',
+//                                            'src/eval/geom.js',
+//                                            'src/eval/eval.js'],
+          'build/<%= pkg.name %>Core.js': [ 'src/eval_hx/header.js',
+                                            'build/verbHaxe.js']
         }
       }
     },
@@ -49,7 +51,8 @@ module.exports = function(grunt) {
       build: {
         files: {
           'build/<%= pkg.name %>.min.js': ['build/<%= pkg.name %>.js'],
-          'build/<%= pkg.name %>Eval.min.js': ['build/<%= pkg.name %>Eval.js']
+          'build/<%= pkg.name %>Eval.min.js': ['build/<%= pkg.name %>Eval.js'],
+          'build/<%= pkg.name %>Core.min.js': ['build/<%= pkg.name %>Core.js']
         }
       }
     },
@@ -85,10 +88,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-docco');
   grunt.loadNpmTasks('grunt-benchmark');
 
-  var build_steps = ['concat', 'uglify', 'docco'];
+  var build_steps = [ 'haxe', 'concat' ]; // 'uglify', 'docco'];
   grunt.registerTask('default', build_steps );
+
   grunt.registerTask('build', build_steps);
-  grunt.registerTask('test', ['concat', 'mochaTest']);
+  grunt.registerTask('test', ['haxe', 'concat', 'mochaTest']);
   grunt.registerTask('benchmarks', ['concat', 'benchmark']);
 
 
