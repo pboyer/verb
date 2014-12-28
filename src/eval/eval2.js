@@ -28,11 +28,11 @@ public static function surface_split( degree_u, knots_u, degree_v, knots_v, cont
 		, newpts1 = []
 		, res;
 
-	var s = public static function knot_span( degree, u, knots );
+	var s = knot_span( degree, u, knots );
 
 	for (i = 0; i < control_points.length; i++){
 
-		res = public static function curve_knot_refine( degree, knots, control_points[i], knots_to_insert );
+		res = curve_knot_refine( degree, knots, control_points[i], knots_to_insert );
 
 		var cpts0 = res.control_points.slice( 0, s + 1 );
 		var cpts1 = res.control_points.slice( s + 1 );
@@ -123,7 +123,7 @@ public static function surface_knot_refine =  function( degree_u, knots_u, degre
 	// do knot refinement on every row
 	for (var i = 0; i < ctrlPts.length; i++ ){
 
-		c = public static function curve_knot_refine( degree, knots, ctrlPts[i], knots_to_insert );
+		c = curve_knot_refine( degree, knots, ctrlPts[i], knots_to_insert );
 		newPts.push( c.control_points );
 
 	}
@@ -183,9 +183,9 @@ public static function curve_bezier_decompose( degree, knots, control_points ) {
 	// find all of the unique knot values and their multiplicity
 	// for each, increase their multiplicity to degree + 1
 
-	var mults = public static function knot_multiplicities( knots );
+	var mults = knot_multiplicities( knots );
 	var reqMult = degree + 1;
-	var refine = public static function curve_knot_refine;
+	var refine = curve_knot_refine;
 
 	// insert the knots
 	for (var i = 0; i < mults.length; i++){
@@ -270,9 +270,9 @@ public static function curve_split( degree, knots, control_points, u ) {
 
 	var knots_to_insert = [];
 	for (var i = 0; i < degree+1; i++) knots_to_insert.push(u);
-	var res = public static function curve_knot_refine( degree, knots, control_points, knots_to_insert );
+	var res = curve_knot_refine( degree, knots, control_points, knots_to_insert );
 
-	var s = public static function knot_span( degree, u, knots );
+	var s = knot_span( degree, u, knots );
 
 	var knots0 = res.knots.slice(0, s + degree + 2);
 	var knots1 = res.knots.slice( s + 1 );
@@ -310,8 +310,8 @@ public static function curve_knot_refine( degree, knots, control_points, knots_t
 	var n = control_points.length - 1
 		, m = n + degree + 1
 		, r = knots_to_insert.length - 1
-		, a = public static function knot_span( degree, knots_to_insert[0], knots )
-		, b = public static function knot_span( degree, knots_to_insert[r], knots )
+		, a = knot_span( degree, knots_to_insert[0], knots )
+		, b = knot_span( degree, knots_to_insert[r], knots )
 		, control_points_post = new Array( control_points.length + r + 1 )
 		, knots_post = new Array( knots.length + r + 1 )
 		, i = 0
@@ -410,7 +410,7 @@ public static function curve_knot_insert( degree, knots, control_points, u, r ) 
 	var s = 0; // assume original multiplicity is 0 - TODO add check for multiplicity in knots
 
 	var num_pts = control_points.length
-		, k = public static function knot_span( degree, u, knots ) // the span in which the knot will be inserted
+		, k = knot_span( degree, u, knots ) // the span in which the knot will be inserted
 		, num_pts_post = num_pts + r // a new control pt for every new knot
 		, control_points_temp = new Array( degree - s )
 		, knots_post = new Array( knots.length + r )  // r new knots
@@ -534,7 +534,7 @@ public static function rational_surface_curvature( degree_u, knots_u, degree_v, 
 
 	// principal curvatures are the eigenvalues of the second fundamental form
 
-	var derivs = public static function rational_surface_derivs( 	degree_u,
+	var derivs = rational_surface_derivs( 	degree_u,
 															knots_u,
 															degree_v,
 															knots_v,
@@ -600,8 +600,8 @@ public static function rational_surface_curvature( degree_u, knots_u, degree_v, 
 
 public static function rational_surface_derivs( degree_u, knots_u, degree_v, knots_v, homo_control_points, num_derivs, u, v) {
 
-	var SKL_homo = public static function surface_derivs( degree_u, knots_u, degree_v, knots_v, homo_control_points, num_derivs, u, v )
-		, ders = public static function separate_homo_derivs_2d( SKL_homo )
+	var SKL_homo = surface_derivs( degree_u, knots_u, degree_v, knots_v, homo_control_points, num_derivs, u, v )
+		, ders = separate_homo_derivs_2d( SKL_homo )
 		, Aders = ders[0]
 		, wders = ders[1]
 		, k = 0
@@ -624,7 +624,7 @@ public static function rational_surface_derivs( degree_u, knots_u, degree_v, kno
 			for (i = 1; i <= k; i++) {
 				v = Vec.sub( v, Vec.mul( Vec.mul( binomial.get(k, i), wders[i][0] ), SKL[k-i][l] ) );
 
-				var v2 = public static function zeros1d(dim);
+				var v2 = zeros1d(dim);
 
 				for (j = 1; j <= l; j++) {
 					v2 = Vec.add( v2, Vec.mul( Vec.mul( binomial.get(l, j), wders[i][j] ), SKL[k-i][l-j] ) );
@@ -686,7 +686,7 @@ public static function rational_curve_derivs( degree, knots, homo_control_points
 
 	// compute the derivatives of the control points
 	// separate derivative array into two
-	var ders = public static function separate_homo_derivs_1d( public static function curve_derivs( degree, knots, homo_control_points, u, num_derivs ) )
+	var ders = separate_homo_derivs_1d( public static function curve_derivs( degree, knots, homo_control_points, u, num_derivs ) )
 		, Aders = ders[0]
 		, wders = ders[1]
 		, k = 0
@@ -753,7 +753,7 @@ public static function separate_homo_derivs_2d( SKL ) {
 		, wders = [];
 
 	for ( var i = 0, l = SKL.length; i < l; i++ ) {
-		var CK = public static function separate_homo_derivs_1d( SKL[i] );
+		var CK = separate_homo_derivs_1d( SKL[i] );
 		Aders.push( CK[0] );
 		wders.push( CK[1] );
 	}
@@ -1026,12 +1026,12 @@ public static function surface_derivs_given_n_m( n, degree_u, knots_u, m, degree
 	var dim = control_points[0][0].length
 		, du = Math.min(num_derivatives, degree_u)
 		, dv = Math.min(num_derivatives, degree_v)
-		, SKL = public static function zeros3d( du+1, dv+1, dim )
-		, knot_span_index_u = public static function knot_span_given_n( n, degree_u, u, knots_u )
-		, knot_span_index_v = public static function knot_span_given_n( m, degree_v, v, knots_v )
-		, uders = public static function deriv_basis_functions_given_n_i( knot_span_index_u, u, degree_u, n, knots_u )
-		, vders = public static function deriv_basis_functions_given_n_i( knot_span_index_v, v, degree_v, m, knots_v )
-		, temp = public static function zeros2d( degree_v+1, dim )
+		, SKL = zeros3d( du+1, dv+1, dim )
+		, knot_span_index_u = knot_span_given_n( n, degree_u, u, knots_u )
+		, knot_span_index_v = knot_span_given_n( m, degree_v, v, knots_v )
+		, uders = deriv_basis_functions_given_n_i( knot_span_index_u, u, degree_u, n, knots_u )
+		, vders = deriv_basis_functions_given_n_i( knot_span_index_v, v, degree_v, m, knots_v )
+		, temp = zeros2d( degree_v+1, dim )
 		, k = 0
 		, s = 0
 		, r = 0
@@ -1040,7 +1040,7 @@ public static function surface_derivs_given_n_m( n, degree_u, knots_u, m, degree
 
 	for (k = 0; k <= du; k++) {
 		for (s = 0; s <= degree_v; s++) {
-			temp[s] = public static function zeros1d( dim );
+			temp[s] = zeros1d( dim );
 
 			for (r = 0; r <= degree_u; r++) {
 				temp[s] = Vec.add( temp[s], Vec.mul( uders[k][r], control_points[knot_span_index_u-degree_u+r][knot_span_index_v-degree_v+s]) );
@@ -1050,7 +1050,7 @@ public static function surface_derivs_given_n_m( n, degree_u, knots_u, m, degree
 		dd = Math.min(num_derivatives-k, dv);
 
 		for (l = 0; l <= dd; l++) {
-			SKL[k][l] = public static function zeros1d( dim );
+			SKL[k][l] = zeros1d( dim );
 
 			for (s = 0; s <= degree_v; s++) {
 				SKL[k][l] = Vec.add( SKL[k][l], Vec.mul( vders[l][s], temp[s] ) );
@@ -1131,29 +1131,29 @@ public static function volume_point_given_n_m_l( n, degree_u, knots_u, m, degree
 
 	var dim = control_points[0][0][0].length
 
-		, knot_span_index_u = public static function knot_span_given_n( n, degree_u, u, knots_u )
-		, knot_span_index_v = public static function knot_span_given_n( m, degree_v, v, knots_v )
-		, knot_span_index_w = public static function knot_span_given_n( l, degree_w, w, knots_w )
-		, u_basis_vals = public static function basis_functions_given_knot_span_index( knot_span_index_u, u, degree_u, knots_u )
-		, v_basis_vals = public static function basis_functions_given_knot_span_index( knot_span_index_v, v, degree_v, knots_v )
-		, w_basis_vals = public static function basis_functions_given_knot_span_index( knot_span_index_w, w, degree_w, knots_w )
+		, knot_span_index_u = knot_span_given_n( n, degree_u, u, knots_u )
+		, knot_span_index_v = knot_span_given_n( m, degree_v, v, knots_v )
+		, knot_span_index_w = knot_span_given_n( l, degree_w, w, knots_w )
+		, u_basis_vals = basis_functions_given_knot_span_index( knot_span_index_u, u, degree_u, knots_u )
+		, v_basis_vals = basis_functions_given_knot_span_index( knot_span_index_v, v, degree_v, knots_v )
+		, w_basis_vals = basis_functions_given_knot_span_index( knot_span_index_w, w, degree_w, knots_w )
 		, uind = knot_span_index_u - degree_u
 		, vind = knot_span_index_v
 		, wind = knot_span_index_w
-		, position = public static function zeros1d( dim )
-		, temp = public static function zeros1d( dim )
-		, temp2 = public static function zeros1d( dim )
+		, position = zeros1d( dim )
+		, temp = zeros1d( dim )
+		, temp2 = zeros1d( dim )
 		, j = 0
 		, k = 0;
 
 	for (var i = 0; i <= degree_w; i++){
 
-		temp2 = public static function zeros1d( dim );
+		temp2 = zeros1d( dim );
 		wind = knot_span_index_w - degree_w + i;
 
 		for (j = 0; j <= degree_v; j++) {
 
-			temp = public static function zeros1d( dim );
+			temp = zeros1d( dim );
 			vind = knot_span_index_v  - degree_v + j;
 
 			for (k = 0; k <= degree_u; k++) {
@@ -1233,20 +1233,20 @@ public static function surface_point_given_n_m( n, degree_u, knots_u, m, degree_
 	}
 
 	var dim = control_points[0][0].length
-		, knot_span_index_u = public static function knot_span_given_n( n, degree_u, u, knots_u )
-		, knot_span_index_v = public static function knot_span_given_n( m, degree_v, v, knots_v )
-		, u_basis_vals = public static function basis_functions_given_knot_span_index( knot_span_index_u, u, degree_u, knots_u )
-		, v_basis_vals = public static function basis_functions_given_knot_span_index( knot_span_index_v, v, degree_v, knots_v )
+		, knot_span_index_u = knot_span_given_n( n, degree_u, u, knots_u )
+		, knot_span_index_v = knot_span_given_n( m, degree_v, v, knots_v )
+		, u_basis_vals = basis_functions_given_knot_span_index( knot_span_index_u, u, degree_u, knots_u )
+		, v_basis_vals = basis_functions_given_knot_span_index( knot_span_index_v, v, degree_v, knots_v )
 		, uind = knot_span_index_u - degree_u
 		, vind = knot_span_index_v
-		, position = public static function zeros1d( dim )
-		, temp = public static function zeros1d( dim )
+		, position = zeros1d( dim )
+		, temp = zeros1d( dim )
 		, l = 0
 		, k = 0;
 
 	for (l = 0; l <= degree_v; l++) {
 
-		temp = public static function zeros1d( dim );
+		temp = zeros1d( dim );
 		vind = knot_span_index_v - degree_v + l;
 
 		// sample u isoline
@@ -1309,9 +1309,9 @@ public static function curve_derivs_given_n( n, degree, knots, control_points, u
 
 	var dim = control_points[0].length
 		, du = Math.min(num_derivatives, degree)
-		, CK = public static function zeros2d( du+1, dim )
-		, knot_span_index = public static function knot_span_given_n( n, degree, u, knots )
-		, nders = public static function deriv_basis_functions_given_n_i( knot_span_index, u, degree, du, knots )
+		, CK = zeros2d( du+1, dim )
+		, knot_span_index = knot_span_given_n( n, degree, u, knots )
+		, nders = deriv_basis_functions_given_n_i( knot_span_index, u, degree, du, knots )
 		, k = 0
 		, j = 0;
 
@@ -1389,9 +1389,9 @@ public static function curve_point_given_n( n, degree, knots, control_points, u)
 		return null;
 	}
 
-	var knot_span_index = public static function knot_span_given_n( n, degree, u, knots )
-		, basis_values = public static function basis_functions_given_knot_span_index( knot_span_index, u, degree, knots )
-		, position = public static function zeros1d( control_points[0].length );
+	var knot_span_index = knot_span_given_n( n, degree, u, knots )
+		, basis_values = basis_functions_given_knot_span_index( knot_span_index, u, degree, knots )
+		, position = zeros1d( control_points[0].length );
 
 		for (var j = 0; j <= degree; j++ )	{
 			position = Vec.add( position, Vec.mul( basis_values[j], control_points[ knot_span_index - degree + j ] ) );
@@ -1473,7 +1473,7 @@ public static function zeros3d(rows, cols, dim) {
 
 public static function deriv_basis_functions( u, degree, knots )
 {
-	var knot_span_index = public static function knot_span( degree, u, knots )
+	var knot_span_index = knot_span( degree, u, knots )
 		, m = knots.length - 1
 		, n = m - degree - 1;
 
@@ -1499,7 +1499,7 @@ public static function deriv_basis_functions( u, degree, knots )
 
 public static function deriv_basis_functions_given_n_i( knot_span_index, u, p, n, knots )
 {
-	var ndu = public static function zeros2d(p+1, p+1)
+	var ndu = zeros2d(p+1, p+1)
 		, left = new Array( p + 1 )
 		, right = new Array( p + 1 )
 		, saved = 0
@@ -1528,8 +1528,8 @@ public static function deriv_basis_functions_given_n_i( knot_span_index, u, p, n
 	}
 
 
-	var ders = public static function zeros2d(n+1, p+1)
-		, a = public static function zeros2d(2, p+1)
+	var ders = zeros2d(n+1, p+1)
+		, a = zeros2d(2, p+1)
 		, k = 1
 		, s1 = 0
 		, s2 = 1
@@ -1617,7 +1617,7 @@ public static function deriv_basis_functions_given_n_i( knot_span_index, u, p, n
 
 public static function basis_functions( u, degree, knots )
 {
-	var knot_span_index = public static function knot_span(u, degree, knots);
+	var knot_span_index = knot_span(u, degree, knots);
 	return public static function basis_functions_given_knot_span_index( knot_span_index, u, degree, knots );
 };
 

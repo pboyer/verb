@@ -825,17 +825,17 @@ describe("verb.eval.Nurbs.curve_knot_refine",function(){
 		var control_points = [];
 		for (var i = 0; i < 8; i++) control_points.push([i, 0, 0]);
 
-		var after = verb.eval.Nurbs.curve_knot_refine( degree, knots, control_points, new_knots );
+		var crv = new verb.eval.CurveData( degree, knots, control_points );
+		var after = verb.eval.Modify.curve_knot_refine( crv, new_knots );
 
-		after.control_points.forEach(function(cp){ should.exist(cp); });
+		after.controlPoints.forEach(function(cp){ should.exist(cp); });
 		after.knots.forEach(function(cp){ should.exist(cp); });
 
 		should.equal(knots.length + r, after.knots.length);
-		should.equal(control_points.length + r, after.control_points.length);
+		should.equal(control_points.length + r, after.controlPoints.length);
 
 		var p0 = verb.eval.Nurbs.curve_point( crv, 2.5);
-
-		var p1 = verb.eval.Nurbs.curve_point( degree, after.knots, after.control_points, 2.5);
+		var p1 = verb.eval.Nurbs.curve_point( after, 2.5);
 
 		p0[0].should.be.approximately(p1[0], verb.eval.Constants.TOLERANCE);
 		p0[1].should.be.approximately(p1[1], verb.eval.Constants.TOLERANCE);
@@ -862,7 +862,6 @@ describe("verb.eval.Nurbs.curve_knot_refine",function(){
 
 });
 
-/*
 
 describe("verb.eval.Nurbs.curve_knot_split",function(){
 
@@ -874,7 +873,8 @@ describe("verb.eval.Nurbs.curve_knot_split",function(){
 		var control_points = [];
 		for (var i = 0; i < 8; i++) control_points.push([i, 0, 0, 1]);
 
-		var after = verb.eval.Nurbs.curve_split( degree, knots, control_points, u );
+		var crv = new verb.eval.CurveData( degree, knots, control_points );
+		var after = verb.eval.Modify.curve_split( crv, u );
 
 		for (var i = 0; i < degree + 1; i++ ){
 			var d = after[0].knots.length - (degree+1);
@@ -887,8 +887,8 @@ describe("verb.eval.Nurbs.curve_knot_split",function(){
 		}
 
 		// a point evaluated on each curve is the same
-		var p0 = verb.eval.Nurbs.curve_point( after[0].degree, after[0].knots, after[0].control_points, after[0].knots[ after[0].knots.length-1] );
-		var p1 = verb.eval.Nurbs.curve_point( after[1].degree, after[1].knots, after[1].control_points, after[1].knots[ 0] );
+		var p0 = verb.eval.Nurbs.curve_point( after[0], after[0].knots[ after[0].knots.length-1] );
+		var p1 = verb.eval.Nurbs.curve_point( after[1], after[1].knots[ 0] );
 
 		p0[0].should.be.approximately(p1[0], verb.eval.Constants.TOLERANCE);
 		p0[1].should.be.approximately(p1[1], verb.eval.Constants.TOLERANCE);
@@ -906,31 +906,34 @@ describe("verb.eval.Nurbs.curve_knot_split",function(){
 });
 
 
+
 describe("verb.eval.Nurbs.knot_multiplicities",function(){
 
 	it('is correct for a basic example', function(){
 
-		var res = verb.eval.Nurbs.knot_multiplicities( [ 0, 0, 0, 0, 1, 1, 2, 2, 2, 3, 3.3] );
+		var res = verb.eval.Modify.knot_multiplicities( [ 0, 0, 0, 0, 1, 1, 2, 2, 2, 3, 3.3] );
 
 		res.length.should.be.equal( 5 );
 
-		res[0][0].should.be.equal( 0 );
-		res[0][1].should.be.equal( 4 );
+		res[0].knot.should.be.equal( 0 );
+		res[0].mult.should.be.equal( 4 );
 
-		res[1][0].should.be.equal( 1 );
-		res[1][1].should.be.equal( 2 );
+		res[1].knot.should.be.equal( 1 );
+		res[1].mult.should.be.equal( 2 );
 
-		res[2][0].should.be.equal( 2 );
-		res[2][1].should.be.equal( 3 );
+		res[2].knot.should.be.equal( 2 );
+		res[2].mult.should.be.equal( 3 );
 
-		res[3][0].should.be.equal( 3 );
-		res[3][1].should.be.equal( 1 );
+		res[3].knot.should.be.equal( 3 );
+		res[3].mult.should.be.equal( 1 );
 
-		res[4][0].should.be.equal( 3.3 );
-		res[4][1].should.be.equal( 1 );
+		res[4].knot.should.be.equal( 3.3 );
+		res[4].mult.should.be.equal( 1 );
 
 	});
 });
+
+
 
 describe("verb.eval.Nurbs.curve_bezier_decompose",function(){
 
@@ -944,7 +947,8 @@ describe("verb.eval.Nurbs.curve_bezier_decompose",function(){
 			control_points.push([i, 0, 0]);
 		}
 
-		var res = verb.eval.Nurbs.curve_bezier_decompose( degree, knots, control_points );
+		var crv = new verb.eval.CurveData( degree, knots, control_points );
+		var res = verb.eval.Modify.curve_bezier_decompose( crv );
 
 		res.length.should.be.equal( 5 );
 
@@ -952,10 +956,10 @@ describe("verb.eval.Nurbs.curve_bezier_decompose",function(){
 
 			var u0 = x.knots[0];
 
-			var pt0 = verb.eval.Nurbs.curve_point( x.degree, x.knots, x.control_points, u0);
+			var pt0 = verb.eval.Nurbs.curve_point( x, u0);
 			var pt1 = verb.eval.Nurbs.curve_point( crv, u0);
 
-			( numeric.norm2(numeric.sub(pt0, pt1))).should.be.approximately(0, verb.eval.Constants.TOLERANCE );
+			( verb.eval.Vec.norm(verb.eval.Vec.sub(pt0, pt1))).should.be.approximately(0, verb.eval.Constants.TOLERANCE );
 
 		});
 
@@ -963,6 +967,179 @@ describe("verb.eval.Nurbs.curve_bezier_decompose",function(){
 });
 
 
+describe("verb.eval.Vec.transpose",function(){
+	it('is correct for a basic example', function(){
+		var a = [ [6,5,4], [1,2,3] ];
+		verb.eval.Vec.transpose(a).should.eql( [[6,1], [5,2], [4,3]])
+	});
+
+
+	it('is correct for empty array', function(){
+		verb.eval.Vec.transpose([]).should.eql( [] );
+	});
+});
+
+
+describe("verb.eval.Nurbs.surface_knot_refine",function(){
+
+	var degree = 3
+		, knotsV = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
+		, knotsU = [0, 0, 0, 0, 0.5, 1, 1, 1, 1]
+		, controlPoints = [
+					[ [0, 0, -10], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] , 	[40, 0, 0], 	[50, 0, 0] ],
+					[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] , 	[40, -10, 0], 	[50, -10, 0]	],
+					[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] , 	[40, -20, -2],	[50, -20, 0] 	],
+					[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, -23], [30, -30, 0] , 	[40, -30, 0], 	[50, -30, 0]     ],
+					[ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , 	[40, -40, -20],	[50, -40, 0]     ] ]
+		, surface = new verb.eval.SurfaceData( degree, degree, knotsU, knotsV, controlPoints );
+
+	it('can add knots into a surface in the u direction', function(){
+
+		var r = 1;
+		var u = 0.2;
+		var new_knots = [];
+
+		for (var i = 0; i < r; i++){
+			new_knots.push(u);
+		}
+
+		var res = verb.eval.Modify.surface_knot_refine( surface, new_knots, false );
+
+		res.controlPoints.forEach(function(cp){ should.exist(cp); });
+		res.knotsU.forEach(function(cp){ should.exist(cp); });
+		res.knotsV.forEach(function(cp){ should.exist(cp); });
+
+		should.equal(knotsU.length + r, res.knotsU.length);
+		should.equal(controlPoints.length + r, res.controlPoints.length);
+
+		var p0 = verb.eval.Nurbs.surface_point( surface, 0.5, 0.25 );
+		var p1 = verb.eval.Nurbs.surface_point( res, 0.5, 0.25);
+
+		p0[0].should.be.approximately(p1[0], verb.eval.Constants.TOLERANCE);
+		p0[1].should.be.approximately(p1[1], verb.eval.Constants.TOLERANCE);
+		p0[2].should.be.approximately(p1[2], verb.eval.Constants.TOLERANCE);
+
+	});
+
+	it('can add knots into a surface in the v direction', function(){
+
+		var r = 1;
+		var u = 0.2;
+		var new_knots = [];
+
+		for (var i = 0; i < r; i++){
+			new_knots.push(u);
+		}
+
+		var res = verb.eval.Modify.surface_knot_refine( surface, new_knots, true );
+
+		res.controlPoints.forEach(function(cp){ should.exist(cp); });
+		res.knotsU.forEach(function(cp){ should.exist(cp); });
+		res.knotsV.forEach(function(cp){ should.exist(cp); });
+
+		should.equal(knotsV.length + r, res.knotsV.length);
+		should.equal(controlPoints[0].length + r, res.controlPoints[0].length);
+
+		var p0 = verb.eval.Nurbs.surface_point( surface, 0.5, 0.25 );
+		var p1 = verb.eval.Nurbs.surface_point( res, 0.5, 0.25);
+
+		p0[0].should.be.approximately(p1[0], verb.eval.Constants.TOLERANCE);
+		p0[1].should.be.approximately(p1[1], verb.eval.Constants.TOLERANCE);
+		p0[2].should.be.approximately(p1[2], verb.eval.Constants.TOLERANCE);
+
+
+	});
+});
+
+
+describe("verb.eval.Nurbs.surface_split", function(){
+
+	var degree = 3
+		, knotsV = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
+		, knotsU = [0, 0, 0, 0, 0.5, 1, 1, 1, 1]
+		, controlPoints = [
+					[ [0, 0, -10], 	[10, 0, 0], 		[20, 0, 0], 		[30, 0, 0] , 		[40, 0, 0], 		[50, 0, 0] ],
+					[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] , 	[40, -10, 0], 	[50, -10, 0]	],
+					[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] , 	[40, -20, -2],	[50, -20, 0] 	],
+					[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, -23], [30, -30, 0] , 	[40, -30, 0], 	[50, -30, 0]     ],
+					[ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , 	[40, -40, -20],	[50, -40, 0]     ] ]
+		, surface = new verb.eval.SurfaceData( degree, degree, knotsU, knotsV, controlPoints );
+
+	it('can split a surface in the u direction', function(){
+
+		var u = 0.2;
+
+
+		var res = verb.eval.Modify.surface_split( surface, u, false );
+
+		res[0].controlPoints.forEach(function(cp){ should.exist(cp); });
+		res[0].knotsU.forEach(function(cp){ should.exist(cp); });
+		res[0].knotsV.forEach(function(cp){ should.exist(cp); });
+		should.exist( res[0].degreeU );
+		should.exist( res[0].degreeV );
+
+		res[1].controlPoints.forEach(function(cp){ should.exist(cp); });
+		res[1].knotsU.forEach(function(cp){ should.exist(cp); });
+		res[1].knotsV.forEach(function(cp){ should.exist(cp); });
+		should.exist( res[1].degreeU );
+		should.exist( res[1].degreeV );
+
+		var p0 = verb.eval.Nurbs.surface_point( surface, 0.1, 0.1 );
+		var p1 = verb.eval.Nurbs.surface_point( res[0], 0.1, 0.1);
+
+		p0[0].should.be.approximately(p1[0], verb.eval.Constants.TOLERANCE);
+		p0[1].should.be.approximately(p1[1], verb.eval.Constants.TOLERANCE);
+		p0[2].should.be.approximately(p1[2], verb.eval.Constants.TOLERANCE);
+
+		p0 = verb.eval.Nurbs.surface_point( surface, 0.8, 0.8 );
+		p1 = verb.eval.Nurbs.surface_point( res[1], 0.8, 0.8);
+
+		p0[0].should.be.approximately(p1[0], verb.eval.Constants.TOLERANCE);
+		p0[1].should.be.approximately(p1[1], verb.eval.Constants.TOLERANCE);
+		p0[2].should.be.approximately(p1[2], verb.eval.Constants.TOLERANCE);
+
+
+	});
+
+	it('can split a surface in the v direction', function(){
+
+		var u = 0.2;
+
+		var res = verb.eval.Modify.surface_split( surface, u, true );
+
+		res[0].controlPoints.forEach(function(cp){ should.exist(cp); });
+		res[0].knotsU.forEach(function(cp){ should.exist(cp); });
+		res[0].knotsV.forEach(function(cp){ should.exist(cp); });
+		should.exist( res[0].degreeU );
+		should.exist( res[0].degreeV );
+
+		res[1].controlPoints.forEach(function(cp){ should.exist(cp); });
+		res[1].knotsU.forEach(function(cp){ should.exist(cp); });
+		res[1].knotsV.forEach(function(cp){ should.exist(cp); });
+		should.exist( res[1].degreeU );
+		should.exist( res[1].degreeV );
+
+		var p0 = verb.eval.Nurbs.surface_point( surface, 0.1, 0.1 );
+		var p1 = verb.eval.Nurbs.surface_point( res[0], 0.1, 0.1);
+
+		p0[0].should.be.approximately(p1[0], verb.eval.Constants.TOLERANCE);
+		p0[1].should.be.approximately(p1[1], verb.eval.Constants.TOLERANCE);
+		p0[2].should.be.approximately(p1[2], verb.eval.Constants.TOLERANCE);
+
+		p0 = verb.eval.Nurbs.surface_point( surface, 0.8, 0.8 );
+		p1 = verb.eval.Nurbs.surface_point( res[1], 0.8, 0.8);
+
+		p0[0].should.be.approximately(p1[0], verb.eval.Constants.TOLERANCE);
+		p0[1].should.be.approximately(p1[1], verb.eval.Constants.TOLERANCE);
+		p0[2].should.be.approximately(p1[2], verb.eval.Constants.TOLERANCE);
+
+
+	});
+
+});
+
+
+/*
 
 describe("verb.eval.Nurbs.three_points_are_flat",function(){
 
@@ -2271,7 +2448,7 @@ describe("FourPointSurface.derivatives",function(){
 		var p = srf.derivatives(0.5, 0.5, 1);
 
 		p[0][0].should.eql([0.5,0.5,0.5]);
-		p[0][1].should.eql([0,1,0]);
+		p[0].mult.should.eql([0,1,0]);
 		p[1][0].should.eql([1,0,0]);
 
 	});
@@ -2535,14 +2712,14 @@ describe("Circle.derivatives",function(){
 		var p = c.derivatives(0.5, 1);
 
 		p[0][0].should.be.approximately(-5, verb.eval.Constants.TOLERANCE );
-		p[0][1].should.be.approximately(0, verb.eval.Constants.TOLERANCE );
+		p[0].mult.should.be.approximately(0, verb.eval.Constants.TOLERANCE );
 		p[0][2].should.be.approximately(0, verb.eval.Constants.TOLERANCE );
 
 		// normalize the derivative
 		p[1] = numeric.div( p[1], numeric.norm2(p[1]) );
 
 		p[1][0].should.be.approximately(0, verb.eval.Constants.TOLERANCE );
-		p[1][1].should.be.approximately(-1, verb.eval.Constants.TOLERANCE );
+		p[1].mult.should.be.approximately(-1, verb.eval.Constants.TOLERANCE );
 		p[1][2].should.be.approximately(0, verb.eval.Constants.TOLERANCE );
 
 	});
@@ -2623,27 +2800,27 @@ describe("Ellipse.derivatives",function(){
 		var p = c.derivatives(0.5, 1);
 
 		p[0][0].should.be.approximately(-5, verb.eval.Constants.TOLERANCE );
-		p[0][1].should.be.approximately(0, verb.eval.Constants.TOLERANCE );
+		p[0].mult.should.be.approximately(0, verb.eval.Constants.TOLERANCE );
 		p[0][2].should.be.approximately(0, verb.eval.Constants.TOLERANCE );
 
 		// normalize the derivative
 		p[1] = numeric.div( p[1], numeric.norm2(p[1]) );
 
 		p[1][0].should.be.approximately(0, verb.eval.Constants.TOLERANCE );
-		p[1][1].should.be.approximately(-1, verb.eval.Constants.TOLERANCE );
+		p[1].mult.should.be.approximately(-1, verb.eval.Constants.TOLERANCE );
 		p[1][2].should.be.approximately(0, verb.eval.Constants.TOLERANCE );
 
 		p = c.derivatives(0.25, 1);
 
 		p[0][0].should.be.approximately(0, verb.eval.Constants.TOLERANCE );
-		p[0][1].should.be.approximately(10, verb.eval.Constants.TOLERANCE );
+		p[0].mult.should.be.approximately(10, verb.eval.Constants.TOLERANCE );
 		p[0][2].should.be.approximately(0, verb.eval.Constants.TOLERANCE );
 
 		// normalize the derivative
 		p[1] = numeric.div( p[1], numeric.norm2(p[1]) );
 
 		p[1][0].should.be.approximately(-1, verb.eval.Constants.TOLERANCE );
-		p[1][1].should.be.approximately(0, verb.eval.Constants.TOLERANCE );
+		p[1].mult.should.be.approximately(0, verb.eval.Constants.TOLERANCE );
 		p[1][2].should.be.approximately(0, verb.eval.Constants.TOLERANCE );
 
 	});
@@ -2716,14 +2893,14 @@ describe("EllipseArc.derivatives",function(){
 		var p = c.derivatives(0.5, 1);
 
 		p[0][0].should.be.approximately(0, verb.eval.Constants.TOLERANCE );
-		p[0][1].should.be.approximately(10, verb.eval.Constants.TOLERANCE );
+		p[0].mult.should.be.approximately(10, verb.eval.Constants.TOLERANCE );
 		p[0][2].should.be.approximately(0, verb.eval.Constants.TOLERANCE );
 
 		// normalize the derivative
 		p[1] = numeric.div( p[1], numeric.norm2(p[1]) );
 
 		p[1][0].should.be.approximately(-1, verb.eval.Constants.TOLERANCE );
-		p[1][1].should.be.approximately(0, verb.eval.Constants.TOLERANCE );
+		p[1].mult.should.be.approximately(0, verb.eval.Constants.TOLERANCE );
 		p[1][2].should.be.approximately(0, verb.eval.Constants.TOLERANCE );
 
 	});
@@ -2799,7 +2976,7 @@ describe("PolyLine.derivatives",function(){
 		p[1] = numeric.div( p[1], numeric.norm2(p[1]) );
 
 		p[1][0].should.be.approximately(-Math.sqrt(2) / 2, verb.eval.Constants.TOLERANCE );
-		p[1][1].should.be.approximately(Math.sqrt(2) / 2, verb.eval.Constants.TOLERANCE );
+		p[1].mult.should.be.approximately(Math.sqrt(2) / 2, verb.eval.Constants.TOLERANCE );
 		p[1][2].should.be.approximately(0, verb.eval.Constants.TOLERANCE );
 
 	});
@@ -2876,7 +3053,7 @@ describe("PolyLine.derivatives",function(){
 		p[1] = numeric.div( p[1], numeric.norm2(p[1]) );
 
 		p[1][0].should.be.approximately(-Math.sqrt(2) / 2, verb.eval.Constants.TOLERANCE );
-		p[1][1].should.be.approximately(Math.sqrt(2) / 2, verb.eval.Constants.TOLERANCE );
+		p[1].mult.should.be.approximately(Math.sqrt(2) / 2, verb.eval.Constants.TOLERANCE );
 		p[1][2].should.be.approximately(0, verb.eval.Constants.TOLERANCE );
 
 	});
@@ -2967,17 +3144,17 @@ describe("Cone.derivatives",function(){
 		var p = srf.derivatives(0.5, 0.5, 1);
 
 		p[0][0][0].should.be.approximately(-1.5, verb.EPSILON );
-		p[0][0][1].should.be.approximately(0, verb.EPSILON );
+		p[0][0].mult.should.be.approximately(0, verb.EPSILON );
 		p[0][0][2].should.be.approximately(2.5, verb.EPSILON );
 
 		p[0][1][0].should.be.approximately(-3, verb.EPSILON );
-		p[0][1][1].should.be.approximately(0, verb.EPSILON );
+		p[0][1].mult.should.be.approximately(0, verb.EPSILON );
 		p[0][1][2].should.be.approximately(-5, verb.EPSILON );
 
 		p[1][0] = numeric.div( p[1][0], numeric.norm2(p[1][0]) );
 
 		p[1][0][0].should.be.approximately(0, verb.EPSILON );
-		p[1][0][1].should.be.approximately(-1, verb.EPSILON );
+		p[1][0].mult.should.be.approximately(-1, verb.EPSILON );
 		p[1][0][2].should.be.approximately(0, verb.EPSILON );
 
 	});
@@ -3083,17 +3260,17 @@ describe("Cylinder.derivatives",function(){
 		var p = srf.derivatives(0.5, 0.5, 1);
 
 		p[0][0][0].should.be.approximately(-3, verb.EPSILON );
-		p[0][0][1].should.be.approximately(0, verb.EPSILON );
+		p[0][0].mult.should.be.approximately(0, verb.EPSILON );
 		p[0][0][2].should.be.approximately(2.5, verb.EPSILON );
 
 		p[1][0][0].should.be.approximately(0, verb.EPSILON );
-		p[1][0][1].should.be.approximately(0, verb.EPSILON );
+		p[1][0].mult.should.be.approximately(0, verb.EPSILON );
 		p[1][0][2].should.be.approximately(-5, verb.EPSILON );
 
 		p[0][1] = numeric.div( p[0][1], numeric.norm2(p[0][1]) );
 
 		p[0][1][0].should.be.approximately(0, verb.EPSILON );
-		p[0][1][1].should.be.approximately(-1, verb.EPSILON );
+		p[0][1].mult.should.be.approximately(-1, verb.EPSILON );
 		p[0][1][2].should.be.approximately(0, verb.EPSILON );
 
 	});
@@ -3193,15 +3370,15 @@ describe("Extrusion.derivatives",function(){
 		var p = srf.derivatives(0.5, 0.5, 1);
 
 		p[0][0][0].should.be.approximately(0.5, verb.EPSILON );
-		p[0][0][1].should.be.approximately(0.5, verb.EPSILON );
+		p[0][0].mult.should.be.approximately(0.5, verb.EPSILON );
 		p[0][0][2].should.be.approximately(1.5, verb.EPSILON );
 
 		p[0][1][0].should.be.approximately(1, verb.EPSILON );
-		p[0][1][1].should.be.approximately(1, verb.EPSILON );
+		p[0][1].mult.should.be.approximately(1, verb.EPSILON );
 		p[0][1][2].should.be.approximately(0, verb.EPSILON );
 
 		p[1][0][0].should.be.approximately(0, verb.EPSILON );
-		p[1][0][1].should.be.approximately(0, verb.EPSILON );
+		p[1][0].mult.should.be.approximately(0, verb.EPSILON );
 		p[1][0][2].should.be.approximately(-3, verb.EPSILON );
 
 	});
@@ -3305,15 +3482,15 @@ describe("PlanarSurface.derivatives",function(){
 		var p = srf.derivatives(0.5, 0.5, 1);
 
 		p[0][0][0].should.be.approximately(5, verb.EPSILON );
-		p[0][0][1].should.be.approximately(2, verb.EPSILON );
+		p[0][0].mult.should.be.approximately(2, verb.EPSILON );
 		p[0][0][2].should.be.approximately(0, verb.EPSILON );
 
 		p[0][1][0].should.be.approximately(0, verb.EPSILON );
-		p[0][1][1].should.be.approximately(4, verb.EPSILON );
+		p[0][1].mult.should.be.approximately(4, verb.EPSILON );
 		p[0][1][2].should.be.approximately(0, verb.EPSILON );
 
 		p[1][0][0].should.be.approximately(10, verb.EPSILON );
-		p[1][0][1].should.be.approximately(0, verb.EPSILON );
+		p[1][0].mult.should.be.approximately(0, verb.EPSILON );
 		p[1][0][2].should.be.approximately(0, verb.EPSILON );
 
 	});
@@ -3416,18 +3593,18 @@ describe("RevolvedSurface.derivatives",function(){
 		var p = srf.derivatives(0.5, 0.5, 1);
 
 		p[0][0][0].should.be.approximately(0, verb.EPSILON );
-		p[0][0][1].should.be.approximately(5.5, verb.EPSILON );
+		p[0][0].mult.should.be.approximately(5.5, verb.EPSILON );
 		p[0][0][2].should.be.approximately(5.5, verb.EPSILON );
 
 		
 		p[0][1][0].should.be.approximately(0, verb.EPSILON );
-		p[0][1][1].should.be.approximately(9, verb.EPSILON );
+		p[0][1].mult.should.be.approximately(9, verb.EPSILON );
 		p[0][1][2].should.be.approximately(-9, verb.EPSILON );
 
 	  p[1][0] = numeric.normalized( p[1][0] );
 
 		p[1][0][0].should.be.approximately(-1, verb.EPSILON );
-		p[1][0][1].should.be.approximately(0, verb.EPSILON );
+		p[1][0].mult.should.be.approximately(0, verb.EPSILON );
 		p[1][0][2].should.be.approximately(0, verb.EPSILON );
 
 	});
@@ -3526,19 +3703,19 @@ describe("Sphere.derivatives",function(){
 		var p = srf.derivatives(0.5, 0.5, 1);
 
 		p[0][0][0].should.be.approximately(-radius, verb.EPSILON );
-		p[0][0][1].should.be.approximately(0, verb.EPSILON );
+		p[0][0].mult.should.be.approximately(0, verb.EPSILON );
 		p[0][0][2].should.be.approximately(0, verb.EPSILON );
 
 		p[0][1] = numeric.normalized( p[0][1] );
 
 		p[0][1][0].should.be.approximately(0, verb.EPSILON );
-		p[0][1][1].should.be.approximately(0, verb.EPSILON );
+		p[0][1].mult.should.be.approximately(0, verb.EPSILON );
 		p[0][1][2].should.be.approximately(1, verb.EPSILON );
 
 	  p[1][0] = numeric.normalized( p[1][0] );
 
 		p[1][0][0].should.be.approximately(0, verb.EPSILON );
-		p[1][0][1].should.be.approximately(-1, verb.EPSILON );
+		p[1][0].mult.should.be.approximately(-1, verb.EPSILON );
 		p[1][0][2].should.be.approximately(0, verb.EPSILON );
 
 	});
@@ -3648,15 +3825,15 @@ describe("SweepOneRail.derivatives",function(){
 		var p = srf.derivatives(0.5, 0.5, 1);
 
 		p[0][0][0].should.be.greaterThan( 0 );
-		p[0][0][1].should.be.approximately(0, verb.EPSILON );
+		p[0][0].mult.should.be.approximately(0, verb.EPSILON );
 		p[0][0][2].should.be.greaterThan(0, verb.EPSILON );
 
 		p[0][1][0].should.be.approximately(0, verb.EPSILON );
-		p[0][1][1].should.be.approximately(-2, verb.EPSILON );
+		p[0][1].mult.should.be.approximately(-2, verb.EPSILON );
 		p[0][1][2].should.be.approximately(0, verb.EPSILON );
 
 		p[0][0][0].should.be.greaterThan( 0 );
-		p[0][0][1].should.be.approximately(0, verb.EPSILON );
+		p[0][0].mult.should.be.approximately(0, verb.EPSILON );
 		p[0][0][2].should.be.greaterThan( 0  );
 
 	});
@@ -3722,7 +3899,7 @@ describe("verb.eval.Nurbs.intersect_rational_curves_by_aabb",function(){
 																																	tol );
 
 		res[0][0].should.be.approximately(0.25, verb.eval.Constants.TOLERANCE );
-		res[0][1].should.be.approximately(0.25, verb.eval.Constants.TOLERANCE );
+		res[0].mult.should.be.approximately(0.25, verb.eval.Constants.TOLERANCE );
 
 	});
 
@@ -3748,7 +3925,7 @@ describe("verb.eval.Nurbs.intersect_rational_curves_by_aabb",function(){
 		var match_tol = 0.01;
 
 		res[0][0].should.be.approximately(0.296, match_tol );
-		res[0][1].should.be.approximately(0.36, match_tol );
+		res[0].mult.should.be.approximately(0.36, match_tol );
 
 	});
 
@@ -3775,7 +3952,7 @@ describe("verb.eval.Nurbs.intersect_rational_curves_by_aabb",function(){
 		var match_tol = 0.01;
 
 		res[0][0].should.be.approximately(0.36, match_tol );
-		res[0][1].should.be.approximately(0.29, match_tol );
+		res[0].mult.should.be.approximately(0.29, match_tol );
 
 	});
 
@@ -3801,7 +3978,7 @@ describe("verb.eval.Nurbs.intersect_rational_curves_by_aabb",function(){
 		var match_tol = 0.01;
 
 		res[0][0].should.be.approximately(0.41, match_tol );
-		res[0][1].should.be.approximately(0.33, match_tol );
+		res[0].mult.should.be.approximately(0.33, match_tol );
 
 	});
 
@@ -3910,7 +4087,7 @@ describe("verb.eval.Nurbs.intersect_rational_curves_by_aabb_refine",function(){
 																																	tol );
 
 		res[0][0].should.be.approximately(0.25, verb.eval.Constants.TOLERANCE );
-		res[0][1].should.be.approximately(0.25, verb.eval.Constants.TOLERANCE );
+		res[0].mult.should.be.approximately(0.25, verb.eval.Constants.TOLERANCE );
 
 	});
 
@@ -3935,7 +4112,7 @@ describe("verb.eval.Nurbs.intersect_rational_curves_by_aabb_refine",function(){
 																																	tol );
 
 		res[0][0].should.be.approximately(0.2964101616038012, verb.eval.Constants.TOLERANCE );
-		res[0][1].should.be.approximately(0.3660254038069307, verb.eval.Constants.TOLERANCE );
+		res[0].mult.should.be.approximately(0.3660254038069307, verb.eval.Constants.TOLERANCE );
 
 	});
 
@@ -3960,7 +4137,7 @@ describe("verb.eval.Nurbs.intersect_rational_curves_by_aabb_refine",function(){
 																																	tol );
 
 		res[0][0].should.be.approximately(0.3660254038069307, verb.eval.Constants.TOLERANCE );
-		res[0][1].should.be.approximately(0.2964101616038012, verb.eval.Constants.TOLERANCE );
+		res[0].mult.should.be.approximately(0.2964101616038012, verb.eval.Constants.TOLERANCE );
 
 	});
 
@@ -3986,7 +4163,7 @@ describe("verb.eval.Nurbs.intersect_rational_curves_by_aabb_refine",function(){
 		var match_tol = 0.01;
 
 		res[0][0].should.be.approximately(0.416208132514572, verb.eval.Constants.TOLERANCE );
-		res[0][1].should.be.approximately(0.3374987853196129, verb.eval.Constants.TOLERANCE );
+		res[0].mult.should.be.approximately(0.3374987853196129, verb.eval.Constants.TOLERANCE );
 
 	});
 
@@ -4023,10 +4200,10 @@ describe("verb.intersectCurves",function(){
 		res[1].length.should.be.equal(3);
 
 		res[0][0].should.be.approximately(0.23545561131691756, verb.eval.Constants.TOLERANCE);
-		res[0][1].should.be.approximately(0.4756848757799639, verb.eval.Constants.TOLERANCE);
+		res[0].mult.should.be.approximately(0.4756848757799639, verb.eval.Constants.TOLERANCE);
 
 		res[1][0].should.be.approximately(0.7756197831105017, verb.eval.Constants.TOLERANCE);
-		res[1][1].should.be.approximately(0.7908648647054176, verb.eval.Constants.TOLERANCE);
+		res[1].mult.should.be.approximately(0.7908648647054176, verb.eval.Constants.TOLERANCE);
 
 
 	});
@@ -5041,7 +5218,7 @@ describe("verb.eval.Nurbs.make_intersect_polylines ",function(){
 		pls.length.should.be.equal( 1 );
 		pls[0].length.should.be.equal( 4 );
 		pls[0][0].pt.should.be.eql( [10,0,0] );
-		pls[0][1].pt.should.be.eql( [10,10,0] );
+		pls[0].mult.pt.should.be.eql( [10,10,0] );
 		pls[0][2].pt.should.be.eql( [0,10,0] );
 		pls[0][3].pt.should.be.eql( [5,0,0] );
 
@@ -5555,186 +5732,6 @@ describe("verb.eval.Nurbs.tessellate_rational_surface_adaptive",function(){
 	});
 });
 
-describe("verb.eval.Nurbs.surface_knot_refine",function(){
-
-	var degree = 3
-		, knots_v = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
-		, knots_u = [0, 0, 0, 0, 0.5, 1, 1, 1, 1]
-		, control_points = [ 		
-					[ [0, 0, -10], 	[10, 0, 0], 		[20, 0, 0], 		[30, 0, 0] , 		[40, 0, 0], 		[50, 0, 0] ],
-					[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] , 	[40, -10, 0], 	[50, -10, 0]	],
-					[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] , 	[40, -20, -2],	[50, -20, 0] 	],
-					[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, -23], [30, -30, 0] , 	[40, -30, 0], 	[50, -30, 0]     ],  
-					[ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , 	[40, -40, -20],	[50, -40, 0]     ] ];
-
-	it('can add knots into a surface in the u direction', function(){
-
-		var r = 1;
-		var u = 0.2;
-		var new_knots = [];
-
-		for (var i = 0; i < r; i++){
-			new_knots.push(u);
-		}
-
-		var res = verb.eval.Nurbs.surface_knot_refine( degree,
-									knots_u,
-									degree,
-									knots_v, 
-									control_points,
-									new_knots,
-									0 );
-
-		res.control_points.forEach(function(cp){ should.exist(cp); });
-		res.knots_u.forEach(function(cp){ should.exist(cp); });
-		res.knots_v.forEach(function(cp){ should.exist(cp); });
-
-		should.equal(knots_u.length + r, res.knots_u.length);
-		should.equal(control_points.length + r, res.control_points.length);
-
-		var p0 = verb.eval.Nurbs.surface_point( degree, knots_u, degree, knots_v, control_points, 0.5, 0.25 );
-		var p1 = verb.eval.Nurbs.surface_point( degree, res.knots_u, degree, res.knots_v, res.control_points, 0.5, 0.25);
-
-		p0[0].should.be.approximately(p1[0], verb.eval.Constants.TOLERANCE);
-		p0[1].should.be.approximately(p1[1], verb.eval.Constants.TOLERANCE);
-		p0[2].should.be.approximately(p1[2], verb.eval.Constants.TOLERANCE);
-
-
-	});
-
-	it('can add knots into a surface in the v direction', function(){
-
-		var r = 1;
-		var u = 0.2;
-		var new_knots = [];
-
-		for (var i = 0; i < r; i++){
-			new_knots.push(u);
-		}
-
-		var res = verb.eval.Nurbs.surface_knot_refine( degree,
-									knots_u,
-									degree,
-									knots_v, 
-									control_points,
-									new_knots,
-									1 );
-
-		res.control_points.forEach(function(cp){ should.exist(cp); });
-		res.knots_u.forEach(function(cp){ should.exist(cp); });
-		res.knots_v.forEach(function(cp){ should.exist(cp); });
-
-		should.equal(knots_v.length + r, res.knots_v.length);
-		should.equal(control_points[0].length + r, res.control_points[0].length);
-
-		var p0 = verb.eval.Nurbs.surface_point( degree, knots_u, degree, knots_v, control_points, 0.5, 0.25 );
-		var p1 = verb.eval.Nurbs.surface_point( degree, res.knots_u, degree, res.knots_v, res.control_points, 0.5, 0.25);
-
-		p0[0].should.be.approximately(p1[0], verb.eval.Constants.TOLERANCE);
-		p0[1].should.be.approximately(p1[1], verb.eval.Constants.TOLERANCE);
-		p0[2].should.be.approximately(p1[2], verb.eval.Constants.TOLERANCE);
-
-
-	});
-});
-
-
-describe("verb.eval.Nurbs.surface_split",function(){
-
-	var degree = 3
-		, knots_v = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
-		, knots_u = [0, 0, 0, 0, 0.5, 1, 1, 1, 1]
-		, control_points = [ 		
-					[ [0, 0, -10], 	[10, 0, 0], 		[20, 0, 0], 		[30, 0, 0] , 		[40, 0, 0], 		[50, 0, 0] ],
-					[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] , 	[40, -10, 0], 	[50, -10, 0]	],
-					[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] , 	[40, -20, -2],	[50, -20, 0] 	],
-					[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, -23], [30, -30, 0] , 	[40, -30, 0], 	[50, -30, 0]     ],  
-					[ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , 	[40, -40, -20],	[50, -40, 0]     ] ];
-
-	it('can split a surface in the u direction', function(){
-
-		var u = 0.2;
-
-		var res = verb.eval.Nurbs.surface_split( degree,
-									knots_u,
-									degree,
-									knots_v, 
-									control_points,
-									u,
-									0 );
-
-		res[0].control_points.forEach(function(cp){ should.exist(cp); });
-		res[0].knots_u.forEach(function(cp){ should.exist(cp); });
-		res[0].knots_v.forEach(function(cp){ should.exist(cp); });
-		should.exist( res[0].degree_u );
-		should.exist( res[0].degree_v );
-
-		res[1].control_points.forEach(function(cp){ should.exist(cp); });
-		res[1].knots_u.forEach(function(cp){ should.exist(cp); });
-		res[1].knots_v.forEach(function(cp){ should.exist(cp); });
-		should.exist( res[1].degree_u );
-		should.exist( res[1].degree_v );
-
-		var p0 = verb.eval.Nurbs.surface_point( degree, knots_u, degree, knots_v, control_points, 0.1, 0.1 );
-		var p1 = verb.eval.Nurbs.surface_point( res[0].degree_u, res[0].knots_u, res[0].degree_v, res[0].knots_v, res[0].control_points, 0.1, 0.1);
-
-		p0[0].should.be.approximately(p1[0], verb.eval.Constants.TOLERANCE);
-		p0[1].should.be.approximately(p1[1], verb.eval.Constants.TOLERANCE);
-		p0[2].should.be.approximately(p1[2], verb.eval.Constants.TOLERANCE);
-
-		p0 = verb.eval.Nurbs.surface_point( degree, knots_u, degree, knots_v, control_points, 0.8, 0.8 );
-		p1 = verb.eval.Nurbs.surface_point( res[1].degree_u, res[1].knots_u, res[1].degree_v, res[1].knots_v, res[1].control_points, 0.8, 0.8);
-
-		p0[0].should.be.approximately(p1[0], verb.eval.Constants.TOLERANCE);
-		p0[1].should.be.approximately(p1[1], verb.eval.Constants.TOLERANCE);
-		p0[2].should.be.approximately(p1[2], verb.eval.Constants.TOLERANCE);
-
-
-	});
-
-	it('can split a surface in the v direction', function(){
-
-		var u = 0.2;
-
-		var res = verb.eval.Nurbs.surface_split( degree,
-									knots_u,
-									degree,
-									knots_v, 
-									control_points,
-									u,
-									1 );
-
-		res[0].control_points.forEach(function(cp){ should.exist(cp); });
-		res[0].knots_u.forEach(function(cp){ should.exist(cp); });
-		res[0].knots_v.forEach(function(cp){ should.exist(cp); });
-		should.exist( res[0].degree_u );
-		should.exist( res[0].degree_v );
-
-		res[1].control_points.forEach(function(cp){ should.exist(cp); });
-		res[1].knots_u.forEach(function(cp){ should.exist(cp); });
-		res[1].knots_v.forEach(function(cp){ should.exist(cp); });
-		should.exist( res[1].degree_u );
-		should.exist( res[1].degree_v );
-
-		var p0 = verb.eval.Nurbs.surface_point( degree, knots_u, degree, knots_v, control_points, 0.1, 0.1 );
-		var p1 = verb.eval.Nurbs.surface_point( res[0].degree_u, res[0].knots_u, res[0].degree_v, res[0].knots_v, res[0].control_points, 0.1, 0.1);
-
-		p0[0].should.be.approximately(p1[0], verb.eval.Constants.TOLERANCE);
-		p0[1].should.be.approximately(p1[1], verb.eval.Constants.TOLERANCE);
-		p0[2].should.be.approximately(p1[2], verb.eval.Constants.TOLERANCE);
-
-		p0 = verb.eval.Nurbs.surface_point( degree, knots_u, degree, knots_v, control_points, 0.8, 0.8 );
-		p1 = verb.eval.Nurbs.surface_point( res[1].degree_u, res[1].knots_u, res[1].degree_v, res[1].knots_v, res[1].control_points, 0.8, 0.8);
-
-		p0[0].should.be.approximately(p1[0], verb.eval.Constants.TOLERANCE);
-		p0[1].should.be.approximately(p1[1], verb.eval.Constants.TOLERANCE);
-		p0[2].should.be.approximately(p1[2], verb.eval.Constants.TOLERANCE);
-
-
-	});
-
-});
-
 describe("verb.InterpCurve",function(){
 
 	function shouldInterpPointsWithTangents(pts, degree, start_tangent, end_tangent){
@@ -5819,7 +5816,7 @@ describe("verb.eval.Nurbs.rational_interp_curve",function(){
 		crv.degree.should.be.equal( degree );
 
 		crv.control_points[0][0].should.be.approximately(pts[0][0], verb.eval.Constants.TOLERANCE);
-		crv.control_points[0][1].should.be.approximately(pts[0][1], verb.eval.Constants.TOLERANCE);
+		crv.control_points[0].mult.should.be.approximately(pts[0][1], verb.eval.Constants.TOLERANCE);
 
 		verb.last(crv.control_points)[0].should.be.approximately(verb.last(pts)[0], verb.eval.Constants.TOLERANCE);
 		verb.last(crv.control_points)[1].should.be.approximately(verb.last(pts)[1], verb.eval.Constants.TOLERANCE);

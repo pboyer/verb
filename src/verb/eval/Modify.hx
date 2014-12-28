@@ -1,67 +1,322 @@
 package verb.eval;
 
 import verb.eval.types.CurveData;
+import verb.eval.types.CurveData;
+import verb.eval.types.SurfaceData;
+
+@:expose("KnotMultiplicity")
+class KnotMultiplicity {
+    public var knot : Float;
+    public var mult : Int;
+
+    public function new(knot : Float, mult : Int ){
+        this.knot = knot;
+        this.mult = mult;
+    }
+
+    public function inc(){
+        mult++;
+    }
+}
 
 @:expose("Modify")
 class Modify {
 
-//    public static function surface_split( surface : SurfaceData, u : Float, dir : Bool) : Array<SurfaceData> {
-//
-//        var c
-//        , newPts = []
-//        , knots
-//        , degree
-//        , newknots
-//        , i;
-//
-//        if (dir == 0) {
-//
-//            control_points = Vec.transpose(control_points);
-//            knots = knots_u;
-//            degree = degree_u;
-//
-//        } else {
-//
-//            control_points = control_points;
-//            knots = knots_v;
-//            degree = degree_v;
-//
-//        }
-//
-//        var knots_to_insert = [ for (i in 0...degree+1) u ];
-//
-//        var newpts0 = new Array<Array<Point>>()
-//        , newpts1 = new Array<Array<Point>>()
-//        , res;
-//
-//        var s = knot_span( degree, u, knots );
-//
-//        for (cps in control_points){
-//
-//            res = curve_knot_refine( degree, knots, cps, knots_to_insert );
-//
-//            var cpts0 = res.control_points.slice( 0, s + 1 );
-//            var cpts1 = res.control_points.slice( s + 1 );
-//
-//            newpts0.push( cpts0 );
-//            newpts1.push( cpts1 );
-//
-//        }
-//
-//        var knots0 = res.knots.slice(0, s + degree + 2);
-//        var knots1 = res.knots.slice( s + 1 );
-//
-//        if (dir == 0){
-//            newpts0 = Vec.transpose( newpts0 );
-//            newpts1 = Vec.transpose( newpts1 );
-//
-//            return [ 	new SurfaceData(degree, degree_v, knots0, knots_v, newpts0 ), new SurfaceData(degree, degree_v, knots1, knots_v, newpts1 ) ];
-//         }
-//
-//        // v dir
-//        return [ 	new SurfaceData(degree_u, degree, knots_u, knots0, newpts0 ),  new SurfaceData(degree_u, degree, knots_u, knots1, newpts1 ) ];
-//    }
+    public static function surface_knot_refine( surface : SurfaceData, knots_to_insert : Array<Float>, useV : Bool ) : SurfaceData {
 
+        // TODO: make this faster by taking advantage of repeat computations in every row
+        // 			 i.e. no reason to recompute the knot vectors on every row
+
+        var newPts = []
+        , knots
+        , degree
+        , ctrlPts;
+
+        // u dir
+        if (!useV){
+            ctrlPts = Vec.transpose( surface.controlPoints );
+            knots = surface.knotsU;
+            degree = surface.degreeU;
+        // v dir
+        } else {
+            ctrlPts = surface.controlPoints;
+            knots = surface.knotsV;
+            degree = surface.degreeV;
+        }
+
+        // do knot refinement on every row
+        var c : CurveData = null;
+        for (cptrow in ctrlPts){
+            c = curve_knot_refine( new CurveData(degree, knots, cptrow), knots_to_insert );
+            newPts.push( c.controlPoints );
+        }
+
+        var newknots = c.knots;
+
+        // u dir
+        if (!useV){
+            newPts = Vec.transpose( newPts );
+            return new SurfaceData( surface.degreeU, surface.degreeV, newknots, surface.knotsV.copy(), newPts );
+        // v dir
+        } else {
+            return new SurfaceData( surface.degreeU, surface.degreeV, surface.knotsU.copy(), newknots, newPts );
+        }
+
+    }
+
+    public static function surface_split( surface : SurfaceData, u : Float, useV : Bool = false) : Array<SurfaceData> {
+
+        var knots
+        , degree
+        , control_points;
+
+        if (!useV) {
+
+            control_points = Vec.transpose( surface.controlPoints );
+            knots = surface.knotsU;
+            degree = surface.degreeU;
+
+        } else {
+
+            control_points = surface.controlPoints;
+            knots = surface.knotsV;
+            degree = surface.degreeV;
+
+        }
+
+        var knots_to_insert = [ for (i in 0...degree+1) u ];
+
+        var newpts0 = new Array<Array<Point>>()
+        , newpts1 = new Array<Array<Point>>();
+
+        var s = Nurbs.knot_span( degree, u, knots );
+        var res : CurveData = null;
+
+        for (cps in control_points){
+
+            res = curve_knot_refine( new CurveData(degree, knots, cps), knots_to_insert );
+
+            newpts0.push( res.controlPoints.slice( 0, s + 1 ) );
+            newpts1.push( res.controlPoints.slice( s + 1 ) );
+
+        }
+
+        var knots0 = res.knots.slice(0, s + degree + 2);
+        var knots1 = res.knots.slice( s + 1 );
+
+        if (!useV){
+            newpts0 = Vec.transpose( newpts0 );
+            newpts1 = Vec.transpose( newpts1 );
+
+            return [ new SurfaceData(degree, surface.degreeV, knots0, surface.knotsV.copy(), newpts0 ),
+                new SurfaceData(degree, surface.degreeV, knots1, surface.knotsV.copy(), newpts1 ) ];
+         }
+
+        // v dir
+        return [ new SurfaceData(surface.degreeU, degree, surface.knotsU.copy(), knots0, newpts0 ),
+                    new SurfaceData(surface.degreeU, degree, surface.knotsU.copy(), knots1, newpts1 ) ];
+    }
+
+    //
+    // Decompose a NURBS curve into a collection of bezier's.  Useful
+    // as each bezier fits into it's convex hull.  This is a useful starting
+    // point for intersection, closest point, divide & conquer algorithms
+    //
+    // **params**
+    // + CurveData object representing the curve
+    //
+    // **returns**
+    // + *Array* of CurveData objects, defined by degree, knots, and control points
+    //
+    public static function curve_bezier_decompose( curve : CurveData ) : Array<CurveData> {
+
+        var degree = curve.degree
+        , control_points = curve.controlPoints
+        , knots = curve.knots;
+
+        // find all of the unique knot values and their multiplicity
+        // for each, increase their multiplicity to degree + 1
+
+        var knotmults = knot_multiplicities( knots );
+        var reqMult = degree + 1;
+
+        // insert the knots
+        for (knotmult in knotmults) { // (var i = 0; i < mults.length; i++){
+            if ( knotmult.mult < reqMult ){
+
+                var knotsInsert = Vec.rep( reqMult - knotmult.mult, knotmult.knot );
+                var res = curve_knot_refine( new CurveData(degree, knots, control_points), knotsInsert );
+
+                knots = res.knots;
+                control_points = res.controlPoints;
+            }
+        }
+
+        var numCrvs = knots.length / reqMult - 1;
+        var crvKnotLength = reqMult * 2;
+
+        var crvs = [];
+
+        var i = 0;
+        while ( i < control_points.length){
+            var kts = knots.slice( i, i + crvKnotLength );
+            var pts = control_points.slice( i, i + reqMult );
+
+            crvs.push( new CurveData(degree, kts, pts ) );
+
+            i += reqMult;
+        }
+
+        return crvs;
+
+    }
+
+    //
+    // Determine the multiplicities of the values in a knot vector
+    //
+    // **params**
+    // + array of nondecreasing knot values
+    //
+    // **returns**
+    // + *Array* of length 2 arrays, [knotValue, knotMultiplicity]
+    //
+    public static function knot_multiplicities( knots : KnotArray) : Array<KnotMultiplicity> {
+
+        var mults = [  new KnotMultiplicity( knots[0], 0 ) ];
+        var curr : KnotMultiplicity = mults[0];
+
+        for (knot in knots){
+            if ( (Math.abs(knot - curr.knot)) > Constants.EPSILON ){
+                curr = new KnotMultiplicity(knot, 0);
+                mults.push(curr);
+            }
+
+            curr.inc();
+        }
+
+        return mults;
+    }
+
+    // Split a curve into two parts
+    //
+    // **params**
+    // + CurveData object representing the curve
+    // + location to split the curve
+    //
+    // **returns**
+    // + *Array* two new curves, defined by degree, knots, and control points
+    //
+    public static function curve_split( curve : CurveData, u : Float ) : Array<CurveData> {
+
+        var degree = curve.degree
+        , control_points = curve.controlPoints
+        , knots = curve.knots;
+
+        var knots_to_insert = [for (i in 0...degree+1) u];
+        var res = curve_knot_refine( curve, knots_to_insert );
+
+        var s = Nurbs.knot_span( degree, u, knots );
+
+        var knots0 = res.knots.slice(0, s + degree + 2);
+        var knots1 = res.knots.slice( s + 1 );
+
+        var cpts0 = res.controlPoints.slice( 0, s + 1 );
+        var cpts1 = res.controlPoints.slice( s + 1 );
+
+        return [
+            new CurveData( degree, knots0, cpts0 ),
+            new CurveData( degree, knots1, cpts1 )
+        ];
+
+    }
+
+    // Insert a collection of knots on a curve
+    //
+    // Corresponds to Algorithm A5.4 (Piegl & Tiller)
+    //
+    // **params**
+    // + CurveData object representing the curve
+    // + array of knots to insert
+    //
+    // **returns**
+    // +  CurveData object representing the curve
+    //
+
+    public static function curve_knot_refine( curve : CurveData, knots_to_insert : Array<Float> ) : CurveData {
+
+        var degree = curve.degree
+        , control_points = curve.controlPoints
+        , knots = curve.knots;
+
+        var n = control_points.length - 1
+        , m = n + degree + 1
+        , r = knots_to_insert.length - 1
+        , a = Nurbs.knot_span( degree, knots_to_insert[0], knots )
+        , b = Nurbs.knot_span( degree, knots_to_insert[r], knots )
+        , control_points_post = new CurvePointArray()
+        , knots_post = new KnotArray();
+
+        // new control pts
+        for (i in 0...a-degree+1){
+            control_points_post[i] = control_points[i];
+        }
+
+        for (i in b-1...n+1){
+            control_points_post[i+r+1] = control_points[i];
+        }
+
+        // new knot vector
+        for (i in 0...a+1){
+            knots_post[i] = knots[i];
+        }
+
+        for (i in b+degree...m+1){
+            knots_post[i+r+1] = knots[i];
+        }
+
+        var i = b + degree - 1;
+        var k = b + degree + r;
+        var j = r;
+
+        while ( j >= 0 ) {
+
+            while (knots_to_insert[j] <= knots[i] && i > a){
+
+                control_points_post[k-degree-1] = control_points[i-degree-1];
+                knots_post[k] = knots[i];
+                k = k-1;
+                i = i-1;
+
+            }
+
+            control_points_post[k-degree-1] = control_points_post[k-degree];
+
+            for ( l in 1...degree+1){
+
+                var ind = k-degree+l;
+                var alfa = knots_post[k+l] - knots_to_insert[j];
+
+                if (Math.abs(alfa) < Constants.EPSILON){
+                    control_points_post[ind-1] = control_points_post[ind];
+                } else {
+                    alfa = alfa / (knots_post[k+l] - knots[i-degree+l]);
+
+                    control_points_post[ind-1] = Vec.add(
+                        Vec.mul( alfa, control_points_post[ind-1] ),
+                        Vec.mul( (1.0 - alfa), control_points_post[ind]) );
+                }
+
+            }
+
+            knots_post[k] = knots_to_insert[j];
+            k = k - 1;
+
+            j--;
+
+        }
+
+        return new CurveData(degree, knots_post, control_points_post );
+    }
 
     // Insert a knot along a rational curve.  Note that this algorithm only works
     // for r + s <= degree, where s is the initial multiplicity (number of duplicates) of the knot.
