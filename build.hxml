@@ -1,4 +1,4 @@
--main verb.eval.Init
+-main verb.Init
 -cp src
 -js build/verbHaxe.js
 -dce std

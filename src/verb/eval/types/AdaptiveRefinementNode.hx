@@ -251,6 +251,11 @@ class AdaptiveRefinementNode {
 
     public function divide( options : AdaptiveRefinementOptions = null ) : Void {
         if (options == null) options = new AdaptiveRefinementOptions();
+
+        if (options.normTol == null) options.normTol = 8.5e-2;
+        if (options.minDepth == null) options.minDepth = 0;
+        if (options.maxDepth == null) options.maxDepth = 10;
+
         this._divide( options, 0, true );
     }
 

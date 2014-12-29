@@ -26,7 +26,7 @@ module.exports = function(grunt) {
 //                                            'src/eval/tessellate.js',
 //                                            'src/eval/geom.js',
 //                                            'src/eval/eval.js'],
-          'build/<%= pkg.name %>Core.js': [ 'src/eval_hx/header.js',
+          'build/<%= pkg.name %>.js': [ 'src/header.js',
                                             'build/verbHaxe.js']
         }
       }
@@ -51,8 +51,8 @@ module.exports = function(grunt) {
       build: {
         files: {
           'build/<%= pkg.name %>.min.js': ['build/<%= pkg.name %>.js'],
-          'build/<%= pkg.name %>Eval.min.js': ['build/<%= pkg.name %>Eval.js'],
-          'build/<%= pkg.name %>Core.min.js': ['build/<%= pkg.name %>Core.js']
+//          'build/<%= pkg.name %>Eval.min.js': ['build/<%= pkg.name %>Eval.js'],
+//          'build/<%= pkg.name %>Core.min.js': ['build/<%= pkg.name %>Core.js']
         }
       }
     },
@@ -88,12 +88,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-docco');
   grunt.loadNpmTasks('grunt-benchmark');
 
-  var build_steps = [ 'haxe', 'concat' ]; // 'uglify', 'docco'];
+  var build_steps = [ 'haxe', 'concat', 'uglify' ]; // 'docco'];
   grunt.registerTask('default', build_steps );
 
   grunt.registerTask('build', build_steps);
   grunt.registerTask('test', ['haxe', 'concat', 'mochaTest']);
   grunt.registerTask('benchmarks', ['concat', 'benchmark']);
-
 
 };

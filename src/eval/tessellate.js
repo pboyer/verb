@@ -1,3 +1,69 @@
+
+
+//
+// ####rational_curve_regular_sample( degree, knots, control_points, num_samples [, include_u] )
+//
+// Sample a NURBS curve, corresponds to http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf
+//
+// **params**
+// + *Number*, integer degree
+// + array of nondecreasing knot values
+// + 1d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi)
+// + *Number*, integer number of samples
+// + *Boolean*, whether to prefix the point with the parameter
+//
+// **returns**
+// + an array of points, prepended by the point param
+//
+
+verb.eval.rational_curve_regular_sample = function( degree, knots, control_points, num_samples, include_u ) {
+
+	return verb.eval.rational_curve_regular_sample_range( degree, knots, control_points, knots[0], verb.last(knots), num_samples, include_u);
+
+}
+
+//
+// ####rational_curve_regular_sample_range( degree, knots, control_points, start_u, end_u, num_samples, include_u )
+//
+// Sample a NURBS curve assuming parameterization 0 to 1, corresponds to http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf
+//
+// **params**
+// + *Number*, integer degree
+// + array of nondecreasing knot values
+// + 1d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi)
+// + *Number*, start parameter for sampling
+// + *Number*, end parameter for sampling
+// + *Number*, integer number of samples
+// + *Boolean*, whether to prefix the point with the parameter
+//
+// **returns**
+// + an dictionary of parameter - point pairs
+//
+
+verb.eval.rational_curve_regular_sample_range = function( degree, knots, control_points, start_u, end_u, num_samples, include_u ) {
+
+	if (num_samples < 1){
+		num_samples = 2;
+	}
+
+	var p = [],
+		span = (end_u - start_u) / (num_samples - 1),
+		u = 0;
+
+	for (var i = 0; i < num_samples; i++){
+
+		u = start_u + span * i;
+		if ( include_u ){
+			p.push( [u].concat( verb.eval.rational_curve_point(degree, knots, control_points, u) ) );
+		} else {
+			p.push( verb.eval.rational_curve_point(degree, knots, control_points, u) );
+		}
+
+	}
+
+	return p;
+
+}
 //
 // ####tessellate_rational_surface_naive( degree_u, knots_u, degree_v, knots_v, homo_control_points, divs_u, divs_v )
 //
@@ -5,14 +71,14 @@
 //
 // **params**
 // + *Number*, integer degree of surface in u direction
-// + *Array*, array of nondecreasing knot values in u direction
+// + array of nondecreasing knot values in u direction
 // + *Number*, integer degree of surface in v direction
-// + *Array*, array of nondecreasing knot values in v direction
-// + *Array*, 3d array of control points, top to bottom is increasing u direction, left to right is increasing v direction,
+// + array of nondecreasing knot values in v direction
+// + 3d array of control points, top to bottom is increasing u direction, left to right is increasing v direction,
 // and where each control point is an array of length (dim+1)
-// 
-// **returns** 
-// + *Array*, first element of array is an array of positions, second element are 3-tuple of triangle windings, third element is the 
+//
+// **returns**
+// + first element of array is an array of positions, second element are 3-tuple of triangle windings, third element is the
 // uvs
 
 verb.eval.tessellate_rational_surface_naive = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, divs_u, divs_v ) {
@@ -30,7 +96,7 @@ verb.eval.tessellate_rational_surface_naive = function( degree_u, knots_u, degre
 
 	var span_u = u_span / divs_u,
 		span_v = v_span / divs_v;
-  
+
   var points = [];
   var uvs = [];
   var normals = [];
@@ -38,7 +104,7 @@ verb.eval.tessellate_rational_surface_naive = function( degree_u, knots_u, degre
 	for (var i = 0; i < divs_u + 1; i++) {
 		for (var j = 0; j < divs_v + 1; j++) {
 
-			var pt_u = i * span_u, 
+			var pt_u = i * span_u,
 				pt_v = j * span_v;
 
 			uvs.push( [pt_u, pt_v] );
@@ -76,70 +142,6 @@ verb.eval.tessellate_rational_surface_naive = function( degree_u, knots_u, degre
 
 }
 
-//
-// ####rational_curve_regular_sample( degree, knots, control_points, num_samples [, include_u] )
-//
-// Sample a NURBS curve, corresponds to http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf
-//
-// **params**
-// + *Number*, integer degree
-// + *Array*, array of nondecreasing knot values 
-// + *Array*, 1d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi) 
-// + *Number*, integer number of samples
-// + *Boolean*, whether to prefix the point with the parameter
-// 
-// **returns** 
-// + *Array*, an array of points, prepended by the point param
-//
-
-verb.eval.rational_curve_regular_sample = function( degree, knots, control_points, num_samples, include_u ) {
-
-	return verb.eval.rational_curve_regular_sample_range( degree, knots, control_points, knots[0], verb.last(knots), num_samples, include_u);
-
-}
-
-//
-// ####rational_curve_regular_sample_range( degree, knots, control_points, start_u, end_u, num_samples, include_u )
-//
-// Sample a NURBS curve assuming parameterization 0 to 1, corresponds to http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf
-//
-// **params**
-// + *Number*, integer degree
-// + *Array*, array of nondecreasing knot values 
-// + *Array*, 1d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi) 
-// + *Number*, start parameter for sampling
-// + *Number*, end parameter for sampling
-// + *Number*, integer number of samples
-// + *Boolean*, whether to prefix the point with the parameter
-// 
-// **returns** 
-// + *Array*, an dictionary of parameter - point pairs
-//
-
-verb.eval.rational_curve_regular_sample_range = function( degree, knots, control_points, start_u, end_u, num_samples, include_u ) {
-
-	if (num_samples < 1){
-		num_samples = 2;
-	}
-
-	var p = [],
-		span = (end_u - start_u) / (num_samples - 1),
-		u = 0;
-
-	for (var i = 0; i < num_samples; i++){
-
-		u = start_u + span * i;
-		if ( include_u ){
-			p.push( [u].concat( verb.eval.rational_curve_point(degree, knots, control_points, u) ) );
-		} else {
-			p.push( verb.eval.rational_curve_point(degree, knots, control_points, u) );
-		}
-	
-	}
-
-	return p;
-
-}
 
 //
 // ####rational_curve_adaptive_sample( degree, knots, control_points, tol, include_u )
@@ -148,20 +150,20 @@ verb.eval.rational_curve_regular_sample_range = function( degree, knots, control
 //
 // **params**
 // + *Number*, integer degree
-// + *Array*, array of nondecreasing knot values 
-// + *Array*, 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
-// and form (wi*pi, wi) 
+// + array of nondecreasing knot values
+// + 2d array of homogeneous control points, where each control point is an array of length (dim+1)
+// and form (wi*pi, wi)
 // + *Number*, tol for the adaptive scheme
 // + *Boolean*, whether to prefix the point with the parameter
-// 
-// **returns** 
-// + *Array*, an array of dim + 1 length where the first element is the param where it was sampled and the remaining the pt
+//
+// **returns**
+// + an array of dim + 1 length where the first element is the param where it was sampled and the remaining the pt
 //
 
 verb.eval.rational_curve_adaptive_sample = function( degree, knots, control_points, tol, include_u ) {
 
 	// if degree is 1, just return the dehomogenized control points
-	if (degree === 1){ 
+	if (degree === 1){
 		if ( !include_u ) {
 			return control_points.map( verb.eval.dehomogenize );
 		} else {
@@ -183,15 +185,15 @@ verb.eval.rational_curve_adaptive_sample = function( degree, knots, control_poin
 //
 // **params**
 // + *Number*, integer degree
-// + *Array*, array of nondecreasing knot values 
-// + *Array*, 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
-// and form (wi*pi, wi) 
+// + array of nondecreasing knot values
+// + 2d array of homogeneous control points, where each control point is an array of length (dim+1)
+// and form (wi*pi, wi)
 // + *Number*, start parameter for sampling
 // + *Number*, end parameter for sampling
 // + *Boolean*, whether to prefix the point with the parameter
-// 
-// **returns** 
-// + *Array*, an array of dim + 1 length where the first element is the param where it was sampled and the remaining the pt
+//
+// **returns**
+// + an array of dim + 1 length where the first element is the param where it was sampled and the remaining the pt
 //
 
 verb.eval.rational_curve_adaptive_sample_range = function( degree, knots, control_points, start_u, end_u, tol, include_u ) {
@@ -217,7 +219,7 @@ verb.eval.rational_curve_adaptive_sample_range = function( degree, knots, contro
 		var left_pts = verb.eval.rational_curve_adaptive_sample_range( degree, knots, control_points, start_u, exact_mid_u, tol, include_u )
 			, right_pts = verb.eval.rational_curve_adaptive_sample_range( degree, knots, control_points, exact_mid_u, end_u, tol, include_u );
 
-		// concatenate the two		
+		// concatenate the two
 		return left_pts.slice(0, -1).concat(right_pts);
 
 	} else {
@@ -238,19 +240,19 @@ verb.eval.rational_curve_adaptive_sample_range = function( degree, knots, contro
 //          * p2
 //         / \
 //        /   \
-//       /     \ 
+//       /     \
 //      /       \
 //     * p1 ---- * p3
 //
 // The area metric is 2 * the squared norm of the cross product of two edges, requiring no square roots and no divisions
 //
 // **params**
-// + *Array*, p1
-// + *Array*, p2
-// + *Array*, p3
+// + p1
+// + p2
+// + p3
 // + *Number*, The tolerance for whether the three points form a line
 //
-// **returns** 
+// **returns**
 // + *Number*, Whether the triangle passes the test
 //
 verb.eval.three_points_are_flat = function( p1, p2, p3, tol ) {
@@ -620,16 +622,16 @@ verb.eval.AdaptiveRefinementNode.prototype.midpoint = function( index ){
 	if (this.midpoints[index]) return this.midpoints[index];
 
 	switch (index){
-		case 0: 
+		case 0:
 			this.midpoints[0] = this.evalSrf( this.u05, this.corners[0].uv[1] );
 			break;
-		case 1: 
+		case 1:
 			this.midpoints[1] = this.evalSrf( this.corners[1].uv[0], this.v05 );
 			break;
-		case 2: 
+		case 2:
 			this.midpoints[2] = this.evalSrf( this.u05, this.corners[2].uv[1] );
 			break;
-		case 3: 
+		case 3:
 			this.midpoints[3] = this.evalSrf( this.corners[0].uv[0], this.v05 );
 			break;
 	}
