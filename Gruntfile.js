@@ -26,8 +26,8 @@ module.exports = function(grunt) {
 //                                            'src/eval/tessellate.js',
 //                                            'src/eval/geom.js',
 //                                            'src/eval/eval.js'],
-          'build/<%= pkg.name %>.js': [ 'src/header.js',
-                                            'build/verbHaxe.js']
+          'build/<%= pkg.name %>.js': [ 'src/support/header.js',
+                                        'build/verbHaxe.js']
         }
       }
     },

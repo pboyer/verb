@@ -1,3 +1,12 @@
+// browser context
+if ( typeof exports != 'object' || exports === undefined )
+{
+    // todo fix this
+	var verb = exports = {};
+} else  {
+	var verb = module.exports = {};
+}
+
 (function ($hx_exports) { "use strict";
 $hx_exports.core = $hx_exports.core || {};
 var HxOverrides = function() { };
@@ -789,6 +798,327 @@ verb.core.Make.extruded_surface = function(axis,length,profile) {
 	}
 	return new verb.core.types.SurfaceData(2,profile.degree,[0,0,0,1,1,1],profile.knots,verb.core.Eval.homogenize_2d(control_points,weights));
 };
+verb.core.Make.cylinder_surface = function(axis,xaxis,base,height,radius) {
+	var yaxis = verb.core.Vec.cross(axis,xaxis);
+	var angle = 2.0 * Math.PI;
+	var circ = verb.core.Make.arc(base,xaxis,yaxis,radius,0.0,2 * Math.PI);
+	return verb.core.Make.extruded_surface(axis,height,circ);
+};
+verb.core.Make.revolved_surface = function(center,axis,theta,profile) {
+	var prof_control_points = verb.core.Eval.dehomogenize_1d(profile.controlPoints);
+	var prof_weights = verb.core.Eval.weight_1d(profile.controlPoints);
+	var narcs;
+	var knots_u;
+	var control_points;
+	var weights;
+	if(theta <= Math.PI / 2) {
+		narcs = 1;
+		knots_u = verb.core.Vec.zeros1d(6 + 2 * (narcs - 1));
+	} else if(theta <= Math.PI) {
+		narcs = 2;
+		knots_u = verb.core.Vec.zeros1d(6 + 2 * (narcs - 1));
+		knots_u[3] = knots_u[4] = 0.5;
+	} else if(theta <= 3 * Math.PI / 2) {
+		narcs = 3;
+		knots_u = verb.core.Vec.zeros1d(6 + 2 * (narcs - 1));
+		knots_u[3] = knots_u[4] = 0.333333333333333315;
+		knots_u[5] = knots_u[6] = 0.66666666666666663;
+	} else {
+		narcs = 4;
+		knots_u = verb.core.Vec.zeros1d(6 + 2 * (narcs - 1));
+		knots_u[3] = knots_u[4] = 0.25;
+		knots_u[5] = knots_u[6] = 0.5;
+		knots_u[7] = knots_u[8] = 0.75;
+	}
+	var dtheta = theta / narcs;
+	var j = 3 + 2 * (narcs - 1);
+	var _g = 0;
+	while(_g < 3) {
+		var i = _g++;
+		knots_u[i] = 0.0;
+		knots_u[j + i] = 1.0;
+	}
+	var n = 2 * narcs;
+	var wm = Math.cos(dtheta / 2.0);
+	var angle = 0.0;
+	var sines = verb.core.Vec.zeros1d(narcs + 1);
+	var cosines = verb.core.Vec.zeros1d(narcs + 1);
+	var control_points1 = verb.core.Vec.zeros3d(2 * narcs + 1,prof_control_points.length,3);
+	var weights1 = verb.core.Vec.zeros2d(2 * narcs + 1,prof_control_points.length);
+	var _g1 = 1;
+	var _g2 = narcs + 1;
+	while(_g1 < _g2) {
+		var i1 = _g1++;
+		angle += dtheta;
+		cosines[i1] = Math.cos(angle);
+		sines[i1] = Math.sin(angle);
+	}
+	var _g11 = 0;
+	var _g3 = prof_control_points.length;
+	while(_g11 < _g3) {
+		var j1 = _g11++;
+		var O = verb.core.Trig.closest_point_on_ray(prof_control_points[j1],center,axis);
+		var X = verb.core.Vec.sub(prof_control_points[j1],O);
+		var r = verb.core.Vec.norm(X);
+		var Y = verb.core.Vec.cross(axis,X);
+		if(r > verb.core.Constants.EPSILON) {
+			X = verb.core.Vec.mul(1 / r,X);
+			Y = verb.core.Vec.mul(1 / r,Y);
+		}
+		control_points1[0][j1] = prof_control_points[j1];
+		var P0 = prof_control_points[j1];
+		weights1[0][j1] = prof_weights[j1];
+		var T0 = Y;
+		var index = 0;
+		var angle1 = 0.0;
+		var _g31 = 1;
+		var _g21 = narcs + 1;
+		while(_g31 < _g21) {
+			var i2 = _g31++;
+			var P2;
+			if(r == 0) P2 = O; else P2 = verb.core.Vec.add(O,verb.core.Vec.add(verb.core.Vec.mul(r * cosines[i2],X),verb.core.Vec.mul(r * sines[i2],Y)));
+			control_points1[index + 2][j1] = P2;
+			weights1[index + 2][j1] = prof_weights[j1];
+			var T2 = verb.core.Vec.sub(verb.core.Vec.mul(cosines[i2],Y),verb.core.Vec.mul(sines[i2],X));
+			if(r == 0) control_points1[index + 1][j1] = O; else {
+				var params = verb.core.Intersect.rays(P0,verb.core.Vec.mul(1 / verb.core.Vec.norm(T0),T0),P2,verb.core.Vec.mul(1 / verb.core.Vec.norm(T2),T2));
+				var P1 = verb.core.Vec.add(P0,verb.core.Vec.mul(params[0],T0));
+				control_points1[index + 1][j1] = P1;
+			}
+			weights1[index + 1][j1] = wm * prof_weights[j1];
+			index += 2;
+			if(i2 < narcs) {
+				P0 = P2;
+				T0 = T2;
+			}
+		}
+	}
+	return new verb.core.types.SurfaceData(2,profile.degree,knots_u,profile.knots,verb.core.Eval.homogenize_2d(control_points1,weights1));
+};
+verb.core.Make.sphere_surface = function(center,axis,xaxis,radius) {
+	var arc = verb.core.Make.arc(center,verb.core.Vec.mul(-1.0,axis),xaxis,radius,0.0,Math.PI);
+	return verb.core.Make.revolved_surface(center,axis,2 * Math.PI,arc);
+};
+verb.core.Make.cone_surface = function(axis,xaxis,base,height,radius) {
+	var angle = 2 * Math.PI;
+	var prof_degree = 1;
+	var prof_ctrl_pts = [verb.core.Vec.add(base,verb.core.Vec.mul(height,axis)),verb.core.Vec.add(base,verb.core.Vec.mul(radius,xaxis))];
+	var prof_knots = [0.0,0.0,1.0,1.0];
+	var prof_weights = [1.0,1.0];
+	var prof = new verb.core.types.CurveData(prof_degree,prof_knots,verb.core.Eval.homogenize_1d(prof_ctrl_pts,prof_weights));
+	return verb.core.Make.revolved_surface(base,axis,angle,prof);
+};
+verb.core.Make.rational_interp_curve = function(points,degree,start_tangent,end_tangent) {
+	if(degree == null) degree = 3;
+	if(points.length < degree + 1) throw "You need to supply at least degree + 1 points!";
+	var us = [0.0];
+	var _g1 = 1;
+	var _g = points.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		var chord = verb.core.Vec.norm(verb.core.Vec.sub(points[i],points[i - 1]));
+		var last = us[us.length - 1];
+		us.push(last + chord);
+	}
+	var max = us[us.length - 1];
+	var _g11 = 0;
+	var _g2 = us.length;
+	while(_g11 < _g2) {
+		var i1 = _g11++;
+		us[i1] = us[i1] / max;
+	}
+	var knotsStart = verb.core.Vec.rep(degree + 1,0.0);
+	var hasTangents = start_tangent != null && end_tangent != null;
+	var start;
+	if(hasTangents) start = 0; else start = 1;
+	var end;
+	if(hasTangents) end = us.length - degree + 1; else end = us.length - degree;
+	var _g3 = start;
+	while(_g3 < end) {
+		var i2 = _g3++;
+		var weightSums = 0.0;
+		var _g12 = 0;
+		while(_g12 < degree) {
+			var j = _g12++;
+			weightSums += us[i2 + j];
+		}
+		knotsStart.push(1 / degree * weightSums);
+	}
+	var knots = knotsStart.concat(verb.core.Vec.rep(degree + 1,1.0));
+	var A = [];
+	var n;
+	if(hasTangents) n = points.length + 1; else n = points.length - 1;
+	var lst;
+	if(hasTangents) lst = 1; else lst = 0;
+	var ld;
+	if(hasTangents) ld = points.length - (degree - 1); else ld = points.length - (degree + 1);
+	var _g4 = 0;
+	while(_g4 < us.length) {
+		var u = us[_g4];
+		++_g4;
+		var span = verb.core.Eval.knot_span_given_n(n,degree,u,knots);
+		var basisFuncs = verb.core.Eval.basis_functions_given_knot_span_index(span,u,degree,knots);
+		var ls = span - degree;
+		var rowstart = verb.core.Vec.zeros1d(ls);
+		var rowend = verb.core.Vec.zeros1d(ld - ls);
+		A.push(rowstart.concat(basisFuncs).concat(rowend));
+	}
+	if(hasTangents) {
+		var ln = A[0].length - 2;
+		var tanRow0 = [-1.0,1.0].concat(verb.core.Vec.zeros1d(ln));
+		var tanRow1 = verb.core.Vec.zeros1d(ln).concat([-1.0,1.0]);
+		verb.core.Utils.spliceAndInsert(A,1,0,tanRow0);
+		verb.core.Utils.spliceAndInsert(A,A.length - 1,0,tanRow1);
+	}
+	var dim = points[0].length;
+	var xs = [];
+	var mult1 = (1 - knots[knots.length - degree - 2]) / degree;
+	var mult0 = knots[degree + 1] / degree;
+	var _g5 = 0;
+	while(_g5 < dim) {
+		var i3 = [_g5++];
+		var b;
+		if(!hasTangents) b = points.map((function(i3) {
+			return function(x) {
+				return x[i3[0]];
+			};
+		})(i3)); else {
+			b = [points[0][i3[0]]];
+			b.push(mult0 * start_tangent[i3[0]]);
+			var _g21 = 1;
+			var _g13 = points.length - 1;
+			while(_g21 < _g13) {
+				var j1 = _g21++;
+				b.push(points[j1][i3[0]]);
+			}
+			b.push(mult1 * end_tangent[i3[0]]);
+			b.push(verb.core.Utils.last(points)[i3[0]]);
+		}
+		var x1 = verb.core.Mat.solve(A,b);
+		xs.push(x1);
+	}
+	var controlPts = verb.core.Vec.transpose(xs);
+	var weights = verb.core.Vec.rep(controlPts.length,1.0);
+	return new verb.core.types.CurveData(degree,knots,verb.core.Eval.homogenize_1d(controlPts,weights));
+};
+verb.core.LUDecomp = function(lu,p) {
+	this.LU = lu;
+	this.P = p;
+};
+verb.core.Mat = $hx_exports.core.Mat = function() { };
+verb.core.Mat.solve = function(A,b) {
+	return verb.core.Mat.LUsolve(verb.core.Mat.LU(A),b);
+};
+verb.core.Mat.LUsolve = function(LUP,b) {
+	var i;
+	var j;
+	var LU = LUP.LU;
+	var n = LU.length;
+	var x = b.slice();
+	var P = LUP.P;
+	var Pi;
+	var LUi;
+	var LUii;
+	var tmp;
+	i = n - 1;
+	while(i != -1) {
+		x[i] = b[i];
+		--i;
+	}
+	i = 0;
+	while(i < n) {
+		Pi = P[i];
+		if(P[i] != i) {
+			tmp = x[i];
+			x[i] = x[Pi];
+			x[Pi] = tmp;
+		}
+		LUi = LU[i];
+		j = 0;
+		while(j < i) {
+			x[i] -= x[j] * LUi[j];
+			++j;
+		}
+		++i;
+	}
+	i = n - 1;
+	while(i >= 0) {
+		LUi = LU[i];
+		j = i + 1;
+		while(j < n) {
+			x[i] -= x[j] * LUi[j];
+			++j;
+		}
+		x[i] /= LUi[i];
+		--i;
+	}
+	return x;
+};
+verb.core.Mat.LU = function(A) {
+	var abs = Math.abs;
+	var i;
+	var j;
+	var k;
+	var absAjk;
+	var Akk;
+	var Ak;
+	var Pk;
+	var Ai;
+	var max;
+	var _g = [];
+	var _g2 = 0;
+	var _g1 = A.length;
+	while(_g2 < _g1) {
+		var i1 = _g2++;
+		_g.push(A[i1].slice());
+	}
+	A = _g;
+	var n = A.length;
+	var n1 = n - 1;
+	var P = new Array();
+	k = 0;
+	while(k < n) {
+		Pk = k;
+		Ak = A[k];
+		max = Math.abs(Ak[k]);
+		j = k + 1;
+		while(j < n) {
+			absAjk = Math.abs(A[j][k]);
+			if(max < absAjk) {
+				max = absAjk;
+				Pk = j;
+			}
+			++j;
+		}
+		P[k] = Pk;
+		if(Pk != k) {
+			A[k] = A[Pk];
+			A[Pk] = Ak;
+			Ak = A[k];
+		}
+		Akk = Ak[k];
+		i = k + 1;
+		while(i < n) {
+			A[i][k] /= Akk;
+			++i;
+		}
+		i = k + 1;
+		while(i < n) {
+			Ai = A[i];
+			j = k + 1;
+			while(j < n1) {
+				Ai[j] -= Ai[k] * Ak[j];
+				++j;
+				Ai[j] -= Ai[k] * Ak[j];
+				++j;
+			}
+			if(j == n1) Ai[j] -= Ai[k] * Ak[j];
+			++i;
+		}
+		++k;
+	}
+	return new verb.core.LUDecomp(A,P);
+};
 verb.core.Mesh = function() {
 };
 verb.core.KnotMultiplicity = $hx_exports.core.KnotMultiplicity = function(knot,mult) {
@@ -1277,6 +1607,17 @@ verb.core.Trig.dist_to_seg = function(a,b,c) {
 	var acd = verb.core.Vec.add(a,verb.core.Vec.mul(p,ac));
 	return verb.core.Vec.dist(acd,b);
 };
+verb.core.Trig.closest_point_on_ray = function(pt,o,r) {
+	var o2pt = verb.core.Vec.sub(pt,o);
+	var do2ptr = verb.core.Vec.dot(o2pt,r);
+	var proj = verb.core.Vec.add(o,verb.core.Vec.mul(do2ptr,r));
+	return proj;
+};
+verb.core.Trig.dist_to_ray = function(pt,o,r) {
+	var d = verb.core.Trig.closest_point_on_ray(pt,o,r);
+	var dif = verb.core.Vec.sub(d,pt);
+	return verb.core.Vec.norm(dif);
+};
 verb.core.Trig.three_points_are_flat = function(p1,p2,p3,tol) {
 	var p2mp1 = verb.core.Vec.sub(p2,p1);
 	var p3mp1 = verb.core.Vec.sub(p3,p1);
@@ -1288,9 +1629,13 @@ verb.core.Utils = function() { };
 verb.core.Utils.last = function(a) {
 	return a[a.length - 1];
 };
+verb.core.Utils.spliceAndInsert = function(a,start,end,ele) {
+	a.splice(start,end);
+	a.splice(start,0,ele);
+};
 verb.core.Vec = $hx_exports.core.Vec = function() { };
 verb.core.Vec.normalized = function(arr) {
-	return verb.core.Vec.div(arr,verb.core.Vec.normSquared(arr));
+	return verb.core.Vec.div(arr,verb.core.Vec.norm(arr));
 };
 verb.core.Vec.cross = function(u,v) {
 	return [u[1] * v[2] - u[2] * v[1],u[2] * v[0] - u[0] * v[2],u[0] * v[1] - u[1] * v[0]];

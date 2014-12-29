@@ -5,9 +5,9 @@
 <head>
   <title></title>
 
-  <script src="js/numeric-1.2.6.min.js"></script>
-  <script src="js/binomial.js"></script>
-  <script src="js/labor.js"></script>
+  <!--<script src="js/numeric-1.2.6.min.js"></script>-->
+  <!--<script src="js/binomial.js"></script>-->
+  <!--<script src="js/labor.js"></script>-->
   <script src="../build/verb.js"></script>
 
 	<style>
@@ -24,6 +24,8 @@
   <script src="js/OrbitControls.js"></script>
   
 	<script>
+
+		console.log(verb);
 
 		// construct the scene & camera
 		var scene = new THREE.Scene();
@@ -50,14 +52,13 @@
 
 		// verb.NurbsCurve -> THREE.Geometry
 		function tessellateCurve(geom) {
-			return asGeometry( asVector3( geom.tessellate() ) );
+			return asGeometry( asVector3( verb.core.Tess.rational_curve_adaptive_sample( geom , 1e-8) ) );
 		}
 
 		// use verb to construct the curve
-		verb.init();
 		var p1 = [0,0,0], p2 = [10,0,0], p3 = [10,10,5], p4 = [0,10,0], p5 = [5, 5, 0];
-		var pts = [p1, p2, p3, p4, p5];
-		var interpCurve = new verb.InterpCurve( pts, 2, [0,0,-100], [0,0,100] );
+		var pts = [ [0, 0, 1], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ];
+		var interpCurve = verb.core.Make.rational_interp_curve( pts, 3 ); //, [0,0,-100], [0,0,100] );
 
 		var interpCurveGeom = tessellateCurve(interpCurve);
 
@@ -67,34 +68,11 @@
 
 		scene.add( interpCurveLine );
 
-		// splitting a curve
-		// var splitcrvs = interpCurve.split( 0.3 );
 
-		// var split0Geom = tessellateCurve( splitcrvs[0] );
-
-		// var split0LineMat = new THREE.LineBasicMaterial({ color: 0xffbb00 });
-		// var split0Line = new THREE.Line( split0Geom, split0LineMat );
-
-		// scene.add( split0Line );
-
-		// var split1Geom = tessellateCurve( splitcrvs[1] );
-
-		// var split1LineMat = new THREE.LineBasicMaterial({ color: 0x00bbff });
-		// var split1Line = new THREE.Line( split1Geom, split1LineMat );
-
-		// scene.add( split1Line );
-
-		// draw the points 
-		// var ptGeom = asGeometry( asVector3( interpCurve.get('controlPoints') ) );
-
-		var cloudMat = new THREE.PointCloudMaterial({ size: 0.3 });
-		var cloud = new THREE.PointCloud( ptGeom, cloudMat );
-
-		scene.add( cloud );
 
 		var interPtGeom = asGeometry( asVector3( pts ) );
 
-		var cloudMat2 = new THREE.PointCloudMaterial({ size: 1, color: 0xff0000 });
+		var cloudMat2 = new THREE.PointCloudMaterial({ size: 0.1, color: 0xff0000 });
 		var cloud2 = new THREE.PointCloud( interPtGeom, cloudMat2 );
 
 		scene.add( cloud2 );

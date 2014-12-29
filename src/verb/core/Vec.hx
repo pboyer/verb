@@ -6,7 +6,7 @@ using Lambda;
 class Vec {
 
     public static function normalized( arr : Array<Float> ){
-        return div( arr, normSquared(arr) );
+        return div( arr, norm(arr) );
     }
 
     public static function cross(u : Array<Float>, v : Array<Float>) : Array<Float>{

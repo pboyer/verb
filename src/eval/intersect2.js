@@ -147,7 +147,7 @@ public static function rational_curve_surface_by_aabb( degree_u, knots_u, degree
 
 	// eliminate duplicate intersections
 	return verb.unique( res, function(a, b){
-		return Vec.norm2( Vec.sub( a.point, b.point ) ) < tol && Math.abs( a.p - b.p ) < tol && Vec.norm2( Vec.sub( a.uv, b.uv ) ) < tol
+		return Vec.norm( Vec.sub( a.point, b.point ) ) < tol && Math.abs( a.p - b.p ) < tol && Vec.norm( Vec.sub( a.uv, b.uv ) ) < tol
 	});
 
 }
@@ -600,7 +600,7 @@ public static function get_tri_norm( points, tri ) {
 		, v = Vec.sub( v2, v0 )
 		, n = Vec.cross( u, v );
 
-	return Vec.mul( 1 / Vec.norm2( n ), n );
+	return Vec.mul( 1 / Vec.norm( n ), n );
 
 };
 
@@ -820,7 +820,7 @@ public static function segments( a0, a1, b0, b1, tol ) {
 				u2 = Math.min( Math.max( 0, int_params[1] / bN ), 1.0),
 				int_a = Vec.add( Vec.mul( u1, a1ma0 ), a0 ),
 				int_b = Vec.add( Vec.mul( u2, b1mb0 ), b0 ),
-				dist = Vec.norm2Squared( Vec.sub(int_a, int_b) );
+				dist = Vec.normSquared( Vec.sub(int_a, int_b) );
 
 		if (  dist < tol*tol ) {
 			return [ [u1].concat(int_a), [u2].concat(int_b) ] ;
@@ -851,7 +851,7 @@ public static function segments( a0, a1, b0, b1, tol ) {
 public static function closest_point_on_segment( pt, segpt0, segpt1, u0, u1 ) {
 
 	var dif = Vec.sub( segpt1, segpt0 )
-		, l = Vec.norm2( dif );
+		, l = Vec.norm( dif );
 
 	if (l < verb.EPSILON ) {
 		return { 	u: u0, 
@@ -882,50 +882,7 @@ public static function closest_point_on_segment( pt, segpt0, segpt1, u0, u1 ) {
 
 //
 //
-//
-// Find the closest point on a ray
-//
-// **params**
-// + point to project
-// + origin for ray
-// + direction of ray 1, assumed normalized
-// 
-// **returns** 
-// + pt
-//
 
-public static function closest_point_on_ray( pt, o, r ) {
-
-		var o2pt = Vec.sub(pt,o)
-			, do2ptr = Vec.dot(o2pt, r)
-			, proj = Vec.add(o, Vec.mul(do2ptr, r));
-
-		return proj;
-
- }
-
-//
-//
-//
-// Find the distance of a point to a ray
-//
-// **params**
-// + point to project
-// + origin for ray
-// + direction of ray 1, assumed normalized
-// 
-// **returns** 
-// + the distance
-//
-
-public static function dist_to_ray( pt, o, r ) {
-
-	var d = verb.eval.closest_point_on_ray( pt, o, r );
-	var dif = Vec.sub( d, pt );
-
-	return Vec.norm2( dif );
-
-}
 
 
 //
@@ -1018,7 +975,7 @@ public static function refine_rational_surface_point(uv1, uv2, degree_u1, knots_
 		qd = Vec.dot( qn, q );
 
 		// if tolerance is met, exit loop
-		dist = Vec.norm2( Vec.sub(p, q) );
+		dist = Vec.norm( Vec.sub(p, q) );
 
 		
 		if (dist < tol) {
@@ -1354,7 +1311,7 @@ public static function clip_ray_in_coplanar_tri(o1, d1, points, tri, uvs ){
 		, s = [ Vec.sub( o[1], o[0] ), Vec.sub( o[2], o[1] ), Vec.sub( o[0], o[2] ) ]
 
 		, d = s.map( Vec.normalized )
-		, l = s.map( Vec.norm2 )
+		, l = s.map( Vec.norm )
 
 	// 1) for each tri ray, if intersects and in segment interval, store minU, maxU
 	var minU = null;
@@ -1542,10 +1499,10 @@ public static function tri_uv_from_point( points, tri, uvs, f ){
 	var f3 = Vec.sub(p3, f);
 
 	// calculate the areas and factors (order of parameters doesn't matter):
-	var a = Vec.norm2( Vec.cross( Vec.sub(p1, p2), Vec.sub(p1, p3) ) ); // main triangle area a
-	var a1 = Vec.norm2( Vec.cross(f2, f3) ) / a; // p1's triangle area / a
-	var a2 = Vec.norm2( Vec.cross(f3, f1) ) / a; // p2's triangle area / a 
-	var a3 = Vec.norm2( Vec.cross(f1, f2) ) / a; // p3's triangle area / a
+	var a = Vec.norm( Vec.cross( Vec.sub(p1, p2), Vec.sub(p1, p3) ) ); // main triangle area a
+	var a1 = Vec.norm( Vec.cross(f2, f3) ) / a; // p1's triangle area / a
+	var a2 = Vec.norm( Vec.cross(f3, f1) ) / a; // p2's triangle area / a 
+	var a3 = Vec.norm( Vec.cross(f1, f2) ) / a; // p3's triangle area / a
 
 	// find the uv corresponding to point f (uv1/uv2/uv3 are associated to p1/p2/p3):
 	return Vec.add( Vec.mul( a1, uv1), Vec.mul( a2, uv2), Vec.mul( a3, uv3) );

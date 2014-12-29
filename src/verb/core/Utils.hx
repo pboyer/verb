@@ -6,4 +6,9 @@ class Utils {
         return a[a.length-1];
     }
 
+    public static function spliceAndInsert<T>(a : Array<T>, start : Int, end : Int, ele : T) : Void {
+        a.splice(start, end);
+        a.insert(start, ele);
+    }
+
 }
