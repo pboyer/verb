@@ -1,12 +1,12 @@
-package verb.eval;
+package verb.core;
 
-import verb.eval.types.SurfaceData;
-import verb.eval.types.CurveData;
+import verb.core.types.SurfaceData;
+import verb.core.types.CurveData;
 
-import verb.eval.Binomial;
+import verb.core.Binomial;
 
-@:expose("eval.Nurbs")
-class Nurbs {
+@:expose("core.Eval")
+class Eval {
 
 	// Compute the derivatives at a point on a NURBS surface
 	//

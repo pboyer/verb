@@ -1,6 +1,6 @@
-package verb.eval.types;
+package verb.core.types;
 
-using verb.eval.Utils;
+using verb.core.Utils;
 
 class AdaptiveRefinementOptions {
     public var normTol : Float = 8.5e-2;
@@ -11,7 +11,7 @@ class AdaptiveRefinementOptions {
     public var minDivsV : Int = 1;
 }
 
-@:expose("eval.AdaptiveRefinementNode")
+@:expose("core.AdaptiveRefinementNode")
 class AdaptiveRefinementNode {
 
     var srf : SurfaceData;
@@ -100,7 +100,7 @@ class AdaptiveRefinementNode {
 
     public function evalSrf( u : Float, v : Float, srfPt : SurfacePoint = null ) : SurfacePoint {
 
-        var derivs = Nurbs.rational_surface_derivs( this.srf, 1, u, v );
+        var derivs = Eval.rational_surface_derivs( this.srf, 1, u, v );
         var pt = derivs[0][0];
         var norm = Vec.cross(  derivs[0][1], derivs[1][0] );
         var degen = Vec.isZero( norm );
@@ -165,7 +165,7 @@ class AdaptiveRefinementNode {
 
         var funcIndex = edgeIndex % 2;
 
-        var e = verb.eval.Constants.EPSILON;
+        var e = verb.core.Constants.EPSILON;
         var that = this;
 
         // range clipping functions

@@ -92,7 +92,7 @@ public static function surface_split( degree_u, knots_u, degree_v, knots_v, cont
 	}
 }
 
-public static function surface_knot_refine =  function( degree_u, knots_u, degree_v, knots_v, control_points, knots_to_insert, dir ){
+public static function surface_knot_refine( degree_u, knots_u, degree_v, knots_v, control_points, knots_to_insert, dir ){
 
 	// TODO: make this faster by taking advantage of repeat computations in every row
 	// 			 i.e. no reason to recompute the knot vectors on every row

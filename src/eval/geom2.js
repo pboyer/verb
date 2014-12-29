@@ -52,9 +52,9 @@ public static function rational_surface_closest_point( degree_u, knots_u, degree
 		, maxu = verb.last(knots_u)
 		, minv = knots_v[0]
 		, maxv = verb.last(knots_v)
-		, closedu = homo_control_points[0].reduce(function(acc,x,i){ return acc && numeric.norm2Squared( numeric.sub(x, verb.last(homo_control_points)[i] ) ) < verb.EPSILON; })
-		, transposed = numeric.transpose( homo_control_points )
-		, closedv = transposed[0].reduce(function(acc, x,i){ return acc && numeric.norm2Squared( numeric.sub(x, verb.last(transposed)[i] ) ) < verb.EPSILON; })
+		, closedu = homo_control_points[0].reduce(function(acc,x,i){ return acc && Vec.normSquared( Vec.sub(x, verb.last(homo_control_points)[i] ) ) < verb.EPSILON; })
+		, transposed = Vec.transpose( homo_control_points )
+		, closedv = transposed[0].reduce(function(acc, x,i){ return acc && Vec.normSquared( Vec.sub(x, verb.last(transposed)[i] ) ) < verb.EPSILON; })
 		, cuv;
 
 	// console.log(closedu, closedv)
@@ -67,7 +67,7 @@ public static function rational_surface_closest_point( degree_u, knots_u, degree
 	var dmin = Number.MAX_VALUE;
 	tess.points.forEach(function(x,i){
 
-		var d = numeric.norm2Squared( numeric.sub( p, x ) );
+		var d = Vec.normSquared( Vec.sub( p, x ) );
 
 		if ( d < dmin ){
 			dmin = d;
@@ -98,15 +98,15 @@ public static function rational_surface_closest_point( degree_u, knots_u, degree
 		var Suv = e[1][1];
 		var Svu = e[1][1];
 
-		var f = numeric.dot( Su, r );
-		var g = numeric.dot( Sv, r );
+		var f = Vec.dot( Su, r );
+		var g = Vec.dot( Sv, r );
 
 		var k = [-f, -g];
 
-		var J00 = numeric.dot( Su, Su ) + numeric.dot( Suu, r );
-		var J01 = numeric.dot( Su, Sv ) + numeric.dot( Suv, r );
-		var J10 = numeric.dot( Su, Sv ) + numeric.dot( Svu, r );
-		var J11 = numeric.dot( Sv, Sv ) + numeric.dot( Svv, r );
+		var J00 = Vec.dot( Su, Su ) + Vec.dot( Suu, r );
+		var J01 = Vec.dot( Su, Sv ) + Vec.dot( Suv, r );
+		var J10 = Vec.dot( Su, Sv ) + Vec.dot( Svu, r );
+		var J11 = Vec.dot( Sv, Sv ) + Vec.dot( Svv, r );
 
 		var J = [ [ J00, J01 ], [ J10, J11 ] ];
 
@@ -117,24 +117,24 @@ public static function rational_surface_closest_point( degree_u, knots_u, degree
 		//				   Su*Sv   +  Svu * r      |Sv|^2  +  Svv * r
 		//
 
-		var d = numeric.solve( J, k );
+		var d = Vec.solve( J, k );
 
-		return numeric.add( d, uv );
+		return Vec.add( d, uv );
 
 	}
 
 	while( i < maxits ){
 
 		e = f(cuv);
-		dif = numeric.sub(e[0][0], p );
+		dif = Vec.sub(e[0][0], p );
 	
-		// console.log('dist', numeric.norm2Squared(dif))
+		// console.log('dist', Vec.normSquared(dif))
 		// console.log('uv', cuv)
 
 		//  point coincidence
 		//
 		//		|S(u,v) - p| < e1
-		var c1v = numeric.norm2( dif );
+		var c1v = Vec.norm( dif );
 
 		//
 		//  cosine
@@ -147,11 +147,11 @@ public static function rational_surface_closest_point( degree_u, knots_u, degree
 		//   ----------------------  < e2
 		//   |Sv(u,v)| |S(u,v) - P|
 		//
-		var c2an = numeric.norm2( numeric.dot( e[1][0], dif) );
-		var c2ad = numeric.norm2( e[1][0] ) * c1;
+		var c2an = Vec.norm( Vec.dot( e[1][0], dif) );
+		var c2ad = Vec.norm( e[1][0] ) * c1;
 
-		var c2bn = numeric.norm2( numeric.dot( e[0][1], dif) );
-		var c2bd = numeric.norm2( e[0][1] ) * c1;
+		var c2bn = Vec.norm( Vec.dot( e[0][1], dif) );
+		var c2bd = Vec.norm( e[0][1] ) * c1;
 
 		var c2av = c2an / c2ad;
 		var c2bv = c2bn / c2bd;
@@ -184,8 +184,8 @@ public static function rational_surface_closest_point( degree_u, knots_u, degree
 		}
 
 		// if |(u* - u) C'(u)| < e1, halt
-		var c3v0 =  numeric.norm2( numeric.mul(ct[0] - cuv[0], e[1][0] ) );
-		var c3v1 =  numeric.norm2( numeric.mul(ct[1] - cuv[1], e[0][1] ) );
+		var c3v0 =  Vec.norm( Vec.mul(ct[0] - cuv[0], e[1][0] ) );
+		var c3v1 =  Vec.norm( Vec.mul(ct[1] - cuv[1], e[0][1] ) );
 
 		if (c3v0 + c3v1 < eps1) {
 			return cuv;
@@ -247,7 +247,7 @@ public static function rational_curve_closest_point( degree, knots, control_poin
 		var p1 = pts[i+1].slice(1);
 
 		var proj = verb.eval.closest_point_on_segment( p, p0, p1, u0, u1 );
-		var d = numeric.norm2( numeric.sub( p, proj.pt ) );
+		var d = Vec.norm( Vec.sub( p, proj.pt ) );
 
 		if ( d < min ){
 			min = d;
@@ -263,7 +263,7 @@ public static function rational_curve_closest_point( degree, knots, control_poin
 		, dif
 		, minu = knots[0]
 		, maxu = verb.last(knots)
-		, closed = numeric.norm2Squared( numeric.sub(control_points[0], verb.last( control_points) ) ) < verb.EPSILON
+		, closed = Vec.normSquared( Vec.sub(control_points[0], verb.last( control_points) ) ) < verb.EPSILON
 		, cu = u; 
 
 	function f(u){
@@ -273,11 +273,11 @@ public static function rational_curve_closest_point( degree, knots, control_poin
 	function n(u, e, d){
 
 		//   C'(u) * ( C(u) - P ) = 0 = f(u)
-		var f = numeric.dot( e[1], d );
+		var f = Vec.dot( e[1], d );
 
 		//	f' = C"(u) * ( C(u) - p ) + C'(u) * C'(u)
-		var s0 = numeric.dot( e[2], d )
-			, s1 = numeric.dot( e[1], e[1] )
+		var s0 = Vec.dot( e[2], d )
+			, s1 = Vec.dot( e[1], e[1] )
 			, df = s0 + s1;
 
 		return u - f / df;
@@ -287,16 +287,16 @@ public static function rational_curve_closest_point( degree, knots, control_poin
 	while( i < maxits ){
 
 		e = f( cu );
-		dif = numeric.sub( e[0], p );
+		dif = Vec.sub( e[0], p );
 
 		// |C(u) - p| < e1
-		var c1v = numeric.norm2( dif );
+		var c1v = Vec.norm( dif );
 		
 		// C'(u) * (C(u) - P)
 		// ------------------ < e2
 		// |C'(u)| |C(u) - P|
-		var c2n = numeric.dot( e[1], dif);
-		var c2d = numeric.norm2( e[1] ) * c1v;
+		var c2n = Vec.dot( e[1], dif);
+		var c2d = Vec.norm( e[1] ) * c1v;
 
 		var c2v = c2n / c2d;
 
@@ -318,7 +318,7 @@ public static function rational_curve_closest_point( degree, knots, control_poin
 		}
 
 		// will our next step force us out of the curve?
-		var c3v = numeric.norm2( numeric.mul(ct - cu, e[1] ) );
+		var c3v = Vec.norm( Vec.mul(ct - cu, e[1] ) );
 		if (c3v < eps1) {
 			return cu;
 		}
@@ -485,7 +485,7 @@ public static function rational_bezier_curve_arc_length(degree, knots, control_p
     cu = z * verb.eval.Tvalues[gaussDeg][i] + z + knots[0];
     tan = verb.eval.rational_curve_derivs( degree, knots, control_points, cu, 1 );
 
-    sum += verb.eval.Cvalues[gaussDeg][i] * numeric.norm2( tan[1] );
+    sum += verb.eval.Cvalues[gaussDeg][i] * Vec.norm( tan[1] );
 
   }
 
@@ -568,7 +568,7 @@ public static function rational_interp_curve( points, degree, start_tangent, end
 	var us = [ 0 ]; 
 	for (var i = 1; i < points.length; i++){
 
-		var chord = numeric.norm2( numeric.sub( points[i], points[i-1] ) );
+		var chord = Vec.norm( Vec.sub( points[i], points[i-1] ) );
 		var last = us[us.length - 1];
 		us.push( last + chord );
 
@@ -580,7 +580,7 @@ public static function rational_interp_curve( points, degree, start_tangent, end
 		us[i] = us[i] / max;
 	}
 
-	var knotsStart = numeric.rep( [ degree + 1 ], 0 ); 
+	var knotsStart = Vec.rep( [ degree + 1 ], 0 ); 
 
 
 	// we need two more control points, two more knots
@@ -599,7 +599,7 @@ public static function rational_interp_curve( points, degree, start_tangent, end
 		knotsStart.push( (1 / degree) * weightSums );
 	}
 
-	var knots = knotsStart.concat( numeric.rep( [ degree + 1 ], 1 ) );
+	var knots = knotsStart.concat( Vec.rep( [ degree + 1 ], 1 ) );
 
 	// build matrix of basis function coeffs (TODO: use sparse rep)
 	var A = [];
@@ -617,8 +617,8 @@ public static function rational_interp_curve( points, degree, start_tangent, end
 
 		var ls = span - degree;
 
-		var rowstart = verb.eval.zeros_1d( ls );
-		var rowend = verb.eval.zeros_1d( ld - ls );
+		var rowstart = Vec.zeros1d( ls );
+		var rowend = Vec.zeros1d( ld - ls );
 
 		A.push( rowstart.concat(basisFuncs).concat(rowend) );
 	}
@@ -626,8 +626,8 @@ public static function rational_interp_curve( points, degree, start_tangent, end
 	if (hasTangents){
 		var ln = A[0].length - 2;
 
-		var tanRow0 = [-1,1].concat( verb.eval.zeros_1d( ln ) );
-		var tanRow1 = verb.eval.zeros_1d( ln ).concat( [-1,1] );
+		var tanRow0 = [-1,1].concat( Vec.zeros1d( ln ) );
+		var tanRow1 = Vec.zeros1d( ln ).concat( [-1,1] );
 
 		A.splice( 1, 0, tanRow0 );
 		A.splice( A.length-1, 0, tanRow1 );
@@ -653,190 +653,37 @@ public static function rational_interp_curve( points, degree, start_tangent, end
 			b.push( verb.last(points)[i] );
 		}
 
-		var x = numeric.solve( A, b );
+		var x = Vec.solve( A, b );
 
 		xs.push(x);
 	}
 
-	var controlPts = numeric.transpose(xs);
-	var weights = numeric.rep([controlPts.length], 1);
+	var controlPts = Vec.transpose(xs);
+	var weights = Vec.rep([controlPts.length], 1);
 
 	return { control_points: controlPts, knots: knots, degree: degree, weights: weights };
 
 }
 
 //
-// ####get_sweep1_surface( profile_knots, profile_degree, profile_control_points, profile_weights, rail_knots, rail_degree, rail_control_points, rail_weights )
-//
-// Generate the control points, weights, and knots of an elliptical arc
-//
-// **params**
-// + *Array*, the center
-// + *Array*, the xaxis
-// + *Array*, orthogonal yaxis
-// + *Number*, xradius of the ellipse arc
-// + *Number*, yradius of the ellipse arc
-// + *Number*, start angle of the ellipse arc, between 0 and 2pi, where 0 points at the xaxis
-// + *Number*, end angle of the arc, between 0 and 2pi, greater than the start angle
-// 
-// **returns** 
-// + *Object*, an object with the following properties: control_points, weights, knots, degree
-//
-verb.eval.get_sweep1_surface = function( profile_knots, profile_degree, profile_control_points, profile_weights, rail_knots, rail_degree, rail_control_points, rail_weights ) {
-
-	// for each point on rail, move all of the points
-	var homo_rail = verb.eval.homogenize_1d( rail_control_points, rail_weights )
-		, rail_start = verb.eval.rational_curve_point( rail_degree, rail_knots, homo_rail, 0 )
-		, span = 1.0 / rail_control_points.length
-		, control_points = []
-		, weights = [];
-
-	for (var i = 0; i < rail_control_points.length; i++ ){
-
-		// evaluate the point on the curve, subtracting it from the first point
-		var rail_point = verb.eval.rational_curve_point( rail_degree, rail_knots, homo_rail, i * span )
-			, rail_offset = numeric.sub( rail_point, rail_start )
-			, row_control_points = []
-			, row_weights = [];
-
-		for (var j = 0; j < profile_control_points.length; j++ ){
-
-			row_control_points.push( numeric.add(rail_offset, profile_control_points[j] ) );
-			row_weights.push( profile_weights[j] * rail_weights[i] );
-
-		}
-
-		control_points.push( row_control_points);
-		weights.push( row_weights );
-	}
-
-	return {"knots_u": rail_knots, 
-			"knots_v": profile_knots,
-			"control_points": control_points, 
-			"degree_u": rail_degree, 
-			"degree_v": profile_degree, 
-			"weights": weights };
-
-}
-
-//
-// ####get_ellipse_arc( center, xaxis, yaxis, xradius, yradius, start_angle, end_angle )
-//
-// Generate the control points, weights, and knots of an elliptical arc
-//
-// **params**
-// + *Array*, the center
-// + *Array*, the xaxis
-// + *Array*, orthogonal yaxis
-// + *Number*, xradius of the ellipse arc
-// + *Number*, yradius of the ellipse arc
-// + *Number*, start angle of the ellipse arc, between 0 and 2pi, where 0 points at the xaxis
-// + *Number*, end angle of the arc, between 0 and 2pi, greater than the start angle
-// 
-// **returns** 
-// + *Object*, an object with the following properties: control_points, weights, knots, degree
-//
-
-public static function get_ellipse_arc( center, xaxis, yaxis, xradius, yradius, start_angle, end_angle ) {
-
-	// if the end angle is less than the start angle, do a circle
-	if (end_angle < start_angle) end_angle = 2 * Math.PI + start_angle;
-
-	var theta = end_angle - start_angle
-		, narcs = 0;
-
-	// how many arcs?
-	if (theta <= Math.PI / 2) {
-		narcs = 1;
-	} else {
-		if (theta <= Math.PI){
-			narcs = 2;
-		} else if (theta <= 3 * Math.PI / 2){
-			narcs = 3;
-		} else {
-			narcs = 4;
-		}
-	}
-
-	var dtheta = theta / narcs
-		, n = 2 * narcs
-		, w1 = Math.cos( dtheta / 2) 
-		, P0 = numeric.add( center, numeric.mul( xradius, Math.cos(start_angle), xaxis), numeric.mul( yradius, Math.sin(start_angle), yaxis ) )
-		, T0 = numeric.sub( numeric.mul( Math.cos(start_angle), yaxis ), numeric.mul( Math.sin(start_angle), xaxis) )
-		, Pw = verb.eval.zeros_1d( narcs * 2 )
-		, U = verb.eval.zeros_1d( 2 *narcs + 3 )
-		, index = 0
-		, angle = start_angle
-		, W = verb.eval.zeros_1d( narcs * 2 );
-
-	Pw[0] = P0;
-	W[0] = 1;
-
-	for (var i = 1; i <= narcs; i++){
-
-		angle += dtheta;
-		var P2 = numeric.add( center, numeric.mul( xradius, Math.cos(angle), xaxis), numeric.mul( yradius, Math.sin(angle), yaxis ) )
-
-		W[index+2] = 1;
-		Pw[index+2] = P2;
-
-		var T2 = numeric.sub( numeric.mul( Math.cos(angle), yaxis ), numeric.mul( Math.sin(angle), xaxis) )
-
-		var params = verb.eval.intersect_rays(P0, numeric.mul( 1 / numeric.norm2(T0), T0), P2, numeric.mul( 1 / numeric.norm2(T2), T2));
-		var P1 = numeric.add( P0, numeric.mul(T0, params[0]));
-
-		W[index+1] = w1;
-		Pw[index+1] = P1;
-
-		index += 2;
-
-		if (i < narcs){
-			P0 = P2;
-			T0 = T2;
-		}
-	}
-
-	var j = 2 *  narcs + 1;
-
-	for (var i = 0; i < 3; i++){
-		U[i] = 0.0;
-		U[i+j] = 1.0;
-	}
-
-	switch (narcs){
-		case 1: break;
-		case 2: U[3] = U[4] = 0.5; break;
-		case 3: U[3] = U[4] = 1/3;
-						U[5] = U[6] = 2/3; break;
-		case 4: U[3] = U[4] = 0.25;
-						U[5] = U[6] = 0.5;
-						U[7] = U[8] = 0.75; break;
-	}
-
-	return {knots: U, control_points: Pw, degree: 2, weights: W };
-
-}
-
-//
-// ####get_sphere_surface( center, axis, xaxis, radius )
+// ####sphere_surface( center, axis, xaxis, radius )
 //
 // Generate the control points, weights, and knots of a sphere
 //
 // **params**
-// + *Array*, the center of the sphere
-// + *Array*, normalized axis of sphere
-// + *Array*, vector perpendicular to axis of sphere, starting the rotation of the sphere
-// + *Number*, radius of the sphere
+// + the center of the sphere
+// + normalized axis of sphere
+// + vector perpendicular to axis of sphere, starting the rotation of the sphere
+// + radius of the sphere
 // 
 // **returns** 
-// + *Object*, an object with the following properties: control_points, weights, knots_u, knots_v, degree_u, degree_v
+// + an object with the following properties: control_points, weights, knots_u, knots_v, degree_u, degree_v
 //
 
-public static function get_sphere_surface( center, axis, xaxis, radius ){
+public static function sphere_surface( center, axis, xaxis, radius ){
 
-	var arc = verb.eval.get_arc(center, numeric.mul(axis, -1), xaxis, radius, 0, Math.PI );
-
-	return verb.eval.get_revolved_surface( center, axis, 2 * Math.PI, arc.knots, arc.degree, arc.control_points, arc.weights );
+	var arc = Make.arc(center, Vec.mul(axis, -1), xaxis, radius, 0, Math.PI );
+	return Make.revolved_surface( center, axis, 2 * Math.PI, arc.knots, arc.degree, arc.control_points, arc.weights );
 
 }
 
@@ -847,13 +694,13 @@ public static function get_sphere_surface( center, axis, xaxis, radius ){
 // Generate the control points, weights, and knots of a polyline curve
 //
 // **params**
-// + *Array*, array of points in curve
+// + array of points in curve
 // 
 // **returns** 
-// + *Object*, an object with the following properties: control_points, weights, knots, degree
+// + an object with the following properties: control_points, weights, knots, degree
 //
 
-public static function get_polyline_curve( pts ){
+public static function polyline_curve( pts ){
 
 	var num_spans = pts.length - 1
 		, span = 1.0 / num_spans
@@ -882,87 +729,87 @@ public static function get_polyline_curve( pts ){
 }
 
 //
-// ####get_cylinder_surface( axis, xaxis, base, height, radius )
+// ####cylinder_surface( axis, xaxis, base, height, radius )
 //
 // Generate the control points, weights, and knots of a cylinder
 //
 // **params**
-// + *Array*, normalized axis of cylinder
-// + *Array*, xaxis in plane of cylinder
-// + *Array*, position of base of cylinder
-// + *Number*, height from base to top
-// + *Number*, radius of the cylinder
+// + normalized axis of cylinder
+// + xaxis in plane of cylinder
+// + position of base of cylinder
+// + height from base to top
+// + radius of the cylinder
 // 
 // **returns** 
-// + *Object*, an object with the following properties: control_points, weights, knots_u, knots_v, degree_u, degree_v
+// + an object with the following properties: control_points, weights, knots_u, knots_v, degree_u, degree_v
 //
 
-public static function get_cylinder_surface( axis, xaxis, base, height, radius ){
+public static function cylinder_surface( axis, xaxis, base, height, radius ){
 
-	var yaxis = crossprod( axis, xaxis )
+	var yaxis = Vec.cross( axis, xaxis )
 		, angle = 2 * Math.PI
-		, circ = verb.eval.get_arc( base, xaxis, yaxis, radius, 0, 2 * Math.PI );
+		, circ = verb.eval.arc( base, xaxis, yaxis, radius, 0, 2 * Math.PI );
 
-	return verb.eval.get_extruded_surface( axis, height, circ.knots, circ.degree, circ.control_points, circ.weights );
+	return verb.eval.extruded_surface( axis, height, circ.knots, circ.degree, circ.control_points, circ.weights );
 
 }
 
 //
-// ####get_cone_surface( axis, xaxis, base, height, radius )
+// ####cone_surface( axis, xaxis, base, height, radius )
 //
 // Generate the control points, weights, and knots of a cone
 //
 // **params**
-// + *Array*, normalized axis of cone
-// + *Array*, position of base of cone
-// + *Number*, height from base to tip
-// + *Number*, radius at the base of the cone
+// + normalized axis of cone
+// + position of base of cone
+// + height from base to tip
+// + radius at the base of the cone
 // 
 // **returns** 
-// + *Object*, an object with the following properties: control_points, weights, knots, degree
+// + an object with the following properties: control_points, weights, knots, degree
 //
 
-public static function get_cone_surface( axis, xaxis, base, height, radius ){
+public static function cone_surface( axis, xaxis, base, height, radius ){
 
 	var angle = 2 * Math.PI
 		, prof_degree = 1
-		, prof_ctrl_pts = [ numeric.add( base, numeric.mul( height, axis ) ), numeric.add( base, numeric.mul( radius, xaxis ) )]
+		, prof_ctrl_pts = [ Vec.add( base, Vec.mul( height, axis ) ), Vec.add( base, Vec.mul( radius, xaxis ) )]
 		, prof_knots = [0,0,1,1]
 		, prof_weights = [1,1];
 
-	return verb.eval.get_revolved_surface(base, axis, angle, prof_knots, prof_degree, prof_ctrl_pts, prof_weights);
+	return verb.eval.revolved_surface(base, axis, angle, prof_knots, prof_degree, prof_ctrl_pts, prof_weights);
 
 }
 
 //
-// ####get_extruded_surface( axis, length, prof_knots, prof_degree, prof_control_points, prof_weights)
+// ####extruded_surface( axis, length, prof_knots, prof_degree, prof_control_points, prof_weights)
 //
 // Generate the control points, weights, and knots of an extruded surface
 //
 // **params**
-// + *Array*, axis of the extrusion
-// + *Array*, length of the extrusion
-// + *Number*, degree of the profile
-// + *Number*, control points of the profile
-// + *Number*, weights of the profile
+// + axis of the extrusion
+// + length of the extrusion
+// + degree of the profile
+// + control points of the profile
+// + weights of the profile
 // 
 // **returns** 
-// + *Object*, an object with the following properties: control_points, weights, knots, degree
+// + an object with the following properties: control_points, weights, knots, degree
 //
 
-public static function get_extruded_surface( axis, length, prof_knots, prof_degree, prof_control_points, prof_weights){
+public static function extruded_surface( axis, length, prof_knots, prof_degree, prof_control_points, prof_weights){
 
-	var control_points = verb.eval.zeros_2d( 3, prof_control_points.length )
-		, weights = verb.eval.zeros_2d( 3, prof_control_points.length );
+	var control_points = Vec.zeros2d( 3, prof_control_points.length )
+		, weights = Vec.zeros2d( 3, prof_control_points.length );
 
-	var translation = numeric.mul(axis, length);
-	var halfTranslation = numeric.mul(axis, 0.5 * length);
+	var translation = Vec.mul(axis, length);
+	var halfTranslation = Vec.mul(axis, 0.5 * length);
 
 	// original control points
 	for (var j = 0; j < prof_control_points.length; j++){
 		control_points[2][j] = prof_control_points[j];
-		control_points[1][j] = numeric.add( halfTranslation, prof_control_points[j] );
-		control_points[0][j] = numeric.add( translation, prof_control_points[j] );
+		control_points[1][j] = Vec.add( halfTranslation, prof_control_points[j] );
+		control_points[0][j] = Vec.add( translation, prof_control_points[j] );
 
 		weights[0][j] = prof_weights[j];
 		weights[1][j] = prof_weights[j];
@@ -979,49 +826,43 @@ public static function get_extruded_surface( axis, length, prof_knots, prof_degr
 }
 
 //
-// ####get_revolved_surface( center, axis, theta, prof_knots, prof_degree, prof_control_points, prof_weights)
-//
 // Generate the control points, weights, and knots of a revolved surface
 // (Corresponds to Algorithm A7.1 from Piegl & Tiller)
 //
 // **params**
-// + *Array*, center of the rotation axis
-// + *Array*, axis of the rotation axis
-// + *Number*, angle to revolve around axis
-// + *Number*, degree of the generatrix
-// + *Number*, control points of the generatrix
-// + *Number*, weights of the generatrix
+// + center of the rotation axis
+// + axis of the rotation axis
+// + angle to revolve around axis
+// + degree of the generatrix
+// + control points of the generatrix
+// + weights of the generatrix
 // 
 // **returns** 
-// + *Object*, an object with the following properties: control_points, weights, knots, degree
+// + an object with the following properties: control_points, weights, knots, degree
 //
 
 // helper method
 
-function crossprod(u,v) {
-  return [u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
-}
-
-public static function get_revolved_surface( center, axis, theta, prof_knots, prof_degree, prof_control_points, prof_weights){
+public static function revolved_surface( center, axis, theta, prof_knots, prof_degree, prof_control_points, prof_weights){
 
 	var narcs, knots_u, control_points, weights;
 
 	if (theta <= Math.PI / 2) { // less than 90
 		narcs = 1;
-		knots_u = verb.eval.zeros_1d( 6 + 2  * (narcs-1) );
+		knots_u = Vec.zeros1d( 6 + 2  * (narcs-1) );
 	} else {
 		if (theta <= Math.PI){  // between 90 and 180
 			narcs = 2;
-			knots_u = verb.eval.zeros_1d( 6 + 2 * (narcs-1) );
+			knots_u = Vec.zeros1d( 6 + 2 * (narcs-1) );
 			knots_u[3]= knots_u[4] = 0.5;
 		} else if (theta <= 3 * Math.PI / 2){ // between 180 and 270
 			narcs = 3;
-			knots_u = verb.eval.zeros_1d( 6 + 2 * (narcs-1) );
+			knots_u = Vec.zeros1d( 6 + 2 * (narcs-1) );
 			knots_u[3]= knots_u[4] = 1/3;
 			knots_u[5]= knots_u[6] = 2/3;
 		} else { // between 270 and 360
 			narcs = 4;
-			knots_u = verb.eval.zeros_1d( 6 + 2 * (narcs-1) );
+			knots_u = Vec.zeros1d( 6 + 2 * (narcs-1) );
 			knots_u[3]= knots_u[4] = 1/4;
 			knots_u[5]= knots_u[6] = 1/2;
 			knots_u[7]= knots_u[8] = 3/4;
@@ -1043,10 +884,10 @@ public static function get_revolved_surface( center, axis, theta, prof_knots, pr
 	var n = 2 * narcs 
 		, wm = Math.cos( dtheta/2.0 )
 		, angle = 0.0
-		, sines = verb.eval.zeros_1d( narcs + 1)
-		, cosines = verb.eval.zeros_1d( narcs + 1)
-		, control_points = verb.eval.zeros_2d( 2*narcs + 1, prof_control_points.length )
-		, weights = verb.eval.zeros_2d( 2*narcs + 1, prof_control_points.length );
+		, sines = Vec.zeros1d( narcs + 1)
+		, cosines = Vec.zeros1d( narcs + 1)
+		, control_points = Vec.zeros2d( 2*narcs + 1, prof_control_points.length )
+		, weights = Vec.zeros2d( 2*narcs + 1, prof_control_points.length );
 
 	// initialize the sines and cosines
 	for (var i = 1; i <= narcs; i++){
@@ -1062,15 +903,15 @@ public static function get_revolved_surface( center, axis, theta, prof_knots, pr
 		// get the closest point of the generatrix point on the axis
 		var O = verb.eval.closest_point_on_ray(prof_control_points[j], center, axis)
 			// X is the vector from the axis to generatrix control pt
-			, X = numeric.sub( prof_control_points[j], O )
+			, X = Vec.sub( prof_control_points[j], O )
 			// radius at that height
-			, r = numeric.norm2(X)
+			, r = Vec.norm(X)
 			// Y is perpendicular to X and axis, and complete the coordinate system
-			, Y = crossprod(axis,X); 
+			, Y = Vec.cross(axis,X); 
 
 		if ( r > verb.EPSILON ){
-			X = numeric.mul( 1 / r, X);
-			Y = numeric.mul( 1 / r, Y);
+			X = Vec.mul( 1 / r, X);
+			Y = Vec.mul( 1 / r, Y);
 		}
 
 		// the first row of control_points and weights is just the generatrix
@@ -1088,20 +929,20 @@ public static function get_revolved_surface( center, axis, theta, prof_knots, pr
 
 			// O + r * cos(theta) * X + r * sin(theta) * Y
 			// rotated generatrix pt
-			var P2 = r == 0 ? O : numeric.add( O, numeric.mul( r, cosines[i], X), numeric.mul( r, sines[i], Y) );
+			var P2 = r == 0 ? O : Vec.add( O, Vec.mul( r, cosines[i], X), Vec.mul( r, sines[i], Y) );
 
 			control_points[index+2][j] = P2;
 			weights[index+2][j] = prof_weights[j];
 
 			// construct the vector tangent to the rotation
-			var T2 = numeric.sub( numeric.mul( cosines[i], Y), numeric.mul(sines[i], X));
+			var T2 = Vec.sub( Vec.mul( cosines[i], Y), Vec.mul(sines[i], X));
 
 			// construct the next control pt
 			if (r == 0){
 				control_points[index+1][j] = O;
 			} else {
-				var params = verb.eval.intersect_rays(P0, numeric.mul( 1 / numeric.norm2(T0), T0), P2, numeric.mul( 1 / numeric.norm2(T2), T2));
-				var P1 = numeric.add( P0, numeric.mul(T0, params[0]));
+				var params = verb.eval.intersect_rays(P0, Vec.mul( 1 / Vec.norm(T0), T0), P2, Vec.mul( 1 / Vec.norm(T2), T2));
+				var P1 = Vec.add( P0, Vec.mul(T0, params[0]));
 
 				control_points[index+1][j] = P1;
 			}
@@ -1129,29 +970,25 @@ public static function get_revolved_surface( center, axis, theta, prof_knots, pr
 
 }
 
-
-
-//
-// ####get_arc( center, xaxis, yaxis, radius, start_angle, end_angle )
 //
 // Generate the control points, weights, and knots of an arbitrary arc
 // (Corresponds to Algorithm A7.1 from Piegl & Tiller)
 //
 // **params**
-// + *Array*, the center of the arc
-// + *Array*, the xaxis of the arc
-// + *Array*, orthogonal yaxis of the arc
-// + *Number*, radius of the arc
-// + *Number*, start angle of the arc, between 0 and 2pi
-// + *Number*, end angle of the arc, between 0 and 2pi, greater than the start angle
+// + the center of the arc
+// + the xaxis of the arc
+// + orthogonal yaxis of the arc
+// + radius of the arc
+// + start angle of the arc, between 0 and 2pi
+// + end angle of the arc, between 0 and 2pi, greater than the start angle
 // 
 // **returns** 
-// + *Object*, an object with the following properties: control_points, weights, knots, degree
+// + an object with the following properties: control_points, weights, knots, degree
 //
 
-public static function get_arc( center, xaxis, yaxis, radius, start_angle, end_angle ) {
+public static function arc( center, xaxis, yaxis, radius, start_angle, end_angle ) {
 
-	return verb.eval.get_ellipse_arc( center, xaxis, yaxis, radius, radius, start_angle, end_angle );
+	return verb.eval.ellipse_arc( center, xaxis, yaxis, radius, radius, start_angle, end_angle );
 
 }
 

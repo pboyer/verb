@@ -1,5 +1,5 @@
 (function ($hx_exports) { "use strict";
-$hx_exports.eval = $hx_exports.eval || {};
+$hx_exports.core = $hx_exports.core || {};
 var HxOverrides = function() { };
 HxOverrides.iter = function(a) {
 	return { cur : 0, arr : a, hasNext : function() {
@@ -157,32 +157,32 @@ verb.Init = function() { };
 verb.Init.main = function() {
 	console.log("verb 0.2.0");
 };
-verb["eval"] = {};
-verb.eval.Analyze = function() { };
-verb.eval.Binomial = function() { };
-verb.eval.Binomial.get = function(n,k) {
+verb.core = {};
+verb.core.Analyze = function() { };
+verb.core.Binomial = function() { };
+verb.core.Binomial.get = function(n,k) {
 	if(k == 0.0) return 1.0;
 	if(n == 0 || k > n) return 0.0;
 	if(k > n - k) k = n - k;
-	if(verb.eval.Binomial.memo_exists(n,k)) return verb.eval.Binomial.get_memo(n,k);
+	if(verb.core.Binomial.memo_exists(n,k)) return verb.core.Binomial.get_memo(n,k);
 	var r = 1;
 	var n_o = n;
 	var _g1 = 1;
 	var _g = k + 1;
 	while(_g1 < _g) {
 		var d = _g1++;
-		if(verb.eval.Binomial.memo_exists(n_o,d)) {
+		if(verb.core.Binomial.memo_exists(n_o,d)) {
 			n--;
-			r = verb.eval.Binomial.get_memo(n_o,d);
+			r = verb.core.Binomial.get_memo(n_o,d);
 			continue;
 		}
 		r *= n--;
 		r /= d;
-		verb.eval.Binomial.memoize(n_o,d,r);
+		verb.core.Binomial.memoize(n_o,d,r);
 	}
 	return r;
 };
-verb.eval.Binomial.get_no_memo = function(n,k) {
+verb.core.Binomial.get_no_memo = function(n,k) {
 	if(k == 0) return 1;
 	if(n == 0 || k > n) return 0;
 	if(k > n - k) k = n - k;
@@ -197,308 +197,22 @@ verb.eval.Binomial.get_no_memo = function(n,k) {
 	}
 	return r;
 };
-verb.eval.Binomial.memo_exists = function(n,k) {
-	return verb.eval.Binomial.memo.exists(n) && verb.eval.Binomial.memo.get(n).exists(k);
+verb.core.Binomial.memo_exists = function(n,k) {
+	return verb.core.Binomial.memo.exists(n) && verb.core.Binomial.memo.get(n).exists(k);
 };
-verb.eval.Binomial.get_memo = function(n,k) {
-	return verb.eval.Binomial.memo.get(n).get(k);
+verb.core.Binomial.get_memo = function(n,k) {
+	return verb.core.Binomial.memo.get(n).get(k);
 };
-verb.eval.Binomial.memoize = function(n,k,val) {
-	if(!verb.eval.Binomial.memo.exists(n)) verb.eval.Binomial.memo.set(n,new haxe.ds.IntMap());
-	verb.eval.Binomial.memo.get(n).set(k,val);
+verb.core.Binomial.memoize = function(n,k,val) {
+	if(!verb.core.Binomial.memo.exists(n)) verb.core.Binomial.memo.set(n,new haxe.ds.IntMap());
+	verb.core.Binomial.memo.get(n).set(k,val);
 };
-verb.eval.Constants = $hx_exports.eval.Constants = function() { };
-verb.eval.Create = function() { };
-verb.eval.Intersect = $hx_exports.Intersect = function() { };
-verb.eval.Mesh = function() {
-};
-verb.eval.KnotMultiplicity = $hx_exports.eval.KnotMultiplicity = function(knot,mult) {
-	this.knot = knot;
-	this.mult = mult;
-};
-verb.eval.KnotMultiplicity.prototype = {
-	inc: function() {
-		this.mult++;
-	}
-};
-verb.eval.Modify = $hx_exports.eval.Modify = function() { };
-verb.eval.Modify.surface_knot_refine = function(surface,knots_to_insert,useV) {
-	var newPts = [];
-	var knots;
-	var degree;
-	var ctrlPts;
-	if(!useV) {
-		ctrlPts = verb.eval.Vec.transpose(surface.controlPoints);
-		knots = surface.knotsU;
-		degree = surface.degreeU;
-	} else {
-		ctrlPts = surface.controlPoints;
-		knots = surface.knotsV;
-		degree = surface.degreeV;
-	}
-	var c = null;
-	var _g = 0;
-	while(_g < ctrlPts.length) {
-		var cptrow = ctrlPts[_g];
-		++_g;
-		c = verb.eval.Modify.curve_knot_refine(new verb.eval.types.CurveData(degree,knots,cptrow),knots_to_insert);
-		newPts.push(c.controlPoints);
-	}
-	var newknots = c.knots;
-	if(!useV) {
-		newPts = verb.eval.Vec.transpose(newPts);
-		return new verb.eval.types.SurfaceData(surface.degreeU,surface.degreeV,newknots,surface.knotsV.slice(),newPts);
-	} else return new verb.eval.types.SurfaceData(surface.degreeU,surface.degreeV,surface.knotsU.slice(),newknots,newPts);
-};
-verb.eval.Modify.surface_split = function(surface,u,useV) {
-	if(useV == null) useV = false;
-	var knots;
-	var degree;
-	var control_points;
-	if(!useV) {
-		control_points = verb.eval.Vec.transpose(surface.controlPoints);
-		knots = surface.knotsU;
-		degree = surface.degreeU;
-	} else {
-		control_points = surface.controlPoints;
-		knots = surface.knotsV;
-		degree = surface.degreeV;
-	}
-	var knots_to_insert;
-	var _g = [];
-	var _g2 = 0;
-	var _g1 = degree + 1;
-	while(_g2 < _g1) {
-		var i = _g2++;
-		_g.push(u);
-	}
-	knots_to_insert = _g;
-	var newpts0 = new Array();
-	var newpts1 = new Array();
-	var s = verb.eval.Nurbs.knot_span(degree,u,knots);
-	var res = null;
-	var _g11 = 0;
-	while(_g11 < control_points.length) {
-		var cps = control_points[_g11];
-		++_g11;
-		res = verb.eval.Modify.curve_knot_refine(new verb.eval.types.CurveData(degree,knots,cps),knots_to_insert);
-		newpts0.push(res.controlPoints.slice(0,s + 1));
-		newpts1.push(res.controlPoints.slice(s + 1));
-	}
-	var knots0 = res.knots.slice(0,s + degree + 2);
-	var knots1 = res.knots.slice(s + 1);
-	if(!useV) {
-		newpts0 = verb.eval.Vec.transpose(newpts0);
-		newpts1 = verb.eval.Vec.transpose(newpts1);
-		return [new verb.eval.types.SurfaceData(degree,surface.degreeV,knots0,surface.knotsV.slice(),newpts0),new verb.eval.types.SurfaceData(degree,surface.degreeV,knots1,surface.knotsV.slice(),newpts1)];
-	}
-	return [new verb.eval.types.SurfaceData(surface.degreeU,degree,surface.knotsU.slice(),knots0,newpts0),new verb.eval.types.SurfaceData(surface.degreeU,degree,surface.knotsU.slice(),knots1,newpts1)];
-};
-verb.eval.Modify.curve_bezier_decompose = function(curve) {
-	var degree = curve.degree;
-	var control_points = curve.controlPoints;
-	var knots = curve.knots;
-	var knotmults = verb.eval.Modify.knot_multiplicities(knots);
-	var reqMult = degree + 1;
-	var _g = 0;
-	while(_g < knotmults.length) {
-		var knotmult = knotmults[_g];
-		++_g;
-		if(knotmult.mult < reqMult) {
-			var knotsInsert = verb.eval.Vec.rep(reqMult - knotmult.mult,knotmult.knot);
-			var res = verb.eval.Modify.curve_knot_refine(new verb.eval.types.CurveData(degree,knots,control_points),knotsInsert);
-			knots = res.knots;
-			control_points = res.controlPoints;
-		}
-	}
-	var numCrvs = knots.length / reqMult - 1;
-	var crvKnotLength = reqMult * 2;
-	var crvs = [];
-	var i = 0;
-	while(i < control_points.length) {
-		var kts = knots.slice(i,i + crvKnotLength);
-		var pts = control_points.slice(i,i + reqMult);
-		crvs.push(new verb.eval.types.CurveData(degree,kts,pts));
-		i += reqMult;
-	}
-	return crvs;
-};
-verb.eval.Modify.knot_multiplicities = function(knots) {
-	var mults = [new verb.eval.KnotMultiplicity(knots[0],0)];
-	var curr = mults[0];
-	var _g = 0;
-	while(_g < knots.length) {
-		var knot = knots[_g];
-		++_g;
-		if(Math.abs(knot - curr.knot) > verb.eval.Constants.EPSILON) {
-			curr = new verb.eval.KnotMultiplicity(knot,0);
-			mults.push(curr);
-		}
-		curr.inc();
-	}
-	return mults;
-};
-verb.eval.Modify.curve_split = function(curve,u) {
-	var degree = curve.degree;
-	var control_points = curve.controlPoints;
-	var knots = curve.knots;
-	var knots_to_insert;
-	var _g = [];
-	var _g2 = 0;
-	var _g1 = degree + 1;
-	while(_g2 < _g1) {
-		var i = _g2++;
-		_g.push(u);
-	}
-	knots_to_insert = _g;
-	var res = verb.eval.Modify.curve_knot_refine(curve,knots_to_insert);
-	var s = verb.eval.Nurbs.knot_span(degree,u,knots);
-	var knots0 = res.knots.slice(0,s + degree + 2);
-	var knots1 = res.knots.slice(s + 1);
-	var cpts0 = res.controlPoints.slice(0,s + 1);
-	var cpts1 = res.controlPoints.slice(s + 1);
-	return [new verb.eval.types.CurveData(degree,knots0,cpts0),new verb.eval.types.CurveData(degree,knots1,cpts1)];
-};
-verb.eval.Modify.curve_knot_refine = function(curve,knots_to_insert) {
-	var degree = curve.degree;
-	var control_points = curve.controlPoints;
-	var knots = curve.knots;
-	var n = control_points.length - 1;
-	var m = n + degree + 1;
-	var r = knots_to_insert.length - 1;
-	var a = verb.eval.Nurbs.knot_span(degree,knots_to_insert[0],knots);
-	var b = verb.eval.Nurbs.knot_span(degree,knots_to_insert[r],knots);
-	var control_points_post = new Array();
-	var knots_post = new Array();
-	var _g1 = 0;
-	var _g = a - degree + 1;
-	while(_g1 < _g) {
-		var i = _g1++;
-		control_points_post[i] = control_points[i];
-	}
-	var _g11 = b - 1;
-	var _g2 = n + 1;
-	while(_g11 < _g2) {
-		var i1 = _g11++;
-		control_points_post[i1 + r + 1] = control_points[i1];
-	}
-	var _g12 = 0;
-	var _g3 = a + 1;
-	while(_g12 < _g3) {
-		var i2 = _g12++;
-		knots_post[i2] = knots[i2];
-	}
-	var _g13 = b + degree;
-	var _g4 = m + 1;
-	while(_g13 < _g4) {
-		var i3 = _g13++;
-		knots_post[i3 + r + 1] = knots[i3];
-	}
-	var i4 = b + degree - 1;
-	var k = b + degree + r;
-	var j = r;
-	while(j >= 0) {
-		while(knots_to_insert[j] <= knots[i4] && i4 > a) {
-			control_points_post[k - degree - 1] = control_points[i4 - degree - 1];
-			knots_post[k] = knots[i4];
-			k = k - 1;
-			i4 = i4 - 1;
-		}
-		control_points_post[k - degree - 1] = control_points_post[k - degree];
-		var _g14 = 1;
-		var _g5 = degree + 1;
-		while(_g14 < _g5) {
-			var l = _g14++;
-			var ind = k - degree + l;
-			var alfa = knots_post[k + l] - knots_to_insert[j];
-			if(Math.abs(alfa) < verb.eval.Constants.EPSILON) control_points_post[ind - 1] = control_points_post[ind]; else {
-				alfa = alfa / (knots_post[k + l] - knots[i4 - degree + l]);
-				control_points_post[ind - 1] = verb.eval.Vec.add(verb.eval.Vec.mul(alfa,control_points_post[ind - 1]),verb.eval.Vec.mul(1.0 - alfa,control_points_post[ind]));
-			}
-		}
-		knots_post[k] = knots_to_insert[j];
-		k = k - 1;
-		j--;
-	}
-	return new verb.eval.types.CurveData(degree,knots_post,control_points_post);
-};
-verb.eval.Modify.curve_knot_insert = function(curve,u,r) {
-	var degree = curve.degree;
-	var control_points = curve.controlPoints;
-	var knots = curve.knots;
-	var s = 0;
-	var num_pts = control_points.length;
-	var k = verb.eval.Nurbs.knot_span(degree,u,knots);
-	var num_pts_post = num_pts + r;
-	var control_points_temp = new Array();
-	var knots_post = new Array();
-	var control_points_post = new Array();
-	var i = 0;
-	var _g1 = 1;
-	var _g = k + 1;
-	while(_g1 < _g) {
-		var i1 = _g1++;
-		knots_post[i1] = knots[i1];
-	}
-	var _g11 = 1;
-	var _g2 = r + 1;
-	while(_g11 < _g2) {
-		var i2 = _g11++;
-		knots_post[k + i2] = u;
-	}
-	var _g12 = k + 1;
-	var _g3 = knots.length;
-	while(_g12 < _g3) {
-		var i3 = _g12++;
-		knots_post[i3 + r] = knots[i3];
-	}
-	var _g13 = 0;
-	var _g4 = k - degree + 1;
-	while(_g13 < _g4) {
-		var i4 = _g13++;
-		control_points_post[i4] = control_points[i4];
-	}
-	var _g5 = k - s;
-	while(_g5 < num_pts) {
-		var i5 = _g5++;
-		control_points_post[i5 + r] = control_points[i5];
-	}
-	var _g14 = 0;
-	var _g6 = degree - s + 1;
-	while(_g14 < _g6) {
-		var i6 = _g14++;
-		control_points_temp[i6] = control_points[k - degree + i6];
-	}
-	var L = 0;
-	var alpha = 0;
-	var _g15 = 1;
-	var _g7 = r + 1;
-	while(_g15 < _g7) {
-		var j = _g15++;
-		L = k - degree + j;
-		var _g31 = 0;
-		var _g21 = degree - j - s + 1;
-		while(_g31 < _g21) {
-			var i7 = _g31++;
-			alpha = (u - knots[L + i7]) / (knots[i7 + k + 1] - knots[L + i7]);
-			control_points_temp[i7] = verb.eval.Vec.add(verb.eval.Vec.mul(alpha,control_points_temp[i7 + 1]),verb.eval.Vec.mul(1.0 - alpha,control_points_temp[i7]));
-		}
-		control_points_post[L] = control_points_temp[0];
-		control_points_post[k + r - j - s] = control_points_temp[degree - j - s];
-	}
-	var _g16 = L + 1;
-	var _g8 = k - s;
-	while(_g16 < _g8) {
-		var i8 = _g16++;
-		control_points_post[i8] = control_points_temp[i8 - L];
-	}
-	return new verb.eval.types.CurveData(degree,knots_post,control_points_post);
-};
-verb.eval.Nurbs = $hx_exports.eval.Nurbs = function() { };
-verb.eval.Nurbs.rational_surface_derivs = function(surface,num_derivs,u,v) {
-	var ders = verb.eval.Nurbs.surface_derivs(surface,num_derivs,u,v);
-	var Aders = verb.eval.Nurbs.rational_2d(ders);
-	var wders = verb.eval.Nurbs.weight_2d(ders);
+verb.core.Constants = $hx_exports.core.Constants = function() { };
+verb.core.Eval = $hx_exports.core.Eval = function() { };
+verb.core.Eval.rational_surface_derivs = function(surface,num_derivs,u,v) {
+	var ders = verb.core.Eval.surface_derivs(surface,num_derivs,u,v);
+	var Aders = verb.core.Eval.rational_2d(ders);
+	var wders = verb.core.Eval.weight_2d(ders);
 	var SKL = new Array();
 	var dim = Aders[0][0].length;
 	var _g1 = 0;
@@ -515,34 +229,34 @@ verb.eval.Nurbs.rational_surface_derivs = function(surface,num_derivs,u,v) {
 			var _g4 = l + 1;
 			while(_g5 < _g4) {
 				var j = _g5++;
-				v1 = verb.eval.Vec.sub(v1,verb.eval.Vec.mul(verb.eval.Binomial.get(l,j) * wders[0][j],SKL[k][l - j]));
+				v1 = verb.core.Vec.sub(v1,verb.core.Vec.mul(verb.core.Binomial.get(l,j) * wders[0][j],SKL[k][l - j]));
 			}
 			var _g51 = 1;
 			var _g41 = k + 1;
 			while(_g51 < _g41) {
 				var i = _g51++;
-				v1 = verb.eval.Vec.sub(v1,verb.eval.Vec.mul(verb.eval.Binomial.get(k,i) * wders[i][0],SKL[k - i][l]));
-				var v2 = verb.eval.Vec.zeros1d(dim);
+				v1 = verb.core.Vec.sub(v1,verb.core.Vec.mul(verb.core.Binomial.get(k,i) * wders[i][0],SKL[k - i][l]));
+				var v2 = verb.core.Vec.zeros1d(dim);
 				var _g7 = 1;
 				var _g6 = l + 1;
 				while(_g7 < _g6) {
 					var j1 = _g7++;
-					v2 = verb.eval.Vec.add(v2,verb.eval.Vec.mul(verb.eval.Binomial.get(l,j1) * wders[i][j1],SKL[k - i][l - j1]));
+					v2 = verb.core.Vec.add(v2,verb.core.Vec.mul(verb.core.Binomial.get(l,j1) * wders[i][j1],SKL[k - i][l - j1]));
 				}
-				v1 = verb.eval.Vec.sub(v1,verb.eval.Vec.mul(verb.eval.Binomial.get(k,i),v2));
+				v1 = verb.core.Vec.sub(v1,verb.core.Vec.mul(verb.core.Binomial.get(k,i),v2));
 			}
-			SKL[k].push(verb.eval.Vec.mul(1 / wders[0][0],v1));
+			SKL[k].push(verb.core.Vec.mul(1 / wders[0][0],v1));
 		}
 	}
 	return SKL;
 };
-verb.eval.Nurbs.rational_surface_point = function(surface,u,v) {
-	return verb.eval.Nurbs.dehomogenize(verb.eval.Nurbs.surface_point(surface,u,v));
+verb.core.Eval.rational_surface_point = function(surface,u,v) {
+	return verb.core.Eval.dehomogenize(verb.core.Eval.surface_point(surface,u,v));
 };
-verb.eval.Nurbs.rational_curve_derivs = function(curve,u,num_derivs) {
-	var ders = verb.eval.Nurbs.curve_derivs(curve,u,num_derivs);
-	var Aders = verb.eval.Nurbs.rational_1d(ders);
-	var wders = verb.eval.Nurbs.weight_1d(ders);
+verb.core.Eval.rational_curve_derivs = function(curve,u,num_derivs) {
+	var ders = verb.core.Eval.curve_derivs(curve,u,num_derivs);
+	var Aders = verb.core.Eval.rational_1d(ders);
+	var wders = verb.core.Eval.weight_1d(ders);
 	var k = 0;
 	var i = 0;
 	var CK = [];
@@ -555,16 +269,16 @@ verb.eval.Nurbs.rational_curve_derivs = function(curve,u,num_derivs) {
 		var _g2 = k1 + 1;
 		while(_g3 < _g2) {
 			var i1 = _g3++;
-			v = verb.eval.Vec.sub(v,verb.eval.Vec.mul(verb.eval.Binomial.get(k1,i1) * wders[i1],CK[k1 - i1]));
+			v = verb.core.Vec.sub(v,verb.core.Vec.mul(verb.core.Binomial.get(k1,i1) * wders[i1],CK[k1 - i1]));
 		}
-		CK.push(verb.eval.Vec.mul(1 / wders[0],v));
+		CK.push(verb.core.Vec.mul(1 / wders[0],v));
 	}
 	return CK;
 };
-verb.eval.Nurbs.rational_curve_point = function(curve,u) {
-	return verb.eval.Nurbs.dehomogenize(verb.eval.Nurbs.curve_point(curve,u));
+verb.core.Eval.rational_curve_point = function(curve,u) {
+	return verb.core.Eval.dehomogenize(verb.core.Eval.curve_point(curve,u));
 };
-verb.eval.Nurbs.dehomogenize = function(homo_point) {
+verb.core.Eval.dehomogenize = function(homo_point) {
 	var dim = homo_point.length;
 	var point = [];
 	var wt = homo_point[dim - 1];
@@ -576,31 +290,31 @@ verb.eval.Nurbs.dehomogenize = function(homo_point) {
 	}
 	return point;
 };
-verb.eval.Nurbs.rational_1d = function(homo_points) {
+verb.core.Eval.rational_1d = function(homo_points) {
 	var dim = homo_points[0].length - 1;
 	return homo_points.map(function(x) {
 		return x.slice(0,dim);
 	});
 };
-verb.eval.Nurbs.rational_2d = function(homo_points) {
-	return homo_points.map(verb.eval.Nurbs.rational_1d);
+verb.core.Eval.rational_2d = function(homo_points) {
+	return homo_points.map(verb.core.Eval.rational_1d);
 };
-verb.eval.Nurbs.weight_1d = function(homo_points) {
+verb.core.Eval.weight_1d = function(homo_points) {
 	var dim = homo_points[0].length - 1;
 	return homo_points.map(function(x) {
 		return x[dim];
 	});
 };
-verb.eval.Nurbs.weight_2d = function(homo_points) {
-	return homo_points.map(verb.eval.Nurbs.weight_1d);
+verb.core.Eval.weight_2d = function(homo_points) {
+	return homo_points.map(verb.core.Eval.weight_1d);
 };
-verb.eval.Nurbs.dehomogenize_1d = function(homo_points) {
-	return homo_points.map(verb.eval.Nurbs.dehomogenize);
+verb.core.Eval.dehomogenize_1d = function(homo_points) {
+	return homo_points.map(verb.core.Eval.dehomogenize);
 };
-verb.eval.Nurbs.dehomogenize_2d = function(homo_points) {
-	return homo_points.map(verb.eval.Nurbs.dehomogenize_1d);
+verb.core.Eval.dehomogenize_2d = function(homo_points) {
+	return homo_points.map(verb.core.Eval.dehomogenize_1d);
 };
-verb.eval.Nurbs.homogenize_1d = function(control_points,weights) {
+verb.core.Eval.homogenize_1d = function(control_points,weights) {
 	var rows = control_points.length;
 	var dim = control_points[0].length;
 	var homo_control_points = new Array();
@@ -622,39 +336,39 @@ verb.eval.Nurbs.homogenize_1d = function(control_points,weights) {
 	}
 	return homo_control_points;
 };
-verb.eval.Nurbs.homogenize_2d = function(control_points,weights) {
+verb.core.Eval.homogenize_2d = function(control_points,weights) {
 	var rows = control_points.length;
 	var homo_control_points = new Array();
 	var _g = 0;
 	while(_g < rows) {
 		var i = _g++;
-		homo_control_points.push(verb.eval.Nurbs.homogenize_1d(control_points[i],weights[i]));
+		homo_control_points.push(verb.core.Eval.homogenize_1d(control_points[i],weights[i]));
 	}
 	return homo_control_points;
 };
-verb.eval.Nurbs.surface_derivs = function(surface,num_derivatives,u,v) {
+verb.core.Eval.surface_derivs = function(surface,num_derivatives,u,v) {
 	var n = surface.knotsU.length - surface.degreeU - 2;
 	var m = surface.knotsV.length - surface.degreeV - 2;
-	return verb.eval.Nurbs.surface_derivs_given_n_m(n,m,surface,num_derivatives,u,v);
+	return verb.core.Eval.surface_derivs_given_n_m(n,m,surface,num_derivatives,u,v);
 };
-verb.eval.Nurbs.surface_derivs_given_n_m = function(n,m,surface,num_derivatives,u,v) {
+verb.core.Eval.surface_derivs_given_n_m = function(n,m,surface,num_derivatives,u,v) {
 	var degree_u = surface.degreeU;
 	var degree_v = surface.degreeV;
 	var control_points = surface.controlPoints;
 	var knots_u = surface.knotsU;
 	var knots_v = surface.knotsV;
-	if(!verb.eval.Nurbs.are_valid_relations(degree_u,control_points.length,knots_u.length) || !verb.eval.Nurbs.are_valid_relations(degree_v,control_points[0].length,knots_v.length)) throw "Invalid relations between control points, knot vector, and n";
+	if(!verb.core.Eval.are_valid_relations(degree_u,control_points.length,knots_u.length) || !verb.core.Eval.are_valid_relations(degree_v,control_points[0].length,knots_v.length)) throw "Invalid relations between control points, knot vector, and n";
 	var dim = control_points[0][0].length;
 	var du;
 	if(num_derivatives < degree_u) du = num_derivatives; else du = degree_u;
 	var dv;
 	if(num_derivatives < degree_v) dv = num_derivatives; else dv = degree_v;
-	var SKL = verb.eval.Vec.zeros3d(du + 1,dv + 1,dim);
-	var knot_span_index_u = verb.eval.Nurbs.knot_span_given_n(n,degree_u,u,knots_u);
-	var knot_span_index_v = verb.eval.Nurbs.knot_span_given_n(m,degree_v,v,knots_v);
-	var uders = verb.eval.Nurbs.deriv_basis_functions_given_n_i(knot_span_index_u,u,degree_u,n,knots_u);
-	var vders = verb.eval.Nurbs.deriv_basis_functions_given_n_i(knot_span_index_v,v,degree_v,m,knots_v);
-	var temp = verb.eval.Vec.zeros2d(degree_v + 1,dim);
+	var SKL = verb.core.Vec.zeros3d(du + 1,dv + 1,dim);
+	var knot_span_index_u = verb.core.Eval.knot_span_given_n(n,degree_u,u,knots_u);
+	var knot_span_index_v = verb.core.Eval.knot_span_given_n(m,degree_v,v,knots_v);
+	var uders = verb.core.Eval.deriv_basis_functions_given_n_i(knot_span_index_u,u,degree_u,n,knots_u);
+	var vders = verb.core.Eval.deriv_basis_functions_given_n_i(knot_span_index_v,v,degree_v,m,knots_v);
+	var temp = verb.core.Vec.zeros2d(degree_v + 1,dim);
 	var dd = 0;
 	var _g1 = 0;
 	var _g = du + 1;
@@ -664,12 +378,12 @@ verb.eval.Nurbs.surface_derivs_given_n_m = function(n,m,surface,num_derivatives,
 		var _g2 = degree_v + 1;
 		while(_g3 < _g2) {
 			var s = _g3++;
-			temp[s] = verb.eval.Vec.zeros1d(dim);
+			temp[s] = verb.core.Vec.zeros1d(dim);
 			var _g5 = 0;
 			var _g4 = degree_u + 1;
 			while(_g5 < _g4) {
 				var r = _g5++;
-				temp[s] = verb.eval.Vec.add(temp[s],verb.eval.Vec.mul(uders[k][r],control_points[knot_span_index_u - degree_u + r][knot_span_index_v - degree_v + s]));
+				temp[s] = verb.core.Vec.add(temp[s],verb.core.Vec.mul(uders[k][r],control_points[knot_span_index_u - degree_u + r][knot_span_index_v - degree_v + s]));
 			}
 		}
 		var nk = num_derivatives - k;
@@ -678,69 +392,69 @@ verb.eval.Nurbs.surface_derivs_given_n_m = function(n,m,surface,num_derivatives,
 		var _g21 = dd + 1;
 		while(_g31 < _g21) {
 			var l = _g31++;
-			SKL[k][l] = verb.eval.Vec.zeros1d(dim);
+			SKL[k][l] = verb.core.Vec.zeros1d(dim);
 			var _g51 = 0;
 			var _g41 = degree_v + 1;
 			while(_g51 < _g41) {
 				var s1 = _g51++;
-				SKL[k][l] = verb.eval.Vec.add(SKL[k][l],verb.eval.Vec.mul(vders[l][s1],temp[s1]));
+				SKL[k][l] = verb.core.Vec.add(SKL[k][l],verb.core.Vec.mul(vders[l][s1],temp[s1]));
 			}
 		}
 	}
 	return SKL;
 };
-verb.eval.Nurbs.surface_point = function(surface,u,v) {
+verb.core.Eval.surface_point = function(surface,u,v) {
 	var n = surface.knotsU.length - surface.degreeU - 2;
 	var m = surface.knotsV.length - surface.degreeV - 2;
-	return verb.eval.Nurbs.surface_point_given_n_m(n,m,surface,u,v);
+	return verb.core.Eval.surface_point_given_n_m(n,m,surface,u,v);
 };
-verb.eval.Nurbs.surface_point_given_n_m = function(n,m,surface,u,v) {
+verb.core.Eval.surface_point_given_n_m = function(n,m,surface,u,v) {
 	var degree_u = surface.degreeU;
 	var degree_v = surface.degreeV;
 	var control_points = surface.controlPoints;
 	var knots_u = surface.knotsU;
 	var knots_v = surface.knotsV;
-	if(!verb.eval.Nurbs.are_valid_relations(degree_u,control_points.length,knots_u.length) || !verb.eval.Nurbs.are_valid_relations(degree_v,control_points[0].length,knots_v.length)) throw "Invalid relations between control points, knot vector, and n";
+	if(!verb.core.Eval.are_valid_relations(degree_u,control_points.length,knots_u.length) || !verb.core.Eval.are_valid_relations(degree_v,control_points[0].length,knots_v.length)) throw "Invalid relations between control points, knot vector, and n";
 	var dim = control_points[0][0].length;
-	var knot_span_index_u = verb.eval.Nurbs.knot_span_given_n(n,degree_u,u,knots_u);
-	var knot_span_index_v = verb.eval.Nurbs.knot_span_given_n(m,degree_v,v,knots_v);
-	var u_basis_vals = verb.eval.Nurbs.basis_functions_given_knot_span_index(knot_span_index_u,u,degree_u,knots_u);
-	var v_basis_vals = verb.eval.Nurbs.basis_functions_given_knot_span_index(knot_span_index_v,v,degree_v,knots_v);
+	var knot_span_index_u = verb.core.Eval.knot_span_given_n(n,degree_u,u,knots_u);
+	var knot_span_index_v = verb.core.Eval.knot_span_given_n(m,degree_v,v,knots_v);
+	var u_basis_vals = verb.core.Eval.basis_functions_given_knot_span_index(knot_span_index_u,u,degree_u,knots_u);
+	var v_basis_vals = verb.core.Eval.basis_functions_given_knot_span_index(knot_span_index_v,v,degree_v,knots_v);
 	var uind = knot_span_index_u - degree_u;
 	var vind = knot_span_index_v;
-	var position = verb.eval.Vec.zeros1d(dim);
-	var temp = verb.eval.Vec.zeros1d(dim);
+	var position = verb.core.Vec.zeros1d(dim);
+	var temp = verb.core.Vec.zeros1d(dim);
 	var _g1 = 0;
 	var _g = degree_v + 1;
 	while(_g1 < _g) {
 		var l = _g1++;
-		temp = verb.eval.Vec.zeros1d(dim);
+		temp = verb.core.Vec.zeros1d(dim);
 		vind = knot_span_index_v - degree_v + l;
 		var _g3 = 0;
 		var _g2 = degree_u + 1;
 		while(_g3 < _g2) {
 			var k = _g3++;
-			temp = verb.eval.Vec.add(temp,verb.eval.Vec.mul(u_basis_vals[k],control_points[uind + k][vind]));
+			temp = verb.core.Vec.add(temp,verb.core.Vec.mul(u_basis_vals[k],control_points[uind + k][vind]));
 		}
-		position = verb.eval.Vec.add(position,verb.eval.Vec.mul(v_basis_vals[l],temp));
+		position = verb.core.Vec.add(position,verb.core.Vec.mul(v_basis_vals[l],temp));
 	}
 	return position;
 };
-verb.eval.Nurbs.curve_derivs = function(crv,u,num_derivs) {
+verb.core.Eval.curve_derivs = function(crv,u,num_derivs) {
 	var n = crv.knots.length - crv.degree - 2;
-	return verb.eval.Nurbs.curve_derivs_given_n(n,crv,u,num_derivs);
+	return verb.core.Eval.curve_derivs_given_n(n,crv,u,num_derivs);
 };
-verb.eval.Nurbs.curve_derivs_given_n = function(n,curve,u,num_derivatives) {
+verb.core.Eval.curve_derivs_given_n = function(n,curve,u,num_derivatives) {
 	var degree = curve.degree;
 	var control_points = curve.controlPoints;
 	var knots = curve.knots;
-	if(!verb.eval.Nurbs.are_valid_relations(degree,control_points.length,knots.length)) throw "Invalid relations between control points, knot vector, and n";
+	if(!verb.core.Eval.are_valid_relations(degree,control_points.length,knots.length)) throw "Invalid relations between control points, knot vector, and n";
 	var dim = control_points[0].length;
 	var du;
 	if(num_derivatives < degree) du = num_derivatives; else du = degree;
-	var CK = verb.eval.Vec.zeros2d(du + 1,dim);
-	var knot_span_index = verb.eval.Nurbs.knot_span_given_n(n,degree,u,knots);
-	var nders = verb.eval.Nurbs.deriv_basis_functions_given_n_i(knot_span_index,u,degree,du,knots);
+	var CK = verb.core.Vec.zeros2d(du + 1,dim);
+	var knot_span_index = verb.core.Eval.knot_span_given_n(n,degree,u,knots);
+	var nders = verb.core.Eval.deriv_basis_functions_given_n_i(knot_span_index,u,degree,du,knots);
 	var k = 0;
 	var j = 0;
 	var _g1 = 0;
@@ -751,47 +465,47 @@ verb.eval.Nurbs.curve_derivs_given_n = function(n,curve,u,num_derivatives) {
 		var _g2 = degree + 1;
 		while(_g3 < _g2) {
 			var j1 = _g3++;
-			CK[k1] = verb.eval.Vec.add(CK[k1],verb.eval.Vec.mul(nders[k1][j1],control_points[knot_span_index - degree + j1]));
+			CK[k1] = verb.core.Vec.add(CK[k1],verb.core.Vec.mul(nders[k1][j1],control_points[knot_span_index - degree + j1]));
 		}
 	}
 	return CK;
 };
-verb.eval.Nurbs.curve_point = function(curve,u) {
+verb.core.Eval.curve_point = function(curve,u) {
 	var n = curve.knots.length - curve.degree - 2;
-	return verb.eval.Nurbs.curve_point_given_n(n,curve,u);
+	return verb.core.Eval.curve_point_given_n(n,curve,u);
 };
-verb.eval.Nurbs.are_valid_relations = function(degree,num_control_points,knots_length) {
+verb.core.Eval.are_valid_relations = function(degree,num_control_points,knots_length) {
 	return num_control_points + degree + 1 - knots_length == 0;
 };
-verb.eval.Nurbs.curve_point_given_n = function(n,curve,u) {
+verb.core.Eval.curve_point_given_n = function(n,curve,u) {
 	var degree = curve.degree;
 	var control_points = curve.controlPoints;
 	var knots = curve.knots;
-	if(!verb.eval.Nurbs.are_valid_relations(degree,control_points.length,knots.length)) {
+	if(!verb.core.Eval.are_valid_relations(degree,control_points.length,knots.length)) {
 		throw "Invalid relations between control points, knot Array, and n";
 		return null;
 	}
-	var knot_span_index = verb.eval.Nurbs.knot_span_given_n(n,degree,u,knots);
-	var basis_values = verb.eval.Nurbs.basis_functions_given_knot_span_index(knot_span_index,u,degree,knots);
-	var position = verb.eval.Vec.zeros1d(control_points[0].length);
+	var knot_span_index = verb.core.Eval.knot_span_given_n(n,degree,u,knots);
+	var basis_values = verb.core.Eval.basis_functions_given_knot_span_index(knot_span_index,u,degree,knots);
+	var position = verb.core.Vec.zeros1d(control_points[0].length);
 	var _g1 = 0;
 	var _g = degree + 1;
 	while(_g1 < _g) {
 		var j = _g1++;
-		position = verb.eval.Vec.add(position,verb.eval.Vec.mul(basis_values[j],control_points[knot_span_index - degree + j]));
+		position = verb.core.Vec.add(position,verb.core.Vec.mul(basis_values[j],control_points[knot_span_index - degree + j]));
 	}
 	return position;
 };
-verb.eval.Nurbs.deriv_basis_functions = function(u,degree,knots) {
-	var knot_span_index = verb.eval.Nurbs.knot_span(degree,u,knots);
+verb.core.Eval.deriv_basis_functions = function(u,degree,knots) {
+	var knot_span_index = verb.core.Eval.knot_span(degree,u,knots);
 	var m = knots.length - 1;
 	var n = m - degree - 1;
-	return verb.eval.Nurbs.deriv_basis_functions_given_n_i(knot_span_index,u,degree,n,knots);
+	return verb.core.Eval.deriv_basis_functions_given_n_i(knot_span_index,u,degree,n,knots);
 };
-verb.eval.Nurbs.deriv_basis_functions_given_n_i = function(knot_span_index,u,p,n,knots) {
-	var ndu = verb.eval.Vec.zeros2d(p + 1,p + 1);
-	var left = verb.eval.Vec.zeros1d(p + 1);
-	var right = verb.eval.Vec.zeros1d(p + 1);
+verb.core.Eval.deriv_basis_functions_given_n_i = function(knot_span_index,u,p,n,knots) {
+	var ndu = verb.core.Vec.zeros2d(p + 1,p + 1);
+	var left = verb.core.Vec.zeros1d(p + 1);
+	var right = verb.core.Vec.zeros1d(p + 1);
 	var saved = 0.0;
 	var temp = 0.0;
 	ndu[0][0] = 1.0;
@@ -812,8 +526,8 @@ verb.eval.Nurbs.deriv_basis_functions_given_n_i = function(knot_span_index,u,p,n
 		}
 		ndu[j][j] = saved;
 	}
-	var ders = verb.eval.Vec.zeros2d(n + 1,p + 1);
-	var a = verb.eval.Vec.zeros2d(2,p + 1);
+	var ders = verb.core.Vec.zeros2d(n + 1,p + 1);
+	var a = verb.core.Vec.zeros2d(2,p + 1);
 	var s1 = 0;
 	var s2 = 1;
 	var d = 0.0;
@@ -879,14 +593,14 @@ verb.eval.Nurbs.deriv_basis_functions_given_n_i = function(knot_span_index,u,p,n
 	}
 	return ders;
 };
-verb.eval.Nurbs.basis_functions = function(u,degree,knots) {
-	var knot_span_index = verb.eval.Nurbs.knot_span(degree,u,knots);
-	return verb.eval.Nurbs.basis_functions_given_knot_span_index(knot_span_index,u,degree,knots);
+verb.core.Eval.basis_functions = function(u,degree,knots) {
+	var knot_span_index = verb.core.Eval.knot_span(degree,u,knots);
+	return verb.core.Eval.basis_functions_given_knot_span_index(knot_span_index,u,degree,knots);
 };
-verb.eval.Nurbs.basis_functions_given_knot_span_index = function(knot_span_index,u,degree,knots) {
-	var basis_functions = verb.eval.Vec.zeros1d(degree + 1);
-	var left = verb.eval.Vec.zeros1d(degree + 1);
-	var right = verb.eval.Vec.zeros1d(degree + 1);
+verb.core.Eval.basis_functions_given_knot_span_index = function(knot_span_index,u,degree,knots) {
+	var basis_functions = verb.core.Vec.zeros1d(degree + 1);
+	var left = verb.core.Vec.zeros1d(degree + 1);
+	var right = verb.core.Vec.zeros1d(degree + 1);
 	var saved = 0;
 	var temp = 0;
 	basis_functions[0] = 1.0;
@@ -908,12 +622,12 @@ verb.eval.Nurbs.basis_functions_given_knot_span_index = function(knot_span_index
 	}
 	return basis_functions;
 };
-verb.eval.Nurbs.knot_span = function(degree,u,knots) {
+verb.core.Eval.knot_span = function(degree,u,knots) {
 	var m = knots.length - 1;
 	var n = m - degree - 1;
-	return verb.eval.Nurbs.knot_span_given_n(n,degree,u,knots);
+	return verb.core.Eval.knot_span_given_n(n,degree,u,knots);
 };
-verb.eval.Nurbs.knot_span_given_n = function(n,degree,u,knots) {
+verb.core.Eval.knot_span_given_n = function(n,degree,u,knots) {
 	if(u >= knots[n + 1]) return n;
 	if(u < knots[degree]) return degree;
 	var low = degree;
@@ -925,11 +639,399 @@ verb.eval.Nurbs.knot_span_given_n = function(n,degree,u,knots) {
 	}
 	return mid;
 };
-verb.eval.Tess = $hx_exports.eval.Tess = function() { };
-verb.eval.Tess.rational_curve_regular_sample = function(curve,numSamples,includeU) {
-	return verb.eval.Tess.rational_curve_regular_sample_range(curve,curve.knots[0],verb.eval.Utils.last(curve.knots),numSamples,includeU);
+verb.core.Intersect = $hx_exports.core.Intersect = function() { };
+verb.core.Intersect.rays = function(a0,a,b0,b) {
+	var dab = verb.core.Vec.dot(a,b);
+	var dab0 = verb.core.Vec.dot(a,b0);
+	var daa0 = verb.core.Vec.dot(a,a0);
+	var dbb0 = verb.core.Vec.dot(b,b0);
+	var dba0 = verb.core.Vec.dot(b,a0);
+	var daa = verb.core.Vec.dot(a,a);
+	var dbb = verb.core.Vec.dot(b,b);
+	var div = daa * dbb - dab * dab;
+	if(Math.abs(div) < verb.core.Constants.EPSILON) return null;
+	var num = dab * (dab0 - daa0) - daa * (dbb0 - dba0);
+	var w = num / div;
+	var t = (dab0 - daa0 + w * dab) / daa;
+	return [t,w];
 };
-verb.eval.Tess.rational_curve_regular_sample_range = function(curve,start,end,numSamples,includeU) {
+verb.core.Make = $hx_exports.core.Make = function() { };
+verb.core.Make.sweep1_surface = function(profile,rail) {
+	var rail_start = verb.core.Eval.rational_curve_point(rail,0.0);
+	var span = 1.0 / rail.controlPoints.length;
+	var control_points = [];
+	var weights = [];
+	var rail_weights = verb.core.Eval.weight_1d(rail.controlPoints);
+	var profile_weights = verb.core.Eval.weight_1d(profile.controlPoints);
+	var profile_points = verb.core.Eval.dehomogenize_1d(profile.controlPoints);
+	var _g1 = 0;
+	var _g = rail.controlPoints.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		var rail_point = verb.core.Eval.rational_curve_point(rail,i * span);
+		var rail_offset = verb.core.Vec.sub(rail_point,rail_start);
+		var row_control_points = [];
+		var row_weights = [];
+		var _g3 = 0;
+		var _g2 = profile.controlPoints.length;
+		while(_g3 < _g2) {
+			var j = _g3++;
+			row_control_points.push(verb.core.Vec.add(rail_offset,profile_points[j]));
+			row_weights.push(profile_weights[j] * rail_weights[i]);
+		}
+		control_points.push(row_control_points);
+		weights.push(row_weights);
+	}
+	return new verb.core.types.SurfaceData(rail.degree,profile.degree,rail.knots,profile.knots,verb.core.Eval.homogenize_2d(control_points,weights));
+};
+verb.core.Make.ellipse_arc = function(center,xaxis,yaxis,xradius,yradius,startAngle,endAngle) {
+	if(endAngle < startAngle) endAngle = 2.0 * Math.PI + startAngle;
+	var theta = endAngle - startAngle;
+	var numArcs = 0;
+	if(theta <= Math.PI / 2) numArcs = 1; else if(theta <= Math.PI) numArcs = 2; else if(theta <= 3 * Math.PI / 2) numArcs = 3; else numArcs = 4;
+	var dtheta = theta / numArcs;
+	var n = 2 * numArcs;
+	var w1 = Math.cos(dtheta / 2);
+	var P0 = verb.core.Vec.add(center,verb.core.Vec.add(verb.core.Vec.mul(xradius * Math.cos(startAngle),xaxis),verb.core.Vec.mul(yradius * Math.sin(startAngle),yaxis)));
+	var T0 = verb.core.Vec.sub(verb.core.Vec.mul(Math.cos(startAngle),yaxis),verb.core.Vec.mul(Math.sin(startAngle),xaxis));
+	var controlPoints = [];
+	var knots = verb.core.Vec.zeros1d(2 * numArcs + 3);
+	var index = 0;
+	var angle = startAngle;
+	var weights = verb.core.Vec.zeros1d(numArcs * 2);
+	controlPoints[0] = P0;
+	weights[0] = 1.0;
+	var _g1 = 1;
+	var _g = numArcs + 1;
+	while(_g1 < _g) {
+		var i = _g1++;
+		angle += dtheta;
+		var P2 = verb.core.Vec.add(center,verb.core.Vec.add(verb.core.Vec.mul(xradius * Math.cos(angle),xaxis),verb.core.Vec.mul(yradius * Math.sin(angle),yaxis)));
+		weights[index + 2] = 1;
+		controlPoints[index + 2] = P2;
+		var T2 = verb.core.Vec.sub(verb.core.Vec.mul(Math.cos(angle),yaxis),verb.core.Vec.mul(Math.sin(angle),xaxis));
+		var params = verb.core.Intersect.rays(P0,verb.core.Vec.mul(1 / verb.core.Vec.norm(T0),T0),P2,verb.core.Vec.mul(1 / verb.core.Vec.norm(T2),T2));
+		var P1 = verb.core.Vec.add(P0,verb.core.Vec.mul(params[0],T0));
+		weights[index + 1] = w1;
+		controlPoints[index + 1] = P1;
+		index += 2;
+		if(i < numArcs) {
+			P0 = P2;
+			T0 = T2;
+		}
+	}
+	var j = 2 * numArcs + 1;
+	var _g2 = 0;
+	while(_g2 < 3) {
+		var i1 = _g2++;
+		knots[i1] = 0.0;
+		knots[i1 + j] = 1.0;
+	}
+	switch(numArcs) {
+	case 2:
+		knots[3] = knots[4] = 0.5;
+		break;
+	case 3:
+		knots[3] = knots[4] = 0.333333333333333315;
+		knots[5] = knots[6] = 0.66666666666666663;
+		break;
+	case 4:
+		knots[3] = knots[4] = 0.25;
+		knots[5] = knots[6] = 0.5;
+		knots[7] = knots[8] = 0.75;
+		break;
+	}
+	return new verb.core.types.CurveData(2,knots,verb.core.Eval.homogenize_1d(controlPoints,weights));
+};
+verb.core.Mesh = function() {
+};
+verb.core.KnotMultiplicity = $hx_exports.core.KnotMultiplicity = function(knot,mult) {
+	this.knot = knot;
+	this.mult = mult;
+};
+verb.core.KnotMultiplicity.prototype = {
+	inc: function() {
+		this.mult++;
+	}
+};
+verb.core.Modify = $hx_exports.core.Modify = function() { };
+verb.core.Modify.surface_knot_refine = function(surface,knots_to_insert,useV) {
+	var newPts = [];
+	var knots;
+	var degree;
+	var ctrlPts;
+	if(!useV) {
+		ctrlPts = verb.core.Vec.transpose(surface.controlPoints);
+		knots = surface.knotsU;
+		degree = surface.degreeU;
+	} else {
+		ctrlPts = surface.controlPoints;
+		knots = surface.knotsV;
+		degree = surface.degreeV;
+	}
+	var c = null;
+	var _g = 0;
+	while(_g < ctrlPts.length) {
+		var cptrow = ctrlPts[_g];
+		++_g;
+		c = verb.core.Modify.curve_knot_refine(new verb.core.types.CurveData(degree,knots,cptrow),knots_to_insert);
+		newPts.push(c.controlPoints);
+	}
+	var newknots = c.knots;
+	if(!useV) {
+		newPts = verb.core.Vec.transpose(newPts);
+		return new verb.core.types.SurfaceData(surface.degreeU,surface.degreeV,newknots,surface.knotsV.slice(),newPts);
+	} else return new verb.core.types.SurfaceData(surface.degreeU,surface.degreeV,surface.knotsU.slice(),newknots,newPts);
+};
+verb.core.Modify.surface_split = function(surface,u,useV) {
+	if(useV == null) useV = false;
+	var knots;
+	var degree;
+	var control_points;
+	if(!useV) {
+		control_points = verb.core.Vec.transpose(surface.controlPoints);
+		knots = surface.knotsU;
+		degree = surface.degreeU;
+	} else {
+		control_points = surface.controlPoints;
+		knots = surface.knotsV;
+		degree = surface.degreeV;
+	}
+	var knots_to_insert;
+	var _g = [];
+	var _g2 = 0;
+	var _g1 = degree + 1;
+	while(_g2 < _g1) {
+		var i = _g2++;
+		_g.push(u);
+	}
+	knots_to_insert = _g;
+	var newpts0 = new Array();
+	var newpts1 = new Array();
+	var s = verb.core.Eval.knot_span(degree,u,knots);
+	var res = null;
+	var _g11 = 0;
+	while(_g11 < control_points.length) {
+		var cps = control_points[_g11];
+		++_g11;
+		res = verb.core.Modify.curve_knot_refine(new verb.core.types.CurveData(degree,knots,cps),knots_to_insert);
+		newpts0.push(res.controlPoints.slice(0,s + 1));
+		newpts1.push(res.controlPoints.slice(s + 1));
+	}
+	var knots0 = res.knots.slice(0,s + degree + 2);
+	var knots1 = res.knots.slice(s + 1);
+	if(!useV) {
+		newpts0 = verb.core.Vec.transpose(newpts0);
+		newpts1 = verb.core.Vec.transpose(newpts1);
+		return [new verb.core.types.SurfaceData(degree,surface.degreeV,knots0,surface.knotsV.slice(),newpts0),new verb.core.types.SurfaceData(degree,surface.degreeV,knots1,surface.knotsV.slice(),newpts1)];
+	}
+	return [new verb.core.types.SurfaceData(surface.degreeU,degree,surface.knotsU.slice(),knots0,newpts0),new verb.core.types.SurfaceData(surface.degreeU,degree,surface.knotsU.slice(),knots1,newpts1)];
+};
+verb.core.Modify.curve_bezier_decompose = function(curve) {
+	var degree = curve.degree;
+	var control_points = curve.controlPoints;
+	var knots = curve.knots;
+	var knotmults = verb.core.Modify.knot_multiplicities(knots);
+	var reqMult = degree + 1;
+	var _g = 0;
+	while(_g < knotmults.length) {
+		var knotmult = knotmults[_g];
+		++_g;
+		if(knotmult.mult < reqMult) {
+			var knotsInsert = verb.core.Vec.rep(reqMult - knotmult.mult,knotmult.knot);
+			var res = verb.core.Modify.curve_knot_refine(new verb.core.types.CurveData(degree,knots,control_points),knotsInsert);
+			knots = res.knots;
+			control_points = res.controlPoints;
+		}
+	}
+	var numCrvs = knots.length / reqMult - 1;
+	var crvKnotLength = reqMult * 2;
+	var crvs = [];
+	var i = 0;
+	while(i < control_points.length) {
+		var kts = knots.slice(i,i + crvKnotLength);
+		var pts = control_points.slice(i,i + reqMult);
+		crvs.push(new verb.core.types.CurveData(degree,kts,pts));
+		i += reqMult;
+	}
+	return crvs;
+};
+verb.core.Modify.knot_multiplicities = function(knots) {
+	var mults = [new verb.core.KnotMultiplicity(knots[0],0)];
+	var curr = mults[0];
+	var _g = 0;
+	while(_g < knots.length) {
+		var knot = knots[_g];
+		++_g;
+		if(Math.abs(knot - curr.knot) > verb.core.Constants.EPSILON) {
+			curr = new verb.core.KnotMultiplicity(knot,0);
+			mults.push(curr);
+		}
+		curr.inc();
+	}
+	return mults;
+};
+verb.core.Modify.curve_split = function(curve,u) {
+	var degree = curve.degree;
+	var control_points = curve.controlPoints;
+	var knots = curve.knots;
+	var knots_to_insert;
+	var _g = [];
+	var _g2 = 0;
+	var _g1 = degree + 1;
+	while(_g2 < _g1) {
+		var i = _g2++;
+		_g.push(u);
+	}
+	knots_to_insert = _g;
+	var res = verb.core.Modify.curve_knot_refine(curve,knots_to_insert);
+	var s = verb.core.Eval.knot_span(degree,u,knots);
+	var knots0 = res.knots.slice(0,s + degree + 2);
+	var knots1 = res.knots.slice(s + 1);
+	var cpts0 = res.controlPoints.slice(0,s + 1);
+	var cpts1 = res.controlPoints.slice(s + 1);
+	return [new verb.core.types.CurveData(degree,knots0,cpts0),new verb.core.types.CurveData(degree,knots1,cpts1)];
+};
+verb.core.Modify.curve_knot_refine = function(curve,knots_to_insert) {
+	var degree = curve.degree;
+	var control_points = curve.controlPoints;
+	var knots = curve.knots;
+	var n = control_points.length - 1;
+	var m = n + degree + 1;
+	var r = knots_to_insert.length - 1;
+	var a = verb.core.Eval.knot_span(degree,knots_to_insert[0],knots);
+	var b = verb.core.Eval.knot_span(degree,knots_to_insert[r],knots);
+	var control_points_post = new Array();
+	var knots_post = new Array();
+	var _g1 = 0;
+	var _g = a - degree + 1;
+	while(_g1 < _g) {
+		var i = _g1++;
+		control_points_post[i] = control_points[i];
+	}
+	var _g11 = b - 1;
+	var _g2 = n + 1;
+	while(_g11 < _g2) {
+		var i1 = _g11++;
+		control_points_post[i1 + r + 1] = control_points[i1];
+	}
+	var _g12 = 0;
+	var _g3 = a + 1;
+	while(_g12 < _g3) {
+		var i2 = _g12++;
+		knots_post[i2] = knots[i2];
+	}
+	var _g13 = b + degree;
+	var _g4 = m + 1;
+	while(_g13 < _g4) {
+		var i3 = _g13++;
+		knots_post[i3 + r + 1] = knots[i3];
+	}
+	var i4 = b + degree - 1;
+	var k = b + degree + r;
+	var j = r;
+	while(j >= 0) {
+		while(knots_to_insert[j] <= knots[i4] && i4 > a) {
+			control_points_post[k - degree - 1] = control_points[i4 - degree - 1];
+			knots_post[k] = knots[i4];
+			k = k - 1;
+			i4 = i4 - 1;
+		}
+		control_points_post[k - degree - 1] = control_points_post[k - degree];
+		var _g14 = 1;
+		var _g5 = degree + 1;
+		while(_g14 < _g5) {
+			var l = _g14++;
+			var ind = k - degree + l;
+			var alfa = knots_post[k + l] - knots_to_insert[j];
+			if(Math.abs(alfa) < verb.core.Constants.EPSILON) control_points_post[ind - 1] = control_points_post[ind]; else {
+				alfa = alfa / (knots_post[k + l] - knots[i4 - degree + l]);
+				control_points_post[ind - 1] = verb.core.Vec.add(verb.core.Vec.mul(alfa,control_points_post[ind - 1]),verb.core.Vec.mul(1.0 - alfa,control_points_post[ind]));
+			}
+		}
+		knots_post[k] = knots_to_insert[j];
+		k = k - 1;
+		j--;
+	}
+	return new verb.core.types.CurveData(degree,knots_post,control_points_post);
+};
+verb.core.Modify.curve_knot_insert = function(curve,u,r) {
+	var degree = curve.degree;
+	var control_points = curve.controlPoints;
+	var knots = curve.knots;
+	var s = 0;
+	var num_pts = control_points.length;
+	var k = verb.core.Eval.knot_span(degree,u,knots);
+	var num_pts_post = num_pts + r;
+	var control_points_temp = new Array();
+	var knots_post = new Array();
+	var control_points_post = new Array();
+	var i = 0;
+	var _g1 = 1;
+	var _g = k + 1;
+	while(_g1 < _g) {
+		var i1 = _g1++;
+		knots_post[i1] = knots[i1];
+	}
+	var _g11 = 1;
+	var _g2 = r + 1;
+	while(_g11 < _g2) {
+		var i2 = _g11++;
+		knots_post[k + i2] = u;
+	}
+	var _g12 = k + 1;
+	var _g3 = knots.length;
+	while(_g12 < _g3) {
+		var i3 = _g12++;
+		knots_post[i3 + r] = knots[i3];
+	}
+	var _g13 = 0;
+	var _g4 = k - degree + 1;
+	while(_g13 < _g4) {
+		var i4 = _g13++;
+		control_points_post[i4] = control_points[i4];
+	}
+	var _g5 = k - s;
+	while(_g5 < num_pts) {
+		var i5 = _g5++;
+		control_points_post[i5 + r] = control_points[i5];
+	}
+	var _g14 = 0;
+	var _g6 = degree - s + 1;
+	while(_g14 < _g6) {
+		var i6 = _g14++;
+		control_points_temp[i6] = control_points[k - degree + i6];
+	}
+	var L = 0;
+	var alpha = 0;
+	var _g15 = 1;
+	var _g7 = r + 1;
+	while(_g15 < _g7) {
+		var j = _g15++;
+		L = k - degree + j;
+		var _g31 = 0;
+		var _g21 = degree - j - s + 1;
+		while(_g31 < _g21) {
+			var i7 = _g31++;
+			alpha = (u - knots[L + i7]) / (knots[i7 + k + 1] - knots[L + i7]);
+			control_points_temp[i7] = verb.core.Vec.add(verb.core.Vec.mul(alpha,control_points_temp[i7 + 1]),verb.core.Vec.mul(1.0 - alpha,control_points_temp[i7]));
+		}
+		control_points_post[L] = control_points_temp[0];
+		control_points_post[k + r - j - s] = control_points_temp[degree - j - s];
+	}
+	var _g16 = L + 1;
+	var _g8 = k - s;
+	while(_g16 < _g8) {
+		var i8 = _g16++;
+		control_points_post[i8] = control_points_temp[i8 - L];
+	}
+	return new verb.core.types.CurveData(degree,knots_post,control_points_post);
+};
+verb.core.Tess = $hx_exports.core.Tess = function() { };
+verb.core.Tess.rational_curve_regular_sample = function(curve,numSamples,includeU) {
+	return verb.core.Tess.rational_curve_regular_sample_range(curve,curve.knots[0],verb.core.Utils.last(curve.knots),numSamples,includeU);
+};
+verb.core.Tess.rational_curve_regular_sample_range = function(curve,start,end,numSamples,includeU) {
 	if(numSamples < 1) numSamples = 2;
 	var p = [];
 	var span = (end - start) / (numSamples - 1);
@@ -938,41 +1040,41 @@ verb.eval.Tess.rational_curve_regular_sample_range = function(curve,start,end,nu
 	while(_g < numSamples) {
 		var i = _g++;
 		u = start + span * i;
-		if(includeU) p.push([u].concat(verb.eval.Nurbs.rational_curve_point(curve,u))); else p.push(verb.eval.Nurbs.rational_curve_point(curve,u));
+		if(includeU) p.push([u].concat(verb.core.Eval.rational_curve_point(curve,u))); else p.push(verb.core.Eval.rational_curve_point(curve,u));
 	}
 	return p;
 };
-verb.eval.Tess.rational_curve_adaptive_sample = function(curve,tol,includeU) {
+verb.core.Tess.rational_curve_adaptive_sample = function(curve,tol,includeU) {
 	if(curve.degree == 1) {
-		if(!includeU) return curve.controlPoints.map(verb.eval.Nurbs.dehomogenize); else {
+		if(!includeU) return curve.controlPoints.map(verb.core.Eval.dehomogenize); else {
 			var _g = [];
 			var _g2 = 0;
 			var _g1 = curve.controlPoints.length;
 			while(_g2 < _g1) {
 				var i = _g2++;
-				_g.push([curve.knots[i + 1]].concat(verb.eval.Nurbs.dehomogenize(curve.controlPoints[i])));
+				_g.push([curve.knots[i + 1]].concat(verb.core.Eval.dehomogenize(curve.controlPoints[i])));
 			}
 			return _g;
 		}
 	}
-	return verb.eval.Tess.rational_curve_adaptive_sample_range(curve,curve.knots[0],verb.eval.Utils.last(curve.knots),tol,includeU);
+	return verb.core.Tess.rational_curve_adaptive_sample_range(curve,curve.knots[0],verb.core.Utils.last(curve.knots),tol,includeU);
 };
-verb.eval.Tess.rational_curve_adaptive_sample_range = function(curve,start,end,tol,includeU) {
-	var p1 = verb.eval.Nurbs.rational_curve_point(curve,start);
-	var p3 = verb.eval.Nurbs.rational_curve_point(curve,end);
+verb.core.Tess.rational_curve_adaptive_sample_range = function(curve,start,end,tol,includeU) {
+	var p1 = verb.core.Eval.rational_curve_point(curve,start);
+	var p3 = verb.core.Eval.rational_curve_point(curve,end);
 	var t = 0.5 + 0.2 * Math.random();
 	var mid = start + (end - start) * t;
-	var p2 = verb.eval.Nurbs.rational_curve_point(curve,mid);
-	var diff = verb.eval.Vec.sub(p1,p3);
-	var diff2 = verb.eval.Vec.sub(p1,p2);
-	if(verb.eval.Vec.dot(diff,diff) < tol && verb.eval.Vec.dot(diff2,diff2) > tol || !verb.eval.Trig.three_points_are_flat(p1,p2,p3,tol)) {
+	var p2 = verb.core.Eval.rational_curve_point(curve,mid);
+	var diff = verb.core.Vec.sub(p1,p3);
+	var diff2 = verb.core.Vec.sub(p1,p2);
+	if(verb.core.Vec.dot(diff,diff) < tol && verb.core.Vec.dot(diff2,diff2) > tol || !verb.core.Trig.three_points_are_flat(p1,p2,p3,tol)) {
 		var exact_mid = start + (end - start) * 0.5;
-		var left_pts = verb.eval.Tess.rational_curve_adaptive_sample_range(curve,start,exact_mid,tol,includeU);
-		var right_pts = verb.eval.Tess.rational_curve_adaptive_sample_range(curve,exact_mid,end,tol,includeU);
+		var left_pts = verb.core.Tess.rational_curve_adaptive_sample_range(curve,start,exact_mid,tol,includeU);
+		var right_pts = verb.core.Tess.rational_curve_adaptive_sample_range(curve,exact_mid,end,tol,includeU);
 		return left_pts.slice(0,-1).concat(right_pts);
 	} else if(includeU) return [[start].concat(p1),[end].concat(p3)]; else return [p1,p3];
 };
-verb.eval.Tess.tessellate_rational_surface_naive = function(surface,divs_u,divs_v) {
+verb.core.Tess.tessellate_rational_surface_naive = function(surface,divs_u,divs_v) {
 	if(divs_u < 1) divs_u = 1;
 	if(divs_v < 1) divs_v = 1;
 	var degree_u = surface.degreeU;
@@ -980,8 +1082,8 @@ verb.eval.Tess.tessellate_rational_surface_naive = function(surface,divs_u,divs_
 	var control_points = surface.controlPoints;
 	var knotsU = surface.knotsU;
 	var knotsV = surface.knotsV;
-	var u_span = verb.eval.Utils.last(knotsU) - knotsU[0];
-	var v_span = verb.eval.Utils.last(knotsV) - knotsV[0];
+	var u_span = verb.core.Utils.last(knotsU) - knotsU[0];
+	var v_span = verb.core.Utils.last(knotsV) - knotsV[0];
 	var span_u = u_span / divs_u;
 	var span_v = v_span / divs_v;
 	var points = [];
@@ -998,10 +1100,10 @@ verb.eval.Tess.tessellate_rational_surface_naive = function(surface,divs_u,divs_
 			var pt_u = i * span_u;
 			var pt_v = j * span_v;
 			uvs.push([pt_u,pt_v]);
-			var derivs = verb.eval.Nurbs.rational_surface_derivs(surface,1,pt_u,pt_v);
+			var derivs = verb.core.Eval.rational_surface_derivs(surface,1,pt_u,pt_v);
 			var pt = derivs[0][0];
 			points.push(pt);
-			var normal = verb.eval.Vec.normalized(verb.eval.Vec.cross(derivs[1][0],derivs[0][1]));
+			var normal = verb.core.Vec.normalized(verb.core.Vec.cross(derivs[1][0],derivs[0][1]));
 			normals.push(normal);
 		}
 	}
@@ -1022,10 +1124,10 @@ verb.eval.Tess.tessellate_rational_surface_naive = function(surface,divs_u,divs_
 			faces.push(acd);
 		}
 	}
-	return new verb.eval.types.MeshData(faces,points,normals,uvs);
+	return new verb.core.types.MeshData(faces,points,normals,uvs);
 };
-verb.eval.Tess.divide_rational_surface_adaptive = function(surface,options) {
-	if(options == null) options = new verb.eval.types.AdaptiveRefinementOptions();
+verb.core.Tess.divide_rational_surface_adaptive = function(surface,options) {
+	if(options == null) options = new verb.core.types.AdaptiveRefinementOptions();
 	if(options.minDivsU != null) options.minDivsU = options.minDivsU; else options.minDivsU = 1;
 	if(options.minDivsV != null) options.minDivsU = options.minDivsV; else options.minDivsU = 1;
 	if(options.refine != null) options.refine = options.refine; else options.refine = true;
@@ -1035,9 +1137,9 @@ verb.eval.Tess.divide_rational_surface_adaptive = function(surface,options) {
 	divsU = options.minDivsU > minU?options.minDivsU = options.minDivsU:options.minDivsU = minU;
 	var divsV;
 	divsV = options.minDivsV > minV?options.minDivsV = options.minDivsV:options.minDivsV = minV;
-	var umax = verb.eval.Utils.last(surface.knotsU);
+	var umax = verb.core.Utils.last(surface.knotsU);
 	var umin = surface.knotsU[0];
-	var vmax = verb.eval.Utils.last(surface.knotsV);
+	var vmax = verb.core.Utils.last(surface.knotsV);
 	var vmin = surface.knotsV[0];
 	var du = (umax - umin) / divsU;
 	var dv = (vmax - vmin) / divsV;
@@ -1054,9 +1156,9 @@ verb.eval.Tess.divide_rational_surface_adaptive = function(surface,options) {
 			var j = _g3++;
 			var u = umin + du * j;
 			var v = vmin + dv * i;
-			var ds = verb.eval.Nurbs.rational_surface_derivs(surface,1,u,v);
-			var norm = verb.eval.Vec.normalized(verb.eval.Vec.cross(ds[0][1],ds[1][0]));
-			ptrow.push(new verb.eval.types.SurfacePoint(ds[0][0],norm,[u,v],-1,verb.eval.Vec.isZero(norm)));
+			var ds = verb.core.Eval.rational_surface_derivs(surface,1,u,v);
+			var norm = verb.core.Vec.normalized(verb.core.Vec.cross(ds[0][1],ds[1][0]));
+			ptrow.push(new verb.core.types.SurfacePoint(ds[0][0],norm,[u,v],-1,verb.core.Vec.isZero(norm)));
 		}
 		pts.push(ptrow);
 	}
@@ -1067,7 +1169,7 @@ verb.eval.Tess.divide_rational_surface_adaptive = function(surface,options) {
 		while(_g11 < divsU) {
 			var j1 = _g11++;
 			var corners = [pts[divsV - i1 - 1][j1],pts[divsV - i1 - 1][j1 + 1],pts[divsV - i1][j1 + 1],pts[divsV - i1][j1]];
-			divs.push(new verb.eval.types.AdaptiveRefinementNode(surface,corners));
+			divs.push(new verb.core.types.AdaptiveRefinementNode(surface,corners));
 		}
 	}
 	if(!options.refine) return divs;
@@ -1078,34 +1180,34 @@ verb.eval.Tess.divide_rational_surface_adaptive = function(surface,options) {
 		while(_g12 < divsU) {
 			var j2 = _g12++;
 			var ci = i2 * divsU + j2;
-			var n = verb.eval.Tess.north(ci,i2,j2,divsU,divsV,divs);
-			var e = verb.eval.Tess.east(ci,i2,j2,divsU,divsV,divs);
-			var s = verb.eval.Tess.south(ci,i2,j2,divsU,divsV,divs);
-			var w = verb.eval.Tess.west(ci,i2,j2,divsU,divsV,divs);
+			var n = verb.core.Tess.north(ci,i2,j2,divsU,divsV,divs);
+			var e = verb.core.Tess.east(ci,i2,j2,divsU,divsV,divs);
+			var s = verb.core.Tess.south(ci,i2,j2,divsU,divsV,divs);
+			var w = verb.core.Tess.west(ci,i2,j2,divsU,divsV,divs);
 			divs[ci].neighbors = [s,e,n,w];
 			divs[ci].divide(options);
 		}
 	}
 	return divs;
 };
-verb.eval.Tess.north = function(index,i,j,divsU,divsV,divs) {
+verb.core.Tess.north = function(index,i,j,divsU,divsV,divs) {
 	if(i == 0) return null;
 	return divs[index - divsU];
 };
-verb.eval.Tess.south = function(index,i,j,divsU,divsV,divs) {
+verb.core.Tess.south = function(index,i,j,divsU,divsV,divs) {
 	if(i == divsV - 1) return null;
 	return divs[index + divsU];
 };
-verb.eval.Tess.east = function(index,i,j,divsU,divsV,divs) {
+verb.core.Tess.east = function(index,i,j,divsU,divsV,divs) {
 	if(j == divsU - 1) return null;
 	return divs[index + 1];
 };
-verb.eval.Tess.west = function(index,i,j,divsU,divsV,divs) {
+verb.core.Tess.west = function(index,i,j,divsU,divsV,divs) {
 	if(j == 0) return null;
 	return divs[index - 1];
 };
-verb.eval.Tess.triangulate_adaptive_refinement_node_tree = function(arrTree) {
-	var mesh = verb.eval.types.MeshData.empty();
+verb.core.Tess.triangulate_adaptive_refinement_node_tree = function(arrTree) {
+	var mesh = verb.core.types.MeshData.empty();
 	var _g = 0;
 	while(_g < arrTree.length) {
 		var x = arrTree[_g];
@@ -1114,40 +1216,40 @@ verb.eval.Tess.triangulate_adaptive_refinement_node_tree = function(arrTree) {
 	}
 	return mesh;
 };
-verb.eval.Tess.tessellate_rational_surface_adaptive = function(surface,options) {
-	var arrTrees = verb.eval.Tess.divide_rational_surface_adaptive(surface,options);
-	return verb.eval.Tess.triangulate_adaptive_refinement_node_tree(arrTrees);
+verb.core.Tess.tessellate_rational_surface_adaptive = function(surface,options) {
+	var arrTrees = verb.core.Tess.divide_rational_surface_adaptive(surface,options);
+	return verb.core.Tess.triangulate_adaptive_refinement_node_tree(arrTrees);
 };
-verb.eval.Trig = $hx_exports.eval.Trig = function() { };
-verb.eval.Trig.dist_to_seg = function(a,b,c) {
-	var acv = verb.eval.Vec.sub(c,a);
-	var acl = verb.eval.Vec.norm(acv);
-	var bma = verb.eval.Vec.sub(b,a);
-	if(acl < verb.eval.Constants.TOLERANCE) return verb.eval.Vec.norm(bma);
-	var ac = verb.eval.Vec.mul(1 / acl,acv);
-	var p = verb.eval.Vec.dot(bma,ac);
-	var acd = verb.eval.Vec.add(a,verb.eval.Vec.mul(p,ac));
-	return verb.eval.Vec.dist(acd,b);
+verb.core.Trig = $hx_exports.core.Trig = function() { };
+verb.core.Trig.dist_to_seg = function(a,b,c) {
+	var acv = verb.core.Vec.sub(c,a);
+	var acl = verb.core.Vec.norm(acv);
+	var bma = verb.core.Vec.sub(b,a);
+	if(acl < verb.core.Constants.TOLERANCE) return verb.core.Vec.norm(bma);
+	var ac = verb.core.Vec.mul(1 / acl,acv);
+	var p = verb.core.Vec.dot(bma,ac);
+	var acd = verb.core.Vec.add(a,verb.core.Vec.mul(p,ac));
+	return verb.core.Vec.dist(acd,b);
 };
-verb.eval.Trig.three_points_are_flat = function(p1,p2,p3,tol) {
-	var p2mp1 = verb.eval.Vec.sub(p2,p1);
-	var p3mp1 = verb.eval.Vec.sub(p3,p1);
-	var norm = verb.eval.Vec.cross(p2mp1,p3mp1);
-	var area = verb.eval.Vec.dot(norm,norm);
+verb.core.Trig.three_points_are_flat = function(p1,p2,p3,tol) {
+	var p2mp1 = verb.core.Vec.sub(p2,p1);
+	var p3mp1 = verb.core.Vec.sub(p3,p1);
+	var norm = verb.core.Vec.cross(p2mp1,p3mp1);
+	var area = verb.core.Vec.dot(norm,norm);
 	return area < tol;
 };
-verb.eval.Utils = function() { };
-verb.eval.Utils.last = function(a) {
+verb.core.Utils = function() { };
+verb.core.Utils.last = function(a) {
 	return a[a.length - 1];
 };
-verb.eval.Vec = $hx_exports.eval.Vec = function() { };
-verb.eval.Vec.normalized = function(arr) {
-	return verb.eval.Vec.div(arr,verb.eval.Vec.normSquared(arr));
+verb.core.Vec = $hx_exports.core.Vec = function() { };
+verb.core.Vec.normalized = function(arr) {
+	return verb.core.Vec.div(arr,verb.core.Vec.normSquared(arr));
 };
-verb.eval.Vec.cross = function(u,v) {
+verb.core.Vec.cross = function(u,v) {
 	return [u[1] * v[2] - u[2] * v[1],u[2] * v[0] - u[0] * v[2],u[0] * v[1] - u[1] * v[0]];
 };
-verb.eval.Vec.transpose = function(a) {
+verb.core.Vec.transpose = function(a) {
 	if(a.length == 0) return [];
 	var _g = [];
 	var _g2 = 0;
@@ -1171,26 +1273,26 @@ verb.eval.Vec.transpose = function(a) {
 	}
 	return _g;
 };
-verb.eval.Vec.dist = function(a,b) {
-	return verb.eval.Vec.norm(verb.eval.Vec.sub(a,b));
+verb.core.Vec.dist = function(a,b) {
+	return verb.core.Vec.norm(verb.core.Vec.sub(a,b));
 };
-verb.eval.Vec.distSquared = function(a,b) {
-	return verb.eval.Vec.normSquared(verb.eval.Vec.sub(a,b));
+verb.core.Vec.distSquared = function(a,b) {
+	return verb.core.Vec.normSquared(verb.core.Vec.sub(a,b));
 };
-verb.eval.Vec.sum = function(a) {
+verb.core.Vec.sum = function(a) {
 	return Lambda.fold(a,function(x,a1) {
 		return a1 + x;
 	},0);
 };
-verb.eval.Vec.norm = function(a) {
-	return Math.sqrt(verb.eval.Vec.normSquared(a));
+verb.core.Vec.norm = function(a) {
+	return Math.sqrt(verb.core.Vec.normSquared(a));
 };
-verb.eval.Vec.normSquared = function(a) {
+verb.core.Vec.normSquared = function(a) {
 	return Lambda.fold(a,function(x,a1) {
 		return a1 + x * x;
 	},0);
 };
-verb.eval.Vec.rep = function(num,ele) {
+verb.core.Vec.rep = function(num,ele) {
 	var _g = [];
 	var _g1 = 0;
 	while(_g1 < num) {
@@ -1199,7 +1301,7 @@ verb.eval.Vec.rep = function(num,ele) {
 	}
 	return _g;
 };
-verb.eval.Vec.zeros1d = function(rows) {
+verb.core.Vec.zeros1d = function(rows) {
 	var _g = [];
 	var _g1 = 0;
 	while(_g1 < rows) {
@@ -1208,25 +1310,25 @@ verb.eval.Vec.zeros1d = function(rows) {
 	}
 	return _g;
 };
-verb.eval.Vec.zeros2d = function(rows,cols) {
+verb.core.Vec.zeros2d = function(rows,cols) {
 	var _g = [];
 	var _g1 = 0;
 	while(_g1 < rows) {
 		var i = _g1++;
-		_g.push(verb.eval.Vec.zeros1d(cols));
+		_g.push(verb.core.Vec.zeros1d(cols));
 	}
 	return _g;
 };
-verb.eval.Vec.zeros3d = function(rows,cols,depth) {
+verb.core.Vec.zeros3d = function(rows,cols,depth) {
 	var _g = [];
 	var _g1 = 0;
 	while(_g1 < rows) {
 		var i = _g1++;
-		_g.push(verb.eval.Vec.zeros2d(cols,depth));
+		_g.push(verb.core.Vec.zeros2d(cols,depth));
 	}
 	return _g;
 };
-verb.eval.Vec.dot = function(a,b) {
+verb.core.Vec.dot = function(a,b) {
 	var sum = 0;
 	var _g1 = 0;
 	var _g = a.length;
@@ -1236,7 +1338,7 @@ verb.eval.Vec.dot = function(a,b) {
 	}
 	return sum;
 };
-verb.eval.Vec.add = function(a,b) {
+verb.core.Vec.add = function(a,b) {
 	var _g = [];
 	var _g2 = 0;
 	var _g1 = a.length;
@@ -1246,7 +1348,7 @@ verb.eval.Vec.add = function(a,b) {
 	}
 	return _g;
 };
-verb.eval.Vec.mul = function(a,b) {
+verb.core.Vec.mul = function(a,b) {
 	var _g = [];
 	var _g2 = 0;
 	var _g1 = b.length;
@@ -1256,7 +1358,7 @@ verb.eval.Vec.mul = function(a,b) {
 	}
 	return _g;
 };
-verb.eval.Vec.div = function(a,b) {
+verb.core.Vec.div = function(a,b) {
 	var _g = [];
 	var _g2 = 0;
 	var _g1 = a.length;
@@ -1266,7 +1368,7 @@ verb.eval.Vec.div = function(a,b) {
 	}
 	return _g;
 };
-verb.eval.Vec.sub = function(a,b) {
+verb.core.Vec.sub = function(a,b) {
 	var _g = [];
 	var _g2 = 0;
 	var _g1 = a.length;
@@ -1276,17 +1378,17 @@ verb.eval.Vec.sub = function(a,b) {
 	}
 	return _g;
 };
-verb.eval.Vec.isZero = function(vec) {
+verb.core.Vec.isZero = function(vec) {
 	var _g1 = 0;
 	var _g = vec.length;
 	while(_g1 < _g) {
 		var i = _g1++;
-		if(Math.abs(vec[i]) > verb.eval.Constants.TOLERANCE) return false;
+		if(Math.abs(vec[i]) > verb.core.Constants.TOLERANCE) return false;
 	}
 	return true;
 };
-verb.eval.types = {};
-verb.eval.types.AdaptiveRefinementOptions = function() {
+verb.core.types = {};
+verb.core.types.AdaptiveRefinementOptions = function() {
 	this.minDivsV = 1;
 	this.minDivsU = 1;
 	this.refine = true;
@@ -1294,19 +1396,19 @@ verb.eval.types.AdaptiveRefinementOptions = function() {
 	this.minDepth = 0;
 	this.normTol = 8.5e-2;
 };
-verb.eval.types.AdaptiveRefinementNode = $hx_exports.eval.AdaptiveRefinementNode = function(srf,corners,neighbors) {
+verb.core.types.AdaptiveRefinementNode = $hx_exports.core.AdaptiveRefinementNode = function(srf,corners,neighbors) {
 	this.srf = srf;
 	if(neighbors == null) this.neighbors = [null,null,null,null]; else this.neighbors = neighbors;
 	this.corners = corners;
 	if(this.corners == null) {
 		var u0 = srf.knotsU[0];
-		var u1 = verb.eval.Utils.last(srf.knotsU);
+		var u1 = verb.core.Utils.last(srf.knotsU);
 		var v0 = srf.knotsV[0];
-		var v1 = verb.eval.Utils.last(srf.knotsV);
-		this.corners = [verb.eval.types.SurfacePoint.fromUv(u0,v0),verb.eval.types.SurfacePoint.fromUv(u1,v0),verb.eval.types.SurfacePoint.fromUv(u1,v1),verb.eval.types.SurfacePoint.fromUv(u0,v1)];
+		var v1 = verb.core.Utils.last(srf.knotsV);
+		this.corners = [verb.core.types.SurfacePoint.fromUv(u0,v0),verb.core.types.SurfacePoint.fromUv(u1,v0),verb.core.types.SurfacePoint.fromUv(u1,v1),verb.core.types.SurfacePoint.fromUv(u0,v1)];
 	}
 };
-verb.eval.types.AdaptiveRefinementNode.prototype = {
+verb.core.types.AdaptiveRefinementNode.prototype = {
 	isLeaf: function() {
 		return this.children == null;
 	}
@@ -1326,17 +1428,17 @@ verb.eval.types.AdaptiveRefinementNode.prototype = {
 		}
 	}
 	,evalSrf: function(u,v,srfPt) {
-		var derivs = verb.eval.Nurbs.rational_surface_derivs(this.srf,1,u,v);
+		var derivs = verb.core.Eval.rational_surface_derivs(this.srf,1,u,v);
 		var pt = derivs[0][0];
-		var norm = verb.eval.Vec.cross(derivs[0][1],derivs[1][0]);
-		var degen = verb.eval.Vec.isZero(norm);
-		if(!degen) norm = verb.eval.Vec.normalized(norm);
+		var norm = verb.core.Vec.cross(derivs[0][1],derivs[1][0]);
+		var degen = verb.core.Vec.isZero(norm);
+		if(!degen) norm = verb.core.Vec.normalized(norm);
 		if(srfPt != null) {
 			srfPt.degen = degen;
 			srfPt.point = pt;
 			srfPt.normal = norm;
 			return srfPt;
-		} else return new verb.eval.types.SurfacePoint(pt,norm,[u,v],-1,degen);
+		} else return new verb.core.types.SurfacePoint(pt,norm,[u,v],-1,degen);
 	}
 	,getEdgeCorners: function(edgeIndex) {
 		if(this.isLeaf()) return [this.corners[edgeIndex]];
@@ -1367,7 +1469,7 @@ verb.eval.types.AdaptiveRefinementNode.prototype = {
 		if(this.neighbors[edgeIndex] == null) return baseArr;
 		var corners = this.neighbors[edgeIndex].getEdgeCorners((edgeIndex + 2) % 4);
 		var funcIndex = edgeIndex % 2;
-		var e = verb.eval.Constants.EPSILON;
+		var e = verb.core.Constants.EPSILON;
 		var that = this;
 		var rangeFuncMap = [function(c) {
 			return c.uv[0] > that.corners[0].uv[0] + e && c.uv[0] < that.corners[2].uv[0] - e;
@@ -1420,14 +1522,14 @@ verb.eval.types.AdaptiveRefinementNode.prototype = {
 			this.fixNormals();
 			return false;
 		}
-		this.splitVert = verb.eval.Vec.normSquared(verb.eval.Vec.sub(this.corners[0].normal,this.corners[1].normal)) > options.normTol || verb.eval.Vec.normSquared(verb.eval.Vec.sub(this.corners[2].normal,this.corners[3].normal)) > options.normTol;
-		this.splitHoriz = verb.eval.Vec.normSquared(verb.eval.Vec.sub(this.corners[1].normal,this.corners[2].normal)) > options.normTol || verb.eval.Vec.normSquared(verb.eval.Vec.sub(this.corners[3].normal,this.corners[0].normal)) > options.normTol;
+		this.splitVert = verb.core.Vec.normSquared(verb.core.Vec.sub(this.corners[0].normal,this.corners[1].normal)) > options.normTol || verb.core.Vec.normSquared(verb.core.Vec.sub(this.corners[2].normal,this.corners[3].normal)) > options.normTol;
+		this.splitHoriz = verb.core.Vec.normSquared(verb.core.Vec.sub(this.corners[1].normal,this.corners[2].normal)) > options.normTol || verb.core.Vec.normSquared(verb.core.Vec.sub(this.corners[3].normal,this.corners[0].normal)) > options.normTol;
 		if(this.splitVert || this.splitHoriz) return true;
 		var center = this.center();
-		return verb.eval.Vec.normSquared(verb.eval.Vec.sub(center.normal,this.corners[0].normal)) > options.normTol || verb.eval.Vec.normSquared(verb.eval.Vec.sub(center.normal,this.corners[1].normal)) > options.normTol || verb.eval.Vec.normSquared(verb.eval.Vec.sub(center.normal,this.corners[2].normal)) > options.normTol || verb.eval.Vec.normSquared(verb.eval.Vec.sub(center.normal,this.corners[3].normal)) > options.normTol;
+		return verb.core.Vec.normSquared(verb.core.Vec.sub(center.normal,this.corners[0].normal)) > options.normTol || verb.core.Vec.normSquared(verb.core.Vec.sub(center.normal,this.corners[1].normal)) > options.normTol || verb.core.Vec.normSquared(verb.core.Vec.sub(center.normal,this.corners[2].normal)) > options.normTol || verb.core.Vec.normSquared(verb.core.Vec.sub(center.normal,this.corners[3].normal)) > options.normTol;
 	}
 	,divide: function(options) {
-		if(options == null) options = new verb.eval.types.AdaptiveRefinementOptions();
+		if(options == null) options = new verb.core.types.AdaptiveRefinementOptions();
 		if(options.normTol == null) options.normTol = 8.5e-2;
 		if(options.minDepth == null) options.minDepth = 0;
 		if(options.maxDepth == null) options.maxDepth = 10;
@@ -1442,13 +1544,13 @@ verb.eval.types.AdaptiveRefinementNode.prototype = {
 		if(this.horizontal) {
 			var bott = [this.corners[0],this.corners[1],this.midpoint(1),this.midpoint(3)];
 			var top = [this.midpoint(3),this.midpoint(1),this.corners[2],this.corners[3]];
-			this.children = [new verb.eval.types.AdaptiveRefinementNode(this.srf,bott),new verb.eval.types.AdaptiveRefinementNode(this.srf,top)];
+			this.children = [new verb.core.types.AdaptiveRefinementNode(this.srf,bott),new verb.core.types.AdaptiveRefinementNode(this.srf,top)];
 			this.children[0].neighbors = [this.neighbors[0],this.neighbors[1],this.children[1],this.neighbors[3]];
 			this.children[1].neighbors = [this.children[0],this.neighbors[1],this.neighbors[2],this.neighbors[3]];
 		} else {
 			var left = [this.corners[0],this.midpoint(0),this.midpoint(2),this.corners[3]];
 			var right = [this.midpoint(0),this.corners[1],this.corners[2],this.midpoint(2)];
-			this.children = [new verb.eval.types.AdaptiveRefinementNode(this.srf,left),new verb.eval.types.AdaptiveRefinementNode(this.srf,right)];
+			this.children = [new verb.core.types.AdaptiveRefinementNode(this.srf,left),new verb.core.types.AdaptiveRefinementNode(this.srf,right)];
 			this.children[0].neighbors = [this.neighbors[0],this.children[1],this.neighbors[2],this.neighbors[3]];
 			this.children[1].neighbors = [this.neighbors[0],this.neighbors[1],this.neighbors[2],this.children[0]];
 		}
@@ -1461,7 +1563,7 @@ verb.eval.types.AdaptiveRefinementNode.prototype = {
 		}
 	}
 	,triangulate: function(mesh) {
-		if(mesh == null) mesh = verb.eval.types.MeshData.empty();
+		if(mesh == null) mesh = verb.core.types.MeshData.empty();
 		if(this.isLeaf()) return this.triangulateLeaf(mesh);
 		var _g = 0;
 		var _g1 = this.children;
@@ -1530,28 +1632,28 @@ verb.eval.types.AdaptiveRefinementNode.prototype = {
 		return mesh;
 	}
 };
-verb.eval.types.CurveData = $hx_exports.eval.CurveData = function(degree,knots,controlPoints) {
+verb.core.types.CurveData = $hx_exports.core.CurveData = function(degree,knots,controlPoints) {
 	this.degree = degree;
 	this.controlPoints = controlPoints;
 	this.knots = knots;
 };
-verb.eval.types.MeshData = $hx_exports.eval.MeshData = function(faces,vertices,normals,uvs) {
+verb.core.types.MeshData = $hx_exports.core.MeshData = function(faces,vertices,normals,uvs) {
 	this.faces = faces;
 	this.points = vertices;
 	this.normals = normals;
 	this.uvs = uvs;
 };
-verb.eval.types.MeshData.empty = function() {
-	return new verb.eval.types.MeshData([],[],[],[]);
+verb.core.types.MeshData.empty = function() {
+	return new verb.core.types.MeshData([],[],[],[]);
 };
-verb.eval.types.SurfaceData = $hx_exports.eval.SurfaceData = function(degreeU,degreeV,knotsU,knotsV,controlPoints) {
+verb.core.types.SurfaceData = $hx_exports.core.SurfaceData = function(degreeU,degreeV,knotsU,knotsV,controlPoints) {
 	this.degreeU = degreeU;
 	this.degreeV = degreeV;
 	this.knotsU = knotsU;
 	this.knotsV = knotsV;
 	this.controlPoints = controlPoints;
 };
-verb.eval.types.SurfacePoint = function(point,normal,uv,id,degen) {
+verb.core.types.SurfacePoint = function(point,normal,uv,id,degen) {
 	if(degen == null) degen = false;
 	if(id == null) id = -1;
 	this.uv = uv;
@@ -1560,8 +1662,8 @@ verb.eval.types.SurfacePoint = function(point,normal,uv,id,degen) {
 	this.id = id;
 	this.degen = degen;
 };
-verb.eval.types.SurfacePoint.fromUv = function(u,v) {
-	return new verb.eval.types.SurfacePoint(null,null,[u,v]);
+verb.core.types.SurfacePoint.fromUv = function(u,v) {
+	return new verb.core.types.SurfacePoint(null,null,[u,v]);
 };
 function $iterator(o) { if( o instanceof Array ) return function() { return HxOverrides.iter(o); }; return typeof(o.iterator) == 'function' ? $bind(o,o.iterator) : o.iterator; }
 var $_, $fid = 0;
@@ -1597,8 +1699,8 @@ if(Array.prototype.filter == null) Array.prototype.filter = function(f1) {
 	return a1;
 };
 verb.BoundingBox.TOLERANCE = 1e-4;
-verb.eval.Binomial.memo = new haxe.ds.IntMap();
-verb.eval.Constants.TOLERANCE = 1e-6;
-verb.eval.Constants.EPSILON = 1e-10;
+verb.core.Binomial.memo = new haxe.ds.IntMap();
+verb.core.Constants.TOLERANCE = 1e-6;
+verb.core.Constants.EPSILON = 1e-10;
 verb.Init.main();
 })(typeof window != "undefined" ? window : exports);

@@ -1,6 +1,6 @@
 package verb;
 
-import verb.eval.types.CurveData.Point;
+import verb.core.types.CurveData.Point;
 using Lambda;
 
 @:expose("BoundingBox")

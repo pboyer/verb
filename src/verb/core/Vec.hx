@@ -1,8 +1,8 @@
-package verb.eval;
+package verb.core;
 
 using Lambda;
 
-@:expose("eval.Vec")
+@:expose("core.Vec")
 class Vec {
 
     public static function normalized( arr : Array<Float> ){
@@ -81,7 +81,7 @@ class Vec {
     public static function isZero( vec : Array<Float> ){
 
         for (i in 0...vec.length){
-            if (Math.abs( vec[i] ) > verb.eval.Constants.TOLERANCE ) return false;
+            if (Math.abs( vec[i] ) > verb.core.Constants.TOLERANCE ) return false;
         }
 
         return true;

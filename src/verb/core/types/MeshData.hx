@@ -1,11 +1,11 @@
-package verb.eval.types;
+package verb.core.types;
 
-import verb.eval.types.CurveData.Point;
+import verb.core.types.CurveData.Point;
 
 typedef Tri = Array<Int>;
 typedef UV = Array<Float>;
 
-@:expose("eval.MeshData")
+@:expose("core.MeshData")
 class MeshData {
 
     public var faces : Array<Tri>;

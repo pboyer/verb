@@ -1,16 +1,16 @@
 package verb;
 
 import verb.BoundingBox;
-import verb.eval.Constants;
-import verb.eval.Trig;
-import verb.eval.Utils;
-import verb.eval.Nurbs;
-import verb.eval.Mesh;
-import verb.eval.Intersect;
-import verb.eval.Tess;
-import verb.eval.Create;
-import verb.eval.Modify;
-import verb.eval.Analyze;
+import verb.core.Constants;
+import verb.core.Trig;
+import verb.core.Utils;
+import verb.core.Eval;
+import verb.core.Mesh;
+import verb.core.Intersect;
+import verb.core.Tess;
+import verb.core.Make;
+import verb.core.Modify;
+import verb.core.Analyze;
 
 class Init {
 	public static function main():Void {

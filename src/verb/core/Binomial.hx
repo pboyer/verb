@@ -1,4 +1,4 @@
-package verb.eval;
+package verb.core;
 
 import haxe.ds.IntMap;
 

@@ -1,15 +1,15 @@
-package verb.eval;
+package verb.core;
 
-using verb.eval.Utils;
+using verb.core.Utils;
 
-import verb.eval.types.SurfacePoint;
-import verb.eval.types.MeshData;
-import verb.eval.types.AdaptiveRefinementNode;
-import verb.eval.types.SurfaceData;
+import verb.core.types.SurfacePoint;
+import verb.core.types.MeshData;
+import verb.core.types.AdaptiveRefinementNode;
+import verb.core.types.SurfaceData;
 
-import verb.eval.types.CurveData;
+import verb.core.types.CurveData;
 
-@:expose("eval.Tess")
+@:expose("core.Tess")
 class Tess {
 
 	//
@@ -58,9 +58,9 @@ class Tess {
 			u = start + span * i;
 
 			if ( includeU ){
-				p.push( [u].concat( Nurbs.rational_curve_point(curve, u) ) );
+				p.push( [u].concat( Eval.rational_curve_point(curve, u) ) );
 			} else {
-				p.push( Nurbs.rational_curve_point(curve, u) );
+				p.push( Eval.rational_curve_point(curve, u) );
 			}
 
 		}
@@ -86,11 +86,11 @@ class Tess {
 		// if degree is 1, just return the dehomogenized control points
 		if (curve.degree == 1){
 			if ( !includeU ) {
-				return curve.controlPoints.map( Nurbs.dehomogenize );
+				return curve.controlPoints.map( Eval.dehomogenize );
 			} else {
 				// the first element of each array is the parameter
 				return [ for (i in 0...curve.controlPoints.length)
-					[ curve.knots[i+1] ].concat( Nurbs.dehomogenize( curve.controlPoints[i] ) ) ];
+					[ curve.knots[i+1] ].concat( Eval.dehomogenize( curve.controlPoints[i] ) ) ];
 			}
 		}
 
@@ -113,11 +113,11 @@ class Tess {
 	public static function rational_curve_adaptive_sample_range( curve : CurveData, start, end, tol, includeU ) : Array<Point>{
 
 		// sample curve at three pts
-		var p1 = Nurbs.rational_curve_point(curve, start),
-			p3 = Nurbs.rational_curve_point(curve, end),
+		var p1 = Eval.rational_curve_point(curve, start),
+			p3 = Eval.rational_curve_point(curve, end),
 			t = 0.5 + 0.2 * Math.random(),
 			mid = start + (end - start) * t,
-			p2 = Nurbs.rational_curve_point(curve, mid);
+			p2 = Eval.rational_curve_point(curve, mid);
 
 		// if the two end control points are coincident, the three point test will always return 0, let's split the curve
 		var diff = Vec.sub( p1, p3);
@@ -186,7 +186,7 @@ class Tess {
 
 				uvs.push( [pt_u, pt_v] );
 
-				var derivs = Nurbs.rational_surface_derivs( surface, 1, pt_u, pt_v );
+				var derivs = Eval.rational_surface_derivs( surface, 1, pt_u, pt_v );
 				var pt = derivs[0][0];
 
 				points.push( pt );
@@ -262,7 +262,7 @@ class Tess {
 				, v = vmin + dv * i;
 
 				// todo: make this faster by specifying n,m
-				var ds = Nurbs.rational_surface_derivs( surface, 1, u, v );
+				var ds = Eval.rational_surface_derivs( surface, 1, u, v );
 
 				var norm = Vec.normalized( Vec.cross(  ds[0][1], ds[1][0] ) );
 				ptrow.push( new SurfacePoint( ds[0][0], norm, [u,v], -1, Vec.isZero( norm ) ) );

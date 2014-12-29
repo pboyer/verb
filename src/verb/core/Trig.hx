@@ -1,7 +1,7 @@
-package verb.eval;
+package verb.core;
 
-import verb.eval.types.CurveData.Point;
-@:expose("eval.Trig")
+import verb.core.types.CurveData.Point;
+@:expose("core.Trig")
 class Trig {
 
     public static function dist_to_seg(a : Point, b : Point, c : Point){

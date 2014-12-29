@@ -72,7 +72,7 @@
             </div>
             
             <div class="content"><div class='highlight'><pre>verb = verb || {};
-verb.eval = verb.eval || {};</pre></div></div>
+verb.core = verb.core || {};</pre></div></div>
             
         </li>
         
@@ -4594,7 +4594,7 @@ verb.eval.intersect_rational_curve_surface_by_aabb_refine = <span class="hljs-fu
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>			, refined_params = verb.eval.refine_rational_curve_surface_intersection( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, start_params );</pre></div></div>
+            <div class="content"><div class='highlight'><pre>			, refined_params = verb.core.refine_rational_curve_surface_intersection( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, degree_crv, knots_crv, homo_control_points_crv, start_params );</pre></div></div>
             
         </li>
         
@@ -4746,7 +4746,7 @@ verb.eval.intersect_rational_curve_surface_by_aabb = <span class="hljs-function"
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>		, mesh = verb.eval.tessellate_rational_surface_naive( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, divs_u, divs_v )</pre></div></div>
+            <div class="content"><div class='highlight'><pre>		, mesh = verb.core.tessellate_rational_surface_naive( degree_u, knots_u, degree_v, knots_v, homo_control_points_srf, divs_u, divs_v )</pre></div></div>
             
         </li>
         
@@ -4777,7 +4777,7 @@ verb.eval.intersect_rational_curve_surface_by_aabb = <span class="hljs-function"
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>		, res = verb.eval.intersect_parametric_polyline_mesh_by_aabb( p1, u1, mesh, verb.range(mesh.faces.length), tol );</pre></div></div>
+            <div class="content"><div class='highlight'><pre>		, res = verb.core.intersect_parametric_polyline_mesh_by_aabb( p1, u1, mesh, verb.range(mesh.faces.length), tol );</pre></div></div>
             
         </li>
         
@@ -5410,8 +5410,8 @@ verb.eval.make_mesh_aabb_tree = <span class="hljs-function"><span class="hljs-ke
 
             </div>
             
-            <div class="content"><div class='highlight'><pre>	aabb.children = [ verb.eval.make_mesh_aabb_tree(points, tris, tri_indices_a), 
-										verb.eval.make_mesh_aabb_tree(points, tris, tri_indices_b) ];</pre></div></div>
+            <div class="content"><div class='highlight'><pre>	aabb.children = [ verb.core.make_mesh_aabb_tree(points, tris, tri_indices_a),
+										verb.core.make_mesh_aabb_tree(points, tris, tri_indices_b) ];</pre></div></div>
             
         </li>
         

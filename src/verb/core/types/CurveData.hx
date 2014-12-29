@@ -1,10 +1,10 @@
-package verb.eval.types;
+package verb.core.types;
 
 typedef Point = Array<Float>;
 typedef KnotArray = Array<Float>;
 typedef CurvePointArray = Array<Point>;
 
-@:expose("eval.CurveData")
+@:expose("core.CurveData")
 class CurveData {
 
 // integer degree of curve

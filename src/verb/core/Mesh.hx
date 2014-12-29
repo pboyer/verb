@@ -1,4 +1,4 @@
-package verb.eval;
+package verb.core;
 
 class Mesh {
     public function new() {

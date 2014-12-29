@@ -1,10 +1,10 @@
-package verb.eval;
+package verb.core;
 
-import verb.eval.types.CurveData;
-import verb.eval.types.CurveData;
-import verb.eval.types.SurfaceData;
+import verb.core.types.CurveData;
+import verb.core.types.CurveData;
+import verb.core.types.SurfaceData;
 
-@:expose("eval.KnotMultiplicity")
+@:expose("core.KnotMultiplicity")
 class KnotMultiplicity {
     public var knot : Float;
     public var mult : Int;
@@ -19,7 +19,7 @@ class KnotMultiplicity {
     }
 }
 
-@:expose("eval.Modify")
+@:expose("core.Modify")
 class Modify {
 
     public static function surface_knot_refine( surface : SurfaceData, knots_to_insert : Array<Float>, useV : Bool ) : SurfaceData {
@@ -89,7 +89,7 @@ class Modify {
         var newpts0 = new Array<Array<Point>>()
         , newpts1 = new Array<Array<Point>>();
 
-        var s = Nurbs.knot_span( degree, u, knots );
+        var s = Eval.knot_span( degree, u, knots );
         var res : CurveData = null;
 
         for (cps in control_points){
@@ -215,7 +215,7 @@ class Modify {
         var knots_to_insert = [for (i in 0...degree+1) u];
         var res = curve_knot_refine( curve, knots_to_insert );
 
-        var s = Nurbs.knot_span( degree, u, knots );
+        var s = Eval.knot_span( degree, u, knots );
 
         var knots0 = res.knots.slice(0, s + degree + 2);
         var knots1 = res.knots.slice( s + 1 );
@@ -251,8 +251,8 @@ class Modify {
         var n = control_points.length - 1
         , m = n + degree + 1
         , r = knots_to_insert.length - 1
-        , a = Nurbs.knot_span( degree, knots_to_insert[0], knots )
-        , b = Nurbs.knot_span( degree, knots_to_insert[r], knots )
+        , a = Eval.knot_span( degree, knots_to_insert[0], knots )
+        , b = Eval.knot_span( degree, knots_to_insert[r], knots )
         , control_points_post = new CurvePointArray()
         , knots_post = new KnotArray();
 
@@ -351,7 +351,7 @@ class Modify {
         var s = 0; // assume original multiplicity is 0 - TODO add check for multiplicity in knots
 
         var num_pts = control_points.length
-        , k = Nurbs.knot_span( degree, u, knots ) // the span in which the knot will be inserted
+        , k = Eval.knot_span( degree, u, knots ) // the span in which the knot will be inserted
         , num_pts_post = num_pts + r // a new control pt for every new knot
         , control_points_temp = new CurvePointArray() // new Array( degree - s )
         , knots_post = new KnotArray() // new Array( knots.length + r )  // r new knots
