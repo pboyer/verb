@@ -2,35 +2,11 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="938890c0-f1ce-4fbd-8322-63610af7f5e6" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/verbCore.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/verb/eval/Create.hx" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/verb/eval/Intersect.hx" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/verb/eval/Modify.hx" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/verb/eval/Tess.hx" afterPath="" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/verb/eval/Analyze.hx" afterPath="$PROJECT_DIR$/src/verb/core/Analyze.hx" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/verb/eval/Binomial.hx" afterPath="$PROJECT_DIR$/src/verb/core/Binomial.hx" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/verb/eval/Constants.hx" afterPath="$PROJECT_DIR$/src/verb/core/Constants.hx" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/verb/eval/Mesh.hx" afterPath="$PROJECT_DIR$/src/verb/core/Mesh.hx" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/verb/eval/Nurbs.hx" afterPath="$PROJECT_DIR$/src/verb/core/Eval.hx" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/verb/eval/Trig.hx" afterPath="$PROJECT_DIR$/src/verb/core/Trig.hx" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/verb/eval/Utils.hx" afterPath="$PROJECT_DIR$/src/verb/core/Utils.hx" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/verb/eval/Vec.hx" afterPath="$PROJECT_DIR$/src/verb/core/Vec.hx" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/verb/eval/types/AdaptiveRefinementNode.hx" afterPath="$PROJECT_DIR$/src/verb/core/types/AdaptiveRefinementNode.hx" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/verb/eval/types/CurveData.hx" afterPath="$PROJECT_DIR$/src/verb/core/types/CurveData.hx" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/verb/eval/types/MeshData.hx" afterPath="$PROJECT_DIR$/src/verb/core/types/MeshData.hx" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/verb/eval/types/SurfaceData.hx" afterPath="$PROJECT_DIR$/src/verb/core/types/SurfaceData.hx" />
-      <change type="MOVED" beforePath="$PROJECT_DIR$/src/verb/eval/types/SurfacePoint.hx" afterPath="$PROJECT_DIR$/src/verb/core/types/SurfacePoint.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/BoundingBox.hx" afterPath="$PROJECT_DIR$/src/verb/BoundingBox.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/Init.hx" afterPath="$PROJECT_DIR$/src/verb/Init.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/eval/eval2.js" afterPath="$PROJECT_DIR$/src/eval/eval2.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/Make.hx" afterPath="$PROJECT_DIR$/src/verb/core/Make.hx" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/eval/geom2.js" afterPath="$PROJECT_DIR$/src/eval/geom2.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/eval/intersect2.js" afterPath="$PROJECT_DIR$/src/eval/intersect2.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/test.js" afterPath="$PROJECT_DIR$/test/test.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/docs/verb.html" afterPath="$PROJECT_DIR$/docs/verb.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/verb.js" afterPath="$PROJECT_DIR$/build/verb.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/verb.min.js" afterPath="$PROJECT_DIR$/build/verb.min.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/verbHaxe.js" afterPath="$PROJECT_DIR$/build/verbHaxe.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="verb.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -68,10 +44,11 @@
       <file leaf-file-name="test.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/test/test.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.16216215" vertical-offset="26094" max-vertical-offset="95505">
-              <caret line="1792" column="23" selection-start-line="1792" selection-start-column="23" selection-end-line="1792" selection-end-column="23" />
+            <state vertical-scroll-proportion="0.27799228" vertical-offset="28674" max-vertical-offset="93540">
+              <caret line="2103" column="0" selection-start-line="2103" selection-start-column="0" selection-end-line="2103" selection-end-column="0" />
               <folding>
-                <element signature="e#0#173702#0" expanded="false" />
+                <element signature="e#0#173746#0" expanded="false" />
+                <element signature="e#0#173746#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -80,26 +57,10 @@
       <file leaf-file-name="geom2.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/eval/geom2.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="11643" max-vertical-offset="13125">
-              <caret line="845" column="121" selection-start-line="845" selection-start-column="121" selection-end-line="845" selection-end-column="121" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="10278" max-vertical-offset="11550">
+              <caret line="689" column="0" selection-start-line="689" selection-start-column="0" selection-end-line="689" selection-end-column="0" />
               <folding>
-                <element signature="e#0#49539#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Tess.hx" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/verb/core/Tess.hx">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="30" max-vertical-offset="2235">
-              <caret line="3" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
-              <folding>
-                <element signature="e#1321#1691#0" expanded="false" />
-                <element signature="e#2211#2710#0" expanded="false" />
-                <element signature="e#3212#4387#0" expanded="false" />
-                <element signature="e#4778#5944#0" expanded="false" />
-                <element signature="e#6338#8354#0" expanded="false" />
+                <element signature="e#0#46823#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -118,10 +79,11 @@
       <file leaf-file-name="Make.hx" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/verb/core/Make.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="438" max-vertical-offset="1950">
-              <caret line="83" column="34" selection-start-line="83" selection-start-column="34" selection-end-line="83" selection-end-column="34" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="1110" max-vertical-offset="2040">
+              <caret line="206" column="17" selection-start-line="206" selection-start-column="17" selection-end-line="206" selection-end-column="17" />
               <folding>
                 <element signature="e#435#1704#0" expanded="false" />
+                <element signature="e#2419#4909#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -204,7 +166,6 @@
         <option value="$PROJECT_DIR$/src/eval/geom.js" />
         <option value="$PROJECT_DIR$/src/eval/eval2.js" />
         <option value="$PROJECT_DIR$/src/verb/eval/Create.hx" />
-        <option value="$PROJECT_DIR$/src/eval/geom2.js" />
         <option value="$PROJECT_DIR$/src/verb/eval/Intersect.hx" />
         <option value="$PROJECT_DIR$/src/eval/intersect2.js" />
         <option value="$PROJECT_DIR$/src/verb/eval/Make.hx" />
@@ -226,15 +187,16 @@
         <option value="$PROJECT_DIR$/src/verb/core/Modify.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/types/SurfaceData.hx" />
         <option value="$PROJECT_DIR$/build/verbHaxe.js" />
+        <option value="$PROJECT_DIR$/src/eval/geom2.js" />
         <option value="$PROJECT_DIR$/src/verb/core/Make.hx" />
         <option value="$PROJECT_DIR$/test/test.js" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="38" />
+    <option name="x" value="268" />
     <option name="y" value="22" />
-    <option name="width" value="1402" />
+    <option name="width" value="1172" />
     <option name="height" value="874" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
@@ -594,7 +556,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="38" y="22" width="1402" height="874" extended-state="0" />
+    <frame x="268" y="22" width="1172" height="874" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -613,7 +575,7 @@
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.1676177" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.20051195" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -1006,16 +968,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/eval/geom2.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="11643" max-vertical-offset="13125">
-          <caret line="845" column="121" selection-start-line="845" selection-start-column="121" selection-end-line="845" selection-end-column="121" />
-          <folding>
-            <element signature="e#0#49539#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/eval/eval2.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="25830">
@@ -1034,22 +986,34 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/eval/geom2.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="10278" max-vertical-offset="11550">
+          <caret line="689" column="0" selection-start-line="689" selection-start-column="0" selection-end-line="689" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#46823#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/verb/core/Make.hx">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="438" max-vertical-offset="1950">
-          <caret line="83" column="34" selection-start-line="83" selection-start-column="34" selection-end-line="83" selection-end-column="34" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="1110" max-vertical-offset="2040">
+          <caret line="206" column="17" selection-start-line="206" selection-start-column="17" selection-end-line="206" selection-end-column="17" />
           <folding>
             <element signature="e#435#1704#0" expanded="false" />
+            <element signature="e#2419#4909#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test/test.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.16216215" vertical-offset="26094" max-vertical-offset="95505">
-          <caret line="1792" column="23" selection-start-line="1792" selection-start-column="23" selection-end-line="1792" selection-end-column="23" />
+        <state vertical-scroll-proportion="0.27799228" vertical-offset="28674" max-vertical-offset="93540">
+          <caret line="2103" column="0" selection-start-line="2103" selection-start-column="0" selection-end-line="2103" selection-end-column="0" />
           <folding>
-            <element signature="e#0#173702#0" expanded="false" />
+            <element signature="e#0#173746#0" expanded="false" />
+            <element signature="e#0#173746#0" expanded="false" />
           </folding>
         </state>
       </provider>

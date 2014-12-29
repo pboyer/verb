@@ -1907,6 +1907,203 @@ describe("verb.core.Make.ellipse_arc",function(){
 
 });
 
+
+describe("verb.core.Make.extruded_surface",function(){
+
+	it('can extrude a line into a plane', function(){
+
+		var axis = [0,0,1]
+			, length = 5
+			, prof_degree = 1
+			, prof_ctrl_pts = [[0,1,0,1], [1,0,0,1]]
+			, prof_knots = [0,0,1,1]
+			, profile = new verb.core.CurveData( prof_degree, prof_knots, prof_ctrl_pts  );
+
+		var comps = verb.core.Make.extruded_surface(axis, length, profile);
+
+		// the first row are the profile control pts
+		should.equal( 0, comps.controlPoints[2][0][0] );
+		should.equal( 1, comps.controlPoints[2][0][1] );
+		should.equal( 0, comps.controlPoints[2][0][2] );
+
+		should.equal( 1, comps.controlPoints[2][1][0] );
+		should.equal( 0, comps.controlPoints[2][1][1] );
+		should.equal( 0, comps.controlPoints[2][1][2] );
+
+		// sample at the center
+		var p = verb.core.Eval.rational_surface_point( comps, 0.5, 0.5);
+
+		should.equal( Math.abs( 0.5 - p[0]) < verb.core.Constants.EPSILON, true );
+		should.equal( Math.abs( 0.5 - p[1]) < verb.core.Constants.EPSILON, true );
+		should.equal( Math.abs( 2.5 - p[2]) < verb.core.Constants.EPSILON, true );
+
+	});
+
+	it('can extrude a 90 deg quadratic arc bezier curve', function(){
+
+		var axis = [0,0,1]
+			, length = 5
+			, prof_degree = 2
+			, prof_ctrl_pts = [[0,1,0], [1,1,0], [1,0,0]]
+			, prof_knots = [0,0,0,1,1,1]
+			, prof_weights = [1, Math.sqrt(2) / 2, 1]
+			, profile = new verb.core.CurveData( prof_degree, prof_knots,
+													verb.core.Eval.homogenize_1d(prof_ctrl_pts, prof_weights)  );
+
+		var comps = verb.core.Make.extruded_surface(axis, length, profile);
+
+		// the first row are the profile control pts
+		should.equal( 0, comps.controlPoints[2][0][0] );
+		should.equal( 1, comps.controlPoints[2][0][1] );
+		should.equal( 0, comps.controlPoints[2][0][2] );
+		should.equal( 1, comps.controlPoints[2][0][3] );
+
+		should.equal( Math.sqrt(2) / 2, comps.controlPoints[2][1][0] );
+		should.equal( Math.sqrt(2) / 2, comps.controlPoints[2][1][1] );
+		should.equal( 0, comps.controlPoints[2][1][2] );
+		should.equal( Math.sqrt(2) / 2, comps.controlPoints[2][1][3] );
+
+		should.equal( 1, comps.controlPoints[2][2][0] );
+		should.equal( 0, comps.controlPoints[2][2][1] );
+		should.equal( 0, comps.controlPoints[2][2][2] );
+		should.equal( 1, comps.controlPoints[2][2][3] );
+
+		// sample at the center
+		var p = verb.core.Eval.rational_surface_point( comps, 0.5, 0.5);
+
+		should.equal( Math.abs( Math.sqrt(2)/2 - p[0]) < verb.core.Constants.EPSILON, true );
+		should.equal( Math.abs( Math.sqrt(2)/2 - p[1]) < verb.core.Constants.EPSILON, true );
+		should.equal( Math.abs( 2.5 - p[2]) < verb.core.Constants.EPSILON, true );
+
+	});
+
+});
+
+
+describe("verb.core.Make.arc",function(){
+
+	it('returns correct result for unit arc from 0 to 90 deg', function(){
+
+		var center = [0,0,0]
+			, x = [1,0,0]
+			, y = [0,1,0]
+			, r = 1
+			, start = 0
+			, end = Math.PI/2;
+
+		var arc = verb.core.Make.arc(center, x, y, 1, start, end);
+
+		var p = verb.core.Eval.rational_curve_point( arc, 0.5);
+
+		should.equal( Math.abs( p[0] - Math.sqrt(2)/2 ) < verb.core.Constants.EPSILON, true );
+		should.equal( Math.abs( p[1] - Math.sqrt(2)/2 ) < verb.core.Constants.EPSILON, true );
+		should.equal( p[2], 0 );
+
+	});
+
+	it('returns correct result for unit arc from 0 to 45 deg', function(){
+
+		var center = [0,0,0]
+			, x = [1,0,0]
+			, y = [0,1,0]
+			, r = 1
+			, start = 0
+			, end = Math.PI/4;
+
+		var arc = verb.core.Make.arc(center, x, y, 1, start, end);
+
+		var p = verb.core.Eval.rational_curve_point( arc, 1);
+
+		should.equal( Math.abs( p[0] - Math.sqrt(2)/2 ) < verb.core.Constants.EPSILON, true );
+		should.equal( Math.abs( p[1] - Math.sqrt(2)/2 ) < verb.core.Constants.EPSILON, true );
+		should.equal( p[2], 0 );
+
+	});
+
+	it('returns correct result for unit arc from 45 to 135 deg', function(){
+
+		var center = [0,0,0]
+			, x = [1,0,0]
+			, y = [0,1,0]
+			, r = 1
+			, start = Math.PI/4
+			, end = 3 * Math.PI/4;
+
+		var arc = verb.core.Make.arc(center, x, y, 1, start, end);
+
+		var p = verb.core.Eval.rational_curve_point( arc, 0.5);
+
+		should.equal( Math.abs( p[0] ) < verb.core.Constants.EPSILON, true );
+		should.equal( Math.abs( p[1] - 1 ) < verb.core.Constants.EPSILON, true );
+		should.equal( p[2], 0 );
+
+	});
+
+	it('returns correct result for unit circle', function(){
+
+		var center = [0,0,0]
+			, x = [1,0,0]
+			, y = [0,1,0]
+			, r = 5
+			, start = 0
+			, end = Math.PI;
+
+		var arc = verb.core.Make.arc(center, x, y, r, start, end);
+
+		var p = verb.core.Eval.rational_curve_point( arc, 0.5);
+
+		p[0].should.be.approximately( 0, verb.core.Constants.EPSILON );
+		p[1].should.be.approximately( 5 , verb.core.Constants.EPSILON);
+		p[2].should.be.approximately( 0, verb.core.Constants.EPSILON );
+
+	});
+
+	it('returns correct result for unit circle', function(){
+
+		var center = [0,0,0]
+			, x = [1,0,0]
+			, y = [0,1,0]
+			, r = 1
+			, start = 0
+			, end = Math.PI * 2;
+
+		var arc = verb.core.Make.arc(center, x, y, 1, start, end);
+
+		var p = verb.core.Eval.rational_curve_point( arc, 0.5);
+
+		should.equal( Math.abs( p[0] + 1) < verb.core.Constants.EPSILON, true );
+		should.equal( Math.abs( p[1] ) < verb.core.Constants.EPSILON, true );
+		should.equal( p[2], 0 );
+
+	});
+
+});
+
+describe("verb.core.Make.polyline_curve",function(){
+
+	it('can create a polyline with correct structure', function(){
+
+		var degree = 1
+			, knots = [0, 0, 0.25, 0.5, 0.75, 1, 1]
+			, controlPoints = [ [0, 0, 0], [10, 10, 0], [14, 20, 0], [10, 32, 4], [12, 16, 22] ]
+			, weights = [1, 1, 1, 1, 1];
+
+		var comps = verb.core.Make.polyline_curve( controlPoints );
+
+		comps.degree.should.equal(degree);
+		comps.controlPoints.should.eql( verb.core.Eval.homogenize_1d( controlPoints, weights ));
+
+		// natural parameterization
+		for (var i = 1; i < knots.length-1; i++){
+			vecShouldBe( controlPoints[i-1], verb.core.Eval.rational_curve_point(comps, comps.knots[i] ) );
+		}
+
+	});
+
+});
+
+
+
 /*
 
 describe("verb.core.Eval.tri_centroid",function(){
@@ -2080,105 +2277,6 @@ describe("verb.core.Eval.dist_to_ray",function(){
 
 });
 
-describe("verb.core.Eval.arc",function(){
-
-	it('returns correct result for unit arc from 0 to 90 deg', function(){
-
-		var center = [0,0,0]
-			, x = [1,0,0]
-			, y = [0,1,0]
-			, r = 1
-			, start = 0
-			, end = Math.PI/2;
-
-		var arc = verb.core.Eval.arc(center, x, y, 1, start, end);
-
-		var p = verb.core.Eval.rational_curve_point( arc, 0.5);
-
-		should.equal( Math.abs( p[0] - Math.sqrt(2)/2 ) < verb.core.Constants.EPSILON, true );
-		should.equal( Math.abs( p[1] - Math.sqrt(2)/2 ) < verb.core.Constants.EPSILON, true );
-		should.equal( p[2], 0 );
-
-	});
-
-	it('returns correct result for unit arc from 0 to 45 deg', function(){
-
-		var center = [0,0,0]
-			, x = [1,0,0]
-			, y = [0,1,0]
-			, r = 1
-			, start = 0
-			, end = Math.PI/4;
-
-		var arc = verb.core.Eval.arc(center, x, y, 1, start, end);
-
-		var p = verb.core.Eval.rational_curve_point( arc, 1);
-
-		should.equal( Math.abs( p[0] - Math.sqrt(2)/2 ) < verb.core.Constants.EPSILON, true );
-		should.equal( Math.abs( p[1] - Math.sqrt(2)/2 ) < verb.core.Constants.EPSILON, true );
-		should.equal( p[2], 0 );
-
-	});
-
-	it('returns correct result for unit arc from 45 to 135 deg', function(){
-
-		var center = [0,0,0]
-			, x = [1,0,0]
-			, y = [0,1,0]
-			, r = 1
-			, start = Math.PI/4
-			, end = 3*Math.PI/4;
-
-		var arc = verb.core.Eval.arc(center, x, y, 1, start, end);
-
-		var p = verb.core.Eval.rational_curve_point( arc, 0.5);
-
-		should.equal( Math.abs( p[0] ) < verb.core.Constants.EPSILON, true );
-		should.equal( Math.abs( p[1] - 1 ) < verb.core.Constants.EPSILON, true );
-		should.equal( p[2], 0 );
-
-	});
-
-	it('returns correct result for unit circle', function(){
-
-		var center = [0,0,0]
-			, x = [1,0,0]
-			, y = [0,1,0]
-			, r = 5
-			, start = 0
-			, end = Math.PI;
-
-		var arc = verb.core.Eval.arc(center, x, y, r, start, end);
-
-		var p = verb.core.Eval.rational_curve_point( arc, 0.5);
-
-		p[0].should.be.approximately( 0, verb.core.Constants.EPSILON );
-		p[1].should.be.approximately( 5 , verb.core.Constants.EPSILON);
-		p[2].should.be.approximately( 0, verb.core.Constants.EPSILON );
-
-	});
-
-	it('returns correct result for unit circle', function(){
-
-		var center = [0,0,0]
-			, x = [1,0,0]
-			, y = [0,1,0]
-			, r = 1
-			, start = 0
-			, end = Math.PI * 2;
-
-		var arc = verb.core.Eval.arc(center, x, y, 1, start, end);
-
-		var p = verb.core.Eval.rational_curve_point( arc, 0.5);
-
-		should.equal( Math.abs( p[0] + 1) < verb.core.Constants.EPSILON, true );
-		should.equal( Math.abs( p[1] ) < verb.core.Constants.EPSILON, true );
-		should.equal( p[2], 0 );
-
-	});
-
-});
-
 describe("verb.core.Eval.revolved_surface",function(){
 
 	it('creates a 90 degree cone with the given line for a profile', function(){
@@ -2289,83 +2387,6 @@ describe("verb.core.Eval.revolved_surface",function(){
 
 });
 
-describe("verb.core.Eval.extruded_surface",function(){
-
-	it('can extrude a line into a plane', function(){
-
-		var axis = [0,0,1]
-			, length = 5
-			, prof_degree = 1
-			, prof_ctrl_pts = [[0,1,0], [1,0,0]]
-			, prof_knots = [0,0,1,1]
-			, prof_weights = [1,1];
-
-		var comps = verb.core.Eval.extruded_surface(axis, length, prof_knots, prof_degree, prof_ctrl_pts, prof_weights);
-
-		// the first row are the profile control pts
-		should.equal( 0, comps.controlPoints[2][0][0] );
-		should.equal( 1, comps.controlPoints[2][0][1] );
-		should.equal( 0, comps.controlPoints[2][0][2] );
-
-		should.equal( 1, comps.controlPoints[2][1][0] );
-		should.equal( 0, comps.controlPoints[2][1][1] );
-		should.equal( 0, comps.controlPoints[2][1][2] );
-
-		// sample at the center
-		var p = verb.core.Eval.rational_surface_point( comps.degree_u,
-														comps.knots_u, 
-														comps.degree_v,
-														comps.knots_v, 
-														verb.core.Eval.homogenize_2d( comps.controlPoints, comps.weights), 
-														0.5, 
-														0.5);
- 
-		should.equal( Math.abs( 0.5 - p[0]) < verb.core.Constants.EPSILON, true );
-		should.equal( Math.abs( 0.5 - p[1]) < verb.core.Constants.EPSILON, true );
-		should.equal( Math.abs( 2.5 - p[2]) < verb.core.Constants.EPSILON, true );
-
-	});
-
-	it('can extrude a 90 deg quadratic arc bezier curve', function(){
-
-		var axis = [0,0,1]
-			, length = 5
-			, prof_degree = 2
-			, prof_ctrl_pts = [[0,1,0], [1,1,0], [1,0,0]]
-			, prof_knots = [0,0,0,1,1,1]
-			, prof_weights = [1, Math.sqrt(2) / 2, 1];
-
-		var comps = verb.core.Eval.extruded_surface(axis, length, prof_knots, prof_degree, prof_ctrl_pts, prof_weights);
-
-		// the first row are the profile control pts
-		should.equal( 0, comps.controlPoints[2][0][0] );
-		should.equal( 1, comps.controlPoints[2][0][1] );
-		should.equal( 0, comps.controlPoints[2][0][2] );
-
-		should.equal( 1, comps.controlPoints[2][1][0] );
-		should.equal( 1, comps.controlPoints[2][1][1] );
-		should.equal( 0, comps.controlPoints[2][1][2] );
-
-		should.equal( 1, comps.controlPoints[2][2][0] );
-		should.equal( 0, comps.controlPoints[2][2][1] );
-		should.equal( 0, comps.controlPoints[2][2][2] );
-
-		// sample at the center
-		var p = verb.core.Eval.rational_surface_point( comps.degree_u,
-														comps.knots_u, 
-														comps.degree_v,
-														comps.knots_v, 
-														verb.core.Eval.homogenize_2d( comps.controlPoints, comps.weights), 
-														0.5, 
-														0.5);
-
-		should.equal( Math.abs( Math.sqrt(2)/2 - p[0]) < verb.core.Constants.EPSILON, true );
-		should.equal( Math.abs( Math.sqrt(2)/2 - p[1]) < verb.core.Constants.EPSILON, true );
-		should.equal( Math.abs( 2.5 - p[2]) < verb.core.Constants.EPSILON, true );
-
-	});
-
-});
 
 describe("verb.core.Eval.cylinder_surface",function(){
 
@@ -2435,25 +2456,6 @@ describe("verb.core.Eval.cylinder_surface",function(){
 
 });
 
-describe("verb.core.Eval.polyline_curve",function(){
-
-	it('can create a polyline with correct structure', function(){
-
-		var degree = 1
-			, knots = [0, 0, 0.25, 0.5, 0.75, 1, 1]
-			, controlPoints = [ [0, 0, 0], [10, 10, 0], [14, 20, 0], [10, 32, 4], [12, 16, 22] ]
-			, weights = [1, 1, 1, 1, 1];
-
-		var comps = verb.core.Eval.polyline_curve( controlPoints );
-
-		comps.degree.should.equal(degree);
-		comps.knots.should.eql(knots);
-		comps.controlPoints.should.eql(controlPoints);
-		comps.weights.should.eql(weights);
-
-	});
-
-});
 
 describe("verb.core.Eval.cone_surface",function(){
 

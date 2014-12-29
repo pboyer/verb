@@ -688,45 +688,6 @@ public static function sphere_surface( center, axis, xaxis, radius ){
 }
 
 
-//
-//
-//
-// Generate the control points, weights, and knots of a polyline curve
-//
-// **params**
-// + array of points in curve
-// 
-// **returns** 
-// + an object with the following properties: control_points, weights, knots, degree
-//
-
-public static function polyline_curve( pts ){
-
-	var num_spans = pts.length - 1
-		, span = 1.0 / num_spans
-		, knots = [0,0];
-
-	for (var i = 1; i < num_spans; i++){
-		knots.push(i * span);
-	}
-
-	knots.push(1);
-	knots.push(1);
-
-	var weights = [];
-
-	for (var i = 0; i < pts.length; i++){
-		weights.push(1);
-	}
-
-	return {
-			"knots": knots, 
-			"control_points": pts.slice(0), 
-			"degree": 1,
-			"weights": weights 
-		};
-			
-}
 
 //
 // ####cylinder_surface( axis, xaxis, base, height, radius )
@@ -779,50 +740,6 @@ public static function cone_surface( axis, xaxis, base, height, radius ){
 
 	return verb.eval.revolved_surface(base, axis, angle, prof_knots, prof_degree, prof_ctrl_pts, prof_weights);
 
-}
-
-//
-// ####extruded_surface( axis, length, prof_knots, prof_degree, prof_control_points, prof_weights)
-//
-// Generate the control points, weights, and knots of an extruded surface
-//
-// **params**
-// + axis of the extrusion
-// + length of the extrusion
-// + degree of the profile
-// + control points of the profile
-// + weights of the profile
-// 
-// **returns** 
-// + an object with the following properties: control_points, weights, knots, degree
-//
-
-public static function extruded_surface( axis, length, prof_knots, prof_degree, prof_control_points, prof_weights){
-
-	var control_points = Vec.zeros2d( 3, prof_control_points.length )
-		, weights = Vec.zeros2d( 3, prof_control_points.length );
-
-	var translation = Vec.mul(axis, length);
-	var halfTranslation = Vec.mul(axis, 0.5 * length);
-
-	// original control points
-	for (var j = 0; j < prof_control_points.length; j++){
-		control_points[2][j] = prof_control_points[j];
-		control_points[1][j] = Vec.add( halfTranslation, prof_control_points[j] );
-		control_points[0][j] = Vec.add( translation, prof_control_points[j] );
-
-		weights[0][j] = prof_weights[j];
-		weights[1][j] = prof_weights[j];
-		weights[2][j] = prof_weights[j];
-	}
-
-	// return all parameters
-	return {"knots_u": [0,0,0,1,1,1], 
-			"knots_v": prof_knots, 
-			"control_points": control_points, 
-			"degree_u": 2, 
-			"degree_v": prof_degree, 
-			"weights": weights };
 }
 
 //
@@ -967,28 +884,6 @@ public static function revolved_surface( center, axis, theta, prof_knots, prof_d
 			"degree_u": 2, 
 			"degree_v": prof_degree, 
 			"weights": weights };
-
-}
-
-//
-// Generate the control points, weights, and knots of an arbitrary arc
-// (Corresponds to Algorithm A7.1 from Piegl & Tiller)
-//
-// **params**
-// + the center of the arc
-// + the xaxis of the arc
-// + orthogonal yaxis of the arc
-// + radius of the arc
-// + start angle of the arc, between 0 and 2pi
-// + end angle of the arc, between 0 and 2pi, greater than the start angle
-// 
-// **returns** 
-// + an object with the following properties: control_points, weights, knots, degree
-//
-
-public static function arc( center, xaxis, yaxis, radius, start_angle, end_angle ) {
-
-	return verb.eval.ellipse_arc( center, xaxis, yaxis, radius, radius, start_angle, end_angle );
 
 }
 

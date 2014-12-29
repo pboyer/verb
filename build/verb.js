@@ -743,6 +743,52 @@ verb.core.Make.ellipse_arc = function(center,xaxis,yaxis,xradius,yradius,startAn
 	}
 	return new verb.core.types.CurveData(2,knots,verb.core.Eval.homogenize_1d(controlPoints,weights));
 };
+verb.core.Make.arc = function(center,xaxis,yaxis,radius,start_angle,end_angle) {
+	return verb.core.Make.ellipse_arc(center,xaxis,yaxis,radius,radius,start_angle,end_angle);
+};
+verb.core.Make.polyline_curve = function(pts) {
+	var knots = [0.0,0.0];
+	var lsum = 0.0;
+	var _g1 = 0;
+	var _g = pts.length - 1;
+	while(_g1 < _g) {
+		var i = _g1++;
+		lsum += verb.core.Vec.dist(pts[i],pts[i + 1]);
+		knots.push(lsum);
+	}
+	knots.push(lsum);
+	knots = verb.core.Vec.mul(1 / lsum,knots);
+	var weights;
+	var _g2 = [];
+	var _g21 = 0;
+	var _g11 = pts.length;
+	while(_g21 < _g11) {
+		var i1 = _g21++;
+		_g2.push(1.0);
+	}
+	weights = _g2;
+	return new verb.core.types.CurveData(1,knots,verb.core.Eval.homogenize_1d(pts.slice(0),weights));
+};
+verb.core.Make.extruded_surface = function(axis,length,profile) {
+	var control_points = [[],[],[]];
+	var weights = [[],[],[]];
+	var prof_control_points = verb.core.Eval.dehomogenize_1d(profile.controlPoints);
+	var prof_weights = verb.core.Eval.weight_1d(profile.controlPoints);
+	var translation = verb.core.Vec.mul(length,axis);
+	var halfTranslation = verb.core.Vec.mul(0.5 * length,axis);
+	var _g1 = 0;
+	var _g = prof_control_points.length;
+	while(_g1 < _g) {
+		var j = _g1++;
+		control_points[2][j] = prof_control_points[j];
+		control_points[1][j] = verb.core.Vec.add(halfTranslation,prof_control_points[j]);
+		control_points[0][j] = verb.core.Vec.add(translation,prof_control_points[j]);
+		weights[0][j] = prof_weights[j];
+		weights[1][j] = prof_weights[j];
+		weights[2][j] = prof_weights[j];
+	}
+	return new verb.core.types.SurfaceData(2,profile.degree,[0,0,0,1,1,1],profile.knots,verb.core.Eval.homogenize_2d(control_points,weights));
+};
 verb.core.Mesh = function() {
 };
 verb.core.KnotMultiplicity = $hx_exports.core.KnotMultiplicity = function(knot,mult) {

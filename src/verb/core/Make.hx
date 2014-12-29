@@ -50,8 +50,6 @@ class Make {
 
 
     //
-    // ####ellipse_arc( center, xaxis, yaxis, xradius, yradius, start_angle, end_angle )
-    //
     // Generate the control points, weights, and knots of an elliptical arc
     //
     // **params**
@@ -64,7 +62,7 @@ class Make {
     // + end angle of the arc, between 0 and 2pi, greater than the start angle
     //
     // **returns**
-    // + an object with the following properties: control_points, weights, knots, degree
+    // + a CurveData object representing a NURBS curve
     //
 
     public static function ellipse_arc( center : Point, xaxis : Point, yaxis : Point, xradius : Float,
@@ -151,6 +149,95 @@ class Make {
         return new CurveData( 2, knots, Eval.homogenize_1d( controlPoints, weights ));
     }
 
+
+    //
+    // Generate the control points, weights, and knots of an arbitrary arc
+    // (Corresponds to Algorithm A7.1 from Piegl & Tiller)
+    //
+    // **params**
+    // + the center of the arc
+    // + the xaxis of the arc
+    // + orthogonal yaxis of the arc
+    // + radius of the arc
+    // + start angle of the arc, between 0 and 2pi
+    // + end angle of the arc, between 0 and 2pi, greater than the start angle
+    //
+    // **returns**
+    // + a CurveData object representing a NURBS curve
+    //
+
+    public static function arc( center, xaxis, yaxis, radius, start_angle, end_angle ) {
+        return ellipse_arc( center, xaxis, yaxis, radius, radius, start_angle, end_angle );
+    }
+
+
+    //
+    // Generate the control points, weights, and knots of a polyline curve
+    //
+    // **params**
+    // + array of points in curve
+    //
+    // **returns**
+    // + a CurveData object representing a NURBS curve
+    //
+
+    public static function polyline_curve( pts : Array<Point>) : CurveData {
+
+        var knots = [0.0,0.0];
+        var lsum = 0.0;
+
+        for (i in 0...pts.length-1) {
+            lsum += Vec.dist( pts[i], pts[i+1] );
+            knots.push( lsum );
+        }
+        knots.push( lsum );
+
+        // normalize the knot array
+        knots = Vec.mul( 1 / lsum, knots );
+
+        var weights = [ for (i in 0...pts.length) 1.0 ];
+
+        return new CurveData( 1, knots, Eval.homogenize_1d(pts.slice(0), weights ));
+
+    }
+
+    //
+    // Generate the control points, weights, and knots of an extruded surface
+    //
+    // **params**
+    // + axis of the extrusion
+    // + length of the extrusion
+    // + a CurveData object representing a NURBS surface
+    //
+    // **returns**
+    // + an object with the following properties: control_points, weights, knots, degree
+    //
+
+    public static function extruded_surface( axis : Point, length : Float, profile : CurveData ) : SurfaceData {
+
+        var control_points = [[],[],[]]
+        , weights = [[],[],[]];
+
+        var prof_control_points = Eval.dehomogenize_1d( profile.controlPoints );
+        var prof_weights = Eval.weight_1d( profile.controlPoints );
+
+        var translation = Vec.mul( length, axis );
+        var halfTranslation = Vec.mul( 0.5 * length, axis );
+
+        // original control points
+        for (j in 0...prof_control_points.length){
+
+            control_points[2][j] = prof_control_points[j];
+            control_points[1][j] = Vec.add( halfTranslation, prof_control_points[j] );
+            control_points[0][j] = Vec.add( translation, prof_control_points[j] );
+
+            weights[0][j] = prof_weights[j];
+            weights[1][j] = prof_weights[j];
+            weights[2][j] = prof_weights[j];
+        }
+
+        return new SurfaceData( 2, profile.degree, [0,0,0,1,1,1], profile.knots, Eval.homogenize_2d( control_points, weights) );
+    }
 
 
 }
