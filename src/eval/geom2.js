@@ -1,6 +1,4 @@
-
-
-verb.eval.rational_surface_closest_point = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, p ){
+public static function rational_surface_closest_point( degree_u, knots_u, degree_v, knots_v, homo_control_points, p ){
 
 	// for surfaces, we try to minimize the following:
 	// 
@@ -202,7 +200,7 @@ verb.eval.rational_surface_closest_point = function( degree_u, knots_u, degree_v
 
 }
 
-verb.eval.rational_curve_closest_point = function( degree, knots, control_points, p ){
+public static function rational_curve_closest_point( degree, knots, control_points, p ){
 
 	//  We want to solve:
 	// 
@@ -334,7 +332,7 @@ verb.eval.rational_curve_closest_point = function( degree, knots, control_points
 
 }
 
-verb.eval.rational_curve_divide_curve_equally_by_arc_length = function(degree, knots, control_points, num){
+public static function rational_curve_divide_curve_equally_by_arc_length(degree, knots, control_points, num){
 
 	var tlen = verb.eval.rational_curve_arc_length( degree, knots, control_points );
 	var inc = tlen / num;
@@ -348,7 +346,7 @@ function CurvePoint(u, len){
 	this.len = len;
 }
 
-verb.eval.rational_curve_divide_curve_by_arc_length = function(degree, knots, control_points, l){
+public static function rational_curve_divide_curve_by_arc_length(degree, knots, control_points, l){
 
 	var crvs = verb.eval.curve_bezier_decompose( degree, knots, control_points )
 		, crvlens = crvs.map(function(x){ return verb.eval.rational_bezier_curve_arc_length( x.degree, x.knots, x.control_points ); })
@@ -388,7 +386,7 @@ verb.eval.rational_curve_divide_curve_by_arc_length = function(degree, knots, co
 
 }
 
-verb.eval.rational_curve_param_at_arc_length = function(degree, knots, control_points, len, tol, beziers, bezier_lengths){
+public static function rational_curve_param_at_arc_length(degree, knots, control_points, len, tol, beziers, bezier_lengths){
 
 	if (len < verb.EPSILON) return knots[0];
 
@@ -417,7 +415,7 @@ verb.eval.rational_curve_param_at_arc_length = function(degree, knots, control_p
 
 }
 
-verb.eval.rational_bezier_curve_param_at_arc_length = function(degree, knots, control_points, len, tol, total_len){
+public static function rational_bezier_curve_param_at_arc_length(degree, knots, control_points, len, tol, total_len){
 
 	if (len < 0) return knots[0];
 
@@ -452,7 +450,7 @@ verb.eval.rational_bezier_curve_param_at_arc_length = function(degree, knots, co
 
 }
 
-verb.eval.rational_curve_arc_length = function(degree, knots, control_points, u){
+public static function rational_curve_arc_length(degree, knots, control_points, u){
 
 	if (u === undefined) u = verb.last( knots );
 
@@ -472,7 +470,7 @@ verb.eval.rational_curve_arc_length = function(degree, knots, control_points, u)
 	
 }
 
-verb.eval.rational_bezier_curve_arc_length = function(degree, knots, control_points, u, gaussDegIncrease) {
+public static function rational_bezier_curve_arc_length(degree, knots, control_points, u, gaussDegIncrease) {
 
   var u = u === undefined ? verb.last(knots) : u
   	, z = (u - knots[0]) / 2
@@ -550,7 +548,7 @@ verb.eval.Cvalues = [[],[],
   [0.1279381953467521569740561652246953718517,0.1279381953467521569740561652246953718517,0.1258374563468282961213753825111836887264,0.1258374563468282961213753825111836887264,0.1216704729278033912044631534762624256070,0.1216704729278033912044631534762624256070,0.1155056680537256013533444839067835598622,0.1155056680537256013533444839067835598622,0.1074442701159656347825773424466062227946,0.1074442701159656347825773424466062227946,0.0976186521041138882698806644642471544279,0.0976186521041138882698806644642471544279,0.0861901615319532759171852029837426671850,0.0861901615319532759171852029837426671850,0.0733464814110803057340336152531165181193,0.0733464814110803057340336152531165181193,0.0592985849154367807463677585001085845412,0.0592985849154367807463677585001085845412,0.0442774388174198061686027482113382288593,0.0442774388174198061686027482113382288593,0.0285313886289336631813078159518782864491,0.0285313886289336631813078159518782864491,0.0123412297999871995468056670700372915759,0.0123412297999871995468056670700372915759]
 ];
 
-verb.eval.rational_interp_curve = function( points, degree, start_tangent, end_tangent ) {
+public static function rational_interp_curve( points, degree, start_tangent, end_tangent ) {
 
 	// 0) build knot vector for curve by normalized chord length
 	// 1) construct effective basis function in square matrix (W)
@@ -739,7 +737,7 @@ verb.eval.get_sweep1_surface = function( profile_knots, profile_degree, profile_
 // + *Object*, an object with the following properties: control_points, weights, knots, degree
 //
 
-verb.eval.get_ellipse_arc = function( center, xaxis, yaxis, xradius, yradius, start_angle, end_angle ) {
+public static function get_ellipse_arc( center, xaxis, yaxis, xradius, yradius, start_angle, end_angle ) {
 
 	// if the end angle is less than the start angle, do a circle
 	if (end_angle < start_angle) end_angle = 2 * Math.PI + start_angle;
@@ -834,7 +832,7 @@ verb.eval.get_ellipse_arc = function( center, xaxis, yaxis, xradius, yradius, st
 // + *Object*, an object with the following properties: control_points, weights, knots_u, knots_v, degree_u, degree_v
 //
 
-verb.eval.get_sphere_surface = function( center, axis, xaxis, radius ){
+public static function get_sphere_surface( center, axis, xaxis, radius ){
 
 	var arc = verb.eval.get_arc(center, numeric.mul(axis, -1), xaxis, radius, 0, Math.PI );
 
@@ -844,7 +842,7 @@ verb.eval.get_sphere_surface = function( center, axis, xaxis, radius ){
 
 
 //
-// ####get_polyline_curve( pts )
+//
 //
 // Generate the control points, weights, and knots of a polyline curve
 //
@@ -855,7 +853,7 @@ verb.eval.get_sphere_surface = function( center, axis, xaxis, radius ){
 // + *Object*, an object with the following properties: control_points, weights, knots, degree
 //
 
-verb.eval.get_polyline_curve = function( pts ){
+public static function get_polyline_curve( pts ){
 
 	var num_spans = pts.length - 1
 		, span = 1.0 / num_spans
@@ -899,7 +897,7 @@ verb.eval.get_polyline_curve = function( pts ){
 // + *Object*, an object with the following properties: control_points, weights, knots_u, knots_v, degree_u, degree_v
 //
 
-verb.eval.get_cylinder_surface = function( axis, xaxis, base, height, radius ){
+public static function get_cylinder_surface( axis, xaxis, base, height, radius ){
 
 	var yaxis = crossprod( axis, xaxis )
 		, angle = 2 * Math.PI
@@ -924,7 +922,7 @@ verb.eval.get_cylinder_surface = function( axis, xaxis, base, height, radius ){
 // + *Object*, an object with the following properties: control_points, weights, knots, degree
 //
 
-verb.eval.get_cone_surface = function( axis, xaxis, base, height, radius ){
+public static function get_cone_surface( axis, xaxis, base, height, radius ){
 
 	var angle = 2 * Math.PI
 		, prof_degree = 1
@@ -952,7 +950,7 @@ verb.eval.get_cone_surface = function( axis, xaxis, base, height, radius ){
 // + *Object*, an object with the following properties: control_points, weights, knots, degree
 //
 
-verb.eval.get_extruded_surface = function( axis, length, prof_knots, prof_degree, prof_control_points, prof_weights){
+public static function get_extruded_surface( axis, length, prof_knots, prof_degree, prof_control_points, prof_weights){
 
 	var control_points = verb.eval.zeros_2d( 3, prof_control_points.length )
 		, weights = verb.eval.zeros_2d( 3, prof_control_points.length );
@@ -1004,7 +1002,7 @@ function crossprod(u,v) {
   return [u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
 }
 
-verb.eval.get_revolved_surface = function( center, axis, theta, prof_knots, prof_degree, prof_control_points, prof_weights){
+public static function get_revolved_surface( center, axis, theta, prof_knots, prof_degree, prof_control_points, prof_weights){
 
 	var narcs, knots_u, control_points, weights;
 
@@ -1151,7 +1149,7 @@ verb.eval.get_revolved_surface = function( center, axis, theta, prof_knots, prof
 // + *Object*, an object with the following properties: control_points, weights, knots, degree
 //
 
-verb.eval.get_arc = function( center, xaxis, yaxis, radius, start_angle, end_angle ) {
+public static function get_arc( center, xaxis, yaxis, radius, start_angle, end_angle ) {
 
 	return verb.eval.get_ellipse_arc( center, xaxis, yaxis, radius, radius, start_angle, end_angle );
 
