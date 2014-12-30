@@ -21,7 +21,6 @@ class Mat {
         return LUsolve( LU(A), b );
     }
 
-
     private static function LUsolve(LUP : LUDecomp, b : Vector) : Vector {
         var i, j;
         var LU = LUP.LU;

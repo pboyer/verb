@@ -1,6 +1,7 @@
 var should = require('should')
 	, verb = require('../build/verbHaxe.js');
 
+// some testing utilities
 function vecShouldBe( expected, test, tol ){
 
 	if (tol === undefined) tol = verb.core.Constants.TOLERANCE;
@@ -11,6 +12,10 @@ function vecShouldBe( expected, test, tol ){
  		test[i].should.be.approximately( expected[i], tol );
  	}
 
+}
+
+function last(a){
+	return a[a.length-1];
 }
 
 console.log(verb)
@@ -2448,10 +2453,6 @@ describe("verb.core.Make.rational_interp_curve",function(){
 
 	}
 
-	function last(a){
-		return a[a.length-1];
-	}
-
 	function shouldInterpPoints(pts, degree, start_tangent, end_tangent){
 
 		var crv = verb.core.Make.rational_interp_curve( pts, degree, start_tangent, end_tangent );
@@ -2557,6 +2558,101 @@ describe("verb.core.Make.rational_interp_curve",function(){
 
 });
 
+describe("verb.core.Analyze.rational_bezier_curve_arc_length",function(){
+
+	it('can compute entire arc length of straight cubic bezier parameterized from 0 to 1', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,1,1,1,1]
+			, controlPoints = [ [0,0,0,1], [1.5,0,0,1], [2,0,0,1], [3,0,0,1] ]
+			, curve = new verb.core.CurveData( degree, knots, controlPoints );
+
+		var res = verb.core.Analyze.rational_bezier_curve_arc_length( curve, 1 );
+
+		res.should.be.approximately( 3, verb.core.Constants.TOLERANCE );
+
+	});
+
+	it('can compute entire arc length of straight cubic bezier parameterized from 1 to 4', function(){
+
+		var degree = 3
+			, knots = [1,1,1,1,4,4,4,4]
+			, controlPoints = [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1] ]
+			, curve = new verb.core.CurveData( degree, knots, controlPoints );
+
+		var res = verb.core.Analyze.rational_bezier_curve_arc_length( curve, 4 );
+
+		res.should.be.approximately( 3, verb.core.Constants.TOLERANCE );
+
+	});
+
+});
+
+describe("verb.core.Analyze.rational_curve_arc_length",function(){
+
+	it('can compute entire arc length of straight nurbs curve parameterized from 0 to 2', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,0.5,2,2,2,2]
+			, controlPoints = [ [0,0,0,1], [1.5,0,0,1], [1.8,0,0,1], [2,0,0,1], [3,0,0,1] ]
+			, curve = new verb.core.CurveData( degree, knots, controlPoints );
+
+		var u = 0;
+		var steps = 2;
+		var inc = (last(knots) - knots[0]) / (steps-1);
+		for (var i = 0; i < steps; i++){
+			var pt = verb.core.Eval.rational_curve_point( curve, u );
+			var res2 = verb.core.Analyze.rational_curve_arc_length( curve, u );
+
+			res2.should.be.approximately( verb.core.Vec.norm( pt ), verb.core.Constants.TOLERANCE );
+
+			u += inc;
+		}
+	});
+
+	it('can compute entire arc length of curved nurbs curve parameterized from 0 to 1', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,0.5,1,1,1,1]
+			, controlPoints = [ [1,1,1,1], [1.5,0,1,1], [1.8,0,0,1], [2,0.1,5,1], [3.1,0,0,1] ]
+			, curve = new verb.core.CurveData( degree, knots, controlPoints );
+
+		var gaussLen = verb.core.Analyze.rational_curve_arc_length( curve );
+
+		// sample the curve with 10,000 pts
+		var samples = verb.core.Tess.rational_curve_regular_sample_range( curve, 0, 1, 10000 );
+
+		var red = samples.reduce(function(acc, v){
+			return { pt: v, l : acc.l + verb.core.Vec.norm( verb.core.Vec.sub( acc.pt, v ) ) };
+		}, { pt: samples[0], l : 0 });
+
+		gaussLen.should.be.approximately( red.l, 1e-3 )
+
+	});
+
+	it('can compute entire arc length of straight nurbs curve parameterized from 0 to 2', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,0.5,2,2,2,2]
+			, controlPoints = [ [0,0,0,1], [1.5,0,0,1], [1.8,0,0,1], [2,0,0,1], [3,0,0,1] ]
+			, curve = new verb.core.CurveData( degree, knots, controlPoints );
+
+		var u = 0;
+		var steps = 10;
+		var inc = (last(knots) - knots[0]) / (steps-1);
+		for (var i = 0; i < steps; i++){
+
+			var pt = verb.core.Eval.rational_curve_point( curve, u );
+			var res2 = verb.core.Analyze.rational_curve_arc_length( curve, u );
+
+			res2.should.be.approximately( verb.core.Vec.norm( pt ), verb.core.Constants.TOLERANCE );
+
+			u += inc;
+		}
+
+	});
+
+});
 /*
 
 describe("verb.core.Eval.tri_centroid",function(){
@@ -5942,104 +6038,8 @@ describe("verb.InterpCurve",function(){
 
 
 
-describe("verb.core.Eval.rational_bezier_curve_arc_length",function(){
 
-	it('can compute entire arc length of straight cubic bezier parameterized from 0 to 1', function(){
-
-		var degree = 3
-			, knots = [0,0,0,0,1,1,1,1]
-			, controlPoints = [ [0,0,0,1], [1.5,0,0,1], [2,0,0,1], [3,0,0,1] ];
-
-		var res = verb.core.Eval.rational_bezier_curve_arc_length( degree, knots, controlPoints, 1 );
-
-		res.should.be.approximately( 3, verb.core.Constants.TOLERANCE );
-
-	});
-
-	it('can compute entire arc length of straight cubic bezier parameterized from 1 to 4', function(){
-
-		var degree = 3
-			, knots = [1,1,1,1,4,4,4,4]
-			, controlPoints = [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1] ];
-
-		var res = verb.core.Eval.rational_bezier_curve_arc_length( degree, knots, controlPoints, 4 );
-
-		res.should.be.approximately( 3, verb.core.Constants.TOLERANCE );
-
-	});
-
-});
-
-describe("verb.core.Eval.rational_curve_arc_length",function(){
-
-	it('can compute entire arc length of straight nurbs curve parameterized from 0 to 2', function(){
-
-		var degree = 3
-			, knots = [0,0,0,0,0.5,2,2,2,2]
-			, controlPoints = [ [0,0,0,1], [1.5,0,0,1], [1.8,0,0,1], [2,0,0,1], [3,0,0,1] ];
-
-		var u = 0;
-		var steps = 2;
-		var inc = (verb.last(knots) - knots[0]) / (steps-1);
-		for (var i = 0; i < steps; i++){
-
-			var pt = verb.core.Eval.rational_curve_point( degree, knots, controlPoints, u );
-			var res2 = verb.core.Eval.rational_curve_arc_length( degree, knots, controlPoints, u );
-
-			res2.should.be.approximately( verb.core.Vec.norm( pt ), verb.core.Constants.TOLERANCE );
-
-			u += inc;
-		}
-
-	});
-
-	it('can compute entire arc length of curved nurbs curve parameterized from 0 to 1', function(){
-
-		var degree = 3
-			, knots = [0,0,0,0,0.5,1,1,1,1]
-			, controlPoints = [ [1,1,1,1], [1.5,0,1,1], [1.8,0,0,1], [2,0.1,5,1], [3.1,0,0,1] ];
-
-		var gaussLen = verb.core.Eval.rational_curve_arc_length( degree, knots, controlPoints );
-
-		// sample the curve with 10,000 pts
-		var samples = verb.core.Eval.rational_curve_regular_sample_range( degree, knots, controlPoints, 0, 1, 10000 );
-
-		var red = samples.reduce(function(acc, v){
-			return { pt: v, l : acc.l + verb.core.Vec.norm( verb.core.Vec.sub( acc.pt, v ) ) };
-		}, { pt: samples[0], l : 0 });
-
-		gaussLen.should.be.approximately( red.l, 1e-3 )
-
-	});
-
-});
-
-describe("verb.core.Eval.rational_curve_arc_length",function(){
-
-	it('can compute entire arc length of straight nurbs curve parameterized from 0 to 2', function(){
-
-		var degree = 3
-			, knots = [0,0,0,0,0.5,2,2,2,2]
-			, controlPoints = [ [0,0,0,1], [1.5,0,0,1], [1.8,0,0,1], [2,0,0,1], [3,0,0,1] ];
-
-		var u = 0;
-		var steps = 10;
-		var inc = (verb.last(knots) - knots[0]) / (steps-1);
-		for (var i = 0; i < steps; i++){
-
-			var pt = verb.core.Eval.rational_curve_point( degree, knots, controlPoints, u );
-			var res2 = verb.core.Eval.rational_curve_arc_length( degree, knots, controlPoints, u );
-
-			res2.should.be.approximately( verb.core.Vec.norm( pt ), verb.core.Constants.TOLERANCE );
-
-			u += inc;
-		}
-
-	});
-
-});
-
-describe("verb.core.Eval.rational_bezier_curve_param_at_arc_length",function(){
+describe("verb.core.Analyze.rational_bezier_curve_param_at_arc_length",function(){
 
 	it('can compute parameter at arc length of straight bezier curve', function(){
 
@@ -6054,8 +6054,8 @@ describe("verb.core.Eval.rational_bezier_curve_param_at_arc_length",function(){
 
 		for (var i = 0; i < steps; i++){
 
-			var u = verb.core.Eval.rational_bezier_curve_param_at_arc_length(degree, knots, controlPoints, d, tol);
-			var len = verb.core.Eval.rational_bezier_curve_arc_length(degree, knots, controlPoints, u);
+			var u = verb.core.Analyze.rational_bezier_curve_param_at_arc_length(curve, d, tol);
+			var len = verb.core.Analyze.rational_bezier_curve_arc_length(curve, u);
 
 			len.should.be.approximately( d, tol );
 
@@ -6077,8 +6077,8 @@ describe("verb.core.Eval.rational_bezier_curve_param_at_arc_length",function(){
 
 		for (var i = 0; i < steps; i++){
 
-			var u = verb.core.Eval.rational_bezier_curve_param_at_arc_length(degree, knots, controlPoints, d, tol);
-			var len = verb.core.Eval.rational_bezier_curve_arc_length(degree, knots, controlPoints, u);
+			var u = verb.core.Analyze.rational_bezier_curve_param_at_arc_length(curve, d, tol);
+			var len = verb.core.Analyze.rational_bezier_curve_arc_length(curve, u);
 
 			len.should.be.approximately( d, tol );
 
@@ -6102,12 +6102,12 @@ describe("verb.core.Eval.rational_curve_param_at_arc_length",function(){
 		var steps = 10;
 		var inc = 4 / (steps-1);
 
-		var u = verb.core.Eval.rational_curve_param_at_arc_length(degree, knots, controlPoints, 2, tol);
+		var u = verb.core.Eval.rational_curve_param_at_arc_length(curve, 2, tol);
 
 		for (var i = 0; i < steps; i++){
 
-			var u = verb.core.Eval.rational_curve_param_at_arc_length(degree, knots, controlPoints, d, tol);
-			var len = verb.core.Eval.rational_curve_arc_length(degree, knots, controlPoints, u);
+			var u = verb.core.Eval.rational_curve_param_at_arc_length(curve, d, tol);
+			var len = verb.core.Analyze.rational_curve_arc_length(curve, u);
 
 			len.should.be.approximately( d, tol );
 
@@ -6129,8 +6129,8 @@ describe("verb.core.Eval.rational_curve_param_at_arc_length",function(){
 
 		for (var i = 0; i < steps; i++){
 
-			var u = verb.core.Eval.rational_curve_param_at_arc_length(degree, knots, controlPoints, d, tol);
-			var len = verb.core.Eval.rational_curve_arc_length(degree, knots, controlPoints, u);
+			var u = verb.core.Eval.rational_curve_param_at_arc_length(curve, d, tol);
+			var len = verb.core.Analyze.rational_curve_arc_length(curve, u);
 
 			len.should.be.approximately( d, tol );
 
@@ -6152,12 +6152,12 @@ describe("verb.core.Eval.rational_curve_divide_curve_by_arc_length",function(){
 			, d = 0.5
 			, tol = 1e-3;
 
-		var res = verb.core.Eval.rational_curve_divide_curve_by_arc_length(degree, knots, controlPoints, d);
+		var res = verb.core.Eval.rational_curve_divide_curve_by_arc_length(curve, d);
 
 		var s = 0;
 		res.forEach(function(u){
 
-			var pt = verb.core.Eval.rational_curve_point( degree, knots, controlPoints, u.u );
+			var pt = verb.core.Eval.rational_curve_point( curve, u.u );
 			u.len.should.be.approximately( s, tol );
 			s += d;
 
@@ -6178,12 +6178,12 @@ describe("verb.core.Eval.rational_curve_divide_curve_equally_by_arc_length",func
 			, tol = 1e-3
 			, d = 4 / divs;
 
-		var res = verb.core.Eval.rational_curve_divide_curve_equally_by_arc_length(degree, knots, controlPoints, divs );
+		var res = verb.core.Eval.rational_curve_divide_curve_equally_by_arc_length(curve, divs );
 
 		var s = 0;
 		res.forEach(function(u){
 
-			var pt = verb.core.Eval.rational_curve_point( degree, knots, controlPoints, u.u );
+			var pt = verb.core.Eval.rational_curve_point( curve, u.u );
 			u.len.should.be.approximately( s, tol );
 			s += d;
 
@@ -6333,25 +6333,25 @@ describe("verb.core.Eval.rational_curve_closest_point",function(){
 			, controlPoints = [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1], [4,0,0,1] ]
 			, pt = [1,0.2,0];
 
-		var res = verb.core.Eval.rational_curve_closest_point(degree, knots, controlPoints, [1,0.2,0] );
-		var p = verb.core.Eval.rational_curve_point( degree, knots, controlPoints, res );
+		var res = verb.core.Eval.rational_curve_closest_point(curve, [1,0.2,0] );
+		var p = verb.core.Eval.rational_curve_point( curve, res );
 
 		vecShouldBe( [1,0,0], p, 1e-3 );
 
-		res = verb.core.Eval.rational_curve_closest_point(degree, knots, controlPoints, [2,0.2,0] );
-		p = verb.core.Eval.rational_curve_point( degree, knots, controlPoints, res );
+		res = verb.core.Eval.rational_curve_closest_point(curve, [2,0.2,0] );
+		p = verb.core.Eval.rational_curve_point( curve, res );
 
 		vecShouldBe( [2,0,0], p, 1e-3 );
 
 		// before start
-		res = verb.core.Eval.rational_curve_closest_point(degree, knots, controlPoints, [-1,0.2,1] );
-		p = verb.core.Eval.rational_curve_point( degree, knots, controlPoints, res );
+		res = verb.core.Eval.rational_curve_closest_point(curve, [-1,0.2,1] );
+		p = verb.core.Eval.rational_curve_point( curve, res );
 
 		vecShouldBe( [0,0,0], p, 1e-3 );
 
 		// beyond end
-		res = verb.core.Eval.rational_curve_closest_point(degree, knots, controlPoints, [5,0.2,0] );
-		p = verb.core.Eval.rational_curve_point( degree, knots, controlPoints, res );
+		res = verb.core.Eval.rational_curve_closest_point(curve, [5,0.2,0] );
+		p = verb.core.Eval.rational_curve_point( curve, res );
 
 		vecShouldBe( [4,0,0], p, 1e-3 );
 
