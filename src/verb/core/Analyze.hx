@@ -1,10 +1,421 @@
 package verb.core;
 
+import verb.core.types.AdaptiveRefinementNode.AdaptiveRefinementOptions;
+import verb.core.types.SurfaceData;
+import verb.core.types.MeshData.UV;
 import verb.core.types.CurveData;
+
 using verb.core.Utils;
+using Lambda;
+using verb.core.Mat;
 
 @:expose("core.Analyze")
 class Analyze {
+
+    public static function is_rational_surface_closed(surface : SurfaceData, uDir : Bool = true ) : Bool {
+
+        var cpts = if (uDir) surface.controlPoints else surface.controlPoints.transpose();
+
+        for (i in 0...cpts[0].length){
+            var test = Vec.dist( cpts.first()[i], cpts.last()[i] ) < Constants.EPSILON;
+            if (!test) return false;
+        }
+
+        return true;
+    }
+
+    public static function rational_surface_closest_point( surface : SurfaceData, p : Point ) : UV {
+
+        // for surfaces, we try to minimize the following:
+        //
+        // f = Su(u,v) * r = 0
+        // g = Sv(u,v) * r = 0
+        //
+        //  where r = S(u,v) - P
+        //
+        // Again, this requires newton iteration, but this time our objective function is vector valued
+        //
+        //    J d = k
+        //
+        //    d =   [ u* - u, v* - v ]
+        //		k = - [ f(u,v), g(u,v) ]
+        //		J =
+        //          |Su|^2   +  Suu * r       Su*Sv  +  Suv * r
+        //		     Su*Sv   +  Svu * r      |Sv|^2  +  Svv * r
+        //
+        //
+        // 	we have similar halting conditions:
+        //
+        //  point coincidence
+        //
+        //		|S(u,v) - p| < e1
+        //
+        //  cosine
+        //
+        //   |Su(u,v)*(S(u,v) - P)|
+        //   ----------------------  < e2
+        //   |Su(u,v)| |S(u,v) - P|
+        //
+        //   |Sv(u,v)*(S(u,v) - P)|
+        //   ----------------------  < e2
+        //   |Sv(u,v)| |S(u,v) - P|
+        //
+        //  1) first check 2 & 3
+        // 	2) if at least one of these is not, compute new value, otherwise halt
+        // 	3) ensure the parameter stays within range
+        // 			* if not closed, don't allow outside of range a-b
+        // 			* if closed (e.g. circle), allow to move back to beginning
+        //  4)  if |(u* - u)C'(u)| < e1, halt
+        //
+
+        var maxits = 5;
+        var i = 0
+        , e
+        , eps1 = 0.0001
+        , eps2 = 0.0005
+        , dif
+        , minu = surface.knotsU[0]
+        , maxu = surface.knotsU.last()
+        , minv = surface.knotsV[0]
+        , maxv = surface.knotsV.last()
+        , closedu = is_rational_surface_closed(surface)
+        , closedv = is_rational_surface_closed(surface, false)
+        , cuv;
+
+        // approximate closest point with tessellation
+        var tess = Tess.tessellate_rational_surface_adaptive( surface, new AdaptiveRefinementOptions() );
+
+        var dmin = Math.POSITIVE_INFINITY;
+
+        for ( i in 0...tess.points.length ){
+            var x = tess.points[i];
+            var d = Vec.normSquared( Vec.sub( p, x ) );
+
+            if ( d < dmin ){
+                dmin = d;
+                cuv = tess.uvs[i];
+            }
+        }
+
+        function f(uv : UV) : Array<Array<Point>> {
+            return Eval.rational_surface_derivs( surface, 2, uv[0], uv[1] );
+        }
+
+        function n(uv : UV, e : Array<Array<Point>>, r : Array<Float>) : UV {
+
+            // f = Su(u,v) * r = 0
+            // g = Sv(u,v) * r = 0
+
+            var Su = e[1][0];
+            var Sv = e[0][1];
+
+            var Suu = e[2][0];
+            var Svv = e[0][2];
+
+            var Suv = e[1][1];
+            var Svu = e[1][1];
+
+            var f = Vec.dot( Su, r );
+            var g = Vec.dot( Sv, r );
+
+            var k = [-f, -g];
+
+            var J00 = Vec.dot( Su, Su ) + Vec.dot( Suu, r );
+            var J01 = Vec.dot( Su, Sv ) + Vec.dot( Suv, r );
+            var J10 = Vec.dot( Su, Sv ) + Vec.dot( Svu, r );
+            var J11 = Vec.dot( Sv, Sv ) + Vec.dot( Svv, r );
+
+            var J = [ [ J00, J01 ], [ J10, J11 ] ];
+
+            //    d =   [ u* - u, v* - v ]
+            //		k = - [ f(u,v), g(u,v) ]
+            //		J =
+            //          |Su|^2   +  Suu * r       Su*Sv  +  Suv * r
+            //		     Su*Sv   +  Svu * r      |Sv|^2  +  Svv * r
+            //
+
+            var d = Mat.solve( J, k );
+
+            return Vec.add( d, uv );
+
+        }
+
+        while( i < maxits ){
+
+            e = f(cuv);
+            dif = Vec.sub(e[0][0], p );
+
+            //  point coincidence
+            //
+            //		|S(u,v) - p| < e1
+            var c1v = Vec.norm( dif );
+
+            //
+            //  cosine
+            //
+            //   |Su(u,v)*(S(u,v) - P)|
+            //   ----------------------  < e2
+            //   |Su(u,v)| |S(u,v) - P|
+            //
+            //   |Sv(u,v)*(S(u,v) - P)|
+            //   ----------------------  < e2
+            //   |Sv(u,v)| |S(u,v) - P|
+            //
+            var c2an = Vec.dot( e[1][0], dif);
+            var c2ad = Vec.norm( e[1][0] ) * c1v;
+
+            var c2bn = Vec.dot( e[0][1], dif);
+            var c2bd = Vec.norm( e[0][1] ) * c1v;
+
+            var c2av = c2an / c2ad;
+            var c2bv = c2bn / c2bd;
+
+            var c1 = c1v < eps1;
+            var c2a = c2av < eps2;
+            var c2b = c2bv < eps2;
+
+            // if all of the tolerance are met, we're done
+            if (c1 && c2a && c2b){
+                return cuv;
+            }
+
+            // otherwise, take a step
+            var ct = n(cuv, e, dif);
+
+            // correct for exceeding bounds
+            if ( ct[0] < minu ){
+                ct = closedu ? [ maxu - ( ct[0] - minu ), ct[1] ] : [ minu + Constants.EPSILON, ct[1] ];
+            } else if (ct[0] > maxu){
+                ct = closedu ? [ minu + ( ct[0] - maxu ), ct[1] ] : [ maxu - Constants.EPSILON, ct[1] ];
+            }
+
+            if ( ct[1] < minv ){
+                ct = closedv ? [ ct[0], maxv - ( ct[1] - minv ) ] : [ ct[0], minv + Constants.EPSILON ];
+            } else if (ct[1] > maxv){
+                ct = closedv ? [ ct[0], minv + ( ct[0] - maxv ) ] : [ ct[0], maxv - Constants.EPSILON ];
+            }
+
+            // if |(u* - u) C'(u)| < e1, halt
+            var c3v0 =  Vec.norm( Vec.mul(ct[0] - cuv[0], e[1][0] ) );
+            var c3v1 =  Vec.norm( Vec.mul(ct[1] - cuv[1], e[0][1] ) );
+
+            if (c3v0 + c3v1 < eps1) {
+                return cuv;
+            }
+
+            cuv = ct;
+            i++;
+
+        }
+
+        return cuv;
+
+    }
+
+
+    public static function rational_curve_closest_point( curve, p ){
+
+        //  We want to solve:
+        //
+        //   C'(u) * ( C(u) - P ) = 0 = f(u)
+        //
+        //  C(u) is the curve, p is the point, * is a dot product
+        //
+        // We'll use newton's method:
+        //
+        // 	 u* = u - f / f'
+        //
+        // We use the product rule in order to form the derivative, f':
+        //
+        //	f' = C"(u) * ( C(u) - p ) + C'(u) * C'(u)
+        //
+        // What is the conversion criteria? (Piegl & Tiller suggest)
+        //
+        // |C(u) - p| < e1
+        //
+        // |C'(u)*(C(u) - P)|
+        // ------------------  < e2
+        // |C'(u)| |C(u) - P|
+        //
+        //  1) first check 2 & 3
+        // 	2) if at least one of these is not, compute new value, otherwise halt
+        // 	3) ensure the parameter stays within range
+        // 			* if not closed, don't allow outside of range a-b
+        // 			* if closed (e.g. circle), allow to move back to beginning
+        //  4)  if |(u* - u)C'(u)| < e1, halt
+        //
+
+        var tol = 1.0e-3;
+        var min = Math.POSITIVE_INFINITY;
+        var u = 0.0;
+
+        var pts = Tess.rational_curve_adaptive_sample( curve, tol, true );
+
+        for ( i in 0...pts.length-1){
+
+            var u0 = pts[i][0];
+            var u1 = pts[i+1][0];
+
+            var p0 = pts[i].slice(1);
+            var p1 = pts[i+1].slice(1);
+
+            var proj = Trig.closest_point_on_segment( p, p0, p1, u0, u1 );
+            var d = Vec.norm( Vec.sub( p, proj.pt ) );
+
+            if ( d < min ){
+                min = d;
+                u = proj.u;
+            }
+        }
+
+        var maxits = 5
+        , i = 0
+        , e
+        , eps1 = 0.0001
+        , eps2 = 0.0005
+        , dif
+        , minu = curve.knots[0]
+        , maxu = curve.knots.last()
+        , closed = Vec.normSquared( Vec.sub( curve.controlPoints[0], curve.controlPoints.last() ) ) < Constants.EPSILON
+        , cu = u;
+
+        function f(u : Float) : Array<Point> {
+            return Eval.rational_curve_derivs( curve, u, 2 );
+        }
+
+        function n(u : Float, e: Array<Point>, d : Array<Float>) : Float {
+            //   C'(u) * ( C(u) - P ) = 0 = f(u)
+            var f = Vec.dot( e[1], d );
+
+            //	f' = C"(u) * ( C(u) - p ) + C'(u) * C'(u)
+            var s0 = Vec.dot( e[2], d )
+            , s1 = Vec.dot( e[1], e[1] )
+            , df = s0 + s1;
+
+            return u - f / df;
+        }
+
+        while( i < maxits ){
+
+            e = f( cu );
+            dif = Vec.sub( e[0], p );
+
+            // |C(u) - p| < e1
+            var c1v = Vec.norm( dif );
+
+            // C'(u) * (C(u) - P)
+            // ------------------ < e2
+            // |C'(u)| |C(u) - P|
+            var c2n = Vec.dot( e[1], dif);
+            var c2d = Vec.norm( e[1] ) * c1v;
+
+            var c2v = c2n / c2d;
+
+            var c1 = c1v < eps1;
+            var c2 = Math.abs(c2v) < eps2;
+
+            // if both tolerances are met
+            if (c1 && c2){
+                return cu;
+            }
+
+            var ct = n(cu, e, dif);
+
+            // are we outside of the bounds of the curve?
+            if ( ct < minu ){
+                ct = closed ? maxu - ( ct - minu ) : minu;
+            } else if (ct > maxu){
+                ct = closed ? minu + ( ct - maxu ) : maxu;
+            }
+
+            // will our next step force us out of the curve?
+            var c3v = Vec.norm( Vec.mul(ct - cu, e[1] ) );
+
+            if (c3v < eps1) {
+                return cu;
+            }
+
+            cu = ct;
+            i++;
+
+        }
+
+        return cu;
+
+    }
+
+    public static function rational_curve_param_at_arc_length(curve : CurveData, len : Float, tol : Float,
+                                                              beziers : Array<CurveData> = null, bezierLengths : Array<Float> = null) : Float {
+
+        if (len < Constants.EPSILON) return curve.knots[0];
+
+        var crvs = if (beziers != null) beziers else Modify.curve_bezier_decompose( curve )
+        , i = 0
+        , cc = crvs[i]
+        , cl = -Constants.EPSILON
+        , bezier_lengths = if (bezierLengths != null) bezierLengths else [];
+
+        // iterate through the curves consuming the bezier's, summing their length along the way
+        while (cl < len && i < crvs.length){
+
+            bezier_lengths[i] = i < bezier_lengths.length ? bezier_lengths[i] : rational_bezier_curve_arc_length( curve );
+
+            cl += bezier_lengths[i];
+
+            if (len < cl + Constants.EPSILON){
+                return rational_bezier_curve_param_at_arc_length(curve, len, tol, bezier_lengths[i]);
+            }
+
+            i++;
+        }
+
+        return -1;
+    }
+
+    //
+    // Get the curve parameter at an arc length
+    //
+    // **params**
+    // + CurveData object representing the curve
+    // + the arc length to find the parameter
+    // + the tolerance - increasing the tolerance can make this computation quite expensive
+    // + the total length of the curve, if already computed
+    //
+    // **returns**
+    // + the parameter
+    //
+    public static function rational_bezier_curve_param_at_arc_length(curve : CurveData, len : Float, tol : Float = null, totalLength : Float = null) : Float {
+        if (len < 0) return curve.knots[0];
+
+        // we compute the whole length.  if desired length is outside of that, give up
+        var totalLen = totalLength != null ? totalLength : rational_bezier_curve_arc_length( curve );
+
+        if (len > totalLen) return curve.knots.last();
+
+        // divide & conquer
+        // TODO: can we use derivative?
+        var start = { p : curve.knots[0], l : 0.0 }
+        , end = { p : curve.knots.last(), l : totalLen }
+        , mid = { p : 0.0, l : 0.0 }
+        , tol = if (tol != null) tol else Constants.TOLERANCE * 2;
+
+        while ( (end.l - start.l) > tol ){
+
+            mid.p = (start.p + end.p) / 2;
+            mid.l = rational_bezier_curve_arc_length(curve, mid.p );
+
+            if (mid.l > len){
+                end.p = mid.p;
+                end.l = mid.l;
+            } else {
+                start.p = mid.p;
+                start.l = mid.l;
+            }
+
+        }
+
+        return (start.p + end.p) / 2;
+    }
 
     //
     // Approximate the length of a rational curve by gaussian quadrature - assumes a smooth curve

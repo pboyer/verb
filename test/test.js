@@ -267,12 +267,12 @@ describe("verb.core.Eval.surface_point_given_n_m",function(){
 		var degreeU = 3
 			, degreeV = 3
 			, knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
-			, knots_v =	[0, 0, 0, 0, 1, 1, 1, 1]
+			, knotsV =	[0, 0, 0, 0, 1, 1, 1, 1]
 			, controlPoints = [ 	[ [0, 0, 50], 		[10, 0, 0], 		[20, 0, 0], 		[30, 0, 0] 		],
 														[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] 	],
 														[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] 	],
 														[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
-			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knots_v, controlPoints )
+			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints )
 			, n = 3
 			, m = 3;
 
@@ -300,12 +300,12 @@ describe("verb.core.Eval.surface_point",function(){
 		var degreeU = 3
 			, degreeV = 3
 			, knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
-			, knots_v =	[0, 0, 0, 0, 1, 1, 1, 1]
+			, knotsV =	[0, 0, 0, 0, 1, 1, 1, 1]
 			, controlPoints = [ 	[ [0, 0, 50], 		[10, 0, 0], 		[20, 0, 0], 		[30, 0, 0] 		],
 									[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] 	],
 									[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] 	],
 									[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
-			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knots_v, controlPoints );
+			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
 
 		var p = verb.core.Eval.surface_point( surface, 0, 0 );
 
@@ -326,10 +326,10 @@ describe("verb.core.Eval.surface_point",function(){
 		var degreeU = 1
 			, degreeV = 3
 			, knotsU = [0, 0, 1, 1 ]
-			, knots_v =	[0, 0, 0, 0, 1, 1, 1, 1]
+			, knotsV =	[0, 0, 0, 0, 1, 1, 1, 1]
 			, controlPoints = [ 	[ [0, 0, 50], 		[10, 0, 0], 		[20, 0, 0], 		[30, 0, 0] 		],
 									[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] 	] ]
-			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knots_v, controlPoints );
+			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
 
 		var p = verb.core.Eval.surface_point( surface, 0, 0 );
 
@@ -352,7 +352,7 @@ describe("verb.core.Eval.surface_derivs_given_n_m",function(){
 			, u = 0.0
 			, v = 0.0
 			, knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
-			, knots_v =	[0, 0, 0, 0, 1, 1, 1, 1]
+			, knotsV =	[0, 0, 0, 0, 1, 1, 1, 1]
 			, controlPoints = [ 	[ [0, 0, 0], 		[10, 10, 0], 		[20, 10, 0], 		[30, 0, 0] 		],
 														[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] 	],
 														[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] 	],
@@ -360,7 +360,7 @@ describe("verb.core.Eval.surface_derivs_given_n_m",function(){
 			, n = 3
 			, m = 3
 			, num_derivatives = 1
-			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knots_v, controlPoints );
+			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
 
 		var p = verb.core.Eval.surface_derivs_given_n_m( n, m, surface, num_derivatives, 0, 0 );
 
@@ -395,7 +395,7 @@ describe("verb.core.Eval.surface_derivs",function(){
 			, u = 0.0
 			, v = 0.0
 			, knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
-			, knots_v =	[0, 0, 0, 0, 1, 1, 1, 1]
+			, knotsV =	[0, 0, 0, 0, 1, 1, 1, 1]
 			, controlPoints = [ 	[ [0, 0, 0], 		[10, 10, 0], 		[20, 10, 0], 		[30, 0, 0] 		],
 														[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] 	],
 														[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] 	],
@@ -403,7 +403,7 @@ describe("verb.core.Eval.surface_derivs",function(){
 			, n = 3
 			, m = 3
 			, num_derivatives = 1
-			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knots_v, controlPoints );
+			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
 
 		var p = verb.core.Eval.surface_derivs( surface, num_derivatives, 0, 0 );
 
@@ -560,10 +560,10 @@ describe("verb.core.Eval.rational_surface_point",function(){
 		var degreeU = 1
 			, degreeV = 2
 			, knotsU = [0, 0, 1, 1 ]
-			, knots_v = [0, 0, 0, 1, 1, 1 ]
+			, knotsV = [0, 0, 0, 1, 1, 1 ]
 			, controlPoints = [ [ [1, 1, 0, 1], 	[1, 1, 1, 1], [2, 0, 2, 2] ],
 													 		  [ [-1, 1, 0, 1], 	[-1, 1, 1, 1], [-2, 0, 2, 2] ] ]
-			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knots_v, controlPoints );
+			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
 
 		var p = verb.core.Eval.rational_surface_point( surface, 0, 0 );
 
@@ -630,11 +630,11 @@ describe("verb.core.Eval.rational_surface_derivs",function(){
 		var degreeU = 1
 			, degreeV = 2
 			, knotsU = [0, 0, 1, 1 ]
-			, knots_v = [0, 0, 0, 1, 1, 1 ]
+			, knotsV = [0, 0, 0, 1, 1, 1 ]
 			, controlPoints = [ [ [1, 1, 0, 1], 	[1, 1, 1, 1], [2, 0, 2, 2] ],
 													 		  [ [-1, 1, 0, 1], 	[-1, 1, 1, 1], [-2, 0, 2, 2] ] ]
 			, num_derivatives = 1
-			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knots_v, controlPoints );
+			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
 
 		var p = verb.core.Eval.rational_surface_derivs( surface, num_derivatives, 0, 0);
 
@@ -969,19 +969,17 @@ describe("verb.core.Eval.curve_bezier_decompose",function(){
 	});
 });
 
-
-describe("verb.core.Vec.transpose",function(){
+describe("verb.core.Mat.transpose",function(){
 	it('is correct for a basic example', function(){
 		var a = [ [6,5,4], [1,2,3] ];
-		verb.core.Vec.transpose(a).should.eql( [[6,1], [5,2], [4,3]])
+		verb.core.Mat.transpose(a).should.eql( [[6,1], [5,2], [4,3]])
 	});
 
 
 	it('is correct for empty array', function(){
-		verb.core.Vec.transpose([]).should.eql( [] );
+		verb.core.Mat.transpose([]).should.eql( [] );
 	});
 });
-
 
 describe("verb.core.Eval.surface_knot_refine",function(){
 
@@ -2385,7 +2383,7 @@ describe("verb.core.Mat.solve",function(){
 	it('can solve simple case', function(){
 
 		var A = [[1,0.4], [-0.2,1]];
-		var At = verb.core.Vec.transpose(A);
+		var At = verb.core.Mat.transpose(A);
 		var b = [5,4];
 
 		var x = verb.core.Mat.solve( A, b);
@@ -2425,7 +2423,7 @@ describe("verb.core.Mat.solve",function(){
 
 		var n = 5;
 		var A = rand2d(n);
-		var At = verb.core.Vec.transpose(A);
+		var At = verb.core.Mat.transpose(A);
 		var b = rand1d(n);
 
 		var x = verb.core.Mat.solve( A, b);
@@ -2653,6 +2651,229 @@ describe("verb.core.Analyze.rational_curve_arc_length",function(){
 	});
 
 });
+
+
+
+describe("verb.core.Analyze.rational_bezier_curve_param_at_arc_length",function(){
+
+	it('can compute parameter at arc length of straight bezier curve', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,1,1,1,1]
+			, controlPoints = [ [0,0,0,1], [1.5,0,0,1], [2,0,0,1], [3,0,0,1] ]
+			, curve = new verb.core.CurveData( degree, knots, controlPoints );
+
+		var tol = 1e-3;
+		var d = 0;
+		var steps = 10;
+		var inc = 3 / (steps-1);;
+
+		for (var i = 0; i < steps; i++){
+
+			var u = verb.core.Analyze.rational_bezier_curve_param_at_arc_length(curve, d, tol);
+			var len = verb.core.Analyze.rational_bezier_curve_arc_length(curve, u);
+
+			len.should.be.approximately( d, tol );
+
+			d += inc;
+		}
+
+	});
+
+	it('can compute parameter at arc length of curved bezier curve', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,1,1,1,1]
+			, controlPoints = [ [1,0,0,1], [1,0,-1,1], [2,0,0,1], [5,0,0,1] ]
+			, curve = new verb.core.CurveData( degree, knots, controlPoints );
+
+		var tol = 1e-3;
+		var d = 0;
+		var steps = 10;
+		var inc = 3 / (steps-1);
+
+		for (var i = 0; i < steps; i++){
+
+			var u = verb.core.Analyze.rational_bezier_curve_param_at_arc_length(curve, d, tol);
+			var len = verb.core.Analyze.rational_bezier_curve_arc_length(curve, u);
+
+			len.should.be.approximately( d, tol );
+
+			d += inc;
+		}
+
+	});
+
+});
+
+
+describe("verb.core.Analyze.rational_curve_param_at_arc_length",function(){
+
+	it('can compute parameter at arc length of straight NURBS curve', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,0.5,1,1,1,1]
+			, controlPoints = [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1], [4,0,0,1] ]
+			, curve = new verb.core.CurveData( degree, knots, controlPoints );
+
+		var tol = 1e-3;
+		var d = 0;
+		var steps = 10;
+		var inc = 4 / (steps-1);
+
+		var u = verb.core.Analyze.rational_curve_param_at_arc_length(curve, 2, tol);
+
+		for (var i = 0; i < steps; i++){
+
+			var u = verb.core.Analyze.rational_curve_param_at_arc_length(curve, d, tol);
+			var len = verb.core.Analyze.rational_curve_arc_length(curve, u);
+
+			len.should.be.approximately( d, tol );
+
+			d += inc;
+		}
+
+	});
+
+	it('can compute parameter at arc length of curved NURBS curve', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,0.5,1,1,1,1]
+			, controlPoints = [ [1,0,0,1], [1,0,-1,1], [2,0,0,1], [3,0,1,1], [5,0,0,1] ]
+			, curve = new verb.core.CurveData( degree, knots, controlPoints );
+
+		var tol = 1e-3;
+		var d = 0;
+		var steps = 10;
+		var inc = 3 / (steps-1);
+
+		for (var i = 0; i < steps; i++){
+
+			var u = verb.core.Analyze.rational_curve_param_at_arc_length(curve, d, tol);
+			var len = verb.core.Analyze.rational_curve_arc_length(curve, u);
+
+			len.should.be.approximately( d, tol );
+
+			d += inc;
+		}
+
+	});
+
+});
+
+describe("verb.core.Divide.rational_curve_by_arc_length",function(){
+
+	it('can divide a straight NURBS curve', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,0.5,1,1,1,1]
+			, controlPoints = [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1], [4,0,0,1] ]
+			, curve = new verb.core.CurveData( degree, knots, controlPoints )
+			, d = 0.5
+			, tol = 1e-3;
+
+		var res = verb.core.Divide.rational_curve_by_arc_length(curve, d);
+
+		var s = 0;
+		res.forEach(function(u){
+
+			var pt = verb.core.Eval.rational_curve_point( curve, u.u );
+			u.len.should.be.approximately( s, tol );
+			s += d;
+
+		});
+
+	});
+
+});
+
+describe("verb.core.Divide.rational_curve_equally_by_arc_length",function(){
+
+	it('can divide a straight NURBS curve', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,0.5,1,1,1,1]
+			, controlPoints = [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1], [4,0,0,1] ]
+			, curve = new verb.core.CurveData( degree, knots, controlPoints )
+			, divs = 8
+			, tol = 1e-3
+			, d = 4 / divs;
+
+		var res = verb.core.Divide.rational_curve_equally_by_arc_length(curve, divs );
+
+		var s = 0;
+		res.forEach(function(u){
+
+			var pt = verb.core.Eval.rational_curve_point( curve, u.u );
+			u.len.should.be.approximately( s, tol );
+			s += d;
+
+		});
+
+	});
+
+});
+
+describe("verb.core.Analyze.rational_curve_closest_point",function(){
+
+	it('can get closest point to a straight curve', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,0.5,1,1,1,1]
+			, controlPoints = [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1], [4,0,0,1] ]
+			, curve = new verb.core.CurveData( degree, knots, controlPoints )
+			, pt = [1,0.2,0];
+
+		var res = verb.core.Analyze.rational_curve_closest_point(curve, [1,0.2,0] );
+		var p = verb.core.Eval.rational_curve_point( curve, res );
+
+		vecShouldBe( [1,0,0], p, 1e-3 );
+
+		res = verb.core.Analyze.rational_curve_closest_point(curve, [2,0.2,0] );
+		p = verb.core.Eval.rational_curve_point( curve, res );
+
+		vecShouldBe( [2,0,0], p, 1e-3 );
+
+		// before start
+		res = verb.core.Analyze.rational_curve_closest_point(curve, [-1,0.2,1] );
+		p = verb.core.Eval.rational_curve_point( curve, res );
+
+		vecShouldBe( [0,0,0], p, 1e-3 );
+
+		// beyond end
+		res = verb.core.Analyze.rational_curve_closest_point(curve, [5,0.2,0] );
+		p = verb.core.Eval.rational_curve_point( curve, res );
+
+		vecShouldBe( [4,0,0], p, 1e-3 );
+
+	});
+
+});
+
+describe("verb.core.Eval.rational_surface_closest_point",function(){
+
+	it('can get closest point to flat bezier patch', function(){
+
+		var degreeU = 3
+			, degreeV = 3
+			, knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
+			, knotsV =	[0, 0, 0, 0, 1, 1, 1, 1]
+			, controlPoints = [ 	[ [0, 0, 0, 1], 		[10, 0, 0, 1], 		[20, 0, 0, 1], 		[30, 0, 0, 1] 		],
+														[ [0, -10, 0, 1], 	[10, -10, 0, 1], 	[20, -10, 0, 1], 	[30, -10, 0, 1] 	],
+														[ [0, -20, 0, 1], 	[10, -20, 0, 1], 	[20, -20, 0, 1], 	[30, -20, 0, 1] 	],
+														[ [0, -30, 0, 1], 	[10, -30, 0, 1], 	[20, -30, 0, 1], 	[30, -30, 0, 1] 	] ]
+			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints )
+			, point = [12,-20,5];
+
+		var res = verb.core.Analyze.rational_surface_closest_point( surface, point );
+		var p = verb.core.Eval.rational_surface_point( surface, res[0], res[1] );
+
+		vecShouldBe( [12,-20,0], p, 1e-3 );
+
+	});
+
+});
+
 /*
 
 describe("verb.core.Eval.tri_centroid",function(){
@@ -2811,7 +3032,7 @@ describe("verb.core.Eval.4pt_surface",function(){
 		var p = verb.core.Eval.rational_surface_point( comps.degreeU,
 														comps.knotsU, 
 														comps.degreeV,
-														comps.knots_v, 
+														comps.knotsV, 
 														verb.core.Eval.homogenize_2d( comps.controlPoints, comps.weights), 
 														0.5, 
 														0.5);
@@ -2838,7 +3059,7 @@ describe("verb.core.Eval.4pt_surface",function(){
 		var p = verb.core.Eval.rational_surface_point( comps.degreeU,
 														comps.knotsU, 
 														comps.degreeV,
-														comps.knots_v, 
+														comps.knotsV, 
 														verb.core.Eval.homogenize_2d( comps.controlPoints, comps.weights), 
 														0.5, 
 														0.5);
@@ -2851,7 +3072,7 @@ describe("verb.core.Eval.4pt_surface",function(){
 		p = verb.core.Eval.rational_surface_point( comps.degreeU,
 														comps.knotsU, 
 														comps.degreeV,
-														comps.knots_v, 
+														comps.knotsV, 
 														verb.core.Eval.homogenize_2d( comps.controlPoints, comps.weights), 
 														0, 
 														0);
@@ -2864,7 +3085,7 @@ describe("verb.core.Eval.4pt_surface",function(){
 		p = verb.core.Eval.rational_surface_point( comps.degreeU,
 														comps.knotsU, 
 														comps.degreeV,
-														comps.knots_v, 
+														comps.knotsV, 
 														verb.core.Eval.homogenize_2d( comps.controlPoints, comps.weights), 
 														1, 
 														0);
@@ -4831,7 +5052,7 @@ describe("verb.core.Eval.intersect_rational_curve_surface_by_aabb",function(){
 			, degreeU  = 1
 			, degreeV = 1
 			, knotsU = [0,0,1,1]
-			, knots_v = [0,0,1,1];
+			, knotsV = [0,0,1,1];
 
 		// line from [5,5,5] to [5,5,-5]
 		var degree_crv = 1
@@ -4846,7 +5067,7 @@ describe("verb.core.Eval.intersect_rational_curve_surface_by_aabb",function(){
 		var res =  verb.core.Eval.intersect_rational_curve_surface_by_aabb( 	degreeU, 
 																																					knotsU, 
 																																					degreeV, 
-																																					knots_v, 
+																																					knotsV, 
 																																					homo_controlPoints_srf, 
 
 																																					degree_crv, 
@@ -4872,7 +5093,7 @@ describe("verb.core.Eval.intersect_rational_curve_surface_by_aabb",function(){
 			, degreeU  = 1
 			, degreeV = 1
 			, knotsU = [0,0,1,1]
-			, knots_v = [0,0,1,1];
+			, knotsV = [0,0,1,1];
 
 		// line from [5,5,5] to [5,5,-5]
 		var degree_crv = 1
@@ -4887,7 +5108,7 @@ describe("verb.core.Eval.intersect_rational_curve_surface_by_aabb",function(){
 		var res =  verb.core.Eval.intersect_rational_curve_surface_by_aabb( 	degreeU, 
 																																					knotsU, 
 																																					degreeV, 
-																																					knots_v, 
+																																					knotsV, 
 																																					homo_controlPoints_srf, 
 
 																																					degree_crv, 
@@ -4913,7 +5134,7 @@ describe("verb.core.Eval.intersect_rational_curve_surface_by_aabb",function(){
 			, degreeU  = 1
 			, degreeV = 1
 			, knotsU = [0,0,1,1]
-			, knots_v = [0,0,1,1];
+			, knotsV = [0,0,1,1];
 
 		// line from [5,5,5] to [5,5,-5]
 		var degree_crv = 2
@@ -4928,7 +5149,7 @@ describe("verb.core.Eval.intersect_rational_curve_surface_by_aabb",function(){
 		var res =  verb.core.Eval.intersect_rational_curve_surface_by_aabb( 	degreeU, 
 																																					knotsU, 
 																																					degreeV, 
-																																					knots_v, 
+																																					knotsV, 
 																																					homo_controlPoints_srf, 
 
 																																					degree_crv, 
@@ -4954,7 +5175,7 @@ describe("verb.core.Eval.intersect_rational_curve_surface_by_aabb",function(){
 			, degreeU  = 1
 			, degreeV = 1
 			, knotsU = [0,0,1,1]
-			, knots_v = [0,0,1,1];
+			, knotsV = [0,0,1,1];
 
 		// line from [5,5,5] to [5,5,-5]
 		var degree_crv = 1
@@ -4969,7 +5190,7 @@ describe("verb.core.Eval.intersect_rational_curve_surface_by_aabb",function(){
 		var res =  verb.core.Eval.intersect_rational_curve_surface_by_aabb( 	degreeU, 
 																																					knotsU, 
 																																					degreeV, 
-																																					knots_v, 
+																																					knotsV, 
 																																					homo_controlPoints_srf, 
 
 																																					degree_crv, 
@@ -5061,7 +5282,7 @@ describe("verb.core.Eval.refine_rational_curve_surface_intersection",function(){
 			, degreeU  = 1
 			, degreeV = 1
 			, knotsU = [0,0,1,1]
-			, knots_v = [0,0,1,1];
+			, knotsV = [0,0,1,1];
 
 		var degree_crv = 2
 			, knots_crv = [0,0,0,1,1,1]
@@ -5069,7 +5290,7 @@ describe("verb.core.Eval.refine_rational_curve_surface_intersection",function(){
 
 		var start_params = [ 0.45, 0.25, 0.55 ];
 
-		var res = verb.core.Eval.refine_rational_curve_surface_intersection( degreeU, knotsU, degreeV, knots_v, homo_controlPoints_srf, degree_crv, knots_crv, homo_controlPoints_crv, start_params );
+		var res = verb.core.Eval.refine_rational_curve_surface_intersection( degreeU, knotsU, degreeV, knotsV, homo_controlPoints_srf, degree_crv, knots_crv, homo_controlPoints_crv, start_params );
 
 		res[0].should.be.approximately(0.5, verb.core.Constants.TOLERANCE);
 		res[1].should.be.approximately(0.265, verb.core.Constants.TOLERANCE);
@@ -5087,7 +5308,7 @@ describe("verb.core.Eval.intersect_rational_curve_surface_by_aabb_refine",functi
 			, degreeU  = 1
 			, degreeV = 1
 			, knotsU = [0,0,1,1]
-			, knots_v = [0,0,1,1];
+			, knotsV = [0,0,1,1];
 
 		var degree_crv = 2
 			, knots_crv = [0,0,0,1,1,1]
@@ -5098,7 +5319,7 @@ describe("verb.core.Eval.intersect_rational_curve_surface_by_aabb_refine",functi
 			, divs_u = 3
 			, divs_v = 3;
 
-		var res = verb.core.Eval.intersect_rational_curve_surface_by_aabb_refine( degreeU, knotsU, degreeV, knots_v, homo_controlPoints_srf, degree_crv, knots_crv, homo_controlPoints_crv, sample_tol, tol, divs_u, divs_v );
+		var res = verb.core.Eval.intersect_rational_curve_surface_by_aabb_refine( degreeU, knotsU, degreeV, knotsV, homo_controlPoints_srf, degree_crv, knots_crv, homo_controlPoints_crv, sample_tol, tol, divs_u, divs_v );
 
 		res.length.should.be.equal( 1 );
 		res[0].p.should.be.approximately(0.5, verb.core.Constants.TOLERANCE);
@@ -5150,7 +5371,7 @@ describe("verb.core.Eval.volume_point",function(){
 		var degreeU = 1
 			, knotsU = [ 0,0,0.5,1,1 ]
 			, degreeV = 1
-			, knots_v = [ 0,0,0.5,1,1 ]
+			, knotsV = [ 0,0,0.5,1,1 ]
 			, degree_w = 1
 			, knots_w = [ 0,0,0.5,1,1 ]
 			, controlPoints = [];
@@ -5178,7 +5399,7 @@ describe("verb.core.Eval.volume_point",function(){
 		for (var i = 0; i < 10; i++){
 
 			var u = Math.random(), v = Math.random(), w = Math.random()
-			var result = verb.core.Eval.volume_point( degreeU, knotsU, degreeV, knots_v, degree_w, knots_w, controlPoints, u, v, w );
+			var result = verb.core.Eval.volume_point( degreeU, knotsU, degreeV, knotsV, degree_w, knots_w, controlPoints, u, v, w );
 
 			result[0].should.be.approximately( u, verb.core.Constants.TOLERANCE );
 			result[1].should.be.approximately( v, verb.core.Constants.TOLERANCE );
@@ -6039,159 +6260,6 @@ describe("verb.InterpCurve",function(){
 
 
 
-describe("verb.core.Analyze.rational_bezier_curve_param_at_arc_length",function(){
-
-	it('can compute parameter at arc length of straight bezier curve', function(){
-
-		var degree = 3
-			, knots = [0,0,0,0,1,1,1,1]
-			, controlPoints = [ [0,0,0,1], [1.5,0,0,1], [2,0,0,1], [3,0,0,1] ];
-
-		var tol = 1e-3;
-		var d = 0;
-		var steps = 10;
-		var inc = 3 / (steps-1);;
-
-		for (var i = 0; i < steps; i++){
-
-			var u = verb.core.Analyze.rational_bezier_curve_param_at_arc_length(curve, d, tol);
-			var len = verb.core.Analyze.rational_bezier_curve_arc_length(curve, u);
-
-			len.should.be.approximately( d, tol );
-
-			d += inc;
-		}
-
-	});
-
-	it('can compute parameter at arc length of curved bezier curve', function(){
-
-		var degree = 3
-			, knots = [0,0,0,0,1,1,1,1]
-			, controlPoints = [ [1,0,0,1], [1,0,-1,1], [2,0,0,1], [5,0,0,1] ];
-
-		var tol = 1e-3;
-		var d = 0;
-		var steps = 10;
-		var inc = 3 / (steps-1);
-
-		for (var i = 0; i < steps; i++){
-
-			var u = verb.core.Analyze.rational_bezier_curve_param_at_arc_length(curve, d, tol);
-			var len = verb.core.Analyze.rational_bezier_curve_arc_length(curve, u);
-
-			len.should.be.approximately( d, tol );
-
-			d += inc;
-		}
-
-	});
-
-});
-
-describe("verb.core.Eval.rational_curve_param_at_arc_length",function(){
-
-	it('can compute parameter at arc length of straight NURBS curve', function(){
-
-		var degree = 3
-			, knots = [0,0,0,0,0.5,1,1,1,1]
-			, controlPoints = [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1], [4,0,0,1] ];
-
-		var tol = 1e-3;
-		var d = 0;
-		var steps = 10;
-		var inc = 4 / (steps-1);
-
-		var u = verb.core.Eval.rational_curve_param_at_arc_length(curve, 2, tol);
-
-		for (var i = 0; i < steps; i++){
-
-			var u = verb.core.Eval.rational_curve_param_at_arc_length(curve, d, tol);
-			var len = verb.core.Analyze.rational_curve_arc_length(curve, u);
-
-			len.should.be.approximately( d, tol );
-
-			d += inc;
-		}
-
-	});
-
-	it('can compute parameter at arc length of curved NURBS curve', function(){
-
-		var degree = 3
-			, knots = [0,0,0,0,0.5,1,1,1,1]
-			, controlPoints = [ [1,0,0,1], [1,0,-1,1], [2,0,0,1], [3,0,1,1], [5,0,0,1] ];
-
-		var tol = 1e-3;
-		var d = 0;
-		var steps = 10;
-		var inc = 3 / (steps-1);
-
-		for (var i = 0; i < steps; i++){
-
-			var u = verb.core.Eval.rational_curve_param_at_arc_length(curve, d, tol);
-			var len = verb.core.Analyze.rational_curve_arc_length(curve, u);
-
-			len.should.be.approximately( d, tol );
-
-			d += inc;
-		}
-
-	});
-
-});
-
-
-describe("verb.core.Eval.rational_curve_divide_curve_by_arc_length",function(){
-
-	it('can divide a straight NURBS curve', function(){
-
-		var degree = 3
-			, knots = [0,0,0,0,0.5,1,1,1,1]
-			, controlPoints = [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1], [4,0,0,1] ]
-			, d = 0.5
-			, tol = 1e-3;
-
-		var res = verb.core.Eval.rational_curve_divide_curve_by_arc_length(curve, d);
-
-		var s = 0;
-		res.forEach(function(u){
-
-			var pt = verb.core.Eval.rational_curve_point( curve, u.u );
-			u.len.should.be.approximately( s, tol );
-			s += d;
-
-		});
-
-	});
-
-});
-
-describe("verb.core.Eval.rational_curve_divide_curve_equally_by_arc_length",function(){
-
-	it('can divide a straight NURBS curve', function(){
-
-		var degree = 3
-			, knots = [0,0,0,0,0.5,1,1,1,1]
-			, controlPoints = [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1], [4,0,0,1] ]
-			, divs = 8
-			, tol = 1e-3
-			, d = 4 / divs;
-
-		var res = verb.core.Eval.rational_curve_divide_curve_equally_by_arc_length(curve, divs );
-
-		var s = 0;
-		res.forEach(function(u){
-
-			var pt = verb.core.Eval.rational_curve_point( curve, u.u );
-			u.len.should.be.approximately( s, tol );
-			s += d;
-
-		});
-
-	});
-
-});
 
 
 describe(.EvalCurve.lengthAtParam",function(){
@@ -6324,40 +6392,6 @@ describe(.EvalCurve.divideByArcLength",function(){
 });
 
 
-describe("verb.core.Eval.rational_curve_closest_point",function(){
-
-	it('can get closest point to a straight curve', function(){
-
-		var degree = 3
-			, knots = [0,0,0,0,0.5,1,1,1,1]
-			, controlPoints = [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1], [4,0,0,1] ]
-			, pt = [1,0.2,0];
-
-		var res = verb.core.Eval.rational_curve_closest_point(curve, [1,0.2,0] );
-		var p = verb.core.Eval.rational_curve_point( curve, res );
-
-		vecShouldBe( [1,0,0], p, 1e-3 );
-
-		res = verb.core.Eval.rational_curve_closest_point(curve, [2,0.2,0] );
-		p = verb.core.Eval.rational_curve_point( curve, res );
-
-		vecShouldBe( [2,0,0], p, 1e-3 );
-
-		// before start
-		res = verb.core.Eval.rational_curve_closest_point(curve, [-1,0.2,1] );
-		p = verb.core.Eval.rational_curve_point( curve, res );
-
-		vecShouldBe( [0,0,0], p, 1e-3 );
-
-		// beyond end
-		res = verb.core.Eval.rational_curve_closest_point(curve, [5,0.2,0] );
-		p = verb.core.Eval.rational_curve_point( curve, res );
-
-		vecShouldBe( [4,0,0], p, 1e-3 );
-
-	});
-
-});
 
 describe(.EvalCurve.closestPoint",function(){
 
@@ -6399,31 +6433,5 @@ describe(.EvalCurve.closestPoint",function(){
 
 });
 
-
-describe("verb.core.Eval.rational_surface_closest_point",function(){
-
-	it('can get closest point to flat bezier patch', function(){
-
-		var degreeU = 3
-			, degreeV = 3
-			, knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
-			, knots_v =	[0, 0, 0, 0, 1, 1, 1, 1]
-			, controlPoints = [ 	[ [0, 0, 0, 1], 		[10, 0, 0, 1], 		[20, 0, 0, 1], 		[30, 0, 0, 1] 		],
-														[ [0, -10, 0, 1], 	[10, -10, 0, 1], 	[20, -10, 0, 1], 	[30, -10, 0, 1] 	],
-														[ [0, -20, 0, 1], 	[10, -20, 0, 1], 	[20, -20, 0, 1], 	[30, -20, 0, 1] 	],
-														[ [0, -30, 0, 1], 	[10, -30, 0, 1], 	[20, -30, 0, 1], 	[30, -30, 0, 1] 	] ]
-			, point = [12,-20,5];
-
-		var res = verb.core.Eval.rational_surface_closest_point( degreeU, knotsU, degreeV, knots_v, 
-			controlPoints, point );
-
-		var p = verb.core.Eval.rational_surface_point( degreeU, knotsU, degreeV, knots_v, 
-			controlPoints, res[0], res[1] );
-
-		vecShouldBe( [12,-20,0], p, 1e-3 );
-
-	});
-
-});
 
 */

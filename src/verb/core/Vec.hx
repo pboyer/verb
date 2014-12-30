@@ -13,11 +13,6 @@ class Vec {
         return [u[1]*v[2]-u[2]*v[1],u[2]*v[0]-u[0]*v[2],u[0]*v[1]-u[1]*v[0]];
     }
 
-    public static function transpose<T>(a : Array<Array<T>>) : Array<Array<T>> {
-        if (a.length == 0) return [];
-        return [ for (i in 0...a[0].length) [for (j in 0...a.length) a[j][i] ]  ];
-    }
-
     public static function dist(a : Array<Float>, b : Array<Float> ) : Float {
         return norm(sub(a,b));
     }

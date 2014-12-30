@@ -108,4 +108,43 @@ class Trig {
         return area < tol;
 
     }
+
+    //
+    // Find the closest point on a segment
+    //
+    // **params**
+    // + point to project
+    // + first point of segment
+    // + second point of segment
+    // + first param of segment
+    // + second param of segment
+    //
+    // **returns**
+    // + *Object* with u and pt properties
+    //
+
+    public static function closest_point_on_segment( pt : Point, segpt0 : Point, segpt1 : Point, u0 : Float, u1 : Float ) {
+
+        var dif = Vec.sub( segpt1, segpt0 )
+        , l = Vec.norm( dif );
+
+        if (l < Constants.EPSILON ) {
+            return { u: u0, pt : segpt0 };
+        }
+
+        var o = segpt0
+        , r = Vec.mul( 1 / l, dif )
+        , o2pt = Vec.sub(pt, o)
+        , do2ptr = Vec.dot(o2pt, r);
+
+        if (do2ptr < 0){
+            return { u: u0,  pt : segpt0 };
+        } else if (do2ptr > l){
+            return { u: u1,  pt : segpt1 };
+        }
+
+        return { 	u: u0 + (u1 - u0) * do2ptr / l, pt : Vec.add(o, Vec.mul( do2ptr, r ) ) };
+
+    }
+
 }

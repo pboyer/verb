@@ -554,7 +554,7 @@ class Make {
             xs.push(x);
         }
 
-        var controlPts = Vec.transpose(xs);
+        var controlPts = Mat.transpose(xs);
         var weights = Vec.rep(controlPts.length, 1.0);
 
         return new CurveData( degree, knots, Eval.homogenize_1d(controlPts, weights) );

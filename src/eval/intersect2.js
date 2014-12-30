@@ -835,53 +835,6 @@ public static function segments( a0, a1, b0, b1, tol ) {
 //
 //
 //
-// Find the closest point on a ray
-//
-// **params**
-// + point to project
-// + first point of segment
-// + second point of segment
-// + first param of segment
-// + second param of segment
-// 
-// **returns** 
-// + *Object* with u and pt properties
-//
-
-public static function closest_point_on_segment( pt, segpt0, segpt1, u0, u1 ) {
-
-	var dif = Vec.sub( segpt1, segpt0 )
-		, l = Vec.norm( dif );
-
-	if (l < verb.EPSILON ) {
-		return { 	u: u0, 
-							pt : segpt0 };
-	}		
-
-	var o = segpt0
-		, r = Vec.mul( 1 / l, dif )
-		, o2pt = Vec.sub(pt, o)
-		, do2ptr = Vec.dot(o2pt, r);
-
-	if (do2ptr < 0){
-
-		return { 	u: u0, 
-							pt : segpt0 };
-
-	} else if (do2ptr > l){
-
-		return { 	u: u1, 
-							pt : segpt1 };
-
-	}
-
-	return { 	u: u0 + (u1 - u0) * do2ptr / l, 
-						pt : Vec.add(o, Vec.mul( do2ptr, r ) ) };
-
- }
-
-//
-//
 
 
 

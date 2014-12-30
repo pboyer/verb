@@ -34,7 +34,7 @@ class Modify {
 
         // u dir
         if (!useV){
-            ctrlPts = Vec.transpose( surface.controlPoints );
+            ctrlPts = Mat.transpose( surface.controlPoints );
             knots = surface.knotsU;
             degree = surface.degreeU;
         // v dir
@@ -55,7 +55,7 @@ class Modify {
 
         // u dir
         if (!useV){
-            newPts = Vec.transpose( newPts );
+            newPts = Mat.transpose( newPts );
             return new SurfaceData( surface.degreeU, surface.degreeV, newknots, surface.knotsV.copy(), newPts );
         // v dir
         } else {
@@ -72,7 +72,7 @@ class Modify {
 
         if (!useV) {
 
-            control_points = Vec.transpose( surface.controlPoints );
+            control_points = Mat.transpose( surface.controlPoints );
             knots = surface.knotsU;
             degree = surface.degreeU;
 
@@ -105,8 +105,8 @@ class Modify {
         var knots1 = res.knots.slice( s + 1 );
 
         if (!useV){
-            newpts0 = Vec.transpose( newpts0 );
-            newpts1 = Vec.transpose( newpts1 );
+            newpts0 = Mat.transpose( newpts0 );
+            newpts1 = Mat.transpose( newpts1 );
 
             return [ new SurfaceData(degree, surface.degreeV, knots0, surface.knotsV.copy(), newpts0 ),
                 new SurfaceData(degree, surface.degreeV, knots1, surface.knotsV.copy(), newpts1 ) ];

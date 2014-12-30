@@ -17,6 +17,11 @@ class LUDecomp {
 @:expose("core.Mat")
 class Mat {
 
+    public static function transpose<T>(a : Array<Array<T>>) : Array<Array<T>> {
+        if (a.length == 0) return [];
+        return [ for (i in 0...a[0].length) [for (j in 0...a.length) a[j][i] ]  ];
+    }
+
     public static function solve(A : Matrix, b : Vector) : Vector {
         return LUsolve( LU(A), b );
     }
