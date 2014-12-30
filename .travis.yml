@@ -1,5 +1,11 @@
 language: node_js
 node_js:
    - "0.10.22"
-before_install: npm install -g grunt-cli
+before_install:
+  - sudo apt-get update                                # run update before installing anything
+  - sudo apt-get install python-software-properties -y # for the next command
+  - sudo add-apt-repository ppa:eyecreate/haxe -y      # add the ubuntu ppa that contains haxe
+  - sudo apt-get update                                # pull info from ppa
+  - sudo apt-get install haxe -y                       # install haxe (and neko)
+  - npm install -g grunt-cli
 install: npm install
