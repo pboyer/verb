@@ -266,102 +266,11 @@ public static function parametric_polyline_mesh_by_aabb( crv_points, crv_param_p
 
 //
 //
-//
-//  Intersect segment with triangle (from http://geomalgorithms.com/a06-_intersect-2.html)
-//
-// **params**
-// + array of length 3 representing first point of the segment
-// + array of length 3 representing second point of the segment
-// + array of length 3 arrays representing the points of the triangle
-// + array of length 3 containing int indices in the array of points, this allows passing a full mesh
-// 
-// **returns** 
-// + *Object*, an object with an "intersects" property that is true or false and if true, a 
-// "s" property giving the param on u, and "t" is the property on v, where u is the 
-// axis from v0 to v1, and v is v0 to v1, a "point" property
-// where the intersection took place, and "p" property representing the parameter along the segment
-//
 
-public static function segment_with_tri( p0, p1, points, tri ) {
-
-	var v0 = points[ tri[0] ]
-		, v1 = points[ tri[1] ]
-		, v2 = points[ tri[2] ]
-		, u = Vec.sub( v1, v0 )
-		, v = Vec.sub( v2, v0 )
-		, n = Vec.cross( u, v );
-
-	var dir = Vec.sub( p1, p0 )
-		, w0 = Vec.sub( p0, v0 )
-		, a = -Vec.dot( n, w0 )
-		, b = Vec.dot( n, dir )
-
-	// is ray is parallel to triangle plane?
-	if ( Math.abs( b ) < verb.EPSILON ){ 
-		return null;
-	}
-
-	var r = a / b;
-
-	// segment goes away from triangle or is beyond segment
-	if ( r < 0 || r > 1 ){
-		return null;
-	}
-
-	// get proposed intersection
-	var pt = Vec.add( p0, Vec.mul( r, dir ) );
-
-	// is I inside T?
-	var uv = Vec.dot(u,v)
-		, uu = Vec.dot(u,u)
-		, vv = Vec.dot(v,v)
-		, w = Vec.sub( pt, v0 )
-		, wu = Vec.dot( w, u )
-		, wv = Vec.dot( w, v )
-		, denom = uv * uv - uu * vv
-		, s = ( uv * wv - vv * wu ) / denom
-		, t = ( uv * wu - uu * wv ) / denom;
-
-	if (s > 1.0 + verb.EPSILON || t > 1.0 + verb.EPSILON || t < -verb.EPSILON || s < -verb.EPSILON || s + t > 1.0 + verb.EPSILON){
-		return null;
-	}
-
-	return { point: pt, s: s, t: t, p: r };
-
-}
 
 //
 //
-//
-//  Intersect ray/segment with plane (from http://geomalgorithms.com/a06-_intersect-2.html)
-//
-//  If intersecting a ray, the param needs to be between 0 and 1 and the caller is responsible
-//  for making that check
-//
-// **params**
-// + array of length 3 representing first point of the segment
-// + array of length 3 representing second point of the segment
-// + array of length 3 representing an origin point on the plane
-// + array of length 3 representing the normal of the plane
-// 
-// **returns** 
-// null or an object with a p property representing the param on the segment
-//
 
-public static function segment_with_plane( p0, p1, v0, n ) {
-
-	var denom = Vec.dot( n, Vec.sub(p0,p1) );
-
-	// parallel case
-	if ( abs( denom ) < EPSILON ) { 
-   	return null;
- 	}
-
- 	var numer = Vec.dot( n, Vec.sub(v0,p0) );
-
-	return { p: numer / denom };
-
-}
 
 //
 //
@@ -417,135 +326,14 @@ public static function aabb_trees( points1, tris1, points2, tris2, aabb_tree1, a
 
 //
 //
-//
-// Make tree of axis aligned bounding boxes 
-//
-// **params**
-// + array of length 3 arrays of numbers representing the points
-// + array of length 3 arrays of number representing the triangles
-// + array of numbers representing the relevant triangles to use to form aabb
-// 
-// **returns** 
-// + a point represented by an array of length (dim)
-//
 
-public static function make_mesh_aabb_tree( points, tris, tri_indices ) {
-
-	// build bb
-	var aabb = { 	bounding_box: verb.eval.make_mesh_aabb( points, tris, tri_indices ), 
-								children: [] };
-
-	// if only one ele, terminate recursion and store the triangles
-	if (tri_indices.length === 1){
-		aabb.triangle = tri_indices[0];
-		return aabb;
-	}
-
-	// sort triangles in sub mesh
-	var sorted_tri_indices = verb.eval.sort_tris_on_longest_axis( aabb.bounding_box, points, tris, tri_indices )
-		, tri_indices_a = sorted_tri_indices.slice( 0, Math.floor( sorted_tri_indices.length / 2 ) )
-		, tri_indices_b = sorted_tri_indices.slice( Math.floor( sorted_tri_indices.length / 2 ), sorted_tri_indices.length );
-
-	// recurse 
-	aabb.children = [ verb.eval.make_mesh_aabb_tree(points, tris, tri_indices_a), 
-										verb.eval.make_mesh_aabb_tree(points, tris, tri_indices_b) ];
-
-	// return result
-	return aabb;
-
-}
 
 //
 //
-//
-// Form axis-aligned bounding box from triangles of mesh
-//
-// **params**
-// + array of length 3 arrays of numbers representing the points
-// + array of length 3 arrays of number representing the triangles
-// + array of numbers representing the relevant triangles
-// 
-// **returns** 
-// + a point represented by an array of length (dim)
-//
 
-public static function make_mesh_aabb( points, tris, tri_indices ) {
-
-	var bb = new verb.BoundingBox();
-
-	tri_indices.forEach(function(x){
-		bb.add( points[ tris[ x ][0] ] );
-		bb.add( points[ tris[ x ][1] ] );
-		bb.add( points[ tris[ x ][2] ] );
-	});
-
-	return bb;
-
-}
 
 //
 //
-//
-// Sort triangles on longest axis
-//
-// **params**
-// + integer degree of surface in u direction
-// + array of nondecreasing knot values in u direction
-// + integer degree of surface in v direction
-// + array of nondecreasing knot values in v direction
-// 
-// **returns** 
-// + a point represented by an array of length (dim)
-//
-
-public static function sort_tris_on_longest_axis( container_bb, points, tris, tri_indices ) {
-
-	var long_axis = container_bb.getLongestAxis();
-
-	var axis_position_map = [];
-	for (var i = tri_indices.length - 1; i >= 0; i--) {
-
-		var tri_i = tri_indices[i],
-			tri_min = verb.eval.get_min_coordinate_on_axis( points, tris[ tri_i ], long_axis );
-
-		axis_position_map.push( [ tri_min, tri_i ] );
-
-	}
-
-	axis_position_map.sort(function(a,b) { return a[0] > b[0] } );
-
-	var sorted_tri_indices = [];
-	for (var i = 0, l = axis_position_map.length; i < l; i++) {
-		sorted_tri_indices.push( axis_position_map[i][1] );
-	}
-
-	return sorted_tri_indices;
-
-}
-
-//
-//
-//
-// Get min coordinate on axis
-//
-// **params**
-// + array of length 3 arrays of numbers representing the points
-// + length 3 array of point indices for the triangle
-// 
-// **returns** 
-// + a point represented by an array of length 3
-//
-
-public static function get_min_coordinate_on_axis( points, tri, axis ) {
-
-	var axis_coords = [];
-
-	for (var i = 0; i < 3; i++){
-		axis_coords.push( points[ tri[i] ][ axis ] );
-	}
-
-	return Math.min.apply(Math, axis_coords);
-};
 
 //
 //
@@ -832,14 +620,6 @@ public static function segments( a0, a1, b0, b1, tol ) {
 
  }
 
-//
-//
-//
-
-
-
-//
-//
 //
 // Find the closest parameter on two rays, see http://geomalgorithms.com/a07-_distance.html
 //

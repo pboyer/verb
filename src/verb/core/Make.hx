@@ -3,7 +3,7 @@ package verb.core;
 import verb.core.types.SurfaceData;
 import verb.core.types.CurveData;
 
-using verb.core.Utils;
+using verb.core.ArrayExtensions;
 
 @:expose("core.Make")
 class Make {

@@ -5,7 +5,7 @@ import verb.core.types.SurfaceData;
 import verb.core.types.MeshData.UV;
 import verb.core.types.CurveData;
 
-using verb.core.Utils;
+using verb.core.ArrayExtensions;
 using Lambda;
 using verb.core.Mat;
 

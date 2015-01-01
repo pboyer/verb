@@ -1,6 +1,6 @@
 package verb.core.types;
 
-using verb.core.Utils;
+using verb.core.ArrayExtensions;
 
 class AdaptiveRefinementOptions {
     public var normTol : Float = 8.5e-2;

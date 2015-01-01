@@ -3,7 +3,7 @@ package verb;
 import verb.BoundingBox;
 import verb.core.Constants;
 import verb.core.Trig;
-import verb.core.Utils;
+import verb.core.ArrayExtensions;
 import verb.core.Eval;
 import verb.core.Mesh;
 import verb.core.Intersect;

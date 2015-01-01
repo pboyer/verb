@@ -2874,6 +2874,186 @@ describe("verb.core.Eval.rational_surface_closest_point",function(){
 
 });
 
+
+describe("verb.core.Intersect.segment_with_tri",function(){
+
+	it('gives correct result for intersecting axis aligned segment and triangle ', function(){
+
+		// line from [5,5,5] to [5,5,-5]
+		var p0 = [ 5,5,5 ]
+			, p1 = [ 5,5,-10 ]
+			, points = [ [0,0,0], [10,0,0], [5,10,1] ]
+			, tri = [ 0, 1, 2 ];
+
+		var res = verb.core.Intersect.segment_with_tri( p0, p1, points, tri );
+
+		res.p.should.be.approximately(0.3, verb.core.Constants.TOLERANCE);
+		res.s.should.be.approximately(0.25, verb.core.Constants.TOLERANCE);
+		res.t.should.be.approximately(0.5, verb.core.Constants.TOLERANCE);
+
+		console.log()
+
+		var p_srf = verb.core.Vec.add( 	points[0],
+										verb.core.Vec.add( 	verb.core.Vec.mul( res.s, verb.core.Vec.sub(points[1], points[0])),
+															verb.core.Vec.mul( res.t, verb.core.Vec.sub(points[2], points[0]))));
+
+		verb.core.Vec.norm( verb.core.Vec.sub( res.point, p_srf ) ).should.be.approximately(0, verb.core.Constants.TOLERANCE );
+
+	});
+
+	it('gives correct result for intersecting axis aligned segment and planar triangle ', function(){
+
+		// line from [5,5,5] to [5,5,-5]
+		var p0 = [ 5,5,5 ]
+			, p1 = [ 5,5,-10 ]
+			, points = [ [0,0,0], [10,0,0], [5,10,0] ]
+			, tri = [ 0, 1, 2 ];
+
+		var res = verb.core.Intersect.segment_with_tri( p0, p1, points, tri );
+
+		res.p.should.be.approximately(0.333333333333, verb.core.Constants.TOLERANCE);
+		res.s.should.be.approximately(0.25, verb.core.Constants.TOLERANCE);
+		res.t.should.be.approximately(0.5, verb.core.Constants.TOLERANCE);
+
+		var p_srf = verb.core.Vec.add( 	points[0],
+										verb.core.Vec.add( 	verb.core.Vec.mul( res.s, verb.core.Vec.sub(points[1], points[0])),
+															verb.core.Vec.mul( res.t, verb.core.Vec.sub(points[2], points[0]))));
+
+		verb.core.Vec.norm( verb.core.Vec.sub( res.point, p_srf ) ).should.be.approximately(0, verb.core.Constants.TOLERANCE );
+
+	});
+
+	it('gives null for non-intersecting segment and triangle', function(){
+
+		// line from [5,5,5] to [5,5,-5]
+		var p0 = [ 5,5,5 ]
+			, p1 = [ 5,5,4 ]
+
+			// planar triangle
+			, points = [ [0,0,0], [10,0,0], [5,10,0] ]
+			, tri = [ 0, 1, 2 ];
+
+		var res = verb.core.Intersect.segment_with_tri( p0, p1, points, tri );
+
+		(null === res).should.be.true;
+
+	});
+
+});
+
+describe("verb.core.Mesh.make_mesh_aabb",function(){
+
+	it('should return correct result for planar mesh', function(){
+
+		//
+		//  0  - 1
+		//  |  /  \
+		//  2   --  3
+		//  |  \   /
+		//  4  -  5
+		//
+
+		var points = [ [0,0,0], [1,0,0], [0, -1, 0 ], [2, -1, 0], [0, -2, 0], [1, -2, 0] ]
+			, tris = [ [0,2,1], [1,2,3], [2,4,5], [2,5,3] ]
+			, mesh = new verb.core.MeshData(tris, points, null, null)
+			, tri_indices = [0,1,2,3]
+			, aabb = verb.core.Mesh.make_mesh_aabb(mesh, tri_indices);
+
+		should.equal( 2, aabb.max[0] );
+		should.equal( 0, aabb.min[0] );
+		should.equal( 0, aabb.max[1] );
+		should.equal( -2, aabb.min[1] );
+		should.equal( 0, aabb.max[2] );
+		should.equal( 0, aabb.min[2] );
+
+	});
+
+	it('make_mesh_aabb should return correct result for non-planar mesh', function(){
+
+		//
+		//  0  - 1
+		//  |  /  \
+		//  2   --  3
+		//  |  \   /
+		//  4  -  5
+		//
+
+		var points = [ [0,0,-5], [1,0,0], [0, -1, 0 ], [2, -1, 0], [0, -2, 0], [1, -2, 4] ]
+			, tris = [ [0,2,1], [1,2,3], [2,4,5], [2,5,3] ]
+			, mesh = new verb.core.MeshData(tris, points, null, null)
+			, tri_indices = [0,1,2,3]
+			, aabb = verb.core.Mesh.make_mesh_aabb(mesh, tri_indices);
+
+		should.equal( 2, aabb.max[0] );
+		should.equal( 0, aabb.min[0] );
+		should.equal( 0, aabb.max[1] );
+		should.equal( -2, aabb.min[1] );
+		should.equal( 4, aabb.max[2] );
+		should.equal( -5, aabb.min[2] );
+
+	});
+
+});
+
+
+
+describe("verb.core.Mesh.make_mesh_aabb_tree",function(){
+
+	it('should return the correct structure', function(){
+
+		//
+		//  0 --  1
+		//  |   /  \
+		//  2  ---  3
+		//  |   \  /
+		//  4 --  5
+		//
+
+		var points = [ [0,0,0], [1,0,0], [0, -1, 0 ], [2, -1, 0], [0, -2, 0], [1, -2, 0] ]
+			, tris = [ [0,2,1], [1,2,3], [2,4,5], [2,5,3] ]
+			, mesh = new verb.core.MeshData(tris, points, null, null)
+			, tri_indices = [0,1,2,3]
+			, root = verb.core.Mesh.make_mesh_aabb_tree( mesh, tri_indices );
+
+		// root bb is correct
+		should.equal( 2, root.boundingBox.max[0] );
+		should.equal( 0, root.boundingBox.min[0] );
+		should.equal( 0, root.boundingBox.max[1] );
+		should.equal( -2, root.boundingBox.min[1] );
+		should.equal( 0, root.boundingBox.max[2] );
+		should.equal( 0, root.boundingBox.min[2] );
+
+		// root is not a leaf
+		should.equal( 2, root.children.length);
+
+		// children should have 2 children, too
+		var child1 = root.children[0],
+			child2 = root.children[1];
+
+		should.equal( 2, child1.children.length );
+		should.equal( 2, child2.children.length );
+
+		// the children's children should be leaves
+		var child1child1 = child1.children[0],
+			child1child2 = child1.children[1],
+			child2child1 = child2.children[0],
+			child2child2 = child2.children[1];
+
+		should.not.exist( child1child1.children );
+		should.not.exist( child1child2.children );
+		should.not.exist( child2child1.children );
+		should.not.exist( child2child2.children );
+
+		// the grandchildren have the correct items in them
+		should.equal( 0, child1child1.item );
+		should.equal( 1, child1child2.item );
+
+		should.equal( 2, child2child1.item );
+		should.equal( 3, child2child2.item );
+	});
+
+});
+
 /*
 
 describe("verb.core.Eval.tri_centroid",function(){
@@ -5209,70 +5389,6 @@ describe("verb.core.Eval.intersect_rational_curve_surface_by_aabb",function(){
 
 });
 
-describe("verb.core.Eval.intersect_segment_with_tri",function(){
-
-	it('gives correct result for intersecting axis aligned segment and triangle ', function(){
-
-		// line from [5,5,5] to [5,5,-5]
-		var p0 = [ 5,5,5 ]
-			, p1 = [ 5,5,-10 ]
-			, points = [ [0,0,0], [10,0,0], [5,10,1] ]
-			, tri = [ 0, 1, 2 ];
-
-		var res = verb.core.Eval.intersect_segment_with_tri( p0, p1, points, tri );
-
-		res.p.should.be.approximately(0.3, verb.core.Constants.TOLERANCE);
-		res.s.should.be.approximately(0.25, verb.core.Constants.TOLERANCE);
-		res.t.should.be.approximately(0.5, verb.core.Constants.TOLERANCE);
-
-		var p_srf = verb.core.Vec.add( 	points[0], 
-															verb.core.Vec.mul( res.s, verb.core.Vec.sub(points[1], points[0])), 
-															verb.core.Vec.mul( res.t, verb.core.Vec.sub(points[2], points[0])) );
-
-		verb.core.Vec.norm( verb.core.Vec.sub( res.point, p_srf ) ).should.be.approximately(0, verb.core.Constants.TOLERANCE );
-
-	});
-
-	it('gives correct result for intersecting axis aligned segment and planar triangle ', function(){
-
-		// line from [5,5,5] to [5,5,-5]
-		var p0 = [ 5,5,5 ]
-			, p1 = [ 5,5,-10 ]
-			, points = [ [0,0,0], [10,0,0], [5,10,0] ]
-			, tri = [ 0, 1, 2 ];
-
-		var res = verb.core.Eval.intersect_segment_with_tri( p0, p1, points, tri );
-
-		res.p.should.be.approximately(0.333333333333, verb.core.Constants.TOLERANCE);
-		res.s.should.be.approximately(0.25, verb.core.Constants.TOLERANCE);
-		res.t.should.be.approximately(0.5, verb.core.Constants.TOLERANCE);
-
-		var p_srf = verb.core.Vec.add( 	points[0], 
-															verb.core.Vec.mul( res.s, verb.core.Vec.sub(points[1], points[0])), 
-															verb.core.Vec.mul( res.t, verb.core.Vec.sub(points[2], points[0])) );
-
-		verb.core.Vec.norm( verb.core.Vec.sub( res.point, p_srf ) ).should.be.approximately(0, verb.core.Constants.TOLERANCE );
-
-	});
-
-	it('gives null for non-intersecting segment and triangle', function(){
-
-		// line from [5,5,5] to [5,5,-5]
-		var p0 = [ 5,5,5 ]
-			, p1 = [ 5,5,4 ]
-
-			// planar triangle
-			, points = [ [0,0,0], [10,0,0], [5,10,0] ]
-			, tri = [ 0, 1, 2 ];
-
-		var res = verb.core.Eval.intersect_segment_with_tri( p0, p1, points, tri );
-
-		(null === res).should.be.true;
-
-	});
-
-});
-
 
 describe("verb.core.Eval.refine_rational_curve_surface_intersection",function(){
 
@@ -5519,119 +5635,6 @@ describe("verb.core.Eval.tri_uv_from_point",function(){
 });
 
 
-describe("verb.core.Eval.make_mesh_aabb",function(){
-
-	it('should return correct result for planar mesh', function(){
-
-		//
-		//  0  - 1
-		//  |  /  \
-		//  2   --  3
-		//  |  \   /
-		//  4  -  5
-		// 
-
-		var points = [ [0,0,0], [1,0,0], [0, -1, 0 ], [2, -1, 0], [0, -2, 0], [1, -2, 0] ]
-			, tris = [ [0,2,1], [1,2,3], [2,4,5], [2,5,3] ]
-			, tri_indices = [0,1,2,3]
-			, aabb = verb.core.Eval.make_mesh_aabb(points, tris, tri_indices);
-
-		should.equal( 2, aabb.max[0] );
-		should.equal( 0, aabb.min[0] );
-		should.equal( 0, aabb.max[1] );
-		should.equal( -2, aabb.min[1] );		
-		should.equal( 0, aabb.max[2] );
-		should.equal( 0, aabb.min[2] );
-
-	});
-
-});
-
-describe("verb.core.Eval.make_mesh_aabb",function(){
-
-	it('make_mesh_aabb should return correct result for non-planar mesh', function(){
-
-		//
-		//  0  - 1
-		//  |  /  \
-		//  2   --  3
-		//  |  \   /
-		//  4  -  5
-		// 
-
-		var points = [ [0,0,-5], [1,0,0], [0, -1, 0 ], [2, -1, 0], [0, -2, 0], [1, -2, 4] ]
-			, tris = [ [0,2,1], [1,2,3], [2,4,5], [2,5,3] ]
-			, tri_indices = [0,1,2,3]
-			, aabb = verb.core.Eval.make_mesh_aabb(points, tris, tri_indices);
-
-		should.equal( 2, aabb.max[0] );
-		should.equal( 0, aabb.min[0] );
-		should.equal( 0, aabb.max[1] );
-		should.equal( -2, aabb.min[1] );		
-		should.equal( 4, aabb.max[2] );
-		should.equal( -5, aabb.min[2] );
-
-	});
-
-});
-
-describe("verb.core.Eval.make_mesh_aabb_tree",function(){
-
-	it('make_mesh_aabb_tree should have the correct structure', function(){
-
-		//
-		//  0  - 1
-		//  |  /  \
-		//  2   --  3
-		//  |  \   /
-		//  4  -  5
-		// 
-
-		var points = [ [0,0,0], [1,0,0], [0, -1, 0 ], [2, -1, 0], [0, -2, 0], [1, -2, 0] ]
-			, tris = [ [0,2,1], [1,2,3], [2,4,5], [2,5,3] ]
-			, tri_indices = [0,1,2,3]
-			, root = verb.core.Eval.make_mesh_aabb_tree( points, tris, tri_indices );
-
-		// root bb is correct
-		should.equal( 2, root.bounding_box.max[0] );
-		should.equal( 0, root.bounding_box.min[0] );
-		should.equal( 0, root.bounding_box.max[1] );
-		should.equal( -2, root.bounding_box.min[1] );		
-		should.equal( 0, root.bounding_box.max[2] );
-		should.equal( 0, root.bounding_box.min[2] );
-
-		// root is not a leaf
-		should.equal( 2, root.children.length);
-
-		// children should have 2 children, too
-		var child1 = root.children[0],
-			child2 = root.children[1];
-
-		should.equal( 2, child1.children.length );
-		should.equal( 2, child2.children.length );
-
-		// the children's children should be leaves
-		var child1child1 = child1.children[0],
-			child1child2 = child1.children[1],
-			child2child1 = child2.children[0],
-			child2child2 = child2.children[1];
-
-		should.equal( 0, child1child1.children.length );
-		should.equal( 0, child1child2.children.length );
-
-		should.equal( 0, child2child1.children.length );
-		should.equal( 0, child2child2.children.length );
-
-		// the grandchildren have the correct triangles in them
-		should.equal( 2, child1child1.triangle );
-		should.equal( 3, child1child2.triangle );
-
-		should.equal( 0, child2child1.triangle );
-		should.equal( 1, child2child2.triangle );
-
-	});
-
-});
 
 describe("verb.core.Eval.intersect_aabb_trees",function(){
 

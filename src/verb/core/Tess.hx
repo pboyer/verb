@@ -1,6 +1,6 @@
 package verb.core;
 
-using verb.core.Utils;
+using verb.core.ArrayExtensions;
 
 import verb.core.types.SurfacePoint;
 import verb.core.types.MeshData;
