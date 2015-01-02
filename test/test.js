@@ -3054,15 +3054,13 @@ describe("verb.core.Mesh.make_mesh_aabb_tree",function(){
 
 });
 
-/*
-
-describe("verb.core.Eval.tri_centroid",function(){
+describe("verb.core.Mesh.get_tri_centroid",function(){
 
 	it('should return origin for zeroed triangle', function(){
 
 		var points = [[0,0,0],[0,0,0],[0,0,0]]
 			, tri = [0,1,2]
-			, centroid = verb.core.Eval.tri_centroid( points, tri );
+			, centroid = verb.core.Mesh.get_tri_centroid( points, tri );
 
 		should.equal( 0, centroid[0] );
 		should.equal( 0, centroid[1] );
@@ -3074,7 +3072,7 @@ describe("verb.core.Eval.tri_centroid",function(){
 
 		var points = [[5,10,2],[3,-4,5],[-10,-3, 10]]
 			, tri = [0,1,2]
-			, centroid = verb.core.Eval.tri_centroid( points, tri );
+			, centroid = verb.core.Mesh.get_tri_centroid( points, tri );
 
 		should.equal( -2/3, centroid[0] );
 		should.equal( 1, centroid[1] );
@@ -3084,74 +3082,132 @@ describe("verb.core.Eval.tri_centroid",function(){
 
 });
 
-describe("verb.core.Eval.min_coordinate_on_axis",function(){
+describe("verb.core.Eval.get_min_coordinate_on_axis",function(){
 
 	it('should return correct value', function(){
 
 		var points = [[5,10,2],[3,-4,5],[-10,-3, 10]]
 			, tri = [0,1,2]
-			, a1 = verb.core.Eval.min_coordinate_on_axis( points, tri, 0 )
-			, a2 = verb.core.Eval.min_coordinate_on_axis( points, tri, 1 )
-			, a3 = verb.core.Eval.min_coordinate_on_axis( points, tri, 2 );
+			, a1 = verb.core.Mesh.get_min_coordinate_on_axis( points, tri, 0 )
+			, a2 = verb.core.Mesh.get_min_coordinate_on_axis( points, tri, 1 )
+			, a3 = verb.core.Mesh.get_min_coordinate_on_axis( points, tri, 2 );
 
 		should.equal( -10, a1 );
 		should.equal( -4, a2 );
 		should.equal( 2, a3 );
 
 	});
-
 });
 
-describe("verb.core.Eval.sort_tris_on_longest_axis",function(){
+
+describe("verb.core.Mesh.sort_tris_on_longest_axis",function(){
 
 	it('should return correct result with y axis regular array', function(){
 
 		//
 		//  0  -  1
-		//  | 0 / 3 \ 
+		//  | 0 / 3 \
 		//  2   --  3
 		//  | 1 \ 2 /
 		//  4  -  5
-		// 
+		//
 
-		var points = [ [0,0,0], [1,-0.2,0], [0, -1, 0 ], [1, -1.2, 0], [0, -2, 0], [1, -2.2, 0]]
+		var points = [ [0,0,0], [1,-0.2,0], [0, -1, 0 ], [1, -1.2, 0], [0, -2.2, 0], [1, -2, 0]]
 			, tris = [[0,2,1], [2,4,5], [2,5,3], [1,2,3]]
+			, mesh = new verb.core.MeshData(tris, points, null, null)
 			, tri_indices = [0,1,2,3]
-			, aabb = verb.core.Eval.make_mesh_aabb(points, tris, tri_indices)
-			, sort_tri_indices = verb.core.Eval.sort_tris_on_longest_axis( aabb, points, tris, tri_indices );
+			, aabb = verb.core.Mesh.make_mesh_aabb(mesh, tri_indices)
+			, sort_tri_indices = verb.core.Mesh.sort_tris_on_longest_axis( aabb, mesh, tri_indices );
 
-		should.equal( 2, sort_tri_indices[0] );
-		should.equal( 1, sort_tri_indices[1] );
-		should.equal( 3, sort_tri_indices[2] );
-		should.equal( 0, sort_tri_indices[3] );
+		sort_tri_indices.should.eql([ 1, 2, 3, 0 ])
 
 	});
-
-});
-
-describe("verb.core.Eval.sort_tris_on_longest_axis",function(){
 
 	it('should return correct result', function(){
 
-		// 0 \
-		// 1 \\     0
-		//     4    2
-		// 2 //     1
-		// 3 /      
-
 		var points = [ [0,10,0], [0,5,0], [0, 0, 0 ], [0, -5, 0], [0, -2, 0], [1, -2.2, 0]]
 			, tris = [[0,1,4], [2,3,4], [1,2,4]]
+			, mesh = new verb.core.MeshData(tris, points, null, null)
 			, tri_indices = [0,1,2]
-			, aabb = verb.core.Eval.make_mesh_aabb(points, tris, tri_indices)
-			, sort_tri_indices = verb.core.Eval.sort_tris_on_longest_axis( aabb, points, tris, tri_indices );
+			, aabb = verb.core.Mesh.make_mesh_aabb(mesh, tri_indices)
+			, sort_tri_indices = verb.core.Mesh.sort_tris_on_longest_axis( aabb, mesh, tri_indices );
 
-		should.equal( 1, sort_tri_indices[0] );
-		should.equal( 2, sort_tri_indices[1] );
-		should.equal( 0, sort_tri_indices[2] );
+		sort_tri_indices.should.eql([ 1, 0, 2 ])
+	});
+
+});
+
+describe("verb.core.Make.four_point_surface",function(){
+
+	it('can create an inclined plane', function(){
+
+		var p1 = [0,0,0]
+			, p2 = [1,0,0]
+			, p3 = [1,1,1]
+			, p4 = [0,1,1];
+
+		var comps = verb.core.Make.four_point_surface(p1, p2, p3, p4);
+
+		comps.degreeU.should.equal(3);
+		comps.degreeV.should.equal(3);
+
+		// sample at the center
+		var p = verb.core.Eval.rational_surface_point( comps,
+														0.5,
+														0.5);
+
+		p[0].should.be.approximately(0.5, verb.core.Constants.EPSILON );
+		p[1].should.be.approximately(0.5, verb.core.Constants.EPSILON );
+		p[2].should.be.approximately(0.5, verb.core.Constants.EPSILON );
+
+	});
+
+	it('can create a hypar', function(){
+
+		var p1 = [0,0,1]
+			, p2 = [1,0,0]
+			, p3 = [1,1,1]
+			, p4 = [0,1,0];
+
+		var comps = verb.core.Make.four_point_surface(p1, p2, p3, p4);
+
+		comps.degreeU.should.equal(3);
+		comps.degreeV.should.equal(3);
+
+		// sample at the center
+		var p = verb.core.Eval.rational_surface_point( comps,
+														0.5,
+														0.5);
+
+		p[0].should.be.approximately(0.5, verb.core.Constants.EPSILON );
+		p[1].should.be.approximately(0.5, verb.core.Constants.EPSILON );
+		p[2].should.be.approximately(0.5, verb.core.Constants.EPSILON );
+
+		// bottom left
+		p = verb.core.Eval.rational_surface_point( comps,
+														0,
+														0);
+
+		p[0].should.be.approximately(0, verb.core.Constants.EPSILON );
+		p[1].should.be.approximately(0, verb.core.Constants.EPSILON );
+		p[2].should.be.approximately(1, verb.core.Constants.EPSILON );
+
+		// bottom right
+		p = verb.core.Eval.rational_surface_point( comps,
+														1,
+														0);
+
+		p[0].should.be.approximately(1, verb.core.Constants.EPSILON );
+		p[1].should.be.approximately(0, verb.core.Constants.EPSILON );
+		p[2].should.be.approximately(0, verb.core.Constants.EPSILON );
 
 	});
 
 });
+
+
+
+/*
 
 
 describe(.EvalCurve.split",function(){
@@ -3188,91 +3244,6 @@ describe(.EvalCurve.split",function(){
 
 		cubicSplit( 0.5 );
 		cubicSplit( 3.5 );
-
-	});
-
-});
-
-
-describe("verb.core.Eval.4pt_surface",function(){
-
-	it('can create an inclined plane', function(){
-
-		var p1 = [0,0,0]
-			, p2 = [1,0,0]
-			, p3 = [1,1,1]
-			, p4 = [0,1,1];
-
-		var comps = verb.core.Eval.4pt_surface(p1, p2, p3, p4);
-
-		comps.degreeU.should.equal(2);
-		comps.degreeV.should.equal(2);
-
-		// sample at the center
-		var p = verb.core.Eval.rational_surface_point( comps.degreeU,
-														comps.knotsU, 
-														comps.degreeV,
-														comps.knotsV, 
-														verb.core.Eval.homogenize_2d( comps.controlPoints, comps.weights), 
-														0.5, 
-														0.5);
-
-		p[0].should.be.approximately(0.5, verb.core.Constants.EPSILON );
-		p[1].should.be.approximately(0.5, verb.core.Constants.EPSILON );
-		p[2].should.be.approximately(0.5, verb.core.Constants.EPSILON );
-
-	});
-
-	it('can create a hypar', function(){
-
-		var p1 = [0,0,1]
-			, p2 = [1,0,0]
-			, p3 = [1,1,1]
-			, p4 = [0,1,0];
-
-		var comps = verb.core.Eval.4pt_surface(p1, p2, p3, p4);
-
-		comps.degreeU.should.equal(2);
-		comps.degreeV.should.equal(2);
-
-		// sample at the center
-		var p = verb.core.Eval.rational_surface_point( comps.degreeU,
-														comps.knotsU, 
-														comps.degreeV,
-														comps.knotsV, 
-														verb.core.Eval.homogenize_2d( comps.controlPoints, comps.weights), 
-														0.5, 
-														0.5);
-
-		p[0].should.be.approximately(0.5, verb.core.Constants.EPSILON );
-		p[1].should.be.approximately(0.5, verb.core.Constants.EPSILON );
-		p[2].should.be.approximately(0.5, verb.core.Constants.EPSILON );
-
-		// bottom left
-		p = verb.core.Eval.rational_surface_point( comps.degreeU,
-														comps.knotsU, 
-														comps.degreeV,
-														comps.knotsV, 
-														verb.core.Eval.homogenize_2d( comps.controlPoints, comps.weights), 
-														0, 
-														0);
-
-		p[0].should.be.approximately(0, verb.core.Constants.EPSILON );
-		p[1].should.be.approximately(0, verb.core.Constants.EPSILON );
-		p[2].should.be.approximately(1, verb.core.Constants.EPSILON );
-
-		// bottom right
-		p = verb.core.Eval.rational_surface_point( comps.degreeU,
-														comps.knotsU, 
-														comps.degreeV,
-														comps.knotsV, 
-														verb.core.Eval.homogenize_2d( comps.controlPoints, comps.weights), 
-														1, 
-														0);
-
-		p[0].should.be.approximately(1, verb.core.Constants.EPSILON );
-		p[1].should.be.approximately(0, verb.core.Constants.EPSILON );
-		p[2].should.be.approximately(0, verb.core.Constants.EPSILON );
 
 	});
 

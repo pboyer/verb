@@ -8,6 +8,44 @@ using verb.core.ArrayExtensions;
 @:expose("core.Make")
 class Make {
 
+    //
+    // Generate the control points, weights, and knots of a surface defined by 4 points
+    //
+    // **params**
+    // + *Array*, first point in counter-clockwise form
+    // + *Array*, second point in counter-clockwise form
+    // + *Array*, third point in counter-clockwise form
+    // + *Array*, forth point in counter-clockwise form
+    //
+    // **returns**
+    // + SurfaceData object
+    //
+
+   public static function four_point_surface( p1 : Point, p2 : Point, p3 : Point, p4 : Point ) : SurfaceData {
+
+        var pts = [];
+        for (i in 0...4){
+
+            var row = [];
+            for (j in 0...4){
+
+                var l = 1.0 - i / 3.0;
+                var p1p2 = Vec.lerp( l, p1, p2 );
+                var p4p3 = Vec.lerp( l, p4, p3 );
+
+                var res = Vec.lerp( 1.0 - j / 3.0, p1p2, p4p3 );
+                res.push(1.0); // add the weight
+
+                row.push(res);
+            }
+
+            pts.push( row );
+        }
+
+       return new SurfaceData( 3, 3, [0,0,0,0,1,1,1,1], [0,0,0,0,1,1,1,1], pts );
+
+    }
+
     // Generate the control points, weights, and knots of a swept surface
     //
     // **params**
@@ -49,7 +87,6 @@ class Make {
 
         return new SurfaceData( rail.degree, profile.degree, rail.knots, profile.knots, Eval.homogenize_2d( control_points, weights) );
     }
-
 
     //
     // Generate the control points, weights, and knots of an elliptical arc

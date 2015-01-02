@@ -337,34 +337,7 @@ public static function aabb_trees( points1, tris1, points2, tris2, aabb_tree1, a
 
 //
 //
-//
-// Get triangle centroid
-//
-// **params**
-// + array of length 3 arrays of numbers representing the points
-// + length 3 array of point indices for the triangle
-// 
-// **returns** 
-// + a point represented by an array of length 3
-//
 
-public static function get_tri_centroid( points, tri ) {
-
-	var centroid = [0,0,0];
-
-	for (var i = 0; i < 3; i++){
-		for (var j = 0; j < 3; j++){
-			centroid[j] += points[ tri[i] ][j];
-		}
-	}
-
-	for (var i = 0; i < 3; i++){
-		centroid[i] /= 3;
-	}
-
-	return centroid;
-
-};
 
 //
 //

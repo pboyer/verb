@@ -5,6 +5,10 @@ using Lambda;
 @:expose("core.Vec")
 class Vec {
 
+    public static function lerp(i : Float, u : Array<Float>, v : Array<Float>) : Array<Float>{
+        return Vec.add( Vec.mul( i, u ), Vec.mul( 1.0 - i, v) );
+    }
+
     public static function normalized( arr : Array<Float> ){
         return div( arr, norm(arr) );
     }

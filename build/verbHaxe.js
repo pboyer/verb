@@ -980,6 +980,26 @@ verb.core.Intersect.rays = function(a0,a,b0,b) {
 	return [t,w];
 };
 verb.core.Make = $hx_exports.core.Make = function() { };
+verb.core.Make.four_point_surface = function(p1,p2,p3,p4) {
+	var pts = [];
+	var _g = 0;
+	while(_g < 4) {
+		var i = _g++;
+		var row = [];
+		var _g1 = 0;
+		while(_g1 < 4) {
+			var j = _g1++;
+			var l = 1.0 - i / 3.0;
+			var p1p2 = verb.core.Vec.lerp(l,p1,p2);
+			var p4p3 = verb.core.Vec.lerp(l,p4,p3);
+			var res = verb.core.Vec.lerp(1.0 - j / 3.0,p1p2,p4p3);
+			res.push(1.0);
+			row.push(res);
+		}
+		pts.push(row);
+	}
+	return new verb.core.types.SurfaceData(3,3,[0,0,0,0,1,1,1,1],[0,0,0,0,1,1,1,1],pts);
+};
 verb.core.Make.sweep1_surface = function(profile,rail) {
 	var rail_start = verb.core.Eval.rational_curve_point(rail,0.0);
 	var span = 1.0 / rail.controlPoints.length;
@@ -1513,6 +1533,24 @@ verb.core.Mesh.get_min_coordinate_on_axis = function(points,tri,axis) {
 	}
 	return min;
 };
+verb.core.Mesh.get_tri_centroid = function(points,tri) {
+	var centroid = [0.0,0.0,0.0];
+	var _g = 0;
+	while(_g < 3) {
+		var i = _g++;
+		var _g1 = 0;
+		while(_g1 < 3) {
+			var j = _g1++;
+			centroid[j] += points[tri[i]][j];
+		}
+	}
+	var _g2 = 0;
+	while(_g2 < 3) {
+		var i1 = _g2++;
+		centroid[i1] /= 3;
+	}
+	return centroid;
+};
 verb.core.KnotMultiplicity = $hx_exports.core.KnotMultiplicity = function(knot,mult) {
 	this.knot = knot;
 	this.mult = mult;
@@ -2029,6 +2067,9 @@ verb.core.Trig.closest_point_on_segment = function(pt,segpt0,segpt1,u0,u1) {
 	return { u : u0 + (u1 - u0) * do2ptr / l, pt : verb.core.Vec.add(o,verb.core.Vec.mul(do2ptr,r))};
 };
 verb.core.Vec = $hx_exports.core.Vec = function() { };
+verb.core.Vec.lerp = function(i,u,v) {
+	return verb.core.Vec.add(verb.core.Vec.mul(i,u),verb.core.Vec.mul(1.0 - i,v));
+};
 verb.core.Vec.normalized = function(arr) {
 	return verb.core.Vec.div(arr,verb.core.Vec.norm(arr));
 };

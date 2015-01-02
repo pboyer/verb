@@ -86,6 +86,7 @@ class Mesh {
         minCoordFaceMap.sort(function(a : Pair<Float,Int>, b : Pair<Float, Int>):Int {
             var a0 = a.item1;
             var b0 = b.item1;
+
             if (a0 == b0) return 0 else if (a0 > b0) return 1 else return -1;
         });
 
@@ -119,5 +120,34 @@ class Mesh {
         }
 
         return min;
+    }
+
+    //
+    // Get triangle centroid
+    //
+    // **params**
+    // + array of length 3 arrays of numbers representing the points
+    // + length 3 array of point indices for the triangle
+    //
+    // **returns**
+    // + a point represented by an array of length 3
+    //
+
+    public static function get_tri_centroid( points : Array<Point>, tri : Tri ) : Point {
+
+        var centroid = [0.0,0.0,0.0];
+
+        for (i in 0...3){
+            for (j in 0...3){
+                centroid[j] += points[ tri[i] ][j];
+            }
+        }
+
+        for (i in 0...3){
+            centroid[i] /= 3;
+        }
+
+        return centroid;
+
     }
 }
