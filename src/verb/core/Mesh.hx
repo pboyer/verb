@@ -11,6 +11,30 @@ using verb.core.ArrayExtensions;
 class Mesh {
 
     //
+    // Get triangle normal
+    //
+    // **params**
+    // + array of length 3 arrays of numbers representing the points
+    // + length 3 array of point indices for the triangle
+    //
+    // **returns**
+    // + a normal vector represented by an array of length 3
+    //
+
+    public static function get_tri_norm( points : Array<Point>, tri : Tri ) : Point {
+
+        var v0 = points[ tri[0] ]
+        , v1 = points[ tri[1] ]
+        , v2 = points[ tri[2] ]
+        , u = Vec.sub( v1, v0 )
+        , v = Vec.sub( v2, v0 )
+        , n = Vec.cross( u, v );
+
+        return Vec.mul( 1 / Vec.norm( n ), n );
+
+    }
+
+    //
     // Form axis-aligned bounding box from triangles of mesh
     //
     // **params**

@@ -21,19 +21,21 @@ class Make {
     // + SurfaceData object
     //
 
-   public static function four_point_surface( p1 : Point, p2 : Point, p3 : Point, p4 : Point ) : SurfaceData {
+   public static function four_point_surface( p1 : Point, p2 : Point, p3 : Point, p4 : Point, degree : Int = 3 ) : SurfaceData {
+
+        var degreeFloat : Float = degree;
 
         var pts = [];
-        for (i in 0...4){
+        for (i in 0...degree+1){
 
             var row = [];
-            for (j in 0...4){
+            for (j in 0...degree+1){
 
-                var l = 1.0 - i / 3.0;
+                var l = 1.0 - i / degreeFloat;
                 var p1p2 = Vec.lerp( l, p1, p2 );
                 var p4p3 = Vec.lerp( l, p4, p3 );
 
-                var res = Vec.lerp( 1.0 - j / 3.0, p1p2, p4p3 );
+                var res = Vec.lerp( 1.0 - j / degreeFloat, p1p2, p4p3 );
                 res.push(1.0); // add the weight
 
                 row.push(res);
@@ -42,7 +44,10 @@ class Make {
             pts.push( row );
         }
 
-       return new SurfaceData( 3, 3, [0,0,0,0,1,1,1,1], [0,0,0,0,1,1,1,1], pts );
+       var zeros = Vec.rep(degree+1, 0.0);
+       var ones = Vec.rep(degree+1, 1.0);
+
+       return new SurfaceData( degree, degree, zeros.concat(ones), zeros.concat(ones), pts );
 
     }
 
@@ -59,12 +64,12 @@ class Make {
 
         // for each point on rail, move all of the points
         var rail_start = Eval.rational_curve_point( rail, 0.0 )
-        , span = 1.0 / rail.controlPoints.length
-        , control_points = []
-        , weights = []
-        , rail_weights = Eval.weight_1d( rail.controlPoints )
-        , profile_weights = Eval.weight_1d( profile.controlPoints )
-        , profile_points = Eval.dehomogenize_1d( profile.controlPoints );
+            , span = 1.0 / rail.controlPoints.length
+            , control_points = []
+            , weights = []
+            , rail_weights = Eval.weight_1d( rail.controlPoints )
+            , profile_weights = Eval.weight_1d( profile.controlPoints )
+            , profile_points = Eval.dehomogenize_1d( profile.controlPoints );
 
         for ( i in 0...rail.controlPoints.length ){
 
@@ -152,8 +157,8 @@ class Make {
 
             var T2 = Vec.sub( Vec.mul( Math.cos(angle), yaxis ), Vec.mul( Math.sin(angle), xaxis) );
 
-            var params = Intersect.rays(P0, Vec.mul( 1 / Vec.norm(T0), T0), P2, Vec.mul( 1 / Vec.norm(T2), T2));
-            var P1 = Vec.add( P0, Vec.mul(params[0], T0));
+            var inters = Intersect.rays(P0, Vec.mul( 1 / Vec.norm(T0), T0), P2, Vec.mul( 1 / Vec.norm(T2), T2));
+            var P1 = Vec.add( P0, Vec.mul(inters.u0, T0));
 
             weights[index+1] = w1;
             controlPoints[index+1] = P1;
@@ -420,8 +425,8 @@ class Make {
                     control_points[index+1][j] = O;
                 } else {
 
-                    var params = Intersect.rays(P0, Vec.mul( 1 / Vec.norm(T0), T0), P2, Vec.mul( 1 / Vec.norm(T2), T2));
-                    var P1 = Vec.add( P0, Vec.mul(params[0], T0));
+                    var inters = Intersect.rays(P0, Vec.mul( 1 / Vec.norm(T0), T0), P2, Vec.mul( 1 / Vec.norm(T2), T2));
+                    var P1 = Vec.add( P0, Vec.mul(inters.u0, T0));
 
                     control_points[index+1][j] = P1;
                 }

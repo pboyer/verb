@@ -1437,7 +1437,6 @@ function getFlatSurface(){
 			"degreeU": 2,
 			"degreeV": 2 };
 
-
 }
 
 describe("verb.core.AdaptiveRefinementNode.constructor",function(){
@@ -3200,6 +3199,94 @@ describe("verb.core.Make.four_point_surface",function(){
 		p[0].should.be.approximately(1, verb.core.Constants.EPSILON );
 		p[1].should.be.approximately(0, verb.core.Constants.EPSILON );
 		p[2].should.be.approximately(0, verb.core.Constants.EPSILON );
+
+	});
+
+});
+
+
+describe("verb.core.Intersect.parameteric_polylines_by_aabb",function(){
+
+	it('can intersect two simple lines', function(){
+
+		var p1 = [0,0,0]
+			, p2 = [0,1,0]
+			, p3 = [-0.5,0.5,0]
+			, p4 = [0.5,0.5,0];
+
+		var inter = verb.core.Intersect.parametric_polylines_by_aabb( [ p1, p2 ], [p3, p4], [0, 1], [0, 1],
+			verb.core.Constants.TOLERANCE );
+
+		inter.length.should.be.equal(1);
+
+		inter[0].u0.should.be.approximately(0.5, verb.core.Constants.TOLERANCE );
+		inter[0].u1.should.be.approximately(0.5, verb.core.Constants.TOLERANCE );
+		vecShouldBe( [0, 0.5, 0], inter[0].point0 );
+		vecShouldBe( [0, 0.5, 0], inter[0].point1 );
+
+	});
+
+	it('can intersect a length 2 polyline and line', function(){
+
+		var p1 = [0,0.5,0]
+			, p2 = [2,0.5,0]
+			, p3 = [0,0,0]
+			, p4 = [1,0,0]
+			, p5 = [1,1,0];
+
+		var inter = verb.core.Intersect.parametric_polylines_by_aabb( [ p1, p2 ], [p3, p4, p5], [0, 1], [0, 0.5, 1],
+			verb.core.Constants.TOLERANCE );
+
+		inter.length.should.be.equal(1);
+
+		inter[0].u0.should.be.approximately(0.5, verb.core.Constants.TOLERANCE );
+		inter[0].u1.should.be.approximately(0.75, verb.core.Constants.TOLERANCE );
+
+		vecShouldBe( [1, 0.5, 0], inter[0].point0 );
+		vecShouldBe( [1, 0.5, 0], inter[0].point1 );
+
+	});
+
+	it('can intersect two length 2 polylines', function(){
+
+		var p1 = [0.5,-0.5,0]
+			, p2 = [0.5,0.5,0]
+			, p3 = [1.5,0.5,0]
+
+			, p4 = [0,0,0]
+			, p5 = [1,0,0]
+			, p6 = [1,1,0];
+
+		var inter = verb.core.Intersect.parametric_polylines_by_aabb( [ p1, p2, p3 ], [p4, p5, p6], [0, 0.5, 1], [0, 0.5, 1],
+			verb.core.Constants.TOLERANCE );
+
+		inter.length.should.be.equal(2);
+
+		inter[0].u0.should.be.approximately(0.25, verb.core.Constants.TOLERANCE );
+		inter[0].u1.should.be.approximately(0.25, verb.core.Constants.TOLERANCE );
+			
+		inter[1].u0.should.be.approximately(0.75, verb.core.Constants.TOLERANCE );
+		inter[1].u1.should.be.approximately(0.75, verb.core.Constants.TOLERANCE );
+
+		vecShouldBe( [0.5, 0, 0], inter[0].point0 );
+		vecShouldBe( [0.5, 0, 0], inter[0].point1 );
+
+		vecShouldBe( [1, 0.5, 0], inter[1].point0 );
+		vecShouldBe( [1, 0.5, 0], inter[1].point1 );
+
+	});
+
+	it('correctly misses when two lines do not intersect', function(){
+
+		var p1 = [0,0,0.5]
+			, p2 = [0,1,0.5]
+			, p3 = [-0.5,0.5,0]
+			, p4 = [0.5,0.5,0];
+
+		var inter = verb.core.Intersect.parametric_polylines_by_aabb( [ p1, p2 ], [p3, p4], [0, 1], [0, 1],
+			verb.core.Constants.TOLERANCE );
+
+		inter.length.should.be.equal(0);
 
 	});
 

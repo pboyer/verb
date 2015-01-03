@@ -1,9 +1,16 @@
 package verb.core;
 
+import verb.core.types.CurveData.Point;
+import verb.core.Mat.Vector;
+
 using Lambda;
 
 @:expose("core.Vec")
 class Vec {
+
+    public static function onLine(origin : Point, dir : Vector, u : Float) : Array<Float> {
+        return Vec.add( origin, Vec.mul(u, dir) );
+    }
 
     public static function lerp(i : Float, u : Array<Float>, v : Array<Float>) : Array<Float>{
         return Vec.add( Vec.mul( i, u ), Vec.mul( 1.0 - i, v) );

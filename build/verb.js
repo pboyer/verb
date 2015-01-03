@@ -52,11 +52,10 @@ haxe.ds.IntMap.prototype = {
 };
 var verb = {};
 verb.BoundingBox = $hx_exports.BoundingBox = function(pts) {
+	this.max = null;
+	this.min = null;
 	this.dim = 3;
 	this.initialized = false;
-	this.dim = 3;
-	this.min = null;
-	this.max = null;
 	if(pts != null) this.addRange(pts);
 };
 verb.BoundingBox.intervalsOverlap = function(a1,a2,b1,b2,tol) {
@@ -71,9 +70,7 @@ verb.BoundingBox.intervalsOverlap = function(a1,a2,b1,b2,tol) {
 };
 verb.BoundingBox.prototype = {
 	fromPoint: function(pt) {
-		var bb = new verb.BoundingBox(null);
-		bb.add(pt);
-		return bb;
+		return new verb.BoundingBox([pt]);
 	}
 	,add: function(point) {
 		if(!this.initialized) {
@@ -83,17 +80,12 @@ verb.BoundingBox.prototype = {
 			this.initialized = true;
 			return this;
 		}
-		var i = 0;
-		var l = this.dim;
-		var _g = 0;
-		while(_g < l) {
-			var i1 = _g++;
-			if(point[i1] > this.max[i1]) this.max[i1] = point[i1];
-		}
 		var _g1 = 0;
-		while(_g1 < l) {
-			var i2 = _g1++;
-			if(point[i2] < this.min[i2]) this.min[i2] = point[i2];
+		var _g = this.dim;
+		while(_g1 < _g) {
+			var i = _g1++;
+			if(point[i] > this.max[i]) this.max[i] = point[i];
+			if(point[i] < this.min[i]) this.min[i] = point[i];
 		}
 		return this;
 	}
@@ -938,7 +930,88 @@ verb.core.TriangleSegmentIntersection = $hx_exports.core.TriangleSegmentIntersec
 	this.t = t;
 	this.p = r;
 };
+verb.core.CurveCurveIntersection = $hx_exports.core.CurveCurveIntersection = function(point0,point1,u0,u1) {
+	this.point0 = point0;
+	this.point1 = point1;
+	this.u0 = u0;
+	this.u1 = u1;
+};
 verb.core.Intersect = $hx_exports.core.Intersect = function() { };
+verb.core.Intersect.parametric_polylines_by_aabb = function(points0,points1,params0,params1,tol) {
+	var bb1 = new verb.BoundingBox(points0);
+	var bb2 = new verb.BoundingBox(points1);
+	if(!bb1.intersects(bb2,tol)) return [];
+	if(points0.length == 2 && points1.length == 2) {
+		var inter = verb.core.Intersect.segments(points0[0],points0[1],points1[0],points1[1],tol);
+		if(inter != null) {
+			inter.u0 = inter.u0 * (params0[1] - params0[0]) + params0[0];
+			inter.u1 = inter.u1 * (params1[1] - params1[0]) + params1[0];
+			return [inter];
+		}
+	} else if(points0.length == 2) {
+		var p2_mid = Math.ceil(points1.length / 2);
+		var p2_a = points1.slice(0,p2_mid);
+		var p2_b = points1.slice(p2_mid - 1);
+		var u2_a = params1.slice(0,p2_mid);
+		var u2_b = params1.slice(p2_mid - 1);
+		return verb.core.Intersect.parametric_polylines_by_aabb(points0,p2_a,params0,u2_a,tol).concat(verb.core.Intersect.parametric_polylines_by_aabb(points0,p2_b,params0,u2_b,tol));
+	} else if(points1.length == 2) {
+		var p1_mid = Math.ceil(points0.length / 2);
+		var p1_a = points0.slice(0,p1_mid);
+		var p1_b = points0.slice(p1_mid - 1);
+		var u1_a = params0.slice(0,p1_mid);
+		var u1_b = params0.slice(p1_mid - 1);
+		return verb.core.Intersect.parametric_polylines_by_aabb(p1_a,points1,u1_a,params1,tol).concat(verb.core.Intersect.parametric_polylines_by_aabb(p1_b,points1,u1_b,params1,tol));
+	} else {
+		var p1_mid1 = Math.ceil(points0.length / 2);
+		var p1_a1 = points0.slice(0,p1_mid1);
+		var p1_b1 = points0.slice(p1_mid1 - 1);
+		var u1_a1 = params0.slice(0,p1_mid1);
+		var u1_b1 = params0.slice(p1_mid1 - 1);
+		var p2_mid1 = Math.ceil(points1.length / 2);
+		var p2_a1 = points1.slice(0,p2_mid1);
+		var p2_b1 = points1.slice(p2_mid1 - 1);
+		var u2_a1 = params1.slice(0,p2_mid1);
+		var u2_b1 = params1.slice(p2_mid1 - 1);
+		return verb.core.Intersect.parametric_polylines_by_aabb(p1_a1,p2_a1,u1_a1,u2_a1,tol).concat(verb.core.Intersect.parametric_polylines_by_aabb(p1_a1,p2_b1,u1_a1,u2_b1,tol)).concat(verb.core.Intersect.parametric_polylines_by_aabb(p1_b1,p2_a1,u1_b1,u2_a1,tol)).concat(verb.core.Intersect.parametric_polylines_by_aabb(p1_b1,p2_b1,u1_b1,u2_b1,tol));
+	}
+	return [];
+};
+verb.core.Intersect.segments = function(a0,a1,b0,b1,tol) {
+	var a1ma0 = verb.core.Vec.sub(a1,a0);
+	var aN = Math.sqrt(verb.core.Vec.dot(a1ma0,a1ma0));
+	var a = verb.core.Vec.mul(1 / aN,a1ma0);
+	var b1mb0 = verb.core.Vec.sub(b1,b0);
+	var bN = Math.sqrt(verb.core.Vec.dot(b1mb0,b1mb0));
+	var b = verb.core.Vec.mul(1 / bN,b1mb0);
+	var int_params = verb.core.Intersect.rays(a0,a,b0,b);
+	if(int_params != null) {
+		var u0 = Math.min(Math.max(0,int_params.u0 / aN),1.0);
+		var u1 = Math.min(Math.max(0,int_params.u1 / bN),1.0);
+		var point0 = verb.core.Vec.onLine(a0,a1ma0,u0);
+		var point1 = verb.core.Vec.onLine(b0,b1mb0,u1);
+		var dist = verb.core.Vec.distSquared(point0,point1);
+		if(dist < tol * tol) return new verb.core.CurveCurveIntersection(point0,point1,u0,u1);
+	}
+	return null;
+};
+verb.core.Intersect.rays = function(a0,a,b0,b) {
+	var dab = verb.core.Vec.dot(a,b);
+	var dab0 = verb.core.Vec.dot(a,b0);
+	var daa0 = verb.core.Vec.dot(a,a0);
+	var dbb0 = verb.core.Vec.dot(b,b0);
+	var dba0 = verb.core.Vec.dot(b,a0);
+	var daa = verb.core.Vec.dot(a,a);
+	var dbb = verb.core.Vec.dot(b,b);
+	var div = daa * dbb - dab * dab;
+	if(Math.abs(div) < verb.core.Constants.EPSILON) return null;
+	var num = dab * (dab0 - daa0) - daa * (dbb0 - dba0);
+	var w = num / div;
+	var t = (dab0 - daa0 + w * dab) / daa;
+	var p0 = verb.core.Vec.onLine(a0,a,t);
+	var p1 = verb.core.Vec.onLine(b0,b,w);
+	return new verb.core.CurveCurveIntersection(p0,p1,t,w);
+};
 verb.core.Intersect.segment_with_tri = function(p0,p1,points,tri) {
 	var v0 = points[tri[0]];
 	var v1 = points[tri[1]];
@@ -973,41 +1046,32 @@ verb.core.Intersect.segment_with_plane = function(p0,p1,v0,n) {
 	var numer = verb.core.Vec.dot(n,verb.core.Vec.sub(v0,p0));
 	return { p : numer / denom};
 };
-verb.core.Intersect.rays = function(a0,a,b0,b) {
-	var dab = verb.core.Vec.dot(a,b);
-	var dab0 = verb.core.Vec.dot(a,b0);
-	var daa0 = verb.core.Vec.dot(a,a0);
-	var dbb0 = verb.core.Vec.dot(b,b0);
-	var dba0 = verb.core.Vec.dot(b,a0);
-	var daa = verb.core.Vec.dot(a,a);
-	var dbb = verb.core.Vec.dot(b,b);
-	var div = daa * dbb - dab * dab;
-	if(Math.abs(div) < verb.core.Constants.EPSILON) return null;
-	var num = dab * (dab0 - daa0) - daa * (dbb0 - dba0);
-	var w = num / div;
-	var t = (dab0 - daa0 + w * dab) / daa;
-	return [t,w];
-};
 verb.core.Make = $hx_exports.core.Make = function() { };
-verb.core.Make.four_point_surface = function(p1,p2,p3,p4) {
+verb.core.Make.four_point_surface = function(p1,p2,p3,p4,degree) {
+	if(degree == null) degree = 3;
+	var degreeFloat = degree;
 	var pts = [];
-	var _g = 0;
-	while(_g < 4) {
-		var i = _g++;
+	var _g1 = 0;
+	var _g = degree + 1;
+	while(_g1 < _g) {
+		var i = _g1++;
 		var row = [];
-		var _g1 = 0;
-		while(_g1 < 4) {
-			var j = _g1++;
-			var l = 1.0 - i / 3.0;
+		var _g3 = 0;
+		var _g2 = degree + 1;
+		while(_g3 < _g2) {
+			var j = _g3++;
+			var l = 1.0 - i / degreeFloat;
 			var p1p2 = verb.core.Vec.lerp(l,p1,p2);
 			var p4p3 = verb.core.Vec.lerp(l,p4,p3);
-			var res = verb.core.Vec.lerp(1.0 - j / 3.0,p1p2,p4p3);
+			var res = verb.core.Vec.lerp(1.0 - j / degreeFloat,p1p2,p4p3);
 			res.push(1.0);
 			row.push(res);
 		}
 		pts.push(row);
 	}
-	return new verb.core.types.SurfaceData(3,3,[0,0,0,0,1,1,1,1],[0,0,0,0,1,1,1,1],pts);
+	var zeros = verb.core.Vec.rep(degree + 1,0.0);
+	var ones = verb.core.Vec.rep(degree + 1,1.0);
+	return new verb.core.types.SurfaceData(degree,degree,zeros.concat(ones),zeros.concat(ones),pts);
 };
 verb.core.Make.sweep1_surface = function(profile,rail) {
 	var rail_start = verb.core.Eval.rational_curve_point(rail,0.0);
@@ -1063,8 +1127,8 @@ verb.core.Make.ellipse_arc = function(center,xaxis,yaxis,xradius,yradius,startAn
 		weights[index + 2] = 1;
 		controlPoints[index + 2] = P2;
 		var T2 = verb.core.Vec.sub(verb.core.Vec.mul(Math.cos(angle),yaxis),verb.core.Vec.mul(Math.sin(angle),xaxis));
-		var params = verb.core.Intersect.rays(P0,verb.core.Vec.mul(1 / verb.core.Vec.norm(T0),T0),P2,verb.core.Vec.mul(1 / verb.core.Vec.norm(T2),T2));
-		var P1 = verb.core.Vec.add(P0,verb.core.Vec.mul(params[0],T0));
+		var inters = verb.core.Intersect.rays(P0,verb.core.Vec.mul(1 / verb.core.Vec.norm(T0),T0),P2,verb.core.Vec.mul(1 / verb.core.Vec.norm(T2),T2));
+		var P1 = verb.core.Vec.add(P0,verb.core.Vec.mul(inters.u0,T0));
 		weights[index + 1] = w1;
 		controlPoints[index + 1] = P1;
 		index += 2;
@@ -1225,8 +1289,8 @@ verb.core.Make.revolved_surface = function(center,axis,theta,profile) {
 			weights1[index + 2][j1] = prof_weights[j1];
 			var T2 = verb.core.Vec.sub(verb.core.Vec.mul(cosines[i2],Y),verb.core.Vec.mul(sines[i2],X));
 			if(r == 0) control_points1[index + 1][j1] = O; else {
-				var params = verb.core.Intersect.rays(P0,verb.core.Vec.mul(1 / verb.core.Vec.norm(T0),T0),P2,verb.core.Vec.mul(1 / verb.core.Vec.norm(T2),T2));
-				var P1 = verb.core.Vec.add(P0,verb.core.Vec.mul(params[0],T0));
+				var inters = verb.core.Intersect.rays(P0,verb.core.Vec.mul(1 / verb.core.Vec.norm(T0),T0),P2,verb.core.Vec.mul(1 / verb.core.Vec.norm(T2),T2));
+				var P1 = verb.core.Vec.add(P0,verb.core.Vec.mul(inters.u0,T0));
 				control_points1[index + 1][j1] = P1;
 			}
 			weights1[index + 1][j1] = wm * prof_weights[j1];
@@ -1488,6 +1552,15 @@ verb.core.Mat.LU = function(A) {
 	return new verb.core.LUDecomp(A,P);
 };
 verb.core.Mesh = $hx_exports.core.Mesh = function() { };
+verb.core.Mesh.get_tri_norm = function(points,tri) {
+	var v0 = points[tri[0]];
+	var v1 = points[tri[1]];
+	var v2 = points[tri[2]];
+	var u = verb.core.Vec.sub(v1,v0);
+	var v = verb.core.Vec.sub(v2,v0);
+	var n = verb.core.Vec.cross(u,v);
+	return verb.core.Vec.mul(1 / verb.core.Vec.norm(n),n);
+};
 verb.core.Mesh.make_mesh_aabb = function(mesh,faceIndices) {
 	var bb = new verb.BoundingBox();
 	var _g = 0;
@@ -2076,6 +2149,9 @@ verb.core.Trig.closest_point_on_segment = function(pt,segpt0,segpt1,u0,u1) {
 	return { u : u0 + (u1 - u0) * do2ptr / l, pt : verb.core.Vec.add(o,verb.core.Vec.mul(do2ptr,r))};
 };
 verb.core.Vec = $hx_exports.core.Vec = function() { };
+verb.core.Vec.onLine = function(origin,dir,u) {
+	return verb.core.Vec.add(origin,verb.core.Vec.mul(u,dir));
+};
 verb.core.Vec.lerp = function(i,u,v) {
 	return verb.core.Vec.add(verb.core.Vec.mul(i,u),verb.core.Vec.mul(1.0 - i,v));
 };
