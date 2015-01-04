@@ -130,7 +130,6 @@ class Eval {
 	// + a point represented by an array of length (dim)
 	//
 
-	
 	public static function rational_curve_point( curve : CurveData, u : Float) : Point {
 		return dehomogenize( curve_point( curve, u) );
 	}

@@ -108,15 +108,15 @@ class Mesh {
         }
 
         minCoordFaceMap.sort(function(a : Pair<Float,Int>, b : Pair<Float, Int>):Int {
-            var a0 = a.item1;
-            var b0 = b.item1;
+            var a0 = a.item0;
+            var b0 = b.item0;
 
             if (a0 == b0) return 0 else if (a0 > b0) return 1 else return -1;
         });
 
         var sortedFaceIndices = new Array<Int>();
         for ( i in 0...minCoordFaceMap.length){
-            sortedFaceIndices.push( minCoordFaceMap[i].item2 );
+            sortedFaceIndices.push( minCoordFaceMap[i].item1 );
         }
 
         return sortedFaceIndices;

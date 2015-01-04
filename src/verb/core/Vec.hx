@@ -8,7 +8,7 @@ using Lambda;
 @:expose("core.Vec")
 class Vec {
 
-    public static function onLine(origin : Point, dir : Vector, u : Float) : Array<Float> {
+    public static function onRay(origin : Point, dir : Vector, u : Float) : Array<Float> {
         return Vec.add( origin, Vec.mul(u, dir) );
     }
 

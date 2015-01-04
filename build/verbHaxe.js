@@ -915,7 +915,25 @@ verb.core.Eval.knot_span_given_n = function(n,degree,u,knots) {
 	}
 	return mid;
 };
-verb.core.TriangleSegmentIntersection = $hx_exports.core.TriangleSegmentIntersection = function(point,s,t,r) {
+verb.core.Ray = $hx_exports.core.Ray = function(origin,dir) {
+	this.origin = origin;
+	this.dir = dir;
+};
+verb.core.Interval = $hx_exports.core.Interval = function(min,max) {
+	this.min = min;
+	this.max = max;
+};
+verb.core.CurveTriPoint = $hx_exports.core.CurveTriPoint = function(u,point,uv) {
+	this.u = u;
+	this.point = point;
+	this.uv = uv;
+};
+verb.core.TriTriPoint = $hx_exports.core.TriTriPoint = function(uv0,uv1,point) {
+	this.uv0 = uv0;
+	this.uv1 = uv1;
+	this.point = point;
+};
+verb.core.TriSegmentIntersection = $hx_exports.core.TriSegmentIntersection = function(point,s,t,r) {
 	this.point = point;
 	this.s = s;
 	this.t = t;
@@ -928,6 +946,137 @@ verb.core.CurveCurveIntersection = $hx_exports.core.CurveCurveIntersection = fun
 	this.u1 = u1;
 };
 verb.core.Intersect = $hx_exports.core.Intersect = function() { };
+verb.core.Intersect.triangles = function(mesh0,tri0,mesh1,tri1) {
+	var n0 = verb.core.Mesh.get_tri_norm(mesh0.points,tri0);
+	var n1 = verb.core.Mesh.get_tri_norm(mesh1.points,tri1);
+	var o0 = mesh0.points[tri0[0]];
+	var o1 = mesh1.points[tri1[0]];
+	var ray = verb.core.Intersect.planes(o0,n0,o1,n1);
+	if(ray == null) return null;
+	var clip1 = verb.core.Intersect.clip_ray_in_coplanar_tri(ray,mesh0,tri0);
+	if(clip1 == null) return null;
+	var clip2 = verb.core.Intersect.clip_ray_in_coplanar_tri(ray,mesh1,tri1);
+	if(clip2 == null) return null;
+	var merged = verb.core.Intersect.merge_tri_clip_intervals(clip1,clip2,mesh0,tri0,mesh1,tri1);
+	if(merged == null) return null;
+	return new verb.core.Interval(new verb.core.TriTriPoint(merged.min.uv0,merged.min.uv1,merged.min.point),new verb.core.TriTriPoint(merged.max.uv0,merged.max.uv1,merged.max.point));
+};
+verb.core.Intersect.clip_ray_in_coplanar_tri = function(ray,mesh,tri) {
+	var o = [mesh.points[tri[0]],mesh.points[tri[1]],mesh.points[tri[2]]];
+	var uvs = [mesh.uvs[tri[0]],mesh.uvs[tri[1]],mesh.uvs[tri[2]]];
+	var uvd = [verb.core.Vec.sub(uvs[1],uvs[0]),verb.core.Vec.sub(uvs[2],uvs[1]),verb.core.Vec.sub(uvs[0],uvs[2])];
+	var s = [verb.core.Vec.sub(o[1],o[0]),verb.core.Vec.sub(o[2],o[1]),verb.core.Vec.sub(o[0],o[2])];
+	var d = s.map(verb.core.Vec.normalized);
+	var l = s.map(verb.core.Vec.norm);
+	var minU = null;
+	var maxU = null;
+	var _g = 0;
+	while(_g < 3) {
+		var i = _g++;
+		var o0 = o[i];
+		var d0 = d[i];
+		var res = verb.core.Intersect.rays(o0,d0,ray.origin,ray.dir);
+		if(res == null) continue;
+		var useg = res.u0;
+		var uray = res.u1;
+		if(useg < -verb.core.Constants.EPSILON || useg > l[i] + verb.core.Constants.EPSILON) continue;
+		if(minU == null || uray < minU.u) minU = new verb.core.CurveTriPoint(uray,verb.core.Vec.onRay(ray.origin,ray.dir,uray),verb.core.Vec.onRay(uvs[i],uvd[i],useg / l[i]));
+		if(maxU == null || uray > maxU.u) maxU = new verb.core.CurveTriPoint(uray,verb.core.Vec.onRay(ray.origin,ray.dir,uray),verb.core.Vec.onRay(uvs[i],uvd[i],useg / l[i]));
+	}
+	if(maxU == null || minU == null) return null;
+	return new verb.core.Interval(minU,maxU);
+};
+verb.core.Intersect.merge_tri_clip_intervals = function(clip1,clip2,mesh1,tri1,mesh2,tri2) {
+	if(clip2.min.u > clip1.max.u + verb.core.Constants.EPSILON || clip1.min.u > clip2.max.u + verb.core.Constants.EPSILON) return null;
+	var min;
+	if(clip1.min.u > clip2.min.u) min = new verb.core.types.Pair(clip1.min,0); else min = new verb.core.types.Pair(clip2.min,1);
+	var max;
+	if(clip1.max.u < clip2.max.u) max = new verb.core.types.Pair(clip1.max,0); else max = new verb.core.types.Pair(clip2.max,1);
+	var res = new verb.core.Interval(new verb.core.TriTriPoint(null,null,min.item0.point),new verb.core.TriTriPoint(null,null,max.item0.point));
+	if(min.item1 == 0) {
+		res.min.uv0 = min.item0.uv;
+		res.min.uv1 = verb.core.Intersect.tri_uv_from_point(mesh2,tri2,min.item0.point);
+	} else {
+		res.min.uv0 = verb.core.Intersect.tri_uv_from_point(mesh1,tri1,min.item0.point);
+		res.min.uv1 = min.item0.uv;
+	}
+	if(max.item1 == 0) {
+		res.max.uv0 = max.item0.uv;
+		res.max.uv1 = verb.core.Intersect.tri_uv_from_point(mesh2,tri2,max.item0.point);
+	} else {
+		res.max.uv0 = verb.core.Intersect.tri_uv_from_point(mesh1,tri1,max.item0.point);
+		res.max.uv1 = max.item0.uv;
+	}
+	return res;
+};
+verb.core.Intersect.tri_uv_from_point = function(mesh,tri,f) {
+	var p1 = mesh.points[tri[0]];
+	var p2 = mesh.points[tri[1]];
+	var p3 = mesh.points[tri[2]];
+	var uv1 = mesh.uvs[tri[0]];
+	var uv2 = mesh.uvs[tri[1]];
+	var uv3 = mesh.uvs[tri[2]];
+	var f1 = verb.core.Vec.sub(p1,f);
+	var f2 = verb.core.Vec.sub(p2,f);
+	var f3 = verb.core.Vec.sub(p3,f);
+	var a = verb.core.Vec.norm(verb.core.Vec.cross(verb.core.Vec.sub(p1,p2),verb.core.Vec.sub(p1,p3)));
+	var a1 = verb.core.Vec.norm(verb.core.Vec.cross(f2,f3)) / a;
+	var a2 = verb.core.Vec.norm(verb.core.Vec.cross(f3,f1)) / a;
+	var a3 = verb.core.Vec.norm(verb.core.Vec.cross(f1,f2)) / a;
+	return verb.core.Vec.add(verb.core.Vec.mul(a1,uv1),verb.core.Vec.add(verb.core.Vec.mul(a2,uv2),verb.core.Vec.mul(a3,uv3)));
+};
+verb.core.Intersect.planes = function(origin0,normal0,origin1,normal1) {
+	var d = verb.core.Vec.cross(normal0,normal1);
+	if(verb.core.Vec.dot(d,d) < verb.core.Constants.EPSILON) return null;
+	var li = 0;
+	var mi = Math.abs(d[0]);
+	var m1 = Math.abs(d[1]);
+	var m2 = Math.abs(d[2]);
+	if(m1 > mi) {
+		li = 1;
+		mi = m1;
+	}
+	if(m2 > mi) {
+		li = 2;
+		mi = m2;
+	}
+	var a1;
+	var b1;
+	var a2;
+	var b2;
+	if(li == 0) {
+		a1 = normal0[1];
+		b1 = normal0[2];
+		a2 = normal1[1];
+		b2 = normal1[2];
+	} else if(li == 1) {
+		a1 = normal0[0];
+		b1 = normal0[2];
+		a2 = normal1[0];
+		b2 = normal1[2];
+	} else {
+		a1 = normal0[0];
+		b1 = normal0[1];
+		a2 = normal1[0];
+		b2 = normal1[1];
+	}
+	var d1 = -verb.core.Vec.dot(origin0,normal0);
+	var d2 = -verb.core.Vec.dot(origin1,normal1);
+	var den = a1 * b2 - b1 * a2;
+	var x = (b1 * d2 - d1 * b2) / den;
+	var y = (d1 * a2 - a1 * d2) / den;
+	var p;
+	if(li == 0) p = [0,x,y]; else if(li == 1) p = [x,0,y]; else p = [x,y,0];
+	return new verb.core.Ray(p,verb.core.Vec.normalized(d));
+};
+verb.core.Intersect.three_planes = function(n0,d0,n1,d1,n2,d2) {
+	var u = verb.core.Vec.cross(n1,n2);
+	var den = verb.core.Vec.dot(n0,u);
+	if(Math.abs(den) < verb.core.Constants.EPSILON) return null;
+	var diff = verb.core.Vec.sub(verb.core.Vec.mul(d2,n1),verb.core.Vec.mul(d1,n2));
+	var num = verb.core.Vec.add(verb.core.Vec.mul(d0,u),verb.core.Vec.cross(n0,diff));
+	return verb.core.Vec.mul(1 / den,num);
+};
 verb.core.Intersect.parametric_polylines_by_aabb = function(points0,points1,params0,params1,tol) {
 	var bb1 = new verb.BoundingBox(points0);
 	var bb2 = new verb.BoundingBox(points1);
@@ -979,8 +1128,8 @@ verb.core.Intersect.segments = function(a0,a1,b0,b1,tol) {
 	if(int_params != null) {
 		var u0 = Math.min(Math.max(0,int_params.u0 / aN),1.0);
 		var u1 = Math.min(Math.max(0,int_params.u1 / bN),1.0);
-		var point0 = verb.core.Vec.onLine(a0,a1ma0,u0);
-		var point1 = verb.core.Vec.onLine(b0,b1mb0,u1);
+		var point0 = verb.core.Vec.onRay(a0,a1ma0,u0);
+		var point1 = verb.core.Vec.onRay(b0,b1mb0,u1);
 		var dist = verb.core.Vec.distSquared(point0,point1);
 		if(dist < tol * tol) return new verb.core.CurveCurveIntersection(point0,point1,u0,u1);
 	}
@@ -999,8 +1148,8 @@ verb.core.Intersect.rays = function(a0,a,b0,b) {
 	var num = dab * (dab0 - daa0) - daa * (dbb0 - dba0);
 	var w = num / div;
 	var t = (dab0 - daa0 + w * dab) / daa;
-	var p0 = verb.core.Vec.onLine(a0,a,t);
-	var p1 = verb.core.Vec.onLine(b0,b,w);
+	var p0 = verb.core.Vec.onRay(a0,a,t);
+	var p1 = verb.core.Vec.onRay(b0,b,w);
 	return new verb.core.CurveCurveIntersection(p0,p1,t,w);
 };
 verb.core.Intersect.segment_with_tri = function(p0,p1,points,tri) {
@@ -1029,7 +1178,7 @@ verb.core.Intersect.segment_with_tri = function(p0,p1,points,tri) {
 	var s = (uv * wv - vv * wu) / denom;
 	var t = (uv * wu - uu * wv) / denom;
 	if(s > 1.0 + verb.core.Constants.EPSILON || t > 1.0 + verb.core.Constants.EPSILON || t < -verb.core.Constants.EPSILON || s < -verb.core.Constants.EPSILON || s + t > 1.0 + verb.core.Constants.EPSILON) return null;
-	return new verb.core.TriangleSegmentIntersection(pt,s,t,r);
+	return new verb.core.TriSegmentIntersection(pt,s,t,r);
 };
 verb.core.Intersect.segment_with_plane = function(p0,p1,v0,n) {
 	var denom = verb.core.Vec.dot(n,verb.core.Vec.sub(p0,p1));
@@ -1583,8 +1732,8 @@ verb.core.Mesh.sort_tris_on_longest_axis = function(bb,mesh,faceIndices) {
 		minCoordFaceMap.push(new verb.core.types.Pair(tri_min,faceIndex));
 	}
 	minCoordFaceMap.sort(function(a,b) {
-		var a0 = a.item1;
-		var b0 = b.item1;
+		var a0 = a.item0;
+		var b0 = b.item0;
 		if(a0 == b0) return 0; else if(a0 > b0) return 1; else return -1;
 	});
 	var sortedFaceIndices = new Array();
@@ -1592,7 +1741,7 @@ verb.core.Mesh.sort_tris_on_longest_axis = function(bb,mesh,faceIndices) {
 	var _g2 = minCoordFaceMap.length;
 	while(_g1 < _g2) {
 		var i = _g1++;
-		sortedFaceIndices.push(minCoordFaceMap[i].item2);
+		sortedFaceIndices.push(minCoordFaceMap[i].item1);
 	}
 	return sortedFaceIndices;
 };
@@ -2140,7 +2289,7 @@ verb.core.Trig.closest_point_on_segment = function(pt,segpt0,segpt1,u0,u1) {
 	return { u : u0 + (u1 - u0) * do2ptr / l, pt : verb.core.Vec.add(o,verb.core.Vec.mul(do2ptr,r))};
 };
 verb.core.Vec = $hx_exports.core.Vec = function() { };
-verb.core.Vec.onLine = function(origin,dir,u) {
+verb.core.Vec.onRay = function(origin,dir,u) {
 	return verb.core.Vec.add(origin,verb.core.Vec.mul(u,dir));
 };
 verb.core.Vec.lerp = function(i,u,v) {
@@ -2537,9 +2686,9 @@ verb.core.types.CurveLengthSample = $hx_exports.core.CurveLengthSample = functio
 	this.u = u;
 	this.len = len;
 };
-verb.core.types.MeshData = $hx_exports.core.MeshData = function(faces,vertices,normals,uvs) {
+verb.core.types.MeshData = $hx_exports.core.MeshData = function(faces,points,normals,uvs) {
 	this.faces = faces;
-	this.points = vertices;
+	this.points = points;
 	this.normals = normals;
 	this.uvs = uvs;
 };
@@ -2547,8 +2696,8 @@ verb.core.types.MeshData.empty = function() {
 	return new verb.core.types.MeshData([],[],[],[]);
 };
 verb.core.types.Pair = $hx_exports.core.Pair = function(item1,item2) {
-	this.item1 = item1;
-	this.item2 = item2;
+	this.item0 = item1;
+	this.item1 = item2;
 };
 verb.core.types.SurfaceData = $hx_exports.core.SurfaceData = function(degreeU,degreeV,knotsU,knotsV,controlPoints) {
 	this.degreeU = degreeU;

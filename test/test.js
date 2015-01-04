@@ -3293,9 +3293,371 @@ describe("verb.core.Intersect.parameteric_polylines_by_aabb",function(){
 });
 
 
+describe("verb.core.Intersect.three_planes",function(){
+
+	it('is correct for intersection of 3 basis planes', function(){
+
+		var d1 = 0;
+		var n1 = [1,0,0];
+		var d2 = 0;
+		var n2 = [0,1,0];
+		var d3 = 0;
+		var n3 = [0,0,1];
+
+		var res = verb.core.Intersect.three_planes(n1, d1, n2, d2, n3, d3);
+		res.should.be.eql( [0,0,0] );
+
+	});
+
+	it('is correct for intersection of shifted basis planes', function(){
+
+		var n1 = [1,0,0];
+		var n2 = [0,1,0];
+		var n3 = [0,0,1];
+		var d1, d2, d3, res;
+
+		for (var i = 0; i < 100; i++){
+
+			d1 = (Math.random() - 0.5) * 10000;
+			d2 = (Math.random() - 0.5) * 10000;
+			d3 = (Math.random() - 0.5) * 10000;
+
+			res = verb.core.Intersect.three_planes(n1, d1, n2, d2, n3, d3);
+
+			res[0].should.be.approximately( d1, verb.core.Constants.EPSILON );
+			res[1].should.be.approximately( d2, verb.core.Constants.EPSILON );
+			res[2].should.be.approximately( d3, verb.core.Constants.EPSILON );
+
+		}
+
+	});
+
+	it('is null for repeat planes', function(){
+
+		var d1 = 10;
+		var n1 = [0,1,0];
+		var d2 = 0;
+		var n2 = [0,1,0];
+		var d3 = 10;
+		var n3 = [0,0,1];
+
+		var res = verb.core.Intersect.three_planes(n1, d1, n2, d2, n3, d3);
+		should.equal( res, null ); //non-intersect is null
+
+	});
+
+});
+
+
+describe("verb.core.Intersect.intersect_planes",function(){
+
+	it('is correct for intersection of xz and yz planes', function(){
+
+		var o1 = [0,0,0];
+		var n1 = [1,0,0];
+		var o2 = [0,0,0];
+		var n2 = [0,1,0];
+
+		var res = verb.core.Intersect.planes(o1, n1, o2, n2);
+
+		res.origin.should.be.eql( [0,0,0] );
+		res.dir.should.be.eql( [0,0,1] );
+
+	});
+
+	it('is correct for intersection of xz and shifted yz plane', function(){
+
+		var o1 = [20,0,0];
+		var n1 = [1,0,0];
+		var o2 = [0,0,0];
+		var n2 = [0,1,0];
+
+		var res = verb.core.Intersect.planes(o1, n1, o2, n2);
+
+		res.origin.should.be.eql( [20,0,0] );
+		res.dir.should.be.eql( [0,0,1] );
+
+	});
+
+	it('is correct for intersection of shifted xz and yz plane', function(){
+
+		var o1 = [0,0,0];
+		var n1 = [1,0,0];
+		var o2 = [0,20,0];
+		var n2 = [0,1,0];
+
+		// should be z-axis
+		var res = verb.core.Intersect.planes(o1, n1, o2, n2);
+
+		res.origin.should.be.eql( [0,20,0] );
+		res.dir.should.be.eql( [0,0,1] );
+
+	});
+
+});
+
+describe("verb.core.Intersect.clip_ray_in_coplanar_tri",function(){
+
+	it('is correct for a basic example 1', function(){
+
+		var o = [0,1,0];
+		var d = [1,0,0];
+
+		var pts = [ [0,0,0], [2,0,0], [2, 2,0] ];
+		var tri = [ 0, 1, 2 ];
+		var uvs = [ [0,0], [2,0], [2, 2] ];
+		var mesh = new verb.core.MeshData(null, pts, null, uvs);
+
+		var res = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh, tri);
+
+		res.min.u.should.be.approximately(1, verb.core.Constants.TOLERANCE);
+		res.max.u.should.be.approximately(2, verb.core.Constants.TOLERANCE);
+
+		vecShouldBe( [1,1], res.min.uv );
+		vecShouldBe( [2,1], res.max.uv );
+
+		vecShouldBe( [1,1,0], res.min.point );
+		vecShouldBe( [2,1,0], res.max.point );
+
+	});
+
+	it('is correct for a basic example 2', function(){
+
+		var o = [0.5,-0.5,0];
+		var d = [0,1,0];
+
+		var pts = [ [0,0,0], [2,0,0], [2, 2,0] ];
+		var tri = [ 0, 1, 2 ];
+		var uvs = [ [0,0], [2,0], [2, 2] ];
+
+		var mesh = new verb.core.MeshData(null, pts, null, uvs);
+		var res = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh, tri );
+
+		res.min.u.should.be.approximately(0.5, verb.core.Constants.TOLERANCE);
+		res.max.u.should.be.approximately(1, verb.core.Constants.TOLERANCE);
+
+		vecShouldBe( [0.5,0], res.min.uv );
+		vecShouldBe( [0.5,0.5], res.max.uv );
+
+		vecShouldBe( [0.5,0,0], res.min.point );
+		vecShouldBe( [0.5,0.5,0], res.max.point );
+
+	});
+
+	it('is correct for a basic example 3', function(){
+
+		var o = [0.5,-0.5,0];
+		var d = [Math.sqrt(2)/2,Math.sqrt(2)/2,0];
+
+		var pts = [ [0,0,0], [2,0,0], [2, 2,0] ];
+		var tri = [ 0, 1, 2 ];
+		var uvs = [ [0,0], [2,0], [2, 2] ];
+
+		var mesh = new verb.core.MeshData(null, pts, null, uvs);
+		var res = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh, tri );
+
+		res.min.u.should.be.approximately(Math.sqrt(2)/2, verb.core.Constants.TOLERANCE);
+		res.max.u.should.be.approximately(3 * Math.sqrt(2)/2, verb.core.Constants.TOLERANCE);
+
+		vecShouldBe( [1,0], res.min.uv );
+		vecShouldBe( [2,1], res.max.uv );
+
+		vecShouldBe( [1,0,0], res.min.point );
+		vecShouldBe( [2,1,0], res.max.point );
+
+	});
+
+	it('is correct for a basic example 4', function(){
+
+		var o = [0, 2,0];
+		var d = [Math.sqrt(2)/2,-Math.sqrt(2)/2,0];
+
+		var pts = [ [0,0,0], [2,0,0], [2, 2,0] ];
+		var tri = [ 0, 1, 2 ];
+		var uvs = [ [0,0], [2,0], [2, 2] ];
+
+		var mesh = new verb.core.MeshData(null, pts, null, uvs);
+		var res = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh, tri );
+
+		res.min.u.should.be.approximately(Math.sqrt(2), verb.core.Constants.TOLERANCE);
+		res.max.u.should.be.approximately(2 * Math.sqrt(2), verb.core.Constants.TOLERANCE);
+
+		vecShouldBe( [1,1], res.min.uv );
+		vecShouldBe( [2,0], res.max.uv );
+
+		vecShouldBe( [1,1,0], res.min.point );
+		vecShouldBe( [2,0,0], res.max.point );
+
+	});
+
+	it('is correct for a basic example 5', function(){
+
+		var o = [1,1,0];
+		var d = [Math.sqrt(2)/2,-Math.sqrt(2)/2,0];
+
+		var pts = [ [0,0,0], [2,0,0], [2, 2,0] ];
+		var tri = [ 0, 1, 2 ];
+		var uvs = [ [0,0], [2,0], [2, 2] ];
+
+		var mesh = new verb.core.MeshData(null, pts, null, uvs);
+		var res = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh, tri );
+
+		res.min.u.should.be.approximately(0, verb.core.Constants.TOLERANCE);
+		res.max.u.should.be.approximately(Math.sqrt(2), verb.core.Constants.TOLERANCE);
+
+		vecShouldBe( [1,1], res.min.uv );
+		vecShouldBe( [2,0], res.max.uv );
+
+		vecShouldBe( [1,1,0], res.min.point );
+		vecShouldBe( [2,0,0], res.max.point );
+
+	});
+
+	it('is correct for a basic example 6', function(){
+
+		var o = [3,1,0];
+		var d = [-1,0,0];
+
+		var pts = [ [0,0,0], [2,0,0], [2, 2,0] ];
+		var tri = [ 0, 1, 2 ];
+		var uvs = [ [0,0], [2,0], [2, 2] ];
+
+		var mesh = new verb.core.MeshData(null, pts, null, uvs);
+		var res = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh, tri );
+
+		res.min.u.should.be.approximately(1, verb.core.Constants.TOLERANCE);
+		res.max.u.should.be.approximately(2, verb.core.Constants.TOLERANCE);
+
+		vecShouldBe( [2,1], res.min.uv );
+		vecShouldBe( [1,1], res.max.uv );
+
+		vecShouldBe( [2,1,0], res.min.point );
+		vecShouldBe( [1,1,0], res.max.point );
+
+	});
+
+});
+
+describe("verb.core.Intersect.merge_tri_clip_intervals",function(){
+
+	it('is correct for a basic example', function(){
+
+		var o = [1,0,0];
+		var d = [0,1,0];
+
+		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
+		var tri1 = [ 0, 1, 2 ];
+		var uvs1 = [ [0,0], [2,0], [2, 2] ];
+		var mesh1 = new verb.core.MeshData(null, pts1, null, uvs1);
+
+		var clip1 = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh1, tri1 );
+
+		var pts2 = [ [1,0.5,-1], [1,2.5,-1], [1,0.5,1] ];
+		var tri2 = [ 0, 1, 2 ];
+		var uvs2 = [ [0,0], [2,0], [0,2] ];
+		var mesh2 = new verb.core.MeshData(null, pts2, null, uvs2);
+
+		var clip2 = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh2, tri2 );
+
+		var res = verb.core.Intersect.merge_tri_clip_intervals(clip1, clip2, mesh1, tri1, mesh2, tri2);
+
+		vecShouldBe( [1, 0.5], res.min.uv0 );
+		vecShouldBe( [0, 1], res.min.uv1 );
+		vecShouldBe( [1, 0.5, 0], res.min.point );
+
+		vecShouldBe( [1, 1], res.max.uv0 );
+		vecShouldBe( [0.5, 1], res.max.uv1 );
+		vecShouldBe( [1, 1, 0], res.max.point );
+
+	});
+
+	it('is correct for triangles sharing an edge', function(){
+
+		var o = [2,-1,0];
+		var d = [0,1,0];
+
+		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
+		var tri1 = [ 0, 1, 2 ];
+		var uvs1 = [ [0,0], [2,0], [2, 2] ];
+		var mesh1 = new verb.core.MeshData(null, pts1, null, uvs1);
+
+		var clip1 = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh1, tri1 );
+
+		var pts2 = [ [2,0,0], [2, 2, 0], [2, 0, 2] ];
+		var tri2 = [ 0, 1, 2 ];
+		var uvs2 = [ [0,0], [2,0], [0,2] ];
+		var mesh2 = new verb.core.MeshData(null, pts2, null, uvs2);
+
+		var clip2 = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh2, tri2 );
+
+		var res = verb.core.Intersect.merge_tri_clip_intervals(clip1, clip2, mesh1, tri1, mesh2, tri2);
+
+		vecShouldBe( [2, 0], res.min.uv0 );
+		vecShouldBe( [0, 0], res.min.uv1 );
+		vecShouldBe( [2, 0, 0], res.min.point );
+
+		vecShouldBe( [2, 2], res.max.uv0 );
+		vecShouldBe( [2, 0], res.max.uv1 );
+		vecShouldBe( [2, 2, 0], res.max.point );
+
+	});
+
+});
+
+describe("verb.core.Intersect.triangles",function(){
+
+	it('is correct for a basic example', function(){
+
+		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
+		var tri1 = [ 0, 1, 2 ];
+		var uvs1 = [ [0,0], [2,0], [2, 2] ];
+		var mesh1 = new verb.core.MeshData(null, pts1, null, uvs1);
+
+		var pts2 = [ [1,0.5,-1], [1,2.5,-1], [1,0.5,1] ];
+		var tri2 = [ 0, 1, 2 ];
+		var uvs2 = [ [0,0], [2,0], [0,2] ];
+		var mesh2 = new verb.core.MeshData(null, pts2, null, uvs2);
+
+		var res = verb.core.Intersect.triangles( mesh1, tri1, mesh2, tri2 );
+
+		vecShouldBe( [1, 0.5], res.min.uv0 );
+		vecShouldBe( [0, 1], res.min.uv1 );
+		vecShouldBe( [1, 0.5, 0], res.min.point );
+
+		vecShouldBe( [1, 1], res.max.uv0 );
+		vecShouldBe( [0.5, 1], res.max.uv1 );
+		vecShouldBe( [1, 1, 0], res.max.point );
+
+	});
+
+	it('is correct for triangles sharing an edge', function(){
+
+		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
+		var tri1 = [ 0, 1, 2 ];
+		var uvs1 = [ [0,0], [2,0], [2, 2] ];
+		var mesh1 = new verb.core.MeshData(null, pts1, null, uvs1);
+
+		var pts2 = [ [2, 0, 0], [2, 2, 0], [2,0,2] ];
+		var tri2 = [ 0, 1, 2 ];
+		var uvs2 = [ [0,0], [2,0], [0,2] ];
+		var mesh2 = new verb.core.MeshData(null, pts2, null, uvs2);
+
+		var res = verb.core.Intersect.triangles( mesh1, tri1, mesh2, tri2 );
+
+		vecShouldBe( [2,0], res.min.uv0 );
+		vecShouldBe( [0,0], res.min.uv1 );
+		vecShouldBe( [2,0,0], res.min.point );
+
+		vecShouldBe( [2,2], res.max.uv0 );
+		vecShouldBe( [2,0], res.max.uv1 );
+		vecShouldBe( [2, 2, 0], res.max.point );
+
+	});
+
+
+});
 
 /*
-
 
 describe(.EvalCurve.split",function(){
 
@@ -5738,318 +6100,6 @@ describe("verb.core.Eval.intersect_aabb_trees",function(){
 });
 
 
-describe("verb.core.Eval.intersect_3_planes",function(){
-
-	it('is correct for intersection of 3 basis planes', function(){
-
-		var d1 = [0,0,0];
-		var n1 = [1,0,0];
-		var d2 = [0,0,0];
-		var n2 = [0,1,0];
-		var d3 = [0,0,0];
-		var n3 = [0,0,1];
-
-		var res = verb.core.Eval.intersect_3_planes(n1, d1, n2, d2, n3, d3);
-		res.should.be.eql( [0,0,0] );
-
-	});
-
-	it('is correct for intersection of shifted basis planes', function(){
-
-		var n1 = [1,0,0];
-		var n2 = [0,1,0];
-		var n3 = [0,0,1];
-		var d1, d2, d3, res;
-
-		for (var i = 0; i < 100; i++){
-
-			d1 = (Math.random() - 0.5) * 10000;
-			d2 = (Math.random() - 0.5) * 10000;
-			d3 = (Math.random() - 0.5) * 10000;
-
-			res = verb.core.Eval.intersect_3_planes(n1, d1, n2, d2, n3, d3);
-
-			res[0].should.be.approximately( d1, verb.core.Constants.EPSILON );
-			res[1].should.be.approximately( d2, verb.core.Constants.EPSILON );
-			res[2].should.be.approximately( d3, verb.core.Constants.EPSILON );
-
-		}
-
-	});
-
-	it('is null for repeat planes', function(){
-
-		var d1 = 10;
-		var n1 = [0,1,0];
-		var d2 = 0;
-		var n2 = [0,1,0];
-		var d3 = 10;
-		var n3 = [0,0,1];
-
-		var res = verb.core.Eval.intersect_3_planes(n1, d1, n2, d2, n3, d3);
-		should.equal( res, null ); //non-intersect is null
-
-	});
-
-});
-
-describe("verb.core.Eval.intersect_planes",function(){
-
-	it('is correct for intersection of xz and yz planes', function(){
-
-		var o1 = [0,0,0];
-		var n1 = [1,0,0];
-		var o2 = [0,0,0];
-		var n2 = [0,1,0];
-
-		var res = verb.core.Eval.intersect_planes(o1, n1, o2, n2);
-
-		res.origin.should.be.eql( [0,0,0] );
-		res.dir.should.be.eql( [0,0,1] );
-
-	});
-
-	it('is correct for intersection of xz and shifted yz plane', function(){
-
-		var o1 = [20,0,0];
-		var n1 = [1,0,0];
-		var o2 = [0,0,0];
-		var n2 = [0,1,0];
-
-		var res = verb.core.Eval.intersect_planes(o1, n1, o2, n2);
-
-		res.origin.should.be.eql( [20,0,0] );
-		res.dir.should.be.eql( [0,0,1] );
-
-	});
-
-	it('is correct for intersection of shifted xz and yz plane', function(){
-
-		var o1 = [0,0,0];
-		var n1 = [1,0,0];
-		var o2 = [0,20,0];
-		var n2 = [0,1,0];
-
-		// should be z-axis
-		var res = verb.core.Eval.intersect_planes(o1, n1, o2, n2);
-
-		res.origin.should.be.eql( [0,20,0] );
-		res.dir.should.be.eql( [0,0,1] );
-
-	});
-
-});
-
-describe("verb.core.Eval.point_on_ray",function(){
-
-	it('is correct for a basic example', function(){
-
-		var o = [1,2,3];
-		var d = [1,1,1];
-		var u = 2;
-		var res = verb.core.Eval.point_on_ray(o, d, u);
-
-		res.should.eql( [3, 4, 5] );
-
-	});
-
-});
-
-describe("verb.core.Eval.clip_ray_in_coplanar_tri",function(){
-
-	it('is correct for a basic example 1', function(){
-
-		var o = [0,1,0];
-		var d = [1,0,0];
-		
-		var pts = [ [0,0,0], [2,0,0], [2, 2,0] ];
-		var tri = [ 0, 1, 2 ];
-		var uvs = [ [0,0], [2,0], [2, 2] ];
-
-		var res = verb.core.Eval.clip_ray_in_coplanar_tri(o, d, pts, tri, uvs );
-
-		res.min.u.should.be.approximately(1, verb.core.Constants.TOLERANCE);
-		res.max.u.should.be.approximately(2, verb.core.Constants.TOLERANCE);
-
-		vecShouldBe( [1,1], res.min.uv );
-		vecShouldBe( [2,1], res.max.uv );
-
-		vecShouldBe( [1,1,0], res.min.pt );
-		vecShouldBe( [2,1,0], res.max.pt );
-
-	});
-
-	it('is correct for a basic example 2', function(){
-
-		var o = [0.5,-0.5,0];
-		var d = [0,1,0];
-		
-		var pts = [ [0,0,0], [2,0,0], [2, 2,0] ];
-		var tri = [ 0, 1, 2 ];
-		var uvs = [ [0,0], [2,0], [2, 2] ];
-
-		var res = verb.core.Eval.clip_ray_in_coplanar_tri(o, d, pts, tri, uvs );
-
-		res.min.u.should.be.approximately(0.5, verb.core.Constants.TOLERANCE);
-		res.max.u.should.be.approximately(1, verb.core.Constants.TOLERANCE);
-
-		vecShouldBe( [0.5,0], res.min.uv );
-		vecShouldBe( [0.5,0.5], res.max.uv );
-
-		vecShouldBe( [0.5,0,0], res.min.pt );
-		vecShouldBe( [0.5,0.5,0], res.max.pt );
-
-	});
-
-	it('is correct for a basic example 3', function(){
-
-		var o = [0.5,-0.5,0];
-		var d = [Math.sqrt(2)/2,Math.sqrt(2)/2,0];
-		
-		var pts = [ [0,0,0], [2,0,0], [2, 2,0] ];
-		var tri = [ 0, 1, 2 ];
-		var uvs = [ [0,0], [2,0], [2, 2] ];
-
-		var res = verb.core.Eval.clip_ray_in_coplanar_tri(o, d, pts, tri, uvs );
-
-		res.min.u.should.be.approximately(Math.sqrt(2)/2, verb.core.Constants.TOLERANCE);
-		res.max.u.should.be.approximately(3 * Math.sqrt(2)/2, verb.core.Constants.TOLERANCE);
-
-		vecShouldBe( [1,0], res.min.uv );
-		vecShouldBe( [2,1], res.max.uv );
-
-		vecShouldBe( [1,0,0], res.min.pt );
-		vecShouldBe( [2,1,0], res.max.pt );
-
-	});
-
-	it('is correct for a basic example 4', function(){
-
-		var o = [0, 2,0];
-		var d = [Math.sqrt(2)/2,-Math.sqrt(2)/2,0];
-		
-		var pts = [ [0,0,0], [2,0,0], [2, 2,0] ];
-		var tri = [ 0, 1, 2 ];
-		var uvs = [ [0,0], [2,0], [2, 2] ];
-
-		var res = verb.core.Eval.clip_ray_in_coplanar_tri(o, d, pts, tri, uvs );
-
-		res.min.u.should.be.approximately(Math.sqrt(2), verb.core.Constants.TOLERANCE);
-		res.max.u.should.be.approximately(2 * Math.sqrt(2), verb.core.Constants.TOLERANCE);
-
-		vecShouldBe( [1,1], res.min.uv );
-		vecShouldBe( [2,0], res.max.uv );
-
-		vecShouldBe( [1,1,0], res.min.pt );
-		vecShouldBe( [2,0,0], res.max.pt );
-
-	});
-
-	it('is correct for a basic example 5', function(){
-
-		var o = [1,1,0];
-		var d = [Math.sqrt(2)/2,-Math.sqrt(2)/2,0];
-		
-		var pts = [ [0,0,0], [2,0,0], [2, 2,0] ];
-		var tri = [ 0, 1, 2 ];
-		var uvs = [ [0,0], [2,0], [2, 2] ];
-
-		var res = verb.core.Eval.clip_ray_in_coplanar_tri(o, d, pts, tri, uvs );
-
-		res.min.u.should.be.approximately(0, verb.core.Constants.TOLERANCE);
-		res.max.u.should.be.approximately(Math.sqrt(2), verb.core.Constants.TOLERANCE);
-
-		vecShouldBe( [1,1], res.min.uv );
-		vecShouldBe( [2,0], res.max.uv );
-
-		vecShouldBe( [1,1,0], res.min.pt );
-		vecShouldBe( [2,0,0], res.max.pt );
-
-	});
-
-	it('is correct for a basic example 6', function(){
-
-		var o = [3,1,0];
-		var d = [-1,0,0];
-		
-		var pts = [ [0,0,0], [2,0,0], [2, 2,0] ];
-		var tri = [ 0, 1, 2 ];
-		var uvs = [ [0,0], [2,0], [2, 2] ];
-
-		var res = verb.core.Eval.clip_ray_in_coplanar_tri(o, d, pts, tri, uvs );
-
-		res.min.u.should.be.approximately(1, verb.core.Constants.TOLERANCE);
-		res.max.u.should.be.approximately(2, verb.core.Constants.TOLERANCE);
-
-		vecShouldBe( [2,1], res.min.uv );
-		vecShouldBe( [1,1], res.max.uv );
-
-		vecShouldBe( [2,1,0], res.min.pt );
-		vecShouldBe( [1,1,0], res.max.pt );
-
-	});
-
-});
-
-describe("verb.core.Eval.merge_tri_clip_intervals",function(){
-
-	it('is correct for a basic example', function(){
-
-		var o = [1,0,0];
-		var d = [0,1,0];
-		
-		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
-		var tri1 = [ 0, 1, 2 ];
-		var uvs1 = [ [0,0], [2,0], [2, 2] ];
-
-		var clip1 = verb.core.Eval.clip_ray_in_coplanar_tri(o, d, pts1, tri1, uvs1 );
-
-		var pts2 = [ [1,0.5,-1], [1,2.5,-1], [1,0.5,1] ];
-		var tri2 = [ 0, 1, 2 ];
-		var uvs2 = [ [0,0], [2,0], [0,2] ];
-		var clip2 = verb.core.Eval.clip_ray_in_coplanar_tri(o, d, pts2, tri2, uvs2 );
-
-		var res = verb.core.Eval.merge_tri_clip_intervals(clip1, clip2, pts1, tri1, uvs1, pts2, tri2, uvs2);
-
-		vecShouldBe( [1, 0.5], res.uv1tri1 );
-		vecShouldBe( [0, 1], res.uv1tri2 );
-		vecShouldBe( [1, 0.5, 0], res.pt1 );
-
-		vecShouldBe( [1, 1], res.uv2tri1 );
-		vecShouldBe( [0.5, 1], res.uv2tri2 );
-		vecShouldBe( [1, 1, 0], res.pt2 );
-
-	});
-
-	it('is correct for triangles sharing an edge', function(){
-
-		var o = [2,-1,0];
-		var d = [0,1,0];
-		
-		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
-		var tri1 = [ 0, 1, 2 ];
-		var uvs1 = [ [0,0], [2,0], [2, 2] ];
-
-		var clip1 = verb.core.Eval.clip_ray_in_coplanar_tri(o, d, pts1, tri1, uvs1 );
-
-		var pts2 = [ [2,0,0], [2, 2, 0], [2, 0, 2] ];
-		var tri2 = [ 0, 1, 2 ];
-		var uvs2 = [ [0,0], [2,0], [0,2] ];
-		var clip2 = verb.core.Eval.clip_ray_in_coplanar_tri(o, d, pts2, tri2, uvs2 );
-
-		var res = verb.core.Eval.merge_tri_clip_intervals(clip1, clip2, pts1, tri1, uvs1, pts2, tri2, uvs2);
-
-		vecShouldBe( [2, 0], res.uv1tri1 );
-		vecShouldBe( [0, 0], res.uv1tri2 );
-		vecShouldBe( [2, 0, 0], res.pt1 );
-
-		vecShouldBe( [2, 2], res.uv2tri1 );
-		vecShouldBe( [2, 0], res.uv2tri2 );
-		vecShouldBe( [2, 2, 0], res.pt2 );
-
-	});
-
-});
 
 describe("verb.core.Eval.lookup_adj_segment",function(){
 
@@ -6117,55 +6167,6 @@ describe("verb.core.Eval.make_intersect_polylines ",function(){
 		pls[0][3].pt.should.be.eql( [5,0,0] );
 
 	});
-
-});
-
-describe("verb.core.Eval.intersect_tris",function(){
-
-	it('is correct for a basic example', function(){
-		
-		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
-		var tri1 = [ 0, 1, 2 ];
-		var uvs1 = [ [0,0], [2,0], [2, 2] ];
-
-		var pts2 = [ [1,0.5,-1], [1,2.5,-1], [1,0.5,1] ];
-		var tri2 = [ 0, 1, 2 ];
-		var uvs2 = [ [0,0], [2,0], [0,2] ];
-
-		var res = verb.core.Eval.intersect_tris( pts1, tri1, uvs1, pts2, tri2, uvs2 );
-
-		vecShouldBe( [1, 0.5], res[0].uvtri1 );
-		vecShouldBe( [0, 1], res[0].uvtri2 );
-		vecShouldBe( [1, 0.5, 0], res[0].pt );
-
-		vecShouldBe( [1, 1], res[1].uvtri1 );
-		vecShouldBe( [0.5, 1], res[1].uvtri2 );
-		vecShouldBe( [1, 1, 0], res[1].pt );
-
-	});
-
-	it('is correct for triangles sharing an edge', function(){
-		
-		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
-		var tri1 = [ 0, 1, 2 ];
-		var uvs1 = [ [0,0], [2,0], [2, 2] ];
-
-		var pts2 = [ [2, 0, 0], [2, 2, 0], [2,0,2] ];
-		var tri2 = [ 0, 1, 2 ];
-		var uvs2 = [ [0,0], [2,0], [0,2] ];
-
-		var res = verb.core.Eval.intersect_tris( pts1, tri1, uvs1, pts2, tri2, uvs2 );
-
-		vecShouldBe( [2,0], res[0].uvtri1 );
-		vecShouldBe( [0,0], res[0].uvtri2 );
-		vecShouldBe( [2,0,0], res[0].pt );
-
-		vecShouldBe( [2,2], res[1].uvtri1 );
-		vecShouldBe( [2,0], res[1].uvtri2 );
-		vecShouldBe( [2, 2, 0], res[1].pt );
-
-	});
-
 
 });
 

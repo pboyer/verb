@@ -13,9 +13,9 @@ class MeshData {
     public var normals : Array<Point>;
     public var uvs : Array<UV>;
 
-    public function new(faces : Array<Tri>, vertices : Array<Point>, normals : Array<Point>, uvs : Array<UV> ) {
+    public function new(faces : Array<Tri>, points : Array<Point>, normals : Array<Point>, uvs : Array<UV> ) {
         this.faces = faces;
-        this.points = vertices;
+        this.points = points;
         this.normals = normals;
         this.uvs = uvs;
     }
