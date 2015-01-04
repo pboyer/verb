@@ -946,6 +946,23 @@ verb.core.CurveCurveIntersection = $hx_exports.core.CurveCurveIntersection = fun
 	this.u1 = u1;
 };
 verb.core.Intersect = $hx_exports.core.Intersect = function() { };
+verb.core.Intersect.rational_curves_by_aabb = function(crv1,crv2,sample_tol,tol) {
+	var up1 = verb.core.Tess.rational_curve_adaptive_sample(crv1,sample_tol,true);
+	var up2 = verb.core.Tess.rational_curve_adaptive_sample(crv2,sample_tol,true);
+	var u1 = up1.map(function(el) {
+		return el[0];
+	});
+	var u2 = up2.map(function(el1) {
+		return el1[0];
+	});
+	var p1 = up1.map(function(el2) {
+		return el2.slice(1);
+	});
+	var p2 = up2.map(function(el3) {
+		return el3.slice(1);
+	});
+	return verb.core.Intersect.parametric_polylines_by_aabb(p1,p2,u1,u2,tol);
+};
 verb.core.Intersect.triangles = function(mesh0,tri0,mesh1,tri1) {
 	var n0 = verb.core.Mesh.get_tri_norm(mesh0.points,tri0);
 	var n1 = verb.core.Mesh.get_tri_norm(mesh1.points,tri1);

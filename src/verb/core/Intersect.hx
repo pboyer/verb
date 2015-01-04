@@ -4,7 +4,7 @@ import verb.core.Intersect.TriTriPoint;
 import verb.core.types.Pair;
 import verb.core.Mat.Vector;
 import verb.core.types.MeshData;
-import verb.core.types.CurveData.Point;
+import verb.core.types.CurveData;
 
 @:expose("core.Ray")
 class Ray {
@@ -101,6 +101,35 @@ class CurveCurveIntersection {
 
 @:expose("core.Intersect")
 class Intersect {
+
+    //
+    // Approximate the intersection of two NURBS curves by axis-aligned bounding box intersection.
+    //
+    // **params**
+    // + CurveData object representing the first NURBS curve
+    // + CurveData object representing the second NURBS curve
+    // + tolerance for the inital polygonization of the curves
+    // + tolerance for the intersection
+    //
+    // **returns**
+    // + array of parameter pairs representing the intersection of the two parameteric polylines
+    //
+
+    public static function rational_curves_by_aabb( crv1 : CurveData,
+                                                    crv2 : CurveData,
+                                                    sample_tol : Float,
+                                                    tol : Float ) : Array<CurveCurveIntersection> {
+
+        var up1 = Tess.rational_curve_adaptive_sample( crv1, sample_tol, true)
+        , up2 = Tess.rational_curve_adaptive_sample( crv2, sample_tol, true)
+        , u1 = up1.map( function(el : Point) { return el[0]; })
+        , u2 = up2.map( function(el : Point) { return el[0]; })
+        , p1 = up1.map( function(el : Point) { return el.slice(1); })
+        , p2 = up2.map( function(el : Point) { return el.slice(1); });
+
+        return Intersect.parametric_polylines_by_aabb( p1, p2, u1, u2, tol );
+
+    }
 
     //
     // Intersect two triangles

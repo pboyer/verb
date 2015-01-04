@@ -388,39 +388,6 @@ public static function refine_rational_curve_intersection( degree1, knots1, cont
 
 }
 
-//
-//
-//
-// Approximate the intersection of two nurbs surface by axis-aligned bounding box intersection.
-//
-// **params**
-// + integer degree of curve1
-// + array of nondecreasing knot values for curve 1
-// + 2d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi) for curve 1
-// + integer degree of curve2
-// + array of nondecreasing knot values for curve 2
-// + 2d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi) for curve 2
-// + tolerance for the intersection
-// 
-// **returns** 
-// + array of parameter pairs representing the intersection of the two parameteric polylines
-//
-
-public static function rational_curves_by_aabb( degree1, knots1, homo_control_points1, degree2, knots2, homo_control_points2, sample_tol, tol ) {
-
-	var up1 = verb.eval.rational_curve_adaptive_sample( degree1, knots1, homo_control_points1, sample_tol, true)
-		, up2 = verb.eval.rational_curve_adaptive_sample( degree2, knots2, homo_control_points2, sample_tol, true)
-		, u1 = up1.map( function(el) { return el[0]; })
-		, u2 = up2.map( function(el) { return el[0]; })
-		, p1 = up1.map( function(el) { return el.slice(1) })
-		, p2 = up2.map( function(el) { return el.slice(1) });
-
-	return verb.eval.parametric_polylines_by_aabb( p1, p2, u1, u2, tol );
-
-}
-
-
-
 
 public static function refine_rational_surface_point(uv1, uv2, degree_u1, knots_u1, degree_v1, knots_v1, homo_control_points1, degree_u2, knots_u2, degree_v2, knots_v2, homo_control_points2, tol){
 
@@ -612,7 +579,6 @@ public static function meshes_by_aabb( points1, tris1, uvs1, points2, tris2, uvs
 	return verb.eval.make_polylines( segments );
 
 }
-
 
 public static function make_polylines( segments ) {
 

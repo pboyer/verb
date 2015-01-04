@@ -3657,6 +3657,93 @@ describe("verb.core.Intersect.triangles",function(){
 
 });
 
+describe("verb.core.Intersect.rational_curves_by_aabb",function(){
+
+	it('gives valid result for two planar lines', function(){
+
+		var degree1 = 1,
+				knots1 = [0,0,1,1],
+				controlPoints1 = [[0,0,0,1], [2,0,0,1]],
+				curve1 = new verb.core.CurveData( degree1, knots1, controlPoints1 ),
+				degree2 = 1,
+				knots2 = [0,0,1,1],
+				controlPoints2 = [[0.5,0.5,0,1], [0.5,-1.5,0,1]]
+				curve2 = new verb.core.CurveData( degree2, knots2, controlPoints2 ),
+				sample_tol = 1e-6,
+				tol = 0.0001;
+
+		var res = verb.core.Intersect.rational_curves_by_aabb( 	curve1,curve2,sample_tol, tol );
+		res[0].u0.should.be.approximately(0.25, verb.core.Constants.TOLERANCE );
+		res[0].u1.should.be.approximately(0.25, verb.core.Constants.TOLERANCE );
+
+	});
+
+	it('gives valid result for planar degree 2 bezier and planar line', function(){
+
+		var degree1 = 1,
+				knots1 = [0,0,1,1],
+				controlPoints1 = [[0,0,0,1], [2,0,0,1]],
+				curve1 = new verb.core.CurveData( degree1, knots1, controlPoints1 ),
+				degree2 = 2,
+				knots2 = [0,0,0,1,1,1],
+				controlPoints2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]]
+				curve2 = new verb.core.CurveData( degree2, knots2, controlPoints2 ),
+				sample_tol = 1e-6,
+				tol = 0.0001;
+
+		var res = verb.core.Intersect.rational_curves_by_aabb( 	curve1,curve2,sample_tol,tol );
+		var match_tol = 0.01;
+
+		res[0].u0.should.be.approximately(0.296, match_tol );
+		res[0].u1.should.be.approximately(0.36, match_tol );
+
+	});
+
+	it('gives valid result for planar line and planar degree 2 bezier as second arg', function(){
+
+		var degree1 = 1,
+				knots1 = [0,0,1,1],
+				controlPoints1 = [[0,0,0,1], [2,0,0,1]],
+				curve1 = new verb.core.CurveData( degree1, knots1, controlPoints1 ),
+				degree2 = 2,
+				knots2 = [0,0,0,1,1,1],
+				controlPoints2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]]
+				curve2 = new verb.core.CurveData( degree2, knots2, controlPoints2 ),
+				sample_tol = 1e-6,
+				tol = 0.0001;
+
+		var res = verb.core.Intersect.rational_curves_by_aabb(curve2, curve1,sample_tol,tol );
+
+		var match_tol = 0.01;
+
+		res[0].u0.should.be.approximately(0.36, match_tol );
+		res[0].u1.should.be.approximately(0.29, match_tol );
+
+	});
+
+	it('gives valid result for 2 planar degree 2 beziers', function(){
+
+		var degree1 = 2,
+				knots1 = [0,0,0,1,1,1],
+				controlPoints1 = [[0,0,0,1], [0.5,0.1,0,1],  [2,0,0,1]],
+				curve1 = new verb.core.CurveData( degree1, knots1, controlPoints1 ),
+				degree2 = 2,
+				knots2 = [0,0,0,1,1,1],
+				controlPoints2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]]
+				curve2 = new verb.core.CurveData( degree2, knots2, controlPoints2 ),
+				sample_tol = 1e-6,
+				tol = 0.0001;
+
+		var res = verb.core.Intersect.rational_curves_by_aabb( 	curve1,curve2,sample_tol,tol );
+		var match_tol = 0.01;
+
+		res[0].u0.should.be.approximately(0.41, match_tol );
+		res[0].u1.should.be.approximately(0.33, match_tol );
+
+	});
+
+});
+
 /*
 
 describe(.EvalCurve.split",function(){
@@ -5309,115 +5396,6 @@ describe("SweepOneRail.tessellate",function(){
 
 });
 
-describe("verb.core.Eval.intersect_rational_curves_by_aabb",function(){
-
-	it('gives valid result for two planar lines', function(){
-
-		var degree1 = 1,
-				knots1 = [0,0,1,1],
-				controlPoints1 = [[0,0,0,1], [2,0,0,1]],
-				degree2 = 1,
-				knots2 = [0,0,1,1],
-				controlPoints2 = [[0.5,0.5,0,1], [0.5,-1.5,0,1]]
-				sample_tol = 1e-6,
-				tol = 0.0001;
-
-		var res = verb.core.Eval.intersect_rational_curves_by_aabb( 	degree1, 
-																																	knots1, 
-																																	controlPoints1, 
-																																	degree2, 
-																																	knots2, 
-																																	controlPoints2, 
-																																	sample_tol, 
-																																	tol );
-
-		res[0][0].should.be.approximately(0.25, verb.core.Constants.TOLERANCE );
-		res[0].mult.should.be.approximately(0.25, verb.core.Constants.TOLERANCE );
-
-	});
-
-	it('gives valid result for  planar degree 2 bezier and planar line', function(){
-
-		var degree1 = 1,
-				knots1 = [0,0,1,1],
-				controlPoints1 = [[0,0,0,1], [2,0,0,1]],
-				degree2 = 2,
-				knots2 = [0,0,0,1,1,1],
-				controlPoints2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]]
-				sample_tol = 1e-6,
-				tol = 0.0001;
-
-		var res = verb.core.Eval.intersect_rational_curves_by_aabb( 	degree1, 
-																																	knots1, 
-																																	controlPoints1, 
-																																	degree2, 
-																																	knots2, 
-																																	controlPoints2, 
-																																	sample_tol, 
-																																	tol );
-		var match_tol = 0.01;
-
-		res[0][0].should.be.approximately(0.296, match_tol );
-		res[0].mult.should.be.approximately(0.36, match_tol );
-
-	});
-
-	it('gives valid result for planar line and planar degree 2 bezier as second arg', function(){
-
-		var degree1 = 1,
-				knots1 = [0,0,1,1],
-				controlPoints1 = [[0,0,0,1], [2,0,0,1]],
-				degree2 = 2,
-				knots2 = [0,0,0,1,1,1],
-				controlPoints2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]]
-				sample_tol = 1e-6,
-				tol = 0.0001;
-
-		var res = verb.core.Eval.intersect_rational_curves_by_aabb( 	degree2, 
-																																	knots2, 
-																																	controlPoints2, 
-																																	degree1, 
-																																	knots1, 
-																																	controlPoints1, 
-																																	sample_tol, 
-																																	tol );
-
-		var match_tol = 0.01;
-
-		res[0][0].should.be.approximately(0.36, match_tol );
-		res[0].mult.should.be.approximately(0.29, match_tol );
-
-	});
-
-	it('gives valid result for 2 planar degree 2 beziers', function(){
-
-		var degree1 = 2,
-				knots1 = [0,0,0,1,1,1],
-				controlPoints1 = [[0,0,0,1], [0.5,0.1,0,1],  [2,0,0,1]],
-				degree2 = 2,
-				knots2 = [0,0,0,1,1,1],
-				controlPoints2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]]
-				sample_tol = 1e-6,
-				tol = 0.0001;
-
-		var res = verb.core.Eval.intersect_rational_curves_by_aabb( 	degree1, 
-																																	knots1, 
-																																	controlPoints1, 
-																																	degree2, 
-																																	knots2, 
-																																	controlPoints2, 
-																																	sample_tol, 
-																																	tol );
-		var match_tol = 0.01;
-
-		res[0][0].should.be.approximately(0.41, match_tol );
-		res[0].mult.should.be.approximately(0.33, match_tol );
-
-	});
-
-
-});
-
 describe("verb.core.Eval.refine_rational_curve_intersection",function(){
 
 	it('gives valid result for two lines', function(){
@@ -5494,112 +5472,6 @@ describe("verb.core.Eval.refine_rational_curve_intersection",function(){
 		res[1].should.be.approximately(0.3374987853196129, verb.core.Constants.TOLERANCE );
 
 	});
-
-});
-
-describe("verb.core.Eval.intersect_rational_curves_by_aabb_refine",function(){
-
-	it('gives valid result for two planar lines', function(){
-
-		var degree1 = 1,
-				knots1 = [0,0,1,1],
-				controlPoints1 = [[0,0,0,1], [2,0,0,1]],
-				degree2 = 1,
-				knots2 = [0,0,1,1],
-				controlPoints2 = [[0.5,0.5,0,1], [0.5,-1.5,0,1]]
-				sample_tol = 1e-6,
-				tol = 0.0001;
-
-		var res = verb.core.Eval.intersect_rational_curves_by_aabb_refine( 	degree1, 
-																																	knots1, 
-																																	controlPoints1, 
-																																	degree2, 
-																																	knots2, 
-																																	controlPoints2, 
-																																	sample_tol, 
-																																	tol );
-
-		res[0][0].should.be.approximately(0.25, verb.core.Constants.TOLERANCE );
-		res[0].mult.should.be.approximately(0.25, verb.core.Constants.TOLERANCE );
-
-	});
-
-	it('gives valid result for  planar degree 2 bezier and planar line', function(){
-
-		var degree1 = 1,
-				knots1 = [0,0,1,1],
-				controlPoints1 = [[0,0,0,1], [2,0,0,1]],
-				degree2 = 2,
-				knots2 = [0,0,0,1,1,1],
-				controlPoints2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]]
-				sample_tol = 1e-6,
-				tol = 0.0001;
-
-		var res = verb.core.Eval.intersect_rational_curves_by_aabb_refine( 	degree1, 
-																																	knots1, 
-																																	controlPoints1, 
-																																	degree2, 
-																																	knots2, 
-																																	controlPoints2, 
-																																	sample_tol, 
-																																	tol );
-
-		res[0][0].should.be.approximately(0.2964101616038012, verb.core.Constants.TOLERANCE );
-		res[0].mult.should.be.approximately(0.3660254038069307, verb.core.Constants.TOLERANCE );
-
-	});
-
-	it('gives valid result for planar line and planar degree 2 bezier as second arg', function(){
-
-		var degree1 = 1,
-				knots1 = [0,0,1,1],
-				controlPoints1 = [[0,0,0,1], [2,0,0,1]],
-				degree2 = 2,
-				knots2 = [0,0,0,1,1,1],
-				controlPoints2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]]
-				sample_tol = 1e-6,
-				tol = 0.0001;
-
-		var res = verb.core.Eval.intersect_rational_curves_by_aabb_refine( 	degree2, 
-																																	knots2, 
-																																	controlPoints2, 
-																																	degree1, 
-																																	knots1, 
-																																	controlPoints1, 
-																																	sample_tol, 
-																																	tol );
-
-		res[0][0].should.be.approximately(0.3660254038069307, verb.core.Constants.TOLERANCE );
-		res[0].mult.should.be.approximately(0.2964101616038012, verb.core.Constants.TOLERANCE );
-
-	});
-
-	it('gives valid result for 2 planar degree 2 beziers', function(){
-
-		var degree1 = 2,
-				knots1 = [0,0,0,1,1,1],
-				controlPoints1 = [[0,0,0,1], [0.5,0.1,0,1],  [2,0,0,1]],
-				degree2 = 2,
-				knots2 = [0,0,0,1,1,1],
-				controlPoints2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]]
-				sample_tol = 1e-6,
-				tol = 0.0001;
-
-		var res = verb.core.Eval.intersect_rational_curves_by_aabb_refine( 	degree1, 
-																																	knots1, 
-																																	controlPoints1, 
-																																	degree2, 
-																																	knots2, 
-																																	controlPoints2, 
-																																	sample_tol, 
-																																	tol );
-		var match_tol = 0.01;
-
-		res[0][0].should.be.approximately(0.416208132514572, verb.core.Constants.TOLERANCE );
-		res[0].mult.should.be.approximately(0.3374987853196129, verb.core.Constants.TOLERANCE );
-
-	});
-
 
 });
 
