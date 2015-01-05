@@ -945,24 +945,36 @@ verb.core.CurveCurveIntersection = $hx_exports.core.CurveCurveIntersection = fun
 	this.u0 = u0;
 	this.u1 = u1;
 };
+verb.core.CurveCurveIntersectionOptions = $hx_exports.core.CurveCurveIntersectionOptions = function() {
+	this.tol = verb.core.Constants.TOLERANCE;
+	this.sampleTol = verb.core.Constants.TOLERANCE;
+};
 verb.core.Intersect = $hx_exports.core.Intersect = function() { };
-verb.core.Intersect.refine_rational_curve_intersection = function(curve0,curve1,start_params) {
+verb.core.Intersect.rational_curves = function(curve1,curve2,options) {
+	if(options == null) options = new verb.core.CurveCurveIntersectionOptions();
+	var ints = verb.core.Intersect.rational_curves_by_aabb(curve1,curve2,options);
+	return ints.map(function(start) {
+		return verb.core.Intersect.refine_rational_curve_intersection(curve1,curve2,start.u0,start.u1);
+	});
+};
+verb.core.Intersect.refine_rational_curve_intersection = function(curve0,curve1,u0,u1) {
 	var objective = function(x) {
 		var p1 = verb.core.Eval.rational_curve_point(curve0,x[0]);
 		var p2 = verb.core.Eval.rational_curve_point(curve1,x[1]);
 		var p1_p2 = verb.core.Vec.sub(p1,p2);
 		return verb.core.Vec.dot(p1_p2,p1_p2);
 	};
-	var sol_obj = verb.core.Numeric.uncmin(objective,start_params);
-	var u1 = sol_obj.solution[0];
+	var sol_obj = verb.core.Numeric.uncmin(objective,[u0,u1]);
+	var u11 = sol_obj.solution[0];
 	var u2 = sol_obj.solution[1];
-	var p11 = verb.core.Eval.rational_curve_point(curve0,u1);
+	var p11 = verb.core.Eval.rational_curve_point(curve0,u11);
 	var p21 = verb.core.Eval.rational_curve_point(curve1,u2);
-	return new verb.core.CurveCurveIntersection(p11,p21,u1,u2);
+	return new verb.core.CurveCurveIntersection(p11,p21,u11,u2);
 };
-verb.core.Intersect.rational_curves_by_aabb = function(crv1,crv2,sample_tol,tol) {
-	var up1 = verb.core.Tess.rational_curve_adaptive_sample(crv1,sample_tol,true);
-	var up2 = verb.core.Tess.rational_curve_adaptive_sample(crv2,sample_tol,true);
+verb.core.Intersect.rational_curves_by_aabb = function(crv1,crv2,options) {
+	if(options == null) options = new verb.core.CurveCurveIntersectionOptions();
+	var up1 = verb.core.Tess.rational_curve_adaptive_sample(crv1,options.sampleTol,true);
+	var up2 = verb.core.Tess.rational_curve_adaptive_sample(crv2,options.sampleTol,true);
 	var u1 = up1.map(function(el) {
 		return el[0];
 	});
@@ -975,7 +987,7 @@ verb.core.Intersect.rational_curves_by_aabb = function(crv1,crv2,sample_tol,tol)
 	var p2 = up2.map(function(el3) {
 		return el3.slice(1);
 	});
-	return verb.core.Intersect.parametric_polylines_by_aabb(p1,p2,u1,u2,tol);
+	return verb.core.Intersect.parametric_polylines_by_aabb(p1,p2,u1,u2,options.tol);
 };
 verb.core.Intersect.triangles = function(mesh0,tri0,mesh1,tri1) {
 	var n0 = verb.core.Mesh.get_tri_norm(mesh0.points,tri0);

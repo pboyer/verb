@@ -324,31 +324,6 @@ public static function aabb_trees( points1, tris1, points2, tris2, aabb_tree1, a
 
 }
 
-//
-// Approximate the intersection of two nurbs surface by axis-aligned bounding box intersection and then refine all solutions.
-//
-// **params**
-// + integer degree of curve1
-// + array of nondecreasing knot values for curve 1
-// + 2d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi) for curve 1
-// + integer degree of curve2
-// + array of nondecreasing knot values for curve 2
-// + 2d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi) for curve 2
-// + tolerance for the intersection
-// 
-// **returns** 
-// + a 2d array specifying the intersections on u params of intersections on curve 1 and cruve 2
-//
-
-public static function rational_curves_by_aabb_refine( degree1, knots1, homo_control_points1, degree2, knots2, homo_control_points2, sample_tol, tol ) {
-
-	var ints = verb.eval.rational_curves_by_aabb( degree1, knots1, homo_control_points1, degree2, knots2, homo_control_points2, sample_tol, tol );
-
-	return ints.map(function(start_params){
-		return verb.eval.refine_rational_curve_intersection( degree1, knots1, homo_control_points1, degree2, knots2, homo_control_points2, start_params )
-	});
-
-}
 
 public static function refine_rational_surface_point(uv1, uv2, degree_u1, knots_u1, degree_v1, knots_v1, homo_control_points1, degree_u2, knots_u2, degree_v2, knots_v2, homo_control_points2, tol){
 

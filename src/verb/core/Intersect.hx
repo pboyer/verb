@@ -99,32 +99,64 @@ class CurveCurveIntersection {
 
 }
 
+@:expose("core.CurveCurveIntersectionOptions")
+class CurveCurveIntersectionOptions {
+
+    public var sampleTol : Float = Constants.TOLERANCE;
+    public var tol : Float = Constants.TOLERANCE;
+
+    public function new(){ }
+
+}
+
 @:expose("core.Intersect")
 class Intersect {
+
+    //
+    // Approximate the intersection of two nurbs surface by axis-aligned bounding box intersection and then refine all solutions.
+    //
+    // **params**
+    // + integer degree of curve1
+    // + array of nondecreasing knot values for curve 1
+    // + 2d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi) for curve 1
+    // + integer degree of curve2
+    // + array of nondecreasing knot values for curve 2
+    // + 2d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi) for curve 2
+    // + tolerance for the intersection
+    //
+    // **returns**
+    // + array of CurveCurveIntersection objects
+    //
+
+    public static function rational_curves( curve1 : CurveData, curve2 : CurveData, options : CurveCurveIntersectionOptions = null ) : Array<CurveCurveIntersection> {
+
+        if (options == null) options = new CurveCurveIntersectionOptions();
+
+        var ints = Intersect.rational_curves_by_aabb( curve1, curve2, options );
+
+        return ints.map(function(start : CurveCurveIntersection) : CurveCurveIntersection {
+            return Intersect.refine_rational_curve_intersection( curve1, curve2, start.u0, start.u1 );
+        });
+
+    }
 
     //
     // Refine an intersection pair for two curves given an initial guess.  This is an unconstrained minimization,
     // so the caller is responsible for providing a very good initial guess.
     //
     // **params**
-    // + integer degree of curve1
-    // + array of nondecreasing knot values for curve 1
-    // + 2d array of homogeneous control points, where each control point is an array of length (dim+1)
-    // and form (wi*pi, wi) for curve 1
-    // + integer degree of curve2
-    // + array of nondecreasing knot values for curve 2
-    // + 2d array of homogeneous control points, where each control point is an array of length (dim+1)
-    // and form (wi*pi, wi) for curve 2
+    // + CurveData object representing the first NURBS curve
+    // + CurveData object representing the second NURBS curve
     // + length 2 array with first param guess in first position and second param guess in second position
     //
     // **returns**
-    // + a length 3 array containing the [ distance// distance, u1, u2 ]
+    // + array of CurveCurveIntersection objects
     //
 
-    public static function refine_rational_curve_intersection( curve0, curve1, start_params ) {
-
-        var objective = function( x ) {
-
+    private static function refine_rational_curve_intersection( curve0 : CurveData, curve1 : CurveData,
+                                                               u0 : Float, u1 : Float ) : CurveCurveIntersection
+    {
+        var objective = function( x : Vector ) : Float {
             var p1 = Eval.rational_curve_point(curve0, x[0])
             , p2 = Eval.rational_curve_point(curve1, x[1])
             , p1_p2 = Vec.sub(p1, p2);
@@ -132,7 +164,7 @@ class Intersect {
             return Vec.dot(p1_p2, p1_p2);
         }
 
-        var sol_obj = Numeric.uncmin( objective, start_params );
+        var sol_obj = Numeric.uncmin( objective, [u0, u1] );
 
         var u1 = sol_obj.solution[0]
             , u2 = sol_obj.solution[1];
@@ -156,19 +188,20 @@ class Intersect {
     // + array of parameter pairs representing the intersection of the two parameteric polylines
     //
 
-    public static function rational_curves_by_aabb( crv1 : CurveData,
+    private static function rational_curves_by_aabb( crv1 : CurveData,
                                                     crv2 : CurveData,
-                                                    sample_tol : Float,
-                                                    tol : Float ) : Array<CurveCurveIntersection> {
+                                                    options : CurveCurveIntersectionOptions = null ) : Array<CurveCurveIntersection> {
 
-        var up1 = Tess.rational_curve_adaptive_sample( crv1, sample_tol, true)
-        , up2 = Tess.rational_curve_adaptive_sample( crv2, sample_tol, true)
+        if (options == null) options = new CurveCurveIntersectionOptions();
+
+        var up1 = Tess.rational_curve_adaptive_sample( crv1, options.sampleTol, true)
+        , up2 = Tess.rational_curve_adaptive_sample( crv2, options.sampleTol, true)
         , u1 = up1.map( function(el : Point) { return el[0]; })
         , u2 = up2.map( function(el : Point) { return el[0]; })
         , p1 = up1.map( function(el : Point) { return el.slice(1); })
         , p2 = up2.map( function(el : Point) { return el.slice(1); });
 
-        return Intersect.parametric_polylines_by_aabb( p1, p2, u1, u2, tol );
+        return Intersect.parametric_polylines_by_aabb( p1, p2, u1, u2, options.tol );
 
     }
 
