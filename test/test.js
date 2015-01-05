@@ -3744,6 +3744,86 @@ describe("verb.core.Intersect.rational_curves_by_aabb",function(){
 
 });
 
+describe("verb.core.Intersect.refine_rational_curve_intersection",function(){
+
+	it('gives valid result for two lines', function(){
+
+		var degree1 = 1,
+				knots1 = [0,0,1,1],
+				controlPoints1 = [[0,0,0,1], [2,0,0,1]],
+				curve1 = new verb.core.CurveData( degree1, knots1, controlPoints1 ),
+				degree2 = 1,
+				knots2 = [0,0,1,1],
+				controlPoints2 = [[0.5,0.5,0,1], [0.5,-1.5,0,1]],
+				curve2 = new verb.core.CurveData( degree2, knots2, controlPoints2 ),
+				start_params = [0.26, 0.24 ];
+
+		var res = verb.core.Intersect.refine_rational_curve_intersection( curve1, curve2, start_params );
+
+		res.u0.should.be.approximately(0.25, verb.core.Constants.TOLERANCE );
+		res.u1.should.be.approximately(0.25, verb.core.Constants.TOLERANCE );
+
+	});
+
+	it('gives valid result for  planar degree 2 bezier and planar line', function(){
+
+		var degree1 = 1,
+				knots1 = [0,0,1,1],
+				controlPoints1 = [[0,0,0,1], [2,0,0,1]],
+				curve1 = new verb.core.CurveData( degree1, knots1, controlPoints1 ),
+				degree2 = 2,
+				knots2 = [0,0,0,1,1,1],
+				controlPoints2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]],
+				curve2 = new verb.core.CurveData( degree2, knots2, controlPoints2 ),
+				start_params = [0.29, 0.36 ];
+
+		var res = verb.core.Intersect.refine_rational_curve_intersection( curve1, curve2, start_params );
+
+		res.u0.should.be.approximately(0.2964101616038012, verb.core.Constants.TOLERANCE );
+		res.u1.should.be.approximately(0.3660254038069307, verb.core.Constants.TOLERANCE );
+
+	});
+
+	it('gives valid result for planar line and planar degree 2 bezier as second arg', function(){
+
+		var degree1 = 1,
+				knots1 = [0,0,1,1],
+				controlPoints1 = [[0,0,0,1], [2,0,0,1]],
+				curve1 = new verb.core.CurveData( degree1, knots1, controlPoints1 ),
+				degree2 = 2,
+				knots2 = [0,0,0,1,1,1],
+				controlPoints2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]],
+				curve2 = new verb.core.CurveData( degree2, knots2, controlPoints2 ),
+				start_params = [ 0.36, 0.29 ];
+
+		var res = verb.core.Intersect.refine_rational_curve_intersection( 	curve2, curve1, start_params );
+
+		res.u0.should.be.approximately(0.3660254038069307, verb.core.Constants.TOLERANCE );
+		res.u1.should.be.approximately(0.2964101616038012, verb.core.Constants.TOLERANCE );
+
+	});
+
+	it('gives valid result for 2 planar degree 2 beziers', function(){
+
+		var degree1 = 2,
+				knots1 = [0,0,0,1,1,1],
+				controlPoints1 = [[0,0,0,1], [0.5,0.1,0,1],  [2,0,0,1]],
+				curve1 = new verb.core.CurveData( degree1, knots1, controlPoints1 ),
+				degree2 = 2,
+				knots2 = [0,0,0,1,1,1],
+				controlPoints2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]],
+				curve2 = new verb.core.CurveData( degree2, knots2, controlPoints2 ),
+				start_params = [ 0.41, 0.33 ];
+
+		var res = verb.core.Intersect.refine_rational_curve_intersection( curve1, curve2, start_params );
+
+		res.u0.should.be.approximately(0.416208132514572, verb.core.Constants.TOLERANCE );
+		res.u1.should.be.approximately(0.3374987853196129, verb.core.Constants.TOLERANCE );
+
+	});
+
+});
+
 /*
 
 describe(.EvalCurve.split",function(){
@@ -5393,85 +5473,6 @@ describe("SweepOneRail.tessellate",function(){
 
 	});
 
-
-});
-
-describe("verb.core.Eval.refine_rational_curve_intersection",function(){
-
-	it('gives valid result for two lines', function(){
-
-		var degree1 = 1,
-				knots1 = [0,0,1,1],
-				controlPoints1 = [[0,0,0,1], [2,0,0,1]],
-				degree2 = 1,
-				knots2 = [0,0,1,1],
-				controlPoints2 = [[0.5,0.5,0,1], [0.5,-1.5,0,1]],
-				start_params = [0.26, 0.24 ];
-
-		var res = verb.core.Eval.refine_rational_curve_intersection( degree1, knots1, controlPoints1, degree2, knots2, controlPoints2, start_params );
-
-		res[0].should.be.approximately(0.25, verb.core.Constants.TOLERANCE );
-		res[1].should.be.approximately(0.25, verb.core.Constants.TOLERANCE );
-
-	});
-
-	it('gives valid result for  planar degree 2 bezier and planar line', function(){
-
-		var degree1 = 1,
-				knots1 = [0,0,1,1],
-				controlPoints1 = [[0,0,0,1], [2,0,0,1]],
-				degree2 = 2,
-				knots2 = [0,0,0,1,1,1],
-				controlPoints2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]]
-				start_params = [0.29, 0.36 ];
-
-		var res = verb.core.Eval.refine_rational_curve_intersection( degree1, knots1, controlPoints1, degree2, knots2, controlPoints2, start_params );
-
-		res[0].should.be.approximately(0.2964101616038012, verb.core.Constants.TOLERANCE );
-		res[1].should.be.approximately(0.3660254038069307, verb.core.Constants.TOLERANCE );
-
-	});
-
-	it('gives valid result for planar line and planar degree 2 bezier as second arg', function(){
-
-		var degree1 = 1,
-				knots1 = [0,0,1,1],
-				controlPoints1 = [[0,0,0,1], [2,0,0,1]],
-				degree2 = 2,
-				knots2 = [0,0,0,1,1,1],
-				controlPoints2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]],
-				start_params = [ 0.36, 0.29 ];
-
-		var res = verb.core.Eval.refine_rational_curve_intersection( 	degree2, 
-																																	knots2, 
-																																	controlPoints2, 
-																																	degree1, 
-																																	knots1, 
-																																	controlPoints1, 
-																																	start_params );
-
-		res[0].should.be.approximately(0.3660254038069307, verb.core.Constants.TOLERANCE );
-		res[1].should.be.approximately(0.2964101616038012, verb.core.Constants.TOLERANCE );
-
-	});
-
-	it('gives valid result for 2 planar degree 2 beziers', function(){
-
-		var degree1 = 2,
-				knots1 = [0,0,0,1,1,1],
-				controlPoints1 = [[0,0,0,1], [0.5,0.1,0,1],  [2,0,0,1]],
-				degree2 = 2,
-				knots2 = [0,0,0,1,1,1],
-				controlPoints2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]],
-				start_params = [ 0.41, 0.33 ];
-
-		var res = verb.core.Eval.refine_rational_curve_intersection( degree1, knots1, controlPoints1, degree2, knots2, controlPoints2, start_params );
-
-		
-		res[0].should.be.approximately(0.416208132514572, verb.core.Constants.TOLERANCE );
-		res[1].should.be.approximately(0.3374987853196129, verb.core.Constants.TOLERANCE );
-
-	});
 
 });
 

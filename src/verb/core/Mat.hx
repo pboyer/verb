@@ -17,6 +17,32 @@ class LUDecomp {
 @:expose("core.Mat")
 class Mat {
 
+    public static function mul(a : Float, b : Matrix ) : Matrix {
+        return [ for (i in 0...b.length) Vec.mul(a, b[i]) ];
+    }
+
+    public static function add(a : Matrix, b : Matrix ) : Matrix {
+        return [ for (i in 0...a.length) Vec.add(a[i], b[i]) ];
+    }
+
+    public static function div(a : Matrix, b : Float ) : Matrix {
+        return [ for (i in 0...a.length) Vec.div(a[i], b) ];
+    }
+
+    public static function sub(a : Matrix, b : Matrix ) : Matrix {
+        return [ for (i in 0...a.length) Vec.sub(a[i], b[i]) ];
+    }
+
+    public static function dot(a : Matrix, b : Vector ) : Vector {
+        return [ for (i in 0...a.length) Vec.dot(a[i], b) ];
+    }
+
+    public static function identity(n : Int) : Matrix {
+        var zeros = Vec.zeros2d(n, n);
+        for (i in 0...n){ zeros[i][i] = 1.0; }
+        return zeros;
+    }
+
     public static function transpose<T>(a : Array<Array<T>>) : Array<Array<T>> {
         if (a.length == 0) return [];
         return [ for (i in 0...a[0].length) [for (j in 0...a.length) a[j][i] ]  ];

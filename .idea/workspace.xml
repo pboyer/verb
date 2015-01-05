@@ -2,7 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="938890c0-f1ce-4fbd-8322-63610af7f5e6" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/Init.hx" afterPath="$PROJECT_DIR$/src/verb/Init.hx" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/Intersect.hx" afterPath="$PROJECT_DIR$/src/verb/core/Intersect.hx" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/Mat.hx" afterPath="$PROJECT_DIR$/src/verb/core/Mat.hx" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/Vec.hx" afterPath="$PROJECT_DIR$/src/verb/core/Vec.hx" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/eval/intersect2.js" afterPath="$PROJECT_DIR$/src/eval/intersect2.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/test.js" afterPath="$PROJECT_DIR$/test/test.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/verb.js" afterPath="$PROJECT_DIR$/build/verb.js" />
@@ -32,17 +35,22 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
+      <file leaf-file-name="Init.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/Init.hx">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="390">
+              <caret line="11" column="22" selection-start-line="11" selection-start-column="22" selection-end-line="11" selection-end-column="22" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file leaf-file-name="Intersect.hx" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/verb/core/Intersect.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="930" max-vertical-offset="7440">
-              <caret line="117" column="50" selection-start-line="117" selection-start-column="27" selection-end-line="117" selection-end-column="50" />
-              <folding>
-                <element signature="e#5358#7151#0" expanded="false" />
-                <element signature="e#7408#8723#0" expanded="false" />
-                <element signature="e#8816#9757#0" expanded="false" />
-                <element signature="e#10141#11499#0" expanded="false" />
-              </folding>
+            <state vertical-scroll-proportion="0.0" vertical-offset="1545" max-vertical-offset="10500">
+              <caret line="134" column="64" selection-start-line="134" selection-start-column="64" selection-end-line="134" selection-end-column="64" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -57,25 +65,14 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="intersect.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/eval/intersect.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="4589" max-vertical-offset="23385">
-              <caret line="329" column="4" selection-start-line="329" selection-start-column="4" selection-end-line="329" selection-end-column="43" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="test.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/test/test.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.25974026" vertical-offset="53315" max-vertical-offset="92925">
-              <caret line="3746" column="2" selection-start-line="3746" selection-start-column="2" selection-end-line="3746" selection-end-column="2" />
+            <state vertical-scroll-proportion="0.73214287" vertical-offset="55334" max-vertical-offset="94215">
+              <caret line="3815" column="46" selection-start-line="3815" selection-start-column="46" selection-end-line="3815" selection-end-column="46" />
               <folding>
-                <element signature="e#0#170723#0" expanded="false" />
-                <element signature="e#0#170723#0" expanded="false" />
-                <element signature="e#0#170723#0" expanded="false" />
+                <element signature="e#0#170926#0" expanded="false" />
+                <element signature="e#0#170926#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -91,30 +88,18 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Eval.hx" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/verb/core/Eval.hx">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1575" max-vertical-offset="12645">
-              <caret line="20" column="6" selection-start-line="20" selection-start-column="6" selection-end-line="20" selection-end-column="6" />
-              <folding>
-                <element signature="e#690#1539#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="intersect2.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/eval/intersect2.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="5579" max-vertical-offset="6195">
-              <caret line="389" column="0" selection-start-line="389" selection-start-column="0" selection-end-line="389" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="2613" max-vertical-offset="5610">
+              <caret line="92" column="37" selection-start-line="92" selection-start-column="37" selection-end-line="92" selection-end-column="37" />
               <folding>
-                <element signature="e#0#23970#0" expanded="false" />
-                <element signature="e#0#23970#0" expanded="false" />
-                <element signature="e#0#23970#0" expanded="false" />
-                <element signature="e#0#23970#0" expanded="false" />
-                <element signature="e#0#23970#0" expanded="false" />
-                <element signature="e#0#23970#0" expanded="false" />
+                <element signature="e#0#22594#0" expanded="false" />
+                <element signature="e#0#22594#0" expanded="false" />
+                <element signature="e#0#22594#0" expanded="false" />
+                <element signature="e#0#22594#0" expanded="false" />
+                <element signature="e#0#22594#0" expanded="false" />
+                <element signature="e#0#22594#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -123,18 +108,43 @@
       <file leaf-file-name="Vec.hx" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/verb/core/Vec.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1500">
-              <caret line="16" column="5" selection-start-line="16" selection-start-column="5" selection-end-line="16" selection-end-column="5" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1800">
+              <caret line="12" column="5" selection-start-line="12" selection-start-column="5" selection-end-line="12" selection-end-column="5" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Make.hx" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/verb/core/Make.hx">
+      <file leaf-file-name="Mat.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/core/Mat.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="6105" max-vertical-offset="9150">
-              <caret line="435" column="27" selection-start-line="435" selection-start-column="27" selection-end-line="435" selection-end-column="27" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="195" max-vertical-offset="975">
+              <caret line="42" column="21" selection-start-line="42" selection-start-column="21" selection-end-line="42" selection-end-column="21" />
+              <folding>
+                <element signature="e#1550#2438#0" expanded="false" />
+                <element signature="e#2496#3844#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Numeric.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/core/Numeric.hx">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="9.769231" vertical-offset="1139" max-vertical-offset="1875">
+              <caret line="101" column="20" selection-start-line="101" selection-start-column="20" selection-end-line="101" selection-end-column="20" />
+              <folding>
+                <element signature="e#674#1866#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Trig.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/core/Trig.hx">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="1664" max-vertical-offset="2340">
+              <caret line="125" column="122" selection-start-line="125" selection-start-column="122" selection-end-line="125" selection-end-column="122" />
               <folding />
             </state>
           </provider>
@@ -148,7 +158,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/verb/eval/types/MeshData.hx" />
         <option value="$PROJECT_DIR$/src/verb/eval/Vec.hx" />
         <option value="$PROJECT_DIR$/src/verb/eval/types/SurfTessNode.hx" />
         <option value="$PROJECT_DIR$/src/verb/eval/types/RefinementNode.hx" />
@@ -173,8 +182,6 @@
         <option value="$PROJECT_DIR$/build/verb.js" />
         <option value="$PROJECT_DIR$/example/threeInterpCurveExample.html" />
         <option value="$PROJECT_DIR$/build/verbHaxe.js" />
-        <option value="$PROJECT_DIR$/src/verb/Init.hx" />
-        <option value="$PROJECT_DIR$/src/verb/core/Mat.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Modify.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Divide.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Trig.hx" />
@@ -193,11 +200,14 @@
         <option value="$PROJECT_DIR$/src/verb/core/types/CurveData.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Make.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Eval.hx" />
-        <option value="$PROJECT_DIR$/src/verb/core/Vec.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/types/Pair.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/types/MeshData.hx" />
         <option value="$PROJECT_DIR$/src/eval/intersect2.js" />
+        <option value="$PROJECT_DIR$/src/verb/Init.hx" />
+        <option value="$PROJECT_DIR$/src/verb/core/Vec.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Intersect.hx" />
+        <option value="$PROJECT_DIR$/src/verb/core/Numeric.hx" />
+        <option value="$PROJECT_DIR$/src/verb/core/Mat.hx" />
         <option value="$PROJECT_DIR$/test/test.js" />
       </list>
     </option>
@@ -758,14 +768,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/Init.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="375">
-          <caret line="19" column="1" selection-start-line="19" selection-start-column="1" selection-end-line="19" selection-end-column="1" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/verb/core/types/SurfacePoint.hx">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="435">
@@ -783,14 +785,6 @@
             <element signature="e#4005#5222#0" expanded="false" />
             <element signature="e#5560#5937#0" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/core/Trig.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1664" max-vertical-offset="2340">
-          <caret line="125" column="122" selection-start-line="125" selection-start-column="122" selection-end-line="125" selection-end-column="122" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -925,17 +919,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/core/Mat.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="585">
-          <caret line="13" column="0" selection-start-line="13" selection-start-column="0" selection-end-line="13" selection-end-column="0" />
-          <folding>
-            <element signature="e#700#1588#0" expanded="false" />
-            <element signature="e#1646#2994#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/verb/core/types/SurfaceData.hx">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="555">
@@ -964,14 +947,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="4589" max-vertical-offset="23385">
           <caret line="329" column="4" selection-start-line="329" selection-start-column="4" selection-end-line="329" selection-end-column="43" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/core/Vec.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1500">
-          <caret line="16" column="5" selection-start-line="16" selection-start-column="5" selection-end-line="16" selection-end-column="5" />
           <folding />
         </state>
       </provider>
@@ -1010,42 +985,81 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/core/Trig.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1664" max-vertical-offset="2340">
+          <caret line="125" column="122" selection-start-line="125" selection-start-column="122" selection-end-line="125" selection-end-column="122" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/Init.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="390">
+          <caret line="11" column="22" selection-start-line="11" selection-start-column="22" selection-end-line="11" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/eval/intersect2.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="5579" max-vertical-offset="6195">
-          <caret line="389" column="0" selection-start-line="389" selection-start-column="0" selection-end-line="389" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="2613" max-vertical-offset="5610">
+          <caret line="92" column="37" selection-start-line="92" selection-start-column="37" selection-end-line="92" selection-end-column="37" />
           <folding>
-            <element signature="e#0#23970#0" expanded="false" />
-            <element signature="e#0#23970#0" expanded="false" />
-            <element signature="e#0#23970#0" expanded="false" />
-            <element signature="e#0#23970#0" expanded="false" />
-            <element signature="e#0#23970#0" expanded="false" />
-            <element signature="e#0#23970#0" expanded="false" />
+            <element signature="e#0#22594#0" expanded="false" />
+            <element signature="e#0#22594#0" expanded="false" />
+            <element signature="e#0#22594#0" expanded="false" />
+            <element signature="e#0#22594#0" expanded="false" />
+            <element signature="e#0#22594#0" expanded="false" />
+            <element signature="e#0#22594#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/verb/core/Intersect.hx">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1320" max-vertical-offset="7440">
-          <caret line="117" column="50" selection-start-line="117" selection-start-column="27" selection-end-line="117" selection-end-column="50" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="1545" max-vertical-offset="10500">
+          <caret line="134" column="64" selection-start-line="134" selection-start-column="64" selection-end-line="134" selection-end-column="64" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/core/Vec.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1800">
+          <caret line="12" column="5" selection-start-line="12" selection-start-column="5" selection-end-line="12" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/core/Mat.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="195" max-vertical-offset="975">
+          <caret line="42" column="21" selection-start-line="42" selection-start-column="21" selection-end-line="42" selection-end-column="21" />
           <folding>
-            <element signature="e#5358#7151#0" expanded="false" />
-            <element signature="e#7408#8723#0" expanded="false" />
-            <element signature="e#8816#9757#0" expanded="false" />
-            <element signature="e#10141#11499#0" expanded="false" />
+            <element signature="e#1550#2438#0" expanded="false" />
+            <element signature="e#2496#3844#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/core/Numeric.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="9.769231" vertical-offset="1139" max-vertical-offset="1875">
+          <caret line="101" column="20" selection-start-line="101" selection-start-column="20" selection-end-line="101" selection-end-column="20" />
+          <folding>
+            <element signature="e#674#1866#0" expanded="false" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/test/test.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.25974026" vertical-offset="53315" max-vertical-offset="92925">
-          <caret line="3746" column="2" selection-start-line="3746" selection-start-column="2" selection-end-line="3746" selection-end-column="2" />
+        <state vertical-scroll-proportion="0.73214287" vertical-offset="55334" max-vertical-offset="94215">
+          <caret line="3815" column="46" selection-start-line="3815" selection-start-column="46" selection-end-line="3815" selection-end-column="46" />
           <folding>
-            <element signature="e#0#170723#0" expanded="false" />
-            <element signature="e#0#170723#0" expanded="false" />
-            <element signature="e#0#170723#0" expanded="false" />
+            <element signature="e#0#170926#0" expanded="false" />
+            <element signature="e#0#170926#0" expanded="false" />
           </folding>
         </state>
       </provider>

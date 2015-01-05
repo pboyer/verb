@@ -103,6 +103,47 @@ class CurveCurveIntersection {
 class Intersect {
 
     //
+    // Refine an intersection pair for two curves given an initial guess.  This is an unconstrained minimization,
+    // so the caller is responsible for providing a very good initial guess.
+    //
+    // **params**
+    // + integer degree of curve1
+    // + array of nondecreasing knot values for curve 1
+    // + 2d array of homogeneous control points, where each control point is an array of length (dim+1)
+    // and form (wi*pi, wi) for curve 1
+    // + integer degree of curve2
+    // + array of nondecreasing knot values for curve 2
+    // + 2d array of homogeneous control points, where each control point is an array of length (dim+1)
+    // and form (wi*pi, wi) for curve 2
+    // + length 2 array with first param guess in first position and second param guess in second position
+    //
+    // **returns**
+    // + a length 3 array containing the [ distance// distance, u1, u2 ]
+    //
+
+    public static function refine_rational_curve_intersection( curve0, curve1, start_params ) {
+
+        var objective = function( x ) {
+
+            var p1 = Eval.rational_curve_point(curve0, x[0])
+            , p2 = Eval.rational_curve_point(curve1, x[1])
+            , p1_p2 = Vec.sub(p1, p2);
+
+            return Vec.dot(p1_p2, p1_p2);
+        }
+
+        var sol_obj = Numeric.uncmin( objective, start_params );
+
+        var u1 = sol_obj.solution[0]
+            , u2 = sol_obj.solution[1];
+
+        var p1 = Eval.rational_curve_point(curve0, u1)
+        , p2 = Eval.rational_curve_point(curve1, u2 );
+
+        return new CurveCurveIntersection(p1, p2, u1, u2);
+    }
+
+    //
     // Approximate the intersection of two NURBS curves by axis-aligned bounding box intersection.
     //
     // **params**

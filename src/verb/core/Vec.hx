@@ -8,6 +8,26 @@ using Lambda;
 @:expose("core.Vec")
 class Vec {
 
+    public static function neg(arr : Array<Float>) : Array<Float> {
+        return arr.map(function(x){ return -x; });
+    }
+
+    public static function min(arr : Array<Float>) : Float {
+        return arr.fold(function(x,a){ return Math.min(x,a); }, Math.POSITIVE_INFINITY);
+    }
+
+    public static function max(arr : Array<Float>) : Float {
+        return arr.fold(function(x,a){ return Math.max(x,a); }, Math.NEGATIVE_INFINITY);
+    }
+
+    public static function all(arr : Array<Bool>) : Bool {
+        return arr.fold(function(x,a){ return a && x; }, true);
+    }
+
+    public static function finite(arr : Array<Float>) : Array<Bool> {
+        return arr.map(function(x){ return Math.isFinite(x); });
+    }
+
     public static function onRay(origin : Point, dir : Vector, u : Float) : Array<Float> {
         return Vec.add( origin, Vec.mul(u, dir) );
     }

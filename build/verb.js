@@ -955,6 +955,20 @@ verb.core.CurveCurveIntersection = $hx_exports.core.CurveCurveIntersection = fun
 	this.u1 = u1;
 };
 verb.core.Intersect = $hx_exports.core.Intersect = function() { };
+verb.core.Intersect.refine_rational_curve_intersection = function(curve0,curve1,start_params) {
+	var objective = function(x) {
+		var p1 = verb.core.Eval.rational_curve_point(curve0,x[0]);
+		var p2 = verb.core.Eval.rational_curve_point(curve1,x[1]);
+		var p1_p2 = verb.core.Vec.sub(p1,p2);
+		return verb.core.Vec.dot(p1_p2,p1_p2);
+	};
+	var sol_obj = verb.core.Numeric.uncmin(objective,start_params);
+	var u1 = sol_obj.solution[0];
+	var u2 = sol_obj.solution[1];
+	var p11 = verb.core.Eval.rational_curve_point(curve0,u1);
+	var p21 = verb.core.Eval.rational_curve_point(curve1,u2);
+	return new verb.core.CurveCurveIntersection(p11,p21,u1,u2);
+};
 verb.core.Intersect.rational_curves_by_aabb = function(crv1,crv2,sample_tol,tol) {
 	var up1 = verb.core.Tess.rational_curve_adaptive_sample(crv1,sample_tol,true);
 	var up2 = verb.core.Tess.rational_curve_adaptive_sample(crv2,sample_tol,true);
@@ -1580,6 +1594,65 @@ verb.core.LUDecomp = function(lu,p) {
 	this.P = p;
 };
 verb.core.Mat = $hx_exports.core.Mat = function() { };
+verb.core.Mat.mul = function(a,b) {
+	var _g = [];
+	var _g2 = 0;
+	var _g1 = b.length;
+	while(_g2 < _g1) {
+		var i = _g2++;
+		_g.push(verb.core.Vec.mul(a,b[i]));
+	}
+	return _g;
+};
+verb.core.Mat.add = function(a,b) {
+	var _g = [];
+	var _g2 = 0;
+	var _g1 = a.length;
+	while(_g2 < _g1) {
+		var i = _g2++;
+		_g.push(verb.core.Vec.add(a[i],b[i]));
+	}
+	return _g;
+};
+verb.core.Mat.div = function(a,b) {
+	var _g = [];
+	var _g2 = 0;
+	var _g1 = a.length;
+	while(_g2 < _g1) {
+		var i = _g2++;
+		_g.push(verb.core.Vec.div(a[i],b));
+	}
+	return _g;
+};
+verb.core.Mat.sub = function(a,b) {
+	var _g = [];
+	var _g2 = 0;
+	var _g1 = a.length;
+	while(_g2 < _g1) {
+		var i = _g2++;
+		_g.push(verb.core.Vec.sub(a[i],b[i]));
+	}
+	return _g;
+};
+verb.core.Mat.dot = function(a,b) {
+	var _g = [];
+	var _g2 = 0;
+	var _g1 = a.length;
+	while(_g2 < _g1) {
+		var i = _g2++;
+		_g.push(verb.core.Vec.dot(a[i],b));
+	}
+	return _g;
+};
+verb.core.Mat.identity = function(n) {
+	var zeros = verb.core.Vec.zeros2d(n,n);
+	var _g = 0;
+	while(_g < n) {
+		var i = _g++;
+		zeros[i][i] = 1.0;
+	}
+	return zeros;
+};
 verb.core.Mat.transpose = function(a) {
 	if(a.length == 0) return [];
 	var _g = [];
@@ -2081,6 +2154,175 @@ verb.core.Modify.curve_knot_insert = function(curve,u,r) {
 	}
 	return new verb.core.types.CurveData(degree,knots_post,control_points_post);
 };
+verb.core.MinimizationResult = function(solution,value,gradient,invHessian,iterations,message) {
+	this.solution = solution;
+	this.value = value;
+	this.gradient = gradient;
+	this.invHessian = invHessian;
+	this.iterations = iterations;
+	this.message = message;
+};
+verb.core.Numeric = function() { };
+verb.core.Numeric.numericalGradient = function(f,x) {
+	var n = x.length;
+	var f0 = f(x);
+	if(f0 == Math.NaN) throw "gradient: f(x) is a NaN!";
+	var i;
+	var x0 = x.slice(0);
+	var f1;
+	var f2;
+	var J = [];
+	var errest;
+	var roundoff;
+	var eps = 1e-3;
+	var t0;
+	var t1;
+	var t2;
+	var it = 0;
+	var d1;
+	var d2;
+	var N;
+	var _g = 0;
+	while(_g < n) {
+		var i1 = _g++;
+		var h = Math.max(1e-6 * f0,1e-8);
+		while(true) {
+			++it;
+			if(it > 20) throw "Numerical gradient fails";
+			x0[i1] = x[i1] + h;
+			f1 = f(x0);
+			x0[i1] = x[i1] - h;
+			f2 = f(x0);
+			x0[i1] = x[i1];
+			if(Math.isNaN(f1) || Math.isNaN(f2)) {
+				h /= 16;
+				continue;
+			}
+			J[i1] = (f1 - f2) / (2 * h);
+			t0 = x[i1] - h;
+			t1 = x[i1];
+			t2 = x[i1] + h;
+			d1 = (f1 - f0) / h;
+			d2 = (f0 - f2) / h;
+			N = verb.core.Vec.max([Math.abs(J[i1]),Math.abs(f0),Math.abs(f1),Math.abs(f2),Math.abs(t0),Math.abs(t1),Math.abs(t2),1e-8]);
+			errest = Math.min(verb.core.Vec.max([Math.abs(d1 - J[i1]),Math.abs(d2 - J[i1]),Math.abs(d1 - d2)]) / N,h / N);
+			if(errest > eps) h /= 16; else break;
+		}
+	}
+	return J;
+};
+verb.core.Numeric.uncmin = function(f,x0,tol,gradient,maxit) {
+	if(tol == null) tol = 1e-8;
+	if(gradient == null) gradient = function(x) {
+		return verb.core.Numeric.numericalGradient(f,x);
+	};
+	if(maxit == null) maxit = 1000;
+	x0 = x0.slice(0);
+	var n = x0.length;
+	var f0 = f(x0);
+	var f1 = f0;
+	var df0;
+	if(Math.isNaN(f0)) throw "uncmin: f(x0) is a NaN!";
+	tol = Math.max(tol,verb.core.Constants.EPSILON);
+	var step;
+	var g0;
+	var g1;
+	var H1 = verb.core.Mat.identity(n);
+	var it = 0;
+	var i;
+	var s = [];
+	var x1;
+	var y;
+	var Hy;
+	var Hs;
+	var ys;
+	var i0;
+	var t;
+	var nstep;
+	var t1;
+	var t2;
+	var msg = "";
+	g0 = gradient(x0);
+	while(it < maxit) {
+		if(!verb.core.Vec.all(verb.core.Vec.finite(g0))) {
+			msg = "Gradient has Infinity or NaN";
+			break;
+		}
+		step = verb.core.Vec.neg(verb.core.Mat.dot(H1,g0));
+		if(!verb.core.Vec.all(verb.core.Vec.finite(step))) {
+			msg = "Search direction has Infinity or NaN";
+			break;
+		}
+		nstep = verb.core.Vec.norm(step);
+		if(nstep < tol) {
+			msg = "Newton step smaller than tol";
+			break;
+		}
+		t = 1.0;
+		df0 = verb.core.Vec.dot(g0,step);
+		x1 = x0;
+		while(it < maxit) {
+			if(t * nstep < tol) break;
+			s = verb.core.Vec.mul(t,step);
+			x1 = verb.core.Vec.add(x0,s);
+			f1 = f(x1);
+			if(f1 - f0 >= 0.1 * t * df0 || Math.isNaN(f1)) {
+				t *= 0.5;
+				++it;
+				continue;
+			}
+			break;
+		}
+		if(t * nstep < tol) {
+			msg = "Line search step size smaller than tol";
+			break;
+		}
+		if(it == maxit) {
+			msg = "maxit reached during line search";
+			break;
+		}
+		g1 = gradient(x1);
+		y = verb.core.Vec.sub(g1,g0);
+		ys = verb.core.Vec.dot(y,s);
+		Hy = verb.core.Mat.dot(H1,y);
+		H1 = verb.core.Mat.sub(verb.core.Mat.add(H1,verb.core.Mat.mul((ys + verb.core.Vec.dot(y,Hy)) / (ys * ys),verb.core.Numeric.tensor(s,s))),verb.core.Mat.div(verb.core.Mat.add(verb.core.Numeric.tensor(Hy,s),verb.core.Numeric.tensor(s,Hy)),ys));
+		x0 = x1;
+		f0 = f1;
+		g0 = g1;
+		++it;
+	}
+	return new verb.core.MinimizationResult(x0,f0,g0,H1,it,msg);
+};
+verb.core.Numeric.tensor = function(x,y) {
+	var m = x.length;
+	var n = y.length;
+	var A = [];
+	var Ai;
+	var xi;
+	var i = m - 1;
+	while(i >= 0) {
+		Ai = [];
+		xi = x[i];
+		var j = n - 1;
+		while(j >= 3) {
+			Ai[j] = xi * y[j];
+			--j;
+			Ai[j] = xi * y[j];
+			--j;
+			Ai[j] = xi * y[j];
+			--j;
+			Ai[j] = xi * y[j];
+			--j;
+		}
+		while(j >= 0) {
+			Ai[j] = xi * y[j];
+			--j;
+		}
+		A[i] = Ai;
+		i--;
+	}
+	return A;
+};
 verb.core.Tess = $hx_exports.core.Tess = function() { };
 verb.core.Tess.rational_curve_regular_sample = function(curve,numSamples,includeU) {
 	return verb.core.Tess.rational_curve_regular_sample_range(curve,curve.knots[0],verb.core.ArrayExtensions.last(curve.knots),numSamples,includeU);
@@ -2315,6 +2557,31 @@ verb.core.Trig.closest_point_on_segment = function(pt,segpt0,segpt1,u0,u1) {
 	return { u : u0 + (u1 - u0) * do2ptr / l, pt : verb.core.Vec.add(o,verb.core.Vec.mul(do2ptr,r))};
 };
 verb.core.Vec = $hx_exports.core.Vec = function() { };
+verb.core.Vec.neg = function(arr) {
+	return arr.map(function(x) {
+		return -x;
+	});
+};
+verb.core.Vec.min = function(arr) {
+	return Lambda.fold(arr,function(x,a) {
+		return Math.min(x,a);
+	},Math.POSITIVE_INFINITY);
+};
+verb.core.Vec.max = function(arr) {
+	return Lambda.fold(arr,function(x,a) {
+		return Math.max(x,a);
+	},Math.NEGATIVE_INFINITY);
+};
+verb.core.Vec.all = function(arr) {
+	return Lambda.fold(arr,function(x,a) {
+		return a && x;
+	},true);
+};
+verb.core.Vec.finite = function(arr) {
+	return arr.map(function(x) {
+		return Math.isFinite(x);
+	});
+};
 verb.core.Vec.onRay = function(origin,dir,u) {
 	return verb.core.Vec.add(origin,verb.core.Vec.mul(u,dir));
 };

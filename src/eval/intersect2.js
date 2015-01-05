@@ -350,45 +350,6 @@ public static function rational_curves_by_aabb_refine( degree1, knots1, homo_con
 
 }
 
-
-//
-//
-//
-// Refine an intersection pair for two curves given an initial guess.  This is an unconstrained minimization,
-// so the caller is responsible for providing a very good initial guess.
-//
-// **params**
-// + integer degree of curve1
-// + array of nondecreasing knot values for curve 1
-// + 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
- 									// and form (wi*pi, wi) for curve 1
-// + integer degree of curve2
-// + array of nondecreasing knot values for curve 2
-// + 2d array of homogeneous control points, where each control point is an array of length (dim+1) 
- 									// and form (wi*pi, wi) for curve 2
-// + length 2 array with first param guess in first position and second param guess in second position
-// 
-// **returns** 
-// + a length 3 array containing the [ distance// distance, u1, u2 ]
-//
-
-public static function refine_rational_curve_intersection( degree1, knots1, control_points1, degree2, knots2, control_points2, start_params ) {
-
-	var objective = function(x) { 
-
-		var p1 = verb.eval.rational_curve_point(degree1, knots1, control_points1, x[0])
-			, p2 = verb.eval.rational_curve_point(degree2, knots2, control_points2, x[1])
-			, p1_p2 = Vec.sub(p1, p2);
-
-		return Vec.dot(p1_p2, p1_p2);
-	}
-
-	var sol_obj = Vec.uncmin( objective, start_params);
-	return sol_obj.solution.concat( sol_obj.f );
-
-}
-
-
 public static function refine_rational_surface_point(uv1, uv2, degree_u1, knots_u1, degree_v1, knots_v1, homo_control_points1, degree_u2, knots_u2, degree_v2, knots_v2, homo_control_points2, tol){
 
  var pds, p, pn, pu, pv, pd, qds, q, qn, qu, qv, qd, dist;
