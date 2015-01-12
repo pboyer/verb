@@ -264,67 +264,6 @@ public static function parametric_polyline_mesh_by_aabb( crv_points, crv_param_p
 
 }
 
-//
-//
-
-
-//
-//
-
-
-//
-//
-//
-//  Intersect two aabb trees - a recursive function
-//
-// **params**
-// + array of length 3 arrays of numbers representing the points of mesh1
-// + array of length 3 arrays of number representing the triangles of mesh1
-// + array of length 3 arrays of numbers representing the points of mesh2
-// + array of length 3 arrays of number representing the triangles of mesh2
-// + *Object*, nested object representing the aabb tree of the first mesh
-// + *Object*, nested object representing the aabb tree of the second mesh
-// 
-// **returns** 
-// + a list of pairs of triangle indices for mesh1 and mesh2 that are intersecting
-//
-
-public static function aabb_trees( points1, tris1, points2, tris2, aabb_tree1, aabb_tree2 ) {
-
-  var intersects = aabb_tree1.bounding_box.intersects( aabb_tree2.bounding_box );
-
-  var recur = verb.eval.aabb_trees;
-
-  if (!intersects){
-  	return [];
-  }
-
-  if (aabb_tree1.children.length === 0 && aabb_tree2.children.length === 0){ 
-
-  	return [ [aabb_tree1.triangle, aabb_tree2.triangle ] ]; 
-
-  } else if (aabb_tree1.children.length === 0 && aabb_tree2.children.length != 0){
-
-  	return     recur( points1, tris1, points2, tris2, aabb_tree1, aabb_tree2.children[0] )
-  		.concat( recur( points1, tris1, points2, tris2, aabb_tree1, aabb_tree2.children[1] ) );
-
-  } else if (aabb_tree1.children.length != 0 && aabb_tree2.children.length === 0){
-
-  	return     recur( points1, tris1, points2, tris2, aabb_tree1.children[0], aabb_tree2 )
-  		.concat( recur( points1, tris1, points2, tris2, aabb_tree1.children[1], aabb_tree2 ) );
-
-  } else if (aabb_tree1.children.length != 0 && aabb_tree2.children.length != 0){
-
-  	return     recur( points1, tris1, points2, tris2, aabb_tree1.children[0], aabb_tree2.children[0] )
-  		.concat( recur( points1, tris1, points2, tris2, aabb_tree1.children[0], aabb_tree2.children[1] ) )
-  		.concat( recur( points1, tris1, points2, tris2, aabb_tree1.children[1], aabb_tree2.children[0] ) )
-  		.concat( recur( points1, tris1, points2, tris2, aabb_tree1.children[1], aabb_tree2.children[1] ) );
-
-  }
-
-}
-
-
 public static function refine_rational_surface_point(uv1, uv2, degree_u1, knots_u1, degree_v1, knots_v1, homo_control_points1, degree_u2, knots_u2, degree_v2, knots_v2, homo_control_points2, tol){
 
  var pds, p, pn, pu, pv, pd, qds, q, qn, qu, qv, qd, dist;

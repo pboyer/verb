@@ -958,7 +958,67 @@ verb.core.CurveCurveIntersectionOptions = $hx_exports.core.CurveCurveIntersectio
 	this.tol = verb.core.Constants.TOLERANCE;
 	this.sampleTol = verb.core.Constants.TOLERANCE;
 };
+verb.core.IBoundable = function() { };
+verb.core.MeshBoundingBox = function(mesh,faceIndices,boundingbox) {
+	this._mesh = mesh;
+	this._faceIndices = faceIndices;
+	this._boundingBox = boundingbox;
+};
+verb.core.MeshBoundingBox.__interfaces__ = [verb.core.IBoundable];
+verb.core.MeshBoundingBox.prototype = {
+	split: function() {
+		var $as = verb.core.Mesh.sort_tris_on_longest_axis(this._boundingBox,this._mesh,this._faceIndices);
+		var l = verb.core.ArrayExtensions.left($as);
+		var r = verb.core.ArrayExtensions.right($as);
+		var bbl = verb.core.Mesh.make_mesh_aabb(this._mesh,l);
+		var bbr = verb.core.Mesh.make_mesh_aabb(this._mesh,r);
+		return new verb.core.types.Pair(new verb.core.MeshBoundingBox(this._mesh,l,bbl),new verb.core.MeshBoundingBox(this._mesh,r,bbr));
+	}
+	,boundingBox: function() {
+		return this._boundingBox;
+	}
+	,'yield': function() {
+		return this._faceIndices[0];
+	}
+	,indivisible: function() {
+		return this._faceIndices.length == 1;
+	}
+	,empty: function() {
+		return this._faceIndices.length == 0;
+	}
+};
 verb.core.Intersect = $hx_exports.core.Intersect = function() { };
+verb.core.Intersect.mesh_bounding_boxes = function(a,b) {
+	var ai;
+	var _g = [];
+	var _g2 = 0;
+	var _g1 = a.faces.length;
+	while(_g2 < _g1) {
+		var i = _g2++;
+		_g.push(i);
+	}
+	ai = _g;
+	var abb = verb.core.Mesh.make_mesh_aabb(a,ai);
+	var bi;
+	var _g11 = [];
+	var _g3 = 0;
+	var _g21 = b.faces.length;
+	while(_g3 < _g21) {
+		var i1 = _g3++;
+		_g11.push(i1);
+	}
+	bi = _g11;
+	var bbb = verb.core.Mesh.make_mesh_aabb(b,bi);
+	return verb.core.Intersect.boundables(new verb.core.MeshBoundingBox(a,ai,abb),new verb.core.MeshBoundingBox(b,bi,bbb));
+};
+verb.core.Intersect.boundables = function(a,b) {
+	if(a.empty() || b.empty()) return [];
+	if(!a.boundingBox().intersects(b.boundingBox())) return [];
+	if(a.indivisible() && b.indivisible()) return [new verb.core.types.Pair(a["yield"](),b["yield"]())];
+	var asplit = a.split();
+	var bsplit = b.split();
+	return verb.core.Intersect.boundables(asplit.item0,bsplit.item0).concat(verb.core.Intersect.boundables(asplit.item0,bsplit.item1)).concat(verb.core.Intersect.boundables(asplit.item1,bsplit.item0)).concat(verb.core.Intersect.boundables(asplit.item1,bsplit.item1));
+};
 verb.core.Intersect.rational_curves = function(curve1,curve2,options) {
 	if(options == null) options = new verb.core.CurveCurveIntersectionOptions();
 	var ints = verb.core.Intersect.rational_curves_by_aabb(curve1,curve2,options);

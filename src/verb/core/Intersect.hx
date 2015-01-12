@@ -1,10 +1,14 @@
 package verb.core;
 
+import verb.core.Intersect.MeshBoundingBox;
+import verb.core.types.BoundingBoxNode;
 import verb.core.Intersect.TriTriPoint;
 import verb.core.types.Pair;
 import verb.core.Mat.Vector;
 import verb.core.types.MeshData;
 import verb.core.types.CurveData;
+
+using verb.core.ArrayExtensions;
 
 @:expose("core.Ray")
 class Ray {
@@ -109,23 +113,143 @@ class CurveCurveIntersectionOptions {
 
 }
 
+interface IBoundable<T> {
+    public function boundingBox() : BoundingBox;
+    public function split() : Pair<IBoundable<T>, IBoundable<T>>;
+    public function yield() : T;
+    public function indivisible() : Bool;
+    public function empty() : Bool;
+}
+
+class MeshBoundingBox implements IBoundable<Int> {
+    var _mesh : MeshData;
+    var _faceIndices : Array<Int>;
+    var _boundingBox : BoundingBox;
+
+    public function new(mesh, faceIndices, boundingbox){
+        this._mesh = mesh;
+        this._faceIndices = faceIndices;
+        this._boundingBox = boundingbox;
+    }
+
+    public function split() : Pair<IBoundable<Int>, IBoundable<Int>> {
+        var as = Mesh.sort_tris_on_longest_axis( this._boundingBox, this._mesh, this._faceIndices )
+            , l = as.left()
+            , r = as.right()
+            , bbl = Mesh.make_mesh_aabb( this._mesh, l )
+            , bbr = Mesh.make_mesh_aabb( this._mesh, r );
+
+        return new Pair<IBoundable<Int>, IBoundable<Int>>( new MeshBoundingBox( this._mesh, l, bbl ), new MeshBoundingBox( this._mesh, r, bbr ));
+    }
+
+    public function boundingBox(){
+        return this._boundingBox;
+    }
+
+    public function yield(){
+        return this._faceIndices[0];
+    }
+
+    public function indivisible(){
+        return this._faceIndices.length == 1;
+    }
+
+    public function empty(){
+        return this._faceIndices.length == 0;
+    }
+}
+
 @:expose("core.Intersect")
 class Intersect {
 
+    public static function mesh_bounding_boxes( a : MeshData, b : MeshData ) : Array<Pair<Int,Int>> {
+        var ai = [ for (i in 0...a.faces.length) i ];
+        var abb = Mesh.make_mesh_aabb( a, ai );
+
+        var bi = [ for (i in 0...b.faces.length) i ];
+        var bbb = Mesh.make_mesh_aabb( b, bi );
+
+        return Intersect.boundables(new MeshBoundingBox(a, ai, abb), new MeshBoundingBox(b, bi, bbb));
+    }
+
+    private static function boundables<T1, T2>( a : IBoundable<T1>, b : IBoundable<T2> ) : Array<Pair<T1,T2>> {
+        if (a.empty() || b.empty()) return [];
+
+        if ( !a.boundingBox().intersects( b.boundingBox() ) ) return [];
+
+        if (a.indivisible() && b.indivisible()){
+            return [ new Pair(a.yield(), b.yield()) ];
+        }
+
+        var asplit = a.split()
+            , bsplit = b.split();
+
+        return     Intersect.boundables( asplit.item0, bsplit.item0 )
+            .concat( Intersect.boundables( asplit.item0, bsplit.item1 ) )
+            .concat( Intersect.boundables( asplit.item1, bsplit.item0 ) )
+            .concat( Intersect.boundables( asplit.item1, bsplit.item1 ) );
+    }
+//
+//    //
+//    //  Intersect two aabb trees - a recursive function
+//    //
+//    // **params**
+//    // + array of length 3 arrays of numbers representing the points of mesh1
+//    // + array of length 3 arrays of number representing the triangles of mesh1
+//    // + array of length 3 arrays of numbers representing the points of mesh2
+//    // + array of length 3 arrays of number representing the triangles of mesh2
+//    // + *Object*, nested object representing the aabb tree of the first mesh
+//    // + *Object*, nested object representing the aabb tree of the second mesh
+//    //
+//    // **returns**
+//    // + a list of pairs of triangle indices for mesh1 and mesh2 that are intersecting
+//    //
+//
+//    public static function bounding_box_trees<T>( tree0 : BoundingBoxNode, tree1 : BoundingBoxNode ) {
+//
+//        var intersects = tree0.boundingBox.intersects( tree1.boundingBox );
+//
+//        if (!intersects){
+//            return [ 1 ];
+//        }
+//
+////        if (Type.getClass(tree0) == BoundingBoxLeaf && $type(tree1) == BoundingBoxLeaf){
+////            return [ new Pair<T,T>(tree0.item, tree1.item) ];
+////        }
+//
+//        var tree0a : BoundingBoxInnerNode = tree0;
+//        var tree1a : BoundingBoxInnerNode = tree1a;
+//
+//        if (tree0a.children.length == 0 && tree1a.children.length != 0){
+//
+//            return     Intersect.bounding_box_trees( tree0a, tree1a.children[0] )
+//            .concat( Intersect.bounding_box_trees( tree0a, tree1a.children[1] ) );
+//
+//        } else if (tree0a.children.length != 0 && tree1a.children.length == 0){
+//
+//            return     Intersect.bounding_box_trees( tree0a.children[0], tree1a )
+//            .concat( Intersect.bounding_box_trees( tree0a.children[1], tree1a ) );
+//
+//        } else if (tree0a.children.length != 0 && tree1a.children.length != 0){
+//
+//            return     Intersect.bounding_box_trees( tree0a.children[0], tree1a.children[0] )
+//            .concat( Intersect.bounding_box_trees( tree0a.children[0], tree1a.children[1] ) )
+//            .concat( Intersect.bounding_box_trees( tree0a.children[1], tree1a.children[0] ) )
+//            .concat( Intersect.bounding_box_trees( tree0a.children[1], tree1a.children[1] ) );
+//        }
+//
+//    }
+
     //
-    // Approximate the intersection of two nurbs surface by axis-aligned bounding box intersection and then refine all solutions.
+    // Approximate the intersection of two NURBS curves
     //
     // **params**
-    // + integer degree of curve1
-    // + array of nondecreasing knot values for curve 1
-    // + 2d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi) for curve 1
-    // + integer degree of curve2
-    // + array of nondecreasing knot values for curve 2
-    // + 2d array of homogeneous control points, where each control point is an array of length (dim+1) and form (wi*pi, wi) for curve 2
-    // + tolerance for the intersection
+    // + CurveData object representing the first NURBS curve
+    // + CurveData object representing the second NURBS curve
+    // + CurveCurveIntersectionOptions object
     //
     // **returns**
-    // + array of CurveCurveIntersection objects
+    // + the intersections
     //
 
     public static function rational_curves( curve1 : CurveData, curve2 : CurveData, options : CurveCurveIntersectionOptions = null ) : Array<CurveCurveIntersection> {
@@ -147,7 +271,8 @@ class Intersect {
     // **params**
     // + CurveData object representing the first NURBS curve
     // + CurveData object representing the second NURBS curve
-    // + length 2 array with first param guess in first position and second param guess in second position
+    // + guess for first parameter
+    // + guess for second parameter
     //
     // **returns**
     // + array of CurveCurveIntersection objects
