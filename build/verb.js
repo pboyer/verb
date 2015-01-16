@@ -412,6 +412,25 @@ verb.core.ArrayExtensions.rightWithPivot = function(arr) {
 	var len = Math.ceil(arr.length / 2);
 	return arr.slice(len - 1);
 };
+verb.core.ArrayExtensions.unique = function(arr,comp) {
+	if(arr.length == 0) return [];
+	var uniques = [arr.pop()];
+	while(arr.length > 0) {
+		var ele = arr.pop();
+		var isUnique = true;
+		var _g = 0;
+		while(_g < uniques.length) {
+			var unique = uniques[_g];
+			++_g;
+			if(comp(ele,unique)) {
+				isUnique = false;
+				break;
+			}
+		}
+		if(isUnique) uniques.push(ele);
+	}
+	return uniques;
+};
 verb.core.Binomial = function() { };
 verb.core.Binomial.get = function(n,k) {
 	if(k == 0.0) return 1.0;
@@ -958,105 +977,240 @@ verb.core.CurveCurveIntersectionOptions = $hx_exports.core.CurveCurveIntersectio
 	this.tol = verb.core.Constants.TOLERANCE;
 	this.sampleTol = verb.core.Constants.TOLERANCE;
 };
-verb.core.IBoundable = function() { };
-verb.core.MeshBoundingBox = function(mesh,faceIndices,boundingbox) {
+verb.core.IBoundingBoxTree = function() { };
+verb.core.LazyMeshBoundingBoxTree = function(mesh,faceIndices) {
+	this._boundingBox = null;
 	this._mesh = mesh;
+	if(faceIndices == null) {
+		var _g = [];
+		var _g2 = 0;
+		var _g1 = mesh.faces.length;
+		while(_g2 < _g1) {
+			var i = _g2++;
+			_g.push(i);
+		}
+		faceIndices = _g;
+	}
 	this._faceIndices = faceIndices;
-	this._boundingBox = boundingbox;
 };
-verb.core.MeshBoundingBox.__interfaces__ = [verb.core.IBoundable];
-verb.core.MeshBoundingBox.prototype = {
+verb.core.LazyMeshBoundingBoxTree.__interfaces__ = [verb.core.IBoundingBoxTree];
+verb.core.LazyMeshBoundingBoxTree.prototype = {
 	split: function() {
 		var $as = verb.core.Mesh.sort_tris_on_longest_axis(this._boundingBox,this._mesh,this._faceIndices);
 		var l = verb.core.ArrayExtensions.left($as);
 		var r = verb.core.ArrayExtensions.right($as);
-		var bbl = verb.core.Mesh.make_mesh_aabb(this._mesh,l);
-		var bbr = verb.core.Mesh.make_mesh_aabb(this._mesh,r);
-		return new verb.core.types.Pair(new verb.core.MeshBoundingBox(this._mesh,l,bbl),new verb.core.MeshBoundingBox(this._mesh,r,bbr));
+		return new verb.core.types.Pair(new verb.core.LazyMeshBoundingBoxTree(this._mesh,l),new verb.core.LazyMeshBoundingBoxTree(this._mesh,r));
 	}
 	,boundingBox: function() {
+		if(this._boundingBox == null) this._boundingBox = verb.core.Mesh.make_mesh_aabb(this._mesh,this._faceIndices);
 		return this._boundingBox;
 	}
 	,'yield': function() {
 		return this._faceIndices[0];
 	}
-	,indivisible: function() {
+	,indivisible: function(tolerance) {
 		return this._faceIndices.length == 1;
 	}
 	,empty: function() {
 		return this._faceIndices.length == 0;
 	}
 };
-verb.core.Intersect = $hx_exports.core.Intersect = function() { };
-verb.core.Intersect.mesh_bounding_boxes = function(a,b) {
-	var ai;
-	var _g = [];
-	var _g2 = 0;
-	var _g1 = a.faces.length;
-	while(_g2 < _g1) {
-		var i = _g2++;
-		_g.push(i);
-	}
-	ai = _g;
-	var abb = verb.core.Mesh.make_mesh_aabb(a,ai);
-	var bi;
-	var _g11 = [];
-	var _g3 = 0;
-	var _g21 = b.faces.length;
-	while(_g3 < _g21) {
-		var i1 = _g3++;
-		_g11.push(i1);
-	}
-	bi = _g11;
-	var bbb = verb.core.Mesh.make_mesh_aabb(b,bi);
-	return verb.core.Intersect.boundables(new verb.core.MeshBoundingBox(a,ai,abb),new verb.core.MeshBoundingBox(b,bi,bbb));
+verb.core.PolylineData = $hx_exports.core.PolylineData = function(points,params) {
+	this.points = points;
+	this.params = params;
 };
-verb.core.Intersect.boundables = function(a,b) {
+verb.core.LazyPolylineBoundingBoxTree = function(polyline,interval) {
+	this._boundingBox = null;
+	this._polyline = polyline;
+	if(interval == null) interval = new verb.core.Interval(0,polyline.points.length != 0?polyline.points.length - 1:0);
+	this._interval = interval;
+};
+verb.core.LazyPolylineBoundingBoxTree.__interfaces__ = [verb.core.IBoundingBoxTree];
+verb.core.LazyPolylineBoundingBoxTree.prototype = {
+	split: function() {
+		var min = this._interval.min;
+		var max = this._interval.max;
+		var pivot = min + Math.ceil((max - min) / 2);
+		var l = new verb.core.Interval(min,pivot);
+		var r = new verb.core.Interval(pivot,max);
+		return new verb.core.types.Pair(new verb.core.LazyPolylineBoundingBoxTree(this._polyline,l),new verb.core.LazyPolylineBoundingBoxTree(this._polyline,r));
+	}
+	,boundingBox: function() {
+		if(this._boundingBox == null) this._boundingBox = new verb.BoundingBox(this._polyline.points);
+		return this._boundingBox;
+	}
+	,'yield': function() {
+		return this._interval.min;
+	}
+	,indivisible: function(tolerance) {
+		return this._interval.max - this._interval.min == 1;
+	}
+	,empty: function() {
+		return this._interval.max - this._interval.min == 0;
+	}
+};
+verb.core.LazyCurveBoundingBoxTree = function(curve,knotTol) {
+	this._boundingBox = null;
+	this._curve = curve;
+	if(knotTol == null) knotTol = verb.core.ArrayExtensions.last(this._curve.knots) - this._curve.knots[0] / 1000;
+	this._knotTol = knotTol;
+};
+verb.core.LazyCurveBoundingBoxTree.__interfaces__ = [verb.core.IBoundingBoxTree];
+verb.core.LazyCurveBoundingBoxTree.prototype = {
+	split: function() {
+		var min = this._curve.knots[0];
+		var max = verb.core.ArrayExtensions.last(this._curve.knots);
+		var dom = max - min;
+		var crvs = verb.core.Modify.curve_split(this._curve,(max + min) / 2.0 + dom * 0.01 * Math.random());
+		return new verb.core.types.Pair(new verb.core.LazyCurveBoundingBoxTree(crvs[0],this._knotTol),new verb.core.LazyCurveBoundingBoxTree(crvs[1],this._knotTol));
+	}
+	,boundingBox: function() {
+		if(this._boundingBox == null) this._boundingBox = new verb.BoundingBox(verb.core.Eval.dehomogenize_1d(this._curve.controlPoints));
+		return this._boundingBox;
+	}
+	,'yield': function() {
+		return this._curve;
+	}
+	,indivisible: function(tolerance) {
+		return verb.core.ArrayExtensions.last(this._curve.knots) - this._curve.knots[0] < this._knotTol;
+	}
+	,empty: function() {
+		return false;
+	}
+};
+verb.core.LazySurfaceBoundingBoxTree = function(surface,splitV,knotTolU,knotTolV) {
+	if(splitV == null) splitV = false;
+	this._boundingBox = null;
+	this._surface = surface;
+	this._splitV = splitV;
+	if(knotTolU == null) {
+		knotTolU = (verb.core.ArrayExtensions.last(surface.knotsU) - surface.knotsU[0]) / 1000;
+		console.log(knotTolU);
+	}
+	if(knotTolV == null) {
+		knotTolV = (verb.core.ArrayExtensions.last(surface.knotsV) - surface.knotsV[0]) / 1000;
+		console.log(knotTolV);
+	}
+	this._knotTolU = knotTolU;
+	this._knotTolV = knotTolV;
+};
+verb.core.LazySurfaceBoundingBoxTree.__interfaces__ = [verb.core.IBoundingBoxTree];
+verb.core.LazySurfaceBoundingBoxTree.prototype = {
+	split: function() {
+		var min;
+		var max;
+		if(this._splitV) {
+			min = this._surface.knotsV[0];
+			max = verb.core.ArrayExtensions.last(this._surface.knotsV);
+		} else {
+			min = this._surface.knotsU[0];
+			max = verb.core.ArrayExtensions.last(this._surface.knotsU);
+		}
+		var dom = max - min;
+		var pivot = (min + max) / 2.0 + dom * 0.01 * Math.random();
+		var srfs = verb.core.Modify.surface_split(this._surface,pivot,this._splitV);
+		return new verb.core.types.Pair(new verb.core.LazySurfaceBoundingBoxTree(srfs[0],!this._splitV,this._knotTolU,this._knotTolV),new verb.core.LazySurfaceBoundingBoxTree(srfs[1],!this._splitV,this._knotTolU,this._knotTolV));
+	}
+	,boundingBox: function() {
+		if(this._boundingBox == null) {
+			this._boundingBox = new verb.BoundingBox();
+			var _g = 0;
+			var _g1 = this._surface.controlPoints;
+			while(_g < _g1.length) {
+				var row = _g1[_g];
+				++_g;
+				this._boundingBox.addRange(verb.core.Eval.dehomogenize_1d(row));
+			}
+		}
+		return this._boundingBox;
+	}
+	,'yield': function() {
+		return this._surface;
+	}
+	,indivisible: function(tolerance) {
+		if(this._splitV) return verb.core.ArrayExtensions.last(this._surface.knotsV) - this._surface.knotsV[0] < this._knotTolV; else return verb.core.ArrayExtensions.last(this._surface.knotsU) - this._surface.knotsU[0] < this._knotTolU;
+	}
+	,empty: function() {
+		return false;
+	}
+};
+verb.core.PolylineMeshIntersection = $hx_exports.core.PolylineMeshIntersection = function(point,u,uv,polylineIndex,faceIndex) {
+	this.point = point;
+	this.u = u;
+	this.uv = uv;
+	this.polylineIndex = polylineIndex;
+	this.faceIndex = faceIndex;
+};
+verb.core.CurveSurfaceIntersection = $hx_exports.core.CurveSurfaceIntersection = function(u,uv) {
+	this.u = u;
+	this.uv = uv;
+};
+verb.core.Intersect = $hx_exports.core.Intersect = function() { };
+verb.core.Intersect.curve_and_surface = function(curve,surface,tol) {
+	if(tol == null) tol = 1e-3;
+	return verb.core.Intersect.bounding_box_trees(new verb.core.LazyCurveBoundingBoxTree(curve),new verb.core.LazySurfaceBoundingBoxTree(surface),tol);
+};
+verb.core.Intersect.curve_and_surface_with_estimate = function(curve,surface,tol,start_params) {
+	if(tol == null) tol = 1e-3;
+	var objective = function(x) {
+		var p1 = verb.core.Eval.rational_curve_point(curve,x[0]);
+		var p2 = verb.core.Eval.rational_surface_point(surface,x[1],x[2]);
+		var p1_p2 = verb.core.Vec.sub(p1,p2);
+		return verb.core.Vec.dot(p1_p2,p1_p2);
+	};
+	var sol_obj = verb.core.Numeric.uncmin(objective,start_params,tol);
+	var $final = sol_obj.solution;
+	return new verb.core.CurveSurfaceIntersection($final[0],[$final[1],$final[2]]);
+};
+verb.core.Intersect.polyline_and_mesh = function(polyline,mesh,tol) {
+	var res = verb.core.Intersect.bounding_box_trees(new verb.core.LazyPolylineBoundingBoxTree(polyline),new verb.core.LazyMeshBoundingBoxTree(mesh),tol);
+	var finalResults = [];
+	var _g = 0;
+	while(_g < res.length) {
+		var event = res[_g];
+		++_g;
+		var polid = event.item0;
+		var faceid = event.item1;
+		var inter = verb.core.Intersect.segment_with_tri(polyline.points[polid],polyline.points[polid + 1],mesh.points,mesh.faces[faceid]);
+		if(inter == null) continue;
+		var pt = inter.point;
+		var u = verb.core.Vec.lerp(inter.p,[polyline.params[polid]],[polyline.params[polid + 1]])[0];
+		var uv = verb.core.Intersect.tri_uv_from_point(mesh,mesh.faces[faceid],pt);
+		finalResults.push(new verb.core.PolylineMeshIntersection(pt,u,uv,polid,faceid));
+	}
+	return finalResults;
+};
+verb.core.Intersect.mesh_bounding_boxes = function(a,b,tol) {
+	return verb.core.Intersect.bounding_box_trees(new verb.core.LazyMeshBoundingBoxTree(a),new verb.core.LazyMeshBoundingBoxTree(b),tol);
+};
+verb.core.Intersect.bounding_box_trees = function(a,b,tol) {
+	if(tol == null) tol = 1e-9;
 	if(a.empty() || b.empty()) return [];
-	if(!a.boundingBox().intersects(b.boundingBox())) return [];
-	if(a.indivisible() && b.indivisible()) return [new verb.core.types.Pair(a["yield"](),b["yield"]())];
+	if(!a.boundingBox().intersects(b.boundingBox(),tol)) return [];
+	if(a.indivisible(tol) && b.indivisible(tol)) return [new verb.core.types.Pair(a["yield"](),b["yield"]())];
 	var asplit = a.split();
 	var bsplit = b.split();
-	return verb.core.Intersect.boundables(asplit.item0,bsplit.item0).concat(verb.core.Intersect.boundables(asplit.item0,bsplit.item1)).concat(verb.core.Intersect.boundables(asplit.item1,bsplit.item0)).concat(verb.core.Intersect.boundables(asplit.item1,bsplit.item1));
+	return verb.core.Intersect.bounding_box_trees(asplit.item0,bsplit.item0,tol).concat(verb.core.Intersect.bounding_box_trees(asplit.item0,bsplit.item1,tol)).concat(verb.core.Intersect.bounding_box_trees(asplit.item1,bsplit.item0,tol)).concat(verb.core.Intersect.bounding_box_trees(asplit.item1,bsplit.item1,tol));
 };
-verb.core.Intersect.rational_curves = function(curve1,curve2,options) {
-	if(options == null) options = new verb.core.CurveCurveIntersectionOptions();
-	var ints = verb.core.Intersect.rational_curves_by_aabb(curve1,curve2,options);
-	return ints.map(function(start) {
-		return verb.core.Intersect.refine_rational_curve_intersection(curve1,curve2,start.u0,start.u1);
+verb.core.Intersect.curves = function(curve1,curve2,tolerance) {
+	var ints = verb.core.Intersect.bounding_box_trees(new verb.core.LazyCurveBoundingBoxTree(curve1),new verb.core.LazyCurveBoundingBoxTree(curve2),0);
+	return ints.map(function(x) {
+		return verb.core.Intersect.curves_with_estimate(curve1,curve2,x.item0.knots[0],x.item1.knots[0],tolerance);
 	});
 };
-verb.core.Intersect.refine_rational_curve_intersection = function(curve0,curve1,u0,u1) {
+verb.core.Intersect.curves_with_estimate = function(curve0,curve1,u0,u1,tolerance) {
 	var objective = function(x) {
 		var p1 = verb.core.Eval.rational_curve_point(curve0,x[0]);
 		var p2 = verb.core.Eval.rational_curve_point(curve1,x[1]);
 		var p1_p2 = verb.core.Vec.sub(p1,p2);
 		return verb.core.Vec.dot(p1_p2,p1_p2);
 	};
-	var sol_obj = verb.core.Numeric.uncmin(objective,[u0,u1]);
+	var sol_obj = verb.core.Numeric.uncmin(objective,[u0,u1],tolerance);
 	var u11 = sol_obj.solution[0];
 	var u2 = sol_obj.solution[1];
 	var p11 = verb.core.Eval.rational_curve_point(curve0,u11);
 	var p21 = verb.core.Eval.rational_curve_point(curve1,u2);
 	return new verb.core.CurveCurveIntersection(p11,p21,u11,u2);
-};
-verb.core.Intersect.rational_curves_by_aabb = function(crv1,crv2,options) {
-	if(options == null) options = new verb.core.CurveCurveIntersectionOptions();
-	var up1 = verb.core.Tess.rational_curve_adaptive_sample(crv1,options.sampleTol,true);
-	var up2 = verb.core.Tess.rational_curve_adaptive_sample(crv2,options.sampleTol,true);
-	var u1 = up1.map(function(el) {
-		return el[0];
-	});
-	var u2 = up2.map(function(el1) {
-		return el1[0];
-	});
-	var p1 = up1.map(function(el2) {
-		return el2.slice(1);
-	});
-	var p2 = up2.map(function(el3) {
-		return el3.slice(1);
-	});
-	return verb.core.Intersect.parametric_polylines_by_aabb(p1,p2,u1,u2,options.tol);
 };
 verb.core.Intersect.triangles = function(mesh0,tri0,mesh1,tri1) {
 	var n0 = verb.core.Mesh.get_tri_norm(mesh0.points,tri0);
@@ -1189,45 +1343,22 @@ verb.core.Intersect.three_planes = function(n0,d0,n1,d1,n2,d2) {
 	var num = verb.core.Vec.add(verb.core.Vec.mul(d0,u),verb.core.Vec.cross(n0,diff));
 	return verb.core.Vec.mul(1 / den,num);
 };
-verb.core.Intersect.parametric_polylines_by_aabb = function(points0,points1,params0,params1,tol) {
-	var bb1 = new verb.BoundingBox(points0);
-	var bb2 = new verb.BoundingBox(points1);
-	if(!bb1.intersects(bb2,tol)) return [];
-	if(points0.length == 2 && points1.length == 2) {
-		var inter = verb.core.Intersect.segments(points0[0],points0[1],points1[0],points1[1],tol);
-		if(inter != null) {
-			inter.u0 = inter.u0 * (params0[1] - params0[0]) + params0[0];
-			inter.u1 = inter.u1 * (params1[1] - params1[0]) + params1[0];
-			return [inter];
-		}
-	} else if(points0.length == 2) {
-		var p2_mid = Math.ceil(points1.length / 2);
-		var p2_a = points1.slice(0,p2_mid);
-		var p2_b = points1.slice(p2_mid - 1);
-		var u2_a = params1.slice(0,p2_mid);
-		var u2_b = params1.slice(p2_mid - 1);
-		return verb.core.Intersect.parametric_polylines_by_aabb(points0,p2_a,params0,u2_a,tol).concat(verb.core.Intersect.parametric_polylines_by_aabb(points0,p2_b,params0,u2_b,tol));
-	} else if(points1.length == 2) {
-		var p1_mid = Math.ceil(points0.length / 2);
-		var p1_a = points0.slice(0,p1_mid);
-		var p1_b = points0.slice(p1_mid - 1);
-		var u1_a = params0.slice(0,p1_mid);
-		var u1_b = params0.slice(p1_mid - 1);
-		return verb.core.Intersect.parametric_polylines_by_aabb(p1_a,points1,u1_a,params1,tol).concat(verb.core.Intersect.parametric_polylines_by_aabb(p1_b,points1,u1_b,params1,tol));
-	} else {
-		var p1_mid1 = Math.ceil(points0.length / 2);
-		var p1_a1 = points0.slice(0,p1_mid1);
-		var p1_b1 = points0.slice(p1_mid1 - 1);
-		var u1_a1 = params0.slice(0,p1_mid1);
-		var u1_b1 = params0.slice(p1_mid1 - 1);
-		var p2_mid1 = Math.ceil(points1.length / 2);
-		var p2_a1 = points1.slice(0,p2_mid1);
-		var p2_b1 = points1.slice(p2_mid1 - 1);
-		var u2_a1 = params1.slice(0,p2_mid1);
-		var u2_b1 = params1.slice(p2_mid1 - 1);
-		return verb.core.Intersect.parametric_polylines_by_aabb(p1_a1,p2_a1,u1_a1,u2_a1,tol).concat(verb.core.Intersect.parametric_polylines_by_aabb(p1_a1,p2_b1,u1_a1,u2_b1,tol)).concat(verb.core.Intersect.parametric_polylines_by_aabb(p1_b1,p2_a1,u1_b1,u2_a1,tol)).concat(verb.core.Intersect.parametric_polylines_by_aabb(p1_b1,p2_b1,u1_b1,u2_b1,tol));
+verb.core.Intersect.polylines = function(polyline0,polyline1,tol) {
+	var res = verb.core.Intersect.bounding_box_trees(new verb.core.LazyPolylineBoundingBoxTree(polyline0),new verb.core.LazyPolylineBoundingBoxTree(polyline1),tol);
+	var finalResults = [];
+	var _g = 0;
+	while(_g < res.length) {
+		var event = res[_g];
+		++_g;
+		var polid0 = event.item0;
+		var polid1 = event.item1;
+		var inter = verb.core.Intersect.segments(polyline0.points[polid0],polyline0.points[polid0 + 1],polyline1.points[polid1],polyline1.points[polid1 + 1],tol);
+		if(inter == null) continue;
+		inter.u0 = verb.core.Vec.lerp(inter.u0,[polyline0.params[polid0]],[polyline0.params[polid0 + 1]])[0];
+		inter.u1 = verb.core.Vec.lerp(inter.u1,[polyline1.params[polid1]],[polyline1.params[polid1 + 1]])[0];
+		finalResults.push(inter);
 	}
-	return [];
+	return finalResults;
 };
 verb.core.Intersect.segments = function(a0,a1,b0,b1,tol) {
 	var a1ma0 = verb.core.Vec.sub(a1,a0);
@@ -2629,6 +2760,17 @@ verb.core.Trig.closest_point_on_segment = function(pt,segpt0,segpt1,u0,u1) {
 	return { u : u0 + (u1 - u0) * do2ptr / l, pt : verb.core.Vec.add(o,verb.core.Vec.mul(do2ptr,r))};
 };
 verb.core.Vec = $hx_exports.core.Vec = function() { };
+verb.core.Vec.range = function(max) {
+	var l = [];
+	var f = 0.0;
+	var _g = 0;
+	while(_g < max) {
+		var i = _g++;
+		l.push(f);
+		f += 1.0;
+	}
+	return l;
+};
 verb.core.Vec.neg = function(arr) {
 	return arr.map(function(x) {
 		return -x;

@@ -1,6 +1,10 @@
 package verb.core;
 
-import verb.core.Intersect.MeshBoundingBox;
+import verb.core.types.AdaptiveRefinementNode.AdaptiveRefinementOptions;
+import verb.core.Intersect.PolylineData;
+import verb.core.types.SurfaceData;
+import verb.core.Intersect.PolylineData;
+import verb.core.Intersect.LazyMeshBoundingBoxTree;
 import verb.core.types.BoundingBoxNode;
 import verb.core.Intersect.TriTriPoint;
 import verb.core.types.Pair;
@@ -113,132 +117,424 @@ class CurveCurveIntersectionOptions {
 
 }
 
-interface IBoundable<T> {
+interface IBoundingBoxTree<T> {
     public function boundingBox() : BoundingBox;
-    public function split() : Pair<IBoundable<T>, IBoundable<T>>;
+    public function split() : Pair<IBoundingBoxTree<T>, IBoundingBoxTree<T>>;
     public function yield() : T;
-    public function indivisible() : Bool;
+    public function indivisible( tolerance : Float ) : Bool;
     public function empty() : Bool;
 }
 
-class MeshBoundingBox implements IBoundable<Int> {
+class LazyMeshBoundingBoxTree implements IBoundingBoxTree<Int> {
     var _mesh : MeshData;
     var _faceIndices : Array<Int>;
-    var _boundingBox : BoundingBox;
+    var _boundingBox : BoundingBox = null;
 
-    public function new(mesh, faceIndices, boundingbox){
-        this._mesh = mesh;
-        this._faceIndices = faceIndices;
-        this._boundingBox = boundingbox;
+    public function new(mesh, faceIndices = null){
+        _mesh = mesh;
+        if (faceIndices == null) {
+            faceIndices = [ for (i in 0...mesh.faces.length) i ];
+        }
+        _faceIndices = faceIndices;
     }
 
-    public function split() : Pair<IBoundable<Int>, IBoundable<Int>> {
-        var as = Mesh.sort_tris_on_longest_axis( this._boundingBox, this._mesh, this._faceIndices )
+    public function split() : Pair<IBoundingBoxTree<Int>, IBoundingBoxTree<Int>> {
+        var as = Mesh.sort_tris_on_longest_axis( _boundingBox, _mesh, _faceIndices )
             , l = as.left()
-            , r = as.right()
-            , bbl = Mesh.make_mesh_aabb( this._mesh, l )
-            , bbr = Mesh.make_mesh_aabb( this._mesh, r );
+            , r = as.right();
 
-        return new Pair<IBoundable<Int>, IBoundable<Int>>( new MeshBoundingBox( this._mesh, l, bbl ), new MeshBoundingBox( this._mesh, r, bbr ));
+        return new Pair<IBoundingBoxTree<Int>, IBoundingBoxTree<Int>>(
+            new LazyMeshBoundingBoxTree( _mesh, l),
+            new LazyMeshBoundingBoxTree( _mesh, r ));
     }
 
     public function boundingBox(){
-        return this._boundingBox;
+        if (_boundingBox == null){
+            _boundingBox = Mesh.make_mesh_aabb( _mesh, _faceIndices );
+        }
+        return _boundingBox;
     }
 
     public function yield(){
-        return this._faceIndices[0];
+        return _faceIndices[0];
     }
 
-    public function indivisible(){
-        return this._faceIndices.length == 1;
+    public function indivisible( tolerance : Float ){
+        return _faceIndices.length == 1;
     }
 
     public function empty(){
-        return this._faceIndices.length == 0;
+        return _faceIndices.length == 0;
+    }
+}
+
+@:expose("core.PolylineData")
+class PolylineData {
+    public var points : Array<Point>;
+    public var params : Array<Float>;
+    public function new(points, params){
+        this.points = points;
+        this.params = params;
+    }
+}
+
+class LazyPolylineBoundingBoxTree implements IBoundingBoxTree<Int> {
+
+    var _interval : Interval<Int>;
+    var _polyline : PolylineData;
+    var _boundingBox : BoundingBox = null;
+
+    public function new(polyline, interval = null){
+        _polyline = polyline;
+
+        if (interval == null) {
+            interval = new Interval<Int>(0, polyline.points.length != 0 ? polyline.points.length-1 : 0);
+        }
+        _interval = interval;
+    }
+
+    public function split() : Pair<IBoundingBoxTree<Int>, IBoundingBoxTree<Int>> {
+        var min = _interval.min;
+        var max = _interval.max;
+
+        var pivot = min + Math.ceil( (max-min) / 2 );
+
+        var l = new Interval( min, pivot )
+            , r = new Interval( pivot, max );
+
+        return new Pair<IBoundingBoxTree<Int>, IBoundingBoxTree<Int>>(
+            new LazyPolylineBoundingBoxTree( _polyline, l ),
+            new LazyPolylineBoundingBoxTree( _polyline, r ));
+
+    }
+
+    public function boundingBox(){
+        if (_boundingBox == null){
+            _boundingBox = new BoundingBox( _polyline.points );
+        }
+
+        return _boundingBox;
+    }
+
+    public function yield(){
+        return _interval.min;
+    }
+
+    public function indivisible( tolerance : Float ){
+        return _interval.max - _interval.min == 1;
+    }
+
+    public function empty(){
+        return _interval.max - _interval.min == 0;
+    }
+}
+
+class LazyCurveBoundingBoxTree implements IBoundingBoxTree<CurveData> {
+
+    var _curve : CurveData;
+    var _boundingBox : BoundingBox = null;
+    var _knotTol : Float;
+
+    public function new(curve, knotTol : Float = null){
+        _curve = curve;
+        if (knotTol == null){
+            knotTol = _curve.knots.last() - _curve.knots.first() / 1000;
+        }
+        _knotTol = knotTol;
+    }
+
+    public function split() : Pair<IBoundingBoxTree<CurveData>, IBoundingBoxTree<CurveData>> {
+        var min = _curve.knots.first();
+        var max = _curve.knots.last();
+        var dom = max - min;
+
+        var crvs = Modify.curve_split( _curve, (max + min) / 2.0 + dom * 0.01 * Math.random() );
+
+        return new Pair<IBoundingBoxTree<CurveData>, IBoundingBoxTree<CurveData>>(
+            new LazyCurveBoundingBoxTree( crvs[0], _knotTol ),
+            new LazyCurveBoundingBoxTree( crvs[1], _knotTol ));
+    }
+
+    public function boundingBox(){
+        if (_boundingBox == null){
+            _boundingBox = new BoundingBox( Eval.dehomogenize_1d(_curve.controlPoints) );
+        }
+        return _boundingBox;
+    }
+
+    public function yield(){
+        return _curve;
+    }
+
+    public function indivisible( tolerance : Float ){
+        return _curve.knots.last() - _curve.knots.first() < _knotTol;
+    }
+
+    public function empty(){
+        return false;
+    }
+}
+
+class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<SurfaceData> {
+
+    var _surface : SurfaceData;
+    var _boundingBox : BoundingBox = null;
+    var _splitV : Bool;
+    var _knotTolU : Float;
+    var _knotTolV : Float;
+
+    public function new(surface, splitV = false, knotTolU = null, knotTolV = null){
+        _surface = surface;
+        _splitV = splitV;
+
+        if (knotTolU == null){
+            knotTolU = (surface.knotsU.last() - surface.knotsU.first()) / 1000;
+            trace(knotTolU);
+        }
+
+        if (knotTolV == null){
+            knotTolV = (surface.knotsV.last() - surface.knotsV.first()) / 1000;
+            trace(knotTolV);
+        }
+
+        _knotTolU = knotTolU;
+        _knotTolV = knotTolV;
+    }
+
+    public function split() : Pair<IBoundingBoxTree<SurfaceData>, IBoundingBoxTree<SurfaceData>> {
+
+        var min : Float;
+        var max : Float;
+
+        if (_splitV){
+            min = _surface.knotsV.first();
+            max = _surface.knotsV.last();
+        } else {
+            min = _surface.knotsU.first();
+            max = _surface.knotsU.last();
+        }
+
+        var dom = max - min;
+        var pivot = (min + max) / 2.0 + dom * 0.01 * Math.random();
+
+        var srfs = Modify.surface_split(_surface, pivot, _splitV );
+
+        return new Pair<IBoundingBoxTree<SurfaceData>, IBoundingBoxTree<SurfaceData>>(
+            new LazySurfaceBoundingBoxTree( srfs[0], !_splitV, _knotTolU, _knotTolV ),
+            new LazySurfaceBoundingBoxTree( srfs[1], !_splitV, _knotTolU, _knotTolV ));
+    }
+
+    public function boundingBox(){
+        if (_boundingBox == null){
+            _boundingBox = new BoundingBox();
+            for (row in _surface.controlPoints){
+                _boundingBox.addRange( Eval.dehomogenize_1d(row) );
+            }
+        }
+        return _boundingBox;
+    }
+
+    public function yield(){
+        return _surface;
+    }
+
+    public function indivisible( tolerance : Float ){
+        if (_splitV){
+            return _surface.knotsV.last() - _surface.knotsV.first() < _knotTolV;
+        } else {
+            return _surface.knotsU.last() - _surface.knotsU.first() < _knotTolU;
+        }
+    }
+
+    public function empty(){
+        return false;
+    }
+}
+
+@:expose("core.PolylineMeshIntersection")
+class PolylineMeshIntersection {
+
+    public var point : Point;
+    public var u : Float;
+    public var uv : UV;
+    public var polylineIndex : Int;
+    public var faceIndex : Int;
+
+    public function new(point, u, uv, polylineIndex, faceIndex){
+        this.point = point;
+        this.u = u;
+        this.uv = uv;
+        this.polylineIndex = polylineIndex;
+        this.faceIndex = faceIndex;
+    }
+}
+
+@:expose("core.CurveSurfaceIntersection")
+class CurveSurfaceIntersection {
+
+    public var u : Float;
+    public var uv : UV;
+
+    public function new( u, uv ){
+        this.u = u;
+        this.uv = uv;
     }
 }
 
 @:expose("core.Intersect")
 class Intersect {
 
-    public static function mesh_bounding_boxes( a : MeshData, b : MeshData ) : Array<Pair<Int,Int>> {
-        var ai = [ for (i in 0...a.faces.length) i ];
-        var abb = Mesh.make_mesh_aabb( a, ai );
+    //
+    // Get the intersection of a NURBS curve and a NURBS surface without an estimate
+    //
+    // **params**
+    // + CurveData
+    // + SurfaceData
+    // + tolerance for the curve intersection
+    //
+    // **returns**
+    // + array of CurveSurfaceIntersection objects
+    //
 
-        var bi = [ for (i in 0...b.faces.length) i ];
-        var bbb = Mesh.make_mesh_aabb( b, bi );
+    public static function curve_and_surface( curve : CurveData,
+                                              surface : SurfaceData,
+                                              tol : Float = 1e-3 )  {
 
-        return Intersect.boundables(new MeshBoundingBox(a, ai, abb), new MeshBoundingBox(b, bi, bbb));
+        return Intersect.bounding_box_trees(
+            new LazyCurveBoundingBoxTree( curve ),
+            new LazySurfaceBoundingBoxTree( surface ), tol );
+
+//        return ints.map(function( inter ){
+//
+//            var crvSeg = inter.item0;
+//            var srfPart = inter.item1;
+//
+//            // get the middle param of the curve
+//            var min = crvSeg.knots.first();
+//            var max = crvSeg.knots.last();
+//
+//            var u = (min + max) / 2.0;
+//
+//            // get the middle param of the surface
+//            var minu = srfPart.knotsU.first();
+//            var maxu = srfPart.knotsU.last();
+//
+//            var minv = srfPart.knotsV.first();
+//            var maxv = srfPart.knotsV.last();
+//
+//            var uv = [ (minu + maxu) / 2.0, (minv + maxv) / 2.0 ];
+//
+//            return Intersect.curve_and_surface_with_estimate( crvSeg, srfPart, [u].concat(uv) );
+//        });
     }
 
-    private static function boundables<T1, T2>( a : IBoundable<T1>, b : IBoundable<T2> ) : Array<Pair<T1,T2>> {
+    //
+    // Refine an intersection pair for a surface and curve given an initial guess.  This is an unconstrained minimization,
+    // so the caller is responsible for providing a very good initial guess.
+    //
+    // **params**
+    // + CurveData
+    // + SurfaceData
+    // + array of initial parameter values [ u_crv, u_srf, v_srf ]
+    //
+    // **returns**
+    // + a CurveSurfaceIntersection object
+    //
+
+    public static function curve_and_surface_with_estimate(    curve : CurveData,
+                                                               surface : SurfaceData,
+                                                               tol : Float = 1e-3,
+                                                               start_params : Array<Float> ) : CurveSurfaceIntersection {
+
+        var objective = function(x) {
+            var p1 = Eval.rational_curve_point( curve, x[0])
+            , p2 = Eval.rational_surface_point( surface, x[1], x[2] )
+            , p1_p2 = Vec.sub(p1, p2);
+
+            return Vec.dot(p1_p2, p1_p2);
+        }
+
+        var sol_obj = Numeric.uncmin( objective, start_params, tol );
+        var final = sol_obj.solution;
+
+        return new CurveSurfaceIntersection( final[0], [ final[1], final[2] ] );
+    }
+
+    //
+    // Approximate the intersection of a polyline and mesh while maintaining parameter information
+    //
+    // **params**
+    // + PolylineData
+    // + MeshData
+    //
+    // **returns**
+    // + an array of PolylineMeshIntersection object
+    //
+
+    public static function polyline_and_mesh( polyline : PolylineData,
+                                              mesh : MeshData,
+                                              tol : Float ) : Array<PolylineMeshIntersection> {
+
+        var res = Intersect.bounding_box_trees(
+            new LazyPolylineBoundingBoxTree( polyline ),
+            new LazyMeshBoundingBoxTree( mesh ), tol );
+
+        var finalResults = [];
+
+        for (event in res) {
+
+            var polid = event.item0;
+            var faceid = event.item1;
+
+            var inter = Intersect.segment_with_tri( polyline.points[polid], polyline.points[polid + 1], mesh.points, mesh.faces[ faceid ] );
+            if ( inter == null ) continue;
+
+            var pt = inter.point;
+            var u = Vec.lerp(inter.p, [ polyline.params[polid] ], [ polyline.params[polid+1] ] )[0];
+            var uv = Intersect.tri_uv_from_point( mesh, mesh.faces[faceid],  pt );
+
+            finalResults.push(new PolylineMeshIntersection( pt, u, uv, polid, faceid ));
+
+        }
+
+        return finalResults;
+    }
+
+    public static function mesh_bounding_boxes( a : MeshData, b : MeshData, tol : Float ) : Array<Pair<Int,Int>> {
+
+        return Intersect.bounding_box_trees(new LazyMeshBoundingBoxTree(a), new LazyMeshBoundingBoxTree(b), tol );
+
+    }
+
+    //
+    // The core algorithm for bounding box tree intersection, supporting both lazy and pre-computed bounding box trees
+    // via the IBoundingBoxTree interface
+    //
+    // **params**
+    // + an IBoundingBoxTree object
+    // + a second IBoundingBoxTree object
+    // + the tolerance for the intersection, used by BoundingBox.intersects
+    //
+    // **returns**
+    // + an array of Pair objects extracted from the yield method of IBoundingBoxTree
+    //
+    public static function bounding_box_trees<T1, T2>( a : IBoundingBoxTree<T1>, b : IBoundingBoxTree<T2>, tol : Float = 1e-9 )
+        : Array<Pair<T1,T2>> {
+
         if (a.empty() || b.empty()) return [];
 
-        if ( !a.boundingBox().intersects( b.boundingBox() ) ) return [];
+        if ( !a.boundingBox().intersects( b.boundingBox(), tol ) ) return [];
 
-        if (a.indivisible() && b.indivisible()){
-            return [ new Pair(a.yield(), b.yield()) ];
-        }
+        if (a.indivisible(tol) && b.indivisible(tol) ) return [ new Pair(a.yield(), b.yield()) ];
 
         var asplit = a.split()
             , bsplit = b.split();
 
-        return     Intersect.boundables( asplit.item0, bsplit.item0 )
-            .concat( Intersect.boundables( asplit.item0, bsplit.item1 ) )
-            .concat( Intersect.boundables( asplit.item1, bsplit.item0 ) )
-            .concat( Intersect.boundables( asplit.item1, bsplit.item1 ) );
+        return     Intersect.bounding_box_trees( asplit.item0, bsplit.item0, tol )
+            .concat( Intersect.bounding_box_trees( asplit.item0, bsplit.item1, tol  ) )
+            .concat( Intersect.bounding_box_trees( asplit.item1, bsplit.item0, tol  ) )
+            .concat( Intersect.bounding_box_trees( asplit.item1, bsplit.item1, tol  ) );
     }
-//
-//    //
-//    //  Intersect two aabb trees - a recursive function
-//    //
-//    // **params**
-//    // + array of length 3 arrays of numbers representing the points of mesh1
-//    // + array of length 3 arrays of number representing the triangles of mesh1
-//    // + array of length 3 arrays of numbers representing the points of mesh2
-//    // + array of length 3 arrays of number representing the triangles of mesh2
-//    // + *Object*, nested object representing the aabb tree of the first mesh
-//    // + *Object*, nested object representing the aabb tree of the second mesh
-//    //
-//    // **returns**
-//    // + a list of pairs of triangle indices for mesh1 and mesh2 that are intersecting
-//    //
-//
-//    public static function bounding_box_trees<T>( tree0 : BoundingBoxNode, tree1 : BoundingBoxNode ) {
-//
-//        var intersects = tree0.boundingBox.intersects( tree1.boundingBox );
-//
-//        if (!intersects){
-//            return [ 1 ];
-//        }
-//
-////        if (Type.getClass(tree0) == BoundingBoxLeaf && $type(tree1) == BoundingBoxLeaf){
-////            return [ new Pair<T,T>(tree0.item, tree1.item) ];
-////        }
-//
-//        var tree0a : BoundingBoxInnerNode = tree0;
-//        var tree1a : BoundingBoxInnerNode = tree1a;
-//
-//        if (tree0a.children.length == 0 && tree1a.children.length != 0){
-//
-//            return     Intersect.bounding_box_trees( tree0a, tree1a.children[0] )
-//            .concat( Intersect.bounding_box_trees( tree0a, tree1a.children[1] ) );
-//
-//        } else if (tree0a.children.length != 0 && tree1a.children.length == 0){
-//
-//            return     Intersect.bounding_box_trees( tree0a.children[0], tree1a )
-//            .concat( Intersect.bounding_box_trees( tree0a.children[1], tree1a ) );
-//
-//        } else if (tree0a.children.length != 0 && tree1a.children.length != 0){
-//
-//            return     Intersect.bounding_box_trees( tree0a.children[0], tree1a.children[0] )
-//            .concat( Intersect.bounding_box_trees( tree0a.children[0], tree1a.children[1] ) )
-//            .concat( Intersect.bounding_box_trees( tree0a.children[1], tree1a.children[0] ) )
-//            .concat( Intersect.bounding_box_trees( tree0a.children[1], tree1a.children[1] ) );
-//        }
-//
-//    }
 
     //
     // Approximate the intersection of two NURBS curves
@@ -246,22 +542,21 @@ class Intersect {
     // **params**
     // + CurveData object representing the first NURBS curve
     // + CurveData object representing the second NURBS curve
-    // + CurveCurveIntersectionOptions object
+    // + tolerance for the intersection
     //
     // **returns**
     // + the intersections
     //
 
-    public static function rational_curves( curve1 : CurveData, curve2 : CurveData, options : CurveCurveIntersectionOptions = null ) : Array<CurveCurveIntersection> {
+    public static function curves( curve1 : CurveData, curve2 : CurveData, tolerance : Float ) : Array<CurveCurveIntersection> {
 
-        if (options == null) options = new CurveCurveIntersectionOptions();
+        var ints = Intersect.bounding_box_trees(
+            new LazyCurveBoundingBoxTree( curve1 ),
+            new LazyCurveBoundingBoxTree( curve2 ), 0 );
 
-        var ints = Intersect.rational_curves_by_aabb( curve1, curve2, options );
-
-        return ints.map(function(start : CurveCurveIntersection) : CurveCurveIntersection {
-            return Intersect.refine_rational_curve_intersection( curve1, curve2, start.u0, start.u1 );
+        return ints.map(function(x : Pair<CurveData, CurveData>) : CurveCurveIntersection {
+            return Intersect.curves_with_estimate( curve1, curve2, x.item0.knots.first(), x.item1.knots.first(), tolerance );
         });
-
     }
 
     //
@@ -273,13 +568,17 @@ class Intersect {
     // + CurveData object representing the second NURBS curve
     // + guess for first parameter
     // + guess for second parameter
+    // + tolerance for the intersection
     //
     // **returns**
     // + array of CurveCurveIntersection objects
     //
 
-    private static function refine_rational_curve_intersection( curve0 : CurveData, curve1 : CurveData,
-                                                               u0 : Float, u1 : Float ) : CurveCurveIntersection
+    private static function curves_with_estimate( curve0 : CurveData,
+                                                  curve1 : CurveData,
+                                                  u0 : Float,
+                                                  u1 : Float,
+                                                  tolerance : Float ) : CurveCurveIntersection
     {
         var objective = function( x : Vector ) : Float {
             var p1 = Eval.rational_curve_point(curve0, x[0])
@@ -289,7 +588,7 @@ class Intersect {
             return Vec.dot(p1_p2, p1_p2);
         }
 
-        var sol_obj = Numeric.uncmin( objective, [u0, u1] );
+        var sol_obj = Numeric.uncmin( objective, [u0, u1], tolerance );
 
         var u1 = sol_obj.solution[0]
             , u2 = sol_obj.solution[1];
@@ -298,36 +597,6 @@ class Intersect {
         , p2 = Eval.rational_curve_point(curve1, u2 );
 
         return new CurveCurveIntersection(p1, p2, u1, u2);
-    }
-
-    //
-    // Approximate the intersection of two NURBS curves by axis-aligned bounding box intersection.
-    //
-    // **params**
-    // + CurveData object representing the first NURBS curve
-    // + CurveData object representing the second NURBS curve
-    // + tolerance for the inital polygonization of the curves
-    // + tolerance for the intersection
-    //
-    // **returns**
-    // + array of parameter pairs representing the intersection of the two parameteric polylines
-    //
-
-    private static function rational_curves_by_aabb( crv1 : CurveData,
-                                                    crv2 : CurveData,
-                                                    options : CurveCurveIntersectionOptions = null ) : Array<CurveCurveIntersection> {
-
-        if (options == null) options = new CurveCurveIntersectionOptions();
-
-        var up1 = Tess.rational_curve_adaptive_sample( crv1, options.sampleTol, true)
-        , up2 = Tess.rational_curve_adaptive_sample( crv2, options.sampleTol, true)
-        , u1 = up1.map( function(el : Point) { return el[0]; })
-        , u2 = up2.map( function(el : Point) { return el[0]; })
-        , p1 = up1.map( function(el : Point) { return el.slice(1); })
-        , p2 = up2.map( function(el : Point) { return el.slice(1); });
-
-        return Intersect.parametric_polylines_by_aabb( p1, p2, u1, u2, options.tol );
-
     }
 
     //
@@ -590,86 +859,40 @@ class Intersect {
     // Intersect two polyline curves, keeping track of parameterization on each
     //
     // **params**
-    // + array of point values for curve 1
-    // + array of point values for curve 2
-    // + array of parameter values for curve 1, same length as first arg
-    // + array of parameter values for curve 2, same length as third arg
+    // + PolylineData for first polyline
+    // + PolylineData for second polyline
     // + tolerance for the intersection
     //
     // **returns**
     // + array of parameter pairs representing the intersection of the two parameteric polylines
     //
 
-    public static function parametric_polylines_by_aabb( points0 : Array<Point>,
-                                                         points1 : Array<Point>,
-                                                         params0 : Array<Float>,
-                                                         params1 : Array<Float>,
-                                                         tol : Float ) : Array<CurveCurveIntersection> {
+    public static function polylines( polyline0 : PolylineData, polyline1 : PolylineData, tol : Float )
+        : Array<CurveCurveIntersection> {
 
-        var bb1 = new verb.BoundingBox(points0)
-        , bb2 = new verb.BoundingBox(points1);
+        var res = Intersect.bounding_box_trees(
+            new LazyPolylineBoundingBoxTree( polyline0 ),
+            new LazyPolylineBoundingBoxTree( polyline1 ), tol );
 
-        if ( !bb1.intersects(bb2, tol) ) {
-            return [];
+        var finalResults = [];
+
+        for (event in res) {
+            var polid0 = event.item0;
+            var polid1 = event.item1;
+
+            var inter = Intersect.segments(polyline0.points[polid0],polyline0.points[polid0+1],
+            polyline1.points[polid1],polyline1.points[polid1+1], tol);
+
+            if ( inter == null ) continue;
+
+            // remap to full parametric domain of polyline
+            inter.u0 = Vec.lerp(inter.u0, [ polyline0.params[polid0] ], [ polyline0.params[polid0+1] ] )[0];
+            inter.u1 = Vec.lerp(inter.u1, [ polyline1.params[polid1] ], [ polyline1.params[polid1+1] ] )[0];
+
+            finalResults.push(inter);
         }
 
-        if (points0.length == 2 && points1.length == 2 ){
-
-            var inter = Intersect.segments(points0[0],points0[1], points1[0], points1[1], tol);
-
-            if ( inter != null ){
-                // map the parameters of the segment to the parametric space of the entire polyline
-                inter.u0 = inter.u0 * ( params0[1]-params0[0] ) + params0[0];
-                inter.u1 = inter.u1 * ( params1[1]-params1[0] ) + params1[0];
-
-                return [ inter ];
-            }
-
-        } else if (points0.length == 2) {
-
-            var p2_mid = Math.ceil( points1.length / 2 ),
-            p2_a = points1.slice( 0, p2_mid ),
-            p2_b = points1.slice( p2_mid-1 ),
-            u2_a = params1.slice( 0, p2_mid ),
-            u2_b = params1.slice( p2_mid-1 );
-
-            return 	 Intersect.parametric_polylines_by_aabb(points0, p2_a, params0, u2_a, tol)
-            .concat( Intersect.parametric_polylines_by_aabb(points0, p2_b, params0, u2_b, tol) );
-
-        } else if (points1.length == 2) {
-
-            var p1_mid = Math.ceil( points0.length / 2 ),
-            p1_a = points0.slice( 0, p1_mid ),
-            p1_b = points0.slice( p1_mid-1 ),
-            u1_a = params0.slice( 0, p1_mid ),
-            u1_b = params0.slice( p1_mid-1 );
-
-            return 		 Intersect.parametric_polylines_by_aabb(p1_a, points1, u1_a, params1, tol)
-            .concat( Intersect.parametric_polylines_by_aabb(p1_b, points1, u1_b, params1, tol) );
-
-        } else {
-
-            var p1_mid = Math.ceil( points0.length / 2 ),
-            p1_a = points0.slice( 0, p1_mid ),
-            p1_b = points0.slice( p1_mid-1 ),
-            u1_a = params0.slice( 0, p1_mid ),
-            u1_b = params0.slice( p1_mid-1 ),
-
-            p2_mid = Math.ceil( points1.length / 2 ),
-            p2_a = points1.slice( 0, p2_mid ),
-            p2_b = points1.slice( p2_mid-1 ),
-            u2_a = params1.slice( 0, p2_mid ),
-            u2_b = params1.slice( p2_mid-1 );
-
-            return 		 Intersect.parametric_polylines_by_aabb(p1_a, p2_a, u1_a, u2_a, tol)
-            .concat( Intersect.parametric_polylines_by_aabb(p1_a, p2_b, u1_a, u2_b, tol) )
-            .concat( Intersect.parametric_polylines_by_aabb(p1_b, p2_a, u1_b, u2_a, tol) )
-            .concat( Intersect.parametric_polylines_by_aabb(p1_b, p2_b, u1_b, u2_b, tol) );
-
-        }
-
-        return [];
-
+        return finalResults;
     }
 
     //

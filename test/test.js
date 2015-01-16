@@ -865,8 +865,7 @@ describe("verb.core.Eval.curve_knot_refine",function(){
 
 });
 
-
-describe("verb.core.Eval.curve_knot_split",function(){
+describe("verb.core.Modify.curve_split",function(){
 
 	function cubicSplit(u){
 
@@ -908,9 +907,7 @@ describe("verb.core.Eval.curve_knot_split",function(){
 
 });
 
-
-
-describe("verb.core.Eval.knot_multiplicities",function(){
+describe("verb.core.Modify.knot_multiplicities",function(){
 
 	it('is correct for a basic example', function(){
 
@@ -936,9 +933,7 @@ describe("verb.core.Eval.knot_multiplicities",function(){
 	});
 });
 
-
-
-describe("verb.core.Eval.curve_bezier_decompose",function(){
+describe("verb.core.Modify.curve_bezier_decompose",function(){
 
 	it('is correct for a basic example', function(){
 
@@ -981,7 +976,7 @@ describe("verb.core.Mat.transpose",function(){
 	});
 });
 
-describe("verb.core.Eval.surface_knot_refine",function(){
+describe("verb.core.Modify.surface_knot_refine",function(){
 
 	var degree = 3
 		, knotsV = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
@@ -1053,7 +1048,7 @@ describe("verb.core.Eval.surface_knot_refine",function(){
 });
 
 
-describe("verb.core.Eval.surface_split", function(){
+describe("verb.core.Modify.surface_split", function(){
 
 	var degree = 3
 		, knotsV = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
@@ -1069,7 +1064,6 @@ describe("verb.core.Eval.surface_split", function(){
 	it('can split a surface in the u direction', function(){
 
 		var u = 0.2;
-
 
 		var res = verb.core.Modify.surface_split( surface, u, false );
 
@@ -1138,8 +1132,6 @@ describe("verb.core.Eval.surface_split", function(){
 	});
 
 });
-
-
 
 describe("BoundingBox.init() ",function(){
 
@@ -3098,7 +3090,6 @@ describe("verb.core.Eval.get_min_coordinate_on_axis",function(){
 	});
 });
 
-
 describe("verb.core.Mesh.sort_tris_on_longest_axis",function(){
 
 	it('should return correct result with y axis regular array', function(){
@@ -3204,18 +3195,18 @@ describe("verb.core.Make.four_point_surface",function(){
 
 });
 
-
-describe("verb.core.Intersect.parameteric_polylines_by_aabb",function(){
+describe("verb.core.Intersect.polylines",function(){
 
 	it('can intersect two simple lines', function(){
 
 		var p1 = [0,0,0]
 			, p2 = [0,1,0]
 			, p3 = [-0.5,0.5,0]
-			, p4 = [0.5,0.5,0];
+			, p4 = [0.5,0.5,0]
+			, pl0 = new verb.core.PolylineData([ p1, p2 ], [0, 1])
+			, pl1 = new verb.core.PolylineData([ p3, p4 ], [0, 1]);
 
-		var inter = verb.core.Intersect.parametric_polylines_by_aabb( [ p1, p2 ], [p3, p4], [0, 1], [0, 1],
-			verb.core.Constants.TOLERANCE );
+		var inter = verb.core.Intersect.polylines( pl0, pl1, verb.core.Constants.TOLERANCE );
 
 		inter.length.should.be.equal(1);
 
@@ -3232,10 +3223,11 @@ describe("verb.core.Intersect.parameteric_polylines_by_aabb",function(){
 			, p2 = [2,0.5,0]
 			, p3 = [0,0,0]
 			, p4 = [1,0,0]
-			, p5 = [1,1,0];
+			, p5 = [1,1,0]
+			, pl0 = new verb.core.PolylineData([ p1, p2 ], [0, 1])
+			, pl1 = new verb.core.PolylineData([ p3, p4, p5], [0, 0.5, 1]);
 
-		var inter = verb.core.Intersect.parametric_polylines_by_aabb( [ p1, p2 ], [p3, p4, p5], [0, 1], [0, 0.5, 1],
-			verb.core.Constants.TOLERANCE );
+		var inter = verb.core.Intersect.polylines( pl0, pl1, verb.core.Constants.TOLERANCE );
 
 		inter.length.should.be.equal(1);
 
@@ -3252,13 +3244,13 @@ describe("verb.core.Intersect.parameteric_polylines_by_aabb",function(){
 		var p1 = [0.5,-0.5,0]
 			, p2 = [0.5,0.5,0]
 			, p3 = [1.5,0.5,0]
-
 			, p4 = [0,0,0]
 			, p5 = [1,0,0]
-			, p6 = [1,1,0];
+			, p6 = [1,1,0]
+			, pl0 = new verb.core.PolylineData([ p1, p2, p3 ], [0, 0.5, 1])
+			, pl1 = new verb.core.PolylineData([ p4, p5, p6 ], [0, 0.5, 1]);
 
-		var inter = verb.core.Intersect.parametric_polylines_by_aabb( [ p1, p2, p3 ], [p4, p5, p6], [0, 0.5, 1], [0, 0.5, 1],
-			verb.core.Constants.TOLERANCE );
+		var inter = verb.core.Intersect.polylines( pl0, pl1, verb.core.Constants.TOLERANCE );
 
 		inter.length.should.be.equal(2);
 
@@ -3281,17 +3273,16 @@ describe("verb.core.Intersect.parameteric_polylines_by_aabb",function(){
 		var p1 = [0,0,0.5]
 			, p2 = [0,1,0.5]
 			, p3 = [-0.5,0.5,0]
-			, p4 = [0.5,0.5,0];
+			, p4 = [0.5,0.5,0]
+			, pl0 = new verb.core.PolylineData([ p1, p2 ], [0, 1])
+			, pl1 = new verb.core.PolylineData([ p3, p4 ], [0, 1]);
 
-		var inter = verb.core.Intersect.parametric_polylines_by_aabb( [ p1, p2 ], [p3, p4], [0, 1], [0, 1],
-			verb.core.Constants.TOLERANCE );
+		var inter = verb.core.Intersect.polylines( pl0, pl1, verb.core.Constants.TOLERANCE );
 
 		inter.length.should.be.equal(0);
 
 	});
-
 });
-
 
 describe("verb.core.Intersect.three_planes",function(){
 
@@ -3347,7 +3338,6 @@ describe("verb.core.Intersect.three_planes",function(){
 	});
 
 });
-
 
 describe("verb.core.Intersect.intersect_planes",function(){
 
@@ -3657,7 +3647,7 @@ describe("verb.core.Intersect.triangles",function(){
 
 });
 
-describe("verb.core.Intersect.rational_curves",function(){
+describe("verb.core.Intersect.curves",function(){
 
 	it('gives valid result for two planar lines', function(){
 
@@ -3668,10 +3658,9 @@ describe("verb.core.Intersect.rational_curves",function(){
 				degree2 = 1,
 				knots2 = [0,0,1,1],
 				controlPoints2 = [[0.5,0.5,0,1], [0.5,-1.5,0,1]]
-				curve2 = new verb.core.CurveData( degree2, knots2, controlPoints2 ),
-				options = new verb.core.CurveCurveIntersectionOptions();
+				curve2 = new verb.core.CurveData( degree2, knots2, controlPoints2 );
 
-		var res = verb.core.Intersect.rational_curves( curve1, curve2, options );
+		var res = verb.core.Intersect.curves( curve1, curve2, verb.core.Constants.TOLERANCE );
 
 		res.length.should.be.equal(1);
 
@@ -3689,10 +3678,9 @@ describe("verb.core.Intersect.rational_curves",function(){
 				degree2 = 2,
 				knots2 = [0,0,0,1,1,1],
 				controlPoints2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]]
-				curve2 = new verb.core.CurveData( degree2, knots2, controlPoints2 ),
-				options = new verb.core.CurveCurveIntersectionOptions();
+				curve2 = new verb.core.CurveData( degree2, knots2, controlPoints2 );
 
-		var res = verb.core.Intersect.rational_curves( 	curve1,curve2, options );
+		var res = verb.core.Intersect.curves( 	curve1,curve2, verb.core.Constants.TOLERANCE );
 
 		res.length.should.be.equal(1);
 
@@ -3710,10 +3698,9 @@ describe("verb.core.Intersect.rational_curves",function(){
 				degree2 = 2,
 				knots2 = [0,0,0,1,1,1],
 				controlPoints2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]]
-				curve2 = new verb.core.CurveData( degree2, knots2, controlPoints2 ),
-				options = new verb.core.CurveCurveIntersectionOptions();
+				curve2 = new verb.core.CurveData( degree2, knots2, controlPoints2 );
 
-		var res = verb.core.Intersect.rational_curves(curve2, curve1, options );
+		var res = verb.core.Intersect.curves(curve2, curve1, verb.core.Constants.TOLERANCE );
 
 		res.length.should.be.equal(1);
 
@@ -3731,10 +3718,9 @@ describe("verb.core.Intersect.rational_curves",function(){
 				degree2 = 2,
 				knots2 = [0,0,0,1,1,1],
 				controlPoints2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]]
-				curve2 = new verb.core.CurveData( degree2, knots2, controlPoints2 ),
-				options = new verb.core.CurveCurveIntersectionOptions();
+				curve2 = new verb.core.CurveData( degree2, knots2, controlPoints2 );
 
-		var res = verb.core.Intersect.rational_curves( 	curve1,curve2, options );
+		var res = verb.core.Intersect.curves( 	curve1,curve2, verb.core.Constants.TOLERANCE );
 
 		res.length.should.be.equal(1);
 
@@ -3745,7 +3731,136 @@ describe("verb.core.Intersect.rational_curves",function(){
 
 });
 
+describe("verb.core.Intersect.curve_and_surface",function(){
 /*
+	it('gives valid result for planar surface and line', function(){
+
+		// build planar surface in the xy plane
+		var homo_controlPoints_srf = [ [ [0,0,0,1], [20,0,0,1] ], [[0,10,0,1], [20,10,0,1] ] ]
+			, degreeU  = 1
+			, degreeV = 1
+			, knotsU = [0,0,1,1]
+			, knotsV = [0,0,1,1]
+			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, homo_controlPoints_srf );
+
+		// line from [5,5,5] to [5,5,-5]
+		var degree_crv = 1
+			, knots_crv = [0,0,1,1]
+			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.2,5.2,-10,1] ]
+			, curve = new verb.core.CurveData( degree_crv, knots_crv, homo_controlPoints_crv );
+
+		var res = verb.core.Intersect.curve_and_surface( curve, surface );
+
+		res.length.should.be.equal( 1 );
+		res[0].p.should.be.approximately( 1/3, verb.core.Constants.TOLERANCE );
+		res[0].uv[0].should.be.approximately( 0.52, verb.core.Constants.TOLERANCE );
+		res[0].uv[1].should.be.approximately( 0.26, verb.core.Constants.TOLERANCE );
+
+	});
+
+
+
+	it('gives valid result for planar surface and degree 1 nurbs', function(){
+
+		// build planar surface in the xy plane
+		var homo_controlPoints_srf = [ [ [0,0,0,1], [20,0,0,1] ], [[0,10,0,1], [20,10,0,1] ] ]
+			, degreeU  = 1
+			, degreeV = 1
+			, knotsU = [0,0,1,1]
+			, knotsV = [0,0,1,1]
+			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, homo_controlPoints_srf );
+
+		// line from [5,5,5] to [5,5,-5]
+		var degree_crv = 1
+			, knots_crv = [0,0,0.5,1,1]
+			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.2,5.2,-2.5,1], [5.2,5.2,-10,1] ]
+			, curve = new verb.core.CurveData( degree_crv, knots_crv, homo_controlPoints_crv );
+
+		var res = verb.core.Intersect.curve_and_surface( curve, surface );
+
+		res.length.should.be.equal( 1 );
+		res[0].p.should.be.approximately( 1/3, verb.core.Constants.TOLERANCE );
+		res[0].uv[0].should.be.approximately( 0.52, verb.core.Constants.TOLERANCE );
+		res[0].uv[1].should.be.approximately( 0.26, verb.core.Constants.TOLERANCE );
+
+	});
+
+	it('gives valid result for planar surface and degree 2 bezier', function(){
+
+		// build planar surface in the xy plane
+		var homo_controlPoints_srf = [ [ [0,0,0,1], [0,10,0,1] ], [[20,0,0,1], [20,10,0,1] ] ]
+			, degreeU  = 1
+			, degreeV = 1
+			, knotsU = [0,0,1,1]
+			, knotsV = [0,0,1,1]
+			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, homo_controlPoints_srf );
+
+		// line from [5,5,5] to [5,5,-5]
+		var degree_crv = 2
+			, knots_crv = [0,0,0,1,1,1]
+			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.4,4.8,0,1], [5.2,5.2,-5,1] ]
+			, curve = new verb.core.CurveData( degree_crv, knots_crv, homo_controlPoints_crv );
+
+		var res =  verb.core.Intersect.curve_and_surface( curve, surface );
+
+		res.length.should.be.equal( 1 );
+		res[0].p.should.be.approximately( 0.5, verb.core.Constants.TOLERANCE );
+		res[0].uv[0].should.be.approximately( 0.265, verb.core.Constants.TOLERANCE );
+		res[0].uv[1].should.be.approximately( 0.5, verb.core.Constants.TOLERANCE );
+
+	});
+
+	it('gives valid result for non-intersecting planar surface and line', function(){
+
+		// build planar surface in the xy plane
+		var homo_controlPoints_srf = [ [ [0,0,0,1], [20,0,0,1] ], [[0,10,0,1], [20,10,0,1] ] ]
+			, degreeU  = 1
+			, degreeV = 1
+			, knotsU = [0,0,1,1]
+			, knotsV = [0,0,1,1]
+			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, homo_controlPoints_srf );
+
+		// line from [5,5,5] to [5,5,-5]
+		var degree_crv = 1
+			, knots_crv = [0,0,1,1]
+			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.2,5.2,2,1] ]
+			, curve = new verb.core.CurveData( degree_crv, knots_crv, homo_controlPoints_crv );
+
+		var res =  verb.core.Intersect.curve_and_surface( curve, surface );
+		res.length.should.be.equal( 0 );
+
+	});
+*/
+});
+
+/*
+describe("verb.core.Eval.refine_rational_curve_surface_intersection",function(){
+
+	it('gives valid result for planar surface and degree 2 bezier', function(){
+
+		var homo_controlPoints_srf = [ [ [0,0,0,1], [0,10,0,1] ], [[20,0,0,1], [20,10,0,1] ] ]
+			, degreeU  = 1
+			, degreeV = 1
+			, knotsU = [0,0,1,1]
+			, knotsV = [0,0,1,1];
+
+		var degree_crv = 2
+			, knots_crv = [0,0,0,1,1,1]
+			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.4,4.8,0,1], [5.2,5.2,-5,1] ];
+
+		var start_params = [ 0.45, 0.25, 0.55 ];
+
+		var res = verb.core.Eval.refine_rational_curve_surface_with_estimate( surface, curve, start_params );
+
+		res[0].should.be.approximately(0.5, verb.core.Constants.TOLERANCE);
+		res[1].should.be.approximately(0.265, verb.core.Constants.TOLERANCE);
+		res[2].should.be.approximately(0.5, verb.core.Constants.TOLERANCE);
+
+	});
+
+});
+
+
 
 describe(.EvalCurve.split",function(){
 
@@ -5437,228 +5552,6 @@ describe("verb.intersectCurves",function(){
 
 });
 
-describe("verb.core.Eval.intersect_rational_curve_surface_by_aabb",function(){
-
-	it('gives valid result for planar surface and line', function(){
-
-		// build planar surface in the xy plane
-		var homo_controlPoints_srf = [ [ [0,0,0,1], [20,0,0,1] ], [[0,10,0,1], [20,10,0,1] ] ]
-			, degreeU  = 1
-			, degreeV = 1
-			, knotsU = [0,0,1,1]
-			, knotsV = [0,0,1,1];
-
-		// line from [5,5,5] to [5,5,-5]
-		var degree_crv = 1
-			, knots_crv = [0,0,1,1]
-			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.2,5.2,-10,1] ];
-
-		var sample_tol = 1e-6
-			, tol = 0.00001
-			, divs_u = 3
-			, divs_v = 3;
-
-		var res =  verb.core.Eval.intersect_rational_curve_surface_by_aabb( 	degreeU, 
-																																					knotsU, 
-																																					degreeV, 
-																																					knotsV, 
-																																					homo_controlPoints_srf, 
-
-																																					degree_crv, 
-																																					knots_crv, 
-																																					homo_controlPoints_crv, 
-
-																																					sample_tol, 
-																																					tol, 
-																																					divs_u, 
-																																					divs_v );
-
-		res.length.should.be.equal( 1 );
-		res[0].p.should.be.approximately( 1/3, verb.core.Constants.TOLERANCE );
-		res[0].uv[0].should.be.approximately( 0.52, verb.core.Constants.TOLERANCE );
-		res[0].uv[1].should.be.approximately( 0.26, verb.core.Constants.TOLERANCE );
-
-	});
-
-	it('gives valid result for planar surface and degree 1 nurbs', function(){
-
-		// build planar surface in the xy plane
-		var homo_controlPoints_srf = [ [ [0,0,0,1], [20,0,0,1] ], [[0,10,0,1], [20,10,0,1] ] ]
-			, degreeU  = 1
-			, degreeV = 1
-			, knotsU = [0,0,1,1]
-			, knotsV = [0,0,1,1];
-
-		// line from [5,5,5] to [5,5,-5]
-		var degree_crv = 1
-			, knots_crv = [0,0,0.5,1,1]
-			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.2,5.2,-2.5,1], [5.2,5.2,-10,1] ];
-
-		var sample_tol = 1e-6
-			, tol = 0.00001
-			, divs_u = 2
-			, divs_v = 2;
-
-		var res =  verb.core.Eval.intersect_rational_curve_surface_by_aabb( 	degreeU, 
-																																					knotsU, 
-																																					degreeV, 
-																																					knotsV, 
-																																					homo_controlPoints_srf, 
-
-																																					degree_crv, 
-																																					knots_crv, 
-																																					homo_controlPoints_crv, 
-
-																																					sample_tol, 
-																																					tol, 
-																																					divs_u, 
-																																					divs_v );
-
-		res.length.should.be.equal( 1 );
-		res[0].p.should.be.approximately( 1/3, verb.core.Constants.TOLERANCE );
-		res[0].uv[0].should.be.approximately( 0.52, verb.core.Constants.TOLERANCE );
-		res[0].uv[1].should.be.approximately( 0.26, verb.core.Constants.TOLERANCE );
-
-	});
-
-	it('gives valid result for planar surface and degree 2 bezier', function(){
-
-		// build planar surface in the xy plane
-		var homo_controlPoints_srf = [ [ [0,0,0,1], [0,10,0,1] ], [[20,0,0,1], [20,10,0,1] ] ]
-			, degreeU  = 1
-			, degreeV = 1
-			, knotsU = [0,0,1,1]
-			, knotsV = [0,0,1,1];
-
-		// line from [5,5,5] to [5,5,-5]
-		var degree_crv = 2
-			, knots_crv = [0,0,0,1,1,1]
-			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.4,4.8,0,1], [5.2,5.2,-5,1] ];
-
-		var sample_tol = 1e-6
-			, tol = 0.001
-			, divs_u = 3
-			, divs_v = 3;
-
-		var res =  verb.core.Eval.intersect_rational_curve_surface_by_aabb( 	degreeU, 
-																																					knotsU, 
-																																					degreeV, 
-																																					knotsV, 
-																																					homo_controlPoints_srf, 
-
-																																					degree_crv, 
-																																					knots_crv, 
-																																					homo_controlPoints_crv, 
-
-																																					sample_tol, 
-																																					tol, 
-																																					divs_u, 
-																																					divs_v );
-
-		res.length.should.be.equal( 1 );
-		res[0].p.should.be.approximately( 0.5, verb.core.Constants.TOLERANCE );
-		res[0].uv[0].should.be.approximately( 0.265, verb.core.Constants.TOLERANCE );
-		res[0].uv[1].should.be.approximately( 0.5, verb.core.Constants.TOLERANCE );
-
-	});
-
-	it('gives valid result for non-intersecting planar surface and line', function(){
-
-		// build planar surface in the xy plane
-		var homo_controlPoints_srf = [ [ [0,0,0,1], [20,0,0,1] ], [[0,10,0,1], [20,10,0,1] ] ]
-			, degreeU  = 1
-			, degreeV = 1
-			, knotsU = [0,0,1,1]
-			, knotsV = [0,0,1,1];
-
-		// line from [5,5,5] to [5,5,-5]
-		var degree_crv = 1
-			, knots_crv = [0,0,1,1]
-			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.2,5.2,2,1] ];
-
-		var sample_tol = 1e-6
-			, tol = 0.00001
-			, divs_u = 3
-			, divs_v = 3;
-
-		var res =  verb.core.Eval.intersect_rational_curve_surface_by_aabb( 	degreeU, 
-																																					knotsU, 
-																																					degreeV, 
-																																					knotsV, 
-																																					homo_controlPoints_srf, 
-
-																																					degree_crv, 
-																																					knots_crv, 
-																																					homo_controlPoints_crv, 
-
-																																					sample_tol, 
-																																					tol, 
-																																					divs_u, 
-																																					divs_v );
-
-		res.length.should.be.equal( 0 );
-
-	});
-
-
-});
-
-
-describe("verb.core.Eval.refine_rational_curve_surface_intersection",function(){
-
-	it('gives valid result for planar surface and degree 2 bezier', function(){
-
-		var homo_controlPoints_srf = [ [ [0,0,0,1], [0,10,0,1] ], [[20,0,0,1], [20,10,0,1] ] ]
-			, degreeU  = 1
-			, degreeV = 1
-			, knotsU = [0,0,1,1]
-			, knotsV = [0,0,1,1];
-
-		var degree_crv = 2
-			, knots_crv = [0,0,0,1,1,1]
-			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.4,4.8,0,1], [5.2,5.2,-5,1] ];
-
-		var start_params = [ 0.45, 0.25, 0.55 ];
-
-		var res = verb.core.Eval.refine_rational_curve_surface_intersection( degreeU, knotsU, degreeV, knotsV, homo_controlPoints_srf, degree_crv, knots_crv, homo_controlPoints_crv, start_params );
-
-		res[0].should.be.approximately(0.5, verb.core.Constants.TOLERANCE);
-		res[1].should.be.approximately(0.265, verb.core.Constants.TOLERANCE);
-		res[2].should.be.approximately(0.5, verb.core.Constants.TOLERANCE);
-
-	});
-
-});
-
-describe("verb.core.Eval.intersect_rational_curve_surface_by_aabb_refine",function(){
-
-	it('gives valid result for planar surface and degree 2 bezier', function(){
-
-		var homo_controlPoints_srf = [ [ [0,0,0,1], [0,10,0,1] ], [[20,0,0,1], [20,10,0,1] ] ]
-			, degreeU  = 1
-			, degreeV = 1
-			, knotsU = [0,0,1,1]
-			, knotsV = [0,0,1,1];
-
-		var degree_crv = 2
-			, knots_crv = [0,0,0,1,1,1]
-			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.4,4.8,0,1], [5.2,5.2,-5,1] ];
-
-		var sample_tol = 1e-6
-			, tol = 0.00001
-			, divs_u = 3
-			, divs_v = 3;
-
-		var res = verb.core.Eval.intersect_rational_curve_surface_by_aabb_refine( degreeU, knotsU, degreeV, knotsV, homo_controlPoints_srf, degree_crv, knots_crv, homo_controlPoints_crv, sample_tol, tol, divs_u, divs_v );
-
-		res.length.should.be.equal( 1 );
-		res[0].p.should.be.approximately(0.5, verb.core.Constants.TOLERANCE);
-		res[0].uv[0].should.be.approximately(0.265, verb.core.Constants.TOLERANCE);
-		res[0].uv[1].should.be.approximately(0.5, verb.core.Constants.TOLERANCE);
-
-	});
-
-});
 
 describe("verb.intersectCurveSurface",function(){
 

@@ -8,6 +8,16 @@ using Lambda;
 @:expose("core.Vec")
 class Vec {
 
+    public static function range(max : Int) : Array<Float> {
+        var l = [];
+        var f = 0.0;
+        for ( i in 0...max ){
+            l.push(f);
+            f += 1.0;
+        }
+        return l;
+    }
+
     public static function neg(arr : Array<Float>) : Array<Float> {
         return arr.map(function(x){ return -x; });
     }

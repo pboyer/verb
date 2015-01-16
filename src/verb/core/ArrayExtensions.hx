@@ -3,8 +3,6 @@ package verb.core;
 class ArrayExtensions {
 
     //
-    // ####last(arr)
-    //
     // Get the last element of an array
     //
     // **params**
@@ -17,8 +15,6 @@ class ArrayExtensions {
         return a[a.length-1];
     }
 
-    //
-    // ####first(arr)
     //
     // Get the first element of an array
     //
@@ -38,8 +34,6 @@ class ArrayExtensions {
     }
 
     //
-    // ####left(arr)
-    //
     // Get the first half of an array including the pivot
     //
     // **params**
@@ -55,8 +49,6 @@ class ArrayExtensions {
         return arr.slice( 0, len );
     }
 
-    //
-    // ####right(arr)
     //
     // Get the second half of an array, not including the pivot
     //
@@ -74,8 +66,6 @@ class ArrayExtensions {
     }
 
     //
-    // ####rightWithPivot(arr)
-    //
     // Get the second half of an array including the pivot
     //
     // **params**
@@ -90,6 +80,45 @@ class ArrayExtensions {
         var len = Math.ceil( arr.length / 2 );
         return arr.slice( len-1 );
     }
+
+    //
+    // Obtain the unique set of elements in an array
+    //
+    // **params**
+    // + *Array*, array of stuff
+    // + *Function*, a function that receives two arguments (two objects from the array).  Returning true indicates
+    // the objects are equal.
+    //
+    // **returns**
+    // + *Array*, array of unique elements
+    //
+
+    public static function unique<T>( arr : Array<T>, comp : T -> T -> Bool ){
+
+        if (arr.length == 0) return [];
+
+        var uniques = [ arr.pop() ];
+
+        while (arr.length > 0){
+
+            var ele = arr.pop();
+            var isUnique = true;
+
+            for (unique in uniques){
+                if ( comp( ele, unique ) ){
+                    isUnique = false;
+                    break;
+                }
+            }
+
+            if ( isUnique ){
+                uniques.push( ele );
+            }
+        }
+
+        return uniques;
+    }
+
 
 
 }
