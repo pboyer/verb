@@ -289,12 +289,10 @@ class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<SurfaceData> {
 
         if (knotTolU == null){
             knotTolU = (surface.knotsU.last() - surface.knotsU.first()) / 1000;
-            trace(knotTolU);
         }
 
         if (knotTolV == null){
             knotTolV = (surface.knotsV.last() - surface.knotsV.first()) / 1000;
-            trace(knotTolV);
         }
 
         _knotTolU = knotTolU;
@@ -400,32 +398,33 @@ class Intersect {
                                               surface : SurfaceData,
                                               tol : Float = 1e-3 )  {
 
-        return Intersect.bounding_box_trees(
+        var ints = Intersect.bounding_box_trees(
             new LazyCurveBoundingBoxTree( curve ),
-            new LazySurfaceBoundingBoxTree( surface ), tol );
+            new LazySurfaceBoundingBoxTree( surface ), 0 );
 
-//        return ints.map(function( inter ){
-//
-//            var crvSeg = inter.item0;
-//            var srfPart = inter.item1;
-//
-//            // get the middle param of the curve
-//            var min = crvSeg.knots.first();
-//            var max = crvSeg.knots.last();
-//
-//            var u = (min + max) / 2.0;
-//
-//            // get the middle param of the surface
-//            var minu = srfPart.knotsU.first();
-//            var maxu = srfPart.knotsU.last();
-//
-//            var minv = srfPart.knotsV.first();
-//            var maxv = srfPart.knotsV.last();
-//
-//            var uv = [ (minu + maxu) / 2.0, (minv + maxv) / 2.0 ];
-//
-//            return Intersect.curve_and_surface_with_estimate( crvSeg, srfPart, [u].concat(uv) );
-//        });
+        return ints.map(function( inter ){
+
+            var crvSeg = inter.item0;
+            var srfPart = inter.item1;
+
+            // get the middle param of the curve
+            var min = crvSeg.knots.first();
+            var max = crvSeg.knots.last();
+
+            var u = (min + max) / 2.0;
+
+            // get the middle param of the surface
+            var minu = srfPart.knotsU.first();
+            var maxu = srfPart.knotsU.last();
+
+            var minv = srfPart.knotsV.first();
+            var maxv = srfPart.knotsV.last();
+
+            var uv = [ (minu + maxu) / 2.0, (minv + maxv) / 2.0 ];
+
+            return Intersect.curve_and_surface_with_estimate( crvSeg, srfPart, [u].concat(uv), tol );
+
+        });
     }
 
     //
@@ -443,8 +442,8 @@ class Intersect {
 
     public static function curve_and_surface_with_estimate(    curve : CurveData,
                                                                surface : SurfaceData,
-                                                               tol : Float = 1e-3,
-                                                               start_params : Array<Float> ) : CurveSurfaceIntersection {
+                                                               start_params : Array<Float>,
+                                                               tol : Float = 1e-3 ) : CurveSurfaceIntersection {
 
         var objective = function(x) {
             var p1 = Eval.rational_curve_point( curve, x[0])

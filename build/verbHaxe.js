@@ -1074,14 +1074,8 @@ verb.core.LazySurfaceBoundingBoxTree = function(surface,splitV,knotTolU,knotTolV
 	this._boundingBox = null;
 	this._surface = surface;
 	this._splitV = splitV;
-	if(knotTolU == null) {
-		knotTolU = (verb.core.ArrayExtensions.last(surface.knotsU) - surface.knotsU[0]) / 1000;
-		console.log(knotTolU);
-	}
-	if(knotTolV == null) {
-		knotTolV = (verb.core.ArrayExtensions.last(surface.knotsV) - surface.knotsV[0]) / 1000;
-		console.log(knotTolV);
-	}
+	if(knotTolU == null) knotTolU = (verb.core.ArrayExtensions.last(surface.knotsU) - surface.knotsU[0]) / 1000;
+	if(knotTolV == null) knotTolV = (verb.core.ArrayExtensions.last(surface.knotsV) - surface.knotsV[0]) / 1000;
 	this._knotTolU = knotTolU;
 	this._knotTolV = knotTolV;
 };
@@ -1139,9 +1133,22 @@ verb.core.CurveSurfaceIntersection = $hx_exports.core.CurveSurfaceIntersection =
 verb.core.Intersect = $hx_exports.core.Intersect = function() { };
 verb.core.Intersect.curve_and_surface = function(curve,surface,tol) {
 	if(tol == null) tol = 1e-3;
-	return verb.core.Intersect.bounding_box_trees(new verb.core.LazyCurveBoundingBoxTree(curve),new verb.core.LazySurfaceBoundingBoxTree(surface),tol);
+	var ints = verb.core.Intersect.bounding_box_trees(new verb.core.LazyCurveBoundingBoxTree(curve),new verb.core.LazySurfaceBoundingBoxTree(surface),0);
+	return ints.map(function(inter) {
+		var crvSeg = inter.item0;
+		var srfPart = inter.item1;
+		var min = crvSeg.knots[0];
+		var max = verb.core.ArrayExtensions.last(crvSeg.knots);
+		var u = (min + max) / 2.0;
+		var minu = srfPart.knotsU[0];
+		var maxu = verb.core.ArrayExtensions.last(srfPart.knotsU);
+		var minv = srfPart.knotsV[0];
+		var maxv = verb.core.ArrayExtensions.last(srfPart.knotsV);
+		var uv = [(minu + maxu) / 2.0,(minv + maxv) / 2.0];
+		return verb.core.Intersect.curve_and_surface_with_estimate(crvSeg,srfPart,[u].concat(uv),tol);
+	});
 };
-verb.core.Intersect.curve_and_surface_with_estimate = function(curve,surface,tol,start_params) {
+verb.core.Intersect.curve_and_surface_with_estimate = function(curve,surface,start_params,tol) {
 	if(tol == null) tol = 1e-3;
 	var objective = function(x) {
 		var p1 = verb.core.Eval.rational_curve_point(curve,x[0]);

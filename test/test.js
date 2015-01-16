@@ -3732,7 +3732,7 @@ describe("verb.core.Intersect.curves",function(){
 });
 
 describe("verb.core.Intersect.curve_and_surface",function(){
-/*
+
 	it('gives valid result for planar surface and line', function(){
 
 		// build planar surface in the xy plane
@@ -3749,12 +3749,13 @@ describe("verb.core.Intersect.curve_and_surface",function(){
 			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.2,5.2,-10,1] ]
 			, curve = new verb.core.CurveData( degree_crv, knots_crv, homo_controlPoints_crv );
 
-		var res = verb.core.Intersect.curve_and_surface( curve, surface );
+		var res = verb.core.Intersect.curve_and_surface( curve, surface, verb.core.Constants.TOLERANCE );
 
 		res.length.should.be.equal( 1 );
-		res[0].p.should.be.approximately( 1/3, verb.core.Constants.TOLERANCE );
-		res[0].uv[0].should.be.approximately( 0.52, verb.core.Constants.TOLERANCE );
-		res[0].uv[1].should.be.approximately( 0.26, verb.core.Constants.TOLERANCE );
+
+		res[0].u.should.be.approximately( 1/3, 1e-3 );
+		res[0].uv[0].should.be.approximately( 0.52, 1e-3 );
+		res[0].uv[1].should.be.approximately( 0.26, 1e-3 );
 
 	});
 
@@ -3776,12 +3777,12 @@ describe("verb.core.Intersect.curve_and_surface",function(){
 			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.2,5.2,-2.5,1], [5.2,5.2,-10,1] ]
 			, curve = new verb.core.CurveData( degree_crv, knots_crv, homo_controlPoints_crv );
 
-		var res = verb.core.Intersect.curve_and_surface( curve, surface );
+		var res = verb.core.Intersect.curve_and_surface( curve, surface, verb.core.Constants.TOLERANCE );
 
 		res.length.should.be.equal( 1 );
-		res[0].p.should.be.approximately( 1/3, verb.core.Constants.TOLERANCE );
-		res[0].uv[0].should.be.approximately( 0.52, verb.core.Constants.TOLERANCE );
-		res[0].uv[1].should.be.approximately( 0.26, verb.core.Constants.TOLERANCE );
+		res[0].u.should.be.approximately( 1/3, 1e-3 );
+		res[0].uv[0].should.be.approximately( 0.52, 1e-3 );
+		res[0].uv[1].should.be.approximately( 0.26, 1e-3 );
 
 	});
 
@@ -3801,12 +3802,12 @@ describe("verb.core.Intersect.curve_and_surface",function(){
 			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.4,4.8,0,1], [5.2,5.2,-5,1] ]
 			, curve = new verb.core.CurveData( degree_crv, knots_crv, homo_controlPoints_crv );
 
-		var res =  verb.core.Intersect.curve_and_surface( curve, surface );
+		var res =  verb.core.Intersect.curve_and_surface( curve, surface, verb.core.Constants.TOLERANCE  );
 
 		res.length.should.be.equal( 1 );
-		res[0].p.should.be.approximately( 0.5, verb.core.Constants.TOLERANCE );
-		res[0].uv[0].should.be.approximately( 0.265, verb.core.Constants.TOLERANCE );
-		res[0].uv[1].should.be.approximately( 0.5, verb.core.Constants.TOLERANCE );
+		res[0].u.should.be.approximately( 0.5, 1e-3 );
+		res[0].uv[0].should.be.approximately( 0.265, 1e-3 );
+		res[0].uv[1].should.be.approximately( 0.5, 1e-3 );
 
 	});
 
@@ -3830,11 +3831,10 @@ describe("verb.core.Intersect.curve_and_surface",function(){
 		res.length.should.be.equal( 0 );
 
 	});
-*/
+
 });
 
-/*
-describe("verb.core.Eval.refine_rational_curve_surface_intersection",function(){
+describe("verb.core.Intersect.curve_and_surface_with_estimate",function(){
 
 	it('gives valid result for planar surface and degree 2 bezier', function(){
 
@@ -3842,25 +3842,27 @@ describe("verb.core.Eval.refine_rational_curve_surface_intersection",function(){
 			, degreeU  = 1
 			, degreeV = 1
 			, knotsU = [0,0,1,1]
-			, knotsV = [0,0,1,1];
+			, knotsV = [0,0,1,1]
+			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, homo_controlPoints_srf );
 
 		var degree_crv = 2
 			, knots_crv = [0,0,0,1,1,1]
-			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.4,4.8,0,1], [5.2,5.2,-5,1] ];
+			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.4,4.8,0,1], [5.2,5.2,-5,1] ]
+			, curve = new verb.core.CurveData( degree_crv, knots_crv, homo_controlPoints_crv );
 
 		var start_params = [ 0.45, 0.25, 0.55 ];
 
-		var res = verb.core.Eval.refine_rational_curve_surface_with_estimate( surface, curve, start_params );
+		var res = verb.core.Intersect.curve_and_surface_with_estimate( curve, surface, start_params, verb.core.Constants.TOLERANCE );
 
-		res[0].should.be.approximately(0.5, verb.core.Constants.TOLERANCE);
-		res[1].should.be.approximately(0.265, verb.core.Constants.TOLERANCE);
-		res[2].should.be.approximately(0.5, verb.core.Constants.TOLERANCE);
+		res.u.should.be.approximately(0.5, 1e-3);
+		res.uv[0].should.be.approximately(0.265, 1e-3);
+		res.uv[1].should.be.approximately(0.5, 1e-3);
 
 	});
 
 });
 
-
+/*
 
 describe(.EvalCurve.split",function(){
 
