@@ -992,213 +992,6 @@ verb.core.Eval.knot_span_given_n = function(n,degree,u,knots) {
 	}
 	return mid;
 };
-verb.core.Ray = $hx_exports.core.Ray = function(origin,dir) {
-	this.origin = origin;
-	this.dir = dir;
-};
-verb.core.Interval = $hx_exports.core.Interval = function(min,max) {
-	this.min = min;
-	this.max = max;
-};
-verb.core.CurveTriPoint = $hx_exports.core.CurveTriPoint = function(u,point,uv) {
-	this.u = u;
-	this.point = point;
-	this.uv = uv;
-};
-verb.core.MeshIntersectionPoint = $hx_exports.core.MeshIntersectionPoint = function(uv0,uv1,point,faceIndex0,faceIndex1) {
-	this.visited = false;
-	this.adj = null;
-	this.opp = null;
-	this.uv0 = uv0;
-	this.uv1 = uv1;
-	this.point = point;
-	this.faceIndex0;
-	this.faceIndex1;
-};
-verb.core.TriSegmentIntersection = $hx_exports.core.TriSegmentIntersection = function(point,s,t,r) {
-	this.point = point;
-	this.s = s;
-	this.t = t;
-	this.p = r;
-};
-verb.core.CurveCurveIntersection = $hx_exports.core.CurveCurveIntersection = function(point0,point1,u0,u1) {
-	this.point0 = point0;
-	this.point1 = point1;
-	this.u0 = u0;
-	this.u1 = u1;
-};
-verb.core.CurveCurveIntersectionOptions = $hx_exports.core.CurveCurveIntersectionOptions = function() {
-	this.tol = verb.core.Constants.TOLERANCE;
-	this.sampleTol = verb.core.Constants.TOLERANCE;
-};
-verb.core.IBoundingBoxTree = function() { };
-verb.core.LazyMeshBoundingBoxTree = function(mesh,faceIndices) {
-	this._boundingBox = null;
-	this._mesh = mesh;
-	if(faceIndices == null) {
-		var _g = [];
-		var _g2 = 0;
-		var _g1 = mesh.faces.length;
-		while(_g2 < _g1) {
-			var i = _g2++;
-			_g.push(i);
-		}
-		faceIndices = _g;
-	}
-	this._faceIndices = faceIndices;
-};
-verb.core.LazyMeshBoundingBoxTree.__interfaces__ = [verb.core.IBoundingBoxTree];
-verb.core.LazyMeshBoundingBoxTree.prototype = {
-	split: function() {
-		var $as = verb.core.Mesh.sort_tris_on_longest_axis(this._boundingBox,this._mesh,this._faceIndices);
-		var l = verb.core.ArrayExtensions.left($as);
-		var r = verb.core.ArrayExtensions.right($as);
-		return new verb.core.types.Pair(new verb.core.LazyMeshBoundingBoxTree(this._mesh,l),new verb.core.LazyMeshBoundingBoxTree(this._mesh,r));
-	}
-	,boundingBox: function() {
-		if(this._boundingBox == null) this._boundingBox = verb.core.Mesh.make_mesh_aabb(this._mesh,this._faceIndices);
-		return this._boundingBox;
-	}
-	,'yield': function() {
-		return this._faceIndices[0];
-	}
-	,indivisible: function(tolerance) {
-		return this._faceIndices.length == 1;
-	}
-	,empty: function() {
-		return this._faceIndices.length == 0;
-	}
-};
-verb.core.PolylineData = $hx_exports.core.PolylineData = function(points,params) {
-	this.points = points;
-	this.params = params;
-};
-verb.core.LazyPolylineBoundingBoxTree = function(polyline,interval) {
-	this._boundingBox = null;
-	this._polyline = polyline;
-	if(interval == null) interval = new verb.core.Interval(0,polyline.points.length != 0?polyline.points.length - 1:0);
-	this._interval = interval;
-};
-verb.core.LazyPolylineBoundingBoxTree.__interfaces__ = [verb.core.IBoundingBoxTree];
-verb.core.LazyPolylineBoundingBoxTree.prototype = {
-	split: function() {
-		var min = this._interval.min;
-		var max = this._interval.max;
-		var pivot = min + Math.ceil((max - min) / 2);
-		var l = new verb.core.Interval(min,pivot);
-		var r = new verb.core.Interval(pivot,max);
-		return new verb.core.types.Pair(new verb.core.LazyPolylineBoundingBoxTree(this._polyline,l),new verb.core.LazyPolylineBoundingBoxTree(this._polyline,r));
-	}
-	,boundingBox: function() {
-		if(this._boundingBox == null) this._boundingBox = new verb.BoundingBox(this._polyline.points);
-		return this._boundingBox;
-	}
-	,'yield': function() {
-		return this._interval.min;
-	}
-	,indivisible: function(tolerance) {
-		return this._interval.max - this._interval.min == 1;
-	}
-	,empty: function() {
-		return this._interval.max - this._interval.min == 0;
-	}
-};
-verb.core.LazyCurveBoundingBoxTree = function(curve,knotTol) {
-	this._boundingBox = null;
-	this._curve = curve;
-	if(knotTol == null) knotTol = verb.core.ArrayExtensions.last(this._curve.knots) - this._curve.knots[0] / 1000;
-	this._knotTol = knotTol;
-};
-verb.core.LazyCurveBoundingBoxTree.__interfaces__ = [verb.core.IBoundingBoxTree];
-verb.core.LazyCurveBoundingBoxTree.prototype = {
-	split: function() {
-		var min = this._curve.knots[0];
-		var max = verb.core.ArrayExtensions.last(this._curve.knots);
-		var dom = max - min;
-		var crvs = verb.core.Modify.curve_split(this._curve,(max + min) / 2.0 + dom * 0.01 * Math.random());
-		return new verb.core.types.Pair(new verb.core.LazyCurveBoundingBoxTree(crvs[0],this._knotTol),new verb.core.LazyCurveBoundingBoxTree(crvs[1],this._knotTol));
-	}
-	,boundingBox: function() {
-		if(this._boundingBox == null) this._boundingBox = new verb.BoundingBox(verb.core.Eval.dehomogenize_1d(this._curve.controlPoints));
-		return this._boundingBox;
-	}
-	,'yield': function() {
-		return this._curve;
-	}
-	,indivisible: function(tolerance) {
-		return verb.core.ArrayExtensions.last(this._curve.knots) - this._curve.knots[0] < this._knotTol;
-	}
-	,empty: function() {
-		return false;
-	}
-};
-verb.core.LazySurfaceBoundingBoxTree = function(surface,splitV,knotTolU,knotTolV) {
-	if(splitV == null) splitV = false;
-	this._boundingBox = null;
-	this._surface = surface;
-	this._splitV = splitV;
-	if(knotTolU == null) knotTolU = (verb.core.ArrayExtensions.last(surface.knotsU) - surface.knotsU[0]) / 1000;
-	if(knotTolV == null) knotTolV = (verb.core.ArrayExtensions.last(surface.knotsV) - surface.knotsV[0]) / 1000;
-	this._knotTolU = knotTolU;
-	this._knotTolV = knotTolV;
-};
-verb.core.LazySurfaceBoundingBoxTree.__interfaces__ = [verb.core.IBoundingBoxTree];
-verb.core.LazySurfaceBoundingBoxTree.prototype = {
-	split: function() {
-		var min;
-		var max;
-		if(this._splitV) {
-			min = this._surface.knotsV[0];
-			max = verb.core.ArrayExtensions.last(this._surface.knotsV);
-		} else {
-			min = this._surface.knotsU[0];
-			max = verb.core.ArrayExtensions.last(this._surface.knotsU);
-		}
-		var dom = max - min;
-		var pivot = (min + max) / 2.0 + dom * 0.01 * Math.random();
-		var srfs = verb.core.Modify.surface_split(this._surface,pivot,this._splitV);
-		return new verb.core.types.Pair(new verb.core.LazySurfaceBoundingBoxTree(srfs[0],!this._splitV,this._knotTolU,this._knotTolV),new verb.core.LazySurfaceBoundingBoxTree(srfs[1],!this._splitV,this._knotTolU,this._knotTolV));
-	}
-	,boundingBox: function() {
-		if(this._boundingBox == null) {
-			this._boundingBox = new verb.BoundingBox();
-			var _g = 0;
-			var _g1 = this._surface.controlPoints;
-			while(_g < _g1.length) {
-				var row = _g1[_g];
-				++_g;
-				this._boundingBox.addRange(verb.core.Eval.dehomogenize_1d(row));
-			}
-		}
-		return this._boundingBox;
-	}
-	,'yield': function() {
-		return this._surface;
-	}
-	,indivisible: function(tolerance) {
-		if(this._splitV) return verb.core.ArrayExtensions.last(this._surface.knotsV) - this._surface.knotsV[0] < this._knotTolV; else return verb.core.ArrayExtensions.last(this._surface.knotsU) - this._surface.knotsU[0] < this._knotTolU;
-	}
-	,empty: function() {
-		return false;
-	}
-};
-verb.core.PolylineMeshIntersection = $hx_exports.core.PolylineMeshIntersection = function(point,u,uv,polylineIndex,faceIndex) {
-	this.point = point;
-	this.u = u;
-	this.uv = uv;
-	this.polylineIndex = polylineIndex;
-	this.faceIndex = faceIndex;
-};
-verb.core.CurveSurfaceIntersection = $hx_exports.core.CurveSurfaceIntersection = function(u,uv) {
-	this.u = u;
-	this.uv = uv;
-};
-verb.core.SurfaceSurfaceIntersectionPoint = $hx_exports.core.SurfaceSurfaceIntersectionPoint = function(uv0,uv1,point,dist) {
-	this.uv0 = uv0;
-	this.uv1 = uv1;
-	this.point = point;
-	this.dist = dist;
-};
 verb.core.Intersect = $hx_exports.core.Intersect = function() { };
 verb.core.Intersect.surfaces = function(surface0,surface1,tol) {
 	var tess1 = verb.core.Tess.rational_surface_adaptive(surface0);
@@ -1264,10 +1057,10 @@ verb.core.Intersect.surfaces_at_point_with_estimate = function(surface0,surface1
 		uv2 = verb.core.Vec.add([du,dv],uv2);
 		its++;
 	} while(its < maxits);
-	return new verb.core.SurfaceSurfaceIntersectionPoint(uv1,uv2,p,dist);
+	return new verb.core.types.SurfaceSurfaceIntersectionPoint(uv1,uv2,p,dist);
 };
 verb.core.Intersect.meshes = function(mesh0,mesh1) {
-	var bbints = verb.core.Intersect.bounding_box_trees(new verb.core.LazyMeshBoundingBoxTree(mesh0),new verb.core.LazyMeshBoundingBoxTree(mesh1),0);
+	var bbints = verb.core.Intersect.bounding_box_trees(new verb.core.types.LazyMeshBoundingBoxTree(mesh0),new verb.core.types.LazyMeshBoundingBoxTree(mesh1),0);
 	var segments = verb.core.ArrayExtensions.unique(bbints.map(function(ids) {
 		return verb.core.Intersect.triangles(mesh0,ids.item0,mesh1,ids.item1);
 	}).filter(function(x) {
@@ -1368,7 +1161,7 @@ verb.core.Intersect.lookup_adj_segment = function(segEnd,tree,numSegments) {
 };
 verb.core.Intersect.curve_and_surface = function(curve,surface,tol) {
 	if(tol == null) tol = 1e-3;
-	var ints = verb.core.Intersect.bounding_box_trees(new verb.core.LazyCurveBoundingBoxTree(curve),new verb.core.LazySurfaceBoundingBoxTree(surface),0);
+	var ints = verb.core.Intersect.bounding_box_trees(new verb.core.types.LazyCurveBoundingBoxTree(curve),new verb.core.types.LazySurfaceBoundingBoxTree(surface),0);
 	return ints.map(function(inter) {
 		var crvSeg = inter.item0;
 		var srfPart = inter.item1;
@@ -1393,10 +1186,10 @@ verb.core.Intersect.curve_and_surface_with_estimate = function(curve,surface,sta
 	};
 	var sol_obj = verb.core.Numeric.uncmin(objective,start_params,tol);
 	var $final = sol_obj.solution;
-	return new verb.core.CurveSurfaceIntersection($final[0],[$final[1],$final[2]]);
+	return new verb.core.types.CurveSurfaceIntersection($final[0],[$final[1],$final[2]]);
 };
 verb.core.Intersect.polyline_and_mesh = function(polyline,mesh,tol) {
-	var res = verb.core.Intersect.bounding_box_trees(new verb.core.LazyPolylineBoundingBoxTree(polyline),new verb.core.LazyMeshBoundingBoxTree(mesh),tol);
+	var res = verb.core.Intersect.bounding_box_trees(new verb.core.types.LazyPolylineBoundingBoxTree(polyline),new verb.core.types.LazyMeshBoundingBoxTree(mesh),tol);
 	var finalResults = [];
 	var _g = 0;
 	while(_g < res.length) {
@@ -1409,12 +1202,12 @@ verb.core.Intersect.polyline_and_mesh = function(polyline,mesh,tol) {
 		var pt = inter.point;
 		var u = verb.core.Vec.lerp(inter.p,[polyline.params[polid]],[polyline.params[polid + 1]])[0];
 		var uv = verb.core.Mesh.tri_uv_from_point(mesh,faceid,pt);
-		finalResults.push(new verb.core.PolylineMeshIntersection(pt,u,uv,polid,faceid));
+		finalResults.push(new verb.core.types.PolylineMeshIntersection(pt,u,uv,polid,faceid));
 	}
 	return finalResults;
 };
 verb.core.Intersect.mesh_bounding_boxes = function(a,b,tol) {
-	return verb.core.Intersect.bounding_box_trees(new verb.core.LazyMeshBoundingBoxTree(a),new verb.core.LazyMeshBoundingBoxTree(b),tol);
+	return verb.core.Intersect.bounding_box_trees(new verb.core.types.LazyMeshBoundingBoxTree(a),new verb.core.types.LazyMeshBoundingBoxTree(b),tol);
 };
 verb.core.Intersect.bounding_box_trees = function(a,b,tol) {
 	if(tol == null) tol = 1e-9;
@@ -1426,7 +1219,7 @@ verb.core.Intersect.bounding_box_trees = function(a,b,tol) {
 	return verb.core.Intersect.bounding_box_trees(asplit.item0,bsplit.item0,tol).concat(verb.core.Intersect.bounding_box_trees(asplit.item0,bsplit.item1,tol)).concat(verb.core.Intersect.bounding_box_trees(asplit.item1,bsplit.item0,tol)).concat(verb.core.Intersect.bounding_box_trees(asplit.item1,bsplit.item1,tol));
 };
 verb.core.Intersect.curves = function(curve1,curve2,tolerance) {
-	var ints = verb.core.Intersect.bounding_box_trees(new verb.core.LazyCurveBoundingBoxTree(curve1),new verb.core.LazyCurveBoundingBoxTree(curve2),0);
+	var ints = verb.core.Intersect.bounding_box_trees(new verb.core.types.LazyCurveBoundingBoxTree(curve1),new verb.core.types.LazyCurveBoundingBoxTree(curve2),0);
 	return ints.map(function(x) {
 		return verb.core.Intersect.curves_with_estimate(curve1,curve2,x.item0.knots[0],x.item1.knots[0],tolerance);
 	});
@@ -1443,7 +1236,7 @@ verb.core.Intersect.curves_with_estimate = function(curve0,curve1,u0,u1,toleranc
 	var u2 = sol_obj.solution[1];
 	var p11 = verb.core.Eval.rational_curve_point(curve0,u11);
 	var p21 = verb.core.Eval.rational_curve_point(curve1,u2);
-	return new verb.core.CurveCurveIntersection(p11,p21,u11,u2);
+	return new verb.core.types.CurveCurveIntersection(p11,p21,u11,u2);
 };
 verb.core.Intersect.triangles = function(mesh0,faceIndex0,mesh1,faceIndex1) {
 	var tri0 = mesh0.faces[faceIndex0];
@@ -1460,7 +1253,7 @@ verb.core.Intersect.triangles = function(mesh0,faceIndex0,mesh1,faceIndex1) {
 	if(clip2 == null) return null;
 	var merged = verb.core.Intersect.merge_tri_clip_intervals(clip1,clip2,mesh0,faceIndex0,mesh1,faceIndex1);
 	if(merged == null) return null;
-	return new verb.core.Interval(new verb.core.MeshIntersectionPoint(merged.min.uv0,merged.min.uv1,merged.min.point,faceIndex0,faceIndex1),new verb.core.MeshIntersectionPoint(merged.max.uv0,merged.max.uv1,merged.max.point,faceIndex0,faceIndex1));
+	return new verb.core.types.Interval(new verb.core.types.MeshIntersectionPoint(merged.min.uv0,merged.min.uv1,merged.min.point,faceIndex0,faceIndex1),new verb.core.types.MeshIntersectionPoint(merged.max.uv0,merged.max.uv1,merged.max.point,faceIndex0,faceIndex1));
 };
 verb.core.Intersect.clip_ray_in_coplanar_tri = function(ray,mesh,faceIndex) {
 	var tri = mesh.faces[faceIndex];
@@ -1482,11 +1275,11 @@ verb.core.Intersect.clip_ray_in_coplanar_tri = function(ray,mesh,faceIndex) {
 		var useg = res.u0;
 		var uray = res.u1;
 		if(useg < -verb.core.Constants.EPSILON || useg > l[i] + verb.core.Constants.EPSILON) continue;
-		if(minU == null || uray < minU.u) minU = new verb.core.CurveTriPoint(uray,verb.core.Vec.onRay(ray.origin,ray.dir,uray),verb.core.Vec.onRay(uvs[i],uvd[i],useg / l[i]));
-		if(maxU == null || uray > maxU.u) maxU = new verb.core.CurveTriPoint(uray,verb.core.Vec.onRay(ray.origin,ray.dir,uray),verb.core.Vec.onRay(uvs[i],uvd[i],useg / l[i]));
+		if(minU == null || uray < minU.u) minU = new verb.core.types.CurveTriPoint(uray,verb.core.Vec.onRay(ray.origin,ray.dir,uray),verb.core.Vec.onRay(uvs[i],uvd[i],useg / l[i]));
+		if(maxU == null || uray > maxU.u) maxU = new verb.core.types.CurveTriPoint(uray,verb.core.Vec.onRay(ray.origin,ray.dir,uray),verb.core.Vec.onRay(uvs[i],uvd[i],useg / l[i]));
 	}
 	if(maxU == null || minU == null) return null;
-	return new verb.core.Interval(minU,maxU);
+	return new verb.core.types.Interval(minU,maxU);
 };
 verb.core.Intersect.merge_tri_clip_intervals = function(clip1,clip2,mesh1,faceIndex1,mesh2,faceIndex2) {
 	if(clip2.min.u > clip1.max.u + verb.core.Constants.EPSILON || clip1.min.u > clip2.max.u + verb.core.Constants.EPSILON) return null;
@@ -1494,7 +1287,7 @@ verb.core.Intersect.merge_tri_clip_intervals = function(clip1,clip2,mesh1,faceIn
 	if(clip1.min.u > clip2.min.u) min = new verb.core.types.Pair(clip1.min,0); else min = new verb.core.types.Pair(clip2.min,1);
 	var max;
 	if(clip1.max.u < clip2.max.u) max = new verb.core.types.Pair(clip1.max,0); else max = new verb.core.types.Pair(clip2.max,1);
-	var res = new verb.core.Interval(new verb.core.MeshIntersectionPoint(null,null,min.item0.point,faceIndex1,faceIndex2),new verb.core.MeshIntersectionPoint(null,null,max.item0.point,faceIndex1,faceIndex2));
+	var res = new verb.core.types.Interval(new verb.core.types.MeshIntersectionPoint(null,null,min.item0.point,faceIndex1,faceIndex2),new verb.core.types.MeshIntersectionPoint(null,null,max.item0.point,faceIndex1,faceIndex2));
 	if(min.item1 == 0) {
 		res.min.uv0 = min.item0.uv;
 		res.min.uv1 = verb.core.Mesh.tri_uv_from_point(mesh2,faceIndex2,min.item0.point);
@@ -1553,7 +1346,7 @@ verb.core.Intersect.planes = function(origin0,normal0,origin1,normal1) {
 	var y = (d1 * a2 - a1 * d2) / den;
 	var p;
 	if(li == 0) p = [0,x,y]; else if(li == 1) p = [x,0,y]; else p = [x,y,0];
-	return new verb.core.Ray(p,verb.core.Vec.normalized(d));
+	return new verb.core.types.Ray(p,verb.core.Vec.normalized(d));
 };
 verb.core.Intersect.three_planes = function(n0,d0,n1,d1,n2,d2) {
 	var u = verb.core.Vec.cross(n1,n2);
@@ -1564,7 +1357,7 @@ verb.core.Intersect.three_planes = function(n0,d0,n1,d1,n2,d2) {
 	return verb.core.Vec.mul(1 / den,num);
 };
 verb.core.Intersect.polylines = function(polyline0,polyline1,tol) {
-	var res = verb.core.Intersect.bounding_box_trees(new verb.core.LazyPolylineBoundingBoxTree(polyline0),new verb.core.LazyPolylineBoundingBoxTree(polyline1),tol);
+	var res = verb.core.Intersect.bounding_box_trees(new verb.core.types.LazyPolylineBoundingBoxTree(polyline0),new verb.core.types.LazyPolylineBoundingBoxTree(polyline1),tol);
 	var finalResults = [];
 	var _g = 0;
 	while(_g < res.length) {
@@ -1594,7 +1387,7 @@ verb.core.Intersect.segments = function(a0,a1,b0,b1,tol) {
 		var point0 = verb.core.Vec.onRay(a0,a1ma0,u0);
 		var point1 = verb.core.Vec.onRay(b0,b1mb0,u1);
 		var dist = verb.core.Vec.distSquared(point0,point1);
-		if(dist < tol * tol) return new verb.core.CurveCurveIntersection(point0,point1,u0,u1);
+		if(dist < tol * tol) return new verb.core.types.CurveCurveIntersection(point0,point1,u0,u1);
 	}
 	return null;
 };
@@ -1613,7 +1406,7 @@ verb.core.Intersect.rays = function(a0,a,b0,b) {
 	var t = (dab0 - daa0 + w * dab) / daa;
 	var p0 = verb.core.Vec.onRay(a0,a,t);
 	var p1 = verb.core.Vec.onRay(b0,b,w);
-	return new verb.core.CurveCurveIntersection(p0,p1,t,w);
+	return new verb.core.types.CurveCurveIntersection(p0,p1,t,w);
 };
 verb.core.Intersect.segment_with_tri = function(p0,p1,points,tri) {
 	var v0 = points[tri[0]];
@@ -1641,7 +1434,7 @@ verb.core.Intersect.segment_with_tri = function(p0,p1,points,tri) {
 	var s = (uv * wv - vv * wu) / denom;
 	var t = (uv * wu - uu * wv) / denom;
 	if(s > 1.0 + verb.core.Constants.EPSILON || t > 1.0 + verb.core.Constants.EPSILON || t < -verb.core.Constants.EPSILON || s < -verb.core.Constants.EPSILON || s + t > 1.0 + verb.core.Constants.EPSILON) return null;
-	return new verb.core.TriSegmentIntersection(pt,s,t,r);
+	return new verb.core.types.TriSegmentIntersection(pt,s,t,r);
 };
 verb.core.Intersect.segment_with_plane = function(p0,p1,v0,n) {
 	var denom = verb.core.Vec.dot(n,verb.core.Vec.sub(p0,p1));
@@ -3600,6 +3393,12 @@ verb.core.types.BoundingBoxLeaf = $hx_exports.core.BoundingBoxLeaf = function(bb
 verb.core.types.BoundingBoxLeaf.__super__ = verb.core.types.BoundingBoxNode;
 verb.core.types.BoundingBoxLeaf.prototype = $extend(verb.core.types.BoundingBoxNode.prototype,{
 });
+verb.core.types.CurveCurveIntersection = $hx_exports.core.CurveCurveIntersection = function(point0,point1,u0,u1) {
+	this.point0 = point0;
+	this.point1 = point1;
+	this.u0 = u0;
+	this.u1 = u1;
+};
 verb.core.types.CurveData = $hx_exports.core.CurveData = function(degree,knots,controlPoints) {
 	this.degree = degree;
 	this.controlPoints = controlPoints;
@@ -3608,6 +3407,166 @@ verb.core.types.CurveData = $hx_exports.core.CurveData = function(degree,knots,c
 verb.core.types.CurveLengthSample = $hx_exports.core.CurveLengthSample = function(u,len) {
 	this.u = u;
 	this.len = len;
+};
+verb.core.types.CurveSurfaceIntersection = $hx_exports.core.CurveSurfaceIntersection = function(u,uv) {
+	this.u = u;
+	this.uv = uv;
+};
+verb.core.types.CurveTriPoint = $hx_exports.core.CurveTriPoint = function(u,point,uv) {
+	this.u = u;
+	this.point = point;
+	this.uv = uv;
+};
+verb.core.types.IBoundingBoxTree = function() { };
+verb.core.types.Interval = $hx_exports.core.Interval = function(min,max) {
+	this.min = min;
+	this.max = max;
+};
+verb.core.types.LazyCurveBoundingBoxTree = function(curve,knotTol) {
+	this._boundingBox = null;
+	this._curve = curve;
+	if(knotTol == null) knotTol = verb.core.ArrayExtensions.last(this._curve.knots) - this._curve.knots[0] / 1000;
+	this._knotTol = knotTol;
+};
+verb.core.types.LazyCurveBoundingBoxTree.__interfaces__ = [verb.core.types.IBoundingBoxTree];
+verb.core.types.LazyCurveBoundingBoxTree.prototype = {
+	split: function() {
+		var min = this._curve.knots[0];
+		var max = verb.core.ArrayExtensions.last(this._curve.knots);
+		var dom = max - min;
+		var crvs = verb.core.Modify.curve_split(this._curve,(max + min) / 2.0 + dom * 0.01 * Math.random());
+		return new verb.core.types.Pair(new verb.core.types.LazyCurveBoundingBoxTree(crvs[0],this._knotTol),new verb.core.types.LazyCurveBoundingBoxTree(crvs[1],this._knotTol));
+	}
+	,boundingBox: function() {
+		if(this._boundingBox == null) this._boundingBox = new verb.BoundingBox(verb.core.Eval.dehomogenize_1d(this._curve.controlPoints));
+		return this._boundingBox;
+	}
+	,'yield': function() {
+		return this._curve;
+	}
+	,indivisible: function(tolerance) {
+		return verb.core.ArrayExtensions.last(this._curve.knots) - this._curve.knots[0] < this._knotTol;
+	}
+	,empty: function() {
+		return false;
+	}
+};
+verb.core.types.LazyMeshBoundingBoxTree = function(mesh,faceIndices) {
+	this._boundingBox = null;
+	this._mesh = mesh;
+	if(faceIndices == null) {
+		var _g = [];
+		var _g2 = 0;
+		var _g1 = mesh.faces.length;
+		while(_g2 < _g1) {
+			var i = _g2++;
+			_g.push(i);
+		}
+		faceIndices = _g;
+	}
+	this._faceIndices = faceIndices;
+};
+verb.core.types.LazyMeshBoundingBoxTree.__interfaces__ = [verb.core.types.IBoundingBoxTree];
+verb.core.types.LazyMeshBoundingBoxTree.prototype = {
+	split: function() {
+		var $as = verb.core.Mesh.sort_tris_on_longest_axis(this._boundingBox,this._mesh,this._faceIndices);
+		var l = verb.core.ArrayExtensions.left($as);
+		var r = verb.core.ArrayExtensions.right($as);
+		return new verb.core.types.Pair(new verb.core.types.LazyMeshBoundingBoxTree(this._mesh,l),new verb.core.types.LazyMeshBoundingBoxTree(this._mesh,r));
+	}
+	,boundingBox: function() {
+		if(this._boundingBox == null) this._boundingBox = verb.core.Mesh.make_mesh_aabb(this._mesh,this._faceIndices);
+		return this._boundingBox;
+	}
+	,'yield': function() {
+		return this._faceIndices[0];
+	}
+	,indivisible: function(tolerance) {
+		return this._faceIndices.length == 1;
+	}
+	,empty: function() {
+		return this._faceIndices.length == 0;
+	}
+};
+verb.core.types.LazyPolylineBoundingBoxTree = function(polyline,interval) {
+	this._boundingBox = null;
+	this._polyline = polyline;
+	if(interval == null) interval = new verb.core.types.Interval(0,polyline.points.length != 0?polyline.points.length - 1:0);
+	this._interval = interval;
+};
+verb.core.types.LazyPolylineBoundingBoxTree.__interfaces__ = [verb.core.types.IBoundingBoxTree];
+verb.core.types.LazyPolylineBoundingBoxTree.prototype = {
+	split: function() {
+		var min = this._interval.min;
+		var max = this._interval.max;
+		var pivot = min + Math.ceil((max - min) / 2);
+		var l = new verb.core.types.Interval(min,pivot);
+		var r = new verb.core.types.Interval(pivot,max);
+		return new verb.core.types.Pair(new verb.core.types.LazyPolylineBoundingBoxTree(this._polyline,l),new verb.core.types.LazyPolylineBoundingBoxTree(this._polyline,r));
+	}
+	,boundingBox: function() {
+		if(this._boundingBox == null) this._boundingBox = new verb.BoundingBox(this._polyline.points);
+		return this._boundingBox;
+	}
+	,'yield': function() {
+		return this._interval.min;
+	}
+	,indivisible: function(tolerance) {
+		return this._interval.max - this._interval.min == 1;
+	}
+	,empty: function() {
+		return this._interval.max - this._interval.min == 0;
+	}
+};
+verb.core.types.LazySurfaceBoundingBoxTree = function(surface,splitV,knotTolU,knotTolV) {
+	if(splitV == null) splitV = false;
+	this._boundingBox = null;
+	this._surface = surface;
+	this._splitV = splitV;
+	if(knotTolU == null) knotTolU = (verb.core.ArrayExtensions.last(surface.knotsU) - surface.knotsU[0]) / 1000;
+	if(knotTolV == null) knotTolV = (verb.core.ArrayExtensions.last(surface.knotsV) - surface.knotsV[0]) / 1000;
+	this._knotTolU = knotTolU;
+	this._knotTolV = knotTolV;
+};
+verb.core.types.LazySurfaceBoundingBoxTree.__interfaces__ = [verb.core.types.IBoundingBoxTree];
+verb.core.types.LazySurfaceBoundingBoxTree.prototype = {
+	split: function() {
+		var min;
+		var max;
+		if(this._splitV) {
+			min = this._surface.knotsV[0];
+			max = verb.core.ArrayExtensions.last(this._surface.knotsV);
+		} else {
+			min = this._surface.knotsU[0];
+			max = verb.core.ArrayExtensions.last(this._surface.knotsU);
+		}
+		var dom = max - min;
+		var pivot = (min + max) / 2.0 + dom * 0.01 * Math.random();
+		var srfs = verb.core.Modify.surface_split(this._surface,pivot,this._splitV);
+		return new verb.core.types.Pair(new verb.core.types.LazySurfaceBoundingBoxTree(srfs[0],!this._splitV,this._knotTolU,this._knotTolV),new verb.core.types.LazySurfaceBoundingBoxTree(srfs[1],!this._splitV,this._knotTolU,this._knotTolV));
+	}
+	,boundingBox: function() {
+		if(this._boundingBox == null) {
+			this._boundingBox = new verb.BoundingBox();
+			var _g = 0;
+			var _g1 = this._surface.controlPoints;
+			while(_g < _g1.length) {
+				var row = _g1[_g];
+				++_g;
+				this._boundingBox.addRange(verb.core.Eval.dehomogenize_1d(row));
+			}
+		}
+		return this._boundingBox;
+	}
+	,'yield': function() {
+		return this._surface;
+	}
+	,indivisible: function(tolerance) {
+		if(this._splitV) return verb.core.ArrayExtensions.last(this._surface.knotsV) - this._surface.knotsV[0] < this._knotTolV; else return verb.core.ArrayExtensions.last(this._surface.knotsU) - this._surface.knotsU[0] < this._knotTolU;
+	}
+	,empty: function() {
+		return false;
+	}
 };
 verb.core.types.MeshData = $hx_exports.core.MeshData = function(faces,points,normals,uvs) {
 	this.faces = faces;
@@ -3618,9 +3577,34 @@ verb.core.types.MeshData = $hx_exports.core.MeshData = function(faces,points,nor
 verb.core.types.MeshData.empty = function() {
 	return new verb.core.types.MeshData([],[],[],[]);
 };
+verb.core.types.MeshIntersectionPoint = $hx_exports.core.MeshIntersectionPoint = function(uv0,uv1,point,faceIndex0,faceIndex1) {
+	this.visited = false;
+	this.adj = null;
+	this.opp = null;
+	this.uv0 = uv0;
+	this.uv1 = uv1;
+	this.point = point;
+	this.faceIndex0;
+	this.faceIndex1;
+};
 verb.core.types.Pair = $hx_exports.core.Pair = function(item1,item2) {
 	this.item0 = item1;
 	this.item1 = item2;
+};
+verb.core.types.PolylineData = $hx_exports.core.PolylineData = function(points,params) {
+	this.points = points;
+	this.params = params;
+};
+verb.core.types.PolylineMeshIntersection = $hx_exports.core.PolylineMeshIntersection = function(point,u,uv,polylineIndex,faceIndex) {
+	this.point = point;
+	this.u = u;
+	this.uv = uv;
+	this.polylineIndex = polylineIndex;
+	this.faceIndex = faceIndex;
+};
+verb.core.types.Ray = $hx_exports.core.Ray = function(origin,dir) {
+	this.origin = origin;
+	this.dir = dir;
 };
 verb.core.types.SurfaceData = $hx_exports.core.SurfaceData = function(degreeU,degreeV,knotsU,knotsV,controlPoints) {
 	this.degreeU = degreeU;
@@ -3640,6 +3624,18 @@ verb.core.types.SurfacePoint = function(point,normal,uv,id,degen) {
 };
 verb.core.types.SurfacePoint.fromUv = function(u,v) {
 	return new verb.core.types.SurfacePoint(null,null,[u,v]);
+};
+verb.core.types.SurfaceSurfaceIntersectionPoint = $hx_exports.core.SurfaceSurfaceIntersectionPoint = function(uv0,uv1,point,dist) {
+	this.uv0 = uv0;
+	this.uv1 = uv1;
+	this.point = point;
+	this.dist = dist;
+};
+verb.core.types.TriSegmentIntersection = $hx_exports.core.TriSegmentIntersection = function(point,s,t,r) {
+	this.point = point;
+	this.s = s;
+	this.t = t;
+	this.p = r;
 };
 verb.core.types.VolumeData = $hx_exports.core.VolumeData = function(degreeU,degreeV,degreeW,knotsU,knotsV,knotsW,controlPoints) {
 	this.degreeU = degreeU;
