@@ -394,7 +394,7 @@
 		var tess1 = tess(srf1, udivs0, vdivs0);
 		var tess2 = tess(srf2, udivs1, vdivs1);
 
-		var res = verb.eval.intersect_meshes_by_aabb( tess1.points, tess1.faces, 
+		var res = verb.eval.Intersect.meshes( tess1.points, tess1.faces,
 			tess1.uvs, tess2.points, tess2.faces, tess2.uvs );
 
 		var ref = verb.eval.intersect_rational_surface_surface_by_aabb_refine(srf1.get('degreeU'), srf1.get('knotsU'), srf1.get('degreeV'), srf1.get('knotsV'), srf1.homogenize(), srf2.get('degreeU'), srf2.get('knotsU'), srf2.get('degreeV'), srf2.get('knotsV'), srf2.homogenize(), 1e-6);

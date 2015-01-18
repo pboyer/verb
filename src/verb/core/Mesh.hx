@@ -174,4 +174,30 @@ class Mesh {
         return centroid;
 
     }
+
+    public static function tri_uv_from_point( mesh : MeshData, faceIndex : Int, f : Point ) : UV {
+
+        var tri = mesh.faces[faceIndex];
+
+        var p1 = mesh.points[ tri[0] ];
+        var p2 = mesh.points[ tri[1] ];
+        var p3 = mesh.points[ tri[2] ];
+
+        var uv1 = mesh.uvs[ tri[0] ];
+        var uv2 = mesh.uvs[ tri[1] ];
+        var uv3 = mesh.uvs[ tri[2] ];
+
+        var f1 = Vec.sub(p1, f);
+        var f2 = Vec.sub(p2, f);
+        var f3 = Vec.sub(p3, f);
+
+        // calculate the areas and factors (order of parameters doesn't matter):
+        var a = Vec.norm( Vec.cross( Vec.sub(p1, p2), Vec.sub(p1, p3) ) ); // main triangle area a
+        var a1 = Vec.norm( Vec.cross(f2, f3) ) / a; // p1's triangle area / a
+        var a2 = Vec.norm( Vec.cross(f3, f1) ) / a; // p2's triangle area / a
+        var a3 = Vec.norm( Vec.cross(f1, f2) ) / a; // p3's triangle area / a
+
+        // find the uv corresponding to point f (uv1/uv2/uv3 are associated to p1/p2/p3):
+        return Vec.add( Vec.mul( a1, uv1), Vec.add( Vec.mul( a2, uv2), Vec.mul( a3, uv3)));
+    }
 }

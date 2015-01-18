@@ -1729,7 +1729,7 @@ describe("verb.core.AdaptiveRefinementNode.triangulate",function(){
 });
 
 
-describe("verb.core.Eval.tessellate_rational_surface_adaptive",function(){
+describe("verb.core.Eval.rational_surface_adaptive",function(){
 
 	function getComplexSurface(){
 
@@ -1765,7 +1765,7 @@ describe("verb.core.Eval.tessellate_rational_surface_adaptive",function(){
 
 		var srf = getComplexSurface();
 
-		var mesh = verb.core.Tess.tessellate_rational_surface_adaptive( srf, { minDivsU: 1, minDivsV: 4 } );
+		var mesh = verb.core.Tess.rational_surface_adaptive( srf, { minDivsU: 1, minDivsV: 4 } );
 
 		mesh.faces.length.should.be.greaterThan( 8 );
 		mesh.points.forEach(function(x){ x.length.should.be.equal( 3 ); })
@@ -3892,6 +3892,180 @@ describe("verb.core.KdTree",function(){
 
 });
 
+
+describe("verb.core.Intersect.lookup_adj_segment",function(){
+
+	var segs = [
+		new verb.core.Interval(
+			new verb.core.MeshIntersectionPoint([0,0], [0,0], [1,2,3], 0, 0 ),
+			new verb.core.MeshIntersectionPoint([0,0], [0,0], [5,6,7], 0, 0 )),
+		new verb.core.Interval(
+			new verb.core.MeshIntersectionPoint([0,0], [0,0], [2,2,3], 0, 0 ),
+			new verb.core.MeshIntersectionPoint([0,0], [0,0], [6,6,7], 0, 0 )),
+		new verb.core.Interval(
+			new verb.core.MeshIntersectionPoint([0,0], [0,0], [3,2,3], 0, 0 ),
+			new verb.core.MeshIntersectionPoint([0,0], [0,0], [7,6,7], 0, 0 ))  ];
+
+	it('returns null when only nearest is argument itself', function(){
+
+		var end = segs[0].min;
+
+		var tree = verb.core.Intersect.kdtree_from_segs( segs );
+		var nearest = verb.core.Intersect.lookup_adj_segment( end, tree );
+
+		should.equal( nearest, null );
+
+	});
+
+	it('is correct for a basic example', function(){
+
+		var end = new verb.core.MeshIntersectionPoint([0,0], [0,0], [1,2,3], 0, 0 ); // same pos, but different object
+
+		var tree = verb.core.Intersect.kdtree_from_segs( segs );
+		var nearest = verb.core.Intersect.lookup_adj_segment( end, tree );
+
+		nearest.should.be.equal(segs[0].min)
+
+	});
+
+});
+
+describe("verb.core.Intersect.make_mesh_intersection_polylines ",function(){
+
+	it('is correct for a basic example', function(){
+
+		var segs = [
+			new verb.core.Interval(
+				new verb.core.MeshIntersectionPoint([0,0], [0,0], [10,0,0], 0, 0 ),
+				new verb.core.MeshIntersectionPoint([0,0], [0,0], [10,10,0], 0, 0 )),
+			new verb.core.Interval(
+				new verb.core.MeshIntersectionPoint([0,0], [0,0], [0,10,0], 0, 0 ),
+				new verb.core.MeshIntersectionPoint([0,0], [0,0], [10,10,0], 0, 0 )),
+			new verb.core.Interval(
+				new verb.core.MeshIntersectionPoint([0,0], [0,0], [5,0,0], 0, 0 ),
+				new verb.core.MeshIntersectionPoint([0,0], [0,0], [0,10,0], 0, 0 ))  ];
+
+		var pls = verb.core.Intersect.make_mesh_intersection_polylines( segs );
+
+		// discovers one continuous polyline
+		pls.length.should.be.equal( 1 );
+		pls[0].length.should.be.equal( 4 );
+		pls[0][0].point.should.be.eql( [10,0,0] );
+		pls[0][1].point.should.be.eql( [10,10,0] );
+		pls[0][2].point.should.be.eql( [0,10,0] );
+		pls[0][3].point.should.be.eql( [5,0,0] );
+
+	});
+
+});
+
+describe("verb.core.Intersect.kdtree_from_segs",function(){
+
+	it('is correct for a basic example', function(){
+
+		var segs = [
+			new verb.core.Interval(
+				new verb.core.MeshIntersectionPoint([0,0], [0,0], [1,2,3], 0, 0 ),
+				new verb.core.MeshIntersectionPoint([0,0], [0,0], [5,6,7], 0, 0 )),
+			new verb.core.Interval(
+				new verb.core.MeshIntersectionPoint([0,0], [0,0], [2,2,3], 0, 0 ),
+				new verb.core.MeshIntersectionPoint([0,0], [0,0], [6,6,7], 0, 0 )),
+			new verb.core.Interval(
+				new verb.core.MeshIntersectionPoint([0,0], [0,0], [3,2,3], 0, 0 ),
+				new verb.core.MeshIntersectionPoint([0,0], [0,0], [7,6,7], 0, 0 ))  ];
+
+		var tree = verb.core.Intersect.kdtree_from_segs( segs );
+
+		tree.should.not.be.null;
+
+	});
+
+});
+
+describe("verb.core.Intersect.meshes",function(){
+
+	it('is correct for two intersecting triangles', function(){
+
+		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
+		var tris1 = [[ 0, 1, 2 ]];
+		var uvs1 = [ [0,0], [2,0], [2, 2] ];
+		var mesh1 = new verb.core.MeshData(tris1, pts1, null, uvs1);
+
+		var pts2 = [ [1,1,-1], [1,1,5], [1,-5,-1] ];
+		var tris2 = [[ 0, 1, 2 ]];
+		var uvs2 = [ [0,0], [3,0], [3,3] ];
+		var mesh2 = new verb.core.MeshData(tris2, pts2, null, uvs2);
+
+		var pls = verb.core.Intersect.meshes( mesh1, mesh2 );
+
+		pls.length.should.be.equal( 1 );
+		pls[0].length.should.be.equal( 2 );
+
+	});
+
+	it('is correct for two non-intersecting triangles', function(){
+
+		var pts1 = [ [10,10,10], [2,10,10], [2, 2,10] ];
+		var tris1 = [[ 0, 1, 2 ]];
+		var uvs1 = [ [0,0], [2,0], [2, 2] ];
+		var mesh1 = new verb.core.MeshData(tris1, pts1, null, uvs1);
+
+		var pts2 = [ [1,1,-1], [3,1,-1], [3,1,2] ];
+		var tris2 = [[ 0, 1, 2 ]];
+		var uvs2 = [ [0,0], [3,0], [3,3] ];
+		var mesh2 = new verb.core.MeshData(tris2, pts2, null, uvs2);
+
+		var res = verb.core.Intersect.meshes( mesh1, mesh2 );
+
+		res.length.should.be.equal( 0 );
+
+	});
+
+	it('is correct for two intersecting four point surfaces', function(){
+
+		var p1 = [0,0,0]
+			, p2 = [1,0,0]
+			, p3 = [1,1,0]
+			, p4 = [0,1,0];
+
+		var srf1 = verb.core.Make.four_point_surface( p1, p2, p3, p4 );
+
+		var p5 = [0.5,-0.5,-0.5]
+			, p6 = [0.5,0.5,-0.5]
+			, p7 = [0.5,0.5,0.5]
+			, p8 = [0.5,-0.5,0.5];
+
+		var srf2 = verb.core.Make.four_point_surface( p5, p6, p7, p8 );
+
+		var tess1 = verb.core.Tess.rational_surface_adaptive( srf1 );
+		var tess2 = verb.core.Tess.rational_surface_adaptive( srf2 );
+
+		var res = verb.core.Intersect.meshes( tess1, tess2 );
+
+		res.length.should.be.equal( 1 );
+	});
+
+});
+
+describe("verb.core.Mesh.tri_uv_from_point",function(){
+
+	it('is correct for a basic example', function(){
+
+		var uvs = [ [0,0], [1,0], [1,1] ];
+		var pts = [ [0,0,0], [1,0,0], [1,1,0] ];
+		var tris = [[ 0, 1, 2 ]];
+		var pt = [0.5, 0.25, 0];
+		var mesh = new verb.core.MeshData(tris, pts, null, uvs);
+
+		var uv = verb.core.Mesh.tri_uv_from_point( mesh, 0, pt );
+
+		uv[0].should.be.approximately( pt[0], verb.core.Constants.TOLERANCE );
+		uv[1].should.be.approximately( pt[1], verb.core.Constants.TOLERANCE );
+
+	});
+});
+
+
 /*
 
 describe(.EvalCurve.split",function(){
@@ -5756,25 +5930,6 @@ describe("verb.core.Eval.rational_surface_curvature ",function(){
 });
 
 
-describe("verb.core.Eval.tri_uv_from_point",function(){
-
-	it('is correct for a basic example', function(){
-
-		var uvs = [ [0,0], [1,0], [1,1] ];
-		var pts = [ [0,0,0], [1,0,0], [1,1,0] ];
-		var tri = [[ 0, 1, 2 ]];
-		var pt = [0.5, 0.25, 0];
-
-		var uv = verb.core.Eval.tri_uv_from_point( pts, tri, uvs, pt );
-
-		uv[0].should.be.approximately( pt[0], verb.core.Constants.TOLERANCE );
-		uv[1].should.be.approximately( pt[1], verb.core.Constants.TOLERANCE );
-
-	});
-});
-
-
-
 describe("verb.core.Eval.intersect_aabb_trees",function(){
 
 	it('intersect_aabb_trees should have the correct result', function(){
@@ -5819,162 +5974,6 @@ describe("verb.core.Eval.intersect_aabb_trees",function(){
 });
 
 
-
-describe("verb.core.Eval.lookup_adj_segment",function(){
-
-	it('returns null when only nearest is argument itself', function(){
-
-		var segs = [
-				[ 	{ pt: [1,2,3], key: "a" }, 
-						{ pt: [5,6,7], key: "b" } ],
-				[ 	{ pt: [2,2,3], key: "c" }, 
-						{ pt: [6,6,7], key: "d" } ],
-				[ 	{ pt: [3,2,3], key: "e" }, 
-						{ pt: [7,6,7], key: "f" } ] ];
-
-		var end = segs[0][0];
-
-		var tree = verb.core.Eval.kdtree_from_segs( segs );
-		var nearest = verb.core.Eval.lookup_adj_segment( end, tree );
-
-		should.equal( nearest, null );
-
-	});
-
-	it('is correct for a basic example', function(){
-
-		var segs = [
-				[ 	{ pt: [1,2,3], key: "a" }, 
-						{ pt: [5,6,7], key: "b" } ],
-				[ 	{ pt: [2,2,3], key: "c" }, 
-						{ pt: [6,6,7], key: "d" } ],
-				[ 	{ pt: [3,2,3], key: "e" }, 
-						{ pt: [7,6,7], key: "f" } ] ];
-
-		var end = { pt: [1,2,3], key: "g" }; // same pos, but different object
-
-		var tree = verb.core.Eval.kdtree_from_segs( segs );
-		var nearest = verb.core.Eval.lookup_adj_segment( end, tree );
-
-		nearest.should.be.equal(segs[0][0])
-
-	});
-
-});
-
-describe("verb.core.Eval.make_intersect_polylines ",function(){
-
-	it('is correct for a basic example', function(){
-		
-		// not closed
-		var segs = [
-				[ 	{ pt: [10,0,0], key: "a" }, 
-						{ pt: [10,10,0], key: "b" } ],
-				[ 	{ pt: [0,10,0], key: "c" }, 
-						{ pt: [10,10,0], key: "d" } ],
-				[ 	{ pt: [5,0,0], key: "e" }, 
-						{ pt: [0,10,0], key: "f" } ] ];
-
-		var pls = verb.core.Eval.make_intersect_polylines( segs );
-
-		// discovers one continuous polyline
-		pls.length.should.be.equal( 1 );
-		pls[0].length.should.be.equal( 4 );
-		pls[0][0].pt.should.be.eql( [10,0,0] );
-		pls[0].mult.pt.should.be.eql( [10,10,0] );
-		pls[0][2].pt.should.be.eql( [0,10,0] );
-		pls[0][3].pt.should.be.eql( [5,0,0] );
-
-	});
-
-});
-
-describe("verb.core.Eval.kdtree_from_segs",function(){
-
-	it('is correct for a basic example', function(){
-
-		// the uvs dont matter
-		var segs = [
-				[ 	{ pt: [1,2,3] }, 
-						{ pt: [5,6,7] } ],
-				[ 	{ pt: [2,2,3] }, 
-						{ pt: [6,6,7] } ],
-				[ 	{ pt: [3,2,3] }, 
-						{ pt: [7,6,7] } ] ];
-
-		var tree = verb.core.Eval.kdtree_from_segs( segs );
-
-		tree.should.not.be.null;
-
-	});
-
-});
-
-describe("verb.core.Eval.intersect_meshes_by_aabb",function(){
-
-	it('is correct for two intersecting triangles', function(){
-		
-		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
-		var tris1 = [[ 0, 1, 2 ]];
-		var uvs1 = [ [0,0], [2,0], [2, 2] ];
-
-		var pts2 = [ [1,1,-1], [1,1,5], [1,-5,-1] ];
-		var tris2 = [[ 0, 1, 2 ]];
-		var uvs2 = [ [0,0], [3,0], [3,3] ];
-
-		var pls = verb.core.Eval.intersect_meshes_by_aabb( pts1, tris1, uvs1, pts2, tris2, uvs2 );
-
-		pls.length.should.be.equal( 1 );
-		pls[0].length.should.be.equal( 2 );
-
-	});
-
-	it('is correct for two non-intersecting triangles', function(){
-		
-		var pts1 = [ [10,10,10], [2,10,10], [2, 2,10] ];
-		var tris1 = [[ 0, 1, 2 ]];
-		var uvs1 = [ [0,0], [2,0], [2, 2] ];
-
-		var pts2 = [ [1,1,-1], [3,1,-1], [3,1,2] ];
-		var tris2 = [[ 0, 1, 2 ]];
-		var uvs2 = [ [0,0], [3,0], [3,3] ];
-
-		var res = verb.core.Eval.intersect_meshes_by_aabb( pts1, tris1, uvs1, pts2, tris2, uvs2 );
-
-		res.length.should.be.equal( 0 );
-
-	});
-
-
-	it('is correct for two intersecting FourPointSurfaces', function(){
-
-		verb.init();
-
-		var p1 = [0,0,0]
-			, p2 = [1,0,0]
-			, p3 = [1,1,0]
-			, p4 = [0,1,0];
-
-		var srf1 = new verb.FourPointSurface( p1, p2, p3, p4 );
-
-		var p5 = [0.5,-0.5,-0.5]
-			, p6 = [0.5,0.5,-0.5]
-			, p7 = [0.5,0.5,0.5]
-			, p8 = [0.5,-0.5,0.5];
-
-		var srf2 = new verb.FourPointSurface( p5, p6, p7, p8 );
-
-		var opts = { minDivsU: 20, minDivsV: 20 };
-		var tess1 = srf1.tessellate(opts);
-		var tess2 = srf2.tessellate(opts);
-
-		var res = verb.core.Eval.intersect_meshes_by_aabb( tess1.points, tess1.faces, tess1.uvs, tess2.points, tess2.faces, tess2.uvs );
-
-		res.length.should.be.equal( 1 );
-
-	});
-
-});
 
 describe("verb.InterpCurve",function(){
 

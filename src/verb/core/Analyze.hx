@@ -83,7 +83,7 @@ class Analyze {
         , cuv;
 
         // approximate closest point with tessellation
-        var tess = Tess.tessellate_rational_surface_adaptive( surface, new AdaptiveRefinementOptions() );
+        var tess = Tess.rational_surface_adaptive( surface, new AdaptiveRefinementOptions() );
 
         var dmin = Math.POSITIVE_INFINITY;
 

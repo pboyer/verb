@@ -157,7 +157,7 @@ class Tess {
 	// + MeshData object
 	//
 
-	public static function tessellate_rational_surface_naive( surface : SurfaceData, divs_u : Int, divs_v : Int ) : MeshData {
+	public static function rational_surface_naive( surface : SurfaceData, divs_u : Int, divs_v : Int ) : MeshData {
 
 		if ( divs_u < 1 ) { divs_u = 1; }
 		if ( divs_v < 1 ) { divs_v = 1; }
@@ -331,7 +331,9 @@ class Tess {
 
 	}
 
-	public static function tessellate_rational_surface_adaptive( surface : SurfaceData, options : AdaptiveRefinementOptions ) : MeshData {
+	public static function rational_surface_adaptive( surface : SurfaceData, options : AdaptiveRefinementOptions = null ) : MeshData {
+
+		options = options != null ? options : new AdaptiveRefinementOptions();
 
 		// adaptive divide
 		var arrTrees = divide_rational_surface_adaptive( surface, options );

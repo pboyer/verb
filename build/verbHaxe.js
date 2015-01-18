@@ -184,7 +184,7 @@ verb.core.Analyze.rational_surface_closest_point = function(surface,p) {
 	var closedu = verb.core.Analyze.is_rational_surface_closed(surface);
 	var closedv = verb.core.Analyze.is_rational_surface_closed(surface,false);
 	var cuv;
-	var tess = verb.core.Tess.tessellate_rational_surface_adaptive(surface,new verb.core.types.AdaptiveRefinementOptions());
+	var tess = verb.core.Tess.rational_surface_adaptive(surface,new verb.core.types.AdaptiveRefinementOptions());
 	var dmin = Math.POSITIVE_INFINITY;
 	var _g1 = 0;
 	var _g = tess.points.length;
@@ -1135,7 +1135,79 @@ verb.core.CurveSurfaceIntersection = $hx_exports.core.CurveSurfaceIntersection =
 	this.u = u;
 	this.uv = uv;
 };
+verb.core.SurfaceSurfaceIntersectionPoint = $hx_exports.core.SurfaceSurfaceIntersectionPoint = function(uv0,uv1,point,dist) {
+	this.uv0 = uv0;
+	this.uv1 = uv1;
+	this.point = point;
+	this.dist = dist;
+};
 verb.core.Intersect = $hx_exports.core.Intersect = function() { };
+verb.core.Intersect.surfaces = function(surface0,surface1,tol) {
+	var tess1 = verb.core.Tess.rational_surface_adaptive(surface0);
+	var tess2 = verb.core.Tess.rational_surface_adaptive(surface1);
+	var resApprox = verb.core.Intersect.meshes(tess1,tess2);
+	var exactPls = resApprox.map(function(pl) {
+		return pl.map(function(inter) {
+			return verb.core.Intersect.surfaces_at_point_with_estimate(surface0,surface1,inter.uv0,inter.uv1,tol);
+		});
+	});
+	return exactPls.map(function(x) {
+		return verb.core.Make.rational_interp_curve(x.map(function(x1) {
+			return x1.point;
+		}),3);
+	});
+};
+verb.core.Intersect.surfaces_at_point_with_estimate = function(surface0,surface1,uv1,uv2,tol) {
+	var pds;
+	var p;
+	var pn;
+	var pu;
+	var pv;
+	var pd;
+	var qds;
+	var q;
+	var qn;
+	var qu;
+	var qv;
+	var qd;
+	var dist;
+	var maxits = 10;
+	var its = 0;
+	do {
+		pds = verb.core.Eval.rational_surface_derivs(surface0,1,uv1[0],uv1[1]);
+		p = pds[0][0];
+		pu = pds[1][0];
+		pv = pds[0][1];
+		pn = verb.core.Vec.normalized(verb.core.Vec.cross(pu,pv));
+		pd = verb.core.Vec.dot(pn,p);
+		qds = verb.core.Eval.rational_surface_derivs(surface0,1,uv2[0],uv2[1]);
+		q = qds[0][0];
+		qu = qds[1][0];
+		qv = qds[0][1];
+		qn = verb.core.Vec.normalized(verb.core.Vec.cross(qu,qv));
+		qd = verb.core.Vec.dot(qn,q);
+		dist = verb.core.Vec.norm(verb.core.Vec.sub(p,q));
+		if(dist < tol) break;
+		var fn = verb.core.Vec.normalized(verb.core.Vec.cross(pn,qn));
+		var fd = verb.core.Vec.dot(fn,p);
+		var x = verb.core.Intersect.three_planes(pn,pd,qn,qd,fn,fd);
+		if(x == null) throw "panic!";
+		var pdif = verb.core.Vec.sub(x,p);
+		var qdif = verb.core.Vec.sub(x,q);
+		var rw = verb.core.Vec.cross(pu,pn);
+		var rt = verb.core.Vec.cross(pv,pn);
+		var su = verb.core.Vec.cross(qu,qn);
+		var sv = verb.core.Vec.cross(qv,qn);
+		var dw = verb.core.Vec.dot(rt,pdif) / verb.core.Vec.dot(rt,pu);
+		var dt = verb.core.Vec.dot(rw,pdif) / verb.core.Vec.dot(rw,pv);
+		var du = verb.core.Vec.dot(sv,qdif) / verb.core.Vec.dot(sv,qu);
+		var dv = verb.core.Vec.dot(su,qdif) / verb.core.Vec.dot(su,qv);
+		uv1 = verb.core.Vec.add([dw,dt],uv1);
+		uv2 = verb.core.Vec.add([du,dv],uv2);
+		its++;
+	} while(its < maxits);
+	return new verb.core.SurfaceSurfaceIntersectionPoint(uv1,uv2,p,dist);
+};
 verb.core.Intersect.meshes = function(mesh0,mesh1) {
 	var bbints = verb.core.Intersect.bounding_box_trees(new verb.core.LazyMeshBoundingBoxTree(mesh0),new verb.core.LazyMeshBoundingBoxTree(mesh1),0);
 	var segments = verb.core.ArrayExtensions.unique(bbints.map(function(ids) {
@@ -1156,9 +1228,9 @@ verb.core.Intersect.meshes = function(mesh0,mesh1) {
 		return d1 < verb.core.Constants.EPSILON && d2 < verb.core.Constants.EPSILON || d3 < verb.core.Constants.EPSILON && d4 < verb.core.Constants.EPSILON;
 	});
 	if(segments.length == 0) return [];
-	return verb.core.Intersect.make_polylines(segments);
+	return verb.core.Intersect.make_mesh_intersection_polylines(segments);
 };
-verb.core.Intersect.make_polylines = function(segments) {
+verb.core.Intersect.make_mesh_intersection_polylines = function(segments) {
 	var _g = 0;
 	while(_g < segments.length) {
 		var s = segments[_g];
@@ -1278,7 +1350,7 @@ verb.core.Intersect.polyline_and_mesh = function(polyline,mesh,tol) {
 		if(inter == null) continue;
 		var pt = inter.point;
 		var u = verb.core.Vec.lerp(inter.p,[polyline.params[polid]],[polyline.params[polid + 1]])[0];
-		var uv = verb.core.Intersect.tri_uv_from_point(mesh,faceid,pt);
+		var uv = verb.core.Mesh.tri_uv_from_point(mesh,faceid,pt);
 		finalResults.push(new verb.core.PolylineMeshIntersection(pt,u,uv,polid,faceid));
 	}
 	return finalResults;
@@ -1367,36 +1439,19 @@ verb.core.Intersect.merge_tri_clip_intervals = function(clip1,clip2,mesh1,faceIn
 	var res = new verb.core.Interval(new verb.core.MeshIntersectionPoint(null,null,min.item0.point,faceIndex1,faceIndex2),new verb.core.MeshIntersectionPoint(null,null,max.item0.point,faceIndex1,faceIndex2));
 	if(min.item1 == 0) {
 		res.min.uv0 = min.item0.uv;
-		res.min.uv1 = verb.core.Intersect.tri_uv_from_point(mesh2,faceIndex2,min.item0.point);
+		res.min.uv1 = verb.core.Mesh.tri_uv_from_point(mesh2,faceIndex2,min.item0.point);
 	} else {
-		res.min.uv0 = verb.core.Intersect.tri_uv_from_point(mesh1,faceIndex1,min.item0.point);
+		res.min.uv0 = verb.core.Mesh.tri_uv_from_point(mesh1,faceIndex1,min.item0.point);
 		res.min.uv1 = min.item0.uv;
 	}
 	if(max.item1 == 0) {
 		res.max.uv0 = max.item0.uv;
-		res.max.uv1 = verb.core.Intersect.tri_uv_from_point(mesh2,faceIndex2,max.item0.point);
+		res.max.uv1 = verb.core.Mesh.tri_uv_from_point(mesh2,faceIndex2,max.item0.point);
 	} else {
-		res.max.uv0 = verb.core.Intersect.tri_uv_from_point(mesh1,faceIndex1,max.item0.point);
+		res.max.uv0 = verb.core.Mesh.tri_uv_from_point(mesh1,faceIndex1,max.item0.point);
 		res.max.uv1 = max.item0.uv;
 	}
 	return res;
-};
-verb.core.Intersect.tri_uv_from_point = function(mesh,faceIndex,f) {
-	var tri = mesh.faces[faceIndex];
-	var p1 = mesh.points[tri[0]];
-	var p2 = mesh.points[tri[1]];
-	var p3 = mesh.points[tri[2]];
-	var uv1 = mesh.uvs[tri[0]];
-	var uv2 = mesh.uvs[tri[1]];
-	var uv3 = mesh.uvs[tri[2]];
-	var f1 = verb.core.Vec.sub(p1,f);
-	var f2 = verb.core.Vec.sub(p2,f);
-	var f3 = verb.core.Vec.sub(p3,f);
-	var a = verb.core.Vec.norm(verb.core.Vec.cross(verb.core.Vec.sub(p1,p2),verb.core.Vec.sub(p1,p3)));
-	var a1 = verb.core.Vec.norm(verb.core.Vec.cross(f2,f3)) / a;
-	var a2 = verb.core.Vec.norm(verb.core.Vec.cross(f3,f1)) / a;
-	var a3 = verb.core.Vec.norm(verb.core.Vec.cross(f1,f2)) / a;
-	return verb.core.Vec.add(verb.core.Vec.mul(a1,uv1),verb.core.Vec.add(verb.core.Vec.mul(a2,uv2),verb.core.Vec.mul(a3,uv3)));
 };
 verb.core.Intersect.planes = function(origin0,normal0,origin1,normal1) {
 	var d = verb.core.Vec.cross(normal0,normal1);
@@ -2360,6 +2415,23 @@ verb.core.Mesh.get_tri_centroid = function(points,tri) {
 	}
 	return centroid;
 };
+verb.core.Mesh.tri_uv_from_point = function(mesh,faceIndex,f) {
+	var tri = mesh.faces[faceIndex];
+	var p1 = mesh.points[tri[0]];
+	var p2 = mesh.points[tri[1]];
+	var p3 = mesh.points[tri[2]];
+	var uv1 = mesh.uvs[tri[0]];
+	var uv2 = mesh.uvs[tri[1]];
+	var uv3 = mesh.uvs[tri[2]];
+	var f1 = verb.core.Vec.sub(p1,f);
+	var f2 = verb.core.Vec.sub(p2,f);
+	var f3 = verb.core.Vec.sub(p3,f);
+	var a = verb.core.Vec.norm(verb.core.Vec.cross(verb.core.Vec.sub(p1,p2),verb.core.Vec.sub(p1,p3)));
+	var a1 = verb.core.Vec.norm(verb.core.Vec.cross(f2,f3)) / a;
+	var a2 = verb.core.Vec.norm(verb.core.Vec.cross(f3,f1)) / a;
+	var a3 = verb.core.Vec.norm(verb.core.Vec.cross(f1,f2)) / a;
+	return verb.core.Vec.add(verb.core.Vec.mul(a1,uv1),verb.core.Vec.add(verb.core.Vec.mul(a2,uv2),verb.core.Vec.mul(a3,uv3)));
+};
 verb.core.KnotMultiplicity = $hx_exports.core.KnotMultiplicity = function(knot,mult) {
 	this.knot = knot;
 	this.mult = mult;
@@ -2858,7 +2930,7 @@ verb.core.Tess.rational_curve_adaptive_sample_range = function(curve,start,end,t
 		return left_pts.slice(0,-1).concat(right_pts);
 	} else if(includeU) return [[start].concat(p1),[end].concat(p3)]; else return [p1,p3];
 };
-verb.core.Tess.tessellate_rational_surface_naive = function(surface,divs_u,divs_v) {
+verb.core.Tess.rational_surface_naive = function(surface,divs_u,divs_v) {
 	if(divs_u < 1) divs_u = 1;
 	if(divs_v < 1) divs_v = 1;
 	var degree_u = surface.degreeU;
@@ -3000,7 +3072,8 @@ verb.core.Tess.triangulate_adaptive_refinement_node_tree = function(arrTree) {
 	}
 	return mesh;
 };
-verb.core.Tess.tessellate_rational_surface_adaptive = function(surface,options) {
+verb.core.Tess.rational_surface_adaptive = function(surface,options) {
+	if(options != null) options = options; else options = new verb.core.types.AdaptiveRefinementOptions();
 	var arrTrees = verb.core.Tess.divide_rational_surface_adaptive(surface,options);
 	return verb.core.Tess.triangulate_adaptive_refinement_node_tree(arrTrees);
 };

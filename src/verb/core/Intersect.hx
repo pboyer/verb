@@ -389,8 +389,150 @@ class CurveSurfaceIntersection {
     }
 }
 
+@:expose("core.SurfaceSurfaceIntersectionPoint")
+class SurfaceSurfaceIntersectionPoint {
+
+    public var uv0 : UV;
+    public var uv1 : UV;
+    public var point : Point;
+    public var dist : Float;
+
+    public function new( uv0, uv1, point, dist ){
+        this.uv0 = uv0;
+        this.uv1 = uv1;
+        this.point = point;
+        this.dist = dist;
+    }
+}
+
 @:expose("core.Intersect")
 class Intersect {
+
+    //
+    // Intersect two NURBS surfaces, yielding a list of curves
+    //
+    // **params**
+    // + SurfaceData for the first surface
+    // + SurfaceData for the second
+    //
+    // **returns**
+    // + array of CurveData objects
+    //
+    public static function surfaces( surface0 : SurfaceData, surface1 : SurfaceData, tol : Float) : Array<CurveData> {
+
+        // 1) tessellate the two surfaces
+        var tess1 = Tess.rational_surface_adaptive( surface0 );
+        var tess2 = Tess.rational_surface_adaptive( surface1 );
+
+        var resApprox = Intersect.meshes( tess1, tess2 );
+
+        // 2) refine the intersection points so that they lie on both surfaces
+        var exactPls = resApprox.map(function(pl){
+            return pl.map( function(inter : MeshIntersectionPoint){
+                return Intersect.surfaces_at_point_with_estimate( surface0, surface1, inter.uv0, inter.uv1, tol );
+            });
+        });
+
+        // 3) perform cubic interpolation
+        return exactPls.map(function(x){
+            return Make.rational_interp_curve( x.map(function(x){ return x.point; }), 3 );
+        });
+    }
+
+    //
+    // Refine a pair of surface points to a point where the two surfaces intersect
+    //
+    // **params**
+    // + SurfaceData for the first surface
+    // + SurfaceData for the second
+    // + the UV for the point on the first surface
+    // + the UV for the point on the second surface
+    // + a tolerance value to terminate the refinement procedure
+    //
+    // **returns**
+    // + a SurfaceSurfaceIntersectionPoint object
+    //
+    public static function surfaces_at_point_with_estimate(surface0 : SurfaceData,
+                                                           surface1 : SurfaceData,
+                                                           uv1 : UV,
+                                                           uv2 : UV,
+                                                           tol : Float ) : SurfaceSurfaceIntersectionPoint {
+
+        var pds, p, pn, pu, pv, pd, qds, q, qn, qu, qv, qd, dist;
+        var maxits = 10;
+        var its = 0;
+
+        do {
+            // 1) eval normals, pts on respective surfaces (p, q, pn, qn)
+            pds = Eval.rational_surface_derivs( surface0, 1, uv1[0], uv1[1] );
+            p = pds[0][0];
+            pu = pds[1][0];
+            pv = pds[0][1];
+            pn = Vec.normalized( Vec.cross( pu, pv ) );
+            pd = Vec.dot( pn, p );
+
+            qds = Eval.rational_surface_derivs( surface0, 1, uv2[0], uv2[1] );
+            q = qds[0][0];
+            qu = qds[1][0];
+            qv = qds[0][1];
+            qn = Vec.normalized( Vec.cross( qu, qv ) );
+            qd = Vec.dot( qn, q );
+
+            // if tolerance is met, exit loop
+            dist = Vec.norm( Vec.sub(p, q) );
+
+            if (dist < tol) {
+                break;
+            }
+
+            // 2) construct plane perp to both that passes through p (fn)
+            var fn = Vec.normalized( Vec.cross( pn, qn ) );
+            var fd = Vec.dot( fn, p );
+
+            // 3) x = intersection of all 3 planes
+            var x = Intersect.three_planes( pn, pd, qn, qd, fn, fd );
+
+            if (x == null) throw "panic!";
+
+            // 4) represent the difference vectors (pd = x - p, qd = x - q) in the partial
+            // 		derivative vectors of the respective surfaces (pu, pv, qu, qv)
+
+            var pdif = Vec.sub( x, p );
+            var qdif = Vec.sub( x, q );
+
+            var rw = Vec.cross( pu, pn );
+            var rt = Vec.cross( pv, pn );
+
+            var su = Vec.cross( qu, qn );
+            var sv = Vec.cross( qv, qn );
+
+            var dw = Vec.dot( rt, pdif ) / Vec.dot( rt, pu );
+            var dt = Vec.dot( rw, pdif ) / Vec.dot( rw, pv );
+
+            var du = Vec.dot( sv, qdif ) / Vec.dot( sv, qu );
+            var dv = Vec.dot( su, qdif ) / Vec.dot( su, qv );
+
+            uv1 = Vec.add( [dw, dt], uv1 );
+            uv2 = Vec.add( [du, dv], uv2 );
+
+            // repeat
+            its++;
+
+        } while( its < maxits );
+
+        return new SurfaceSurfaceIntersectionPoint(uv1, uv2, p, dist);
+    }
+
+    //
+    // Intersect two meshes, yielding a list of polylines
+    //
+    // **params**
+    // + MeshData for the first mesh
+    // + MeshData for the latter
+    //
+    // **returns**
+    // + array of array of MeshIntersectionPoints
+    //
 
     public static function meshes( mesh0 : MeshData, mesh1 : MeshData ) : Array<Array<MeshIntersectionPoint>> {
 
@@ -434,11 +576,21 @@ class Intersect {
 
         if (segments.length == 0) return [];
 
-        return make_polylines( segments );
+        return make_mesh_intersection_polylines( segments );
 
     }
 
-    private static function make_polylines( segments : Array<Interval<MeshIntersectionPoint>> ) : Array<Array<MeshIntersectionPoint>> {
+    //
+    // Given a list of unstructured mesh intersection segments, reconstruct into polylines
+    //
+    // **params**
+    // + unstructured collection of segments
+    //
+    // **returns**
+    // + array of array of MeshIntersectionPoint
+    //
+
+    public static function make_mesh_intersection_polylines( segments : Array<Interval<MeshIntersectionPoint>> ) : Array<Array<MeshIntersectionPoint>> {
 
         // debug (return all segments)
         // return segments;
@@ -507,7 +659,6 @@ class Intersect {
 
                 // loop condition
                 if (curEnd == end) break;
-
             }
 
             if (pl.length > 0) {
@@ -518,6 +669,16 @@ class Intersect {
 
         return pls;
     }
+
+    //
+    // Form a KD-tree from a collection of mesh intersection segments
+    //
+    // **params**
+    // + unstructured collection of segments
+    //
+    // **returns**
+    // + array of array of MeshIntersectionPoint
+    //
 
     private static function kdtree_from_segs( segments: Array<Interval<MeshIntersectionPoint>> ) : KdTree<MeshIntersectionPoint> {
 
@@ -533,6 +694,15 @@ class Intersect {
         return new KdTree(treePoints, Vec.distSquared);
     }
 
+    //
+    // Given a segment end
+    //
+    // **params**
+    // + unstructured collection of segments
+    //
+    // **returns**
+    // + array of array of MeshIntersectionPoint
+    //
     public static function lookup_adj_segment( segEnd: MeshIntersectionPoint, tree : KdTree<MeshIntersectionPoint>, numSegments : Int ) {
 
         var numResults : Int = numSegments != null ? (numSegments < 3 ? 3 : numSegments) : 3;
@@ -658,7 +828,7 @@ class Intersect {
 
             var pt = inter.point;
             var u = Vec.lerp(inter.p, [ polyline.params[polid] ], [ polyline.params[polid+1] ] )[0];
-            var uv = Intersect.tri_uv_from_point( mesh, faceid,  pt );
+            var uv = Mesh.tri_uv_from_point( mesh, faceid,  pt );
 
             finalResults.push(new PolylineMeshIntersection( pt, u, uv, polid, faceid ));
 
@@ -667,14 +837,8 @@ class Intersect {
         return finalResults;
     }
 
-
-
-
-
     public static function mesh_bounding_boxes( a : MeshData, b : MeshData, tol : Float ) : Array<Pair<Int,Int>> {
-
         return Intersect.bounding_box_trees(new LazyMeshBoundingBoxTree(a), new LazyMeshBoundingBoxTree(b), tol );
-
     }
 
     //
@@ -886,47 +1050,21 @@ class Intersect {
 
         if (min.item1 == 0){
             res.min.uv0 = min.item0.uv;
-            res.min.uv1 = tri_uv_from_point( mesh2, faceIndex2, min.item0.point );
+            res.min.uv1 = Mesh.tri_uv_from_point( mesh2, faceIndex2, min.item0.point );
         } else {
-            res.min.uv0 = tri_uv_from_point( mesh1, faceIndex1, min.item0.point );
+            res.min.uv0 = Mesh.tri_uv_from_point( mesh1, faceIndex1, min.item0.point );
             res.min.uv1 = min.item0.uv;
         }
 
         if (max.item1 == 0){
             res.max.uv0 = max.item0.uv;
-            res.max.uv1 = tri_uv_from_point( mesh2, faceIndex2, max.item0.point );
+            res.max.uv1 = Mesh.tri_uv_from_point( mesh2, faceIndex2, max.item0.point );
         } else {
-            res.max.uv0 = tri_uv_from_point( mesh1, faceIndex1, max.item0.point );
+            res.max.uv0 = Mesh.tri_uv_from_point( mesh1, faceIndex1, max.item0.point );
             res.max.uv1 = max.item0.uv;
         }
 
         return res;
-    }
-
-    public static function tri_uv_from_point( mesh : MeshData, faceIndex : Int, f : Point ) : UV {
-
-        var tri = mesh.faces[faceIndex];
-
-        var p1 = mesh.points[ tri[0] ];
-        var p2 = mesh.points[ tri[1] ];
-        var p3 = mesh.points[ tri[2] ];
-
-        var uv1 = mesh.uvs[ tri[0] ];
-        var uv2 = mesh.uvs[ tri[1] ];
-        var uv3 = mesh.uvs[ tri[2] ];
-
-        var f1 = Vec.sub(p1, f);
-        var f2 = Vec.sub(p2, f);
-        var f3 = Vec.sub(p3, f);
-
-        // calculate the areas and factors (order of parameters doesn't matter):
-        var a = Vec.norm( Vec.cross( Vec.sub(p1, p2), Vec.sub(p1, p3) ) ); // main triangle area a
-        var a1 = Vec.norm( Vec.cross(f2, f3) ) / a; // p1's triangle area / a
-        var a2 = Vec.norm( Vec.cross(f3, f1) ) / a; // p2's triangle area / a
-        var a3 = Vec.norm( Vec.cross(f1, f2) ) / a; // p3's triangle area / a
-
-        // find the uv corresponding to point f (uv1/uv2/uv3 are associated to p1/p2/p3):
-        return Vec.add( Vec.mul( a1, uv1), Vec.add( Vec.mul( a2, uv2), Vec.mul( a3, uv3)));
     }
 
     //
