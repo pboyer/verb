@@ -42,7 +42,7 @@ class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<SurfaceData> {
         var dom = max - min;
         var pivot = (min + max) / 2.0 + dom * 0.01 * Math.random();
 
-        var srfs = Modify.surface_split(_surface, pivot, _splitV );
+        var srfs = Modify.surfaceSplit(_surface, pivot, _splitV );
 
         return new Pair<IBoundingBoxTree<SurfaceData>, IBoundingBoxTree<SurfaceData>>(
         new LazySurfaceBoundingBoxTree( srfs[0], !_splitV, _knotTolU, _knotTolV ),
@@ -53,7 +53,7 @@ class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<SurfaceData> {
         if (_boundingBox == null){
             _boundingBox = new BoundingBox();
             for (row in _surface.controlPoints){
-                _boundingBox.addRange( Eval.dehomogenize_1d(row) );
+                _boundingBox.addRange( Eval.dehomogenize1d(row) );
             }
         }
         return _boundingBox;

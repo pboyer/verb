@@ -22,7 +22,7 @@ class KnotMultiplicity {
 @:expose("core.Modify")
 class Modify {
 
-    public static function surface_knot_refine( surface : SurfaceData, knots_to_insert : Array<Float>, useV : Bool ) : SurfaceData {
+    public static function surfaceKnotRefine( surface : SurfaceData, knots_to_insert : Array<Float>, useV : Bool ) : SurfaceData {
 
         // TODO: make this faster by taking advantage of repeat computations in every row
         // 			 i.e. no reason to recompute the knot vectors on every row
@@ -47,7 +47,7 @@ class Modify {
         // do knot refinement on every row
         var c : CurveData = null;
         for (cptrow in ctrlPts){
-            c = curve_knot_refine( new CurveData(degree, knots, cptrow), knots_to_insert );
+            c = curveKnotRefine( new CurveData(degree, knots, cptrow), knots_to_insert );
             newPts.push( c.controlPoints );
         }
 
@@ -64,7 +64,7 @@ class Modify {
 
     }
 
-    public static function surface_split( surface : SurfaceData, u : Float, useV : Bool = false) : Array<SurfaceData> {
+    public static function surfaceSplit( surface : SurfaceData, u : Float, useV : Bool = false) : Array<SurfaceData> {
 
         var knots
         , degree
@@ -94,7 +94,7 @@ class Modify {
 
         for (cps in controlPoints){
 
-            res = curve_knot_refine( new CurveData(degree, knots, cps), knots_to_insert );
+            res = curveKnotRefine( new CurveData(degree, knots, cps), knots_to_insert );
 
             newpts0.push( res.controlPoints.slice( 0, s + 1 ) );
             newpts1.push( res.controlPoints.slice( s + 1 ) );
@@ -128,7 +128,7 @@ class Modify {
     // **returns**
     // + *Array* of CurveData objects, defined by degree, knots, and control points
     //
-    public static function curve_bezier_decompose( curve : CurveData ) : Array<CurveData> {
+    public static function decomposeCurveIntoBeziers( curve : CurveData ) : Array<CurveData> {
 
         var degree = curve.degree
         , controlPoints = curve.controlPoints
@@ -137,7 +137,7 @@ class Modify {
         // find all of the unique knot values and their multiplicity
         // for each, increase their multiplicity to degree + 1
 
-        var knotmults = knot_multiplicities( knots );
+        var knotmults = knotMultiplicities( knots );
         var reqMult = degree + 1;
 
         // insert the knots
@@ -145,7 +145,7 @@ class Modify {
             if ( knotmult.mult < reqMult ){
 
                 var knotsInsert = Vec.rep( reqMult - knotmult.mult, knotmult.knot );
-                var res = curve_knot_refine( new CurveData(degree, knots, controlPoints), knotsInsert );
+                var res = curveKnotRefine( new CurveData(degree, knots, controlPoints), knotsInsert );
 
                 knots = res.knots;
                 controlPoints = res.controlPoints;
@@ -180,7 +180,7 @@ class Modify {
     // **returns**
     // + *Array* of length 2 arrays, [knotValue, knotMultiplicity]
     //
-    public static function knot_multiplicities( knots : KnotArray) : Array<KnotMultiplicity> {
+    public static function knotMultiplicities( knots : KnotArray) : Array<KnotMultiplicity> {
 
         var mults = [  new KnotMultiplicity( knots[0], 0 ) ];
         var curr : KnotMultiplicity = mults[0];
@@ -206,14 +206,14 @@ class Modify {
     // **returns**
     // + *Array* two new curves, defined by degree, knots, and control points
     //
-    public static function curve_split( curve : CurveData, u : Float ) : Array<CurveData> {
+    public static function curveSplit( curve : CurveData, u : Float ) : Array<CurveData> {
 
         var degree = curve.degree
         , controlPoints = curve.controlPoints
         , knots = curve.knots;
 
         var knots_to_insert = [for (i in 0...degree+1) u];
-        var res = curve_knot_refine( curve, knots_to_insert );
+        var res = curveKnotRefine( curve, knots_to_insert );
 
         var s = Eval.knotSpan( degree, u, knots );
 
@@ -242,7 +242,7 @@ class Modify {
     // +  CurveData object representing the curve
     //
 
-    public static function curve_knot_refine( curve : CurveData, knots_to_insert : Array<Float> ) : CurveData {
+    public static function curveKnotRefine( curve : CurveData, knots_to_insert : Array<Float> ) : CurveData {
 
         var degree = curve.degree
         , controlPoints = curve.controlPoints
@@ -323,7 +323,7 @@ class Modify {
     //
     // Corresponds to algorithm A5.1 (Piegl & Tiller)
     //
-    // Use the curve_knot_refine for applications like curve splitting.
+    // Use the curveKnotRefine for applications like curve splitting.
     //
     // **params**
     // + integer degree
@@ -336,7 +336,7 @@ class Modify {
     // + *Object* the new curve, defined by knots and controlPoints
     //
 
-    public static function curve_knot_insert( curve : CurveData, u : Float, r : Int ) : CurveData {
+    public static function curveKnotInsert( curve : CurveData, u : Float, r : Int ) : CurveData {
 
         var degree = curve.degree
         , controlPoints = curve.controlPoints

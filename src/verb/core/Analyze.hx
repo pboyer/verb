@@ -83,7 +83,7 @@ class Analyze {
         , cuv;
 
         // approximate closest point with tessellation
-        var tess = Tess.rational_surface_adaptive( surface, new AdaptiveRefinementOptions() );
+        var tess = Tess.rationalSurfaceAdaptive( surface, new AdaptiveRefinementOptions() );
 
         var dmin = Math.POSITIVE_INFINITY;
 
@@ -98,7 +98,7 @@ class Analyze {
         }
 
         function f(uv : UV) : Array<Array<Point>> {
-            return Eval.rational_surface_derivs( surface, 2, uv[0], uv[1] );
+            return Eval.rationalSurfaceDerivatives( surface, 2, uv[0], uv[1] );
         }
 
         function n(uv : UV, e : Array<Array<Point>>, r : Array<Float>) : UV {
@@ -248,7 +248,7 @@ class Analyze {
         var min = Math.POSITIVE_INFINITY;
         var u = 0.0;
 
-        var pts = Tess.rational_curve_adaptive_sample( curve, tol, true );
+        var pts = Tess.rationalCurveAdaptiveSample( curve, tol, true );
 
         for ( i in 0...pts.length-1){
 
@@ -279,7 +279,7 @@ class Analyze {
         , cu = u;
 
         function f(u : Float) : Array<Point> {
-            return Eval.rational_curve_derivs( curve, u, 2 );
+            return Eval.rationalCurveDerivatives( curve, u, 2 );
         }
 
         function n(u : Float, e: Array<Point>, d : Array<Float>) : Float {
@@ -351,7 +351,7 @@ class Analyze {
 
         if (len < Constants.EPSILON) return curve.knots[0];
 
-        var crvs = if (beziers != null) beziers else Modify.curve_bezier_decompose( curve )
+        var crvs = if (beziers != null) beziers else Modify.decomposeCurveIntoBeziers( curve )
         , i = 0
         , cc = crvs[i]
         , cl = -Constants.EPSILON
@@ -436,7 +436,7 @@ class Analyze {
     public static function rationalCurveArcLength(curve : CurveData, u : Float = null, gaussDegIncrease : Int = 16){
         u = (u == null) ? curve.knots.last() : u;
 
-        var crvs = Modify.curve_bezier_decompose( curve )
+        var crvs = Modify.decomposeCurveIntoBeziers( curve )
         , i = 0
         , cc = crvs[0]
         , sum = 0.0;
@@ -473,7 +473,7 @@ class Analyze {
         for (i in 0...gaussDeg){
 
             cu = z * Tvalues[gaussDeg][i] + z + curve.knots[0];
-            tan = Eval.rational_curve_derivs( curve, cu, 1 );
+            tan = Eval.rationalCurveDerivatives( curve, cu, 1 );
 
             sum += Cvalues[gaussDeg][i] * Vec.norm( tan[1] );
 

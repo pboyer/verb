@@ -24,8 +24,8 @@ class Tess {
 	// + an array of points, prepended by the point param if required
 	//
 
-	public static function rational_curve_regular_sample( curve : CurveData, numSamples : Int, includeU : Bool ) : Array<Point> {
-		return rational_curve_regular_sample_range( curve, curve.knots[0], curve.knots.last(), numSamples, includeU);
+	public static function rationalCurveRegularSample( curve : CurveData, numSamples : Int, includeU : Bool ) : Array<Point> {
+		return rationalCurveRegularSampleRange( curve, curve.knots[0], curve.knots.last(), numSamples, includeU);
 	}
 
 	//
@@ -42,7 +42,7 @@ class Tess {
 	// + an dictionary of parameter - point pairs
 	//
 
-	public static function rational_curve_regular_sample_range( curve : CurveData, start : Float, end : Float,
+	public static function rationalCurveRegularSampleRange( curve : CurveData, start : Float, end : Float,
 																numSamples : Int, includeU  : Bool) : Array<Point>  {
 
 		if (numSamples < 1){
@@ -58,9 +58,9 @@ class Tess {
 			u = start + span * i;
 
 			if ( includeU ){
-				p.push( [u].concat( Eval.rational_curve_point(curve, u) ) );
+				p.push( [u].concat( Eval.rationalCurvePoint(curve, u) ) );
 			} else {
-				p.push( Eval.rational_curve_point(curve, u) );
+				p.push( Eval.rationalCurvePoint(curve, u) );
 			}
 
 		}
@@ -81,7 +81,7 @@ class Tess {
 	// + an array of dim + 1 length where the first element is the param where it was sampled and the remaining the pt
 	//
 
-	public static function rational_curve_adaptive_sample( curve : CurveData, tol : Float, includeU : Bool ) : Array<Point> {
+	public static function rationalCurveAdaptiveSample( curve : CurveData, tol : Float, includeU : Bool ) : Array<Point> {
 
 		// if degree is 1, just return the dehomogenized control points
 		if (curve.degree == 1){
@@ -94,7 +94,7 @@ class Tess {
 			}
 		}
 
-		return rational_curve_adaptive_sample_range( curve, curve.knots[0], curve.knots.last(), tol, includeU );
+		return rationalCurveAdaptiveSample_range( curve, curve.knots[0], curve.knots.last(), tol, includeU );
 	}
 
 	//
@@ -110,28 +110,28 @@ class Tess {
 	// + an array of dim + 1 length where the first element is the param where it was sampled and the remaining the pt
 	//
 
-	public static function rational_curve_adaptive_sample_range( curve : CurveData, start, end, tol, includeU ) : Array<Point>{
+	public static function rationalCurveAdaptiveSample_range( curve : CurveData, start, end, tol, includeU ) : Array<Point>{
 
 		// sample curve at three pts
-		var p1 = Eval.rational_curve_point(curve, start),
-			p3 = Eval.rational_curve_point(curve, end),
+		var p1 = Eval.rationalCurvePoint(curve, start),
+			p3 = Eval.rationalCurvePoint(curve, end),
 			t = 0.5 + 0.2 * Math.random(),
 			mid = start + (end - start) * t,
-			p2 = Eval.rational_curve_point(curve, mid);
+			p2 = Eval.rationalCurvePoint(curve, mid);
 
 		// if the two end control points are coincident, the three point test will always return 0, let's split the curve
 		var diff = Vec.sub( p1, p3);
 		var diff2 = Vec.sub( p1, p2);
 
 		// the first condition checks if the curve makes up a loop, if so, we will need to continue evaluation
-		if ( ( Vec.dot( diff, diff ) < tol && Vec.dot( diff2, diff2 ) > tol ) || !Trig.three_points_are_flat( p1, p2, p3, tol ) ) {
+		if ( ( Vec.dot( diff, diff ) < tol && Vec.dot( diff2, diff2 ) > tol ) || !Trig.threePointsAreFlat( p1, p2, p3, tol ) ) {
 
 			// get the exact middle
 			var exact_mid = start + (end - start) * 0.5;
 
 			// recurse on the two halves
-			var left_pts = rational_curve_adaptive_sample_range( curve, start, exact_mid, tol, includeU )
-			, right_pts = rational_curve_adaptive_sample_range( curve, exact_mid, end, tol, includeU );
+			var left_pts = rationalCurveAdaptiveSample_range( curve, start, exact_mid, tol, includeU )
+			, right_pts = rationalCurveAdaptiveSample_range( curve, exact_mid, end, tol, includeU );
 
 			// concatenate the two
 			return left_pts.slice(0, -1).concat(right_pts);
@@ -186,7 +186,7 @@ class Tess {
 
 				uvs.push( [pt_u, pt_v] );
 
-				var derivs = Eval.rational_surface_derivs( surface, 1, pt_u, pt_v );
+				var derivs = Eval.rationalSurfaceDerivatives( surface, 1, pt_u, pt_v );
 				var pt = derivs[0][0];
 
 				points.push( pt );
@@ -227,7 +227,7 @@ class Tess {
 	// + MeshData object
 	//
 
-	public static function divide_rational_surface_adaptive( surface : SurfaceData, options : AdaptiveRefinementOptions = null ): Array<AdaptiveRefinementNode> {
+	public static function divide_rationalSurfaceAdaptive( surface : SurfaceData, options : AdaptiveRefinementOptions = null ): Array<AdaptiveRefinementNode> {
 
 		if (options == null) options = new AdaptiveRefinementOptions();
 
@@ -262,7 +262,7 @@ class Tess {
 				, v = vmin + dv * i;
 
 				// todo: make this faster by specifying n,m
-				var ds = Eval.rational_surface_derivs( surface, 1, u, v );
+				var ds = Eval.rationalSurfaceDerivatives( surface, 1, u, v );
 
 				var norm = Vec.normalized( Vec.cross(  ds[0][1], ds[1][0] ) );
 				ptrow.push( new SurfacePoint( ds[0][0], norm, [u,v], -1, Vec.isZero( norm ) ) );
@@ -331,12 +331,12 @@ class Tess {
 
 	}
 
-	public static function rational_surface_adaptive( surface : SurfaceData, options : AdaptiveRefinementOptions = null ) : MeshData {
+	public static function rationalSurfaceAdaptive( surface : SurfaceData, options : AdaptiveRefinementOptions = null ) : MeshData {
 
 		options = options != null ? options : new AdaptiveRefinementOptions();
 
 		// adaptive divide
-		var arrTrees = divide_rational_surface_adaptive( surface, options );
+		var arrTrees = divide_rationalSurfaceAdaptive( surface, options );
 
 		// triangulation
 		return triangulate_adaptive_refinement_node_tree( arrTrees );

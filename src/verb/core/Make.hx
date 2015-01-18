@@ -63,18 +63,18 @@ class Make {
     public static function sweep1_surface( profile : CurveData, rail : CurveData ) : SurfaceData {
 
         // for each point on rail, move all of the points
-        var rail_start = Eval.rational_curve_point( rail, 0.0 )
+        var rail_start = Eval.rationalCurvePoint( rail, 0.0 )
             , span = 1.0 / rail.controlPoints.length
             , controlPoints = []
             , weights = []
             , rail_weights = Eval.weight_1d( rail.controlPoints )
             , profile_weights = Eval.weight_1d( profile.controlPoints )
-            , profile_points = Eval.dehomogenize_1d( profile.controlPoints );
+            , profile_points = Eval.dehomogenize1d( profile.controlPoints );
 
         for ( i in 0...rail.controlPoints.length ){
 
             // evaluate the point on the curve, subtracting it from the first point
-            var rail_point = Eval.rational_curve_point( rail, i * span )
+            var rail_point = Eval.rationalCurvePoint( rail, i * span )
                 , rail_offset = Vec.sub( rail_point, rail_start )
                 , row_controlPoints = []
                 , row_weights = [];
@@ -90,7 +90,7 @@ class Make {
             weights.push( row_weights );
         }
 
-        return new SurfaceData( rail.degree, profile.degree, rail.knots, profile.knots, Eval.homogenize_2d( controlPoints, weights) );
+        return new SurfaceData( rail.degree, profile.degree, rail.knots, profile.knots, Eval.homogenize2d( controlPoints, weights) );
     }
 
     //
@@ -109,7 +109,7 @@ class Make {
     // + a CurveData object representing a NURBS curve
     //
 
-    public static function ellipse_arc( center : Point, xaxis : Point, yaxis : Point, xradius : Float,
+    public static function ellipseArc( center : Point, xaxis : Point, yaxis : Point, xradius : Float,
                                         yradius : Float, startAngle : Float, endAngle : Float ) : CurveData {
 
 
@@ -190,7 +190,7 @@ class Make {
                 knots[7] = knots[8] = 0.75;
         }
 
-        return new CurveData( 2, knots, Eval.homogenize_1d( controlPoints, weights ));
+        return new CurveData( 2, knots, Eval.homogenize1d( controlPoints, weights ));
     }
 
 
@@ -211,7 +211,7 @@ class Make {
     //
 
     public static function arc( center, xaxis, yaxis, radius, start_angle, end_angle ) {
-        return ellipse_arc( center, xaxis, yaxis, radius, radius, start_angle, end_angle );
+        return ellipseArc( center, xaxis, yaxis, radius, radius, start_angle, end_angle );
     }
 
 
@@ -225,7 +225,7 @@ class Make {
     // + a CurveData object representing a NURBS curve
     //
 
-    public static function polyline_curve( pts : Array<Point>) : CurveData {
+    public static function polylineCurve( pts : Array<Point>) : CurveData {
 
         var knots = [0.0,0.0];
         var lsum = 0.0;
@@ -241,7 +241,7 @@ class Make {
 
         var weights = [ for (i in 0...pts.length) 1.0 ];
 
-        return new CurveData( 1, knots, Eval.homogenize_1d(pts.slice(0), weights ));
+        return new CurveData( 1, knots, Eval.homogenize1d(pts.slice(0), weights ));
 
     }
 
@@ -257,12 +257,12 @@ class Make {
     // + an object with the following properties: controlPoints, weights, knots, degree
     //
 
-    public static function extruded_surface( axis : Point, length : Float, profile : CurveData ) : SurfaceData {
+    public static function extrudedSurface( axis : Point, length : Float, profile : CurveData ) : SurfaceData {
 
         var controlPoints = [[],[],[]]
         , weights = [[],[],[]];
 
-        var prof_controlPoints = Eval.dehomogenize_1d( profile.controlPoints );
+        var prof_controlPoints = Eval.dehomogenize1d( profile.controlPoints );
         var prof_weights = Eval.weight_1d( profile.controlPoints );
 
         var translation = Vec.mul( length, axis );
@@ -280,7 +280,7 @@ class Make {
             weights[2][j] = prof_weights[j];
         }
 
-        return new SurfaceData( 2, profile.degree, [0,0,0,1,1,1], profile.knots, Eval.homogenize_2d( controlPoints, weights) );
+        return new SurfaceData( 2, profile.degree, [0,0,0,1,1,1], profile.knots, Eval.homogenize2d( controlPoints, weights) );
     }
 
     //
@@ -297,13 +297,13 @@ class Make {
     // + an object with the following properties: controlPoints, weights, knotsU, knotsV, degreeU, degreeV
     //
 
-    public static function cylinder_surface( axis : Point, xaxis : Point, base : Point, height : Float, radius : Float ) : SurfaceData {
+    public static function cylinderSurface( axis : Point, xaxis : Point, base : Point, height : Float, radius : Float ) : SurfaceData {
 
         var yaxis = Vec.cross( axis, xaxis )
         , angle = 2.0 * Math.PI
         , circ = Make.arc( base, xaxis, yaxis, radius, 0.0, 2 * Math.PI );
 
-        return Make.extruded_surface( axis, height, circ );
+        return Make.extrudedSurface( axis, height, circ );
 
     }
 
@@ -324,9 +324,9 @@ class Make {
     // + an object with the following properties: controlPoints, weights, knots, degree
     //
 
-    public static function revolved_surface( center : Point, axis : Point, theta : Float, profile : CurveData ) : SurfaceData {
+    public static function revolvedSurface( center : Point, axis : Point, theta : Float, profile : CurveData ) : SurfaceData {
 
-        var prof_controlPoints = Eval.dehomogenize_1d( profile.controlPoints )
+        var prof_controlPoints = Eval.dehomogenize1d( profile.controlPoints )
             , prof_weights = Eval.weight_1d( profile.controlPoints );
 
         var narcs, knotsU, controlPoints, weights;
@@ -384,7 +384,7 @@ class Make {
         for (j in 0...prof_controlPoints.length){
 
             // get the closest point of the generatrix point on the axis
-            var O = Trig.closest_point_on_ray(prof_controlPoints[j], center, axis)
+            var O = Trig.rayClosestPoint(prof_controlPoints[j], center, axis)
             // X is the vector from the axis to generatrix control pt
             , X = Vec.sub( prof_controlPoints[j], O )
             // radius at that height
@@ -442,7 +442,7 @@ class Make {
             }
         }
 
-        return new SurfaceData( 2, profile.degree, knotsU, profile.knots, Eval.homogenize_2d( controlPoints, weights ) );
+        return new SurfaceData( 2, profile.degree, knotsU, profile.knots, Eval.homogenize2d( controlPoints, weights ) );
 
     }
 
@@ -459,10 +459,10 @@ class Make {
     // + an object with the following properties: controlPoints, weights, knotsU, knotsV, degreeU, degreeV
     //
 
-    public static function sphere_surface( center : Point, axis : Point, xaxis : Point, radius : Float ){
+    public static function sphereSurface( center : Point, axis : Point, xaxis : Point, radius : Float ){
 
         var arc = arc(center, Vec.mul( -1.0, axis ), xaxis, radius, 0.0, Math.PI );
-        return revolved_surface( center, axis, 2 * Math.PI, arc );
+        return revolvedSurface( center, axis, 2 * Math.PI, arc );
 
     }
 
@@ -479,16 +479,16 @@ class Make {
     // + an object with the following properties: controlPoints, weights, knots, degree
     //
 
-    public static function cone_surface( axis : Point, xaxis : Point, base : Point, height : Float, radius : Float ) : SurfaceData {
+    public static function coneSurface( axis : Point, xaxis : Point, base : Point, height : Float, radius : Float ) : SurfaceData {
 
         var angle = 2 * Math.PI
         , prof_degree = 1
         , prof_ctrl_pts = [ Vec.add( base, Vec.mul( height, axis ) ), Vec.add( base, Vec.mul( radius, xaxis ) )]
         , prof_knots = [0.0,0.0,1.0,1.0]
         , prof_weights = [1.0,1.0]
-        , prof = new CurveData( prof_degree, prof_knots, Eval.homogenize_1d( prof_ctrl_pts, prof_weights ) );
+        , prof = new CurveData( prof_degree, prof_knots, Eval.homogenize1d( prof_ctrl_pts, prof_weights ) );
 
-        return revolved_surface(base, axis, angle, prof);
+        return revolvedSurface(base, axis, angle, prof);
 
     }
 
@@ -549,7 +549,7 @@ class Make {
 
         for (u in us){
             var span = Eval.knotSpanGivenN( n, degree, u, knots );
-            var basisFuncs = Eval.basis_functions_given_knotSpan_index( span, u, degree, knots );
+            var basisFuncs = Eval.basisFunctionsGivenKnotSpanIndex( span, u, degree, knots );
 
             var ls = span - degree;
 
@@ -599,7 +599,7 @@ class Make {
         var controlPts = Mat.transpose(xs);
         var weights = Vec.rep(controlPts.length, 1.0);
 
-        return new CurveData( degree, knots, Eval.homogenize_1d(controlPts, weights) );
+        return new CurveData( degree, knots, Eval.homogenize1d(controlPts, weights) );
 
     }
 }

@@ -4,7 +4,7 @@ import verb.core.types.CurveData.Point;
 @:expose("core.Trig")
 class Trig {
 
-    public static function dist_to_seg(a : Point, b : Point, c : Point){
+    public static function distToSegment(a : Point, b : Point, c : Point){
 
         // check if ac is zero length
         var acv = Vec.sub( c, a );
@@ -43,7 +43,7 @@ class Trig {
     // + pt
     //
 
-    public static function closest_point_on_ray( pt, o, r ) {
+    public static function rayClosestPoint( pt, o, r ) {
 
         var o2pt = Vec.sub(pt,o)
         , do2ptr = Vec.dot(o2pt, r)
@@ -67,9 +67,9 @@ class Trig {
     // + the distance
     //
 
-    public static function dist_to_ray( pt, o, r ) {
+    public static function distToRay( pt, o, r ) {
 
-        var d = closest_point_on_ray( pt, o, r );
+        var d = rayClosestPoint( pt, o, r );
         var dif = Vec.sub( d, pt );
 
         return Vec.norm( dif );
@@ -97,7 +97,7 @@ class Trig {
     // **returns**
     // + Whether the triangle passes the test
     //
-    public static function three_points_are_flat( p1, p2, p3, tol ) {
+    public static function threePointsAreFlat( p1, p2, p3, tol ) {
 
         // find the area of the triangle without using a square root
         var p2mp1 = Vec.sub( p2, p1 )

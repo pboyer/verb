@@ -18,7 +18,7 @@ class Divide {
 
     public static function rationalCurveByArcLength(curve : CurveData, l : Float) : Array<CurveLengthSample> {
 
-        var crvs = Modify.curve_bezier_decompose( curve )
+        var crvs = Modify.decomposeCurveIntoBeziers( curve )
         , crvlens = crvs.map(function(x){ return Analyze.rationalBezierCurveArcLength(x); })
         , totlen = Vec.sum(crvlens)
         , pts = [ new CurveLengthSample( curve.knots[0], 0.0 ) ];

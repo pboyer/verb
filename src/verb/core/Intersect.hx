@@ -42,8 +42,8 @@ class Intersect {
     public static function surfaces( surface0 : SurfaceData, surface1 : SurfaceData, tol : Float) : Array<CurveData> {
 
         // 1) tessellate the two surfaces
-        var tess1 = Tess.rational_surface_adaptive( surface0 );
-        var tess2 = Tess.rational_surface_adaptive( surface1 );
+        var tess1 = Tess.rationalSurfaceAdaptive( surface0 );
+        var tess2 = Tess.rationalSurfaceAdaptive( surface1 );
 
         var resApprox = Intersect.meshes( tess1, tess2 );
 
@@ -85,14 +85,14 @@ class Intersect {
 
         do {
             // 1) eval normals, pts on respective surfaces (p, q, pn, qn)
-            pds = Eval.rational_surface_derivs( surface0, 1, uv1[0], uv1[1] );
+            pds = Eval.rationalSurfaceDerivatives( surface0, 1, uv1[0], uv1[1] );
             p = pds[0][0];
             pu = pds[1][0];
             pv = pds[0][1];
             pn = Vec.normalized( Vec.cross( pu, pv ) );
             pd = Vec.dot( pn, p );
 
-            qds = Eval.rational_surface_derivs( surface0, 1, uv2[0], uv2[1] );
+            qds = Eval.rationalSurfaceDerivatives( surface0, 1, uv2[0], uv2[1] );
             q = qds[0][0];
             qu = qds[1][0];
             qv = qds[0][1];
@@ -405,8 +405,8 @@ class Intersect {
                                                                tol : Float = 1e-3 ) : CurveSurfaceIntersection {
 
         var objective = function(x) {
-            var p1 = Eval.rational_curve_point( curve, x[0])
-            , p2 = Eval.rational_surface_point( surface, x[1], x[2] )
+            var p1 = Eval.rationalCurvePoint( curve, x[0])
+            , p2 = Eval.rationalSurfacePoint( surface, x[1], x[2] )
             , p1_p2 = Vec.sub(p1, p2);
 
             return Vec.dot(p1_p2, p1_p2);
@@ -537,8 +537,8 @@ class Intersect {
                                                   tolerance : Float ) : CurveCurveIntersection
     {
         var objective = function( x : Vector ) : Float {
-            var p1 = Eval.rational_curve_point(curve0, x[0])
-            , p2 = Eval.rational_curve_point(curve1, x[1])
+            var p1 = Eval.rationalCurvePoint(curve0, x[0])
+            , p2 = Eval.rationalCurvePoint(curve1, x[1])
             , p1_p2 = Vec.sub(p1, p2);
 
             return Vec.dot(p1_p2, p1_p2);
@@ -549,8 +549,8 @@ class Intersect {
         var u1 = sol_obj.solution[0]
             , u2 = sol_obj.solution[1];
 
-        var p1 = Eval.rational_curve_point(curve0, u1)
-        , p2 = Eval.rational_curve_point(curve1, u2 );
+        var p1 = Eval.rationalCurvePoint(curve0, u1)
+        , p2 = Eval.rationalCurvePoint(curve1, u2 );
 
         return new CurveCurveIntersection(p1, p2, u1, u2);
     }
