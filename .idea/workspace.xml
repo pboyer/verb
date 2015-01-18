@@ -2,18 +2,8 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="938890c0-f1ce-4fbd-8322-63610af7f5e6" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/types/AdaptiveRefinementNode.hx" afterPath="$PROJECT_DIR$/src/verb/core/types/AdaptiveRefinementNode.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/Analyze.hx" afterPath="$PROJECT_DIR$/src/verb/core/Analyze.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/Divide.hx" afterPath="$PROJECT_DIR$/src/verb/core/Divide.hx" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/Eval.hx" afterPath="$PROJECT_DIR$/src/verb/core/Eval.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/Intersect.hx" afterPath="$PROJECT_DIR$/src/verb/core/Intersect.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/types/LazyCurveBoundingBoxTree.hx" afterPath="$PROJECT_DIR$/src/verb/core/types/LazyCurveBoundingBoxTree.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/types/LazySurfaceBoundingBoxTree.hx" afterPath="$PROJECT_DIR$/src/verb/core/types/LazySurfaceBoundingBoxTree.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/Make.hx" afterPath="$PROJECT_DIR$/src/verb/core/Make.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/Modify.hx" afterPath="$PROJECT_DIR$/src/verb/core/Modify.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/Tess.hx" afterPath="$PROJECT_DIR$/src/verb/core/Tess.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/Trig.hx" afterPath="$PROJECT_DIR$/src/verb/core/Trig.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/test.js" afterPath="$PROJECT_DIR$/test/test.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/eval/eval2.js" afterPath="$PROJECT_DIR$/src/eval/eval2.js" />
     </list>
     <ignored path="verb.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -38,159 +28,6 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="Intersect.hx" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/verb/core/Intersect.hx">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="6507" max-vertical-offset="15285">
-              <caret line="455" column="9" selection-start-line="455" selection-start-column="9" selection-end-line="455" selection-end-column="9" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="test.js" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/test/test.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.32860824" vertical-offset="2925" max-vertical-offset="34770">
-              <caret line="4051" column="2" selection-start-line="4051" selection-start-column="2" selection-end-line="4051" selection-end-column="2" />
-              <folding>
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-                <element signature="e#0#165814#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Trig.hx" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/verb/core/Trig.hx">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="777" max-vertical-offset="2340">
-              <caret line="69" column="27" selection-start-line="69" selection-start-column="27" selection-end-line="69" selection-end-column="27" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Make.hx" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/verb/core/Make.hx">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="4977" max-vertical-offset="7470">
-              <caret line="461" column="27" selection-start-line="461" selection-start-column="27" selection-end-line="461" selection-end-column="27" />
-              <folding>
-                <element signature="e#1712#2993#0" expanded="false" />
-                <element signature="e#3706#6195#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Tess.hx" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/verb/core/Tess.hx">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1077" max-vertical-offset="2760">
-              <caret line="130" column="0" selection-start-line="130" selection-start-column="0" selection-end-line="130" selection-end-column="0" />
-              <folding>
-                <element signature="e#1320#1686#0" expanded="false" />
-                <element signature="e#2203#2699#0" expanded="false" />
-                <element signature="e#4738#5905#0" expanded="false" />
-                <element signature="e#6297#8316#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="Modify.hx" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/verb/core/Modify.hx">
           <provider selected="true" editor-type-id="text-editor">
@@ -199,6 +36,48 @@
               <folding>
                 <element signature="e#5542#5919#0" expanded="false" />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Interval.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/core/types/Interval.hx">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="255">
+              <caret line="11" column="1" selection-start-line="11" selection-start-column="1" selection-end-line="11" selection-end-column="1" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Pair.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/core/types/Pair.hx">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="270">
+              <caret line="6" column="0" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="KdTree.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/core/KdTree.hx">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="675" max-vertical-offset="7155">
+              <caret line="27" column="0" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
+              <folding>
+                <element signature="e#1630#2416#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="BoundingBoxNode.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/core/types/BoundingBoxNode.hx">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="540">
+              <caret line="18" column="5" selection-start-line="18" selection-start-column="5" selection-end-line="18" selection-end-column="5" />
+              <folding />
             </state>
           </provider>
         </entry>
@@ -216,31 +95,43 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="verb.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/verb.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="839" max-vertical-offset="4350">
-              <caret line="60" column="2" selection-start-line="60" selection-start-column="2" selection-end-line="60" selection-end-column="2" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/.gitignore">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-0.0" vertical-offset="0" max-vertical-offset="255">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Eval.hx" pinned="false" current-in-tab="false">
+      <file leaf-file-name="Eval.hx" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/verb/core/Eval.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="2382" max-vertical-offset="14595">
-              <caret line="176" column="27" selection-start-line="176" selection-start-column="27" selection-end-line="176" selection-end-column="27" />
+            <state vertical-scroll-proportion="0.09149484" vertical-offset="14449" max-vertical-offset="15930">
+              <caret line="968" column="2" selection-start-line="968" selection-start-column="2" selection-end-line="968" selection-end-column="2" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ArrayExtensions.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/core/ArrayExtensions.hx">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1590">
+              <caret line="10" column="18" selection-start-line="10" selection-start-column="18" selection-end-line="10" selection-end-column="18" />
+              <folding>
+                <element signature="e#2321#2802#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="tessellate.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/eval/tessellate.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="13020">
+              <caret line="22" column="1" selection-start-line="22" selection-start-column="1" selection-end-line="22" selection-end-column="1" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="eval2.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/eval/eval2.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="120">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -274,7 +165,6 @@
         <option value="$PROJECT_DIR$/example/threeMeshIntersectExample.html" />
         <option value="$PROJECT_DIR$/src/eval/intersect2.js" />
         <option value="$PROJECT_DIR$/src/eval/tessellate2.js" />
-        <option value="$PROJECT_DIR$/src/eval/eval2.js" />
         <option value="$PROJECT_DIR$/src/verb/core/types/SurfaceData.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/types/VolumeData.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/types/Ray.hx" />
@@ -298,13 +188,14 @@
         <option value="$PROJECT_DIR$/build/verb.min.js" />
         <option value="$PROJECT_DIR$/src/verb/core/Mesh.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Intersect.hx" />
-        <option value="$PROJECT_DIR$/src/verb/core/Eval.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Modify.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Tess.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Analyze.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Trig.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Make.hx" />
         <option value="$PROJECT_DIR$/test/test.js" />
+        <option value="$PROJECT_DIR$/src/eval/eval2.js" />
+        <option value="$PROJECT_DIR$/src/verb/core/Eval.hx" />
       </list>
     </option>
   </component>
@@ -721,37 +612,11 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/verb/Init.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="405">
-          <caret line="21" column="1" selection-start-line="21" selection-start-column="1" selection-end-line="21" selection-end-column="1" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/core/types/SurfacePoint.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="435">
-          <caret line="8" column="30" selection-start-line="8" selection-start-column="30" selection-end-line="8" selection-end-column="30" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file:///usr/lib/haxe/std/Array.hx">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.8051948" vertical-offset="3749" max-vertical-offset="4365">
           <caret line="283" column="13" selection-start-line="283" selection-start-column="13" selection-end-line="283" selection-end-column="13" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/core/ArrayExtensions.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="450" max-vertical-offset="1590">
-          <caret line="45" column="28" selection-start-line="45" selection-start-column="28" selection-end-line="45" selection-end-column="28" />
-          <folding>
-            <element signature="e#2321#2802#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -801,16 +666,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/core/KdTree.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="7155">
-          <caret line="16" column="0" selection-start-line="16" selection-start-column="0" selection-end-line="16" selection-end-column="0" />
-          <folding>
-            <element signature="e#1630#2416#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/eval/eval-webgl.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="3015">
@@ -824,16 +679,6 @@
         <state vertical-scroll-proportion="0.0" vertical-offset="21560" max-vertical-offset="26250">
           <caret line="1463" column="30" selection-start-line="1463" selection-start-column="30" selection-end-line="1463" selection-end-column="30" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/eval/eval2.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="405">
-          <caret line="90" column="0" selection-start-line="90" selection-start-column="0" selection-end-line="90" selection-end-column="0" />
-          <folding>
-            <element signature="e#0#2395#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -869,26 +714,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/core/types/Interval.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="255">
-          <caret line="11" column="1" selection-start-line="11" selection-start-column="1" selection-end-line="11" selection-end-column="1" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/verb/core/types/MeshData.hx">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="480">
           <caret line="18" column="31" selection-start-line="18" selection-start-column="31" selection-end-line="18" selection-end-column="31" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/core/types/Pair.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="270">
-          <caret line="6" column="0" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -1072,24 +901,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/core/Eval.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="2382" max-vertical-offset="14595">
-          <caret line="176" column="27" selection-start-line="176" selection-start-column="27" selection-end-line="176" selection-end-column="27" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/core/Modify.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="732" max-vertical-offset="6255">
-          <caret line="64" column="5" selection-start-line="64" selection-start-column="5" selection-end-line="64" selection-end-column="5" />
-          <folding>
-            <element signature="e#5542#5919#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/verb.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="839" max-vertical-offset="4350">
@@ -1119,17 +930,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/core/Analyze.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1017" max-vertical-offset="7440">
-          <caret line="83" column="0" selection-start-line="83" selection-start-column="0" selection-end-line="83" selection-end-column="0" />
-          <folding>
-            <element signature="e#11931#12903#0" expanded="false" />
-            <element signature="e#14409#14871#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/verb/core/Trig.hx">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="777" max-vertical-offset="2340">
@@ -1151,8 +951,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/test/test.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.32860824" vertical-offset="2925" max-vertical-offset="34770">
-          <caret line="4051" column="2" selection-start-line="4051" selection-start-column="2" selection-end-line="4051" selection-end-column="2" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="34770">
+          <caret line="16" column="17" selection-start-line="16" selection-start-column="17" selection-end-line="16" selection-end-column="17" />
           <folding>
             <element signature="e#0#165814#0" expanded="false" />
             <element signature="e#0#165814#0" expanded="false" />
@@ -1249,6 +1049,95 @@
             <element signature="e#0#165814#0" expanded="false" />
             <element signature="e#0#165814#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/core/Modify.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="732" max-vertical-offset="6255">
+          <caret line="64" column="5" selection-start-line="64" selection-start-column="5" selection-end-line="64" selection-end-column="5" />
+          <folding>
+            <element signature="e#5542#5919#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/core/types/Interval.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="255">
+          <caret line="11" column="1" selection-start-line="11" selection-start-column="1" selection-end-line="11" selection-end-column="1" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/core/types/Pair.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="270">
+          <caret line="6" column="0" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/core/KdTree.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="675" max-vertical-offset="7155">
+          <caret line="27" column="0" selection-start-line="27" selection-start-column="0" selection-end-line="27" selection-end-column="0" />
+          <folding>
+            <element signature="e#1630#2416#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/core/types/BoundingBoxNode.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="540">
+          <caret line="18" column="5" selection-start-line="18" selection-start-column="5" selection-end-line="18" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/core/Analyze.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1017" max-vertical-offset="7440">
+          <caret line="83" column="0" selection-start-line="83" selection-start-column="0" selection-end-line="83" selection-end-column="0" />
+          <folding>
+            <element signature="e#11931#12903#0" expanded="false" />
+            <element signature="e#14409#14871#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/core/ArrayExtensions.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1590">
+          <caret line="10" column="18" selection-start-line="10" selection-start-column="18" selection-end-line="10" selection-end-column="18" />
+          <folding>
+            <element signature="e#2321#2802#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/eval/tessellate.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="13020">
+          <caret line="22" column="1" selection-start-line="22" selection-start-column="1" selection-end-line="22" selection-end-column="1" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/eval/eval2.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="776">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/core/Eval.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.09149484" vertical-offset="14449" max-vertical-offset="15930">
+          <caret line="968" column="2" selection-start-line="968" selection-start-column="2" selection-end-line="968" selection-end-column="2" />
+          <folding />
         </state>
       </provider>
     </entry>
