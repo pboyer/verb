@@ -21,7 +21,7 @@ class Make {
     // + SurfaceData object
     //
 
-   public static function four_point_surface( p1 : Point, p2 : Point, p3 : Point, p4 : Point, degree : Int = 3 ) : SurfaceData {
+   public static function fourPointSurface( p1 : Point, p2 : Point, p3 : Point, p4 : Point, degree : Int = 3 ) : SurfaceData {
 
         var degreeFloat : Float = degree;
 
@@ -65,7 +65,7 @@ class Make {
         // for each point on rail, move all of the points
         var rail_start = Eval.rational_curve_point( rail, 0.0 )
             , span = 1.0 / rail.controlPoints.length
-            , control_points = []
+            , controlPoints = []
             , weights = []
             , rail_weights = Eval.weight_1d( rail.controlPoints )
             , profile_weights = Eval.weight_1d( profile.controlPoints )
@@ -76,21 +76,21 @@ class Make {
             // evaluate the point on the curve, subtracting it from the first point
             var rail_point = Eval.rational_curve_point( rail, i * span )
                 , rail_offset = Vec.sub( rail_point, rail_start )
-                , row_control_points = []
+                , row_controlPoints = []
                 , row_weights = [];
 
             for ( j in 0...profile.controlPoints.length ){
 
-                row_control_points.push( Vec.add(rail_offset, profile_points[j] ) );
+                row_controlPoints.push( Vec.add(rail_offset, profile_points[j] ) );
                 row_weights.push( profile_weights[j] * rail_weights[i] );
 
             }
 
-            control_points.push( row_control_points);
+            controlPoints.push( row_controlPoints);
             weights.push( row_weights );
         }
 
-        return new SurfaceData( rail.degree, profile.degree, rail.knots, profile.knots, Eval.homogenize_2d( control_points, weights) );
+        return new SurfaceData( rail.degree, profile.degree, rail.knots, profile.knots, Eval.homogenize_2d( controlPoints, weights) );
     }
 
     //
@@ -254,33 +254,33 @@ class Make {
     // + a CurveData object representing a NURBS surface
     //
     // **returns**
-    // + an object with the following properties: control_points, weights, knots, degree
+    // + an object with the following properties: controlPoints, weights, knots, degree
     //
 
     public static function extruded_surface( axis : Point, length : Float, profile : CurveData ) : SurfaceData {
 
-        var control_points = [[],[],[]]
+        var controlPoints = [[],[],[]]
         , weights = [[],[],[]];
 
-        var prof_control_points = Eval.dehomogenize_1d( profile.controlPoints );
+        var prof_controlPoints = Eval.dehomogenize_1d( profile.controlPoints );
         var prof_weights = Eval.weight_1d( profile.controlPoints );
 
         var translation = Vec.mul( length, axis );
         var halfTranslation = Vec.mul( 0.5 * length, axis );
 
         // original control points
-        for (j in 0...prof_control_points.length){
+        for (j in 0...prof_controlPoints.length){
 
-            control_points[2][j] = prof_control_points[j];
-            control_points[1][j] = Vec.add( halfTranslation, prof_control_points[j] );
-            control_points[0][j] = Vec.add( translation, prof_control_points[j] );
+            controlPoints[2][j] = prof_controlPoints[j];
+            controlPoints[1][j] = Vec.add( halfTranslation, prof_controlPoints[j] );
+            controlPoints[0][j] = Vec.add( translation, prof_controlPoints[j] );
 
             weights[0][j] = prof_weights[j];
             weights[1][j] = prof_weights[j];
             weights[2][j] = prof_weights[j];
         }
 
-        return new SurfaceData( 2, profile.degree, [0,0,0,1,1,1], profile.knots, Eval.homogenize_2d( control_points, weights) );
+        return new SurfaceData( 2, profile.degree, [0,0,0,1,1,1], profile.knots, Eval.homogenize_2d( controlPoints, weights) );
     }
 
     //
@@ -294,7 +294,7 @@ class Make {
     // + radius of the cylinder
     //
     // **returns**
-    // + an object with the following properties: control_points, weights, knots_u, knots_v, degree_u, degree_v
+    // + an object with the following properties: controlPoints, weights, knotsU, knotsV, degreeU, degreeV
     //
 
     public static function cylinder_surface( axis : Point, xaxis : Point, base : Point, height : Float, radius : Float ) : SurfaceData {
@@ -321,35 +321,35 @@ class Make {
     // + weights of the generatrix
     //
     // **returns**
-    // + an object with the following properties: control_points, weights, knots, degree
+    // + an object with the following properties: controlPoints, weights, knots, degree
     //
 
     public static function revolved_surface( center : Point, axis : Point, theta : Float, profile : CurveData ) : SurfaceData {
 
-        var prof_control_points = Eval.dehomogenize_1d( profile.controlPoints )
+        var prof_controlPoints = Eval.dehomogenize_1d( profile.controlPoints )
             , prof_weights = Eval.weight_1d( profile.controlPoints );
 
-        var narcs, knots_u, control_points, weights;
+        var narcs, knotsU, controlPoints, weights;
 
         if (theta <= Math.PI / 2) { // less than 90
             narcs = 1;
-            knots_u = Vec.zeros1d( 6 + 2  * (narcs-1) );
+            knotsU = Vec.zeros1d( 6 + 2  * (narcs-1) );
         } else {
             if (theta <= Math.PI){  // between 90 and 180
                 narcs = 2;
-                knots_u = Vec.zeros1d( 6 + 2 * (narcs-1) );
-                knots_u[3]= knots_u[4] = 0.5;
+                knotsU = Vec.zeros1d( 6 + 2 * (narcs-1) );
+                knotsU[3]= knotsU[4] = 0.5;
             } else if (theta <= 3 * Math.PI / 2){ // between 180 and 270
                 narcs = 3;
-                knots_u = Vec.zeros1d( 6 + 2 * (narcs-1) );
-                knots_u[3]= knots_u[4] = 1/3;
-                knots_u[5]= knots_u[6] = 2/3;
+                knotsU = Vec.zeros1d( 6 + 2 * (narcs-1) );
+                knotsU[3]= knotsU[4] = 1/3;
+                knotsU[5]= knotsU[6] = 2/3;
             } else { // between 270 and 360
                 narcs = 4;
-                knots_u = Vec.zeros1d( 6 + 2 * (narcs-1) );
-                knots_u[3]= knots_u[4] = 1/4;
-                knots_u[5]= knots_u[6] = 1/2;
-                knots_u[7]= knots_u[8] = 3/4;
+                knotsU = Vec.zeros1d( 6 + 2 * (narcs-1) );
+                knotsU[3]= knotsU[4] = 1/4;
+                knotsU[5]= knotsU[6] = 1/2;
+                knotsU[7]= knotsU[8] = 3/4;
             }
         }
 
@@ -359,8 +359,8 @@ class Make {
         // initialize the start and end knots
         // keep in mind that we only return the knot vector for thes
         for (i in 0...3){
-            knots_u[i] = 0.0;
-            knots_u[j+i] = 1.0;
+            knotsU[i] = 0.0;
+            knotsU[j+i] = 1.0;
         }
 
         // do some initialization
@@ -369,8 +369,8 @@ class Make {
         , angle = 0.0
         , sines = Vec.zeros1d( narcs + 1)
         , cosines = Vec.zeros1d( narcs + 1)
-        , control_points = Vec.zeros3d( 2*narcs + 1, prof_control_points.length, 3 )
-        , weights = Vec.zeros2d( 2*narcs + 1, prof_control_points.length );
+        , controlPoints = Vec.zeros3d( 2*narcs + 1, prof_controlPoints.length, 3 )
+        , weights = Vec.zeros2d( 2*narcs + 1, prof_controlPoints.length );
 
         // initialize the sines and cosines
         for (i in 1...narcs+1){
@@ -381,12 +381,12 @@ class Make {
 
         // for each pt in the generatrix
         // i.e. for each row of the 2d knot vectors
-        for (j in 0...prof_control_points.length){
+        for (j in 0...prof_controlPoints.length){
 
             // get the closest point of the generatrix point on the axis
-            var O = Trig.closest_point_on_ray(prof_control_points[j], center, axis)
+            var O = Trig.closest_point_on_ray(prof_controlPoints[j], center, axis)
             // X is the vector from the axis to generatrix control pt
-            , X = Vec.sub( prof_control_points[j], O )
+            , X = Vec.sub( prof_controlPoints[j], O )
             // radius at that height
             , r = Vec.norm(X)
             // Y is perpendicular to X and axis, and complete the coordinate system
@@ -397,9 +397,9 @@ class Make {
                 Y = Vec.mul( 1 / r, Y);
             }
 
-            // the first row of control_points and weights is just the generatrix
-            control_points[0][j] = prof_control_points[j];
-            var P0 = prof_control_points[j];
+            // the first row of controlPoints and weights is just the generatrix
+            controlPoints[0][j] = prof_controlPoints[j];
+            var P0 = prof_controlPoints[j];
             weights[0][j] = prof_weights[j];
 
             // store T0 as the Y vector
@@ -414,7 +414,7 @@ class Make {
                 // rotated generatrix pt
                 var P2 = r == 0 ? O : Vec.add( O, Vec.add( Vec.mul( r * cosines[i], X), Vec.mul( r * sines[i], Y) ) );
 
-                control_points[index+2][j] = P2;
+                controlPoints[index+2][j] = P2;
                 weights[index+2][j] = prof_weights[j];
 
                 // construct the vector tangent to the rotation
@@ -422,13 +422,13 @@ class Make {
 
                  // construct the next control pt
                 if (r == 0){
-                    control_points[index+1][j] = O;
+                    controlPoints[index+1][j] = O;
                 } else {
 
                     var inters = Intersect.rays(P0, Vec.mul( 1 / Vec.norm(T0), T0), P2, Vec.mul( 1 / Vec.norm(T2), T2));
                     var P1 = Vec.add( P0, Vec.mul(inters.u0, T0));
 
-                    control_points[index+1][j] = P1;
+                    controlPoints[index+1][j] = P1;
                 }
 
                 weights[index+1][j] = wm * prof_weights[j];
@@ -442,7 +442,7 @@ class Make {
             }
         }
 
-        return new SurfaceData( 2, profile.degree, knots_u, profile.knots, Eval.homogenize_2d( control_points, weights ) );
+        return new SurfaceData( 2, profile.degree, knotsU, profile.knots, Eval.homogenize_2d( controlPoints, weights ) );
 
     }
 
@@ -456,7 +456,7 @@ class Make {
     // + radius of the sphere
     //
     // **returns**
-    // + an object with the following properties: control_points, weights, knots_u, knots_v, degree_u, degree_v
+    // + an object with the following properties: controlPoints, weights, knotsU, knotsV, degreeU, degreeV
     //
 
     public static function sphere_surface( center : Point, axis : Point, xaxis : Point, radius : Float ){
@@ -476,7 +476,7 @@ class Make {
     // + radius at the base of the cone
     //
     // **returns**
-    // + an object with the following properties: control_points, weights, knots, degree
+    // + an object with the following properties: controlPoints, weights, knots, degree
     //
 
     public static function cone_surface( axis : Point, xaxis : Point, base : Point, height : Float, radius : Float ) : SurfaceData {
@@ -492,7 +492,7 @@ class Make {
 
     }
 
-    public static function rational_interp_curve( points : Array<Point>, degree : Int = 3,
+    public static function rationalInterpCurve( points : Array<Point>, degree : Int = 3,
                                                   start_tangent : Point = null, end_tangent : Point = null ) : CurveData {
 
         // 0) build knot vector for curve by normalized chord length
@@ -548,8 +548,8 @@ class Make {
         var ld = hasTangents ? points.length - (degree - 1) : points.length - (degree + 1);
 
         for (u in us){
-            var span = Eval.knot_span_given_n( n, degree, u, knots );
-            var basisFuncs = Eval.basis_functions_given_knot_span_index( span, u, degree, knots );
+            var span = Eval.knotSpanGivenN( n, degree, u, knots );
+            var basisFuncs = Eval.basis_functions_given_knotSpan_index( span, u, degree, knots );
 
             var ls = span - degree;
 

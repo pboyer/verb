@@ -56,7 +56,7 @@ class Intersect {
 
         // 3) perform cubic interpolation
         return exactPls.map(function(x){
-            return Make.rational_interp_curve( x.map(function(x){ return x.point; }), 3 );
+            return Make.rationalInterpCurve( x.map(function(x){ return x.point; }), 3 );
         });
     }
 
@@ -111,7 +111,7 @@ class Intersect {
             var fd = Vec.dot( fn, p );
 
             // 3) x = intersection of all 3 planes
-            var x = Intersect.three_planes( pn, pd, qn, qd, fn, fd );
+            var x = Intersect.threePlanes( pn, pd, qn, qd, fn, fd );
 
             if (x == null) throw "panic!";
 
@@ -197,7 +197,7 @@ class Intersect {
 
         if (segments.length == 0) return [];
 
-        return make_mesh_intersection_polylines( segments );
+        return makeMeshIntersectionPolylines( segments );
 
     }
 
@@ -211,7 +211,7 @@ class Intersect {
     // + array of array of MeshIntersectionPoint
     //
 
-    public static function make_mesh_intersection_polylines( segments : Array<Interval<MeshIntersectionPoint>> ) : Array<Array<MeshIntersectionPoint>> {
+    public static function makeMeshIntersectionPolylines( segments : Array<Interval<MeshIntersectionPoint>> ) : Array<Array<MeshIntersectionPoint>> {
 
         // debug (return all segments)
         // return segments;
@@ -223,7 +223,7 @@ class Intersect {
         }
 
         // construct a tree for fast lookup
-        var tree = kdtree_from_segs( segments );
+        var tree = kdTreeFromSegments( segments );
 
         // flatten everything, we no longer need the segments
         var ends : Array<MeshIntersectionPoint> = [];
@@ -237,7 +237,7 @@ class Intersect {
         for (segEnd in ends){
             if (segEnd.adj != null) continue;
 
-            var adjEnd = lookup_adj_segment( segEnd, tree, segments.length );
+            var adjEnd = lookupAdjacentSegment( segEnd, tree, segments.length );
 
             if (adjEnd != null && adjEnd.adj == null){
                 segEnd.adj = adjEnd;
@@ -301,7 +301,7 @@ class Intersect {
     // + array of array of MeshIntersectionPoint
     //
 
-    private static function kdtree_from_segs( segments: Array<Interval<MeshIntersectionPoint>> ) : KdTree<MeshIntersectionPoint> {
+    private static function kdTreeFromSegments( segments: Array<Interval<MeshIntersectionPoint>> ) : KdTree<MeshIntersectionPoint> {
 
         var treePoints = [];
 
@@ -324,7 +324,7 @@ class Intersect {
     // **returns**
     // + array of array of MeshIntersectionPoint
     //
-    public static function lookup_adj_segment( segEnd: MeshIntersectionPoint, tree : KdTree<MeshIntersectionPoint>, numSegments : Int ) {
+    public static function lookupAdjacentSegment( segEnd: MeshIntersectionPoint, tree : KdTree<MeshIntersectionPoint>, numSegments : Int ) {
 
         var numResults : Int = numSegments != null ? (numSegments < 3 ? 3 : numSegments) : 3;
 
@@ -353,7 +353,7 @@ class Intersect {
     // + array of CurveSurfaceIntersection objects
     //
 
-    public static function curve_and_surface( curve : CurveData,
+    public static function curveAndSurface( curve : CurveData,
                                               surface : SurfaceData,
                                               tol : Float = 1e-3 )  {
 
@@ -381,7 +381,7 @@ class Intersect {
 
             var uv = [ (minu + maxu) / 2.0, (minv + maxv) / 2.0 ];
 
-            return Intersect.curve_and_surface_with_estimate( crvSeg, srfPart, [u].concat(uv), tol );
+            return Intersect.curveAndSurfaceWithEstimate( crvSeg, srfPart, [u].concat(uv), tol );
 
         });
     }
@@ -399,7 +399,7 @@ class Intersect {
     // + a CurveSurfaceIntersection object
     //
 
-    public static function curve_and_surface_with_estimate(    curve : CurveData,
+    public static function curveAndSurfaceWithEstimate(    curve : CurveData,
                                                                surface : SurfaceData,
                                                                start_params : Array<Float>,
                                                                tol : Float = 1e-3 ) : CurveSurfaceIntersection {
@@ -444,12 +444,12 @@ class Intersect {
             var polid = event.item0;
             var faceid = event.item1;
 
-            var inter = Intersect.segment_with_tri( polyline.points[polid], polyline.points[polid + 1], mesh.points, mesh.faces[ faceid ] );
+            var inter = Intersect.segmentWithTriangle( polyline.points[polid], polyline.points[polid + 1], mesh.points, mesh.faces[ faceid ] );
             if ( inter == null ) continue;
 
             var pt = inter.point;
             var u = Vec.lerp(inter.p, [ polyline.params[polid] ], [ polyline.params[polid+1] ] )[0];
-            var uv = Mesh.tri_uv_from_point( mesh, faceid,  pt );
+            var uv = Mesh.triangleUVFromPoint( mesh, faceid,  pt );
 
             finalResults.push(new PolylineMeshIntersection( pt, u, uv, polid, faceid ));
 
@@ -584,15 +584,15 @@ class Intersect {
         if (ray == null) return null;
 
         // 2) clip the ray within tri0
-        var clip1 = clip_ray_in_coplanar_tri( ray, mesh0, faceIndex0 );
+        var clip1 = clipRayInCoplanarTriangle( ray, mesh0, faceIndex0 );
         if (clip1 == null) return null;
 
         // 3) clip the ray within tri1
-        var clip2 = clip_ray_in_coplanar_tri( ray, mesh1, faceIndex1 );
+        var clip2 = clipRayInCoplanarTriangle( ray, mesh1, faceIndex1 );
         if (clip2 == null) return null;
 
         // 4) find the interval that overlaps
-        var merged = merge_tri_clip_intervals(clip1, clip2, mesh0, faceIndex0, mesh1, faceIndex1 );
+        var merged = mergeTriangleClipIntervals(clip1, clip2, mesh0, faceIndex0, mesh1, faceIndex1 );
         if (merged == null) return null;
 
         return return new Interval(
@@ -601,7 +601,7 @@ class Intersect {
 
     }
 
-    public static function clip_ray_in_coplanar_tri(ray : Ray, mesh : MeshData, faceIndex : Int ) : Interval<CurveTriPoint> {
+    public static function clipRayInCoplanarTriangle(ray : Ray, mesh : MeshData, faceIndex : Int ) : Interval<CurveTriPoint> {
 
         // 0) construct rays for each edge of the triangle
         var tri = mesh.faces[faceIndex]
@@ -652,7 +652,7 @@ class Intersect {
 
     }
 
-    public static function merge_tri_clip_intervals(clip1 : Interval<CurveTriPoint>, clip2 : Interval<CurveTriPoint>,
+    public static function mergeTriangleClipIntervals(clip1 : Interval<CurveTriPoint>, clip2 : Interval<CurveTriPoint>,
                                                     mesh1 : MeshData, faceIndex1 : Int, mesh2 : MeshData, faceIndex2 : Int ) : Interval<MeshIntersectionPoint> {
 
         // if the intervals dont overlap, fail
@@ -671,17 +671,17 @@ class Intersect {
 
         if (min.item1 == 0){
             res.min.uv0 = min.item0.uv;
-            res.min.uv1 = Mesh.tri_uv_from_point( mesh2, faceIndex2, min.item0.point );
+            res.min.uv1 = Mesh.triangleUVFromPoint( mesh2, faceIndex2, min.item0.point );
         } else {
-            res.min.uv0 = Mesh.tri_uv_from_point( mesh1, faceIndex1, min.item0.point );
+            res.min.uv0 = Mesh.triangleUVFromPoint( mesh1, faceIndex1, min.item0.point );
             res.min.uv1 = min.item0.uv;
         }
 
         if (max.item1 == 0){
             res.max.uv0 = max.item0.uv;
-            res.max.uv1 = Mesh.tri_uv_from_point( mesh2, faceIndex2, max.item0.point );
+            res.max.uv1 = Mesh.triangleUVFromPoint( mesh2, faceIndex2, max.item0.point );
         } else {
-            res.max.uv0 = Mesh.tri_uv_from_point( mesh1, faceIndex1, max.item0.point );
+            res.max.uv0 = Mesh.triangleUVFromPoint( mesh1, faceIndex1, max.item0.point );
             res.max.uv1 = max.item0.uv;
         }
 
@@ -779,7 +779,7 @@ class Intersect {
     // **returns**
     // + the point representing the intersection
     //
-    public static function three_planes(n0 : Point, d0 : Float, n1 : Point, d1 : Float, n2 : Point, d2 : Float) : Point {
+    public static function threePlanes(n0 : Point, d0 : Float, n1 : Point, d1 : Float, n2 : Point, d2 : Float) : Point {
 
         var u = Vec.cross( n1, n2 );
         var den = Vec.dot( n0, u );
@@ -926,7 +926,7 @@ class Intersect {
     // + a TriangleSegmentIntersection or null if failed
     //
 
-    public static function segment_with_tri( p0 : Point, p1 : Point, points : Array<Point>, tri : Tri ) : TriSegmentIntersection {
+    public static function segmentWithTriangle( p0 : Point, p1 : Point, points : Array<Point>, tri : Tri ) : TriSegmentIntersection {
 
         var v0 = points[ tri[0] ]
         , v1 = points[ tri[1] ]

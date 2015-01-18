@@ -22,12 +22,12 @@ class Eval {
 	// + a point represented by an array of length (dim)
 	//
 
-	public static function volume_point( volume : VolumeData, u : Float, v : Float, w : Float ) : Point {
+	public static function volumePoint( volume : VolumeData, u : Float, v : Float, w : Float ) : Point {
 		var n = volume.knotsU.length - volume.degreeU - 2
 		, m = volume.knotsV.length - volume.degreeV - 2
 		, l = volume.knotsW.length - volume.degreeW - 2;
 
-		return volume_point_given_n_m_l( volume, n, m, l, u, v, w );
+		return volumePointGivenNML( volume, n, m, l, u, v, w );
 	}
 
 	//
@@ -43,7 +43,7 @@ class Eval {
 	// + a point represented by an array of length (dim)
 	//
 
-	public static function volume_point_given_n_m_l( volume : VolumeData,
+	public static function volumePointGivenNML( volume : VolumeData,
 													 n : Int,
 													 m : Int,
 													 l : Int,
@@ -51,45 +51,45 @@ class Eval {
 													 v : Float,
 													 w : Float  ) : Point {
 //
-//		if ( !are_valid_relations(degree_u, control_points.length, knots_u.length ) ||
-//			!are_valid_relations(degree_v, control_points[0].length, knots_v.length ) ||
-//			!are_valid_relations(degree_w, control_points[0][0].length, knots_w.length ) ) {
+//		if ( !are_valid_relations(degreeU, controlPoints.length, knotsU.length ) ||
+//			!are_valid_relations(degreeV, controlPoints[0].length, knotsV.length ) ||
+//			!are_valid_relations(degreeW, controlPoints[0][0].length, knotsW.length ) ) {
 //			console.error('Invalid relations between control points and knot vector');
 //			return null;
 //		}
 
-		var control_points = volume.controlPoints
-			, degree_u = volume.degreeU
-			, degree_v = volume.degreeV
-			, degree_w = volume.degreeW
-			, knots_u = volume.knotsU
-			, knots_v = volume.knotsV
-			, knots_w = volume.knotsW;
+		var controlPoints = volume.controlPoints
+			, degreeU = volume.degreeU
+			, degreeV = volume.degreeV
+			, degreeW = volume.degreeW
+			, knotsU = volume.knotsU
+			, knotsV = volume.knotsV
+			, knotsW = volume.knotsW;
 
-		var dim = control_points[0][0][0].length
-			, knot_span_index_u = knot_span_given_n( n, degree_u, u, knots_u )
-			, knot_span_index_v = knot_span_given_n( m, degree_v, v, knots_v )
-			, knot_span_index_w = knot_span_given_n( l, degree_w, w, knots_w )
-			, u_basis_vals = basis_functions_given_knot_span_index( knot_span_index_u, u, degree_u, knots_u )
-			, v_basis_vals = basis_functions_given_knot_span_index( knot_span_index_v, v, degree_v, knots_v )
-			, w_basis_vals = basis_functions_given_knot_span_index( knot_span_index_w, w, degree_w, knots_w )
-			, uind = knot_span_index_u - degree_u
+		var dim = controlPoints[0][0][0].length
+			, knotSpan_index_u = knotSpanGivenN( n, degreeU, u, knotsU )
+			, knotSpan_index_v = knotSpanGivenN( m, degreeV, v, knotsV )
+			, knotSpan_index_w = knotSpanGivenN( l, degreeW, w, knotsW )
+			, u_basis_vals = basis_functions_given_knotSpan_index( knotSpan_index_u, u, degreeU, knotsU )
+			, v_basis_vals = basis_functions_given_knotSpan_index( knotSpan_index_v, v, degreeV, knotsV )
+			, w_basis_vals = basis_functions_given_knotSpan_index( knotSpan_index_w, w, degreeW, knotsW )
+			, uind = knotSpan_index_u - degreeU
 			, position = Vec.zeros1d( dim )
 			, temp = Vec.zeros1d( dim )
 			, temp2 = Vec.zeros1d( dim );
 
-		for ( i in 0...degree_w + 1 ){
+		for ( i in 0...degreeW + 1 ){
 
 			temp2 = Vec.zeros1d( dim );
-			var wind = knot_span_index_w - degree_w + i;
+			var wind = knotSpan_index_w - degreeW + i;
 
-			for ( j in 0...degree_v + 1 ){
+			for ( j in 0...degreeV + 1 ){
 
 				temp = Vec.zeros1d( dim );
-				var vind = knot_span_index_v  - degree_v + j;
+				var vind = knotSpan_index_v  - degreeV + j;
 
-				for ( k in 0...degree_u + 1 ){
-					temp = Vec.add( temp, Vec.mul( u_basis_vals[k], control_points[uind+k][vind][wind] ));
+				for ( k in 0...degreeU + 1 ){
+					temp = Vec.add( temp, Vec.mul( u_basis_vals[k], controlPoints[uind+k][vind][wind] ));
 				}
 
 				// add weighted contribution of u isoline
@@ -356,18 +356,18 @@ class Eval {
 	//
 
 	
-	public static function homogenize_1d( control_points : Array<Point>, weights : Array<Float>) : Array<Point> {
+	public static function homogenize_1d( controlPoints : Array<Point>, weights : Array<Float>) : Array<Point> {
 
-		var rows = control_points.length
-		, dim = control_points[0].length
-		, homo_control_points = new Array<Point>()
+		var rows = controlPoints.length
+		, dim = controlPoints[0].length
+		, homo_controlPoints = new Array<Point>()
 		, wt : Float = 0.0
 		, ref_pt = new Point();
 
 		for (i in 0...rows) {
 
 			var pt = [];
-			ref_pt = control_points[i];
+			ref_pt = controlPoints[i];
 			wt = weights[i];
 
 			for (k in 0...dim) {
@@ -377,10 +377,10 @@ class Eval {
 			// append the weight
 			pt.push(wt);
 
-			homo_control_points.push(pt);
+			homo_controlPoints.push(pt);
 		}
 
-		return homo_control_points;
+		return homo_controlPoints;
 
 	}
 
@@ -395,16 +395,16 @@ class Eval {
 	//
 
 	
-	public static function homogenize_2d( control_points : Array<Array<Point>>,
+	public static function homogenize_2d( controlPoints : Array<Array<Point>>,
 										  weights: Array<Array<Float>>) : Array<Array<Point>> {
-		var rows = control_points.length
-		, homo_control_points = new Array<Array<Point>>();
+		var rows = controlPoints.length
+		, homo_controlPoints = new Array<Array<Point>>();
 
 		for (i in 0...rows) {
-			homo_control_points.push( homogenize_1d(control_points[i], weights[i]) );
+			homo_controlPoints.push( homogenize_1d(controlPoints[i], weights[i]) );
 		}
 
-		return homo_control_points;
+		return homo_controlPoints;
 	}
 
 
@@ -434,8 +434,8 @@ class Eval {
 	// (corresponds to algorithm 3.6 from The NURBS book, Piegl & Tiller 2nd edition)
 	//
 	// **params**
-	// + integer number of basis functions in u dir - 1 = knots_u.length - degree_u - 2
-	// + integer number of basis functions in v dir - 1 = knots_u.length - degree_u - 2
+	// + integer number of basis functions in u dir - 1 = knotsU.length - degreeU - 2
+	// + integer number of basis functions in v dir - 1 = knotsU.length - degreeU - 2
 	// + SurfaceData object representing the surface
 	// + u parameter at which to evaluate the derivatives
 	// + v parameter at which to evaluate the derivatives
@@ -452,36 +452,36 @@ class Eval {
 													 u : Float,
 													 v: Float) : Array<Array<Point>>{
 
-		var degree_u = surface.degreeU
-		, degree_v = surface.degreeV
-		, control_points = surface.controlPoints
-		, knots_u = surface.knotsU
-		, knots_v = surface.knotsV;
+		var degreeU = surface.degreeU
+		, degreeV = surface.degreeV
+		, controlPoints = surface.controlPoints
+		, knotsU = surface.knotsU
+		, knotsV = surface.knotsV;
 
-		if ( !are_valid_relations(degree_u, control_points.length, knots_u.length ) ||
-			!are_valid_relations(degree_v, control_points[0].length, knots_v.length ) ) {
+		if ( !are_valid_relations(degreeU, controlPoints.length, knotsU.length ) ||
+			!are_valid_relations(degreeV, controlPoints[0].length, knotsV.length ) ) {
 
 			throw 'Invalid relations between control points, knot vector, and n';
 		}
 
-		var dim = control_points[0][0].length
-		, du = num_derivatives < degree_u ? num_derivatives : degree_u
-		, dv = num_derivatives < degree_v ? num_derivatives : degree_v
+		var dim = controlPoints[0][0].length
+		, du = num_derivatives < degreeU ? num_derivatives : degreeU
+		, dv = num_derivatives < degreeV ? num_derivatives : degreeV
 		, SKL = Vec.zeros3d( du+1, dv+1, dim )
-		, knot_span_index_u = knot_span_given_n( n, degree_u, u, knots_u )
-		, knot_span_index_v = knot_span_given_n( m, degree_v, v, knots_v )
-		, uders = deriv_basis_functions_given_n_i( knot_span_index_u, u, degree_u, n, knots_u )
-		, vders = deriv_basis_functions_given_n_i( knot_span_index_v, v, degree_v, m, knots_v )
-		, temp = Vec.zeros2d( degree_v+1, dim )
+		, knotSpan_index_u = knotSpanGivenN( n, degreeU, u, knotsU )
+		, knotSpan_index_v = knotSpanGivenN( m, degreeV, v, knotsV )
+		, uders = deriv_basis_functions_given_n_i( knotSpan_index_u, u, degreeU, n, knotsU )
+		, vders = deriv_basis_functions_given_n_i( knotSpan_index_v, v, degreeV, m, knotsV )
+		, temp = Vec.zeros2d( degreeV+1, dim )
 		, dd = 0;
 
 		for (k in 0...du+1){
-			for (s in 0...degree_v+1) {
+			for (s in 0...degreeV+1) {
 				temp[s] = Vec.zeros1d( dim );
 
-				for (r in 0...degree_u+1){
+				for (r in 0...degreeU+1){
 					temp[s] = Vec.add( temp[s],
-						Vec.mul( uders[k][r], control_points[knot_span_index_u-degree_u+r][knot_span_index_v-degree_v+s]) );
+						Vec.mul( uders[k][r], controlPoints[knotSpan_index_u-degreeU+r][knotSpan_index_v-degreeV+s]) );
 				}
 			}
 
@@ -491,7 +491,7 @@ class Eval {
 			for (l in 0...dd+1){
 				SKL[k][l] = Vec.zeros1d( dim );
 
-				for (s in 0...degree_v+1){
+				for (s in 0...degreeV+1){
 					SKL[k][l] = Vec.add( SKL[k][l], Vec.mul( vders[l][s], temp[s] ) );
 				}
 			}
@@ -525,8 +525,8 @@ class Eval {
 	// (corresponds to algorithm 3.5 from The NURBS book, Piegl & Tiller 2nd edition)
 	//
 	// **params**
-	// + integer number of basis functions in u dir - 1 = knots_u.length - degree_u - 2
-	// + integer number of basis functions in v dir - 1 = knots_v.length - degree_v - 2
+	// + integer number of basis functions in u dir - 1 = knotsU.length - degreeU - 2
+	// + integer number of basis functions in v dir - 1 = knotsV.length - degreeV - 2
 	// + SurfaceData object representing the surface
 	// + u parameter at which to evaluate the surface point
 	// + v parameter at which to evaluate the surface point
@@ -538,36 +538,36 @@ class Eval {
 	
 	public static function surface_point_given_n_m( n : Int, m : Int, surface : SurfaceData, u : Float, v : Float ) : Point {
 
-		var degree_u = surface.degreeU
-		, degree_v = surface.degreeV
-		, control_points = surface.controlPoints
-		, knots_u = surface.knotsU
-		, knots_v = surface.knotsV;
+		var degreeU = surface.degreeU
+		, degreeV = surface.degreeV
+		, controlPoints = surface.controlPoints
+		, knotsU = surface.knotsU
+		, knotsV = surface.knotsV;
 
-		if ( !are_valid_relations(degree_u, control_points.length, knots_u.length ) ||
-			!are_valid_relations(degree_v, control_points[0].length, knots_v.length ) ) {
+		if ( !are_valid_relations(degreeU, controlPoints.length, knotsU.length ) ||
+			!are_valid_relations(degreeV, controlPoints[0].length, knotsV.length ) ) {
 
 			throw 'Invalid relations between control points, knot vector, and n';
 		}
 
-		var dim = control_points[0][0].length
-		, knot_span_index_u = knot_span_given_n( n, degree_u, u, knots_u )
-		, knot_span_index_v = knot_span_given_n( m, degree_v, v, knots_v )
-		, u_basis_vals = basis_functions_given_knot_span_index( knot_span_index_u, u, degree_u, knots_u )
-		, v_basis_vals = basis_functions_given_knot_span_index( knot_span_index_v, v, degree_v, knots_v )
-		, uind = knot_span_index_u - degree_u
-		, vind = knot_span_index_v
+		var dim = controlPoints[0][0].length
+		, knotSpan_index_u = knotSpanGivenN( n, degreeU, u, knotsU )
+		, knotSpan_index_v = knotSpanGivenN( m, degreeV, v, knotsV )
+		, u_basis_vals = basis_functions_given_knotSpan_index( knotSpan_index_u, u, degreeU, knotsU )
+		, v_basis_vals = basis_functions_given_knotSpan_index( knotSpan_index_v, v, degreeV, knotsV )
+		, uind = knotSpan_index_u - degreeU
+		, vind = knotSpan_index_v
 		, position = Vec.zeros1d( dim )
 		, temp = Vec.zeros1d( dim );
 
-		for (l in 0...degree_v + 1){
+		for (l in 0...degreeV + 1){
 
 			temp = Vec.zeros1d( dim );
-			vind = knot_span_index_v - degree_v + l;
+			vind = knotSpan_index_v - degreeV + l;
 
 			// sample u isoline
-			for (k in 0...degree_u + 1) {
-				temp = Vec.add( temp, Vec.mul( u_basis_vals[k], control_points[uind+k][vind]) );
+			for (k in 0...degreeU + 1) {
+				temp = Vec.add( temp, Vec.mul( u_basis_vals[k], controlPoints[uind+k][vind]) );
 			}
 
 			// add point from u isoline
@@ -613,24 +613,24 @@ class Eval {
 	public static function curve_derivs_given_n( n : Int, curve : CurveData, u : Float, num_derivatives : Int ) : Array<Point> {
 
 		var degree = curve.degree
-		, control_points = curve.controlPoints
+		, controlPoints = curve.controlPoints
 		, knots = curve.knots;
 
-		if ( !are_valid_relations( degree, control_points.length, knots.length ) ) {
+		if ( !are_valid_relations( degree, controlPoints.length, knots.length ) ) {
 			throw 'Invalid relations between control points, knot vector, and n';
 		}
 
-		var dim = control_points[0].length
+		var dim = controlPoints[0].length
 		, du = num_derivatives < degree ? num_derivatives : degree
 		, CK = Vec.zeros2d( du+1, dim )
-		, knot_span_index = knot_span_given_n( n, degree, u, knots )
-		, nders = deriv_basis_functions_given_n_i( knot_span_index, u, degree, du, knots )
+		, knotSpan_index = knotSpanGivenN( n, degree, u, knots )
+		, nders = deriv_basis_functions_given_n_i( knotSpan_index, u, degree, du, knots )
 		, k = 0
 		, j = 0;
 
 		for (k in 0...du+1) {
 			for (j in 0...degree+1){
-				CK[k] = Vec.add( CK[k], Vec.mul( nders[k][j], control_points[ knot_span_index - degree + j ] ) );
+				CK[k] = Vec.add( CK[k], Vec.mul( nders[k][j], controlPoints[ knotSpan_index - degree + j ] ) );
 			}
 		}
 		return CK;
@@ -665,8 +665,8 @@ class Eval {
 	//
 
 	
-	public static function are_valid_relations( degree : Int, num_control_points : Int, knots_length : Int ) : Bool {
-		return num_control_points + degree + 1 - knots_length == 0;
+	public static function are_valid_relations( degree : Int, num_controlPoints : Int, knots_length : Int ) : Bool {
+		return num_controlPoints + degree + 1 - knots_length == 0;
 	}
 
 	// Compute a point on a non-uniform, non-rational b-spline curve
@@ -685,22 +685,22 @@ class Eval {
 	public static function curve_point_given_n( n : Int, curve : CurveData, u : Float) : Point {
 
 		var degree = curve.degree
-			, control_points = curve.controlPoints
+			, controlPoints = curve.controlPoints
 			, knots = curve.knots;
 
-		if ( !are_valid_relations( degree, control_points.length, knots.length ) ) {
+		if ( !are_valid_relations( degree, controlPoints.length, knots.length ) ) {
 			throw 'Invalid relations between control points, knot Array, and n';
 			return null;
 		}
 
-		var knot_span_index = knot_span_given_n( n, degree, u, knots );
-		var basis_values = basis_functions_given_knot_span_index( knot_span_index, u, degree, knots );
-		var position = Vec.zeros1d( control_points[0].length );
+		var knotSpan_index = knotSpanGivenN( n, degree, u, knots );
+		var basis_values = basis_functions_given_knotSpan_index( knotSpan_index, u, degree, knots );
+		var position = Vec.zeros1d( controlPoints[0].length );
 
 		for (j in 0...degree+1){
 			position = Vec.add( position,
 								Vec.mul( basis_values[j],
-										control_points[ knot_span_index - degree + j ] ) );
+										controlPoints[ knotSpan_index - degree + j ] ) );
 		}
 
 		return position;
@@ -720,11 +720,11 @@ class Eval {
 	
 	public static function deriv_basis_functions( u : Float, degree : Int, knots : KnotArray ): Array<Array<Float>>
 	{
-		var knot_span_index = knot_span( degree, u, knots )
+		var knotSpan_index = knotSpan( degree, u, knots )
 		, m = knots.length - 1
 		, n = m - degree - 1;
 
-		return deriv_basis_functions_given_n_i( knot_span_index, u, degree, n, knots );
+		return deriv_basis_functions_given_n_i( knotSpan_index, u, degree, n, knots );
 	}
 
 	// Compute the non-vanishing basis functions and their derivatives
@@ -742,7 +742,7 @@ class Eval {
 	//
 
 	
-	public static function deriv_basis_functions_given_n_i( knot_span_index : Int, u : Float, p : Int,
+	public static function deriv_basis_functions_given_n_i( knotSpan_index : Int, u : Float, p : Int,
 															n : Int, knots : KnotArray ) : Array<Array<Float>>
 	{
 		var ndu = Vec.zeros2d( p+1, p+1 )
@@ -754,8 +754,8 @@ class Eval {
 		ndu[0][0] = 1.0;
 
 		for(j in 1...p+1){
-			left[j] = u - knots[knot_span_index+1-j];
-			right[j] = knots[knot_span_index+j] - u;
+			left[j] = u - knots[knotSpan_index+1-j];
+			right[j] = knots[knotSpan_index+j] - u;
 			saved = 0.0;
 
 			for (r in 0...j){
@@ -854,8 +854,8 @@ class Eval {
 	
 	public static function basis_functions( u : Float, degree : Int, knots : KnotArray)
 	{
-		var knot_span_index = knot_span(degree, u, knots);
-		return basis_functions_given_knot_span_index( knot_span_index, u, degree, knots );
+		var knotSpan_index = knotSpan(degree, u, knots);
+		return basis_functions_given_knotSpan_index( knotSpan_index, u, degree, knots );
 	}
 
 	// Compute the non-vanishing basis functions
@@ -871,7 +871,7 @@ class Eval {
 	// + *Array*, list of non-vanishing basis functions
 	//
 	
-	public static function basis_functions_given_knot_span_index( knot_span_index : Int,
+	public static function basis_functions_given_knotSpan_index( knotSpan_index : Int,
 																  u : Float,
 																  degree : Int,
 																  knots : KnotArray )
@@ -885,8 +885,8 @@ class Eval {
 		basis_functions[0] = 1.0;
 
 		for( j in 1...degree+1 ){
-			left[j] = u - knots[knot_span_index+1-j];
-			right[j] = knots[knot_span_index+j] - u;
+			left[j] = u - knots[knotSpan_index+1-j];
+			right[j] = knots[knotSpan_index+j] - u;
 			saved = 0.0;
 
 			for (r in 0...j){
@@ -913,12 +913,12 @@ class Eval {
 	// + the index of the knot span
 	//
 	
-	public static function knot_span( degree : Int, u : Float, knots : Array<Float> ) : Int
+	public static function knotSpan( degree : Int, u : Float, knots : Array<Float> ) : Int
 	{
 		var m = knots.length - 1
 			, n = m - degree - 1;
 
-		return knot_span_given_n(n, degree, u, knots);
+		return knotSpanGivenN(n, degree, u, knots);
 	}
 
 	// Find the span on the knot Array knots of the given parameter
@@ -934,7 +934,7 @@ class Eval {
 	// + the index of the knot span
 	//
 	
-	public static function knot_span_given_n( n : Int, degree : Int, u : Float, knots : Array<Float> ) : Int
+	public static function knotSpanGivenN( n : Int, degree : Int, u : Float, knots : Array<Float> ) : Int
 	{
 		if ( u >= knots[n+1] )
 		{

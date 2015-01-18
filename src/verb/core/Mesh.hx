@@ -45,7 +45,7 @@ class Mesh {
     // + a BoundingBox containing the mesh
     //
 
-    public static function make_mesh_aabb( mesh : MeshData, faceIndices : Array<Int> ) : BoundingBox {
+    public static function makeMeshAabb( mesh : MeshData, faceIndices : Array<Int> ) : BoundingBox {
 
         var bb = new verb.BoundingBox();
 
@@ -70,19 +70,19 @@ class Mesh {
     // + a point represented by an array of length (dim)
     //
 
-    public static function make_mesh_aabb_tree( mesh : MeshData, faceIndices : Array<Int> ) : BoundingBoxNode {
+    public static function makeMeshAabbTree( mesh : MeshData, faceIndices : Array<Int> ) : BoundingBoxNode {
 
-        var aabb = make_mesh_aabb( mesh, faceIndices );
+        var aabb = makeMeshAabb( mesh, faceIndices );
 
         if (faceIndices.length == 1){
             return new BoundingBoxLeaf<Int>( aabb, faceIndices[0] );
         }
 
-        var sortedIndices = sort_tris_on_longest_axis( aabb, mesh, faceIndices )
+        var sortedIndices = sortTrianglesOnLongestAxis( aabb, mesh, faceIndices )
         , leftIndices = sortedIndices.left() // slice( 0, Math.floor( sorted_tri_indices.length / 2 ) )
         , rightIndices = sortedIndices.right(); // slice( Math.floor( sorted_tri_indices.length / 2 ), sorted_tri_indices.length );
 
-        return new BoundingBoxInnerNode( aabb, [ make_mesh_aabb_tree(mesh, leftIndices), make_mesh_aabb_tree(mesh, rightIndices) ]);
+        return new BoundingBoxInnerNode( aabb, [ makeMeshAabbTree(mesh, leftIndices), makeMeshAabbTree(mesh, rightIndices) ]);
     }
 
     //
@@ -97,13 +97,13 @@ class Mesh {
     // + a point represented by an array of length (dim)
     //
 
-    public static function sort_tris_on_longest_axis( bb : BoundingBox, mesh : MeshData, faceIndices : Array<Int> ) : Array<Int> {
+    public static function sortTrianglesOnLongestAxis( bb : BoundingBox, mesh : MeshData, faceIndices : Array<Int> ) : Array<Int> {
 
         var longAxis = bb.getLongestAxis();
 
         var minCoordFaceMap = new Array<Pair<Float, Int>>();
         for ( faceIndex in faceIndices){
-            var tri_min = get_min_coordinate_on_axis( mesh.points, mesh.faces[ faceIndex ], longAxis );
+            var tri_min = getMinCoordOnAxis( mesh.points, mesh.faces[ faceIndex ], longAxis );
             minCoordFaceMap.push( new Pair<Float,Int>(tri_min, faceIndex) );
         }
 
@@ -134,7 +134,7 @@ class Mesh {
     // + the minimum coordinate
     //
 
-    private static function get_min_coordinate_on_axis( points : Array<Point>, tri : Tri, axis : Int ) : Float {
+    private static function getMinCoordOnAxis( points : Array<Point>, tri : Tri, axis : Int ) : Float {
 
         var min = Math.POSITIVE_INFINITY;
 
@@ -157,7 +157,7 @@ class Mesh {
     // + a point represented by an array of length 3
     //
 
-    public static function get_tri_centroid( points : Array<Point>, tri : Tri ) : Point {
+    public static function getTriangleCentroid( points : Array<Point>, tri : Tri ) : Point {
 
         var centroid = [0.0,0.0,0.0];
 
@@ -175,7 +175,7 @@ class Mesh {
 
     }
 
-    public static function tri_uv_from_point( mesh : MeshData, faceIndex : Int, f : Point ) : UV {
+    public static function triangleUVFromPoint( mesh : MeshData, faceIndex : Int, f : Point ) : UV {
 
         var tri = mesh.faces[faceIndex];
 

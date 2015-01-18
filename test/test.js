@@ -20,37 +20,7 @@ function last(a){
 
 console.log(verb)
 
-//describe("Array.flatten",function(){
-//
-//	it('returns a flattened version of a nested array', function(){
-//
-//		var arr = [ [1,2] , 1, [1, 2, 3, 4], [1, [1,2]]];
-//		var flattened = arr.flatten();
-//
-//		flattened.should.eql([1,2,1,1,2,3,4,1,1,2]);
-//
-//	});
-//
-//	it('returns an empty array when asked to flatten an empty array', function(){
-//
-//		var arr = [];
-//		var flattened = arr.flatten();
-//
-//		flattened.should.eql([]);
-//
-//	});
-//
-//	it('returns a 1d array when asked to flatten a 1d array', function(){
-//
-//		var arr = [1,2,3,4];
-//		var flattened = arr.flatten();
-//
-//		flattened.should.eql([1,2,3,4]);
-//
-//	});
-//});
-
-describe("verb.core.Eval.knot_span_given_n",function(){
+describe("verb.core.Eval.knotSpanGivenN",function(){
 
 	it('returns correct result', function(){
 
@@ -58,39 +28,39 @@ describe("verb.core.Eval.knot_span_given_n",function(){
 			, degree = 2
 			, knots = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5];
 
-		should.equal( 4, verb.core.Eval.knot_span_given_n( n, degree, 2.5, knots ) );
-		should.equal( 3, verb.core.Eval.knot_span_given_n( n, degree, 1, knots ) );
-		should.equal( 3, verb.core.Eval.knot_span_given_n( n, degree, 1.5, knots ) );
-		should.equal( 7, verb.core.Eval.knot_span_given_n( n, degree, 4.9, knots ) );
-		should.equal( 7, verb.core.Eval.knot_span_given_n( n, degree, 10, knots ) );
-		should.equal( 7, verb.core.Eval.knot_span_given_n( n, degree, 5, knots ) );
-		should.equal( 2, verb.core.Eval.knot_span_given_n( n, degree, 0, knots ) );
-		should.equal( 2, verb.core.Eval.knot_span_given_n( n, degree, -1, knots ) );
+		should.equal( 4, verb.core.Eval.knotSpanGivenN( n, degree, 2.5, knots ) );
+		should.equal( 3, verb.core.Eval.knotSpanGivenN( n, degree, 1, knots ) );
+		should.equal( 3, verb.core.Eval.knotSpanGivenN( n, degree, 1.5, knots ) );
+		should.equal( 7, verb.core.Eval.knotSpanGivenN( n, degree, 4.9, knots ) );
+		should.equal( 7, verb.core.Eval.knotSpanGivenN( n, degree, 10, knots ) );
+		should.equal( 7, verb.core.Eval.knotSpanGivenN( n, degree, 5, knots ) );
+		should.equal( 2, verb.core.Eval.knotSpanGivenN( n, degree, 0, knots ) );
+		should.equal( 2, verb.core.Eval.knotSpanGivenN( n, degree, -1, knots ) );
 
 	});
 
 });
 
-describe("verb.core.Eval.knot_span",function(){
+describe("verb.core.Eval.knotSpan",function(){
 
 	it('returns correct result for degree 2 curve', function(){
 
 		var degree = 2
 			, knots = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5];
 
-		should.equal( 4, verb.core.Eval.knot_span( degree, 2.5, knots ) );
-		should.equal( 3, verb.core.Eval.knot_span( degree, 1, knots ) );
-		should.equal( 3, verb.core.Eval.knot_span( degree, 1.5, knots ) );
-		should.equal( 7, verb.core.Eval.knot_span( degree, 4.9, knots ) );
-		should.equal( 7, verb.core.Eval.knot_span( degree, 10, knots ) ); // above span
-		should.equal( 7, verb.core.Eval.knot_span( degree, 5, knots ) ); // top of span
-		should.equal( 2, verb.core.Eval.knot_span( degree, 0, knots ) ); // bottom span
+		should.equal( 4, verb.core.Eval.knotSpan( degree, 2.5, knots ) );
+		should.equal( 3, verb.core.Eval.knotSpan( degree, 1, knots ) );
+		should.equal( 3, verb.core.Eval.knotSpan( degree, 1.5, knots ) );
+		should.equal( 7, verb.core.Eval.knotSpan( degree, 4.9, knots ) );
+		should.equal( 7, verb.core.Eval.knotSpan( degree, 10, knots ) ); // above span
+		should.equal( 7, verb.core.Eval.knotSpan( degree, 5, knots ) ); // top of span
+		should.equal( 2, verb.core.Eval.knotSpan( degree, 0, knots ) ); // bottom span
 
 	});
 
 });
 
-describe("verb.core.Eval.basis_functions, basis_functions_given_knot_span_index",function(){
+describe("verb.core.Eval.basis_functions, basis_functions_given_knotSpan_index",function(){
 
 	it('return correct results', function(){
 
@@ -98,7 +68,7 @@ describe("verb.core.Eval.basis_functions, basis_functions_given_knot_span_index"
 			, span = 4
 			, knots = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5];
 
-		var N1 = verb.core.Eval.basis_functions_given_knot_span_index( 4, 2.5, degree, knots );
+		var N1 = verb.core.Eval.basis_functions_given_knotSpan_index( 4, 2.5, degree, knots );
 		should.equal( 3, N1.length );
 		should.equal( 0.125, N1[0] );
 		should.equal( 0.75, N1[1] );
@@ -2428,7 +2398,7 @@ describe("verb.core.Mat.solve",function(){
 	});
 });
 
-describe("verb.core.Make.rational_interp_curve",function(){
+describe("verb.core.Make.rationalInterpCurve",function(){
 
 	function shouldInterpPointsWithTangents(pts, degree, start_tangent, end_tangent){
 
@@ -2444,7 +2414,7 @@ describe("verb.core.Make.rational_interp_curve",function(){
 
 	function shouldInterpPoints(pts, degree, start_tangent, end_tangent){
 
-		var crv = verb.core.Make.rational_interp_curve( pts, degree, start_tangent, end_tangent );
+		var crv = verb.core.Make.rationalInterpCurve( pts, degree, start_tangent, end_tangent );
 
 		crv.degree.should.be.equal( degree );
 
@@ -2862,7 +2832,7 @@ describe("verb.core.Analyze.rationalSurfaceClosestPoint",function(){
 
 });
 
-describe("verb.core.Intersect.segment_with_tri",function(){
+describe("verb.core.Intersect.segmentWithTriangle",function(){
 
 	it('gives correct result for intersecting axis aligned segment and triangle ', function(){
 
@@ -2872,7 +2842,7 @@ describe("verb.core.Intersect.segment_with_tri",function(){
 			, points = [ [0,0,0], [10,0,0], [5,10,1] ]
 			, tri = [ 0, 1, 2 ];
 
-		var res = verb.core.Intersect.segment_with_tri( p0, p1, points, tri );
+		var res = verb.core.Intersect.segmentWithTriangle( p0, p1, points, tri );
 
 		res.p.should.be.approximately(0.3, verb.core.Constants.TOLERANCE);
 		res.s.should.be.approximately(0.25, verb.core.Constants.TOLERANCE);
@@ -2896,7 +2866,7 @@ describe("verb.core.Intersect.segment_with_tri",function(){
 			, points = [ [0,0,0], [10,0,0], [5,10,0] ]
 			, tri = [ 0, 1, 2 ];
 
-		var res = verb.core.Intersect.segment_with_tri( p0, p1, points, tri );
+		var res = verb.core.Intersect.segmentWithTriangle( p0, p1, points, tri );
 
 		res.p.should.be.approximately(0.333333333333, verb.core.Constants.TOLERANCE);
 		res.s.should.be.approximately(0.25, verb.core.Constants.TOLERANCE);
@@ -2920,7 +2890,7 @@ describe("verb.core.Intersect.segment_with_tri",function(){
 			, points = [ [0,0,0], [10,0,0], [5,10,0] ]
 			, tri = [ 0, 1, 2 ];
 
-		var res = verb.core.Intersect.segment_with_tri( p0, p1, points, tri );
+		var res = verb.core.Intersect.segmentWithTriangle( p0, p1, points, tri );
 
 		(null === res).should.be.true;
 
@@ -2928,7 +2898,7 @@ describe("verb.core.Intersect.segment_with_tri",function(){
 
 });
 
-describe("verb.core.Mesh.make_mesh_aabb",function(){
+describe("verb.core.Mesh.makeMeshAabb",function(){
 
 	it('should return correct result for planar mesh', function(){
 
@@ -2944,7 +2914,7 @@ describe("verb.core.Mesh.make_mesh_aabb",function(){
 			, tris = [ [0,2,1], [1,2,3], [2,4,5], [2,5,3] ]
 			, mesh = new verb.core.MeshData(tris, points, null, null)
 			, tri_indices = [0,1,2,3]
-			, aabb = verb.core.Mesh.make_mesh_aabb(mesh, tri_indices);
+			, aabb = verb.core.Mesh.makeMeshAabb(mesh, tri_indices);
 
 		should.equal( 2, aabb.max[0] );
 		should.equal( 0, aabb.min[0] );
@@ -2955,7 +2925,7 @@ describe("verb.core.Mesh.make_mesh_aabb",function(){
 
 	});
 
-	it('make_mesh_aabb should return correct result for non-planar mesh', function(){
+	it('makeMeshAabb should return correct result for non-planar mesh', function(){
 
 		//
 		//  0  - 1
@@ -2969,7 +2939,7 @@ describe("verb.core.Mesh.make_mesh_aabb",function(){
 			, tris = [ [0,2,1], [1,2,3], [2,4,5], [2,5,3] ]
 			, mesh = new verb.core.MeshData(tris, points, null, null)
 			, tri_indices = [0,1,2,3]
-			, aabb = verb.core.Mesh.make_mesh_aabb(mesh, tri_indices);
+			, aabb = verb.core.Mesh.makeMeshAabb(mesh, tri_indices);
 
 		should.equal( 2, aabb.max[0] );
 		should.equal( 0, aabb.min[0] );
@@ -2982,7 +2952,7 @@ describe("verb.core.Mesh.make_mesh_aabb",function(){
 
 });
 
-describe("verb.core.Mesh.make_mesh_aabb_tree",function(){
+describe("verb.core.Mesh.makeMeshAabbTree",function(){
 
 	it('should return the correct structure', function(){
 
@@ -2998,7 +2968,7 @@ describe("verb.core.Mesh.make_mesh_aabb_tree",function(){
 			, tris = [ [0,2,1], [1,2,3], [2,4,5], [2,5,3] ]
 			, mesh = new verb.core.MeshData(tris, points, null, null)
 			, tri_indices = [0,1,2,3]
-			, root = verb.core.Mesh.make_mesh_aabb_tree( mesh, tri_indices );
+			, root = verb.core.Mesh.makeMeshAabbTree( mesh, tri_indices );
 
 		// root bb is correct
 		should.equal( 2, root.boundingBox.max[0] );
@@ -3039,13 +3009,13 @@ describe("verb.core.Mesh.make_mesh_aabb_tree",function(){
 
 });
 
-describe("verb.core.Mesh.get_tri_centroid",function(){
+describe("verb.core.Mesh.getTriangleCentroid",function(){
 
 	it('should return origin for zeroed triangle', function(){
 
 		var points = [[0,0,0],[0,0,0],[0,0,0]]
 			, tri = [0,1,2]
-			, centroid = verb.core.Mesh.get_tri_centroid( points, tri );
+			, centroid = verb.core.Mesh.getTriangleCentroid( points, tri );
 
 		should.equal( 0, centroid[0] );
 		should.equal( 0, centroid[1] );
@@ -3057,7 +3027,7 @@ describe("verb.core.Mesh.get_tri_centroid",function(){
 
 		var points = [[5,10,2],[3,-4,5],[-10,-3, 10]]
 			, tri = [0,1,2]
-			, centroid = verb.core.Mesh.get_tri_centroid( points, tri );
+			, centroid = verb.core.Mesh.getTriangleCentroid( points, tri );
 
 		should.equal( -2/3, centroid[0] );
 		should.equal( 1, centroid[1] );
@@ -3067,15 +3037,15 @@ describe("verb.core.Mesh.get_tri_centroid",function(){
 
 });
 
-describe("verb.core.Eval.get_min_coordinate_on_axis",function(){
+describe("verb.core.Eval.getMinCoordOnAxis",function(){
 
 	it('should return correct value', function(){
 
 		var points = [[5,10,2],[3,-4,5],[-10,-3, 10]]
 			, tri = [0,1,2]
-			, a1 = verb.core.Mesh.get_min_coordinate_on_axis( points, tri, 0 )
-			, a2 = verb.core.Mesh.get_min_coordinate_on_axis( points, tri, 1 )
-			, a3 = verb.core.Mesh.get_min_coordinate_on_axis( points, tri, 2 );
+			, a1 = verb.core.Mesh.getMinCoordOnAxis( points, tri, 0 )
+			, a2 = verb.core.Mesh.getMinCoordOnAxis( points, tri, 1 )
+			, a3 = verb.core.Mesh.getMinCoordOnAxis( points, tri, 2 );
 
 		should.equal( -10, a1 );
 		should.equal( -4, a2 );
@@ -3084,7 +3054,7 @@ describe("verb.core.Eval.get_min_coordinate_on_axis",function(){
 	});
 });
 
-describe("verb.core.Mesh.sort_tris_on_longest_axis",function(){
+describe("verb.core.Mesh.sortTrianglesOnLongestAxis",function(){
 
 	it('should return correct result with y axis regular array', function(){
 
@@ -3100,8 +3070,8 @@ describe("verb.core.Mesh.sort_tris_on_longest_axis",function(){
 			, tris = [[0,2,1], [2,4,5], [2,5,3], [1,2,3]]
 			, mesh = new verb.core.MeshData(tris, points, null, null)
 			, tri_indices = [0,1,2,3]
-			, aabb = verb.core.Mesh.make_mesh_aabb(mesh, tri_indices)
-			, sort_tri_indices = verb.core.Mesh.sort_tris_on_longest_axis( aabb, mesh, tri_indices );
+			, aabb = verb.core.Mesh.makeMeshAabb(mesh, tri_indices)
+			, sort_tri_indices = verb.core.Mesh.sortTrianglesOnLongestAxis( aabb, mesh, tri_indices );
 
 		sort_tri_indices.should.eql([ 1, 2, 3, 0 ])
 
@@ -3113,15 +3083,15 @@ describe("verb.core.Mesh.sort_tris_on_longest_axis",function(){
 			, tris = [[0,1,4], [2,3,4], [1,2,4]]
 			, mesh = new verb.core.MeshData(tris, points, null, null)
 			, tri_indices = [0,1,2]
-			, aabb = verb.core.Mesh.make_mesh_aabb(mesh, tri_indices)
-			, sort_tri_indices = verb.core.Mesh.sort_tris_on_longest_axis( aabb, mesh, tri_indices );
+			, aabb = verb.core.Mesh.makeMeshAabb(mesh, tri_indices)
+			, sort_tri_indices = verb.core.Mesh.sortTrianglesOnLongestAxis( aabb, mesh, tri_indices );
 
 		sort_tri_indices.should.eql([ 1, 0, 2 ])
 	});
 
 });
 
-describe("verb.core.Make.four_point_surface",function(){
+describe("verb.core.Make.fourPointSurface",function(){
 
 	it('can create an inclined plane', function(){
 
@@ -3130,7 +3100,7 @@ describe("verb.core.Make.four_point_surface",function(){
 			, p3 = [1,1,1]
 			, p4 = [0,1,1];
 
-		var comps = verb.core.Make.four_point_surface(p1, p2, p3, p4);
+		var comps = verb.core.Make.fourPointSurface(p1, p2, p3, p4);
 
 		comps.degreeU.should.equal(3);
 		comps.degreeV.should.equal(3);
@@ -3153,7 +3123,7 @@ describe("verb.core.Make.four_point_surface",function(){
 			, p3 = [1,1,1]
 			, p4 = [0,1,0];
 
-		var comps = verb.core.Make.four_point_surface(p1, p2, p3, p4);
+		var comps = verb.core.Make.fourPointSurface(p1, p2, p3, p4);
 
 		comps.degreeU.should.equal(3);
 		comps.degreeV.should.equal(3);
@@ -3278,7 +3248,7 @@ describe("verb.core.Intersect.polylines",function(){
 	});
 });
 
-describe("verb.core.Intersect.three_planes",function(){
+describe("verb.core.Intersect.threePlanes",function(){
 
 	it('is correct for intersection of 3 basis planes', function(){
 
@@ -3289,7 +3259,7 @@ describe("verb.core.Intersect.three_planes",function(){
 		var d3 = 0;
 		var n3 = [0,0,1];
 
-		var res = verb.core.Intersect.three_planes(n1, d1, n2, d2, n3, d3);
+		var res = verb.core.Intersect.threePlanes(n1, d1, n2, d2, n3, d3);
 		res.should.be.eql( [0,0,0] );
 
 	});
@@ -3307,7 +3277,7 @@ describe("verb.core.Intersect.three_planes",function(){
 			d2 = (Math.random() - 0.5) * 10000;
 			d3 = (Math.random() - 0.5) * 10000;
 
-			res = verb.core.Intersect.three_planes(n1, d1, n2, d2, n3, d3);
+			res = verb.core.Intersect.threePlanes(n1, d1, n2, d2, n3, d3);
 
 			res[0].should.be.approximately( d1, verb.core.Constants.EPSILON );
 			res[1].should.be.approximately( d2, verb.core.Constants.EPSILON );
@@ -3326,14 +3296,14 @@ describe("verb.core.Intersect.three_planes",function(){
 		var d3 = 10;
 		var n3 = [0,0,1];
 
-		var res = verb.core.Intersect.three_planes(n1, d1, n2, d2, n3, d3);
+		var res = verb.core.Intersect.threePlanes(n1, d1, n2, d2, n3, d3);
 		should.equal( res, null ); //non-intersect is null
 
 	});
 
 });
 
-describe("verb.core.Intersect.intersect_planes",function(){
+describe("verb.core.Intersect.planes",function(){
 
 	it('is correct for intersection of xz and yz planes', function(){
 
@@ -3380,7 +3350,7 @@ describe("verb.core.Intersect.intersect_planes",function(){
 
 });
 
-describe("verb.core.Intersect.clip_ray_in_coplanar_tri",function(){
+describe("verb.core.Intersect.clipRayInCoplanarTriangle",function(){
 
 	it('is correct for a basic example 1', function(){
 
@@ -3392,7 +3362,7 @@ describe("verb.core.Intersect.clip_ray_in_coplanar_tri",function(){
 		var uvs = [ [0,0], [2,0], [2, 2] ];
 		var mesh = new verb.core.MeshData(tri, pts, null, uvs);
 
-		var res = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh, 0);
+		var res = verb.core.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh, 0);
 
 
 
@@ -3417,7 +3387,7 @@ describe("verb.core.Intersect.clip_ray_in_coplanar_tri",function(){
 		var uvs = [ [0,0], [2,0], [2, 2] ];
 
 		var mesh = new verb.core.MeshData(tri, pts, null, uvs);
-		var res = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh, 0 );
+		var res = verb.core.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh, 0 );
 
 		res.min.u.should.be.approximately(0.5, verb.core.Constants.TOLERANCE);
 		res.max.u.should.be.approximately(1, verb.core.Constants.TOLERANCE);
@@ -3440,7 +3410,7 @@ describe("verb.core.Intersect.clip_ray_in_coplanar_tri",function(){
 		var uvs = [ [0,0], [2,0], [2, 2] ];
 
 		var mesh = new verb.core.MeshData(tri, pts, null, uvs);
-		var res = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh, 0 );
+		var res = verb.core.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh, 0 );
 
 		res.min.u.should.be.approximately(Math.sqrt(2)/2, verb.core.Constants.TOLERANCE);
 		res.max.u.should.be.approximately(3 * Math.sqrt(2)/2, verb.core.Constants.TOLERANCE);
@@ -3463,7 +3433,7 @@ describe("verb.core.Intersect.clip_ray_in_coplanar_tri",function(){
 		var uvs = [ [0,0], [2,0], [2, 2] ];
 
 		var mesh = new verb.core.MeshData(tri, pts, null, uvs);
-		var res = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh, 0 );
+		var res = verb.core.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh, 0 );
 
 		res.min.u.should.be.approximately(Math.sqrt(2), verb.core.Constants.TOLERANCE);
 		res.max.u.should.be.approximately(2 * Math.sqrt(2), verb.core.Constants.TOLERANCE);
@@ -3486,7 +3456,7 @@ describe("verb.core.Intersect.clip_ray_in_coplanar_tri",function(){
 		var uvs = [ [0,0], [2,0], [2, 2] ];
 
 		var mesh = new verb.core.MeshData(tri, pts, null, uvs);
-		var res = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh, 0 );
+		var res = verb.core.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh, 0 );
 
 		res.min.u.should.be.approximately(0, verb.core.Constants.TOLERANCE);
 		res.max.u.should.be.approximately(Math.sqrt(2), verb.core.Constants.TOLERANCE);
@@ -3509,7 +3479,7 @@ describe("verb.core.Intersect.clip_ray_in_coplanar_tri",function(){
 		var uvs = [ [0,0], [2,0], [2, 2] ];
 
 		var mesh = new verb.core.MeshData(tri, pts, null, uvs);
-		var res = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh, 0 );
+		var res = verb.core.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh, 0 );
 
 		res.min.u.should.be.approximately(1, verb.core.Constants.TOLERANCE);
 		res.max.u.should.be.approximately(2, verb.core.Constants.TOLERANCE);
@@ -3524,7 +3494,7 @@ describe("verb.core.Intersect.clip_ray_in_coplanar_tri",function(){
 
 });
 
-describe("verb.core.Intersect.merge_tri_clip_intervals",function(){
+describe("verb.core.Intersect.mergeTriangleClipIntervals",function(){
 
 	it('is correct for a basic example', function(){
 
@@ -3536,16 +3506,16 @@ describe("verb.core.Intersect.merge_tri_clip_intervals",function(){
 		var uvs1 = [ [0,0], [2,0], [2, 2] ];
 		var mesh1 = new verb.core.MeshData(tri1, pts1, null, uvs1);
 
-		var clip1 = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh1, 0 );
+		var clip1 = verb.core.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh1, 0 );
 
 		var pts2 = [ [1,0.5,-1], [1,2.5,-1], [1,0.5,1] ];
 		var tri2 = [[ 0, 1, 2 ]];
 		var uvs2 = [ [0,0], [2,0], [0,2] ];
 		var mesh2 = new verb.core.MeshData(tri2, pts2, null, uvs2);
 
-		var clip2 = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh2, 0 );
+		var clip2 = verb.core.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh2, 0 );
 
-		var res = verb.core.Intersect.merge_tri_clip_intervals(clip1, clip2, mesh1, 0, mesh2, 0);
+		var res = verb.core.Intersect.mergeTriangleClipIntervals(clip1, clip2, mesh1, 0, mesh2, 0);
 
 		vecShouldBe( [1, 0.5], res.min.uv0 );
 		vecShouldBe( [0, 1], res.min.uv1 );
@@ -3567,16 +3537,16 @@ describe("verb.core.Intersect.merge_tri_clip_intervals",function(){
 		var uvs1 = [ [0,0], [2,0], [2, 2] ];
 		var mesh1 = new verb.core.MeshData(tri1, pts1, null, uvs1);
 
-		var clip1 = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh1, 0 );
+		var clip1 = verb.core.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh1, 0 );
 
 		var pts2 = [ [2,0,0], [2, 2, 0], [2, 0, 2] ];
 		var tri2 = [[ 0, 1, 2 ]];
 		var uvs2 = [ [0,0], [2,0], [0,2] ];
 		var mesh2 = new verb.core.MeshData(tri2, pts2, null, uvs2);
 
-		var clip2 = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh2, 0 );
+		var clip2 = verb.core.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh2, 0 );
 
-		var res = verb.core.Intersect.merge_tri_clip_intervals(clip1, clip2, mesh1, 0, mesh2, 0);
+		var res = verb.core.Intersect.mergeTriangleClipIntervals(clip1, clip2, mesh1, 0, mesh2, 0);
 
 		vecShouldBe( [2, 0], res.min.uv0 );
 		vecShouldBe( [0, 0], res.min.uv1 );
@@ -3727,7 +3697,7 @@ describe("verb.core.Intersect.curves",function(){
 
 });
 
-describe("verb.core.Intersect.curve_and_surface",function(){
+describe("verb.core.Intersect.curveAndSurface",function(){
 
 	it('gives valid result for planar surface and line', function(){
 
@@ -3745,7 +3715,7 @@ describe("verb.core.Intersect.curve_and_surface",function(){
 			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.2,5.2,-10,1] ]
 			, curve = new verb.core.CurveData( degree_crv, knots_crv, homo_controlPoints_crv );
 
-		var res = verb.core.Intersect.curve_and_surface( curve, surface, verb.core.Constants.TOLERANCE );
+		var res = verb.core.Intersect.curveAndSurface( curve, surface, verb.core.Constants.TOLERANCE );
 
 		res.length.should.be.equal( 1 );
 
@@ -3771,7 +3741,7 @@ describe("verb.core.Intersect.curve_and_surface",function(){
 			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.2,5.2,-2.5,1], [5.2,5.2,-10,1] ]
 			, curve = new verb.core.CurveData( degree_crv, knots_crv, homo_controlPoints_crv );
 
-		var res = verb.core.Intersect.curve_and_surface( curve, surface, verb.core.Constants.TOLERANCE );
+		var res = verb.core.Intersect.curveAndSurface( curve, surface, verb.core.Constants.TOLERANCE );
 
 		res.length.should.be.equal( 1 );
 		res[0].u.should.be.approximately( 1/3, 1e-3 );
@@ -3796,7 +3766,7 @@ describe("verb.core.Intersect.curve_and_surface",function(){
 			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.4,4.8,0,1], [5.2,5.2,-5,1] ]
 			, curve = new verb.core.CurveData( degree_crv, knots_crv, homo_controlPoints_crv );
 
-		var res =  verb.core.Intersect.curve_and_surface( curve, surface, verb.core.Constants.TOLERANCE  );
+		var res =  verb.core.Intersect.curveAndSurface( curve, surface, verb.core.Constants.TOLERANCE  );
 
 		res.length.should.be.equal( 1 );
 		res[0].u.should.be.approximately( 0.5, 1e-3 );
@@ -3821,14 +3791,14 @@ describe("verb.core.Intersect.curve_and_surface",function(){
 			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.2,5.2,2,1] ]
 			, curve = new verb.core.CurveData( degree_crv, knots_crv, homo_controlPoints_crv );
 
-		var res =  verb.core.Intersect.curve_and_surface( curve, surface );
+		var res =  verb.core.Intersect.curveAndSurface( curve, surface );
 		res.length.should.be.equal( 0 );
 
 	});
 
 });
 
-describe("verb.core.Intersect.curve_and_surface_with_estimate",function(){
+describe("verb.core.Intersect.curveAndSurfaceWithEstimate",function(){
 
 	it('gives valid result for planar surface and degree 2 bezier', function(){
 
@@ -3846,7 +3816,7 @@ describe("verb.core.Intersect.curve_and_surface_with_estimate",function(){
 
 		var start_params = [ 0.45, 0.25, 0.55 ];
 
-		var res = verb.core.Intersect.curve_and_surface_with_estimate( curve, surface, start_params, verb.core.Constants.TOLERANCE );
+		var res = verb.core.Intersect.curveAndSurfaceWithEstimate( curve, surface, start_params, verb.core.Constants.TOLERANCE );
 
 		res.u.should.be.approximately(0.5, 1e-3);
 		res.uv[0].should.be.approximately(0.265, 1e-3);
@@ -3855,7 +3825,6 @@ describe("verb.core.Intersect.curve_and_surface_with_estimate",function(){
 	});
 
 });
-
 
 describe("verb.core.KdTree",function(){
 
@@ -3886,8 +3855,7 @@ describe("verb.core.KdTree",function(){
 
 });
 
-
-describe("verb.core.Intersect.lookup_adj_segment",function(){
+describe("verb.core.Intersect.lookupAdjacentSegment",function(){
 
 	var segs = [
 		new verb.core.Interval(
@@ -3904,8 +3872,8 @@ describe("verb.core.Intersect.lookup_adj_segment",function(){
 
 		var end = segs[0].min;
 
-		var tree = verb.core.Intersect.kdtree_from_segs( segs );
-		var nearest = verb.core.Intersect.lookup_adj_segment( end, tree );
+		var tree = verb.core.Intersect.kdTreeFromSegments( segs );
+		var nearest = verb.core.Intersect.lookupAdjacentSegment( end, tree );
 
 		should.equal( nearest, null );
 
@@ -3915,8 +3883,8 @@ describe("verb.core.Intersect.lookup_adj_segment",function(){
 
 		var end = new verb.core.MeshIntersectionPoint([0,0], [0,0], [1,2,3], 0, 0 ); // same pos, but different object
 
-		var tree = verb.core.Intersect.kdtree_from_segs( segs );
-		var nearest = verb.core.Intersect.lookup_adj_segment( end, tree );
+		var tree = verb.core.Intersect.kdTreeFromSegments( segs );
+		var nearest = verb.core.Intersect.lookupAdjacentSegment( end, tree );
 
 		nearest.should.be.equal(segs[0].min)
 
@@ -3924,7 +3892,7 @@ describe("verb.core.Intersect.lookup_adj_segment",function(){
 
 });
 
-describe("verb.core.Intersect.make_mesh_intersection_polylines ",function(){
+describe("verb.core.Intersect.makeMeshIntersectionPolylines ",function(){
 
 	it('is correct for a basic example', function(){
 
@@ -3939,7 +3907,7 @@ describe("verb.core.Intersect.make_mesh_intersection_polylines ",function(){
 				new verb.core.MeshIntersectionPoint([0,0], [0,0], [5,0,0], 0, 0 ),
 				new verb.core.MeshIntersectionPoint([0,0], [0,0], [0,10,0], 0, 0 ))  ];
 
-		var pls = verb.core.Intersect.make_mesh_intersection_polylines( segs );
+		var pls = verb.core.Intersect.makeMeshIntersectionPolylines( segs );
 
 		// discovers one continuous polyline
 		pls.length.should.be.equal( 1 );
@@ -3953,7 +3921,7 @@ describe("verb.core.Intersect.make_mesh_intersection_polylines ",function(){
 
 });
 
-describe("verb.core.Intersect.kdtree_from_segs",function(){
+describe("verb.core.Intersect.kdTreeFromSegments",function(){
 
 	it('is correct for a basic example', function(){
 
@@ -3968,7 +3936,7 @@ describe("verb.core.Intersect.kdtree_from_segs",function(){
 				new verb.core.MeshIntersectionPoint([0,0], [0,0], [3,2,3], 0, 0 ),
 				new verb.core.MeshIntersectionPoint([0,0], [0,0], [7,6,7], 0, 0 ))  ];
 
-		var tree = verb.core.Intersect.kdtree_from_segs( segs );
+		var tree = verb.core.Intersect.kdTreeFromSegments( segs );
 
 		tree.should.not.be.null;
 
@@ -4022,14 +3990,14 @@ describe("verb.core.Intersect.meshes",function(){
 			, p3 = [1,1,0]
 			, p4 = [0,1,0];
 
-		var srf1 = verb.core.Make.four_point_surface( p1, p2, p3, p4 );
+		var srf1 = verb.core.Make.fourPointSurface( p1, p2, p3, p4 );
 
 		var p5 = [0.5,-0.5,-0.5]
 			, p6 = [0.5,0.5,-0.5]
 			, p7 = [0.5,0.5,0.5]
 			, p8 = [0.5,-0.5,0.5];
 
-		var srf2 = verb.core.Make.four_point_surface( p5, p6, p7, p8 );
+		var srf2 = verb.core.Make.fourPointSurface( p5, p6, p7, p8 );
 
 		var tess1 = verb.core.Tess.rational_surface_adaptive( srf1 );
 		var tess2 = verb.core.Tess.rational_surface_adaptive( srf2 );
@@ -4041,7 +4009,7 @@ describe("verb.core.Intersect.meshes",function(){
 
 });
 
-describe("verb.core.Mesh.tri_uv_from_point",function(){
+describe("verb.core.Mesh.triangleUVFromPoint",function(){
 
 	it('is correct for a basic example', function(){
 
@@ -4051,7 +4019,7 @@ describe("verb.core.Mesh.tri_uv_from_point",function(){
 		var pt = [0.5, 0.25, 0];
 		var mesh = new verb.core.MeshData(tris, pts, null, uvs);
 
-		var uv = verb.core.Mesh.tri_uv_from_point( mesh, 0, pt );
+		var uv = verb.core.Mesh.triangleUVFromPoint( mesh, 0, pt );
 
 		uv[0].should.be.approximately( pt[0], verb.core.Constants.TOLERANCE );
 		uv[1].should.be.approximately( pt[1], verb.core.Constants.TOLERANCE );
@@ -4059,7 +4027,7 @@ describe("verb.core.Mesh.tri_uv_from_point",function(){
 	});
 });
 
-describe("verb.core.Eval.volume_point",function(){
+describe("verb.core.Eval.volumePoint",function(){
 
 	it('gives valid result for uniform 3x3x3 cube', function(){
 
@@ -4096,7 +4064,7 @@ describe("verb.core.Eval.volume_point",function(){
 		for (var i = 0; i < 10; i++){
 
 			var u = Math.random(), v = Math.random(), w = Math.random()
-			var result = verb.core.Eval.volume_point( volume, u, v, w );
+			var result = verb.core.Eval.volumePoint( volume, u, v, w );
 
 			result[0].should.be.approximately( u, verb.core.Constants.TOLERANCE );
 			result[1].should.be.approximately( v, verb.core.Constants.TOLERANCE );
@@ -5939,12 +5907,12 @@ describe("verb.core.Eval.intersect_aabb_trees",function(){
 		var points1 = [ [0,0,0], [1,0,0], [0, -1, 0 ], [2, -1, 0], [0, -2, 0], [1, -2, 0] ]
 			, tris1 = [ [0,2,1], [1,2,3], [2,4,5], [2,5,3] ]
 			, tri_indices1 = [0,1,2,3]
-			, aabb1 = verb.core.Eval.make_mesh_aabb_tree( points1, tris1, tri_indices1 )
+			, aabb1 = verb.core.Eval.makeMeshAabbTree( points1, tris1, tri_indices1 )
 
 			, points2 = [ [0.5,-2,0.5], [0.5,-2,-1], [1,0.5,-1 ] ]
 			, tris2 = [ [0,1,2] ]
 			, tri_indices2 = [0]
-			, aabb2 = verb.core.Eval.make_mesh_aabb_tree( points2, tris2, tri_indices2 )
+			, aabb2 = verb.core.Eval.makeMeshAabbTree( points2, tris2, tri_indices2 )
 			, inter_result = verb.core.Eval.intersect_aabb_trees( points1, tris1, points2, tris2, aabb1, aabb2 );
 
 		// find all 4 triangle intersections

@@ -68,17 +68,17 @@ class Modify {
 
         var knots
         , degree
-        , control_points;
+        , controlPoints;
 
         if (!useV) {
 
-            control_points = Mat.transpose( surface.controlPoints );
+            controlPoints = Mat.transpose( surface.controlPoints );
             knots = surface.knotsU;
             degree = surface.degreeU;
 
         } else {
 
-            control_points = surface.controlPoints;
+            controlPoints = surface.controlPoints;
             knots = surface.knotsV;
             degree = surface.degreeV;
 
@@ -89,10 +89,10 @@ class Modify {
         var newpts0 = new Array<Array<Point>>()
         , newpts1 = new Array<Array<Point>>();
 
-        var s = Eval.knot_span( degree, u, knots );
+        var s = Eval.knotSpan( degree, u, knots );
         var res : CurveData = null;
 
-        for (cps in control_points){
+        for (cps in controlPoints){
 
             res = curve_knot_refine( new CurveData(degree, knots, cps), knots_to_insert );
 
@@ -131,7 +131,7 @@ class Modify {
     public static function curve_bezier_decompose( curve : CurveData ) : Array<CurveData> {
 
         var degree = curve.degree
-        , control_points = curve.controlPoints
+        , controlPoints = curve.controlPoints
         , knots = curve.knots;
 
         // find all of the unique knot values and their multiplicity
@@ -145,10 +145,10 @@ class Modify {
             if ( knotmult.mult < reqMult ){
 
                 var knotsInsert = Vec.rep( reqMult - knotmult.mult, knotmult.knot );
-                var res = curve_knot_refine( new CurveData(degree, knots, control_points), knotsInsert );
+                var res = curve_knot_refine( new CurveData(degree, knots, controlPoints), knotsInsert );
 
                 knots = res.knots;
-                control_points = res.controlPoints;
+                controlPoints = res.controlPoints;
             }
         }
 
@@ -158,9 +158,9 @@ class Modify {
         var crvs = [];
 
         var i = 0;
-        while ( i < control_points.length){
+        while ( i < controlPoints.length){
             var kts = knots.slice( i, i + crvKnotLength );
-            var pts = control_points.slice( i, i + reqMult );
+            var pts = controlPoints.slice( i, i + reqMult );
 
             crvs.push( new CurveData(degree, kts, pts ) );
 
@@ -209,13 +209,13 @@ class Modify {
     public static function curve_split( curve : CurveData, u : Float ) : Array<CurveData> {
 
         var degree = curve.degree
-        , control_points = curve.controlPoints
+        , controlPoints = curve.controlPoints
         , knots = curve.knots;
 
         var knots_to_insert = [for (i in 0...degree+1) u];
         var res = curve_knot_refine( curve, knots_to_insert );
 
-        var s = Eval.knot_span( degree, u, knots );
+        var s = Eval.knotSpan( degree, u, knots );
 
         var knots0 = res.knots.slice(0, s + degree + 2);
         var knots1 = res.knots.slice( s + 1 );
@@ -245,24 +245,24 @@ class Modify {
     public static function curve_knot_refine( curve : CurveData, knots_to_insert : Array<Float> ) : CurveData {
 
         var degree = curve.degree
-        , control_points = curve.controlPoints
+        , controlPoints = curve.controlPoints
         , knots = curve.knots;
 
-        var n = control_points.length - 1
+        var n = controlPoints.length - 1
         , m = n + degree + 1
         , r = knots_to_insert.length - 1
-        , a = Eval.knot_span( degree, knots_to_insert[0], knots )
-        , b = Eval.knot_span( degree, knots_to_insert[r], knots )
-        , control_points_post = new CurvePointArray()
+        , a = Eval.knotSpan( degree, knots_to_insert[0], knots )
+        , b = Eval.knotSpan( degree, knots_to_insert[r], knots )
+        , controlPoints_post = new CurvePointArray()
         , knots_post = new KnotArray();
 
         // new control pts
         for (i in 0...a-degree+1){
-            control_points_post[i] = control_points[i];
+            controlPoints_post[i] = controlPoints[i];
         }
 
         for (i in b-1...n+1){
-            control_points_post[i+r+1] = control_points[i];
+            controlPoints_post[i+r+1] = controlPoints[i];
         }
 
         // new knot vector
@@ -282,14 +282,14 @@ class Modify {
 
             while (knots_to_insert[j] <= knots[i] && i > a){
 
-                control_points_post[k-degree-1] = control_points[i-degree-1];
+                controlPoints_post[k-degree-1] = controlPoints[i-degree-1];
                 knots_post[k] = knots[i];
                 k = k-1;
                 i = i-1;
 
             }
 
-            control_points_post[k-degree-1] = control_points_post[k-degree];
+            controlPoints_post[k-degree-1] = controlPoints_post[k-degree];
 
             for ( l in 1...degree+1){
 
@@ -297,13 +297,13 @@ class Modify {
                 var alfa = knots_post[k+l] - knots_to_insert[j];
 
                 if (Math.abs(alfa) < Constants.EPSILON){
-                    control_points_post[ind-1] = control_points_post[ind];
+                    controlPoints_post[ind-1] = controlPoints_post[ind];
                 } else {
                     alfa = alfa / (knots_post[k+l] - knots[i-degree+l]);
 
-                    control_points_post[ind-1] = Vec.add(
-                        Vec.mul( alfa, control_points_post[ind-1] ),
-                        Vec.mul( (1.0 - alfa), control_points_post[ind]) );
+                    controlPoints_post[ind-1] = Vec.add(
+                        Vec.mul( alfa, controlPoints_post[ind-1] ),
+                        Vec.mul( (1.0 - alfa), controlPoints_post[ind]) );
                 }
 
             }
@@ -315,7 +315,7 @@ class Modify {
 
         }
 
-        return new CurveData(degree, knots_post, control_points_post );
+        return new CurveData(degree, knots_post, controlPoints_post );
     }
 
     // Insert a knot along a rational curve.  Note that this algorithm only works
@@ -333,29 +333,29 @@ class Modify {
     // + number of times to insert the knot
     //
     // **returns**
-    // + *Object* the new curve, defined by knots and control_points
+    // + *Object* the new curve, defined by knots and controlPoints
     //
 
     public static function curve_knot_insert( curve : CurveData, u : Float, r : Int ) : CurveData {
 
         var degree = curve.degree
-        , control_points = curve.controlPoints
+        , controlPoints = curve.controlPoints
         , knots = curve.knots;
 
         // num_pts is num control points for the initial curve
         // k is the span on which the knots are inserted
         // s is the initial multiplicity of the knot
         // r is the number of times to insert the knot
-        // control_points is initial set of control points
+        // controlPoints is initial set of control points
 
         var s = 0; // assume original multiplicity is 0 - TODO add check for multiplicity in knots
 
-        var num_pts = control_points.length
-        , k = Eval.knot_span( degree, u, knots ) // the span in which the knot will be inserted
+        var num_pts = controlPoints.length
+        , k = Eval.knotSpan( degree, u, knots ) // the span in which the knot will be inserted
         , num_pts_post = num_pts + r // a new control pt for every new knot
-        , control_points_temp = new CurvePointArray() // new Array( degree - s )
+        , controlPoints_temp = new CurvePointArray() // new Array( degree - s )
         , knots_post = new KnotArray() // new Array( knots.length + r )  // r new knots
-        , control_points_post = new CurvePointArray() // new Array( num_pts_post )
+        , controlPoints_post = new CurvePointArray() // new Array( num_pts_post )
         , i = 0;
 
         // new knot vector
@@ -379,17 +379,17 @@ class Modify {
 
         // copy the original control points before the insertion span
         for (i in 0...k - degree + 1){
-            control_points_post[i] = control_points[i];
+            controlPoints_post[i] = controlPoints[i];
         }
 
         // copy the original controls after the insertion span
         for (i in k-s...num_pts){
-            control_points_post[i+r] = control_points[i];
+            controlPoints_post[i+r] = controlPoints[i];
         }
 
         // collect the affected control points in this temporary array
         for (i in 0...degree-s+1){
-            control_points_temp[i] = control_points[k-degree+i];
+            controlPoints_temp[i] = controlPoints[k-degree+i];
         }
 
         var L : Int = 0
@@ -404,23 +404,23 @@ class Modify {
 
                 alpha = ( u - knots[L+i] ) / ( knots[i+k+1] - knots[L+i] );
 
-                control_points_temp[i] = Vec.add(
-                        Vec.mul( alpha, control_points_temp[i+1] ),
-                        Vec.mul( (1.0 - alpha), control_points_temp[i])
+                controlPoints_temp[i] = Vec.add(
+                        Vec.mul( alpha, controlPoints_temp[i+1] ),
+                        Vec.mul( (1.0 - alpha), controlPoints_temp[i])
                     );
             }
 
-            control_points_post[ L ] = control_points_temp[0];
-            control_points_post[k+r-j-s] = control_points_temp[degree-j-s];
+            controlPoints_post[ L ] = controlPoints_temp[0];
+            controlPoints_post[k+r-j-s] = controlPoints_temp[degree-j-s];
 
         }
 
         // not so confident about this part
         for (i in L+1...k-s){
-            control_points_post[i] = control_points_temp[ i - L ];
+            controlPoints_post[i] = controlPoints_temp[ i - L ];
         }
 
-        return new CurveData(degree, knots_post, control_points_post);
+        return new CurveData(degree, knots_post, controlPoints_post);
     }
 
 }

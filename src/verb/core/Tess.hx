@@ -162,9 +162,9 @@ class Tess {
 		if ( divs_u < 1 ) { divs_u = 1; }
 		if ( divs_v < 1 ) { divs_v = 1; }
 
-		var degree_u = surface.degreeU
+		var degreeU = surface.degreeU
 		, degreeV = surface.degreeV
-		, control_points = surface.controlPoints
+		, controlPoints = surface.controlPoints
 		, knotsU = surface.knotsU
 		, knotsV = surface.knotsV;
 

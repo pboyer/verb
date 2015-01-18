@@ -513,48 +513,48 @@ verb.core.Divide.rationalCurveByArcLength = function(curve,l) {
 	return pts;
 };
 verb.core.Eval = $hx_exports.core.Eval = function() { };
-verb.core.Eval.volume_point = function(volume,u,v,w) {
+verb.core.Eval.volumePoint = function(volume,u,v,w) {
 	var n = volume.knotsU.length - volume.degreeU - 2;
 	var m = volume.knotsV.length - volume.degreeV - 2;
 	var l = volume.knotsW.length - volume.degreeW - 2;
-	return verb.core.Eval.volume_point_given_n_m_l(volume,n,m,l,u,v,w);
+	return verb.core.Eval.volumePointGivenNML(volume,n,m,l,u,v,w);
 };
-verb.core.Eval.volume_point_given_n_m_l = function(volume,n,m,l,u,v,w) {
-	var control_points = volume.controlPoints;
-	var degree_u = volume.degreeU;
-	var degree_v = volume.degreeV;
-	var degree_w = volume.degreeW;
-	var knots_u = volume.knotsU;
-	var knots_v = volume.knotsV;
-	var knots_w = volume.knotsW;
-	var dim = control_points[0][0][0].length;
-	var knot_span_index_u = verb.core.Eval.knot_span_given_n(n,degree_u,u,knots_u);
-	var knot_span_index_v = verb.core.Eval.knot_span_given_n(m,degree_v,v,knots_v);
-	var knot_span_index_w = verb.core.Eval.knot_span_given_n(l,degree_w,w,knots_w);
-	var u_basis_vals = verb.core.Eval.basis_functions_given_knot_span_index(knot_span_index_u,u,degree_u,knots_u);
-	var v_basis_vals = verb.core.Eval.basis_functions_given_knot_span_index(knot_span_index_v,v,degree_v,knots_v);
-	var w_basis_vals = verb.core.Eval.basis_functions_given_knot_span_index(knot_span_index_w,w,degree_w,knots_w);
-	var uind = knot_span_index_u - degree_u;
+verb.core.Eval.volumePointGivenNML = function(volume,n,m,l,u,v,w) {
+	var controlPoints = volume.controlPoints;
+	var degreeU = volume.degreeU;
+	var degreeV = volume.degreeV;
+	var degreeW = volume.degreeW;
+	var knotsU = volume.knotsU;
+	var knotsV = volume.knotsV;
+	var knotsW = volume.knotsW;
+	var dim = controlPoints[0][0][0].length;
+	var knotSpan_index_u = verb.core.Eval.knotSpanGivenN(n,degreeU,u,knotsU);
+	var knotSpan_index_v = verb.core.Eval.knotSpanGivenN(m,degreeV,v,knotsV);
+	var knotSpan_index_w = verb.core.Eval.knotSpanGivenN(l,degreeW,w,knotsW);
+	var u_basis_vals = verb.core.Eval.basis_functions_given_knotSpan_index(knotSpan_index_u,u,degreeU,knotsU);
+	var v_basis_vals = verb.core.Eval.basis_functions_given_knotSpan_index(knotSpan_index_v,v,degreeV,knotsV);
+	var w_basis_vals = verb.core.Eval.basis_functions_given_knotSpan_index(knotSpan_index_w,w,degreeW,knotsW);
+	var uind = knotSpan_index_u - degreeU;
 	var position = verb.core.Vec.zeros1d(dim);
 	var temp = verb.core.Vec.zeros1d(dim);
 	var temp2 = verb.core.Vec.zeros1d(dim);
 	var _g1 = 0;
-	var _g = degree_w + 1;
+	var _g = degreeW + 1;
 	while(_g1 < _g) {
 		var i = _g1++;
 		temp2 = verb.core.Vec.zeros1d(dim);
-		var wind = knot_span_index_w - degree_w + i;
+		var wind = knotSpan_index_w - degreeW + i;
 		var _g3 = 0;
-		var _g2 = degree_v + 1;
+		var _g2 = degreeV + 1;
 		while(_g3 < _g2) {
 			var j = _g3++;
 			temp = verb.core.Vec.zeros1d(dim);
-			var vind = knot_span_index_v - degree_v + j;
+			var vind = knotSpan_index_v - degreeV + j;
 			var _g5 = 0;
-			var _g4 = degree_u + 1;
+			var _g4 = degreeU + 1;
 			while(_g5 < _g4) {
 				var k = _g5++;
-				temp = verb.core.Vec.add(temp,verb.core.Vec.mul(u_basis_vals[k],control_points[uind + k][vind][wind]));
+				temp = verb.core.Vec.add(temp,verb.core.Vec.mul(u_basis_vals[k],controlPoints[uind + k][vind][wind]));
 			}
 			temp2 = verb.core.Vec.add(temp2,verb.core.Vec.mul(v_basis_vals[j],temp));
 		}
@@ -667,17 +667,17 @@ verb.core.Eval.dehomogenize_1d = function(homo_points) {
 verb.core.Eval.dehomogenize_2d = function(homo_points) {
 	return homo_points.map(verb.core.Eval.dehomogenize_1d);
 };
-verb.core.Eval.homogenize_1d = function(control_points,weights) {
-	var rows = control_points.length;
-	var dim = control_points[0].length;
-	var homo_control_points = new Array();
+verb.core.Eval.homogenize_1d = function(controlPoints,weights) {
+	var rows = controlPoints.length;
+	var dim = controlPoints[0].length;
+	var homo_controlPoints = new Array();
 	var wt = 0.0;
 	var ref_pt = new Array();
 	var _g = 0;
 	while(_g < rows) {
 		var i = _g++;
 		var pt = [];
-		ref_pt = control_points[i];
+		ref_pt = controlPoints[i];
 		wt = weights[i];
 		var _g1 = 0;
 		while(_g1 < dim) {
@@ -685,19 +685,19 @@ verb.core.Eval.homogenize_1d = function(control_points,weights) {
 			pt.push(ref_pt[k] * wt);
 		}
 		pt.push(wt);
-		homo_control_points.push(pt);
+		homo_controlPoints.push(pt);
 	}
-	return homo_control_points;
+	return homo_controlPoints;
 };
-verb.core.Eval.homogenize_2d = function(control_points,weights) {
-	var rows = control_points.length;
-	var homo_control_points = new Array();
+verb.core.Eval.homogenize_2d = function(controlPoints,weights) {
+	var rows = controlPoints.length;
+	var homo_controlPoints = new Array();
 	var _g = 0;
 	while(_g < rows) {
 		var i = _g++;
-		homo_control_points.push(verb.core.Eval.homogenize_1d(control_points[i],weights[i]));
+		homo_controlPoints.push(verb.core.Eval.homogenize_1d(controlPoints[i],weights[i]));
 	}
-	return homo_control_points;
+	return homo_controlPoints;
 };
 verb.core.Eval.surface_derivs = function(surface,num_derivatives,u,v) {
 	var n = surface.knotsU.length - surface.degreeU - 2;
@@ -705,38 +705,38 @@ verb.core.Eval.surface_derivs = function(surface,num_derivatives,u,v) {
 	return verb.core.Eval.surface_derivs_given_n_m(n,m,surface,num_derivatives,u,v);
 };
 verb.core.Eval.surface_derivs_given_n_m = function(n,m,surface,num_derivatives,u,v) {
-	var degree_u = surface.degreeU;
-	var degree_v = surface.degreeV;
-	var control_points = surface.controlPoints;
-	var knots_u = surface.knotsU;
-	var knots_v = surface.knotsV;
-	if(!verb.core.Eval.are_valid_relations(degree_u,control_points.length,knots_u.length) || !verb.core.Eval.are_valid_relations(degree_v,control_points[0].length,knots_v.length)) throw "Invalid relations between control points, knot vector, and n";
-	var dim = control_points[0][0].length;
+	var degreeU = surface.degreeU;
+	var degreeV = surface.degreeV;
+	var controlPoints = surface.controlPoints;
+	var knotsU = surface.knotsU;
+	var knotsV = surface.knotsV;
+	if(!verb.core.Eval.are_valid_relations(degreeU,controlPoints.length,knotsU.length) || !verb.core.Eval.are_valid_relations(degreeV,controlPoints[0].length,knotsV.length)) throw "Invalid relations between control points, knot vector, and n";
+	var dim = controlPoints[0][0].length;
 	var du;
-	if(num_derivatives < degree_u) du = num_derivatives; else du = degree_u;
+	if(num_derivatives < degreeU) du = num_derivatives; else du = degreeU;
 	var dv;
-	if(num_derivatives < degree_v) dv = num_derivatives; else dv = degree_v;
+	if(num_derivatives < degreeV) dv = num_derivatives; else dv = degreeV;
 	var SKL = verb.core.Vec.zeros3d(du + 1,dv + 1,dim);
-	var knot_span_index_u = verb.core.Eval.knot_span_given_n(n,degree_u,u,knots_u);
-	var knot_span_index_v = verb.core.Eval.knot_span_given_n(m,degree_v,v,knots_v);
-	var uders = verb.core.Eval.deriv_basis_functions_given_n_i(knot_span_index_u,u,degree_u,n,knots_u);
-	var vders = verb.core.Eval.deriv_basis_functions_given_n_i(knot_span_index_v,v,degree_v,m,knots_v);
-	var temp = verb.core.Vec.zeros2d(degree_v + 1,dim);
+	var knotSpan_index_u = verb.core.Eval.knotSpanGivenN(n,degreeU,u,knotsU);
+	var knotSpan_index_v = verb.core.Eval.knotSpanGivenN(m,degreeV,v,knotsV);
+	var uders = verb.core.Eval.deriv_basis_functions_given_n_i(knotSpan_index_u,u,degreeU,n,knotsU);
+	var vders = verb.core.Eval.deriv_basis_functions_given_n_i(knotSpan_index_v,v,degreeV,m,knotsV);
+	var temp = verb.core.Vec.zeros2d(degreeV + 1,dim);
 	var dd = 0;
 	var _g1 = 0;
 	var _g = du + 1;
 	while(_g1 < _g) {
 		var k = _g1++;
 		var _g3 = 0;
-		var _g2 = degree_v + 1;
+		var _g2 = degreeV + 1;
 		while(_g3 < _g2) {
 			var s = _g3++;
 			temp[s] = verb.core.Vec.zeros1d(dim);
 			var _g5 = 0;
-			var _g4 = degree_u + 1;
+			var _g4 = degreeU + 1;
 			while(_g5 < _g4) {
 				var r = _g5++;
-				temp[s] = verb.core.Vec.add(temp[s],verb.core.Vec.mul(uders[k][r],control_points[knot_span_index_u - degree_u + r][knot_span_index_v - degree_v + s]));
+				temp[s] = verb.core.Vec.add(temp[s],verb.core.Vec.mul(uders[k][r],controlPoints[knotSpan_index_u - degreeU + r][knotSpan_index_v - degreeV + s]));
 			}
 		}
 		var nk = num_derivatives - k;
@@ -747,7 +747,7 @@ verb.core.Eval.surface_derivs_given_n_m = function(n,m,surface,num_derivatives,u
 			var l = _g31++;
 			SKL[k][l] = verb.core.Vec.zeros1d(dim);
 			var _g51 = 0;
-			var _g41 = degree_v + 1;
+			var _g41 = degreeV + 1;
 			while(_g51 < _g41) {
 				var s1 = _g51++;
 				SKL[k][l] = verb.core.Vec.add(SKL[k][l],verb.core.Vec.mul(vders[l][s1],temp[s1]));
@@ -762,32 +762,32 @@ verb.core.Eval.surface_point = function(surface,u,v) {
 	return verb.core.Eval.surface_point_given_n_m(n,m,surface,u,v);
 };
 verb.core.Eval.surface_point_given_n_m = function(n,m,surface,u,v) {
-	var degree_u = surface.degreeU;
-	var degree_v = surface.degreeV;
-	var control_points = surface.controlPoints;
-	var knots_u = surface.knotsU;
-	var knots_v = surface.knotsV;
-	if(!verb.core.Eval.are_valid_relations(degree_u,control_points.length,knots_u.length) || !verb.core.Eval.are_valid_relations(degree_v,control_points[0].length,knots_v.length)) throw "Invalid relations between control points, knot vector, and n";
-	var dim = control_points[0][0].length;
-	var knot_span_index_u = verb.core.Eval.knot_span_given_n(n,degree_u,u,knots_u);
-	var knot_span_index_v = verb.core.Eval.knot_span_given_n(m,degree_v,v,knots_v);
-	var u_basis_vals = verb.core.Eval.basis_functions_given_knot_span_index(knot_span_index_u,u,degree_u,knots_u);
-	var v_basis_vals = verb.core.Eval.basis_functions_given_knot_span_index(knot_span_index_v,v,degree_v,knots_v);
-	var uind = knot_span_index_u - degree_u;
-	var vind = knot_span_index_v;
+	var degreeU = surface.degreeU;
+	var degreeV = surface.degreeV;
+	var controlPoints = surface.controlPoints;
+	var knotsU = surface.knotsU;
+	var knotsV = surface.knotsV;
+	if(!verb.core.Eval.are_valid_relations(degreeU,controlPoints.length,knotsU.length) || !verb.core.Eval.are_valid_relations(degreeV,controlPoints[0].length,knotsV.length)) throw "Invalid relations between control points, knot vector, and n";
+	var dim = controlPoints[0][0].length;
+	var knotSpan_index_u = verb.core.Eval.knotSpanGivenN(n,degreeU,u,knotsU);
+	var knotSpan_index_v = verb.core.Eval.knotSpanGivenN(m,degreeV,v,knotsV);
+	var u_basis_vals = verb.core.Eval.basis_functions_given_knotSpan_index(knotSpan_index_u,u,degreeU,knotsU);
+	var v_basis_vals = verb.core.Eval.basis_functions_given_knotSpan_index(knotSpan_index_v,v,degreeV,knotsV);
+	var uind = knotSpan_index_u - degreeU;
+	var vind = knotSpan_index_v;
 	var position = verb.core.Vec.zeros1d(dim);
 	var temp = verb.core.Vec.zeros1d(dim);
 	var _g1 = 0;
-	var _g = degree_v + 1;
+	var _g = degreeV + 1;
 	while(_g1 < _g) {
 		var l = _g1++;
 		temp = verb.core.Vec.zeros1d(dim);
-		vind = knot_span_index_v - degree_v + l;
+		vind = knotSpan_index_v - degreeV + l;
 		var _g3 = 0;
-		var _g2 = degree_u + 1;
+		var _g2 = degreeU + 1;
 		while(_g3 < _g2) {
 			var k = _g3++;
-			temp = verb.core.Vec.add(temp,verb.core.Vec.mul(u_basis_vals[k],control_points[uind + k][vind]));
+			temp = verb.core.Vec.add(temp,verb.core.Vec.mul(u_basis_vals[k],controlPoints[uind + k][vind]));
 		}
 		position = verb.core.Vec.add(position,verb.core.Vec.mul(v_basis_vals[l],temp));
 	}
@@ -799,15 +799,15 @@ verb.core.Eval.curve_derivs = function(crv,u,num_derivs) {
 };
 verb.core.Eval.curve_derivs_given_n = function(n,curve,u,num_derivatives) {
 	var degree = curve.degree;
-	var control_points = curve.controlPoints;
+	var controlPoints = curve.controlPoints;
 	var knots = curve.knots;
-	if(!verb.core.Eval.are_valid_relations(degree,control_points.length,knots.length)) throw "Invalid relations between control points, knot vector, and n";
-	var dim = control_points[0].length;
+	if(!verb.core.Eval.are_valid_relations(degree,controlPoints.length,knots.length)) throw "Invalid relations between control points, knot vector, and n";
+	var dim = controlPoints[0].length;
 	var du;
 	if(num_derivatives < degree) du = num_derivatives; else du = degree;
 	var CK = verb.core.Vec.zeros2d(du + 1,dim);
-	var knot_span_index = verb.core.Eval.knot_span_given_n(n,degree,u,knots);
-	var nders = verb.core.Eval.deriv_basis_functions_given_n_i(knot_span_index,u,degree,du,knots);
+	var knotSpan_index = verb.core.Eval.knotSpanGivenN(n,degree,u,knots);
+	var nders = verb.core.Eval.deriv_basis_functions_given_n_i(knotSpan_index,u,degree,du,knots);
 	var k = 0;
 	var j = 0;
 	var _g1 = 0;
@@ -818,7 +818,7 @@ verb.core.Eval.curve_derivs_given_n = function(n,curve,u,num_derivatives) {
 		var _g2 = degree + 1;
 		while(_g3 < _g2) {
 			var j1 = _g3++;
-			CK[k1] = verb.core.Vec.add(CK[k1],verb.core.Vec.mul(nders[k1][j1],control_points[knot_span_index - degree + j1]));
+			CK[k1] = verb.core.Vec.add(CK[k1],verb.core.Vec.mul(nders[k1][j1],controlPoints[knotSpan_index - degree + j1]));
 		}
 	}
 	return CK;
@@ -827,35 +827,35 @@ verb.core.Eval.curve_point = function(curve,u) {
 	var n = curve.knots.length - curve.degree - 2;
 	return verb.core.Eval.curve_point_given_n(n,curve,u);
 };
-verb.core.Eval.are_valid_relations = function(degree,num_control_points,knots_length) {
-	return num_control_points + degree + 1 - knots_length == 0;
+verb.core.Eval.are_valid_relations = function(degree,num_controlPoints,knots_length) {
+	return num_controlPoints + degree + 1 - knots_length == 0;
 };
 verb.core.Eval.curve_point_given_n = function(n,curve,u) {
 	var degree = curve.degree;
-	var control_points = curve.controlPoints;
+	var controlPoints = curve.controlPoints;
 	var knots = curve.knots;
-	if(!verb.core.Eval.are_valid_relations(degree,control_points.length,knots.length)) {
+	if(!verb.core.Eval.are_valid_relations(degree,controlPoints.length,knots.length)) {
 		throw "Invalid relations between control points, knot Array, and n";
 		return null;
 	}
-	var knot_span_index = verb.core.Eval.knot_span_given_n(n,degree,u,knots);
-	var basis_values = verb.core.Eval.basis_functions_given_knot_span_index(knot_span_index,u,degree,knots);
-	var position = verb.core.Vec.zeros1d(control_points[0].length);
+	var knotSpan_index = verb.core.Eval.knotSpanGivenN(n,degree,u,knots);
+	var basis_values = verb.core.Eval.basis_functions_given_knotSpan_index(knotSpan_index,u,degree,knots);
+	var position = verb.core.Vec.zeros1d(controlPoints[0].length);
 	var _g1 = 0;
 	var _g = degree + 1;
 	while(_g1 < _g) {
 		var j = _g1++;
-		position = verb.core.Vec.add(position,verb.core.Vec.mul(basis_values[j],control_points[knot_span_index - degree + j]));
+		position = verb.core.Vec.add(position,verb.core.Vec.mul(basis_values[j],controlPoints[knotSpan_index - degree + j]));
 	}
 	return position;
 };
 verb.core.Eval.deriv_basis_functions = function(u,degree,knots) {
-	var knot_span_index = verb.core.Eval.knot_span(degree,u,knots);
+	var knotSpan_index = verb.core.Eval.knotSpan(degree,u,knots);
 	var m = knots.length - 1;
 	var n = m - degree - 1;
-	return verb.core.Eval.deriv_basis_functions_given_n_i(knot_span_index,u,degree,n,knots);
+	return verb.core.Eval.deriv_basis_functions_given_n_i(knotSpan_index,u,degree,n,knots);
 };
-verb.core.Eval.deriv_basis_functions_given_n_i = function(knot_span_index,u,p,n,knots) {
+verb.core.Eval.deriv_basis_functions_given_n_i = function(knotSpan_index,u,p,n,knots) {
 	var ndu = verb.core.Vec.zeros2d(p + 1,p + 1);
 	var left = verb.core.Vec.zeros1d(p + 1);
 	var right = verb.core.Vec.zeros1d(p + 1);
@@ -866,8 +866,8 @@ verb.core.Eval.deriv_basis_functions_given_n_i = function(knot_span_index,u,p,n,
 	var _g = p + 1;
 	while(_g1 < _g) {
 		var j = _g1++;
-		left[j] = u - knots[knot_span_index + 1 - j];
-		right[j] = knots[knot_span_index + j] - u;
+		left[j] = u - knots[knotSpan_index + 1 - j];
+		right[j] = knots[knotSpan_index + j] - u;
 		saved = 0.0;
 		var _g2 = 0;
 		while(_g2 < j) {
@@ -947,10 +947,10 @@ verb.core.Eval.deriv_basis_functions_given_n_i = function(knot_span_index,u,p,n,
 	return ders;
 };
 verb.core.Eval.basis_functions = function(u,degree,knots) {
-	var knot_span_index = verb.core.Eval.knot_span(degree,u,knots);
-	return verb.core.Eval.basis_functions_given_knot_span_index(knot_span_index,u,degree,knots);
+	var knotSpan_index = verb.core.Eval.knotSpan(degree,u,knots);
+	return verb.core.Eval.basis_functions_given_knotSpan_index(knotSpan_index,u,degree,knots);
 };
-verb.core.Eval.basis_functions_given_knot_span_index = function(knot_span_index,u,degree,knots) {
+verb.core.Eval.basis_functions_given_knotSpan_index = function(knotSpan_index,u,degree,knots) {
 	var basis_functions = verb.core.Vec.zeros1d(degree + 1);
 	var left = verb.core.Vec.zeros1d(degree + 1);
 	var right = verb.core.Vec.zeros1d(degree + 1);
@@ -961,8 +961,8 @@ verb.core.Eval.basis_functions_given_knot_span_index = function(knot_span_index,
 	var _g = degree + 1;
 	while(_g1 < _g) {
 		var j = _g1++;
-		left[j] = u - knots[knot_span_index + 1 - j];
-		right[j] = knots[knot_span_index + j] - u;
+		left[j] = u - knots[knotSpan_index + 1 - j];
+		right[j] = knots[knotSpan_index + j] - u;
 		saved = 0.0;
 		var _g2 = 0;
 		while(_g2 < j) {
@@ -975,12 +975,12 @@ verb.core.Eval.basis_functions_given_knot_span_index = function(knot_span_index,
 	}
 	return basis_functions;
 };
-verb.core.Eval.knot_span = function(degree,u,knots) {
+verb.core.Eval.knotSpan = function(degree,u,knots) {
 	var m = knots.length - 1;
 	var n = m - degree - 1;
-	return verb.core.Eval.knot_span_given_n(n,degree,u,knots);
+	return verb.core.Eval.knotSpanGivenN(n,degree,u,knots);
 };
-verb.core.Eval.knot_span_given_n = function(n,degree,u,knots) {
+verb.core.Eval.knotSpanGivenN = function(n,degree,u,knots) {
 	if(u >= knots[n + 1]) return n;
 	if(u < knots[degree]) return degree;
 	var low = degree;
@@ -1003,7 +1003,7 @@ verb.core.Intersect.surfaces = function(surface0,surface1,tol) {
 		});
 	});
 	return exactPls.map(function(x) {
-		return verb.core.Make.rational_interp_curve(x.map(function(x1) {
+		return verb.core.Make.rationalInterpCurve(x.map(function(x1) {
 			return x1.point;
 		}),3);
 	});
@@ -1041,7 +1041,7 @@ verb.core.Intersect.surfaces_at_point_with_estimate = function(surface0,surface1
 		if(dist < tol) break;
 		var fn = verb.core.Vec.normalized(verb.core.Vec.cross(pn,qn));
 		var fd = verb.core.Vec.dot(fn,p);
-		var x = verb.core.Intersect.three_planes(pn,pd,qn,qd,fn,fd);
+		var x = verb.core.Intersect.threePlanes(pn,pd,qn,qd,fn,fd);
 		if(x == null) throw "panic!";
 		var pdif = verb.core.Vec.sub(x,p);
 		var qdif = verb.core.Vec.sub(x,q);
@@ -1079,9 +1079,9 @@ verb.core.Intersect.meshes = function(mesh0,mesh1) {
 		return d1 < verb.core.Constants.EPSILON && d2 < verb.core.Constants.EPSILON || d3 < verb.core.Constants.EPSILON && d4 < verb.core.Constants.EPSILON;
 	});
 	if(segments.length == 0) return [];
-	return verb.core.Intersect.make_mesh_intersection_polylines(segments);
+	return verb.core.Intersect.makeMeshIntersectionPolylines(segments);
 };
-verb.core.Intersect.make_mesh_intersection_polylines = function(segments) {
+verb.core.Intersect.makeMeshIntersectionPolylines = function(segments) {
 	var _g = 0;
 	while(_g < segments.length) {
 		var s = segments[_g];
@@ -1089,7 +1089,7 @@ verb.core.Intersect.make_mesh_intersection_polylines = function(segments) {
 		s.max.opp = s.min;
 		s.min.opp = s.max;
 	}
-	var tree = verb.core.Intersect.kdtree_from_segs(segments);
+	var tree = verb.core.Intersect.kdTreeFromSegments(segments);
 	var ends = [];
 	var _g1 = 0;
 	while(_g1 < segments.length) {
@@ -1103,7 +1103,7 @@ verb.core.Intersect.make_mesh_intersection_polylines = function(segments) {
 		var segEnd = ends[_g2];
 		++_g2;
 		if(segEnd.adj != null) continue;
-		var adjEnd = verb.core.Intersect.lookup_adj_segment(segEnd,tree,segments.length);
+		var adjEnd = verb.core.Intersect.lookupAdjacentSegment(segEnd,tree,segments.length);
 		if(adjEnd != null && adjEnd.adj == null) {
 			segEnd.adj = adjEnd;
 			adjEnd.adj = segEnd;
@@ -1136,7 +1136,7 @@ verb.core.Intersect.make_mesh_intersection_polylines = function(segments) {
 	}
 	return pls;
 };
-verb.core.Intersect.kdtree_from_segs = function(segments) {
+verb.core.Intersect.kdTreeFromSegments = function(segments) {
 	var treePoints = [];
 	var _g = 0;
 	while(_g < segments.length) {
@@ -1147,7 +1147,7 @@ verb.core.Intersect.kdtree_from_segs = function(segments) {
 	}
 	return new verb.core.KdTree(treePoints,verb.core.Vec.distSquared);
 };
-verb.core.Intersect.lookup_adj_segment = function(segEnd,tree,numSegments) {
+verb.core.Intersect.lookupAdjacentSegment = function(segEnd,tree,numSegments) {
 	var numResults;
 	if(numSegments != null) {
 		if(numSegments < 3) numResults = 3; else numResults = numSegments;
@@ -1159,7 +1159,7 @@ verb.core.Intersect.lookup_adj_segment = function(segEnd,tree,numSegments) {
 	});
 	if(adj.length == 1) return adj[0]; else return null;
 };
-verb.core.Intersect.curve_and_surface = function(curve,surface,tol) {
+verb.core.Intersect.curveAndSurface = function(curve,surface,tol) {
 	if(tol == null) tol = 1e-3;
 	var ints = verb.core.Intersect.bounding_box_trees(new verb.core.types.LazyCurveBoundingBoxTree(curve),new verb.core.types.LazySurfaceBoundingBoxTree(surface),0);
 	return ints.map(function(inter) {
@@ -1173,10 +1173,10 @@ verb.core.Intersect.curve_and_surface = function(curve,surface,tol) {
 		var minv = srfPart.knotsV[0];
 		var maxv = verb.core.ArrayExtensions.last(srfPart.knotsV);
 		var uv = [(minu + maxu) / 2.0,(minv + maxv) / 2.0];
-		return verb.core.Intersect.curve_and_surface_with_estimate(crvSeg,srfPart,[u].concat(uv),tol);
+		return verb.core.Intersect.curveAndSurfaceWithEstimate(crvSeg,srfPart,[u].concat(uv),tol);
 	});
 };
-verb.core.Intersect.curve_and_surface_with_estimate = function(curve,surface,start_params,tol) {
+verb.core.Intersect.curveAndSurfaceWithEstimate = function(curve,surface,start_params,tol) {
 	if(tol == null) tol = 1e-3;
 	var objective = function(x) {
 		var p1 = verb.core.Eval.rational_curve_point(curve,x[0]);
@@ -1197,11 +1197,11 @@ verb.core.Intersect.polyline_and_mesh = function(polyline,mesh,tol) {
 		++_g;
 		var polid = event.item0;
 		var faceid = event.item1;
-		var inter = verb.core.Intersect.segment_with_tri(polyline.points[polid],polyline.points[polid + 1],mesh.points,mesh.faces[faceid]);
+		var inter = verb.core.Intersect.segmentWithTriangle(polyline.points[polid],polyline.points[polid + 1],mesh.points,mesh.faces[faceid]);
 		if(inter == null) continue;
 		var pt = inter.point;
 		var u = verb.core.Vec.lerp(inter.p,[polyline.params[polid]],[polyline.params[polid + 1]])[0];
-		var uv = verb.core.Mesh.tri_uv_from_point(mesh,faceid,pt);
+		var uv = verb.core.Mesh.triangleUVFromPoint(mesh,faceid,pt);
 		finalResults.push(new verb.core.types.PolylineMeshIntersection(pt,u,uv,polid,faceid));
 	}
 	return finalResults;
@@ -1247,15 +1247,15 @@ verb.core.Intersect.triangles = function(mesh0,faceIndex0,mesh1,faceIndex1) {
 	var o1 = mesh1.points[tri1[0]];
 	var ray = verb.core.Intersect.planes(o0,n0,o1,n1);
 	if(ray == null) return null;
-	var clip1 = verb.core.Intersect.clip_ray_in_coplanar_tri(ray,mesh0,faceIndex0);
+	var clip1 = verb.core.Intersect.clipRayInCoplanarTriangle(ray,mesh0,faceIndex0);
 	if(clip1 == null) return null;
-	var clip2 = verb.core.Intersect.clip_ray_in_coplanar_tri(ray,mesh1,faceIndex1);
+	var clip2 = verb.core.Intersect.clipRayInCoplanarTriangle(ray,mesh1,faceIndex1);
 	if(clip2 == null) return null;
-	var merged = verb.core.Intersect.merge_tri_clip_intervals(clip1,clip2,mesh0,faceIndex0,mesh1,faceIndex1);
+	var merged = verb.core.Intersect.mergeTriangleClipIntervals(clip1,clip2,mesh0,faceIndex0,mesh1,faceIndex1);
 	if(merged == null) return null;
 	return new verb.core.types.Interval(new verb.core.types.MeshIntersectionPoint(merged.min.uv0,merged.min.uv1,merged.min.point,faceIndex0,faceIndex1),new verb.core.types.MeshIntersectionPoint(merged.max.uv0,merged.max.uv1,merged.max.point,faceIndex0,faceIndex1));
 };
-verb.core.Intersect.clip_ray_in_coplanar_tri = function(ray,mesh,faceIndex) {
+verb.core.Intersect.clipRayInCoplanarTriangle = function(ray,mesh,faceIndex) {
 	var tri = mesh.faces[faceIndex];
 	var o = [mesh.points[tri[0]],mesh.points[tri[1]],mesh.points[tri[2]]];
 	var uvs = [mesh.uvs[tri[0]],mesh.uvs[tri[1]],mesh.uvs[tri[2]]];
@@ -1281,7 +1281,7 @@ verb.core.Intersect.clip_ray_in_coplanar_tri = function(ray,mesh,faceIndex) {
 	if(maxU == null || minU == null) return null;
 	return new verb.core.types.Interval(minU,maxU);
 };
-verb.core.Intersect.merge_tri_clip_intervals = function(clip1,clip2,mesh1,faceIndex1,mesh2,faceIndex2) {
+verb.core.Intersect.mergeTriangleClipIntervals = function(clip1,clip2,mesh1,faceIndex1,mesh2,faceIndex2) {
 	if(clip2.min.u > clip1.max.u + verb.core.Constants.EPSILON || clip1.min.u > clip2.max.u + verb.core.Constants.EPSILON) return null;
 	var min;
 	if(clip1.min.u > clip2.min.u) min = new verb.core.types.Pair(clip1.min,0); else min = new verb.core.types.Pair(clip2.min,1);
@@ -1290,16 +1290,16 @@ verb.core.Intersect.merge_tri_clip_intervals = function(clip1,clip2,mesh1,faceIn
 	var res = new verb.core.types.Interval(new verb.core.types.MeshIntersectionPoint(null,null,min.item0.point,faceIndex1,faceIndex2),new verb.core.types.MeshIntersectionPoint(null,null,max.item0.point,faceIndex1,faceIndex2));
 	if(min.item1 == 0) {
 		res.min.uv0 = min.item0.uv;
-		res.min.uv1 = verb.core.Mesh.tri_uv_from_point(mesh2,faceIndex2,min.item0.point);
+		res.min.uv1 = verb.core.Mesh.triangleUVFromPoint(mesh2,faceIndex2,min.item0.point);
 	} else {
-		res.min.uv0 = verb.core.Mesh.tri_uv_from_point(mesh1,faceIndex1,min.item0.point);
+		res.min.uv0 = verb.core.Mesh.triangleUVFromPoint(mesh1,faceIndex1,min.item0.point);
 		res.min.uv1 = min.item0.uv;
 	}
 	if(max.item1 == 0) {
 		res.max.uv0 = max.item0.uv;
-		res.max.uv1 = verb.core.Mesh.tri_uv_from_point(mesh2,faceIndex2,max.item0.point);
+		res.max.uv1 = verb.core.Mesh.triangleUVFromPoint(mesh2,faceIndex2,max.item0.point);
 	} else {
-		res.max.uv0 = verb.core.Mesh.tri_uv_from_point(mesh1,faceIndex1,max.item0.point);
+		res.max.uv0 = verb.core.Mesh.triangleUVFromPoint(mesh1,faceIndex1,max.item0.point);
 		res.max.uv1 = max.item0.uv;
 	}
 	return res;
@@ -1348,7 +1348,7 @@ verb.core.Intersect.planes = function(origin0,normal0,origin1,normal1) {
 	if(li == 0) p = [0,x,y]; else if(li == 1) p = [x,0,y]; else p = [x,y,0];
 	return new verb.core.types.Ray(p,verb.core.Vec.normalized(d));
 };
-verb.core.Intersect.three_planes = function(n0,d0,n1,d1,n2,d2) {
+verb.core.Intersect.threePlanes = function(n0,d0,n1,d1,n2,d2) {
 	var u = verb.core.Vec.cross(n1,n2);
 	var den = verb.core.Vec.dot(n0,u);
 	if(Math.abs(den) < verb.core.Constants.EPSILON) return null;
@@ -1408,7 +1408,7 @@ verb.core.Intersect.rays = function(a0,a,b0,b) {
 	var p1 = verb.core.Vec.onRay(b0,b,w);
 	return new verb.core.types.CurveCurveIntersection(p0,p1,t,w);
 };
-verb.core.Intersect.segment_with_tri = function(p0,p1,points,tri) {
+verb.core.Intersect.segmentWithTriangle = function(p0,p1,points,tri) {
 	var v0 = points[tri[0]];
 	var v1 = points[tri[1]];
 	var v2 = points[tri[2]];
@@ -1621,7 +1621,7 @@ verb.core.BinaryHeap.prototype = {
 	}
 };
 verb.core.Make = $hx_exports.core.Make = function() { };
-verb.core.Make.four_point_surface = function(p1,p2,p3,p4,degree) {
+verb.core.Make.fourPointSurface = function(p1,p2,p3,p4,degree) {
 	if(degree == null) degree = 3;
 	var degreeFloat = degree;
 	var pts = [];
@@ -1650,7 +1650,7 @@ verb.core.Make.four_point_surface = function(p1,p2,p3,p4,degree) {
 verb.core.Make.sweep1_surface = function(profile,rail) {
 	var rail_start = verb.core.Eval.rational_curve_point(rail,0.0);
 	var span = 1.0 / rail.controlPoints.length;
-	var control_points = [];
+	var controlPoints = [];
 	var weights = [];
 	var rail_weights = verb.core.Eval.weight_1d(rail.controlPoints);
 	var profile_weights = verb.core.Eval.weight_1d(profile.controlPoints);
@@ -1661,19 +1661,19 @@ verb.core.Make.sweep1_surface = function(profile,rail) {
 		var i = _g1++;
 		var rail_point = verb.core.Eval.rational_curve_point(rail,i * span);
 		var rail_offset = verb.core.Vec.sub(rail_point,rail_start);
-		var row_control_points = [];
+		var row_controlPoints = [];
 		var row_weights = [];
 		var _g3 = 0;
 		var _g2 = profile.controlPoints.length;
 		while(_g3 < _g2) {
 			var j = _g3++;
-			row_control_points.push(verb.core.Vec.add(rail_offset,profile_points[j]));
+			row_controlPoints.push(verb.core.Vec.add(rail_offset,profile_points[j]));
 			row_weights.push(profile_weights[j] * rail_weights[i]);
 		}
-		control_points.push(row_control_points);
+		controlPoints.push(row_controlPoints);
 		weights.push(row_weights);
 	}
-	return new verb.core.types.SurfaceData(rail.degree,profile.degree,rail.knots,profile.knots,verb.core.Eval.homogenize_2d(control_points,weights));
+	return new verb.core.types.SurfaceData(rail.degree,profile.degree,rail.knots,profile.knots,verb.core.Eval.homogenize_2d(controlPoints,weights));
 };
 verb.core.Make.ellipse_arc = function(center,xaxis,yaxis,xradius,yradius,startAngle,endAngle) {
 	if(endAngle < startAngle) endAngle = 2.0 * Math.PI + startAngle;
@@ -1761,24 +1761,24 @@ verb.core.Make.polyline_curve = function(pts) {
 	return new verb.core.types.CurveData(1,knots,verb.core.Eval.homogenize_1d(pts.slice(0),weights));
 };
 verb.core.Make.extruded_surface = function(axis,length,profile) {
-	var control_points = [[],[],[]];
+	var controlPoints = [[],[],[]];
 	var weights = [[],[],[]];
-	var prof_control_points = verb.core.Eval.dehomogenize_1d(profile.controlPoints);
+	var prof_controlPoints = verb.core.Eval.dehomogenize_1d(profile.controlPoints);
 	var prof_weights = verb.core.Eval.weight_1d(profile.controlPoints);
 	var translation = verb.core.Vec.mul(length,axis);
 	var halfTranslation = verb.core.Vec.mul(0.5 * length,axis);
 	var _g1 = 0;
-	var _g = prof_control_points.length;
+	var _g = prof_controlPoints.length;
 	while(_g1 < _g) {
 		var j = _g1++;
-		control_points[2][j] = prof_control_points[j];
-		control_points[1][j] = verb.core.Vec.add(halfTranslation,prof_control_points[j]);
-		control_points[0][j] = verb.core.Vec.add(translation,prof_control_points[j]);
+		controlPoints[2][j] = prof_controlPoints[j];
+		controlPoints[1][j] = verb.core.Vec.add(halfTranslation,prof_controlPoints[j]);
+		controlPoints[0][j] = verb.core.Vec.add(translation,prof_controlPoints[j]);
 		weights[0][j] = prof_weights[j];
 		weights[1][j] = prof_weights[j];
 		weights[2][j] = prof_weights[j];
 	}
-	return new verb.core.types.SurfaceData(2,profile.degree,[0,0,0,1,1,1],profile.knots,verb.core.Eval.homogenize_2d(control_points,weights));
+	return new verb.core.types.SurfaceData(2,profile.degree,[0,0,0,1,1,1],profile.knots,verb.core.Eval.homogenize_2d(controlPoints,weights));
 };
 verb.core.Make.cylinder_surface = function(axis,xaxis,base,height,radius) {
 	var yaxis = verb.core.Vec.cross(axis,xaxis);
@@ -1787,46 +1787,46 @@ verb.core.Make.cylinder_surface = function(axis,xaxis,base,height,radius) {
 	return verb.core.Make.extruded_surface(axis,height,circ);
 };
 verb.core.Make.revolved_surface = function(center,axis,theta,profile) {
-	var prof_control_points = verb.core.Eval.dehomogenize_1d(profile.controlPoints);
+	var prof_controlPoints = verb.core.Eval.dehomogenize_1d(profile.controlPoints);
 	var prof_weights = verb.core.Eval.weight_1d(profile.controlPoints);
 	var narcs;
-	var knots_u;
-	var control_points;
+	var knotsU;
+	var controlPoints;
 	var weights;
 	if(theta <= Math.PI / 2) {
 		narcs = 1;
-		knots_u = verb.core.Vec.zeros1d(6 + 2 * (narcs - 1));
+		knotsU = verb.core.Vec.zeros1d(6 + 2 * (narcs - 1));
 	} else if(theta <= Math.PI) {
 		narcs = 2;
-		knots_u = verb.core.Vec.zeros1d(6 + 2 * (narcs - 1));
-		knots_u[3] = knots_u[4] = 0.5;
+		knotsU = verb.core.Vec.zeros1d(6 + 2 * (narcs - 1));
+		knotsU[3] = knotsU[4] = 0.5;
 	} else if(theta <= 3 * Math.PI / 2) {
 		narcs = 3;
-		knots_u = verb.core.Vec.zeros1d(6 + 2 * (narcs - 1));
-		knots_u[3] = knots_u[4] = 0.333333333333333315;
-		knots_u[5] = knots_u[6] = 0.66666666666666663;
+		knotsU = verb.core.Vec.zeros1d(6 + 2 * (narcs - 1));
+		knotsU[3] = knotsU[4] = 0.333333333333333315;
+		knotsU[5] = knotsU[6] = 0.66666666666666663;
 	} else {
 		narcs = 4;
-		knots_u = verb.core.Vec.zeros1d(6 + 2 * (narcs - 1));
-		knots_u[3] = knots_u[4] = 0.25;
-		knots_u[5] = knots_u[6] = 0.5;
-		knots_u[7] = knots_u[8] = 0.75;
+		knotsU = verb.core.Vec.zeros1d(6 + 2 * (narcs - 1));
+		knotsU[3] = knotsU[4] = 0.25;
+		knotsU[5] = knotsU[6] = 0.5;
+		knotsU[7] = knotsU[8] = 0.75;
 	}
 	var dtheta = theta / narcs;
 	var j = 3 + 2 * (narcs - 1);
 	var _g = 0;
 	while(_g < 3) {
 		var i = _g++;
-		knots_u[i] = 0.0;
-		knots_u[j + i] = 1.0;
+		knotsU[i] = 0.0;
+		knotsU[j + i] = 1.0;
 	}
 	var n = 2 * narcs;
 	var wm = Math.cos(dtheta / 2.0);
 	var angle = 0.0;
 	var sines = verb.core.Vec.zeros1d(narcs + 1);
 	var cosines = verb.core.Vec.zeros1d(narcs + 1);
-	var control_points1 = verb.core.Vec.zeros3d(2 * narcs + 1,prof_control_points.length,3);
-	var weights1 = verb.core.Vec.zeros2d(2 * narcs + 1,prof_control_points.length);
+	var controlPoints1 = verb.core.Vec.zeros3d(2 * narcs + 1,prof_controlPoints.length,3);
+	var weights1 = verb.core.Vec.zeros2d(2 * narcs + 1,prof_controlPoints.length);
 	var _g1 = 1;
 	var _g2 = narcs + 1;
 	while(_g1 < _g2) {
@@ -1836,19 +1836,19 @@ verb.core.Make.revolved_surface = function(center,axis,theta,profile) {
 		sines[i1] = Math.sin(angle);
 	}
 	var _g11 = 0;
-	var _g3 = prof_control_points.length;
+	var _g3 = prof_controlPoints.length;
 	while(_g11 < _g3) {
 		var j1 = _g11++;
-		var O = verb.core.Trig.closest_point_on_ray(prof_control_points[j1],center,axis);
-		var X = verb.core.Vec.sub(prof_control_points[j1],O);
+		var O = verb.core.Trig.closest_point_on_ray(prof_controlPoints[j1],center,axis);
+		var X = verb.core.Vec.sub(prof_controlPoints[j1],O);
 		var r = verb.core.Vec.norm(X);
 		var Y = verb.core.Vec.cross(axis,X);
 		if(r > verb.core.Constants.EPSILON) {
 			X = verb.core.Vec.mul(1 / r,X);
 			Y = verb.core.Vec.mul(1 / r,Y);
 		}
-		control_points1[0][j1] = prof_control_points[j1];
-		var P0 = prof_control_points[j1];
+		controlPoints1[0][j1] = prof_controlPoints[j1];
+		var P0 = prof_controlPoints[j1];
 		weights1[0][j1] = prof_weights[j1];
 		var T0 = Y;
 		var index = 0;
@@ -1859,13 +1859,13 @@ verb.core.Make.revolved_surface = function(center,axis,theta,profile) {
 			var i2 = _g31++;
 			var P2;
 			if(r == 0) P2 = O; else P2 = verb.core.Vec.add(O,verb.core.Vec.add(verb.core.Vec.mul(r * cosines[i2],X),verb.core.Vec.mul(r * sines[i2],Y)));
-			control_points1[index + 2][j1] = P2;
+			controlPoints1[index + 2][j1] = P2;
 			weights1[index + 2][j1] = prof_weights[j1];
 			var T2 = verb.core.Vec.sub(verb.core.Vec.mul(cosines[i2],Y),verb.core.Vec.mul(sines[i2],X));
-			if(r == 0) control_points1[index + 1][j1] = O; else {
+			if(r == 0) controlPoints1[index + 1][j1] = O; else {
 				var inters = verb.core.Intersect.rays(P0,verb.core.Vec.mul(1 / verb.core.Vec.norm(T0),T0),P2,verb.core.Vec.mul(1 / verb.core.Vec.norm(T2),T2));
 				var P1 = verb.core.Vec.add(P0,verb.core.Vec.mul(inters.u0,T0));
-				control_points1[index + 1][j1] = P1;
+				controlPoints1[index + 1][j1] = P1;
 			}
 			weights1[index + 1][j1] = wm * prof_weights[j1];
 			index += 2;
@@ -1875,7 +1875,7 @@ verb.core.Make.revolved_surface = function(center,axis,theta,profile) {
 			}
 		}
 	}
-	return new verb.core.types.SurfaceData(2,profile.degree,knots_u,profile.knots,verb.core.Eval.homogenize_2d(control_points1,weights1));
+	return new verb.core.types.SurfaceData(2,profile.degree,knotsU,profile.knots,verb.core.Eval.homogenize_2d(controlPoints1,weights1));
 };
 verb.core.Make.sphere_surface = function(center,axis,xaxis,radius) {
 	var arc = verb.core.Make.arc(center,verb.core.Vec.mul(-1.0,axis),xaxis,radius,0.0,Math.PI);
@@ -1890,7 +1890,7 @@ verb.core.Make.cone_surface = function(axis,xaxis,base,height,radius) {
 	var prof = new verb.core.types.CurveData(prof_degree,prof_knots,verb.core.Eval.homogenize_1d(prof_ctrl_pts,prof_weights));
 	return verb.core.Make.revolved_surface(base,axis,angle,prof);
 };
-verb.core.Make.rational_interp_curve = function(points,degree,start_tangent,end_tangent) {
+verb.core.Make.rationalInterpCurve = function(points,degree,start_tangent,end_tangent) {
 	if(degree == null) degree = 3;
 	if(points.length < degree + 1) throw "You need to supply at least degree + 1 points!";
 	var us = [0.0];
@@ -1938,8 +1938,8 @@ verb.core.Make.rational_interp_curve = function(points,degree,start_tangent,end_
 	while(_g4 < us.length) {
 		var u = us[_g4];
 		++_g4;
-		var span = verb.core.Eval.knot_span_given_n(n,degree,u,knots);
-		var basisFuncs = verb.core.Eval.basis_functions_given_knot_span_index(span,u,degree,knots);
+		var span = verb.core.Eval.knotSpanGivenN(n,degree,u,knots);
+		var basisFuncs = verb.core.Eval.basis_functions_given_knotSpan_index(span,u,degree,knots);
 		var ls = span - degree;
 		var rowstart = verb.core.Vec.zeros1d(ls);
 		var rowend = verb.core.Vec.zeros1d(ld - ls);
@@ -2194,7 +2194,7 @@ verb.core.Mesh.get_tri_norm = function(points,tri) {
 	var n = verb.core.Vec.cross(u,v);
 	return verb.core.Vec.mul(1 / verb.core.Vec.norm(n),n);
 };
-verb.core.Mesh.make_mesh_aabb = function(mesh,faceIndices) {
+verb.core.Mesh.makeMeshAabb = function(mesh,faceIndices) {
 	var bb = new verb.BoundingBox();
 	var _g = 0;
 	while(_g < faceIndices.length) {
@@ -2206,22 +2206,22 @@ verb.core.Mesh.make_mesh_aabb = function(mesh,faceIndices) {
 	}
 	return bb;
 };
-verb.core.Mesh.make_mesh_aabb_tree = function(mesh,faceIndices) {
-	var aabb = verb.core.Mesh.make_mesh_aabb(mesh,faceIndices);
+verb.core.Mesh.makeMeshAabbTree = function(mesh,faceIndices) {
+	var aabb = verb.core.Mesh.makeMeshAabb(mesh,faceIndices);
 	if(faceIndices.length == 1) return new verb.core.types.BoundingBoxLeaf(aabb,faceIndices[0]);
-	var sortedIndices = verb.core.Mesh.sort_tris_on_longest_axis(aabb,mesh,faceIndices);
+	var sortedIndices = verb.core.Mesh.sortTrianglesOnLongestAxis(aabb,mesh,faceIndices);
 	var leftIndices = verb.core.ArrayExtensions.left(sortedIndices);
 	var rightIndices = verb.core.ArrayExtensions.right(sortedIndices);
-	return new verb.core.types.BoundingBoxInnerNode(aabb,[verb.core.Mesh.make_mesh_aabb_tree(mesh,leftIndices),verb.core.Mesh.make_mesh_aabb_tree(mesh,rightIndices)]);
+	return new verb.core.types.BoundingBoxInnerNode(aabb,[verb.core.Mesh.makeMeshAabbTree(mesh,leftIndices),verb.core.Mesh.makeMeshAabbTree(mesh,rightIndices)]);
 };
-verb.core.Mesh.sort_tris_on_longest_axis = function(bb,mesh,faceIndices) {
+verb.core.Mesh.sortTrianglesOnLongestAxis = function(bb,mesh,faceIndices) {
 	var longAxis = bb.getLongestAxis();
 	var minCoordFaceMap = new Array();
 	var _g = 0;
 	while(_g < faceIndices.length) {
 		var faceIndex = faceIndices[_g];
 		++_g;
-		var tri_min = verb.core.Mesh.get_min_coordinate_on_axis(mesh.points,mesh.faces[faceIndex],longAxis);
+		var tri_min = verb.core.Mesh.getMinCoordOnAxis(mesh.points,mesh.faces[faceIndex],longAxis);
 		minCoordFaceMap.push(new verb.core.types.Pair(tri_min,faceIndex));
 	}
 	minCoordFaceMap.sort(function(a,b) {
@@ -2238,7 +2238,7 @@ verb.core.Mesh.sort_tris_on_longest_axis = function(bb,mesh,faceIndices) {
 	}
 	return sortedFaceIndices;
 };
-verb.core.Mesh.get_min_coordinate_on_axis = function(points,tri,axis) {
+verb.core.Mesh.getMinCoordOnAxis = function(points,tri,axis) {
 	var min = Math.POSITIVE_INFINITY;
 	var _g = 0;
 	while(_g < 3) {
@@ -2248,7 +2248,7 @@ verb.core.Mesh.get_min_coordinate_on_axis = function(points,tri,axis) {
 	}
 	return min;
 };
-verb.core.Mesh.get_tri_centroid = function(points,tri) {
+verb.core.Mesh.getTriangleCentroid = function(points,tri) {
 	var centroid = [0.0,0.0,0.0];
 	var _g = 0;
 	while(_g < 3) {
@@ -2266,7 +2266,7 @@ verb.core.Mesh.get_tri_centroid = function(points,tri) {
 	}
 	return centroid;
 };
-verb.core.Mesh.tri_uv_from_point = function(mesh,faceIndex,f) {
+verb.core.Mesh.triangleUVFromPoint = function(mesh,faceIndex,f) {
 	var tri = mesh.faces[faceIndex];
 	var p1 = mesh.points[tri[0]];
 	var p2 = mesh.points[tri[1]];
@@ -2325,13 +2325,13 @@ verb.core.Modify.surface_split = function(surface,u,useV) {
 	if(useV == null) useV = false;
 	var knots;
 	var degree;
-	var control_points;
+	var controlPoints;
 	if(!useV) {
-		control_points = verb.core.Mat.transpose(surface.controlPoints);
+		controlPoints = verb.core.Mat.transpose(surface.controlPoints);
 		knots = surface.knotsU;
 		degree = surface.degreeU;
 	} else {
-		control_points = surface.controlPoints;
+		controlPoints = surface.controlPoints;
 		knots = surface.knotsV;
 		degree = surface.degreeV;
 	}
@@ -2346,11 +2346,11 @@ verb.core.Modify.surface_split = function(surface,u,useV) {
 	knots_to_insert = _g;
 	var newpts0 = new Array();
 	var newpts1 = new Array();
-	var s = verb.core.Eval.knot_span(degree,u,knots);
+	var s = verb.core.Eval.knotSpan(degree,u,knots);
 	var res = null;
 	var _g11 = 0;
-	while(_g11 < control_points.length) {
-		var cps = control_points[_g11];
+	while(_g11 < controlPoints.length) {
+		var cps = controlPoints[_g11];
 		++_g11;
 		res = verb.core.Modify.curve_knot_refine(new verb.core.types.CurveData(degree,knots,cps),knots_to_insert);
 		newpts0.push(res.controlPoints.slice(0,s + 1));
@@ -2367,7 +2367,7 @@ verb.core.Modify.surface_split = function(surface,u,useV) {
 };
 verb.core.Modify.curve_bezier_decompose = function(curve) {
 	var degree = curve.degree;
-	var control_points = curve.controlPoints;
+	var controlPoints = curve.controlPoints;
 	var knots = curve.knots;
 	var knotmults = verb.core.Modify.knot_multiplicities(knots);
 	var reqMult = degree + 1;
@@ -2377,18 +2377,18 @@ verb.core.Modify.curve_bezier_decompose = function(curve) {
 		++_g;
 		if(knotmult.mult < reqMult) {
 			var knotsInsert = verb.core.Vec.rep(reqMult - knotmult.mult,knotmult.knot);
-			var res = verb.core.Modify.curve_knot_refine(new verb.core.types.CurveData(degree,knots,control_points),knotsInsert);
+			var res = verb.core.Modify.curve_knot_refine(new verb.core.types.CurveData(degree,knots,controlPoints),knotsInsert);
 			knots = res.knots;
-			control_points = res.controlPoints;
+			controlPoints = res.controlPoints;
 		}
 	}
 	var numCrvs = knots.length / reqMult - 1;
 	var crvKnotLength = reqMult * 2;
 	var crvs = [];
 	var i = 0;
-	while(i < control_points.length) {
+	while(i < controlPoints.length) {
 		var kts = knots.slice(i,i + crvKnotLength);
-		var pts = control_points.slice(i,i + reqMult);
+		var pts = controlPoints.slice(i,i + reqMult);
 		crvs.push(new verb.core.types.CurveData(degree,kts,pts));
 		i += reqMult;
 	}
@@ -2411,7 +2411,7 @@ verb.core.Modify.knot_multiplicities = function(knots) {
 };
 verb.core.Modify.curve_split = function(curve,u) {
 	var degree = curve.degree;
-	var control_points = curve.controlPoints;
+	var controlPoints = curve.controlPoints;
 	var knots = curve.knots;
 	var knots_to_insert;
 	var _g = [];
@@ -2423,7 +2423,7 @@ verb.core.Modify.curve_split = function(curve,u) {
 	}
 	knots_to_insert = _g;
 	var res = verb.core.Modify.curve_knot_refine(curve,knots_to_insert);
-	var s = verb.core.Eval.knot_span(degree,u,knots);
+	var s = verb.core.Eval.knotSpan(degree,u,knots);
 	var knots0 = res.knots.slice(0,s + degree + 2);
 	var knots1 = res.knots.slice(s + 1);
 	var cpts0 = res.controlPoints.slice(0,s + 1);
@@ -2432,26 +2432,26 @@ verb.core.Modify.curve_split = function(curve,u) {
 };
 verb.core.Modify.curve_knot_refine = function(curve,knots_to_insert) {
 	var degree = curve.degree;
-	var control_points = curve.controlPoints;
+	var controlPoints = curve.controlPoints;
 	var knots = curve.knots;
-	var n = control_points.length - 1;
+	var n = controlPoints.length - 1;
 	var m = n + degree + 1;
 	var r = knots_to_insert.length - 1;
-	var a = verb.core.Eval.knot_span(degree,knots_to_insert[0],knots);
-	var b = verb.core.Eval.knot_span(degree,knots_to_insert[r],knots);
-	var control_points_post = new Array();
+	var a = verb.core.Eval.knotSpan(degree,knots_to_insert[0],knots);
+	var b = verb.core.Eval.knotSpan(degree,knots_to_insert[r],knots);
+	var controlPoints_post = new Array();
 	var knots_post = new Array();
 	var _g1 = 0;
 	var _g = a - degree + 1;
 	while(_g1 < _g) {
 		var i = _g1++;
-		control_points_post[i] = control_points[i];
+		controlPoints_post[i] = controlPoints[i];
 	}
 	var _g11 = b - 1;
 	var _g2 = n + 1;
 	while(_g11 < _g2) {
 		var i1 = _g11++;
-		control_points_post[i1 + r + 1] = control_points[i1];
+		controlPoints_post[i1 + r + 1] = controlPoints[i1];
 	}
 	var _g12 = 0;
 	var _g3 = a + 1;
@@ -2470,40 +2470,40 @@ verb.core.Modify.curve_knot_refine = function(curve,knots_to_insert) {
 	var j = r;
 	while(j >= 0) {
 		while(knots_to_insert[j] <= knots[i4] && i4 > a) {
-			control_points_post[k - degree - 1] = control_points[i4 - degree - 1];
+			controlPoints_post[k - degree - 1] = controlPoints[i4 - degree - 1];
 			knots_post[k] = knots[i4];
 			k = k - 1;
 			i4 = i4 - 1;
 		}
-		control_points_post[k - degree - 1] = control_points_post[k - degree];
+		controlPoints_post[k - degree - 1] = controlPoints_post[k - degree];
 		var _g14 = 1;
 		var _g5 = degree + 1;
 		while(_g14 < _g5) {
 			var l = _g14++;
 			var ind = k - degree + l;
 			var alfa = knots_post[k + l] - knots_to_insert[j];
-			if(Math.abs(alfa) < verb.core.Constants.EPSILON) control_points_post[ind - 1] = control_points_post[ind]; else {
+			if(Math.abs(alfa) < verb.core.Constants.EPSILON) controlPoints_post[ind - 1] = controlPoints_post[ind]; else {
 				alfa = alfa / (knots_post[k + l] - knots[i4 - degree + l]);
-				control_points_post[ind - 1] = verb.core.Vec.add(verb.core.Vec.mul(alfa,control_points_post[ind - 1]),verb.core.Vec.mul(1.0 - alfa,control_points_post[ind]));
+				controlPoints_post[ind - 1] = verb.core.Vec.add(verb.core.Vec.mul(alfa,controlPoints_post[ind - 1]),verb.core.Vec.mul(1.0 - alfa,controlPoints_post[ind]));
 			}
 		}
 		knots_post[k] = knots_to_insert[j];
 		k = k - 1;
 		j--;
 	}
-	return new verb.core.types.CurveData(degree,knots_post,control_points_post);
+	return new verb.core.types.CurveData(degree,knots_post,controlPoints_post);
 };
 verb.core.Modify.curve_knot_insert = function(curve,u,r) {
 	var degree = curve.degree;
-	var control_points = curve.controlPoints;
+	var controlPoints = curve.controlPoints;
 	var knots = curve.knots;
 	var s = 0;
-	var num_pts = control_points.length;
-	var k = verb.core.Eval.knot_span(degree,u,knots);
+	var num_pts = controlPoints.length;
+	var k = verb.core.Eval.knotSpan(degree,u,knots);
 	var num_pts_post = num_pts + r;
-	var control_points_temp = new Array();
+	var controlPoints_temp = new Array();
 	var knots_post = new Array();
-	var control_points_post = new Array();
+	var controlPoints_post = new Array();
 	var i = 0;
 	var _g1 = 1;
 	var _g = k + 1;
@@ -2527,18 +2527,18 @@ verb.core.Modify.curve_knot_insert = function(curve,u,r) {
 	var _g4 = k - degree + 1;
 	while(_g13 < _g4) {
 		var i4 = _g13++;
-		control_points_post[i4] = control_points[i4];
+		controlPoints_post[i4] = controlPoints[i4];
 	}
 	var _g5 = k - s;
 	while(_g5 < num_pts) {
 		var i5 = _g5++;
-		control_points_post[i5 + r] = control_points[i5];
+		controlPoints_post[i5 + r] = controlPoints[i5];
 	}
 	var _g14 = 0;
 	var _g6 = degree - s + 1;
 	while(_g14 < _g6) {
 		var i6 = _g14++;
-		control_points_temp[i6] = control_points[k - degree + i6];
+		controlPoints_temp[i6] = controlPoints[k - degree + i6];
 	}
 	var L = 0;
 	var alpha = 0;
@@ -2552,18 +2552,18 @@ verb.core.Modify.curve_knot_insert = function(curve,u,r) {
 		while(_g31 < _g21) {
 			var i7 = _g31++;
 			alpha = (u - knots[L + i7]) / (knots[i7 + k + 1] - knots[L + i7]);
-			control_points_temp[i7] = verb.core.Vec.add(verb.core.Vec.mul(alpha,control_points_temp[i7 + 1]),verb.core.Vec.mul(1.0 - alpha,control_points_temp[i7]));
+			controlPoints_temp[i7] = verb.core.Vec.add(verb.core.Vec.mul(alpha,controlPoints_temp[i7 + 1]),verb.core.Vec.mul(1.0 - alpha,controlPoints_temp[i7]));
 		}
-		control_points_post[L] = control_points_temp[0];
-		control_points_post[k + r - j - s] = control_points_temp[degree - j - s];
+		controlPoints_post[L] = controlPoints_temp[0];
+		controlPoints_post[k + r - j - s] = controlPoints_temp[degree - j - s];
 	}
 	var _g16 = L + 1;
 	var _g8 = k - s;
 	while(_g16 < _g8) {
 		var i8 = _g16++;
-		control_points_post[i8] = control_points_temp[i8 - L];
+		controlPoints_post[i8] = controlPoints_temp[i8 - L];
 	}
-	return new verb.core.types.CurveData(degree,knots_post,control_points_post);
+	return new verb.core.types.CurveData(degree,knots_post,controlPoints_post);
 };
 verb.core.MinimizationResult = function(solution,value,gradient,invHessian,iterations,message) {
 	this.solution = solution;
@@ -2784,9 +2784,9 @@ verb.core.Tess.rational_curve_adaptive_sample_range = function(curve,start,end,t
 verb.core.Tess.rational_surface_naive = function(surface,divs_u,divs_v) {
 	if(divs_u < 1) divs_u = 1;
 	if(divs_v < 1) divs_v = 1;
-	var degree_u = surface.degreeU;
+	var degreeU = surface.degreeU;
 	var degreeV = surface.degreeV;
-	var control_points = surface.controlPoints;
+	var controlPoints = surface.controlPoints;
 	var knotsU = surface.knotsU;
 	var knotsV = surface.knotsV;
 	var u_span = knotsU[knotsU.length - 1] - knotsU[0];
@@ -3469,13 +3469,13 @@ verb.core.types.LazyMeshBoundingBoxTree = function(mesh,faceIndices) {
 verb.core.types.LazyMeshBoundingBoxTree.__interfaces__ = [verb.core.types.IBoundingBoxTree];
 verb.core.types.LazyMeshBoundingBoxTree.prototype = {
 	split: function() {
-		var $as = verb.core.Mesh.sort_tris_on_longest_axis(this._boundingBox,this._mesh,this._faceIndices);
+		var $as = verb.core.Mesh.sortTrianglesOnLongestAxis(this._boundingBox,this._mesh,this._faceIndices);
 		var l = verb.core.ArrayExtensions.left($as);
 		var r = verb.core.ArrayExtensions.right($as);
 		return new verb.core.types.Pair(new verb.core.types.LazyMeshBoundingBoxTree(this._mesh,l),new verb.core.types.LazyMeshBoundingBoxTree(this._mesh,r));
 	}
 	,boundingBox: function() {
-		if(this._boundingBox == null) this._boundingBox = verb.core.Mesh.make_mesh_aabb(this._mesh,this._faceIndices);
+		if(this._boundingBox == null) this._boundingBox = verb.core.Mesh.makeMeshAabb(this._mesh,this._faceIndices);
 		return this._boundingBox;
 	}
 	,'yield': function() {

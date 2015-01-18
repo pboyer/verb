@@ -16,7 +16,7 @@ class LazyMeshBoundingBoxTree implements IBoundingBoxTree<Int> {
     }
 
     public function split() : Pair<IBoundingBoxTree<Int>, IBoundingBoxTree<Int>> {
-        var as = Mesh.sort_tris_on_longest_axis( _boundingBox, _mesh, _faceIndices )
+        var as = Mesh.sortTrianglesOnLongestAxis( _boundingBox, _mesh, _faceIndices )
         , l = as.left()
         , r = as.right();
 
@@ -27,7 +27,7 @@ class LazyMeshBoundingBoxTree implements IBoundingBoxTree<Int> {
 
     public function boundingBox(){
         if (_boundingBox == null){
-            _boundingBox = Mesh.make_mesh_aabb( _mesh, _faceIndices );
+            _boundingBox = Mesh.makeMeshAabb( _mesh, _faceIndices );
         }
         return _boundingBox;
     }
