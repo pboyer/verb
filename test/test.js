@@ -3394,11 +3394,13 @@ describe("verb.core.Intersect.clip_ray_in_coplanar_tri",function(){
 		var d = [1,0,0];
 
 		var pts = [ [0,0,0], [2,0,0], [2, 2,0] ];
-		var tri = [ 0, 1, 2 ];
+		var tri = [[ 0, 1, 2 ]];
 		var uvs = [ [0,0], [2,0], [2, 2] ];
-		var mesh = new verb.core.MeshData(null, pts, null, uvs);
+		var mesh = new verb.core.MeshData(tri, pts, null, uvs);
 
-		var res = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh, tri);
+		var res = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh, 0);
+
+
 
 		res.min.u.should.be.approximately(1, verb.core.Constants.TOLERANCE);
 		res.max.u.should.be.approximately(2, verb.core.Constants.TOLERANCE);
@@ -3417,11 +3419,11 @@ describe("verb.core.Intersect.clip_ray_in_coplanar_tri",function(){
 		var d = [0,1,0];
 
 		var pts = [ [0,0,0], [2,0,0], [2, 2,0] ];
-		var tri = [ 0, 1, 2 ];
+		var tri = [[ 0, 1, 2 ]];
 		var uvs = [ [0,0], [2,0], [2, 2] ];
 
-		var mesh = new verb.core.MeshData(null, pts, null, uvs);
-		var res = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh, tri );
+		var mesh = new verb.core.MeshData(tri, pts, null, uvs);
+		var res = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh, 0 );
 
 		res.min.u.should.be.approximately(0.5, verb.core.Constants.TOLERANCE);
 		res.max.u.should.be.approximately(1, verb.core.Constants.TOLERANCE);
@@ -3440,11 +3442,11 @@ describe("verb.core.Intersect.clip_ray_in_coplanar_tri",function(){
 		var d = [Math.sqrt(2)/2,Math.sqrt(2)/2,0];
 
 		var pts = [ [0,0,0], [2,0,0], [2, 2,0] ];
-		var tri = [ 0, 1, 2 ];
+		var tri = [[ 0, 1, 2 ]];
 		var uvs = [ [0,0], [2,0], [2, 2] ];
 
-		var mesh = new verb.core.MeshData(null, pts, null, uvs);
-		var res = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh, tri );
+		var mesh = new verb.core.MeshData(tri, pts, null, uvs);
+		var res = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh, 0 );
 
 		res.min.u.should.be.approximately(Math.sqrt(2)/2, verb.core.Constants.TOLERANCE);
 		res.max.u.should.be.approximately(3 * Math.sqrt(2)/2, verb.core.Constants.TOLERANCE);
@@ -3463,11 +3465,11 @@ describe("verb.core.Intersect.clip_ray_in_coplanar_tri",function(){
 		var d = [Math.sqrt(2)/2,-Math.sqrt(2)/2,0];
 
 		var pts = [ [0,0,0], [2,0,0], [2, 2,0] ];
-		var tri = [ 0, 1, 2 ];
+		var tri = [[ 0, 1, 2 ]];
 		var uvs = [ [0,0], [2,0], [2, 2] ];
 
-		var mesh = new verb.core.MeshData(null, pts, null, uvs);
-		var res = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh, tri );
+		var mesh = new verb.core.MeshData(tri, pts, null, uvs);
+		var res = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh, 0 );
 
 		res.min.u.should.be.approximately(Math.sqrt(2), verb.core.Constants.TOLERANCE);
 		res.max.u.should.be.approximately(2 * Math.sqrt(2), verb.core.Constants.TOLERANCE);
@@ -3486,11 +3488,11 @@ describe("verb.core.Intersect.clip_ray_in_coplanar_tri",function(){
 		var d = [Math.sqrt(2)/2,-Math.sqrt(2)/2,0];
 
 		var pts = [ [0,0,0], [2,0,0], [2, 2,0] ];
-		var tri = [ 0, 1, 2 ];
+		var tri = [[ 0, 1, 2 ]];
 		var uvs = [ [0,0], [2,0], [2, 2] ];
 
-		var mesh = new verb.core.MeshData(null, pts, null, uvs);
-		var res = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh, tri );
+		var mesh = new verb.core.MeshData(tri, pts, null, uvs);
+		var res = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh, 0 );
 
 		res.min.u.should.be.approximately(0, verb.core.Constants.TOLERANCE);
 		res.max.u.should.be.approximately(Math.sqrt(2), verb.core.Constants.TOLERANCE);
@@ -3509,11 +3511,11 @@ describe("verb.core.Intersect.clip_ray_in_coplanar_tri",function(){
 		var d = [-1,0,0];
 
 		var pts = [ [0,0,0], [2,0,0], [2, 2,0] ];
-		var tri = [ 0, 1, 2 ];
+		var tri = [[ 0, 1, 2 ]];
 		var uvs = [ [0,0], [2,0], [2, 2] ];
 
-		var mesh = new verb.core.MeshData(null, pts, null, uvs);
-		var res = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh, tri );
+		var mesh = new verb.core.MeshData(tri, pts, null, uvs);
+		var res = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh, 0 );
 
 		res.min.u.should.be.approximately(1, verb.core.Constants.TOLERANCE);
 		res.max.u.should.be.approximately(2, verb.core.Constants.TOLERANCE);
@@ -3536,20 +3538,20 @@ describe("verb.core.Intersect.merge_tri_clip_intervals",function(){
 		var d = [0,1,0];
 
 		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
-		var tri1 = [ 0, 1, 2 ];
+		var tri1 = [[ 0, 1, 2 ]];
 		var uvs1 = [ [0,0], [2,0], [2, 2] ];
-		var mesh1 = new verb.core.MeshData(null, pts1, null, uvs1);
+		var mesh1 = new verb.core.MeshData(tri1, pts1, null, uvs1);
 
-		var clip1 = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh1, tri1 );
+		var clip1 = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh1, 0 );
 
 		var pts2 = [ [1,0.5,-1], [1,2.5,-1], [1,0.5,1] ];
-		var tri2 = [ 0, 1, 2 ];
+		var tri2 = [[ 0, 1, 2 ]];
 		var uvs2 = [ [0,0], [2,0], [0,2] ];
-		var mesh2 = new verb.core.MeshData(null, pts2, null, uvs2);
+		var mesh2 = new verb.core.MeshData(tri2, pts2, null, uvs2);
 
-		var clip2 = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh2, tri2 );
+		var clip2 = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh2, 0 );
 
-		var res = verb.core.Intersect.merge_tri_clip_intervals(clip1, clip2, mesh1, tri1, mesh2, tri2);
+		var res = verb.core.Intersect.merge_tri_clip_intervals(clip1, clip2, mesh1, 0, mesh2, 0);
 
 		vecShouldBe( [1, 0.5], res.min.uv0 );
 		vecShouldBe( [0, 1], res.min.uv1 );
@@ -3567,20 +3569,20 @@ describe("verb.core.Intersect.merge_tri_clip_intervals",function(){
 		var d = [0,1,0];
 
 		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
-		var tri1 = [ 0, 1, 2 ];
+		var tri1 = [[ 0, 1, 2 ]];
 		var uvs1 = [ [0,0], [2,0], [2, 2] ];
-		var mesh1 = new verb.core.MeshData(null, pts1, null, uvs1);
+		var mesh1 = new verb.core.MeshData(tri1, pts1, null, uvs1);
 
-		var clip1 = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh1, tri1 );
+		var clip1 = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh1, 0 );
 
 		var pts2 = [ [2,0,0], [2, 2, 0], [2, 0, 2] ];
-		var tri2 = [ 0, 1, 2 ];
+		var tri2 = [[ 0, 1, 2 ]];
 		var uvs2 = [ [0,0], [2,0], [0,2] ];
-		var mesh2 = new verb.core.MeshData(null, pts2, null, uvs2);
+		var mesh2 = new verb.core.MeshData(tri2, pts2, null, uvs2);
 
-		var clip2 = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh2, tri2 );
+		var clip2 = verb.core.Intersect.clip_ray_in_coplanar_tri(new verb.core.Ray(o, d), mesh2, 0 );
 
-		var res = verb.core.Intersect.merge_tri_clip_intervals(clip1, clip2, mesh1, tri1, mesh2, tri2);
+		var res = verb.core.Intersect.merge_tri_clip_intervals(clip1, clip2, mesh1, 0, mesh2, 0);
 
 		vecShouldBe( [2, 0], res.min.uv0 );
 		vecShouldBe( [0, 0], res.min.uv1 );
@@ -3599,16 +3601,16 @@ describe("verb.core.Intersect.triangles",function(){
 	it('is correct for a basic example', function(){
 
 		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
-		var tri1 = [ 0, 1, 2 ];
+		var tri1 = [[ 0, 1, 2 ]];
 		var uvs1 = [ [0,0], [2,0], [2, 2] ];
-		var mesh1 = new verb.core.MeshData(null, pts1, null, uvs1);
+		var mesh1 = new verb.core.MeshData(tri1, pts1, null, uvs1);
 
 		var pts2 = [ [1,0.5,-1], [1,2.5,-1], [1,0.5,1] ];
-		var tri2 = [ 0, 1, 2 ];
+		var tri2 = [[ 0, 1, 2 ]];
 		var uvs2 = [ [0,0], [2,0], [0,2] ];
-		var mesh2 = new verb.core.MeshData(null, pts2, null, uvs2);
+		var mesh2 = new verb.core.MeshData(tri2, pts2, null, uvs2);
 
-		var res = verb.core.Intersect.triangles( mesh1, tri1, mesh2, tri2 );
+		var res = verb.core.Intersect.triangles( mesh1, 0, mesh2, 0 );
 
 		vecShouldBe( [1, 0.5], res.min.uv0 );
 		vecShouldBe( [0, 1], res.min.uv1 );
@@ -3623,16 +3625,16 @@ describe("verb.core.Intersect.triangles",function(){
 	it('is correct for triangles sharing an edge', function(){
 
 		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
-		var tri1 = [ 0, 1, 2 ];
+		var tri1 = [[ 0, 1, 2 ]];
 		var uvs1 = [ [0,0], [2,0], [2, 2] ];
-		var mesh1 = new verb.core.MeshData(null, pts1, null, uvs1);
+		var mesh1 = new verb.core.MeshData(tri1, pts1, null, uvs1);
 
 		var pts2 = [ [2, 0, 0], [2, 2, 0], [2,0,2] ];
-		var tri2 = [ 0, 1, 2 ];
+		var tri2 = [[ 0, 1, 2 ]];
 		var uvs2 = [ [0,0], [2,0], [0,2] ];
-		var mesh2 = new verb.core.MeshData(null, pts2, null, uvs2);
+		var mesh2 = new verb.core.MeshData(tri2, pts2, null, uvs2);
 
-		var res = verb.core.Intersect.triangles( mesh1, tri1, mesh2, tri2 );
+		var res = verb.core.Intersect.triangles( mesh1, 0, mesh2, 0 );
 
 		vecShouldBe( [2,0], res.min.uv0 );
 		vecShouldBe( [0,0], res.min.uv1 );
@@ -5760,7 +5762,7 @@ describe("verb.core.Eval.tri_uv_from_point",function(){
 
 		var uvs = [ [0,0], [1,0], [1,1] ];
 		var pts = [ [0,0,0], [1,0,0], [1,1,0] ];
-		var tri = [ 0, 1, 2 ];
+		var tri = [[ 0, 1, 2 ]];
 		var pt = [0.5, 0.25, 0];
 
 		var uv = verb.core.Eval.tri_uv_from_point( pts, tri, uvs, pt );

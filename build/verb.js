@@ -956,10 +956,12 @@ verb.core.CurveTriPoint = $hx_exports.core.CurveTriPoint = function(u,point,uv) 
 	this.point = point;
 	this.uv = uv;
 };
-verb.core.TriTriPoint = $hx_exports.core.TriTriPoint = function(uv0,uv1,point) {
+verb.core.MeshIntersectionPoint = $hx_exports.core.MeshIntersectionPoint = function(uv0,uv1,point,faceIndex0,faceIndex1) {
 	this.uv0 = uv0;
 	this.uv1 = uv1;
 	this.point = point;
+	this.faceIndex0;
+	this.faceIndex1;
 };
 verb.core.TriSegmentIntersection = $hx_exports.core.TriSegmentIntersection = function(point,s,t,r) {
 	this.point = point;
@@ -1182,7 +1184,7 @@ verb.core.Intersect.polyline_and_mesh = function(polyline,mesh,tol) {
 		if(inter == null) continue;
 		var pt = inter.point;
 		var u = verb.core.Vec.lerp(inter.p,[polyline.params[polid]],[polyline.params[polid + 1]])[0];
-		var uv = verb.core.Intersect.tri_uv_from_point(mesh,mesh.faces[faceid],pt);
+		var uv = verb.core.Intersect.tri_uv_from_point(mesh,faceid,pt);
 		finalResults.push(new verb.core.PolylineMeshIntersection(pt,u,uv,polid,faceid));
 	}
 	return finalResults;
@@ -1219,22 +1221,25 @@ verb.core.Intersect.curves_with_estimate = function(curve0,curve1,u0,u1,toleranc
 	var p21 = verb.core.Eval.rational_curve_point(curve1,u2);
 	return new verb.core.CurveCurveIntersection(p11,p21,u11,u2);
 };
-verb.core.Intersect.triangles = function(mesh0,tri0,mesh1,tri1) {
+verb.core.Intersect.triangles = function(mesh0,faceIndex0,mesh1,faceIndex1) {
+	var tri0 = mesh0.faces[faceIndex0];
+	var tri1 = mesh1.faces[faceIndex1];
 	var n0 = verb.core.Mesh.get_tri_norm(mesh0.points,tri0);
 	var n1 = verb.core.Mesh.get_tri_norm(mesh1.points,tri1);
 	var o0 = mesh0.points[tri0[0]];
 	var o1 = mesh1.points[tri1[0]];
 	var ray = verb.core.Intersect.planes(o0,n0,o1,n1);
 	if(ray == null) return null;
-	var clip1 = verb.core.Intersect.clip_ray_in_coplanar_tri(ray,mesh0,tri0);
+	var clip1 = verb.core.Intersect.clip_ray_in_coplanar_tri(ray,mesh0,faceIndex0);
 	if(clip1 == null) return null;
-	var clip2 = verb.core.Intersect.clip_ray_in_coplanar_tri(ray,mesh1,tri1);
+	var clip2 = verb.core.Intersect.clip_ray_in_coplanar_tri(ray,mesh1,faceIndex1);
 	if(clip2 == null) return null;
-	var merged = verb.core.Intersect.merge_tri_clip_intervals(clip1,clip2,mesh0,tri0,mesh1,tri1);
+	var merged = verb.core.Intersect.merge_tri_clip_intervals(clip1,clip2,mesh0,faceIndex0,mesh1,faceIndex1);
 	if(merged == null) return null;
-	return new verb.core.Interval(new verb.core.TriTriPoint(merged.min.uv0,merged.min.uv1,merged.min.point),new verb.core.TriTriPoint(merged.max.uv0,merged.max.uv1,merged.max.point));
+	return new verb.core.Interval(new verb.core.MeshIntersectionPoint(merged.min.uv0,merged.min.uv1,merged.min.point,faceIndex0,faceIndex1),new verb.core.MeshIntersectionPoint(merged.max.uv0,merged.max.uv1,merged.max.point,faceIndex0,faceIndex1));
 };
-verb.core.Intersect.clip_ray_in_coplanar_tri = function(ray,mesh,tri) {
+verb.core.Intersect.clip_ray_in_coplanar_tri = function(ray,mesh,faceIndex) {
+	var tri = mesh.faces[faceIndex];
 	var o = [mesh.points[tri[0]],mesh.points[tri[1]],mesh.points[tri[2]]];
 	var uvs = [mesh.uvs[tri[0]],mesh.uvs[tri[1]],mesh.uvs[tri[2]]];
 	var uvd = [verb.core.Vec.sub(uvs[1],uvs[0]),verb.core.Vec.sub(uvs[2],uvs[1]),verb.core.Vec.sub(uvs[0],uvs[2])];
@@ -1259,30 +1264,31 @@ verb.core.Intersect.clip_ray_in_coplanar_tri = function(ray,mesh,tri) {
 	if(maxU == null || minU == null) return null;
 	return new verb.core.Interval(minU,maxU);
 };
-verb.core.Intersect.merge_tri_clip_intervals = function(clip1,clip2,mesh1,tri1,mesh2,tri2) {
+verb.core.Intersect.merge_tri_clip_intervals = function(clip1,clip2,mesh1,faceIndex1,mesh2,faceIndex2) {
 	if(clip2.min.u > clip1.max.u + verb.core.Constants.EPSILON || clip1.min.u > clip2.max.u + verb.core.Constants.EPSILON) return null;
 	var min;
 	if(clip1.min.u > clip2.min.u) min = new verb.core.types.Pair(clip1.min,0); else min = new verb.core.types.Pair(clip2.min,1);
 	var max;
 	if(clip1.max.u < clip2.max.u) max = new verb.core.types.Pair(clip1.max,0); else max = new verb.core.types.Pair(clip2.max,1);
-	var res = new verb.core.Interval(new verb.core.TriTriPoint(null,null,min.item0.point),new verb.core.TriTriPoint(null,null,max.item0.point));
+	var res = new verb.core.Interval(new verb.core.MeshIntersectionPoint(null,null,min.item0.point,faceIndex1,faceIndex2),new verb.core.MeshIntersectionPoint(null,null,max.item0.point,faceIndex1,faceIndex2));
 	if(min.item1 == 0) {
 		res.min.uv0 = min.item0.uv;
-		res.min.uv1 = verb.core.Intersect.tri_uv_from_point(mesh2,tri2,min.item0.point);
+		res.min.uv1 = verb.core.Intersect.tri_uv_from_point(mesh2,faceIndex2,min.item0.point);
 	} else {
-		res.min.uv0 = verb.core.Intersect.tri_uv_from_point(mesh1,tri1,min.item0.point);
+		res.min.uv0 = verb.core.Intersect.tri_uv_from_point(mesh1,faceIndex1,min.item0.point);
 		res.min.uv1 = min.item0.uv;
 	}
 	if(max.item1 == 0) {
 		res.max.uv0 = max.item0.uv;
-		res.max.uv1 = verb.core.Intersect.tri_uv_from_point(mesh2,tri2,max.item0.point);
+		res.max.uv1 = verb.core.Intersect.tri_uv_from_point(mesh2,faceIndex2,max.item0.point);
 	} else {
-		res.max.uv0 = verb.core.Intersect.tri_uv_from_point(mesh1,tri1,max.item0.point);
+		res.max.uv0 = verb.core.Intersect.tri_uv_from_point(mesh1,faceIndex1,max.item0.point);
 		res.max.uv1 = max.item0.uv;
 	}
 	return res;
 };
-verb.core.Intersect.tri_uv_from_point = function(mesh,tri,f) {
+verb.core.Intersect.tri_uv_from_point = function(mesh,faceIndex,f) {
+	var tri = mesh.faces[faceIndex];
 	var p1 = mesh.points[tri[0]];
 	var p2 = mesh.points[tri[1]];
 	var p3 = mesh.points[tri[2]];

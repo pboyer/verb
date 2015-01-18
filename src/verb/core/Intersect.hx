@@ -6,7 +6,7 @@ import verb.core.types.SurfaceData;
 import verb.core.Intersect.PolylineData;
 import verb.core.Intersect.LazyMeshBoundingBoxTree;
 import verb.core.types.BoundingBoxNode;
-import verb.core.Intersect.TriTriPoint;
+import verb.core.Intersect.MeshIntersectionPoint;
 import verb.core.types.Pair;
 import verb.core.Mat.Vector;
 import verb.core.types.MeshData;
@@ -27,7 +27,6 @@ class Ray {
 
 @:expose("core.Interval")
 class Interval<T> {
-
     public var min : T;
     public var max : T;
 
@@ -50,16 +49,21 @@ class CurveTriPoint {
     }
 }
 
-@:expose("core.TriTriPoint")
-class TriTriPoint {
+@:expose("core.MeshIntersectionPoint")
+class MeshIntersectionPoint {
     public var uv0 : UV;
     public var uv1 : UV;
     public var point : Point;
 
-    public function new(uv0, uv1, point){
+    public var faceIndex0 : Int;
+    public var faceIndex1 : Int;
+
+    public function new(uv0, uv1, point, faceIndex0, faceIndex1){
         this.uv0 = uv0;
         this.uv1 = uv1;
         this.point = point;
+        this.faceIndex0;
+        this.faceIndex1;
     }
 }
 
@@ -382,28 +386,23 @@ class CurveSurfaceIntersection {
 @:expose("core.Intersect")
 class Intersect {
 
-    /*
-    public static function meshes_by_aabb( points1, tris1, uvs1, points2, tris2, uvs2 ) {
+/*
 
-        // build aabb for each mesh
-        var tri_indices1 = verb.range(tris1.length)
-        , tri_indices2 = verb.range(tris2.length)
-        , aabb1 = verb.eval.make_mesh_aabb_tree( points1, tris1, tri_indices1 )
-        , aabb2 = verb.eval.make_mesh_aabb_tree( points2, tris2, tri_indices2 );
+    public static function meshes( mesh0 : MeshData, mesh1 : MeshData ) {
 
-        // intersect and get the pairs of triangle intersctions
-        var bbints = verb.eval.aabb_trees( points1, tris1, points2, tris2, aabb1, aabb2 );
+        // bounding box intersection to get all of the face pairs
+        var bbints = Intersect.bounding_box_trees(
+            new LazyMeshBoundingBoxTree( mesh0 ),
+            new LazyMeshBoundingBoxTree( mesh1 ), 0 );
 
         // get the segments of the intersection crv with uvs
-        var segments = bbints.map(function(ids){
-            var res = verb.eval.tris( points1, tris1[ ids[0] ], uvs1, points2, tris2[ ids[1] ], uvs2 );
-            if (!res) return res;
+        var segments = bbints.map(function(ids : Pair<Int, Int>){
 
-            res[0].tri1id = ids[0];
-            res[1].tri1id = ids[0];
-            res[0].tri2id = ids[1];
-            res[1].tri2id = ids[1];
+            var res : Interval<MeshIntersectionPoint> =
+                Intersect.triangles( mesh0, ids.item0, mesh1, ids.item1 );
 
+            // not all face pairs necessarily intersect
+            if (res == null) return res;
             return res;
         })
         .filter(function(x){ return x; })
@@ -559,8 +558,7 @@ class Intersect {
         return (adj.length === 1) ? adj[0] : null;
 
     }
-
-    */
+ */
 
     //
     // Get the intersection of a NURBS curve and a NURBS surface without an estimate
@@ -670,7 +668,7 @@ class Intersect {
 
             var pt = inter.point;
             var u = Vec.lerp(inter.p, [ polyline.params[polid] ], [ polyline.params[polid+1] ] )[0];
-            var uv = Intersect.tri_uv_from_point( mesh, mesh.faces[faceid],  pt );
+            var uv = Intersect.tri_uv_from_point( mesh, faceid,  pt );
 
             finalResults.push(new PolylineMeshIntersection( pt, u, uv, polid, faceid ));
 
@@ -795,7 +793,10 @@ class Intersect {
     // + a point represented by an array of length (dim)
     //
 
-    public static function triangles( mesh0 : MeshData, tri0 : Tri, mesh1 : MeshData, tri1 : Tri ) : Interval<TriTriPoint>{
+    public static function triangles( mesh0 : MeshData, faceIndex0 : Int, mesh1 : MeshData, faceIndex1 : Int ) : Interval<MeshIntersectionPoint>{
+
+        var tri0 = mesh0.faces[faceIndex0];
+        var tri1 = mesh1.faces[faceIndex1];
 
         // 0) get the plane rep of the two triangles
         var n0 = Mesh.get_tri_norm( mesh0.points, tri0 );
@@ -808,26 +809,28 @@ class Intersect {
         if (ray == null) return null;
 
         // 2) clip the ray within tri0
-        var clip1 = clip_ray_in_coplanar_tri( ray, mesh0, tri0 );
+        var clip1 = clip_ray_in_coplanar_tri( ray, mesh0, faceIndex0 );
         if (clip1 == null) return null;
 
         // 3) clip the ray within tri1
-        var clip2 = clip_ray_in_coplanar_tri( ray, mesh1, tri1 );
+        var clip2 = clip_ray_in_coplanar_tri( ray, mesh1, faceIndex1 );
         if (clip2 == null) return null;
 
         // 4) find the interval that overlaps
-        var merged = merge_tri_clip_intervals(clip1, clip2, mesh0, tri0, mesh1, tri1 );
+        var merged = merge_tri_clip_intervals(clip1, clip2, mesh0, faceIndex0, mesh1, faceIndex1 );
         if (merged == null) return null;
 
-        return return new Interval<TriTriPoint>(    new TriTriPoint(merged.min.uv0, merged.min.uv1, merged.min.point ),
-                                                    new TriTriPoint(merged.max.uv0, merged.max.uv1, merged.max.point ));
+        return return new Interval(
+            new MeshIntersectionPoint(merged.min.uv0, merged.min.uv1, merged.min.point, faceIndex0, faceIndex1 ),
+            new MeshIntersectionPoint(merged.max.uv0, merged.max.uv1, merged.max.point, faceIndex0, faceIndex1 ));
 
     }
 
-    public static function clip_ray_in_coplanar_tri(ray : Ray, mesh : MeshData, tri : Tri ) : Interval<CurveTriPoint> {
+    public static function clip_ray_in_coplanar_tri(ray : Ray, mesh : MeshData, faceIndex : Int ) : Interval<CurveTriPoint> {
 
         // 0) construct rays for each edge of the triangle
-        var o = [ mesh.points[ tri[0] ], mesh.points[ tri[1] ], mesh.points[ tri[2] ] ]
+        var tri = mesh.faces[faceIndex]
+        , o = [ mesh.points[ tri[0] ], mesh.points[ tri[1] ], mesh.points[ tri[2] ] ]
         , uvs = [ mesh.uvs[ tri[0] ], mesh.uvs[ tri[1] ], mesh.uvs[ tri[2] ] ]
         , uvd = [ Vec.sub(uvs[1], uvs[0]), Vec.sub(uvs[2], uvs[1]), Vec.sub(uvs[0], uvs[2]) ]
         , s = [ Vec.sub( o[1], o[0] ), Vec.sub( o[2], o[1] ), Vec.sub( o[0], o[2] ) ]
@@ -875,7 +878,7 @@ class Intersect {
     }
 
     public static function merge_tri_clip_intervals(clip1 : Interval<CurveTriPoint>, clip2 : Interval<CurveTriPoint>,
-                                                    mesh1 : MeshData, tri1 : Tri, mesh2 : MeshData, tri2 : Tri ) : Interval<TriTriPoint> {
+                                                    mesh1 : MeshData, faceIndex1 : Int, mesh2 : MeshData, faceIndex2 : Int ) : Interval<MeshIntersectionPoint> {
 
         // if the intervals dont overlap, fail
         if ( clip2.min.u > clip1.max.u + Constants.EPSILON
@@ -887,29 +890,32 @@ class Intersect {
         var min = (clip1.min.u > clip2.min.u) ? new Pair<CurveTriPoint, Int>(clip1.min, 0) : new Pair<CurveTriPoint, Int>(clip2.min, 1);
         var max = (clip1.max.u < clip2.max.u) ? new Pair<CurveTriPoint, Int>(clip1.max, 0) : new Pair<CurveTriPoint, Int>(clip2.max, 1);
 
-        var res = new Interval<TriTriPoint>( new TriTriPoint(null, null, min.item0.point),
-                                             new TriTriPoint(null, null, max.item0.point));
+        var res = new Interval(
+            new MeshIntersectionPoint(null, null, min.item0.point, faceIndex1, faceIndex2),
+            new MeshIntersectionPoint(null, null, max.item0.point, faceIndex1, faceIndex2));
 
         if (min.item1 == 0){
             res.min.uv0 = min.item0.uv;
-            res.min.uv1 = tri_uv_from_point( mesh2, tri2, min.item0.point );
+            res.min.uv1 = tri_uv_from_point( mesh2, faceIndex2, min.item0.point );
         } else {
-            res.min.uv0 = tri_uv_from_point( mesh1, tri1, min.item0.point );
+            res.min.uv0 = tri_uv_from_point( mesh1, faceIndex1, min.item0.point );
             res.min.uv1 = min.item0.uv;
         }
 
         if (max.item1 == 0){
             res.max.uv0 = max.item0.uv;
-            res.max.uv1 = tri_uv_from_point( mesh2, tri2, max.item0.point );
+            res.max.uv1 = tri_uv_from_point( mesh2, faceIndex2, max.item0.point );
         } else {
-            res.max.uv0 = tri_uv_from_point( mesh1, tri1, max.item0.point );
+            res.max.uv0 = tri_uv_from_point( mesh1, faceIndex1, max.item0.point );
             res.max.uv1 = max.item0.uv;
         }
 
         return res;
     }
 
-    public static function tri_uv_from_point( mesh : MeshData, tri : Tri, f : Point ) : UV {
+    public static function tri_uv_from_point( mesh : MeshData, faceIndex : Int, f : Point ) : UV {
+
+        var tri = mesh.faces[faceIndex];
 
         var p1 = mesh.points[ tri[0] ];
         var p2 = mesh.points[ tri[1] ];
