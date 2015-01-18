@@ -513,6 +513,55 @@ verb.core.Divide.rational_curve_by_arc_length = function(curve,l) {
 	return pts;
 };
 verb.core.Eval = $hx_exports.core.Eval = function() { };
+verb.core.Eval.volume_point = function(volume,u,v,w) {
+	var n = volume.knotsU.length - volume.degreeU - 2;
+	var m = volume.knotsV.length - volume.degreeV - 2;
+	var l = volume.knotsW.length - volume.degreeW - 2;
+	return verb.core.Eval.volume_point_given_n_m_l(volume,n,m,l,u,v,w);
+};
+verb.core.Eval.volume_point_given_n_m_l = function(volume,n,m,l,u,v,w) {
+	var control_points = volume.controlPoints;
+	var degree_u = volume.degreeU;
+	var degree_v = volume.degreeV;
+	var degree_w = volume.degreeW;
+	var knots_u = volume.knotsU;
+	var knots_v = volume.knotsV;
+	var knots_w = volume.knotsW;
+	var dim = control_points[0][0][0].length;
+	var knot_span_index_u = verb.core.Eval.knot_span_given_n(n,degree_u,u,knots_u);
+	var knot_span_index_v = verb.core.Eval.knot_span_given_n(m,degree_v,v,knots_v);
+	var knot_span_index_w = verb.core.Eval.knot_span_given_n(l,degree_w,w,knots_w);
+	var u_basis_vals = verb.core.Eval.basis_functions_given_knot_span_index(knot_span_index_u,u,degree_u,knots_u);
+	var v_basis_vals = verb.core.Eval.basis_functions_given_knot_span_index(knot_span_index_v,v,degree_v,knots_v);
+	var w_basis_vals = verb.core.Eval.basis_functions_given_knot_span_index(knot_span_index_w,w,degree_w,knots_w);
+	var uind = knot_span_index_u - degree_u;
+	var position = verb.core.Vec.zeros1d(dim);
+	var temp = verb.core.Vec.zeros1d(dim);
+	var temp2 = verb.core.Vec.zeros1d(dim);
+	var _g1 = 0;
+	var _g = degree_w + 1;
+	while(_g1 < _g) {
+		var i = _g1++;
+		temp2 = verb.core.Vec.zeros1d(dim);
+		var wind = knot_span_index_w - degree_w + i;
+		var _g3 = 0;
+		var _g2 = degree_v + 1;
+		while(_g3 < _g2) {
+			var j = _g3++;
+			temp = verb.core.Vec.zeros1d(dim);
+			var vind = knot_span_index_v - degree_v + j;
+			var _g5 = 0;
+			var _g4 = degree_u + 1;
+			while(_g5 < _g4) {
+				var k = _g5++;
+				temp = verb.core.Vec.add(temp,verb.core.Vec.mul(u_basis_vals[k],control_points[uind + k][vind][wind]));
+			}
+			temp2 = verb.core.Vec.add(temp2,verb.core.Vec.mul(v_basis_vals[j],temp));
+		}
+		position = verb.core.Vec.add(position,verb.core.Vec.mul(w_basis_vals[i],temp2));
+	}
+	return position;
+};
 verb.core.Eval.rational_surface_derivs = function(surface,num_derivs,u,v) {
 	var ders = verb.core.Eval.surface_derivs(surface,num_derivs,u,v);
 	var Aders = verb.core.Eval.rational_2d(ders);
@@ -3591,6 +3640,15 @@ verb.core.types.SurfacePoint = function(point,normal,uv,id,degen) {
 };
 verb.core.types.SurfacePoint.fromUv = function(u,v) {
 	return new verb.core.types.SurfacePoint(null,null,[u,v]);
+};
+verb.core.types.VolumeData = $hx_exports.core.VolumeData = function(degreeU,degreeV,degreeW,knotsU,knotsV,knotsW,controlPoints) {
+	this.degreeU = degreeU;
+	this.degreeV = degreeV;
+	this.degreeW = degreeW;
+	this.knotsU = knotsU;
+	this.knotsV = knotsV;
+	this.knotsW = knotsW;
+	this.controlPoints = controlPoints;
 };
 function $iterator(o) { if( o instanceof Array ) return function() { return HxOverrides.iter(o); }; return typeof(o.iterator) == 'function' ? $bind(o,o.iterator) : o.iterator; }
 var $_, $fid = 0;

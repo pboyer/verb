@@ -17,7 +17,7 @@ class SurfaceData {
     // array of nondecreasing knot values in v direction
     public var knotsV : KnotArray;
 
-    // 3d array of control points, where rows are the u dir, and columns run along the positive v direction,
+    // 2d array of control points, where rows are the u dir, and columns run along the positive v direction,
     // and where each control point is an array of length (dim)
     public var controlPoints : Array<Array<Point>>;
 

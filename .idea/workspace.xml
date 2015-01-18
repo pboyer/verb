@@ -2,15 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="938890c0-f1ce-4fbd-8322-63610af7f5e6" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/src/eval/intersect2.js" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/Analyze.hx" afterPath="$PROJECT_DIR$/src/verb/core/Analyze.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/Intersect.hx" afterPath="$PROJECT_DIR$/src/verb/core/Intersect.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/Mesh.hx" afterPath="$PROJECT_DIR$/src/verb/core/Mesh.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/Tess.hx" afterPath="$PROJECT_DIR$/src/verb/core/Tess.hx" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/verb/core/types/VolumeData.hx" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/eval/tessellate2.js" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/Eval.hx" afterPath="$PROJECT_DIR$/src/verb/core/Eval.hx" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/types/SurfaceData.hx" afterPath="$PROJECT_DIR$/src/verb/core/types/SurfaceData.hx" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/eval/eval2.js" afterPath="$PROJECT_DIR$/src/eval/eval2.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/test.js" afterPath="$PROJECT_DIR$/test/test.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/example/threeMeshIntersectExample.html" afterPath="$PROJECT_DIR$/example/threeMeshIntersectExample.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/verb.js" afterPath="$PROJECT_DIR$/build/verb.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/verb.min.js" afterPath="$PROJECT_DIR$/build/verb.min.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/verbHaxe.js" afterPath="$PROJECT_DIR$/build/verbHaxe.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
@@ -37,32 +35,6 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="Intersect.hx" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/verb/core/Intersect.hx">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-6.851852" vertical-offset="6070" max-vertical-offset="18825">
-              <caret line="417" column="18" selection-start-line="417" selection-start-column="18" selection-end-line="417" selection-end-column="18" />
-              <folding>
-                <element signature="e#12859#14985#0" expanded="false" />
-                <element signature="e#17269#19295#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Divide.hx" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/verb/core/Divide.hx">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="300">
-              <caret line="58" column="0" selection-start-line="58" selection-start-column="0" selection-end-line="58" selection-end-column="0" />
-              <folding>
-                <element signature="e#244#411#0" expanded="false" />
-                <element signature="e#526#1391#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="KdTree.hx" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/verb/core/KdTree.hx">
           <provider selected="true" editor-type-id="text-editor">
@@ -89,56 +61,75 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Modify.hx" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/verb/core/Modify.hx">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="185" max-vertical-offset="5040">
-              <caret line="66" column="27" selection-start-line="66" selection-start-column="27" selection-end-line="66" selection-end-column="27" />
-              <folding>
-                <element signature="e#575#1805#0" expanded="false" />
-                <element signature="e#4005#5222#0" expanded="false" />
-                <element signature="e#5560#5937#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Numeric.hx" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/verb/core/Numeric.hx">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="255" max-vertical-offset="1515">
-              <caret line="84" column="21" selection-start-line="84" selection-start-column="21" selection-end-line="84" selection-end-column="21" />
-              <folding>
-                <element signature="e#674#1866#0" expanded="false" />
-                <element signature="e#4130#4694#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Tess.hx" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/verb/core/Tess.hx">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1619" max-vertical-offset="2265">
-              <caret line="339" column="0" selection-start-line="339" selection-start-column="0" selection-end-line="339" selection-end-column="0" />
-              <folding>
-                <element signature="e#1331#1701#0" expanded="false" />
-                <element signature="e#2221#2720#0" expanded="false" />
-                <element signature="e#3222#4397#0" expanded="false" />
-                <element signature="e#4777#5943#0" expanded="false" />
-                <element signature="e#6337#8353#0" expanded="false" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="test.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/test/test.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.512987" vertical-offset="48734" max-vertical-offset="93090">
-              <caret line="3270" column="38" selection-start-line="3270" selection-start-column="38" selection-end-line="3270" selection-end-column="38" />
+            <state vertical-scroll-proportion="0.36688313" vertical-offset="60644" max-vertical-offset="93090">
+              <caret line="4074" column="38" selection-start-line="4074" selection-start-column="38" selection-end-line="4074" selection-end-column="38" />
               <folding>
-                <element signature="e#0#166887#0" expanded="false" />
+                <element signature="e#0#166933#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="eval.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/eval/eval.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="21560" max-vertical-offset="26250">
+              <caret line="1463" column="30" selection-start-line="1463" selection-start-column="30" selection-end-line="1463" selection-end-column="30" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Eval.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/core/Eval.hx">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="89" max-vertical-offset="14595">
+              <caret line="36" column="19" selection-start-line="36" selection-start-column="19" selection-end-line="36" selection-end-column="19" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="VolumeData.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/core/types/VolumeData.hx">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="59" max-vertical-offset="675">
+              <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="SurfaceData.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/core/types/SurfaceData.hx">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="555">
+              <caret line="21" column="22" selection-start-line="21" selection-start-column="22" selection-end-line="21" selection-end-column="22" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="eval-webgl.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/eval/eval-webgl.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="3015">
+              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="eval2.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/eval/eval2.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="405">
+              <caret line="90" column="0" selection-start-line="90" selection-start-column="0" selection-end-line="90" selection-end-column="0" />
+              <folding>
+                <element signature="e#0#2395#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -166,14 +157,11 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/verb/eval/types/RefinementNode.hx" />
         <option value="$PROJECT_DIR$/src/verb/eval/types/SurfacePoint.hx" />
         <option value="$PROJECT_DIR$/src/eval/tessellate.js" />
         <option value="$PROJECT_DIR$/src/verb/eval/Trig.hx" />
-        <option value="$PROJECT_DIR$/src/eval/tessellate2.js" />
         <option value="$PROJECT_DIR$/src/verb/eval/Tess.hx" />
         <option value="$PROJECT_DIR$/src/verb/eval/types/AdaptiveRefinementNode.hx" />
-        <option value="$PROJECT_DIR$/src/eval/eval2.js" />
         <option value="$PROJECT_DIR$/src/verb/eval/Create.hx" />
         <option value="$PROJECT_DIR$/src/verb/eval/Intersect.hx" />
         <option value="$PROJECT_DIR$/src/verb/eval/Make.hx" />
@@ -181,7 +169,6 @@
         <option value="$PROJECT_DIR$/src/verb/core/Binomial.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/types/AdaptiveRefinementNode.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Constants.hx" />
-        <option value="$PROJECT_DIR$/src/verb/core/types/SurfaceData.hx" />
         <option value="$PROJECT_DIR$/src/support/header.js" />
         <option value="$PROJECT_DIR$/Gruntfile.js" />
         <option value="$PROJECT_DIR$/build/verb.js" />
@@ -201,7 +188,6 @@
         <option value="$PROJECT_DIR$/src/verb/BoundingBox.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/types/CurveData.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Make.hx" />
-        <option value="$PROJECT_DIR$/src/verb/core/Eval.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/types/Pair.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/types/MeshData.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Mat.hx" />
@@ -215,8 +201,13 @@
         <option value="$PROJECT_DIR$/example/threeMeshIntersectExample.html" />
         <option value="$PROJECT_DIR$/src/verb/core/Tess.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Intersect.hx" />
-        <option value="$PROJECT_DIR$/test/test.js" />
         <option value="$PROJECT_DIR$/src/eval/intersect2.js" />
+        <option value="$PROJECT_DIR$/src/eval/tessellate2.js" />
+        <option value="$PROJECT_DIR$/src/eval/eval2.js" />
+        <option value="$PROJECT_DIR$/src/verb/core/types/SurfaceData.hx" />
+        <option value="$PROJECT_DIR$/src/verb/core/types/VolumeData.hx" />
+        <option value="$PROJECT_DIR$/src/verb/core/Eval.hx" />
+        <option value="$PROJECT_DIR$/test/test.js" />
       </list>
     </option>
   </component>
@@ -328,6 +319,54 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="verb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="verb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="verb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="verb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="verb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="verb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="verb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="types" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -563,7 +602,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="245" y="23" width="1195" height="873" extended-state="0" />
-    <editor active="false" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -581,7 +620,7 @@
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19665273" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.19665273" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -622,13 +661,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="4575">
           <caret line="16" column="29" selection-start-line="16" selection-start-column="29" selection-end-line="16" selection-end-column="29" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/eval/tessellate2.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="405">
-          <caret line="3" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
         </state>
       </provider>
     </entry>
@@ -674,13 +706,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/eval/eval2.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="2625" max-vertical-offset="25830">
-          <caret line="189" column="23" selection-start-line="189" selection-start-column="23" selection-end-line="189" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/build/verb.min.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="676">
@@ -706,13 +731,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="150" max-vertical-offset="1890">
           <caret line="31" column="13" selection-start-line="31" selection-start-column="13" selection-end-line="31" selection-end-column="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/eval/eval.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="21560" max-vertical-offset="26250">
-          <caret line="1463" column="30" selection-start-line="1463" selection-start-column="30" selection-end-line="1463" selection-end-column="30" />
         </state>
       </provider>
     </entry>
@@ -763,22 +781,6 @@
             <element signature="e#1550#2438#0" expanded="false" />
             <element signature="e#2496#3844#0" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/eval/eval-webgl.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="3015">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/core/types/SurfaceData.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="555">
-          <caret line="7" column="31" selection-start-line="7" selection-start-column="31" selection-end-line="7" selection-end-column="31" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -911,14 +913,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/core/Eval.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.33279222" vertical-offset="125" max-vertical-offset="13185">
-          <caret line="22" column="27" selection-start-line="22" selection-start-column="27" selection-end-line="22" selection-end-column="27" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/example/threeMeshIntersectExample.html">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-10.625" vertical-offset="5655" max-vertical-offset="6555">
@@ -1028,12 +1022,62 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/eval/eval-webgl.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="3015">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/eval/eval.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="21560" max-vertical-offset="26250">
+          <caret line="1463" column="30" selection-start-line="1463" selection-start-column="30" selection-end-line="1463" selection-end-column="30" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/eval/eval2.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="405">
+          <caret line="90" column="0" selection-start-line="90" selection-start-column="0" selection-end-line="90" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#2395#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/core/types/SurfaceData.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="555">
+          <caret line="21" column="22" selection-start-line="21" selection-start-column="22" selection-end-line="21" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/core/types/VolumeData.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="59" max-vertical-offset="675">
+          <caret line="12" column="0" selection-start-line="12" selection-start-column="0" selection-end-line="12" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/core/Eval.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="89" max-vertical-offset="14595">
+          <caret line="36" column="19" selection-start-line="36" selection-start-column="19" selection-end-line="36" selection-end-column="19" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/test/test.js">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.512987" vertical-offset="48734" max-vertical-offset="93090">
-          <caret line="3270" column="38" selection-start-line="3270" selection-start-column="38" selection-end-line="3270" selection-end-column="38" />
+        <state vertical-scroll-proportion="0.36688313" vertical-offset="60644" max-vertical-offset="93090">
+          <caret line="4074" column="38" selection-start-line="4074" selection-start-column="38" selection-end-line="4074" selection-end-column="38" />
           <folding>
-            <element signature="e#0#166887#0" expanded="false" />
+            <element signature="e#0#166933#0" expanded="false" />
           </folding>
         </state>
       </provider>

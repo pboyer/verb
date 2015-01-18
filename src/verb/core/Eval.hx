@@ -1,5 +1,6 @@
 package verb.core;
 
+import verb.core.types.VolumeData;
 import verb.core.types.SurfaceData;
 import verb.core.types.CurveData;
 
@@ -7,6 +8,101 @@ import verb.core.Binomial;
 
 @:expose("core.Eval")
 class Eval {
+
+	//
+	// Compute a point in a non-uniform, non-rational B spline volume
+	//
+	// **params**
+	// + VolumeData
+	// + u parameter at which to evaluate the volume point
+	// + v parameter at which to evaluate the volume point
+	// + w parameter at which to evaluate the volume point
+	//
+	// **returns**
+	// + a point represented by an array of length (dim)
+	//
+
+	public static function volume_point( volume : VolumeData, u : Float, v : Float, w : Float ) : Point {
+		var n = volume.knotsU.length - volume.degreeU - 2
+		, m = volume.knotsV.length - volume.degreeV - 2
+		, l = volume.knotsW.length - volume.degreeW - 2;
+
+		return volume_point_given_n_m_l( volume, n, m, l, u, v, w );
+	}
+
+	//
+	// Compute a point in a non-uniform, non-rational B spline volume
+	//
+	// **params**
+	// + VolumeData
+	// + u parameter at which to evaluate the volume point
+	// + v parameter at which to evaluate the volume point
+	// + w parameter at which to evaluate the volume point
+	//
+	// **returns**
+	// + a point represented by an array of length (dim)
+	//
+
+	public static function volume_point_given_n_m_l( volume : VolumeData,
+													 n : Int,
+													 m : Int,
+													 l : Int,
+													 u : Float,
+													 v : Float,
+													 w : Float  ) : Point {
+//
+//		if ( !are_valid_relations(degree_u, control_points.length, knots_u.length ) ||
+//			!are_valid_relations(degree_v, control_points[0].length, knots_v.length ) ||
+//			!are_valid_relations(degree_w, control_points[0][0].length, knots_w.length ) ) {
+//			console.error('Invalid relations between control points and knot vector');
+//			return null;
+//		}
+
+		var control_points = volume.controlPoints
+			, degree_u = volume.degreeU
+			, degree_v = volume.degreeV
+			, degree_w = volume.degreeW
+			, knots_u = volume.knotsU
+			, knots_v = volume.knotsV
+			, knots_w = volume.knotsW;
+
+		var dim = control_points[0][0][0].length
+			, knot_span_index_u = knot_span_given_n( n, degree_u, u, knots_u )
+			, knot_span_index_v = knot_span_given_n( m, degree_v, v, knots_v )
+			, knot_span_index_w = knot_span_given_n( l, degree_w, w, knots_w )
+			, u_basis_vals = basis_functions_given_knot_span_index( knot_span_index_u, u, degree_u, knots_u )
+			, v_basis_vals = basis_functions_given_knot_span_index( knot_span_index_v, v, degree_v, knots_v )
+			, w_basis_vals = basis_functions_given_knot_span_index( knot_span_index_w, w, degree_w, knots_w )
+			, uind = knot_span_index_u - degree_u
+			, position = Vec.zeros1d( dim )
+			, temp = Vec.zeros1d( dim )
+			, temp2 = Vec.zeros1d( dim );
+
+		for ( i in 0...degree_w + 1 ){
+
+			temp2 = Vec.zeros1d( dim );
+			var wind = knot_span_index_w - degree_w + i;
+
+			for ( j in 0...degree_v + 1 ){
+
+				temp = Vec.zeros1d( dim );
+				var vind = knot_span_index_v  - degree_v + j;
+
+				for ( k in 0...degree_u + 1 ){
+					temp = Vec.add( temp, Vec.mul( u_basis_vals[k], control_points[uind+k][vind][wind] ));
+				}
+
+				// add weighted contribution of u isoline
+				temp2 = Vec.add( temp2, Vec.mul( v_basis_vals[j], temp ) );
+			}
+
+			// add weighted contribution from uv isosurfaces
+			position = Vec.add( position, Vec.mul( w_basis_vals[i], temp2 ) );
+		}
+
+		return position;
+	}
+
 
 	// Compute the derivatives at a point on a NURBS surface
 	//
@@ -62,8 +158,6 @@ class Eval {
 	}
 
 	//
-	// ####rational_surface_point( degree_u, knots_u,  degree_v, knots_v, homo_control_points, u, v )
-	//
 	// Compute a point on a NURBS surface
 	//
 	// **params**
@@ -84,6 +178,7 @@ class Eval {
 		return dehomogenize( surface_point( surface, u, v ) );
 	}
 
+	//
 	// Determine the derivatives of a NURBS curve at a given parameter
 	//
 	// **params**
@@ -94,7 +189,6 @@ class Eval {
 	// **returns**
 	// + a point represented by an array of length (dim)
 	//
-
 	public static function rational_curve_derivs( curve : CurveData, u : Float, num_derivs : Int ) : Array<Point> {
 
 		var ders = curve_derivs( curve, u, num_derivs )
