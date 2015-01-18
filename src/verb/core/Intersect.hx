@@ -1,5 +1,6 @@
 package verb.core;
 
+import verb.core.KdTree.KdPoint;
 import verb.core.types.AdaptiveRefinementNode.AdaptiveRefinementOptions;
 import verb.core.Intersect.PolylineData;
 import verb.core.types.SurfaceData;
@@ -57,6 +58,11 @@ class MeshIntersectionPoint {
 
     public var faceIndex0 : Int;
     public var faceIndex1 : Int;
+
+    // tags to navigate a segment structure
+    public var opp : MeshIntersectionPoint = null;
+    public var adj : MeshIntersectionPoint = null;
+    public var visited : Bool = false;
 
     public function new(uv0, uv1, point, faceIndex0, faceIndex1){
         this.uv0 = uv0;
@@ -386,9 +392,7 @@ class CurveSurfaceIntersection {
 @:expose("core.Intersect")
 class Intersect {
 
-/*
-
-    public static function meshes( mesh0 : MeshData, mesh1 : MeshData ) {
+    public static function meshes( mesh0 : MeshData, mesh1 : MeshData ) : Array<Array<MeshIntersectionPoint>> {
 
         // bounding box intersection to get all of the face pairs
         var bbints = Intersect.bounding_box_trees(
@@ -397,39 +401,34 @@ class Intersect {
 
         // get the segments of the intersection crv with uvs
         var segments = bbints.map(function(ids : Pair<Int, Int>){
-
-            var res : Interval<MeshIntersectionPoint> =
-                Intersect.triangles( mesh0, ids.item0, mesh1, ids.item1 );
-
-            // not all face pairs necessarily intersect
-            if (res == null) return res;
-            return res;
+            return Intersect.triangles( mesh0, ids.item0, mesh1, ids.item1 );
         })
-        .filter(function(x){ return x; })
         .filter(function(x){
-            var dif = Vec.sub( x[0].pt, x[1].pt );
-            return Vec.dot( dif, dif ) > verb.EPSILON
-        });
+            return x != null;
+        })
+        .filter(function(x){
+            return Vec.distSquared( x.min.point, x.max.point ) > Constants.EPSILON;
+        })
+        .unique(function(a, b){
 
-        // TODO: this is too expensive and this only occurs when the intersection
-        // 		line is on an edge.  we should mark these to avoid doing all of
-        //		these computations
-        segments = segments.unique(function(a, b){
+            // TODO: this is too expensive and this only occurs when the intersection
+            // 		line is on an edge.  we should mark these to avoid doing all of
+            //		these computations
 
-            var s1 = Vec.sub( a[0].uvtri1, b[0].uvtri1 );
+            var s1 = Vec.sub( a.min.uv0, b.min.uv0 );
             var d1 = Vec.dot( s1, s1 );
 
-            var s2 = Vec.sub( a[1].uvtri1, b[1].uvtri1 );
+            var s2 = Vec.sub( a.max.uv0, b.max.uv0 );
             var d2 = Vec.dot( s2, s2 );
 
-            var s3 = Vec.sub( a[0].uvtri1, b[1].uvtri1 );
+            var s3 = Vec.sub( a.min.uv0, b.max.uv0 );
             var d3 = Vec.dot( s3, s3 );
 
-            var s4 = Vec.sub( a[1].uvtri1, b[0].uvtri1 );
+            var s4 = Vec.sub( a.max.uv0, b.min.uv0 );
             var d4 = Vec.dot( s4, s4 );
 
-            return ( d1 < verb.EPSILON && d2 < verb.EPSILON ) ||
-            ( d3 < verb.EPSILON && d4 < verb.EPSILON );
+            return ( d1 < Constants.EPSILON && d2 < Constants.EPSILON ) ||
+                ( d3 < Constants.EPSILON && d4 < Constants.EPSILON );
 
         });
 
@@ -439,42 +438,43 @@ class Intersect {
 
     }
 
-    private static function make_polylines( segments ) {
+    private static function make_polylines( segments : Array<Interval<MeshIntersectionPoint>> ) : Array<Array<MeshIntersectionPoint>> {
 
         // debug (return all segments)
         // return segments;
 
-        // we need to be able to traverse from one end of a segment to the other
-        segments.forEach( function(s){
-            s[1].opp = s[0];
-            s[0].opp = s[1];
-        });
+        // we need to tag the segment ends
+        for (s in segments){
+            s.max.opp = s.min;
+            s.min.opp = s.max;
+        }
 
         // construct a tree for fast lookup
-        var tree = verb.eval.kdtree_from_segs( segments );
+        var tree = kdtree_from_segs( segments );
 
         // flatten everything, we no longer need the segments
-        var ends = segments.flatten();
+        var ends : Array<MeshIntersectionPoint> = [];
+
+        for (seg in segments){
+            ends.push(seg.min);
+            ends.push(seg.max);
+        }
 
         // step 1: assigning the vertices to the segment ends
-        ends.forEach(function(segEnd){
+        for (segEnd in ends){
+            if (segEnd.adj != null) continue;
 
-            if (segEnd.adj) return;
+            var adjEnd = lookup_adj_segment( segEnd, tree, segments.length );
 
-            var adjEnd = verb.eval.lookup_adj_segment( segEnd, tree, segments.length );
-
-            if (adjEnd && !adjEnd.adj){
-
+            if (adjEnd != null && adjEnd.adj == null){
                 segEnd.adj = adjEnd;
                 adjEnd.adj = segEnd;
-
             }
-
-        });
+        }
 
         // step 2: traversing the topology to construct the pls
         var freeEnds = ends.filter(function(x){
-            return !x.adj;
+            return x.adj == null;
         });
 
         // if you cant find one, youve got a loop (or multiple), we run through all
@@ -484,22 +484,22 @@ class Intersect {
 
         var pls = [];
 
-        freeEnds.forEach(function(end){
+        for (end in freeEnds){
 
-            if (end.v) return;
+            if (end.visited) continue;
 
             // traverse to end
             var pl = [];
             var curEnd = end;
 
-            while (curEnd) {
+            while (curEnd != null) {
 
                 // debug
-                if (curEnd.v) throw 'Segment end encountered twice!';
+                if (curEnd.visited) throw 'Segment end encountered twice!';
 
                 // technically we consume both ends of the segment
-                curEnd.v = true;
-                curEnd.opp.v = true;
+                curEnd.visited = true;
+                curEnd.opp.visited = true;
 
                 pl.push(curEnd);
 
@@ -514,51 +514,41 @@ class Intersect {
                 pl.push( pl[pl.length-1].opp );
                 pls.push( pl );
             }
-
-        })
+        }
 
         return pls;
-
     }
 
-    public static function pt_dist(a, b){
-        return Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2) + Math.pow(a.z - b.z, 2);
-    }
-
-    private static function kdtree_from_segs( segments ){
+    private static function kdtree_from_segs( segments: Array<Interval<MeshIntersectionPoint>> ) : KdTree<MeshIntersectionPoint> {
 
         var treePoints = [];
 
         // for each segment, transform into two elements, each keyed by pt1 and pt2
-        segments.forEach(function(seg){
-            treePoints.push({ "x": seg[0].pt[0], "y": seg[0].pt[1], "z": seg[0].pt[2], ele: seg[0] });
-            treePoints.push({ "x": seg[1].pt[0], "y": seg[1].pt[1], "z": seg[1].pt[2], ele: seg[1] });
-        });
+        for (seg in segments){
+            treePoints.push(new KdPoint(seg.min.point, seg.min ));
+            treePoints.push(new KdPoint(seg.max.point, seg.max ));
+        }
 
         // make our tree
-        return new KdTree(treePoints, Vec.distSquared, ["x", "y", "z"]);
-
+        return new KdTree(treePoints, Vec.distSquared);
     }
 
-    public static function lookup_adj_segment( segEnd, tree, numSegments ) {
+    public static function lookup_adj_segment( segEnd: MeshIntersectionPoint, tree : KdTree<MeshIntersectionPoint>, numSegments : Int ) {
 
-        var numResults = numSegments ? Math.min( numSegments, 3 ) : 3;
+        var numResults : Int = numSegments != null ? (numSegments < 3 ? 3 : numSegments) : 3;
 
         // we look up 3 elements because we need to find the unique adj ele
         // we expect one result to be self, one to be neighbor and no more
-        var adj = tree.nearest({ x: segEnd.pt[0], y: segEnd.pt[1], z: segEnd.pt[2] }, numResults)
+        var adj = tree.nearest(segEnd.point, numResults, Constants.EPSILON)
         .filter(function(r){
-            return segEnd != r[0].ele && r[1] < verb.EPSILON;
+            return segEnd != r.item0.obj;
         })
-        .map(function(r){ return r[0].ele; });
-
-        // there may be as many as 1 duplicate pt
+        .map(function(r){ return r.item0.obj; });
 
         // if its not unique (i.e. were at a branching point) we dont return it
-        return (adj.length === 1) ? adj[0] : null;
+        return (adj.length == 1) ? adj[0] : null;
 
     }
- */
 
     //
     // Get the intersection of a NURBS curve and a NURBS surface without an estimate

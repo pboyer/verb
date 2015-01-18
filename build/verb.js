@@ -957,6 +957,9 @@ verb.core.CurveTriPoint = $hx_exports.core.CurveTriPoint = function(u,point,uv) 
 	this.uv = uv;
 };
 verb.core.MeshIntersectionPoint = $hx_exports.core.MeshIntersectionPoint = function(uv0,uv1,point,faceIndex0,faceIndex1) {
+	this.visited = false;
+	this.adj = null;
+	this.opp = null;
 	this.uv0 = uv0;
 	this.uv1 = uv1;
 	this.point = point;
@@ -1142,6 +1145,106 @@ verb.core.CurveSurfaceIntersection = $hx_exports.core.CurveSurfaceIntersection =
 	this.uv = uv;
 };
 verb.core.Intersect = $hx_exports.core.Intersect = function() { };
+verb.core.Intersect.meshes = function(mesh0,mesh1) {
+	var bbints = verb.core.Intersect.bounding_box_trees(new verb.core.LazyMeshBoundingBoxTree(mesh0),new verb.core.LazyMeshBoundingBoxTree(mesh1),0);
+	var segments = verb.core.ArrayExtensions.unique(bbints.map(function(ids) {
+		return verb.core.Intersect.triangles(mesh0,ids.item0,mesh1,ids.item1);
+	}).filter(function(x) {
+		return x != null;
+	}).filter(function(x1) {
+		return verb.core.Vec.distSquared(x1.min.point,x1.max.point) > verb.core.Constants.EPSILON;
+	}),function(a,b) {
+		var s1 = verb.core.Vec.sub(a.min.uv0,b.min.uv0);
+		var d1 = verb.core.Vec.dot(s1,s1);
+		var s2 = verb.core.Vec.sub(a.max.uv0,b.max.uv0);
+		var d2 = verb.core.Vec.dot(s2,s2);
+		var s3 = verb.core.Vec.sub(a.min.uv0,b.max.uv0);
+		var d3 = verb.core.Vec.dot(s3,s3);
+		var s4 = verb.core.Vec.sub(a.max.uv0,b.min.uv0);
+		var d4 = verb.core.Vec.dot(s4,s4);
+		return d1 < verb.core.Constants.EPSILON && d2 < verb.core.Constants.EPSILON || d3 < verb.core.Constants.EPSILON && d4 < verb.core.Constants.EPSILON;
+	});
+	if(segments.length == 0) return [];
+	return verb.core.Intersect.make_polylines(segments);
+};
+verb.core.Intersect.make_polylines = function(segments) {
+	var _g = 0;
+	while(_g < segments.length) {
+		var s = segments[_g];
+		++_g;
+		s.max.opp = s.min;
+		s.min.opp = s.max;
+	}
+	var tree = verb.core.Intersect.kdtree_from_segs(segments);
+	var ends = [];
+	var _g1 = 0;
+	while(_g1 < segments.length) {
+		var seg = segments[_g1];
+		++_g1;
+		ends.push(seg.min);
+		ends.push(seg.max);
+	}
+	var _g2 = 0;
+	while(_g2 < ends.length) {
+		var segEnd = ends[_g2];
+		++_g2;
+		if(segEnd.adj != null) continue;
+		var adjEnd = verb.core.Intersect.lookup_adj_segment(segEnd,tree,segments.length);
+		if(adjEnd != null && adjEnd.adj == null) {
+			segEnd.adj = adjEnd;
+			adjEnd.adj = segEnd;
+		}
+	}
+	var freeEnds = ends.filter(function(x) {
+		return x.adj == null;
+	});
+	if(freeEnds.length == 0) freeEnds = ends;
+	var pls = [];
+	var _g3 = 0;
+	while(_g3 < freeEnds.length) {
+		var end = freeEnds[_g3];
+		++_g3;
+		if(end.visited) continue;
+		var pl = [];
+		var curEnd = end;
+		while(curEnd != null) {
+			if(curEnd.visited) throw "Segment end encountered twice!";
+			curEnd.visited = true;
+			curEnd.opp.visited = true;
+			pl.push(curEnd);
+			curEnd = curEnd.opp.adj;
+			if(curEnd == end) break;
+		}
+		if(pl.length > 0) {
+			pl.push(pl[pl.length - 1].opp);
+			pls.push(pl);
+		}
+	}
+	return pls;
+};
+verb.core.Intersect.kdtree_from_segs = function(segments) {
+	var treePoints = [];
+	var _g = 0;
+	while(_g < segments.length) {
+		var seg = segments[_g];
+		++_g;
+		treePoints.push(new verb.core.KdPoint(seg.min.point,seg.min));
+		treePoints.push(new verb.core.KdPoint(seg.max.point,seg.max));
+	}
+	return new verb.core.KdTree(treePoints,verb.core.Vec.distSquared);
+};
+verb.core.Intersect.lookup_adj_segment = function(segEnd,tree,numSegments) {
+	var numResults;
+	if(numSegments != null) {
+		if(numSegments < 3) numResults = 3; else numResults = numSegments;
+	} else numResults = 3;
+	var adj = tree.nearest(segEnd.point,numResults,verb.core.Constants.EPSILON).filter(function(r) {
+		return segEnd != r.item0.obj;
+	}).map(function(r1) {
+		return r1.item0.obj;
+	});
+	if(adj.length == 1) return adj[0]; else return null;
+};
 verb.core.Intersect.curve_and_surface = function(curve,surface,tol) {
 	if(tol == null) tol = 1e-3;
 	var ints = verb.core.Intersect.bounding_box_trees(new verb.core.LazyCurveBoundingBoxTree(curve),new verb.core.LazySurfaceBoundingBoxTree(surface),0);
