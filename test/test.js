@@ -3720,7 +3720,7 @@ describe("verb.core.Intersect.curves",function(){
 				controlPoints2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]]
 				curve2 = new verb.core.CurveData( degree2, knots2, controlPoints2 );
 
-		var res = verb.core.Intersect.curves( 	curve1,curve2, verb.core.Constants.TOLERANCE );
+		var res = verb.core.Intersect.curves( curve1,curve2, verb.core.Constants.TOLERANCE );
 
 		res.length.should.be.equal(1);
 
@@ -3758,8 +3758,6 @@ describe("verb.core.Intersect.curve_and_surface",function(){
 		res[0].uv[1].should.be.approximately( 0.26, 1e-3 );
 
 	});
-
-
 
 	it('gives valid result for planar surface and degree 1 nurbs', function(){
 
@@ -3857,6 +3855,36 @@ describe("verb.core.Intersect.curve_and_surface_with_estimate",function(){
 		res.u.should.be.approximately(0.5, 1e-3);
 		res.uv[0].should.be.approximately(0.265, 1e-3);
 		res.uv[1].should.be.approximately(0.5, 1e-3);
+
+	});
+
+});
+
+
+describe("verb.core.KdTree",function(){
+
+	var pts = [
+		new verb.core.KdPoint( [0,1,1], "a" ),
+		new verb.core.KdPoint( [0,2,1], "b" ),
+		new verb.core.KdPoint( [2,2,1], "c" )
+	];
+
+	it('gives correct results when requesting a single node', function(){
+
+		var tree = new verb.core.KdTree(pts, verb.core.Vec.distSquared );
+		var res = tree.nearest( [0,2.1,1], 1 );
+
+		res[0].item0.point.should.eql(pts[1].point);
+
+	});
+
+	it('gives correct results for multiple nodes', function(){
+
+		var tree = new verb.core.KdTree(pts, verb.core.Vec.distSquared );
+		var res1 = tree.nearest( [0,1.1,1], 2 );
+
+		res1[1].item0.point.should.eql(pts[0].point);
+		res1[0].item0.point.should.eql(pts[1].point);
 
 	});
 

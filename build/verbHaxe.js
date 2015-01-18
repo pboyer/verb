@@ -1427,6 +1427,184 @@ verb.core.Intersect.segment_with_plane = function(p0,p1,v0,n) {
 	var numer = verb.core.Vec.dot(n,verb.core.Vec.sub(v0,p0));
 	return { p : numer / denom};
 };
+verb.core.KdPoint = $hx_exports.core.KdPoint = function(point,obj) {
+	this.point = point;
+	this.obj = obj;
+};
+verb.core.KdNode = $hx_exports.core.KdNode = function(kdPoint,dimension,parent) {
+	this.kdPoint = kdPoint;
+	this.left = null;
+	this.right = null;
+	this.parent = parent;
+	this.dimension = dimension;
+};
+verb.core.KdTree = $hx_exports.core.KdTree = function(points,distanceFunction) {
+	this.dim = 3;
+	this.points = points;
+	this.distanceFunction = distanceFunction;
+	this.dim = points[0].point.length;
+	this.root = this.buildTree(points,0,null);
+};
+verb.core.KdTree.prototype = {
+	buildTree: function(points,depth,parent) {
+		var dim = depth % this.dim;
+		var median;
+		var node;
+		if(points.length == 0) return null;
+		if(points.length == 1) return new verb.core.KdNode(points[0],dim,parent);
+		points.sort(function(a,b) {
+			var diff = a.point[dim] - b.point[dim];
+			if(diff == 0.0) return 0; else if(diff > 0) return 1; else return -1;
+		});
+		median = Math.floor(points.length / 2);
+		node = new verb.core.KdNode(points[median],dim,parent);
+		node.left = this.buildTree(points.slice(0,median),depth + 1,node);
+		node.right = this.buildTree(points.slice(median + 1),depth + 1,node);
+		return node;
+	}
+	,nearest: function(point,maxNodes,maxDistance) {
+		var _g = this;
+		var bestNodes = new verb.core.BinaryHeap(function(e) {
+			return -e.item1;
+		});
+		var nearestSearch;
+		var nearestSearch1 = null;
+		nearestSearch1 = function(node) {
+			var bestChild;
+			var dimension = node.dimension;
+			var ownDistance = _g.distanceFunction(point,node.kdPoint.point);
+			var linearPoint;
+			var _g1 = [];
+			var _g3 = 0;
+			var _g2 = _g.dim;
+			while(_g3 < _g2) {
+				var i = _g3++;
+				_g1.push(0.0);
+			}
+			linearPoint = _g1;
+			var linearDistance;
+			var otherChild;
+			var i1;
+			var saveNode = function(node1,distance) {
+				bestNodes.push(new verb.core.types.Pair(node1,distance));
+				if(bestNodes.size() > maxNodes) bestNodes.pop();
+			};
+			var _g31 = 0;
+			var _g21 = _g.dim;
+			while(_g31 < _g21) {
+				var i2 = _g31++;
+				if(i2 == node.dimension) linearPoint[i2] = point[i2]; else linearPoint[i2] = node.kdPoint.point[i2];
+			}
+			linearDistance = _g.distanceFunction(linearPoint,node.kdPoint.point);
+			if(node.right == null && node.left == null) {
+				if(bestNodes.size() < maxNodes || ownDistance < bestNodes.peek().item1) saveNode(node,ownDistance);
+				return;
+			}
+			if(node.right == null) bestChild = node.left; else if(node.left == null) bestChild = node.right; else if(point[dimension] < node.kdPoint.point[dimension]) bestChild = node.left; else bestChild = node.right;
+			nearestSearch1(bestChild);
+			if(bestNodes.size() < maxNodes || ownDistance < bestNodes.peek().item1) saveNode(node,ownDistance);
+			if(bestNodes.size() < maxNodes || Math.abs(linearDistance) < bestNodes.peek().item1) {
+				if(bestChild == node.left) otherChild = node.right; else otherChild = node.left;
+				if(otherChild != null) nearestSearch1(otherChild);
+			}
+		};
+		nearestSearch = nearestSearch1;
+		if(maxDistance != null) {
+			var _g4 = 0;
+			while(_g4 < maxNodes) {
+				var i3 = _g4++;
+				bestNodes.push(new verb.core.types.Pair(null,maxDistance));
+			}
+		}
+		nearestSearch(this.root);
+		var result = [];
+		var _g5 = 0;
+		while(_g5 < maxNodes) {
+			var i4 = _g5++;
+			if(bestNodes.content[i4].item0 != null) result.push(new verb.core.types.Pair(bestNodes.content[i4].item0.kdPoint,bestNodes.content[i4].item1));
+		}
+		return result;
+	}
+};
+verb.core.BinaryHeap = function(scoreFunction) {
+	this.content = [];
+	this.scoreFunction = scoreFunction;
+};
+verb.core.BinaryHeap.prototype = {
+	push: function(element) {
+		this.content.push(element);
+		this.bubbleUp(this.content.length - 1);
+	}
+	,pop: function() {
+		var result = this.content[0];
+		var end = this.content.pop();
+		if(this.content.length > 0) {
+			this.content[0] = end;
+			this.sinkDown(0);
+		}
+		return result;
+	}
+	,peek: function() {
+		return this.content[0];
+	}
+	,remove: function(node) {
+		var len = this.content.length;
+		var _g = 0;
+		while(_g < len) {
+			var i = _g++;
+			if(this.content[i] == node) {
+				var end = this.content.pop();
+				if(i != len - 1) {
+					this.content[i] = end;
+					if(this.scoreFunction(end) < this.scoreFunction(node)) this.bubbleUp(i); else this.sinkDown(i);
+				}
+				return;
+			}
+		}
+		throw "Node not found.";
+	}
+	,size: function() {
+		return this.content.length;
+	}
+	,bubbleUp: function(n) {
+		var element = this.content[n];
+		while(n > 0) {
+			var parentN = Math.floor((n + 1.0) / 2) - 1;
+			var parent = this.content[parentN];
+			if(this.scoreFunction(element) < this.scoreFunction(parent)) {
+				this.content[parentN] = element;
+				this.content[n] = parent;
+				n = parentN;
+			} else break;
+		}
+	}
+	,sinkDown: function(n) {
+		var length = this.content.length;
+		var element = this.content[n];
+		var elemScore = this.scoreFunction(element);
+		while(true) {
+			var child2N = (n + 1) * 2;
+			var child1N = child2N - 1;
+			var swap = null;
+			var child1Score = 0.0;
+			if(child1N < length) {
+				var child1 = this.content[child1N];
+				child1Score = this.scoreFunction(child1);
+				if(child1Score < elemScore) swap = child1N;
+			}
+			if(child2N < length) {
+				var child2 = this.content[child2N];
+				var child2Score = this.scoreFunction(child2);
+				if(child2Score < (swap == null?elemScore:child1Score)) swap = child2N;
+			}
+			if(swap != null) {
+				this.content[n] = this.content[swap];
+				this.content[swap] = element;
+				n = swap;
+			} else break;
+		}
+	}
+};
 verb.core.Make = $hx_exports.core.Make = function() { };
 verb.core.Make.four_point_surface = function(p1,p2,p3,p4,degree) {
 	if(degree == null) degree = 3;

@@ -382,6 +382,186 @@ class CurveSurfaceIntersection {
 @:expose("core.Intersect")
 class Intersect {
 
+    /*
+    public static function meshes_by_aabb( points1, tris1, uvs1, points2, tris2, uvs2 ) {
+
+        // build aabb for each mesh
+        var tri_indices1 = verb.range(tris1.length)
+        , tri_indices2 = verb.range(tris2.length)
+        , aabb1 = verb.eval.make_mesh_aabb_tree( points1, tris1, tri_indices1 )
+        , aabb2 = verb.eval.make_mesh_aabb_tree( points2, tris2, tri_indices2 );
+
+        // intersect and get the pairs of triangle intersctions
+        var bbints = verb.eval.aabb_trees( points1, tris1, points2, tris2, aabb1, aabb2 );
+
+        // get the segments of the intersection crv with uvs
+        var segments = bbints.map(function(ids){
+            var res = verb.eval.tris( points1, tris1[ ids[0] ], uvs1, points2, tris2[ ids[1] ], uvs2 );
+            if (!res) return res;
+
+            res[0].tri1id = ids[0];
+            res[1].tri1id = ids[0];
+            res[0].tri2id = ids[1];
+            res[1].tri2id = ids[1];
+
+            return res;
+        })
+        .filter(function(x){ return x; })
+        .filter(function(x){
+            var dif = Vec.sub( x[0].pt, x[1].pt );
+            return Vec.dot( dif, dif ) > verb.EPSILON
+        });
+
+        // TODO: this is too expensive and this only occurs when the intersection
+        // 		line is on an edge.  we should mark these to avoid doing all of
+        //		these computations
+        segments = segments.unique(function(a, b){
+
+            var s1 = Vec.sub( a[0].uvtri1, b[0].uvtri1 );
+            var d1 = Vec.dot( s1, s1 );
+
+            var s2 = Vec.sub( a[1].uvtri1, b[1].uvtri1 );
+            var d2 = Vec.dot( s2, s2 );
+
+            var s3 = Vec.sub( a[0].uvtri1, b[1].uvtri1 );
+            var d3 = Vec.dot( s3, s3 );
+
+            var s4 = Vec.sub( a[1].uvtri1, b[0].uvtri1 );
+            var d4 = Vec.dot( s4, s4 );
+
+            return ( d1 < verb.EPSILON && d2 < verb.EPSILON ) ||
+            ( d3 < verb.EPSILON && d4 < verb.EPSILON );
+
+        });
+
+        if (segments.length == 0) return [];
+
+        return make_polylines( segments );
+
+    }
+
+    private static function make_polylines( segments ) {
+
+        // debug (return all segments)
+        // return segments;
+
+        // we need to be able to traverse from one end of a segment to the other
+        segments.forEach( function(s){
+            s[1].opp = s[0];
+            s[0].opp = s[1];
+        });
+
+        // construct a tree for fast lookup
+        var tree = verb.eval.kdtree_from_segs( segments );
+
+        // flatten everything, we no longer need the segments
+        var ends = segments.flatten();
+
+        // step 1: assigning the vertices to the segment ends
+        ends.forEach(function(segEnd){
+
+            if (segEnd.adj) return;
+
+            var adjEnd = verb.eval.lookup_adj_segment( segEnd, tree, segments.length );
+
+            if (adjEnd && !adjEnd.adj){
+
+                segEnd.adj = adjEnd;
+                adjEnd.adj = segEnd;
+
+            }
+
+        });
+
+        // step 2: traversing the topology to construct the pls
+        var freeEnds = ends.filter(function(x){
+            return !x.adj;
+        });
+
+        // if you cant find one, youve got a loop (or multiple), we run through all
+        if (freeEnds.length == 0) {
+            freeEnds = ends;
+        }
+
+        var pls = [];
+
+        freeEnds.forEach(function(end){
+
+            if (end.v) return;
+
+            // traverse to end
+            var pl = [];
+            var curEnd = end;
+
+            while (curEnd) {
+
+                // debug
+                if (curEnd.v) throw 'Segment end encountered twice!';
+
+                // technically we consume both ends of the segment
+                curEnd.v = true;
+                curEnd.opp.v = true;
+
+                pl.push(curEnd);
+
+                curEnd = curEnd.opp.adj;
+
+                // loop condition
+                if (curEnd == end) break;
+
+            }
+
+            if (pl.length > 0) {
+                pl.push( pl[pl.length-1].opp );
+                pls.push( pl );
+            }
+
+        })
+
+        return pls;
+
+    }
+
+    public static function pt_dist(a, b){
+        return Math.pow(a.x - b.x, 2) + Math.pow(a.y - b.y, 2) + Math.pow(a.z - b.z, 2);
+    }
+
+    private static function kdtree_from_segs( segments ){
+
+        var treePoints = [];
+
+        // for each segment, transform into two elements, each keyed by pt1 and pt2
+        segments.forEach(function(seg){
+            treePoints.push({ "x": seg[0].pt[0], "y": seg[0].pt[1], "z": seg[0].pt[2], ele: seg[0] });
+            treePoints.push({ "x": seg[1].pt[0], "y": seg[1].pt[1], "z": seg[1].pt[2], ele: seg[1] });
+        });
+
+        // make our tree
+        return new KdTree(treePoints, Vec.distSquared, ["x", "y", "z"]);
+
+    }
+
+    public static function lookup_adj_segment( segEnd, tree, numSegments ) {
+
+        var numResults = numSegments ? Math.min( numSegments, 3 ) : 3;
+
+        // we look up 3 elements because we need to find the unique adj ele
+        // we expect one result to be self, one to be neighbor and no more
+        var adj = tree.nearest({ x: segEnd.pt[0], y: segEnd.pt[1], z: segEnd.pt[2] }, numResults)
+        .filter(function(r){
+            return segEnd != r[0].ele && r[1] < verb.EPSILON;
+        })
+        .map(function(r){ return r[0].ele; });
+
+        // there may be as many as 1 duplicate pt
+
+        // if its not unique (i.e. were at a branching point) we dont return it
+        return (adj.length === 1) ? adj[0] : null;
+
+    }
+
+    */
+
     //
     // Get the intersection of a NURBS curve and a NURBS surface without an estimate
     //
@@ -498,6 +678,10 @@ class Intersect {
 
         return finalResults;
     }
+
+
+
+
 
     public static function mesh_bounding_boxes( a : MeshData, b : MeshData, tol : Float ) : Array<Pair<Int,Int>> {
 

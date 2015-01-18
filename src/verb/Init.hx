@@ -7,6 +7,7 @@ import verb.core.Numeric;
 import verb.core.ArrayExtensions;
 import verb.core.Eval;
 import verb.core.Mesh;
+import verb.core.KdTree;
 import verb.core.Intersect;
 import verb.core.Tess;
 import verb.core.Make;
