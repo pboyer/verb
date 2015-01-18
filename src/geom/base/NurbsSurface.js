@@ -81,7 +81,7 @@ verb.NurbsSurface.prototype.derivatives = function( u, v, num_derivs, callback )
 
 verb.NurbsSurface.prototype.closestPoint = function( point, callback ) {
 
-	return this.nurbsEngine.eval( 'rational_surface_closest_point', 
+	return this.nurbsEngine.eval( 'rationalSurfaceClosestPoint',
 		[	this.get('degreeU'), this.get('knotsU'), this.get('degreeV'), this.get('knotsV'), this.homogenize(),  point  ], callback ); 
 
 };

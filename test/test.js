@@ -2547,7 +2547,7 @@ describe("verb.core.Make.rational_interp_curve",function(){
 
 });
 
-describe("verb.core.Analyze.rational_bezier_curve_arc_length",function(){
+describe("verb.core.Analyze.rationalBezierCurveArcLength",function(){
 
 	it('can compute entire arc length of straight cubic bezier parameterized from 0 to 1', function(){
 
@@ -2556,7 +2556,7 @@ describe("verb.core.Analyze.rational_bezier_curve_arc_length",function(){
 			, controlPoints = [ [0,0,0,1], [1.5,0,0,1], [2,0,0,1], [3,0,0,1] ]
 			, curve = new verb.core.CurveData( degree, knots, controlPoints );
 
-		var res = verb.core.Analyze.rational_bezier_curve_arc_length( curve, 1 );
+		var res = verb.core.Analyze.rationalBezierCurveArcLength( curve, 1 );
 
 		res.should.be.approximately( 3, verb.core.Constants.TOLERANCE );
 
@@ -2569,7 +2569,7 @@ describe("verb.core.Analyze.rational_bezier_curve_arc_length",function(){
 			, controlPoints = [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1] ]
 			, curve = new verb.core.CurveData( degree, knots, controlPoints );
 
-		var res = verb.core.Analyze.rational_bezier_curve_arc_length( curve, 4 );
+		var res = verb.core.Analyze.rationalBezierCurveArcLength( curve, 4 );
 
 		res.should.be.approximately( 3, verb.core.Constants.TOLERANCE );
 
@@ -2577,7 +2577,7 @@ describe("verb.core.Analyze.rational_bezier_curve_arc_length",function(){
 
 });
 
-describe("verb.core.Analyze.rational_curve_arc_length",function(){
+describe("verb.core.Analyze.rationalCurveArcLength",function(){
 
 	it('can compute entire arc length of straight nurbs curve parameterized from 0 to 2', function(){
 
@@ -2591,7 +2591,7 @@ describe("verb.core.Analyze.rational_curve_arc_length",function(){
 		var inc = (last(knots) - knots[0]) / (steps-1);
 		for (var i = 0; i < steps; i++){
 			var pt = verb.core.Eval.rational_curve_point( curve, u );
-			var res2 = verb.core.Analyze.rational_curve_arc_length( curve, u );
+			var res2 = verb.core.Analyze.rationalCurveArcLength( curve, u );
 
 			res2.should.be.approximately( verb.core.Vec.norm( pt ), verb.core.Constants.TOLERANCE );
 
@@ -2606,7 +2606,7 @@ describe("verb.core.Analyze.rational_curve_arc_length",function(){
 			, controlPoints = [ [1,1,1,1], [1.5,0,1,1], [1.8,0,0,1], [2,0.1,5,1], [3.1,0,0,1] ]
 			, curve = new verb.core.CurveData( degree, knots, controlPoints );
 
-		var gaussLen = verb.core.Analyze.rational_curve_arc_length( curve );
+		var gaussLen = verb.core.Analyze.rationalCurveArcLength( curve );
 
 		// sample the curve with 10,000 pts
 		var samples = verb.core.Tess.rational_curve_regular_sample_range( curve, 0, 1, 10000 );
@@ -2632,7 +2632,7 @@ describe("verb.core.Analyze.rational_curve_arc_length",function(){
 		for (var i = 0; i < steps; i++){
 
 			var pt = verb.core.Eval.rational_curve_point( curve, u );
-			var res2 = verb.core.Analyze.rational_curve_arc_length( curve, u );
+			var res2 = verb.core.Analyze.rationalCurveArcLength( curve, u );
 
 			res2.should.be.approximately( verb.core.Vec.norm( pt ), verb.core.Constants.TOLERANCE );
 
@@ -2643,9 +2643,7 @@ describe("verb.core.Analyze.rational_curve_arc_length",function(){
 
 });
 
-
-
-describe("verb.core.Analyze.rational_bezier_curve_param_at_arc_length",function(){
+describe("verb.core.Analyze.rationalBezierCurveParamAtArcLength",function(){
 
 	it('can compute parameter at arc length of straight bezier curve', function(){
 
@@ -2661,8 +2659,8 @@ describe("verb.core.Analyze.rational_bezier_curve_param_at_arc_length",function(
 
 		for (var i = 0; i < steps; i++){
 
-			var u = verb.core.Analyze.rational_bezier_curve_param_at_arc_length(curve, d, tol);
-			var len = verb.core.Analyze.rational_bezier_curve_arc_length(curve, u);
+			var u = verb.core.Analyze.rationalBezierCurveParamAtArcLength(curve, d, tol);
+			var len = verb.core.Analyze.rationalBezierCurveArcLength(curve, u);
 
 			len.should.be.approximately( d, tol );
 
@@ -2685,8 +2683,8 @@ describe("verb.core.Analyze.rational_bezier_curve_param_at_arc_length",function(
 
 		for (var i = 0; i < steps; i++){
 
-			var u = verb.core.Analyze.rational_bezier_curve_param_at_arc_length(curve, d, tol);
-			var len = verb.core.Analyze.rational_bezier_curve_arc_length(curve, u);
+			var u = verb.core.Analyze.rationalBezierCurveParamAtArcLength(curve, d, tol);
+			var len = verb.core.Analyze.rationalBezierCurveArcLength(curve, u);
 
 			len.should.be.approximately( d, tol );
 
@@ -2697,8 +2695,7 @@ describe("verb.core.Analyze.rational_bezier_curve_param_at_arc_length",function(
 
 });
 
-
-describe("verb.core.Analyze.rational_curve_param_at_arc_length",function(){
+describe("verb.core.Analyze.rationalCurveParamAtArcLength",function(){
 
 	it('can compute parameter at arc length of straight NURBS curve', function(){
 
@@ -2712,12 +2709,12 @@ describe("verb.core.Analyze.rational_curve_param_at_arc_length",function(){
 		var steps = 10;
 		var inc = 4 / (steps-1);
 
-		var u = verb.core.Analyze.rational_curve_param_at_arc_length(curve, 2, tol);
+		var u = verb.core.Analyze.rationalCurveParamAtArcLength(curve, 2, tol);
 
 		for (var i = 0; i < steps; i++){
 
-			var u = verb.core.Analyze.rational_curve_param_at_arc_length(curve, d, tol);
-			var len = verb.core.Analyze.rational_curve_arc_length(curve, u);
+			var u = verb.core.Analyze.rationalCurveParamAtArcLength(curve, d, tol);
+			var len = verb.core.Analyze.rationalCurveArcLength(curve, u);
 
 			len.should.be.approximately( d, tol );
 
@@ -2740,8 +2737,8 @@ describe("verb.core.Analyze.rational_curve_param_at_arc_length",function(){
 
 		for (var i = 0; i < steps; i++){
 
-			var u = verb.core.Analyze.rational_curve_param_at_arc_length(curve, d, tol);
-			var len = verb.core.Analyze.rational_curve_arc_length(curve, u);
+			var u = verb.core.Analyze.rationalCurveParamAtArcLength(curve, d, tol);
+			var len = verb.core.Analyze.rationalCurveArcLength(curve, u);
 
 			len.should.be.approximately( d, tol );
 
@@ -2752,7 +2749,7 @@ describe("verb.core.Analyze.rational_curve_param_at_arc_length",function(){
 
 });
 
-describe("verb.core.Divide.rational_curve_by_arc_length",function(){
+describe("verb.core.Divide.rationalCurveByArcLength",function(){
 
 	it('can divide a straight NURBS curve', function(){
 
@@ -2763,7 +2760,7 @@ describe("verb.core.Divide.rational_curve_by_arc_length",function(){
 			, d = 0.5
 			, tol = 1e-3;
 
-		var res = verb.core.Divide.rational_curve_by_arc_length(curve, d);
+		var res = verb.core.Divide.rationalCurveByArcLength(curve, d);
 
 		var s = 0;
 		res.forEach(function(u){
@@ -2778,7 +2775,7 @@ describe("verb.core.Divide.rational_curve_by_arc_length",function(){
 
 });
 
-describe("verb.core.Divide.rational_curve_equally_by_arc_length",function(){
+describe("verb.core.Divide.rationalCurveEquallyByArcLength",function(){
 
 	it('can divide a straight NURBS curve', function(){
 
@@ -2790,7 +2787,7 @@ describe("verb.core.Divide.rational_curve_equally_by_arc_length",function(){
 			, tol = 1e-3
 			, d = 4 / divs;
 
-		var res = verb.core.Divide.rational_curve_equally_by_arc_length(curve, divs );
+		var res = verb.core.Divide.rationalCurveEquallyByArcLength(curve, divs );
 
 		var s = 0;
 		res.forEach(function(u){
@@ -2805,7 +2802,7 @@ describe("verb.core.Divide.rational_curve_equally_by_arc_length",function(){
 
 });
 
-describe("verb.core.Analyze.rational_curve_closest_point",function(){
+describe("verb.core.Analyze.rationalCurveClosestPoint",function(){
 
 	it('can get closest point to a straight curve', function(){
 
@@ -2815,24 +2812,24 @@ describe("verb.core.Analyze.rational_curve_closest_point",function(){
 			, curve = new verb.core.CurveData( degree, knots, controlPoints )
 			, pt = [1,0.2,0];
 
-		var res = verb.core.Analyze.rational_curve_closest_point(curve, [1,0.2,0] );
+		var res = verb.core.Analyze.rationalCurveClosestPoint(curve, [1,0.2,0] );
 		var p = verb.core.Eval.rational_curve_point( curve, res );
 
 		vecShouldBe( [1,0,0], p, 1e-3 );
 
-		res = verb.core.Analyze.rational_curve_closest_point(curve, [2,0.2,0] );
+		res = verb.core.Analyze.rationalCurveClosestPoint(curve, [2,0.2,0] );
 		p = verb.core.Eval.rational_curve_point( curve, res );
 
 		vecShouldBe( [2,0,0], p, 1e-3 );
 
 		// before start
-		res = verb.core.Analyze.rational_curve_closest_point(curve, [-1,0.2,1] );
+		res = verb.core.Analyze.rationalCurveClosestPoint(curve, [-1,0.2,1] );
 		p = verb.core.Eval.rational_curve_point( curve, res );
 
 		vecShouldBe( [0,0,0], p, 1e-3 );
 
 		// beyond end
-		res = verb.core.Analyze.rational_curve_closest_point(curve, [5,0.2,0] );
+		res = verb.core.Analyze.rationalCurveClosestPoint(curve, [5,0.2,0] );
 		p = verb.core.Eval.rational_curve_point( curve, res );
 
 		vecShouldBe( [4,0,0], p, 1e-3 );
@@ -2841,7 +2838,7 @@ describe("verb.core.Analyze.rational_curve_closest_point",function(){
 
 });
 
-describe("verb.core.Eval.rational_surface_closest_point",function(){
+describe("verb.core.Analyze.rationalSurfaceClosestPoint",function(){
 
 	it('can get closest point to flat bezier patch', function(){
 
@@ -2856,7 +2853,7 @@ describe("verb.core.Eval.rational_surface_closest_point",function(){
 			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints )
 			, point = [12,-20,5];
 
-		var res = verb.core.Analyze.rational_surface_closest_point( surface, point );
+		var res = verb.core.Analyze.rationalSurfaceClosestPoint( surface, point );
 		var p = verb.core.Eval.rational_surface_point( surface, res[0], res[1] );
 
 		vecShouldBe( [12,-20,0], p, 1e-3 );
@@ -2864,7 +2861,6 @@ describe("verb.core.Eval.rational_surface_closest_point",function(){
 	});
 
 });
-
 
 describe("verb.core.Intersect.segment_with_tri",function(){
 
@@ -2985,8 +2981,6 @@ describe("verb.core.Mesh.make_mesh_aabb",function(){
 	});
 
 });
-
-
 
 describe("verb.core.Mesh.make_mesh_aabb_tree",function(){
 

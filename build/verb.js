@@ -166,7 +166,7 @@ verb.Init.main = function() {
 };
 verb.core = {};
 verb.core.Analyze = $hx_exports.core.Analyze = function() { };
-verb.core.Analyze.is_rational_surface_closed = function(surface,uDir) {
+verb.core.Analyze.isRationalSurfaceClosed = function(surface,uDir) {
 	if(uDir == null) uDir = true;
 	var cpts;
 	if(uDir) cpts = surface.controlPoints; else cpts = verb.core.Mat.transpose(surface.controlPoints);
@@ -179,7 +179,7 @@ verb.core.Analyze.is_rational_surface_closed = function(surface,uDir) {
 	}
 	return true;
 };
-verb.core.Analyze.rational_surface_closest_point = function(surface,p) {
+verb.core.Analyze.rationalSurfaceClosestPoint = function(surface,p) {
 	var maxits = 5;
 	var i = 0;
 	var e;
@@ -190,8 +190,8 @@ verb.core.Analyze.rational_surface_closest_point = function(surface,p) {
 	var maxu = verb.core.ArrayExtensions.last(surface.knotsU);
 	var minv = surface.knotsV[0];
 	var maxv = verb.core.ArrayExtensions.last(surface.knotsV);
-	var closedu = verb.core.Analyze.is_rational_surface_closed(surface);
-	var closedv = verb.core.Analyze.is_rational_surface_closed(surface,false);
+	var closedu = verb.core.Analyze.isRationalSurfaceClosed(surface);
+	var closedv = verb.core.Analyze.isRationalSurfaceClosed(surface,false);
 	var cuv;
 	var tess = verb.core.Tess.rational_surface_adaptive(surface,new verb.core.types.AdaptiveRefinementOptions());
 	var dmin = Math.POSITIVE_INFINITY;
@@ -252,7 +252,7 @@ verb.core.Analyze.rational_surface_closest_point = function(surface,p) {
 	}
 	return cuv;
 };
-verb.core.Analyze.rational_curve_closest_point = function(curve,p) {
+verb.core.Analyze.rationalCurveClosestPoint = function(curve,p) {
 	var tol = 1.0e-3;
 	var min = Math.POSITIVE_INFINITY;
 	var u = 0.0;
@@ -311,7 +311,7 @@ verb.core.Analyze.rational_curve_closest_point = function(curve,p) {
 	}
 	return cu;
 };
-verb.core.Analyze.rational_curve_param_at_arc_length = function(curve,len,tol,beziers,bezierLengths) {
+verb.core.Analyze.rationalCurveParamAtArcLength = function(curve,len,tol,beziers,bezierLengths) {
 	if(len < verb.core.Constants.EPSILON) return curve.knots[0];
 	var crvs;
 	if(beziers != null) crvs = beziers; else crvs = verb.core.Modify.curve_bezier_decompose(curve);
@@ -321,17 +321,17 @@ verb.core.Analyze.rational_curve_param_at_arc_length = function(curve,len,tol,be
 	var bezier_lengths;
 	if(bezierLengths != null) bezier_lengths = bezierLengths; else bezier_lengths = [];
 	while(cl < len && i < crvs.length) {
-		if(i < bezier_lengths.length) bezier_lengths[i] = bezier_lengths[i]; else bezier_lengths[i] = verb.core.Analyze.rational_bezier_curve_arc_length(curve);
+		if(i < bezier_lengths.length) bezier_lengths[i] = bezier_lengths[i]; else bezier_lengths[i] = verb.core.Analyze.rationalBezierCurveArcLength(curve);
 		cl += bezier_lengths[i];
-		if(len < cl + verb.core.Constants.EPSILON) return verb.core.Analyze.rational_bezier_curve_param_at_arc_length(curve,len,tol,bezier_lengths[i]);
+		if(len < cl + verb.core.Constants.EPSILON) return verb.core.Analyze.rationalBezierCurveParamAtArcLength(curve,len,tol,bezier_lengths[i]);
 		i++;
 	}
 	return -1;
 };
-verb.core.Analyze.rational_bezier_curve_param_at_arc_length = function(curve,len,tol,totalLength) {
+verb.core.Analyze.rationalBezierCurveParamAtArcLength = function(curve,len,tol,totalLength) {
 	if(len < 0) return curve.knots[0];
 	var totalLen;
-	if(totalLength != null) totalLen = totalLength; else totalLen = verb.core.Analyze.rational_bezier_curve_arc_length(curve);
+	if(totalLength != null) totalLen = totalLength; else totalLen = verb.core.Analyze.rationalBezierCurveArcLength(curve);
 	if(len > totalLen) return verb.core.ArrayExtensions.last(curve.knots);
 	var start_p = curve.knots[0];
 	var start_l = 0.0;
@@ -343,7 +343,7 @@ verb.core.Analyze.rational_bezier_curve_param_at_arc_length = function(curve,len
 	if(tol != null) tol1 = tol; else tol1 = verb.core.Constants.TOLERANCE * 2;
 	while(end_l - start_l > tol1) {
 		mid_p = (start_p + end_p) / 2;
-		mid_l = verb.core.Analyze.rational_bezier_curve_arc_length(curve,mid_p);
+		mid_l = verb.core.Analyze.rationalBezierCurveArcLength(curve,mid_p);
 		if(mid_l > len) {
 			end_p = mid_p;
 			end_l = mid_l;
@@ -354,7 +354,7 @@ verb.core.Analyze.rational_bezier_curve_param_at_arc_length = function(curve,len
 	}
 	return (start_p + end_p) / 2;
 };
-verb.core.Analyze.rational_curve_arc_length = function(curve,u,gaussDegIncrease) {
+verb.core.Analyze.rationalCurveArcLength = function(curve,u,gaussDegIncrease) {
 	if(gaussDegIncrease == null) gaussDegIncrease = 16;
 	if(u == null) u = verb.core.ArrayExtensions.last(curve.knots); else u = u;
 	var crvs = verb.core.Modify.curve_bezier_decompose(curve);
@@ -363,12 +363,12 @@ verb.core.Analyze.rational_curve_arc_length = function(curve,u,gaussDegIncrease)
 	var sum = 0.0;
 	while(i < crvs.length && cc.knots[0] + verb.core.Constants.EPSILON < u) {
 		var param = Math.min(verb.core.ArrayExtensions.last(cc.knots),u);
-		sum += verb.core.Analyze.rational_bezier_curve_arc_length(cc,param,gaussDegIncrease);
+		sum += verb.core.Analyze.rationalBezierCurveArcLength(cc,param,gaussDegIncrease);
 		cc = crvs[++i];
 	}
 	return sum;
 };
-verb.core.Analyze.rational_bezier_curve_arc_length = function(curve,u,gaussDegIncrease) {
+verb.core.Analyze.rationalBezierCurveArcLength = function(curve,u,gaussDegIncrease) {
 	if(gaussDegIncrease == null) gaussDegIncrease = 16;
 	var u1;
 	if(u == null) u1 = verb.core.ArrayExtensions.last(curve.knots); else u1 = u;
@@ -481,15 +481,15 @@ verb.core.Binomial.memoize = function(n,k,val) {
 };
 verb.core.Constants = $hx_exports.core.Constants = function() { };
 verb.core.Divide = $hx_exports.core.Divide = function() { };
-verb.core.Divide.rational_curve_equally_by_arc_length = function(curve,num) {
-	var tlen = verb.core.Analyze.rational_curve_arc_length(curve);
+verb.core.Divide.rationalCurveEquallyByArcLength = function(curve,num) {
+	var tlen = verb.core.Analyze.rationalCurveArcLength(curve);
 	var inc = tlen / num;
-	return verb.core.Divide.rational_curve_by_arc_length(curve,inc);
+	return verb.core.Divide.rationalCurveByArcLength(curve,inc);
 };
-verb.core.Divide.rational_curve_by_arc_length = function(curve,l) {
+verb.core.Divide.rationalCurveByArcLength = function(curve,l) {
 	var crvs = verb.core.Modify.curve_bezier_decompose(curve);
 	var crvlens = crvs.map(function(x) {
-		return verb.core.Analyze.rational_bezier_curve_arc_length(x);
+		return verb.core.Analyze.rationalBezierCurveArcLength(x);
 	});
 	var totlen = verb.core.Vec.sum(crvlens);
 	var pts = [new verb.core.types.CurveLengthSample(curve.knots[0],0.0)];
@@ -503,7 +503,7 @@ verb.core.Divide.rational_curve_by_arc_length = function(curve,l) {
 	while(i < crvs.length) {
 		runsum += crvlens[i];
 		while(lc < runsum + verb.core.Constants.EPSILON) {
-			u = verb.core.Analyze.rational_bezier_curve_param_at_arc_length(crvs[i],lc - runsum1,verb.core.Constants.TOLERANCE,crvlens[i]);
+			u = verb.core.Analyze.rationalBezierCurveParamAtArcLength(crvs[i],lc - runsum1,verb.core.Constants.TOLERANCE,crvlens[i]);
 			pts.push(new verb.core.types.CurveLengthSample(u,lc));
 			lc += inc;
 		}

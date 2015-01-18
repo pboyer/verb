@@ -7,19 +7,19 @@ using Lambda;
 @:expose("core.Divide")
 class Divide {
 
-    public static function rational_curve_equally_by_arc_length(curve : CurveData, num : Int){
+    public static function rationalCurveEquallyByArcLength(curve : CurveData, num : Int){
 
-        var tlen = Analyze.rational_curve_arc_length( curve );
+        var tlen = Analyze.rationalCurveArcLength( curve );
         var inc = tlen / num;
 
-        return Divide.rational_curve_by_arc_length(curve, inc);
+        return Divide.rationalCurveByArcLength(curve, inc);
 
     }
 
-    public static function rational_curve_by_arc_length(curve : CurveData, l : Float) : Array<CurveLengthSample> {
+    public static function rationalCurveByArcLength(curve : CurveData, l : Float) : Array<CurveLengthSample> {
 
         var crvs = Modify.curve_bezier_decompose( curve )
-        , crvlens = crvs.map(function(x){ return Analyze.rational_bezier_curve_arc_length(x); })
+        , crvlens = crvs.map(function(x){ return Analyze.rationalBezierCurveArcLength(x); })
         , totlen = Vec.sum(crvlens)
         , pts = [ new CurveLengthSample( curve.knots[0], 0.0 ) ];
 
@@ -38,7 +38,7 @@ class Divide {
 
             while ( lc < runsum + Constants.EPSILON ){
 
-                u = Analyze.rational_bezier_curve_param_at_arc_length( crvs[i], lc - runsum1, Constants.TOLERANCE, crvlens[i] );
+                u = Analyze.rationalBezierCurveParamAtArcLength( crvs[i], lc - runsum1, Constants.TOLERANCE, crvlens[i] );
 
                 pts.push( new CurveLengthSample( u, lc ) );
                 lc += inc;

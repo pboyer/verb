@@ -72,7 +72,7 @@ verb.NurbsCurve.prototype.derivatives = function( u, num_derivs, callback ) {
 
 verb.NurbsCurve.prototype.closestPoint = function( point, callback ) {
 
-	return this.nurbsEngine.eval( 'rational_curve_closest_point', [ this.get('degree'), this.get('knots'), this.homogenize(),  point  ], callback ); 
+	return this.nurbsEngine.eval( 'rationalCurveClosestPoint', [ this.get('degree'), this.get('knots'), this.homogenize(),  point  ], callback );
 
 };
 
@@ -86,7 +86,7 @@ verb.NurbsCurve.prototype.closestPoint = function( point, callback ) {
 
 verb.NurbsCurve.prototype.length = function( callback ) {
 
-	return this.nurbsEngine.eval( 'rational_curve_arc_length', [ this.get('degree'), this.get('knots'), this.homogenize()  ], callback ); 
+	return this.nurbsEngine.eval( 'rationalCurveArcLength', [ this.get('degree'), this.get('knots'), this.homogenize()  ], callback );
 
 };
 
@@ -103,7 +103,7 @@ verb.NurbsCurve.prototype.length = function( callback ) {
 
 verb.NurbsCurve.prototype.lengthAtParam = function( u, callback ) {
 
-	return this.nurbsEngine.eval( 'rational_curve_arc_length', [ this.get('degree'), this.get('knots'), this.homogenize(), u  ], callback ); 
+	return this.nurbsEngine.eval( 'rationalCurveArcLength', [ this.get('degree'), this.get('knots'), this.homogenize(), u  ], callback );
 
 };
 
@@ -120,7 +120,7 @@ verb.NurbsCurve.prototype.lengthAtParam = function( u, callback ) {
 
 verb.NurbsCurve.prototype.paramAtLength = function( len, callback ) {
 
-	return this.nurbsEngine.eval( 'rational_curve_param_at_arc_length', [ this.get('degree'), this.get('knots'), this.homogenize(), len  ], callback ); 
+	return this.nurbsEngine.eval( 'rationalCurveParamAtArcLength', [ this.get('degree'), this.get('knots'), this.homogenize(), len  ], callback );
 
 };
 

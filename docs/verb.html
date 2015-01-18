@@ -2061,7 +2061,7 @@ verb.NurbsCurve.prototype.derivatives = <span class="hljs-function"><span class=
             <div class="content"><div class='highlight'><pre>
 verb.NurbsCurve.prototype.closestPoint = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( point, callback )</span> </span>{
 
-	<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.nurbsEngine.eval( <span class="hljs-string">'rational_curve_closest_point'</span>, [ <span class="hljs-keyword">this</span>.get(<span class="hljs-string">'degree'</span>), <span class="hljs-keyword">this</span>.get(<span class="hljs-string">'knots'</span>), <span class="hljs-keyword">this</span>.homogenize(),  point  ], callback ); 
+	<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.nurbsEngine.eval( <span class="hljs-string">'rationalCurveClosestPoint'</span>, [ <span class="hljs-keyword">this</span>.get(<span class="hljs-string">'degree'</span>), <span class="hljs-keyword">this</span>.get(<span class="hljs-string">'knots'</span>), <span class="hljs-keyword">this</span>.homogenize(),  point  ], callback );
 
 };</pre></div></div>
             
@@ -2086,7 +2086,7 @@ verb.NurbsCurve.prototype.closestPoint = <span class="hljs-function"><span class
             <div class="content"><div class='highlight'><pre>
 verb.NurbsCurve.prototype.length = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( callback )</span> </span>{
 
-	<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.nurbsEngine.eval( <span class="hljs-string">'rational_curve_arc_length'</span>, [ <span class="hljs-keyword">this</span>.get(<span class="hljs-string">'degree'</span>), <span class="hljs-keyword">this</span>.get(<span class="hljs-string">'knots'</span>), <span class="hljs-keyword">this</span>.homogenize()  ], callback ); 
+	<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.nurbsEngine.eval( <span class="hljs-string">'rationalCurveArcLength'</span>, [ <span class="hljs-keyword">this</span>.get(<span class="hljs-string">'degree'</span>), <span class="hljs-keyword">this</span>.get(<span class="hljs-string">'knots'</span>), <span class="hljs-keyword">this</span>.homogenize()  ], callback );
 
 };</pre></div></div>
             
@@ -2115,7 +2115,7 @@ verb.NurbsCurve.prototype.length = <span class="hljs-function"><span class="hljs
             <div class="content"><div class='highlight'><pre>
 verb.NurbsCurve.prototype.lengthAtParam = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( u, callback )</span> </span>{
 
-	<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.nurbsEngine.eval( <span class="hljs-string">'rational_curve_arc_length'</span>, [ <span class="hljs-keyword">this</span>.get(<span class="hljs-string">'degree'</span>), <span class="hljs-keyword">this</span>.get(<span class="hljs-string">'knots'</span>), <span class="hljs-keyword">this</span>.homogenize(), u  ], callback ); 
+	<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.nurbsEngine.eval( <span class="hljs-string">'rationalCurveArcLength'</span>, [ <span class="hljs-keyword">this</span>.get(<span class="hljs-string">'degree'</span>), <span class="hljs-keyword">this</span>.get(<span class="hljs-string">'knots'</span>), <span class="hljs-keyword">this</span>.homogenize(), u  ], callback );
 
 };</pre></div></div>
             
@@ -2144,7 +2144,7 @@ verb.NurbsCurve.prototype.lengthAtParam = <span class="hljs-function"><span clas
             <div class="content"><div class='highlight'><pre>
 verb.NurbsCurve.prototype.paramAtLength = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( len, callback )</span> </span>{
 
-	<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.nurbsEngine.eval( <span class="hljs-string">'rational_curve_param_at_arc_length'</span>, [ <span class="hljs-keyword">this</span>.get(<span class="hljs-string">'degree'</span>), <span class="hljs-keyword">this</span>.get(<span class="hljs-string">'knots'</span>), <span class="hljs-keyword">this</span>.homogenize(), len  ], callback ); 
+	<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.nurbsEngine.eval( <span class="hljs-string">'rationalCurveParamAtArcLength'</span>, [ <span class="hljs-keyword">this</span>.get(<span class="hljs-string">'degree'</span>), <span class="hljs-keyword">this</span>.get(<span class="hljs-string">'knots'</span>), <span class="hljs-keyword">this</span>.homogenize(), len  ], callback );
 
 };</pre></div></div>
             
@@ -2611,7 +2611,7 @@ verb.NurbsSurface.prototype.derivatives = <span class="hljs-function"><span clas
             <div class="content"><div class='highlight'><pre>
 verb.NurbsSurface.prototype.closestPoint = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( point, callback )</span> </span>{
 
-	<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.nurbsEngine.eval( <span class="hljs-string">'rational_surface_closest_point'</span>, 
+	<span class="hljs-keyword">return</span> <span class="hljs-keyword">this</span>.nurbsEngine.eval( <span class="hljs-string">'rationalSurfaceClosestPoint'</span>,
 		[	<span class="hljs-keyword">this</span>.get(<span class="hljs-string">'degreeU'</span>), <span class="hljs-keyword">this</span>.get(<span class="hljs-string">'knotsU'</span>), <span class="hljs-keyword">this</span>.get(<span class="hljs-string">'degreeV'</span>), <span class="hljs-keyword">this</span>.get(<span class="hljs-string">'knotsV'</span>), <span class="hljs-keyword">this</span>.homogenize(),  point  ], callback ); 
 
 };</pre></div></div>
@@ -8898,7 +8898,7 @@ rectangle - just build the basic triangulated square</p>
 
 
 
-verb.eval.rational_surface_closest_point = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( degree_u, knots_u, degree_v, knots_v, homo_control_points, p )</span></span>{</pre></div></div>
+verb.eval.rationalSurfaceClosestPoint = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( degree_u, knots_u, degree_v, knots_v, homo_control_points, p )</span></span>{</pre></div></div>
             
         </li>
         
@@ -9257,7 +9257,7 @@ console.log(‘uv’, cuv)</p>
 
 }
 
-verb.eval.rational_curve_closest_point = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( degree, knots, control_points, p )</span></span>{</pre></div></div>
+verb.eval.rationalCurveClosestPoint = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">( degree, knots, control_points, p )</span></span>{</pre></div></div>
             
         </li>
         
@@ -9476,7 +9476,7 @@ verb.eval.rational_curve_closest_point = <span class="hljs-function"><span class
 
 verb.eval.rational_curve_divide_curve_equally_by_arc_length = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(degree, knots, control_points, num)</span></span>{
 
-	<span class="hljs-keyword">var</span> tlen = verb.eval.rational_curve_arc_length( degree, knots, control_points );
+	<span class="hljs-keyword">var</span> tlen = verb.eval.rationalCurveArcLength( degree, knots, control_points );
 	<span class="hljs-keyword">var</span> inc = tlen / num;
 
 	<span class="hljs-keyword">return</span> verb.eval.rational_curve_divide_curve_by_arc_length(degree, knots, control_points, inc);
@@ -9510,7 +9510,7 @@ verb.eval.rational_curve_divide_curve_by_arc_length = <span class="hljs-function
 
 		<span class="hljs-keyword">while</span> ( lc &lt; runsum + verb.EPSILON ){
 
-			u = verb.eval.rational_bezier_curve_param_at_arc_length( crvs[i].degree, crvs[i].knots, crvs[i].control_points, 
+			u = verb.eval.rationalBezierCurveParamAtArcLength( crvs[i].degree, crvs[i].knots, crvs[i].control_points,
 				lc - runsum1, verb.TOLERANCE, crvlens[i] );
 
 			pts.push( <span class="hljs-keyword">new</span> CurvePoint( u, lc ) );
@@ -9528,7 +9528,7 @@ verb.eval.rational_curve_divide_curve_by_arc_length = <span class="hljs-function
 
 }
 
-verb.eval.rational_curve_param_at_arc_length = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(degree, knots, control_points, len, tol, beziers, bezier_lengths)</span></span>{
+verb.eval.rationalCurveParamAtArcLength = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(degree, knots, control_points, len, tol, beziers, bezier_lengths)</span></span>{
 
 	<span class="hljs-keyword">if</span> (len &lt; verb.EPSILON) <span class="hljs-keyword">return</span> knots[<span class="hljs-number">0</span>];
 
@@ -9559,7 +9559,7 @@ verb.eval.rational_curve_param_at_arc_length = <span class="hljs-function"><span
 		cl += bezier_lengths[i];
 
 		<span class="hljs-keyword">if</span> (len &lt; cl + verb.EPSILON){
-			<span class="hljs-keyword">return</span> verb.eval.rational_bezier_curve_param_at_arc_length(degree, knots, 
+			<span class="hljs-keyword">return</span> verb.eval.rationalBezierCurveParamAtArcLength(degree, knots,
 				control_points, len, tol, bezier_lengths[i]);
 		}
 
@@ -9569,7 +9569,7 @@ verb.eval.rational_curve_param_at_arc_length = <span class="hljs-function"><span
 
 }
 
-verb.eval.rational_bezier_curve_param_at_arc_length = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(degree, knots, control_points, len, tol, total_len)</span></span>{
+verb.eval.rationalBezierCurveParamAtArcLength = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(degree, knots, control_points, len, tol, total_len)</span></span>{
 
 	<span class="hljs-keyword">if</span> (len &lt; <span class="hljs-number">0</span>) <span class="hljs-keyword">return</span> knots[<span class="hljs-number">0</span>];</pre></div></div>
             
@@ -9628,7 +9628,7 @@ TODO: newton’s method formulation</p>
 
 }
 
-verb.eval.rational_curve_arc_length = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(degree, knots, control_points, u)</span></span>{
+verb.eval.rationalCurveArcLength = <span class="hljs-function"><span class="hljs-keyword">function</span><span class="hljs-params">(degree, knots, control_points, u)</span></span>{
 
 	<span class="hljs-keyword">if</span> (u === <span class="hljs-literal">undefined</span>) u = verb.last( knots );
 

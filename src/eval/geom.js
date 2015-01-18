@@ -1,6 +1,6 @@
 
 
-verb.eval.rational_surface_closest_point = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, p ){
+verb.eval.rationalSurfaceClosestPoint = function( degree_u, knots_u, degree_v, knots_v, homo_control_points, p ){
 
 	// for surfaces, we try to minimize the following:
 	// 
@@ -202,7 +202,7 @@ verb.eval.rational_surface_closest_point = function( degree_u, knots_u, degree_v
 
 }
 
-verb.eval.rational_curve_closest_point = function( degree, knots, control_points, p ){
+verb.eval.rationalCurveClosestPoint = function( degree, knots, control_points, p ){
 
 	//  We want to solve:
 	// 
@@ -336,7 +336,7 @@ verb.eval.rational_curve_closest_point = function( degree, knots, control_points
 
 verb.eval.rational_curve_divide_curve_equally_by_arc_length = function(degree, knots, control_points, num){
 
-	var tlen = verb.eval.rational_curve_arc_length( degree, knots, control_points );
+	var tlen = verb.eval.rationalCurveArcLength( degree, knots, control_points );
 	var inc = tlen / num;
 
 	return verb.eval.rational_curve_divide_curve_by_arc_length(degree, knots, control_points, inc);
@@ -370,7 +370,7 @@ verb.eval.rational_curve_divide_curve_by_arc_length = function(degree, knots, co
 
 		while ( lc < runsum + verb.EPSILON ){
 
-			u = verb.eval.rational_bezier_curve_param_at_arc_length( crvs[i].degree, crvs[i].knots, crvs[i].control_points, 
+			u = verb.eval.rationalBezierCurveParamAtArcLength( crvs[i].degree, crvs[i].knots, crvs[i].control_points,
 				lc - runsum1, verb.TOLERANCE, crvlens[i] );
 
 			pts.push( new CurvePoint( u, lc ) );
@@ -388,7 +388,7 @@ verb.eval.rational_curve_divide_curve_by_arc_length = function(degree, knots, co
 
 }
 
-verb.eval.rational_curve_param_at_arc_length = function(degree, knots, control_points, len, tol, beziers, bezier_lengths){
+verb.eval.rationalCurveParamAtArcLength = function(degree, knots, control_points, len, tol, beziers, bezier_lengths){
 
 	if (len < verb.EPSILON) return knots[0];
 
@@ -407,7 +407,7 @@ verb.eval.rational_curve_param_at_arc_length = function(degree, knots, control_p
 		cl += bezier_lengths[i];
 
 		if (len < cl + verb.EPSILON){
-			return verb.eval.rational_bezier_curve_param_at_arc_length(degree, knots, 
+			return verb.eval.rationalBezierCurveParamAtArcLength(degree, knots,
 				control_points, len, tol, bezier_lengths[i]);
 		}
 
@@ -417,7 +417,7 @@ verb.eval.rational_curve_param_at_arc_length = function(degree, knots, control_p
 
 }
 
-verb.eval.rational_bezier_curve_param_at_arc_length = function(degree, knots, control_points, len, tol, total_len){
+verb.eval.rationalBezierCurveParamAtArcLength = function(degree, knots, control_points, len, tol, total_len){
 
 	if (len < 0) return knots[0];
 
@@ -452,7 +452,7 @@ verb.eval.rational_bezier_curve_param_at_arc_length = function(degree, knots, co
 
 }
 
-verb.eval.rational_curve_arc_length = function(degree, knots, control_points, u){
+verb.eval.rationalCurveArcLength = function(degree, knots, control_points, u){
 
 	if (u === undefined) u = verb.last( knots );
 

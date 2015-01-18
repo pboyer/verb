@@ -12,7 +12,7 @@ using verb.core.Mat;
 @:expose("core.Analyze")
 class Analyze {
 
-    public static function is_rational_surface_closed(surface : SurfaceData, uDir : Bool = true ) : Bool {
+    public static function isRationalSurfaceClosed(surface : SurfaceData, uDir : Bool = true ) : Bool {
 
         var cpts = if (uDir) surface.controlPoints else surface.controlPoints.transpose();
 
@@ -24,7 +24,7 @@ class Analyze {
         return true;
     }
 
-    public static function rational_surface_closest_point( surface : SurfaceData, p : Point ) : UV {
+    public static function rationalSurfaceClosestPoint( surface : SurfaceData, p : Point ) : UV {
 
         // for surfaces, we try to minimize the following:
         //
@@ -78,8 +78,8 @@ class Analyze {
         , maxu = surface.knotsU.last()
         , minv = surface.knotsV[0]
         , maxv = surface.knotsV.last()
-        , closedu = is_rational_surface_closed(surface)
-        , closedv = is_rational_surface_closed(surface, false)
+        , closedu = isRationalSurfaceClosed(surface)
+        , closedv = isRationalSurfaceClosed(surface, false)
         , cuv;
 
         // approximate closest point with tessellation
@@ -212,8 +212,7 @@ class Analyze {
 
     }
 
-
-    public static function rational_curve_closest_point( curve, p ){
+    public static function rationalCurveClosestPoint( curve, p ){
 
         //  We want to solve:
         //
@@ -344,8 +343,11 @@ class Analyze {
 
     }
 
-    public static function rational_curve_param_at_arc_length(curve : CurveData, len : Float, tol : Float,
-                                                              beziers : Array<CurveData> = null, bezierLengths : Array<Float> = null) : Float {
+    public static function rationalCurveParamAtArcLength(curve : CurveData,
+                                                         len : Float,
+                                                         tol : Float,
+                                                         beziers : Array<CurveData> = null,
+                                                         bezierLengths : Array<Float> = null) : Float {
 
         if (len < Constants.EPSILON) return curve.knots[0];
 
@@ -358,12 +360,12 @@ class Analyze {
         // iterate through the curves consuming the bezier's, summing their length along the way
         while (cl < len && i < crvs.length){
 
-            bezier_lengths[i] = i < bezier_lengths.length ? bezier_lengths[i] : rational_bezier_curve_arc_length( curve );
+            bezier_lengths[i] = i < bezier_lengths.length ? bezier_lengths[i] : rationalBezierCurveArcLength( curve );
 
             cl += bezier_lengths[i];
 
             if (len < cl + Constants.EPSILON){
-                return rational_bezier_curve_param_at_arc_length(curve, len, tol, bezier_lengths[i]);
+                return rationalBezierCurveParamAtArcLength(curve, len, tol, bezier_lengths[i]);
             }
 
             i++;
@@ -384,11 +386,14 @@ class Analyze {
     // **returns**
     // + the parameter
     //
-    public static function rational_bezier_curve_param_at_arc_length(curve : CurveData, len : Float, tol : Float = null, totalLength : Float = null) : Float {
+    public static function rationalBezierCurveParamAtArcLength(curve : CurveData,
+                                                               len : Float,
+                                                               tol : Float = null,
+                                                               totalLength : Float = null) : Float {
         if (len < 0) return curve.knots[0];
 
         // we compute the whole length.  if desired length is outside of that, give up
-        var totalLen = totalLength != null ? totalLength : rational_bezier_curve_arc_length( curve );
+        var totalLen = totalLength != null ? totalLength : rationalBezierCurveArcLength( curve );
 
         if (len > totalLen) return curve.knots.last();
 
@@ -402,7 +407,7 @@ class Analyze {
         while ( (end.l - start.l) > tol ){
 
             mid.p = (start.p + end.p) / 2;
-            mid.l = rational_bezier_curve_arc_length(curve, mid.p );
+            mid.l = rationalBezierCurveArcLength(curve, mid.p );
 
             if (mid.l > len){
                 end.p = mid.p;
@@ -428,7 +433,7 @@ class Analyze {
     // **returns**
     // + the approximate length
     //
-    public static function rational_curve_arc_length(curve : CurveData, u : Float = null, gaussDegIncrease : Int = 16){
+    public static function rationalCurveArcLength(curve : CurveData, u : Float = null, gaussDegIncrease : Int = 16){
         u = (u == null) ? curve.knots.last() : u;
 
         var crvs = Modify.curve_bezier_decompose( curve )
@@ -438,7 +443,7 @@ class Analyze {
 
         while ( i < crvs.length && cc.knots[0] + Constants.EPSILON < u  ){
             var param = Math.min(cc.knots.last(), u);
-            sum += rational_bezier_curve_arc_length( cc, param, gaussDegIncrease );
+            sum += rationalBezierCurveArcLength( cc, param, gaussDegIncrease );
             cc = crvs[++i];
         }
 
@@ -456,7 +461,7 @@ class Analyze {
     // **returns**
     // + the approximate length
     //
-    public static function rational_bezier_curve_arc_length(curve : CurveData, u : Float = null, gaussDegIncrease : Int = 16) : Float {
+    public static function rationalBezierCurveArcLength(curve : CurveData, u : Float = null, gaussDegIncrease : Int = 16) : Float {
 
         var u = u == null ? curve.knots.last() : u
         , z = (u - curve.knots[0]) / 2
@@ -532,8 +537,5 @@ class Analyze {
         [0.1336545721861061753514571105458443385831,0.1324620394046966173716424647033169258050,0.1324620394046966173716424647033169258050,0.1289057221880821499785953393997936532597,0.1289057221880821499785953393997936532597,0.1230490843067295304675784006720096548158,0.1230490843067295304675784006720096548158,0.1149966402224113649416435129339613014914,0.1149966402224113649416435129339613014914,0.1048920914645414100740861850147438548584,0.1048920914645414100740861850147438548584,0.0929157660600351474770186173697646486034,0.0929157660600351474770186173697646486034,0.0792814117767189549228925247420432269137,0.0792814117767189549228925247420432269137,0.0642324214085258521271696151589109980391,0.0642324214085258521271696151589109980391,0.0480376717310846685716410716320339965612,0.0480376717310846685716410716320339965612,0.0309880058569794443106942196418845053837,0.0309880058569794443106942196418845053837,0.0134118594871417720813094934586150649766,0.0134118594871417720813094934586150649766],
         [0.1279381953467521569740561652246953718517,0.1279381953467521569740561652246953718517,0.1258374563468282961213753825111836887264,0.1258374563468282961213753825111836887264,0.1216704729278033912044631534762624256070,0.1216704729278033912044631534762624256070,0.1155056680537256013533444839067835598622,0.1155056680537256013533444839067835598622,0.1074442701159656347825773424466062227946,0.1074442701159656347825773424466062227946,0.0976186521041138882698806644642471544279,0.0976186521041138882698806644642471544279,0.0861901615319532759171852029837426671850,0.0861901615319532759171852029837426671850,0.0733464814110803057340336152531165181193,0.0733464814110803057340336152531165181193,0.0592985849154367807463677585001085845412,0.0592985849154367807463677585001085845412,0.0442774388174198061686027482113382288593,0.0442774388174198061686027482113382288593,0.0285313886289336631813078159518782864491,0.0285313886289336631813078159518782864491,0.0123412297999871995468056670700372915759,0.0123412297999871995468056670700372915759]
     ];
-
-
-
 
 }
