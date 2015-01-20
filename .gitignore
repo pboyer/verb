@@ -1,5 +1,6 @@
 coverage.html
 .DS_Store
+out
 lib-cov
 *.seed
 *.log
