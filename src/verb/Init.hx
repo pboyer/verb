@@ -2,6 +2,7 @@ package verb;
 
 import verb.BoundingBox;
 import verb.NurbsCurve;
+import verb.Arc;
 import verb.core.Constants;
 import verb.core.Trig;
 import verb.core.Numeric;

@@ -1,5 +1,5 @@
 var should = require('should')
-	, verb = require('../build/verbHaxe.js');
+	, verb = require('../build/verb.js');
 
 // some testing utilities
 function vecShouldBe( expected, test, tol ){
@@ -11,14 +11,13 @@ function vecShouldBe( expected, test, tol ){
  	for (var i = 0; i < test.length; i++){
  		test[i].should.be.approximately( expected[i], tol );
  	}
-
 }
 
 function last(a){
 	return a[a.length-1];
 }
 
-console.log(verb)
+console.log(verb);
 
 describe("verb.core.Eval.knotSpanGivenN",function(){
 
@@ -4049,9 +4048,150 @@ describe("verb.core.Eval.volumePoint",function(){
 
 });
 
-/*
+describe("NurbsCurve.lengthAtParam",function(){
 
-describe(.EvalCurve.split",function(){
+	it('can get closest point to straight curve', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,0.5,1,1,1,1]
+			, controlPoints = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
+			, weights = [ 1, 1, 1, 1, 1 ]
+			, pt = [1,0.2,0.1];
+
+		var crv = verb.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
+		var res = crv.lengthAtParam( 1 );
+
+		res.should.be.approximately(4, 1e-3 )
+
+	});
+
+});
+
+
+describe("NurbsCurve.paramAtLength",function(){
+
+	it('can get closest point to straight curve', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,0.5,1,1,1,1]
+			, controlPoints = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
+			, weights = [ 1, 1, 1, 1, 1 ]
+			, pt = [1,0.2,0];
+
+		var crv = verb.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
+		var res = crv.paramAtLength( 2 );
+
+		var p = crv.point( res );
+
+		vecShouldBe( [2,0,0], p, 1e-3 );
+
+	});
+
+});
+
+describe("NurbsCurve.divideByEqualArcLength",function(){
+
+	it('can divide straight curve', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,0.5,1,1,1,1]
+			, controlPoints = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
+			, weights = [ 1, 1, 1, 1, 1 ]
+			, divs = 10
+			, d = 4 / divs;
+
+		var crv = verb.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
+		var res = crv.divideByEqualArcLength( divs );
+
+		var tol = 1e-3;
+
+		var s = 0;
+		res.forEach(function(u){
+
+			var pt = crv.point( u.u );
+			u.len.should.be.approximately( s, tol );
+
+			pt[0].should.be.approximately( s, tol );
+			s += d;
+
+		});
+
+	});
+
+});
+
+describe("NurbsCurve.divideByArcLength",function(){
+
+	it('can divide straight curve', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,0.5,1,1,1,1]
+			, controlPoints = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
+			, weights = [ 1, 1, 1, 1, 1 ]
+			, divs = 10
+			, d = 4 / divs;
+
+		var tol = 1e-3;
+
+		var crv = verb.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
+		var res = crv.divideByArcLength( d );
+
+		var s = 0;
+		res.forEach(function(u){
+
+			var pt = crv.point( u.u );
+			u.len.should.be.approximately( s, tol );
+
+			pt[0].should.be.approximately( s, tol );
+			s += d;
+
+		});
+
+	});
+
+});
+
+describe("NurbsCurve.closestParam",function(){
+
+	it('can get point on straight curve', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,0.5,1,1,1,1]
+			, controlPoints = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
+			, weights = [ 1, 1, 1, 1, 1 ]
+			, pt = [1,0,0];
+
+
+		var crv = verb.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
+		var res = crv.closestParam( pt );
+
+		var p = crv.point( res );
+
+		vecShouldBe( [1,0,0], p, 1e-3 );
+
+	});
+
+	it('can get closest point to straight curve', function(){
+
+		var degree = 3
+			, knots = [0,0,0,0,0.5,1,1,1,1]
+			, controlPoints = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
+			, weights = [ 1, 1, 1, 1, 1 ]
+			, pt = [1,1,0];
+
+
+		var crv = verb.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
+		var res = crv.closestParam(pt);
+
+		var p = crv.point( res );
+
+		vecShouldBe( [1,0,0], p, 1e-3 );
+
+	});
+
+});
+
+describe("NurbsCurve.split",function(){
 
 	function cubicSplit(u){
 
@@ -4065,15 +4205,15 @@ describe(.EvalCurve.split",function(){
 			controlPoints.push([i, 0, 0]);
 		}
 
-		var crv = new verb.EvalCurve( degree, controlPoints, weights, knots );
+		var crv = verb.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
 		var res = crv.split(0.5);
 
 		var crv0 = res[0];
 		var crv1 = res[1];
 
 		// a point evaluated on each curve is the same
-		var p0 = crv0.point(crv0.domain()[1]);
-		var p1 = crv1.point(crv1.domain()[0]);
+		var p0 = crv0.point(crv0.domain().max);
+		var p1 = crv1.point(crv1.domain().min);
 
 		p0[0].should.be.approximately(p1[0], verb.core.Constants.TOLERANCE);
 		p0[1].should.be.approximately(p1[1], verb.core.Constants.TOLERANCE);
@@ -4081,7 +4221,7 @@ describe(.EvalCurve.split",function(){
 
 	}
 
-	it('returns expected results when inserting multiple knots in the middle of a.EvalCurve', function(){
+	it('returns expected results when inserting multiple knots in the middle of aNurbsCurve', function(){
 
 		cubicSplit( 0.5 );
 		cubicSplit( 3.5 );
@@ -4091,57 +4231,20 @@ describe(.EvalCurve.split",function(){
 });
 
 
-describe("WatchObject",function(){
-
-	it('can be created by its constructor', function(){
-
-		var wo = new verb.WatchObject();
-		should.exist(wo);
-
-	});
-
-});
-
-describe("Interval",function(){
-
-	it('can be created by its constructor', function(){
-
-		var interval = new verb.Interval( 0, 0.5);
-		should.exist(interval)
-		interval.get("min").should.equal( 0 );
-		interval.get("max").should.equal( 0.5 );
-
-	});
-
-});
-
-describe("verb.init",function(){
-
-	it('sets the nurbsEngine property for.EvalGeometry', function(){
-
-		verb.init();
-
-		verb.EvalGeometry.prototype.nurbsEngine.should.be.instanceof(verb.Engine);
-
-	});
-
-});
-
 describe("Arc.constructor",function(){
 
 	it('has correct properties', function(){
 
-		verb.init();
-		var arc = new verb.Arc([0,0,0], [1,0,0], [0,1,0], 5, new verb.Interval(0, Math.PI/ 2) );
+		var arc = new verb.Arc([0,0,0], [1,0,0], [0,1,0], 5, 0, Math.PI/ 2 );
 
 		should.exist( arc );
 
-		arc.get("radius").should.be.equal(5);
-		arc.get("center").should.eql([0,0,0]);
-		arc.get("xaxis").should.eql([1,0,0]);
-		arc.get("yaxis").should.eql([0,1,0]);
-		arc.get("interval").get('min').should.be.equal(0);
-		arc.get("interval").get('max').should.be.equal(Math.PI/2);
+		arc.radius().should.be.equal(5);
+		arc.center().should.eql([0,0,0]);
+		arc.xaxis().should.eql([1,0,0]);
+		arc.yaxis().should.eql([0,1,0]);
+		arc.minAngle().should.be.equal(0);
+		arc.maxAngle().should.be.equal(Math.PI/2);
 
 	});
 
@@ -4151,9 +4254,7 @@ describe("Arc.point",function(){
 
 	it('returns expected results', function(){
 
-		verb.init();
-
-		var arc = new verb.Arc([0,0,1], [1,0,0], [0,1,0], 1, new verb.Interval(0, Math.PI/ 2) );
+		var arc = new verb.Arc([0,0,1], [1,0,0], [0,1,0], 1, 0, Math.PI/ 2 );
 		var p1 = arc.point(0);
 		var p2 = arc.point(0.5);
 		var p3 = arc.point(1);
@@ -4162,7 +4263,7 @@ describe("Arc.point",function(){
 		p1[0].should.be.approximately( 1, 0.001 );
 		p1[1].should.be.approximately( 0, 0.001 );
 		p1[2].should.be.approximately( 1, 0.001 );
-		
+
 		p2.should.be.instanceof(Array).and.have.lengthOf(3);
 		p2[0].should.be.approximately( Math.sqrt(2)/2, 0.001 );
 		p2[1].should.be.approximately( Math.sqrt(2)/2, 0.001 );
@@ -4176,11 +4277,9 @@ describe("Arc.point",function(){
 
 	it('creates the expected result when given a callback', function(done){
 
-		verb.init();
-		
-		var arc = new verb.Arc([0,0,1], [1,0,0], [0,1,0], 1, new verb.Interval(0, Math.PI/ 2) );
-		
-		arc.point(0.5, function(res){	 
+		var arc = new verb.Arc([0,0,1], [1,0,0], [0,1,0], 1, 0, Math.PI/ 2 );
+
+		arc.pointAsync(0.5, function(res){
 
 			res.should.be.instanceof(Array).and.have.lengthOf(3);
 			res[0].should.be.approximately( Math.sqrt(2)/2, 0.001 );
@@ -4198,9 +4297,7 @@ describe("Arc.tessellate",function(){
 
 	it('should return a list of vertices', function(){
 
-		verb.init();
-
-		var arc = new verb.Arc([0,0,1], [1,0,0], [0,1,0], 1, new verb.Interval(0, Math.PI/ 2) );
+		var arc = new verb.Arc([0,0,1], [1,0,0], [0,1,0], 1, 0, Math.PI/ 2 );
 		var pts = arc.tessellate();
 
 		pts.length.should.be.greaterThan(2);
@@ -4211,11 +4308,11 @@ describe("Arc.tessellate",function(){
 
 });
 
+/*
+
 describe("FourPointSurface.constructor",function(){
 
 	it('can create an instance', function(){
-
-		verb.init();
 
 		var p1 = [0,0,1]
 			, p2 = [1,0,0]
@@ -4233,8 +4330,6 @@ describe("FourPointSurface.constructor",function(){
 describe("FourPointSurface.point",function(){
 
 	it('evaluates correctly for hypar', function(){
-
-		verb.init();
 
 		var p1 = [0,0,1]
 			, p2 = [1,0,0]
@@ -4259,8 +4354,6 @@ describe("FourPointSurface.derivatives",function(){
 
 	it('gives nice result', function(){
 
-		verb.init();
-
 		var p1 = [0,0,1]
 			, p2 = [1,0,0]
 			, p3 = [1,1,1]
@@ -4283,8 +4376,6 @@ describe("FourPointSurface.derivatives",function(){
 describe("FourPointSurface.tessellate",function(){
 
 	it('gives mesh result', function(){
-
-		verb.init();
 
 		var p1 = [0,0,1]
 			, p2 = [1,0,0]
@@ -4317,8 +4408,6 @@ describe("Line.constructor",function(){
 
 	it('can create an instance', function(){
 
-		verb.init();
-
 		var p1 = [0,0,1]
 			, p2 = [1,0,0];
 
@@ -4333,8 +4422,6 @@ describe("Line.constructor",function(){
 describe("Line.point",function(){
 
 	it('evaluates correctly', function(){
-
-		verb.init();
 
 		var p1 = [0,0,0]
 			, p2 = [1,1,1];
@@ -4357,8 +4444,6 @@ describe("Line.derivatives",function(){
 
 	it('gives nice result', function(){
 
-		verb.init();
-
 		var p1 = [0,0,0]
 			, p2 = [1,1,1];
 
@@ -4378,8 +4463,6 @@ describe("Line.derivatives",function(){
 describe("Line.tessellate",function(){
 
 	it('gives mesh result', function(){
-
-		verb.init();
 
 		var p1 = [0,0,0]
 			, p2 = [1,1,1];
@@ -4402,8 +4485,6 @@ describe("BezierCurve.constructor",function(){
 
 	it('can create an instance', function(){
 
-		verb.init();
-
 		var p1 = [0,0,0]
 			, p2 = [1,0,1]
 			, p3 = [2,0,-1]
@@ -4420,8 +4501,6 @@ describe("BezierCurve.constructor",function(){
 describe("BezierCurve.point",function(){
 
 	it('evaluates correctly', function(){
-
-		verb.init();
 
 		var p1 = [0,0,0]
 			, p2 = [1,0,1]
@@ -4443,8 +4522,6 @@ describe("BezierCurve.point",function(){
 describe("BezierCurve.derivatives",function(){
 
 	it('gives nice result', function(){
-
-		verb.init();
 
 
 		var p1 = [0,0,0]
@@ -4469,8 +4546,6 @@ describe("BezierCurve.tessellate",function(){
 
 	it('gives mesh result', function(){
 
-		verb.init();
-
 		var p1 = [0,0,0]
 			, p2 = [1,0,1]
 			, p3 = [2,0,-1]
@@ -4494,8 +4569,6 @@ describe("Circle.constructor",function(){
 
 	it('can create an instance', function(){
 
-		verb.init();
-
 		var c = new verb.Circle([0,0,0], [1,0,0], [0,1,0], 5);
 
 		should.exist(c);
@@ -4507,8 +4580,6 @@ describe("Circle.constructor",function(){
 describe("Circle.point",function(){
 
 	it('evaluates correctly', function(){
-
-		verb.init();
 
 		var c = new verb.Circle([0,0,0], [1,0,0], [0,1,0], 5);
 
@@ -4527,8 +4598,6 @@ describe("Circle.point",function(){
 describe("Circle.derivatives",function(){
 
 	it('gives correct result', function(){
-
-		verb.init();
 
 		var c = new verb.Circle([0,0,0], [1,0,0], [0,1,0], 5);
 
@@ -4555,8 +4624,6 @@ describe("Circle.tessellate",function(){
 
 	it('gives correct result', function(){
 
-		verb.init();
-
 		var c = new verb.Circle([0,0,0], [1,0,0], [0,1,0], 5);
 
 		should.exist(c);
@@ -4576,8 +4643,6 @@ describe("Ellipse.constructor",function(){
 
 	it('can create an instance', function(){
 
-		verb.init();
-
 		var c = new verb.Ellipse([0,0,0], [1,0,0], [0,1,0], 5, 10);
 
 		should.exist(c);
@@ -4589,8 +4654,6 @@ describe("Ellipse.constructor",function(){
 describe("Ellipse.point",function(){
 
 	it('evaluates correctly', function(){
-
-		verb.init();
 
 		var c = new verb.Ellipse([0,0,0], [1,0,0], [0,1,0], 5, 10);
 
@@ -4615,8 +4678,6 @@ describe("Ellipse.point",function(){
 describe("Ellipse.derivatives",function(){
 
 	it('gives correct result', function(){
-
-		verb.init();
 
 		var c = new verb.Ellipse([0,0,0], [1,0,0], [0,1,0], 5, 10);
 
@@ -4656,8 +4717,6 @@ describe("Ellipse.tessellate",function(){
 
 	it('gives correct result', function(){
 
-		verb.init();
-
 		var c = new verb.Ellipse([0,0,0], [1,0,0], [0,1,0], 5, 10);
 
 		should.exist(c);
@@ -4675,8 +4734,6 @@ describe("EllipseArc.constructor",function(){
 
 	it('can create an instance', function(){
 
-		verb.init();
-
 		var c = new verb.EllipseArc([0,0,0], [1,0,0], [0,1,0], 5, 10, new verb.Interval(0, Math.PI));
 
 		should.exist(c);
@@ -4688,8 +4745,6 @@ describe("EllipseArc.constructor",function(){
 describe("EllipseArc.point",function(){
 
 	it('evaluates correctly', function(){
-
-		verb.init();
 
 		var c = new verb.EllipseArc([0,0,0], [1,0,0], [0,1,0], 5, 10, new verb.Interval(0, Math.PI));
 
@@ -4708,8 +4763,6 @@ describe("EllipseArc.point",function(){
 describe("EllipseArc.derivatives",function(){
 
 	it('gives correct result', function(){
-
-		verb.init();
 
 		var c = new verb.EllipseArc([0,0,0], [1,0,0], [0,1,0], 5, 10, new verb.Interval(0, Math.PI));
 
@@ -4736,8 +4789,6 @@ describe("EllipseArc.tessellate",function(){
 
 	it('gives correct result', function(){
 
-		verb.init();
-
 		var c = new verb.EllipseArc([0,0,0], [1,0,0], [0,1,0], 5, 10, new verb.Interval(0, Math.PI));
 
 		should.exist(c);
@@ -4755,8 +4806,6 @@ describe("PolyLine.constructor",function(){
 
 	it('can create an instance', function(){
 
-		verb.init();
-
 		var c = new verb.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
 
 		should.exist(c);
@@ -4768,8 +4817,6 @@ describe("PolyLine.constructor",function(){
 describe("PolyLine.point",function(){
 
 	it('evaluates correctly', function(){
-
-		verb.init();
 
 		var c = new verb.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
 
@@ -4786,8 +4833,6 @@ describe("PolyLine.point",function(){
 describe("PolyLine.derivatives",function(){
 
 	it('gives correct result', function(){
-
-		verb.init();
 
 		var c = new verb.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
 
@@ -4811,8 +4856,6 @@ describe("PolyLine.derivatives",function(){
 describe("PolyLine.tessellate",function(){
 
 	it('gives correct result', function(){
-
-		verb.init();
 
 		var c = new verb.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
 
@@ -4832,8 +4875,6 @@ describe("PolyLine.constructor",function(){
 
 	it('can create an instance', function(){
 
-		verb.init();
-
 		var c = new verb.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
 
 		should.exist(c);
@@ -4845,8 +4886,6 @@ describe("PolyLine.constructor",function(){
 describe("PolyLine.point",function(){
 
 	it('evaluates correctly', function(){
-
-		verb.init();
 
 		var c = new verb.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
 
@@ -4863,8 +4902,6 @@ describe("PolyLine.point",function(){
 describe("PolyLine.derivatives",function(){
 
 	it('gives correct result', function(){
-
-		verb.init();
 
 		var c = new verb.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
 
@@ -4888,8 +4925,6 @@ describe("PolyLine.derivatives",function(){
 describe("PolyLine.tessellate",function(){
 
 	it('gives correct result', function(){
-
-		verb.init();
 
 		var c = new verb.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
 
@@ -4908,8 +4943,6 @@ describe("Cone.constructor",function(){
 
 	it('can create an instance', function(){
 
-		verb.init();
-
 		var axis = [0,0,1]
 			, xaxis = [1,0,0]
 			, base = [0,0,0]
@@ -4927,8 +4960,6 @@ describe("Cone.constructor",function(){
 describe("Cone.point",function(){
 
 	it('evaluates correctly for middle of surface', function(){
-
-		verb.init();
 
 		var axis = [0,0,1]
 			, xaxis = [1,0,0]
@@ -4953,8 +4984,6 @@ describe("Cone.point",function(){
 describe("Cone.derivatives",function(){
 
 	it('gives expected result for middle of surface', function(){
-
-		verb.init();
 
 		var axis = [0,0,1]
 			, xaxis = [1,0,0]
@@ -4991,8 +5020,6 @@ describe("Cone.tessellate",function(){
 
 	it('gives mesh result', function(){
 
-		verb.init();
-
 		var axis = [0,0,1]
 			, xaxis = [1,0,0]
 			, base = [0,0,0]
@@ -5024,8 +5051,6 @@ describe("Cylinder.constructor",function(){
 
 	it('can create an instance', function(){
 
-		verb.init();
-
 		var axis = [0,0,1]
 			, xaxis = [1,0,0]
 			, base = [0,0,0]
@@ -5043,8 +5068,6 @@ describe("Cylinder.constructor",function(){
 describe("Cylinder.point",function(){
 
 	it('evaluates correctly for middle of surface', function(){
-
-		verb.init();
 
 		var axis = [0,0,1]
 			, xaxis = [1,0,0]
@@ -5069,8 +5092,6 @@ describe("Cylinder.point",function(){
 describe("Cylinder.derivatives",function(){
 
 	it('gives expected result for middle of surface', function(){
-
-		verb.init();
 
 		var axis = [0,0,1]
 			, xaxis = [1,0,0]
@@ -5107,8 +5128,6 @@ describe("Cylinder.tessellate",function(){
 
 	it('gives mesh result', function(){
 
-		verb.init();
-
 		var axis = [0,0,1]
 			, xaxis = [1,0,0]
 			, base = [0,0,0]
@@ -5140,8 +5159,6 @@ describe("Extrusion.constructor",function(){
 
 	it('can create an instance', function(){
 
-		verb.init();
-
 		var profile = new verb.Line( [0,0,0], [1,1,1] )
 			, axis = [0,0,1]
 			, length = 3;
@@ -5157,8 +5174,6 @@ describe("Extrusion.constructor",function(){
 describe("Extrusion.point",function(){
 
 	it('evaluates correctly for middle of surface', function(){
-
-		verb.init();
 
 		var profile = new verb.Line( [0,0,0], [1,1,0] )
 			, axis = [0,0,1]
@@ -5181,8 +5196,6 @@ describe("Extrusion.point",function(){
 describe("Extrusion.derivatives",function(){
 
 	it('gives expected result for middle of surface', function(){
-
-		verb.init();
 
 		var profile = new verb.Line( [0,0,0], [1,1,0] )
 			, axis = [0,0,1]
@@ -5215,8 +5228,6 @@ describe("Extrusion.tessellate",function(){
 
 	it('gives mesh result', function(){
 
-		verb.init();
-
 		var profile = new verb.Line( [0,0,0], [1,1,0] )
 			, axis = [0,0,1]
 			, length = 3;
@@ -5246,8 +5257,6 @@ describe("PlanarSurface.constructor",function(){
 
 	it('can create an instance', function(){
 
-		verb.init();
-
 		var base = [0,0,0]
 			, uaxis = [1,0,0]
 			, vaxis = [0,1,0]
@@ -5265,8 +5274,6 @@ describe("PlanarSurface.constructor",function(){
 describe("PlanarSurface.point",function(){
 
 	it('evaluates correctly for middle of surface', function(){
-
-		verb.init();
 
 		var base = [0,0,0]
 			, uaxis = [1,0,0]
@@ -5291,8 +5298,6 @@ describe("PlanarSurface.point",function(){
 describe("PlanarSurface.derivatives",function(){
 
 	it('gives expected result for middle of surface', function(){
-
-		verb.init();
 
 		var base = [0,0,0]
 			, uaxis = [1,0,0]
@@ -5327,8 +5332,6 @@ describe("PlanarSurface.tessellate",function(){
 
 	it('gives mesh result', function(){
 
-		verb.init();
-
 		var base = [0,0,0]
 			, uaxis = [1,0,0]
 			, vaxis = [0,1,0]
@@ -5360,8 +5363,6 @@ describe("RevolvedSurface.constructor",function(){
 
 	it('can create an instance', function(){
 
-		verb.init();
-
 		var base = [0,0,0]
 			, axis = [0,0,1]
 			, angle = Math.PI
@@ -5378,8 +5379,6 @@ describe("RevolvedSurface.constructor",function(){
 describe("RevolvedSurface.point",function(){
 
 	it('evaluates correctly for middle of surface', function(){
-
-		verb.init();
 
 		var base = [0,0,0]
 			, axis = [0,0,1]
@@ -5404,8 +5403,6 @@ describe("RevolvedSurface.derivatives",function(){
 
 	it('gives expected result for middle of surface', function(){
 
-		verb.init();
-
 		var base = [0,0,0]
 			, axis = [0,0,1]
 			, angle = Math.PI
@@ -5421,7 +5418,7 @@ describe("RevolvedSurface.derivatives",function(){
 		p[0][0].mult.should.be.approximately(5.5, verb.core.Constants.EPSILON );
 		p[0][0][2].should.be.approximately(5.5, verb.core.Constants.EPSILON );
 
-		
+
 		p[0][1][0].should.be.approximately(0, verb.core.Constants.EPSILON );
 		p[0][1].mult.should.be.approximately(9, verb.core.Constants.EPSILON );
 		p[0][1][2].should.be.approximately(-9, verb.core.Constants.EPSILON );
@@ -5440,8 +5437,6 @@ describe("RevolvedSurface.derivatives",function(){
 describe("RevolvedSurface.tessellate",function(){
 
 	it('gives mesh result', function(){
-
-		verb.init();
 
 		var base = [0,0,0]
 			, axis = [0,0,1]
@@ -5476,8 +5471,6 @@ describe("Sphere.constructor",function(){
 
 	it('can create an instance', function(){
 
-		verb.init();
-
 		var center = [0,0,0]
 			, radius = 5;
 
@@ -5492,8 +5485,6 @@ describe("Sphere.constructor",function(){
 describe("Sphere.point",function(){
 
 	it('evaluates correctly for middle of surface', function(){
-
-		verb.init();
 
 		var center = [0,0,0]
 			, radius = 5;
@@ -5515,8 +5506,6 @@ describe("Sphere.point",function(){
 describe("Sphere.derivatives",function(){
 
 	it('gives expected result for middle of surface', function(){
-
-		verb.init();
 
 		var center = [0,0,0]
 			, radius = 5;
@@ -5552,8 +5541,6 @@ describe("Sphere.tessellate",function(){
 
 	it('gives mesh result', function(){
 
-		verb.init();
-
 		var center = [0,0,0]
 			, radius = 5;
 
@@ -5581,8 +5568,6 @@ describe("SweepOneRail.constructor",function(){
 
 	it('can create an instance', function(){
 
-		verb.init();
-		
 		var p1 = [0,0,0]
 			, p2 = [1,0,1]
 			, p3 = [2,0,-1]
@@ -5602,8 +5587,6 @@ describe("SweepOneRail.constructor",function(){
 describe("SweepOneRail.point",function(){
 
 	it('evaluates correctly for middle of surface', function(){
-
-		verb.init();
 
 		var p1 = [0,0,0]
 			, p2 = [1,0,1]
@@ -5632,8 +5615,6 @@ describe("SweepOneRail.point",function(){
 describe("SweepOneRail.derivatives",function(){
 
 	it('gives expected result for middle of surface', function(){
-
-		verb.init();
 
 		var p1 = [0,0,0]
 			, p2 = [1,0,1]
@@ -5670,8 +5651,6 @@ describe("SweepOneRail.tessellate",function(){
 
 	it('gives mesh result', function(){
 
-		verb.init();
-
 		var p1 = [0,0,0]
 			, p2 = [1,0,1]
 			, p3 = [2,0,-1]
@@ -5704,8 +5683,6 @@ describe("SweepOneRail.tessellate",function(){
 describe("verb.intersectCurves",function(){
 
 	it('gives valid result for 2 planar degree 2 beziers', function(){
-
-		verb.init();
 
 		// build a bezier curve
 		var p1 = [0,0,0]
@@ -5746,8 +5723,6 @@ describe("verb.intersectCurveSurface",function(){
 
 	it('gives valid result for planar surface and degree 2 bezier', function(){
 
-		verb.init();
-
 		var base = [0,0,0]
 			, uaxis = [1,0,0]
 			, vaxis = [0,1,0]
@@ -5774,140 +5749,6 @@ describe("verb.intersectCurveSurface",function(){
 	});
 
 });
-
-describe("verb.core.Eval.rational_surface_curvature ",function(){
-
-	it('returns expected result for cylinder', function(){
-
-		verb.init();
-
-		var axis = [0,0,1]
-			, xaxis = [1,0,0]
-			, base = [0,0,0]
-			, height = 1
-			, radius = 1;
-
-		var srf = new verb.Cylinder( axis, xaxis, base, height, radius );
-
-		var res = verb.core.Eval.rational_surface_curvature( srf.get('degreeU'), 
-																													srf.get('knotsU'), 
-																													srf.get('degreeV'), 
-																													srf.get('knotsV'), 
-																													srf.homogenize(),
-																													0.5, 0.5 );
-
-		res.point[0].should.be.approximately( -1, verb.core.Constants.TOLERANCE );
-		res.point[1].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-		res.point[2].should.be.approximately( 0.5, verb.core.Constants.TOLERANCE );
-
-		res.normal[0].should.be.approximately( 5.656854, verb.core.Constants.TOLERANCE );
-		res.normal[1].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-		res.normal[2].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-
-		res.mean.should.be.greaterThan( 0 );
-		res.gaussian.should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-
-		res.p1[0].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-		res.p1[1].should.be.approximately( -5.656854249, verb.core.Constants.TOLERANCE );
-		res.p1[2].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-
-		res.p2[0].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-		res.p2[1].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-		res.p2[2].should.be.approximately( -1, verb.core.Constants.TOLERANCE );
-
-		res.k1.should.be.approximately( 181.01933598, verb.core.Constants.TOLERANCE );
-		res.k2.should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-
-
-	});
-
-	it('returns expected result for sphere', function(){
-
-		verb.init();
-
-		var center = [0,0,0]
-			, radius = 1;
-
-		var srf = new verb.Sphere( center, radius );
-
-		var res = verb.core.Eval.rational_surface_curvature( srf.get('degreeU'), 
-																													srf.get('knotsU'), 
-																													srf.get('degreeV'), 
-																													srf.get('knotsV'), 
-																													srf.homogenize(),
-																													0.5, 0.9 );
-
-		// res.point[0].should.be.approximately( -1, verb.core.Constants.TOLERANCE );
-		// res.point[1].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-		// res.point[2].should.be.approximately( 0.5, verb.core.Constants.TOLERANCE );
-
-		// res.normal[0].should.be.approximately( -5.656854, verb.core.Constants.TOLERANCE );
-		// res.normal[1].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-		// res.normal[2].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-
-		// res.mean.should.be.lessThan( 0 );
-		// res.gaussian.should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-
-		// res.p1[0].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-		// res.p1[1].should.be.approximately( -5.656854249, verb.core.Constants.TOLERANCE );
-		// res.p1[2].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-
-		// res.p2[0].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-		// res.p2[1].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-		// res.p2[2].should.be.approximately( 1, verb.core.Constants.TOLERANCE );
-
-		// res.k1.should.be.approximately( -181.01933598, verb.core.Constants.TOLERANCE );
-		// res.k2.should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-
-
-	});
-
-});
-
-
-describe("verb.core.Eval.intersect_aabb_trees",function(){
-
-	it('intersect_aabb_trees should have the correct result', function(){
-
-		//
-		//  0  - 1
-		//  |  /  \   
-		//  2   --  3
-		//  |  \   /
-		//  4  -  5
-		// 
-
-		var points1 = [ [0,0,0], [1,0,0], [0, -1, 0 ], [2, -1, 0], [0, -2, 0], [1, -2, 0] ]
-			, tris1 = [ [0,2,1], [1,2,3], [2,4,5], [2,5,3] ]
-			, tri_indices1 = [0,1,2,3]
-			, aabb1 = verb.core.Eval.makeMeshAabbTree( points1, tris1, tri_indices1 )
-
-			, points2 = [ [0.5,-2,0.5], [0.5,-2,-1], [1,0.5,-1 ] ]
-			, tris2 = [ [0,1,2] ]
-			, tri_indices2 = [0]
-			, aabb2 = verb.core.Eval.makeMeshAabbTree( points2, tris2, tri_indices2 )
-			, inter_result = verb.core.Eval.intersect_aabb_trees( points1, tris1, points2, tris2, aabb1, aabb2 );
-
-		// find all 4 triangle intersections
-		should.equal( 4, inter_result.length );
-
-		// find the specific intersections
-		should.equal( 2, inter_result[0][0] );
-		should.equal( 0, inter_result[0][1] );
-
-		should.equal( 3, inter_result[1][0] );
-		should.equal( 0, inter_result[1][1] );
-
-		should.equal( 0, inter_result[2][0] );
-		should.equal( 0, inter_result[2][1] );
-
-		should.equal( 1, inter_result[3][0] );
-		should.equal( 0, inter_result[3][1] );
-
-	});
-
-});
-
 
 
 describe("verb.InterpCurve",function(){
@@ -5973,134 +5814,86 @@ describe("verb.InterpCurve",function(){
 });
 
 
+describe("verb.core.Eval.rational_surface_curvature ",function(){
 
+	it('returns expected result for cylinder', function(){
 
+		var axis = [0,0,1]
+			, xaxis = [1,0,0]
+			, base = [0,0,0]
+			, height = 1
+			, radius = 1;
 
+		var srf = new verb.Cylinder( axis, xaxis, base, height, radius );
 
-describe(.EvalCurve.lengthAtParam",function(){
+		var res = verb.core.Eval.rational_surface_curvature( srf.get('degreeU'),
+																													srf.get('knotsU'),
+																													srf.get('degreeV'),
+																													srf.get('knotsV'),
+																													srf.homogenize(),
+																													0.5, 0.5 );
 
-	it('can get closest point to straight curve', function(){
+		res.point[0].should.be.approximately( -1, verb.core.Constants.TOLERANCE );
+		res.point[1].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+		res.point[2].should.be.approximately( 0.5, verb.core.Constants.TOLERANCE );
 
-		var degree = 3
-			, knots = [0,0,0,0,0.5,1,1,1,1]
-			, controlPoints = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
-			, weights = [ 1, 1, 1, 1, 1 ]
-			, pt = [1,0.2,0.1];
+		res.normal[0].should.be.approximately( 5.656854, verb.core.Constants.TOLERANCE );
+		res.normal[1].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+		res.normal[2].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
 
+		res.mean.should.be.greaterThan( 0 );
+		res.gaussian.should.be.approximately( 0, verb.core.Constants.TOLERANCE );
 
-		var crv = new verb.EvalCurve( degree, controlPoints, weights, knots );
-		var res = crv.lengthAtParam( 1 );
+		res.p1[0].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+		res.p1[1].should.be.approximately( -5.656854249, verb.core.Constants.TOLERANCE );
+		res.p1[2].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
 
-		res.should.be.approximately(4, 1e-3 )
+		res.p2[0].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+		res.p2[1].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+		res.p2[2].should.be.approximately( -1, verb.core.Constants.TOLERANCE );
+
+		res.k1.should.be.approximately( 181.01933598, verb.core.Constants.TOLERANCE );
+		res.k2.should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+
 
 	});
 
-});
+	it('returns expected result for sphere', function(){
 
+		var center = [0,0,0]
+			, radius = 1;
 
-describe(.EvalCurve.paramAtLength",function(){
+		var srf = new verb.Sphere( center, radius );
 
-	it('can get closest point to straight curve', function(){
+		var res = verb.core.Eval.rational_surface_curvature( srf.get('degreeU'),
+																													srf.get('knotsU'),
+																													srf.get('degreeV'),
+																													srf.get('knotsV'),
+																													srf.homogenize(),
+																													0.5, 0.9 );
 
-		var degree = 3
-			, knots = [0,0,0,0,0.5,1,1,1,1]
-			, controlPoints = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
-			, weights = [ 1, 1, 1, 1, 1 ]
-			, pt = [1,0.2,0];
+		// res.point[0].should.be.approximately( -1, verb.core.Constants.TOLERANCE );
+		// res.point[1].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+		// res.point[2].should.be.approximately( 0.5, verb.core.Constants.TOLERANCE );
 
-		var crv = new verb.EvalCurve( degree, controlPoints, weights, knots );
-		var res = crv.paramAtLength( 2 );
+		// res.normal[0].should.be.approximately( -5.656854, verb.core.Constants.TOLERANCE );
+		// res.normal[1].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+		// res.normal[2].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
 
-		var p = crv.point( res );
+		// res.mean.should.be.lessThan( 0 );
+		// res.gaussian.should.be.approximately( 0, verb.core.Constants.TOLERANCE );
 
-		vecShouldBe( [2,0,0], p, 1e-3 );
+		// res.p1[0].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+		// res.p1[1].should.be.approximately( -5.656854249, verb.core.Constants.TOLERANCE );
+		// res.p1[2].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
 
-	});
+		// res.p2[0].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+		// res.p2[1].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+		// res.p2[2].should.be.approximately( 1, verb.core.Constants.TOLERANCE );
 
-});
+		// res.k1.should.be.approximately( -181.01933598, verb.core.Constants.TOLERANCE );
+		// res.k2.should.be.approximately( 0, verb.core.Constants.TOLERANCE );
 
-describe(.EvalCurve.divideByEqualArcLength",function(){
-
-	it('can divide straight curve', function(){
-
-		var degree = 3
-			, knots = [0,0,0,0,0.5,1,1,1,1]
-			, controlPoints = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
-			, weights = [ 1, 1, 1, 1, 1 ]
-			, divs = 10
-			, d = 4 / divs;
-
-		var crv = new verb.EvalCurve( degree, controlPoints, weights, knots );
-		var res = crv.divideByEqualArcLength( divs );
-
-		var s = 0;
-		res.forEach(function(u){
-
-			var pt = crv.point( u.u );
-			u.len.should.be.approximately( s, tol );
-
-			pt[0].should.be.approximately( s, tol );
-			s += d;
-
-		});
-
-	});
-
-});
-
-describe(.EvalCurve.divideByEqualArcLength",function(){
-
-	it('can divide straight curve', function(){
-
-		var degree = 3
-			, knots = [0,0,0,0,0.5,1,1,1,1]
-			, controlPoints = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
-			, weights = [ 1, 1, 1, 1, 1 ]
-			, divs = 10
-			, d = 4 / divs;
-
-		var crv = new verb.EvalCurve( degree, controlPoints, weights, knots );
-		var res = crv.divideByEqualArcLength( divs );
-
-		var s = 0;
-		res.forEach(function(u){
-
-			var pt = crv.point( u.u );
-			u.len.should.be.approximately( s, tol );
-
-			pt[0].should.be.approximately( s, tol );
-			s += d;
-
-		});
-
-	});
-
-});
-
-describe(.EvalCurve.divideByArcLength",function(){
-
-	it('can divide straight curve', function(){
-
-		var degree = 3
-			, knots = [0,0,0,0,0.5,1,1,1,1]
-			, controlPoints = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
-			, weights = [ 1, 1, 1, 1, 1 ]
-			, divs = 10
-			, d = 4 / divs;
-
-		var crv = new verb.EvalCurve( degree, controlPoints, weights, knots );
-		var res = crv.divideByArcLength( d );
-
-		var s = 0;
-		res.forEach(function(u){
-
-			var pt = crv.point( u.u );
-			u.len.should.be.approximately( s, tol );
-
-			pt[0].should.be.approximately( s, tol );
-			s += d;
-
-		});
 
 	});
 
@@ -6108,45 +5901,7 @@ describe(.EvalCurve.divideByArcLength",function(){
 
 
 
-describe(.EvalCurve.closestPoint",function(){
 
-	it('can get point on straight curve', function(){
-
-		var degree = 3
-			, knots = [0,0,0,0,0.5,1,1,1,1]
-			, controlPoints = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
-			, weights = [ 1, 1, 1, 1, 1 ]
-			, pt = [1,0,0];
-
-
-		var crv = new verb.EvalCurve( degree, controlPoints, weights, knots );
-		var res = crv.closestPoint(pt);
-
-		var p = crv.point( res );
-
-		vecShouldBe( [1,0,0], p, 1e-3 );
-
-	});
-
-	it('can get closest point to straight curve', function(){
-
-		var degree = 3
-			, knots = [0,0,0,0,0.5,1,1,1,1]
-			, controlPoints = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
-			, weights = [ 1, 1, 1, 1, 1 ]
-			, pt = [1,1,0];
-
-
-		var crv = new verb.EvalCurve( degree, controlPoints, weights, knots );
-		var res = crv.closestPoint(pt);
-
-		var p = crv.point( res );
-
-		vecShouldBe( [1,0,0], p, 1e-3 );
-
-	});
-
-});
 
 
 */

@@ -7,7 +7,7 @@ using Lambda;
 @:expose("core.Divide")
 class Divide {
 
-    public static function rationalCurveEquallyByArcLength(curve : CurveData, num : Int){
+    public static function rationalCurveEquallyByArcLength(curve : CurveData, num : Int) : Array<CurveLengthSample> {
 
         var tlen = Analyze.rationalCurveArcLength( curve );
         var inc = tlen / num;

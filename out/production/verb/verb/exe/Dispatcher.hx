@@ -41,16 +41,10 @@ class Dispatcher {
         #if js
 
             // use WorkerPool
-
-
-        #elseif (neko || cpp)
-
-            // use ThreadPool
-
-
+            _workerPool.addWork( className, methodName, args, callback );
 
         #else
-            // no threadpool is available
+            // TODO: neko || cpp use ThreadPool
             var type = Type.resolveClass("verb.core." + className );
             var result = Reflect.callMethod(type, Reflect.field(type, methodName), args );
             callback( result );

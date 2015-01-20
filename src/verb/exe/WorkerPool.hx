@@ -28,10 +28,10 @@ class WorkerPool {
     private var _working = new IntMap<Worker>();
     private var _callbacks = new IntMap<Dynamic -> Dynamic>();
 
-    public function new( numThreads : Int, fileName : String = "verb.js" ) {
+    public function new( numThreads : Int, fileName : String = "/Users/peter/Dropbox/Github/personal/verb2/verb/build/verb.js" ) {
 
         for (i in 0...numThreads){
-           _pool.push( new Worker("verb.js") );
+           _pool.push( new Worker(fileName) );
         }
     }
 

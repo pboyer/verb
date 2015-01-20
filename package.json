@@ -2,7 +2,7 @@
   "name": "verb",
   "version": "0.2.0",
   "author": "pboyer <peter.b.boyer@gmail.com>",
-  "description": "A small NURBS library.",
+  "description": "A CAD library for the web",
   "repository": {
     "type": "git",
     "url": "https://github.com/pboyer/verb.git"
@@ -18,9 +18,6 @@
     "nurbs"
   ],
   "dependencies": {
-    "binomial": "*",
-    "labor": "*",
-    "numeric": "1.2.6"
   },
   "devDependencies": {
     "benchmark": "^1.0.0",
@@ -33,7 +30,8 @@
     "grunt-mocha-test": "^0.12.2",
     "grunt-text-replace": "^0.4.0",
     "mocha": "^2.0.1",
-    "should": "2.1.0"
+    "should": "2.1.0",
+    "webworker-threads": "*"
   },
   "license": "MIT"
 }

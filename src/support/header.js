@@ -4,24 +4,35 @@ if ( typeof exports != 'object' || exports === undefined )
     // todo fix this
 	var verb = exports = {};
 } else  {
-	var verb = module.exports = {};
+	var Worker = require('webworker-threads').Worker;
 }
 
-//class Router
-//{
-//
-//    if ( arguments.callee._singletonInstance )
-//        return arguments.callee._singletonInstance;
-//
-//    arguments.callee._singletonInstance = this;
-//
-//    this.lib = library;
-//
-//    var self = this;
-//
-//    onmessage = function( e ){
-//        postMessage( { result: self.lib[ e.data.func ].apply( null, e.data.arguments ), id: e.data.id } );
-//    };
-//
-//}
-//
+// web worker context
+if ( typeof window != 'object'){
+
+	var global = this;
+	var lookup = function(className, methodName){
+
+		var obj = global;
+
+		className.split(".").forEach(function(x){
+			if (obj) obj = obj[ x ];
+		});
+
+		if (!obj) return null;
+
+		return obj[ methodName ];
+	}
+
+	onmessage = function( e ){
+
+		var method = lookup( e.data.className, e.data.methodName );
+
+		if (!method){
+			return console.error("could not find " = e.data.className + "." + e.data.methodName)
+		}
+
+		postMessage( { result: method.apply( null, e.data.args ), id: e.data.id } );
+
+	};
+}

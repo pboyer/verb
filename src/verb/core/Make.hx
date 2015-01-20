@@ -1,5 +1,6 @@
 package verb.core;
 
+import verb.core.Mat.Vector;
 import verb.core.types.SurfaceData;
 import verb.core.types.CurveData;
 
@@ -210,7 +211,8 @@ class Make {
     // + a CurveData object representing a NURBS curve
     //
 
-    public static function arc( center, xaxis, yaxis, radius, start_angle, end_angle ) {
+    public static function arc( center : Point, xaxis : Vector, yaxis : Vector, radius : Float, start_angle : Float,
+                                end_angle : Float ) : CurveData {
         return ellipseArc( center, xaxis, yaxis, radius, radius, start_angle, end_angle );
     }
 

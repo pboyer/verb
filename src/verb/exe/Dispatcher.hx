@@ -8,7 +8,7 @@ package verb.exe;
 
 class Dispatcher {
 
-    public static var THREADS : Int = 8;
+    public static var THREADS : Int = 1;
     private static var _instance: Dispatcher = null;
 
     #if (neko || cpp)
@@ -41,17 +41,11 @@ class Dispatcher {
         #if js
 
             // use WorkerPool
-
-
-        #elseif (neko || cpp)
-
-            // use ThreadPool
-
-
+            _workerPool.addWork( className, methodName, args, callback );
 
         #else
-            // no threadpool is available
-            var type = Type.resolveClass("verb.core." + className );
+            // TODO: neko || cpp use ThreadPool
+            var type = Type.resolveClass(className );
             var result = Reflect.callMethod(type, Reflect.field(type, methodName), args );
             callback( result );
         #end

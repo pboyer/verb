@@ -1,5 +1,6 @@
 package verb;
 
+import verb.core.types.CurveData;
 import verb.core.Mat;
 import verb.exe.Dispatcher;
 import verb.core.ArrayExtensions;
@@ -19,14 +20,17 @@ class NurbsCurve {
 
     private var _data : CurveData;
 
-    public function new(degree : Int, knots : KnotArray, controlPoints : Array<Point>, weights : Array<Float> ) {
-
-        // TODO: validate curve data!
-        this._data = new CurveData(degree, knots.slice(0), Eval.homogenize1d(controlPoints.slice(0), weights.slice(0)) );
+    private function new( data : CurveData ) {
+        this._data = data;
     }
 
-    public static function byData(data : CurveData) : NurbsCurve {
-        return new NurbsCurve(data.degree, data.knots, Eval.dehomogenize1d(data.controlPoints), Eval.weight1d(data.controlPoints));
+    public static function byControlPointsWeights(  degree : Int,
+                                                    knots : KnotArray,
+                                                    controlPoints : Array<Point>,
+                                                    weights : Array<Float> ) : NurbsCurve {
+
+        return new NurbsCurve( new CurveData( degree, knots.copy(), Eval.homogenize1d(controlPoints, weights) ) );
+
     }
 
     function data() : CurveData {
@@ -233,9 +237,8 @@ class NurbsCurve {
             throw "Cannot split outside of the domain of the curve!";
         }
 
-        return Modify.curveSplit( _data, u ).map( NurbsCurve.byData );
+        return Modify.curveSplit( _data, u ).map(function(x){ return new NurbsCurve(x); });
 
-//
 //        // transform the result from the engine into a valid pair of NurbsCurves
 //        function asNurbsCurves(res){
 //
@@ -290,13 +293,14 @@ class NurbsCurve {
         var pts = controlPoints();
 
         for (i in 0...pts.length){
+
             var homoPt = pts[i];
             homoPt.push(1.0);
 
             pts[i] = Mat.dot( mat, homoPt ).slice( 0, homoPt.length - 2 );
         }
 
-        return new NurbsCurve( degree(), knots(), pts, weights() );
+        return new NurbsCurve( new CurveData( degree(), knots(), Eval.homogenize1d( pts, weights() ) ) );
     }
 
     //
@@ -307,7 +311,7 @@ class NurbsCurve {
     //
     public function clone(){
 
-        return NurbsCurve.byData( this._data );
+        return new NurbsCurve( this._data );
 
     }
 }

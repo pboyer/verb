@@ -74,7 +74,6 @@ Array.prototype.flatten = function(){
 	}
 
 	return merged;
-
 }
 
 // ####numeric.normalized( arr )
