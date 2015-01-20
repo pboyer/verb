@@ -1,5 +1,7 @@
 package verb;
-class NurbsGeometry {
+class NurbsSurface {
+
+
     public function new() {
     }
 }

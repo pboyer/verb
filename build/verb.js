@@ -7,6 +7,25 @@ if ( typeof exports != 'object' || exports === undefined )
 	var verb = module.exports = {};
 }
 
+//class Router
+//{
+//
+//    if ( arguments.callee._singletonInstance )
+//        return arguments.callee._singletonInstance;
+//
+//    arguments.callee._singletonInstance = this;
+//
+//    this.lib = library;
+//
+//    var self = this;
+//
+//    onmessage = function( e ){
+//        postMessage( { result: self.lib[ e.data.func ].apply( null, e.data.arguments ), id: e.data.id } );
+//    };
+//
+//}
+//
+
 (function ($hx_exports) { "use strict";
 $hx_exports.core = $hx_exports.core || {};
 function $extend(from, fields) {
@@ -48,6 +67,11 @@ haxe.ds.IntMap.prototype = {
 	}
 	,exists: function(key) {
 		return this.h.hasOwnProperty(key);
+	}
+	,remove: function(key) {
+		if(!this.h.hasOwnProperty(key)) return false;
+		delete(this.h[key]);
+		return true;
 	}
 };
 var verb = {};
@@ -164,6 +188,86 @@ verb.Init = function() { };
 verb.Init.main = function() {
 	console.log("verb 0.2.0");
 };
+verb.NurbsCurve = $hx_exports.NurbsCurve = function(degree,knots,controlPoints,weights) {
+	this._data = new verb.core.types.CurveData(degree,knots.slice(0),verb.core.Eval.homogenize1d(controlPoints.slice(0),weights.slice(0)));
+};
+verb.NurbsCurve.byData = function(data) {
+	return new verb.NurbsCurve(data.degree,data.knots,verb.core.Eval.dehomogenize1d(data.controlPoints),verb.core.Eval.weight1d(data.controlPoints));
+};
+verb.NurbsCurve.prototype = {
+	data: function() {
+		return new verb.core.types.CurveData(this.degree(),this.knots(),verb.core.Eval.homogenize1d(this.controlPoints(),this.weights()));
+	}
+	,degree: function() {
+		return this._data.degree;
+	}
+	,knots: function() {
+		return this._data.knots.slice(0);
+	}
+	,controlPoints: function() {
+		return verb.core.Eval.dehomogenize1d(this._data.controlPoints);
+	}
+	,weights: function() {
+		return verb.core.Eval.weight1d(this._data.controlPoints);
+	}
+	,point: function(u) {
+		return verb.core.Eval.rationalCurvePoint(this._data,u);
+	}
+	,pointAsync: function(u,callback) {
+		return verb.exe.Dispatcher.instance()["eval"]("Eval","rationalCurvePoint",[this._data,u],callback);
+	}
+	,derivatives: function(u,numDerivatives) {
+		if(numDerivatives == null) numDerivatives = 1;
+		return verb.core.Eval.rationalCurveDerivatives(this._data,u,numDerivatives);
+	}
+	,closestPoint: function(pt) {
+		return this.point(this.closestParam(pt));
+	}
+	,closestParam: function(pt) {
+		return verb.core.Analyze.rationalCurveClosestPoint(this._data,pt);
+	}
+	,length: function() {
+		return verb.core.Analyze.rationalCurveArcLength(this._data);
+	}
+	,lengthAtParam: function(u) {
+		return verb.core.Analyze.rationalCurveArcLength(this._data,u);
+	}
+	,paramAtLength: function(len,tolerance) {
+		return verb.core.Analyze.rationalCurveParamAtArcLength(this._data,len,tolerance);
+	}
+	,divideByEqualArcLength: function(divisions) {
+		return verb.core.Divide.rationalCurveEquallyByArcLength(this._data,divisions);
+	}
+	,divideByArcLength: function(arcLength) {
+		return verb.core.Divide.rationalCurveByArcLength(this._data,arcLength);
+	}
+	,tessellate: function(tolerance) {
+		return verb.core.Tess.rationalCurveAdaptiveSample(this._data,tolerance,false);
+	}
+	,split: function(u) {
+		var domain = this.domain();
+		if(u <= domain.min || u >= domain.max) throw "Cannot split outside of the domain of the curve!";
+		return verb.core.Modify.curveSplit(this._data,u).map(verb.NurbsCurve.byData);
+	}
+	,domain: function() {
+		return new verb.core.types.Interval(this._data.knots[0],verb.core.ArrayExtensions.last(this._data.knots));
+	}
+	,transform: function(mat) {
+		var pts = this.controlPoints();
+		var _g1 = 0;
+		var _g = pts.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var homoPt = pts[i];
+			homoPt.push(1.0);
+			pts[i] = verb.core.Mat.dot(mat,homoPt).slice(0,homoPt.length - 2);
+		}
+		return new verb.NurbsCurve(this.degree(),this.knots(),pts,this.weights());
+	}
+	,clone: function() {
+		return verb.NurbsCurve.byData(this._data);
+	}
+};
 verb.core = {};
 verb.core.Analyze = $hx_exports.core.Analyze = function() { };
 verb.core.Analyze.isRationalSurfaceClosed = function(surface,uDir) {
@@ -265,7 +369,7 @@ verb.core.Analyze.rationalCurveClosestPoint = function(curve,p) {
 		var u1 = pts[i + 1][0];
 		var p0 = pts[i].slice(1);
 		var p1 = pts[i + 1].slice(1);
-		var proj = verb.core.Trig.closest_point_on_segment(p,p0,p1,u0,u1);
+		var proj = verb.core.Trig.segmentClosestPoint(p,p0,p1,u0,u1);
 		var d = verb.core.Vec.norm(verb.core.Vec.sub(p,proj.pt));
 		if(d < min) {
 			min = d;
@@ -312,6 +416,7 @@ verb.core.Analyze.rationalCurveClosestPoint = function(curve,p) {
 	return cu;
 };
 verb.core.Analyze.rationalCurveParamAtArcLength = function(curve,len,tol,beziers,bezierLengths) {
+	if(tol == null) tol = 1e-3;
 	if(len < verb.core.Constants.EPSILON) return curve.knots[0];
 	var crvs;
 	if(beziers != null) crvs = beziers; else crvs = verb.core.Modify.decomposeCurveIntoBeziers(curve);
@@ -520,6 +625,7 @@ verb.core.Eval.volumePoint = function(volume,u,v,w) {
 	return verb.core.Eval.volumePointGivenNML(volume,n,m,l,u,v,w);
 };
 verb.core.Eval.volumePointGivenNML = function(volume,n,m,l,u,v,w) {
+	if(!verb.core.Eval.areValidRelations(volume.degreeU,volume.controlPoints.length,volume.knotsU.length) || !verb.core.Eval.areValidRelations(volume.degreeV,volume.controlPoints[0].length,volume.knotsV.length) || !verb.core.Eval.areValidRelations(volume.degreeW,volume.controlPoints[0][0].length,volume.knotsW.length)) throw "Invalid relations between control points and knot vector";
 	var controlPoints = volume.controlPoints;
 	var degreeU = volume.degreeU;
 	var degreeV = volume.degreeV;
@@ -606,15 +712,15 @@ verb.core.Eval.rationalSurfaceDerivatives = function(surface,num_derivs,u,v) {
 verb.core.Eval.rationalSurfacePoint = function(surface,u,v) {
 	return verb.core.Eval.dehomogenize(verb.core.Eval.surfacePoint(surface,u,v));
 };
-verb.core.Eval.rationalCurveDerivatives = function(curve,u,num_derivs) {
-	var ders = verb.core.Eval.curveDerivatives(curve,u,num_derivs);
-	var Aders = verb.core.Eval.rational_1d(ders);
-	var wders = verb.core.Eval.weight_1d(ders);
+verb.core.Eval.rationalCurveDerivatives = function(curve,u,numDerivs) {
+	var ders = verb.core.Eval.curveDerivatives(curve,u,numDerivs);
+	var Aders = verb.core.Eval.rational1d(ders);
+	var wders = verb.core.Eval.weight1d(ders);
 	var k = 0;
 	var i = 0;
 	var CK = [];
 	var _g1 = 0;
-	var _g = num_derivs + 1;
+	var _g = numDerivs + 1;
 	while(_g1 < _g) {
 		var k1 = _g1++;
 		var v = Aders[k1];
@@ -643,23 +749,23 @@ verb.core.Eval.dehomogenize = function(homo_point) {
 	}
 	return point;
 };
-verb.core.Eval.rational_1d = function(homo_points) {
+verb.core.Eval.rational1d = function(homo_points) {
 	var dim = homo_points[0].length - 1;
 	return homo_points.map(function(x) {
 		return x.slice(0,dim);
 	});
 };
 verb.core.Eval.rational2d = function(homo_points) {
-	return homo_points.map(verb.core.Eval.rational_1d);
+	return homo_points.map(verb.core.Eval.rational1d);
 };
-verb.core.Eval.weight_1d = function(homo_points) {
+verb.core.Eval.weight1d = function(homo_points) {
 	var dim = homo_points[0].length - 1;
 	return homo_points.map(function(x) {
 		return x[dim];
 	});
 };
 verb.core.Eval.weight2d = function(homo_points) {
-	return homo_points.map(verb.core.Eval.weight_1d);
+	return homo_points.map(verb.core.Eval.weight1d);
 };
 verb.core.Eval.dehomogenize1d = function(homo_points) {
 	return homo_points.map(verb.core.Eval.dehomogenize);
@@ -1241,8 +1347,8 @@ verb.core.Intersect.curves_with_estimate = function(curve0,curve1,u0,u1,toleranc
 verb.core.Intersect.triangles = function(mesh0,faceIndex0,mesh1,faceIndex1) {
 	var tri0 = mesh0.faces[faceIndex0];
 	var tri1 = mesh1.faces[faceIndex1];
-	var n0 = verb.core.Mesh.get_tri_norm(mesh0.points,tri0);
-	var n1 = verb.core.Mesh.get_tri_norm(mesh1.points,tri1);
+	var n0 = verb.core.Mesh.getTriangleNorm(mesh0.points,tri0);
+	var n1 = verb.core.Mesh.getTriangleNorm(mesh1.points,tri1);
 	var o0 = mesh0.points[tri0[0]];
 	var o1 = mesh1.points[tri1[0]];
 	var ray = verb.core.Intersect.planes(o0,n0,o1,n1);
@@ -1652,8 +1758,8 @@ verb.core.Make.sweep1_surface = function(profile,rail) {
 	var span = 1.0 / rail.controlPoints.length;
 	var controlPoints = [];
 	var weights = [];
-	var rail_weights = verb.core.Eval.weight_1d(rail.controlPoints);
-	var profile_weights = verb.core.Eval.weight_1d(profile.controlPoints);
+	var rail_weights = verb.core.Eval.weight1d(rail.controlPoints);
+	var profile_weights = verb.core.Eval.weight1d(profile.controlPoints);
 	var profile_points = verb.core.Eval.dehomogenize1d(profile.controlPoints);
 	var _g1 = 0;
 	var _g = rail.controlPoints.length;
@@ -1764,7 +1870,7 @@ verb.core.Make.extrudedSurface = function(axis,length,profile) {
 	var controlPoints = [[],[],[]];
 	var weights = [[],[],[]];
 	var prof_controlPoints = verb.core.Eval.dehomogenize1d(profile.controlPoints);
-	var prof_weights = verb.core.Eval.weight_1d(profile.controlPoints);
+	var prof_weights = verb.core.Eval.weight1d(profile.controlPoints);
 	var translation = verb.core.Vec.mul(length,axis);
 	var halfTranslation = verb.core.Vec.mul(0.5 * length,axis);
 	var _g1 = 0;
@@ -1788,7 +1894,7 @@ verb.core.Make.cylinderSurface = function(axis,xaxis,base,height,radius) {
 };
 verb.core.Make.revolvedSurface = function(center,axis,theta,profile) {
 	var prof_controlPoints = verb.core.Eval.dehomogenize1d(profile.controlPoints);
-	var prof_weights = verb.core.Eval.weight_1d(profile.controlPoints);
+	var prof_weights = verb.core.Eval.weight1d(profile.controlPoints);
 	var narcs;
 	var knotsU;
 	var controlPoints;
@@ -2185,7 +2291,7 @@ verb.core.Mat.LU = function(A) {
 	return new verb.core.LUDecomp(A,P);
 };
 verb.core.Mesh = $hx_exports.core.Mesh = function() { };
-verb.core.Mesh.get_tri_norm = function(points,tri) {
+verb.core.Mesh.getTriangleNorm = function(points,tri) {
 	var v0 = points[tri[0]];
 	var v1 = points[tri[1]];
 	var v2 = points[tri[2]];
@@ -2752,6 +2858,8 @@ verb.core.Tess.rationalCurveRegularSampleRange = function(curve,start,end,numSam
 	return p;
 };
 verb.core.Tess.rationalCurveAdaptiveSample = function(curve,tol,includeU) {
+	if(includeU == null) includeU = false;
+	if(tol == null) tol = 1e-6;
 	if(curve.degree == 1) {
 		if(!includeU) return curve.controlPoints.map(verb.core.Eval.dehomogenize); else {
 			var _g = [];
@@ -2781,7 +2889,7 @@ verb.core.Tess.rationalCurveAdaptiveSample_range = function(curve,start,end,tol,
 		return left_pts.slice(0,-1).concat(right_pts);
 	} else if(includeU) return [[start].concat(p1),[end].concat(p3)]; else return [p1,p3];
 };
-verb.core.Tess.rational_surface_naive = function(surface,divs_u,divs_v) {
+verb.core.Tess.rationalSurfaceNaive = function(surface,divs_u,divs_v) {
 	if(divs_u < 1) divs_u = 1;
 	if(divs_v < 1) divs_v = 1;
 	var degreeU = surface.degreeU;
@@ -2833,7 +2941,7 @@ verb.core.Tess.rational_surface_naive = function(surface,divs_u,divs_v) {
 	}
 	return new verb.core.types.MeshData(faces,points,normals,uvs);
 };
-verb.core.Tess.divide_rationalSurfaceAdaptive = function(surface,options) {
+verb.core.Tess.divideRationalSurfaceAdaptive = function(surface,options) {
 	if(options == null) options = new verb.core.types.AdaptiveRefinementOptions();
 	if(options.minDivsU != null) options.minDivsU = options.minDivsU; else options.minDivsU = 1;
 	if(options.minDivsV != null) options.minDivsU = options.minDivsV; else options.minDivsU = 1;
@@ -2913,7 +3021,7 @@ verb.core.Tess.west = function(index,i,j,divsU,divsV,divs) {
 	if(j == 0) return null;
 	return divs[index - 1];
 };
-verb.core.Tess.triangulate_adaptive_refinement_node_tree = function(arrTree) {
+verb.core.Tess.triangulateAdaptiveRefinementNodeTree = function(arrTree) {
 	var mesh = verb.core.types.MeshData.empty();
 	var _g = 0;
 	while(_g < arrTree.length) {
@@ -2925,8 +3033,8 @@ verb.core.Tess.triangulate_adaptive_refinement_node_tree = function(arrTree) {
 };
 verb.core.Tess.rationalSurfaceAdaptive = function(surface,options) {
 	if(options != null) options = options; else options = new verb.core.types.AdaptiveRefinementOptions();
-	var arrTrees = verb.core.Tess.divide_rationalSurfaceAdaptive(surface,options);
-	return verb.core.Tess.triangulate_adaptive_refinement_node_tree(arrTrees);
+	var arrTrees = verb.core.Tess.divideRationalSurfaceAdaptive(surface,options);
+	return verb.core.Tess.triangulateAdaptiveRefinementNodeTree(arrTrees);
 };
 verb.core.Trig = $hx_exports.core.Trig = function() { };
 verb.core.Trig.distToSegment = function(a,b,c) {
@@ -2957,7 +3065,7 @@ verb.core.Trig.threePointsAreFlat = function(p1,p2,p3,tol) {
 	var area = verb.core.Vec.dot(norm,norm);
 	return area < tol;
 };
-verb.core.Trig.closest_point_on_segment = function(pt,segpt0,segpt1,u0,u1) {
+verb.core.Trig.segmentClosestPoint = function(pt,segpt0,segpt1,u0,u1) {
 	var dif = verb.core.Vec.sub(segpt1,segpt0);
 	var l = verb.core.Vec.norm(dif);
 	if(l < verb.core.Constants.EPSILON) return { u : u0, pt : segpt0};
@@ -3613,6 +3721,11 @@ verb.core.types.SurfaceData = $hx_exports.core.SurfaceData = function(degreeU,de
 	this.knotsV = knotsV;
 	this.controlPoints = controlPoints;
 };
+verb.core.types.SurfaceData.prototype = {
+	get_foo: function() {
+		return this.foo;
+	}
+};
 verb.core.types.SurfacePoint = function(point,normal,uv,id,degen) {
 	if(degen == null) degen = false;
 	if(id == null) id = -1;
@@ -3645,6 +3758,69 @@ verb.core.types.VolumeData = $hx_exports.core.VolumeData = function(degreeU,degr
 	this.knotsV = knotsV;
 	this.knotsW = knotsW;
 	this.controlPoints = controlPoints;
+};
+verb.exe = {};
+verb.exe.Dispatcher = function() {
+	this._workerPool = new verb.exe.WorkerPool(verb.exe.Dispatcher.THREADS);
+};
+verb.exe.Dispatcher.instance = function() {
+	if(verb.exe.Dispatcher._instance == null) verb.exe.Dispatcher._instance = new verb.exe.Dispatcher();
+	return verb.exe.Dispatcher._instance;
+};
+verb.exe.Dispatcher.prototype = {
+	'eval': function(className,methodName,args,callback) {
+	}
+};
+verb.exe.Work = function(className,methodName,args) {
+	this.className = className;
+	this.methodName = methodName;
+	this.args = args;
+	this.id = verb.exe.Work.uuid++;
+};
+verb.exe.WorkerPool = function(numThreads,fileName) {
+	if(fileName == null) fileName = "verb.js";
+	this._callbacks = new haxe.ds.IntMap();
+	this._working = new haxe.ds.IntMap();
+	this._pool = [];
+	this._queue = [];
+	var _g = 0;
+	while(_g < numThreads) {
+		var i = _g++;
+		this._pool.push(new Worker("verb.js"));
+	}
+};
+verb.exe.WorkerPool.prototype = {
+	addWork: function(className,methodName,$arguments,callback) {
+		var work = new verb.exe.Work(className,methodName,$arguments);
+		this._callbacks.set(work.id,callback);
+		this._queue.push(work);
+		this.processQueue();
+	}
+	,processQueue: function() {
+		var _g = this;
+		while(this._queue.length > 0 && this._pool.length > 0) {
+			var work = this._queue.shift();
+			var workId = [work.id];
+			var worker = [this._pool.shift()];
+			this._working.set(workId[0],worker[0]);
+			worker[0].onmessage = (function(worker,workId) {
+				return function(e) {
+					_g._working.remove(workId[0]);
+					_g._pool.push(worker[0]);
+					try {
+						if(_g._callbacks.exists(workId[0])) {
+							(_g._callbacks.get(workId[0]))(e.data.result);
+							_g._callbacks.remove(workId[0]);
+						}
+					} catch( error ) {
+						console.log(error);
+					}
+					_g.processQueue();
+				};
+			})(worker,workId);
+			worker[0].postMessage(work);
+		}
+	}
 };
 function $iterator(o) { if( o instanceof Array ) return function() { return HxOverrides.iter(o); }; return typeof(o.iterator) == 'function' ? $bind(o,o.iterator) : o.iterator; }
 var $_, $fid = 0;
@@ -3685,5 +3861,7 @@ verb.core.Analyze.Cvalues = [[],[],[1.0,1.0],[0.88888888888888888888888888888888
 verb.core.Binomial.memo = new haxe.ds.IntMap();
 verb.core.Constants.TOLERANCE = 1e-6;
 verb.core.Constants.EPSILON = 1e-10;
+verb.exe.Dispatcher.THREADS = 8;
+verb.exe.Work.uuid = 0;
 verb.Init.main();
 })(typeof window != "undefined" ? window : exports);
