@@ -212,7 +212,11 @@ class Analyze {
 
     }
 
-    public static function rationalCurveClosestPoint( curve : CurveData, p : Point ) : Float {
+    public static function rationalCurveClosestPoint( curve : CurveData, p : Point ) : Point {
+        return Eval.rationalCurvePoint( curve, rationalCurveClosestParam(curve, p));
+    }
+
+    public static function rationalCurveClosestParam( curve : CurveData, p : Point ) : Float {
 
         //  We want to solve:
         //

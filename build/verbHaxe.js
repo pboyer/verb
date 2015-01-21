@@ -1,5 +1,7 @@
 (function ($hx_exports) { "use strict";
 $hx_exports.core = $hx_exports.core || {};
+$hx_exports.promhx = $hx_exports.promhx || {};
+var $estr = function() { return js.Boot.__string_rec(this,''); };
 function $extend(from, fields) {
 	function Inherit() {} Inherit.prototype = from; var proto = new Inherit();
 	for (var name in fields) proto[name] = fields[name];
@@ -8,6 +10,15 @@ function $extend(from, fields) {
 }
 var HxOverrides = function() { };
 HxOverrides.__name__ = ["HxOverrides"];
+HxOverrides.substr = function(s,pos,len) {
+	if(pos != null && pos != 0 && len != null && len < 0) return "";
+	if(len == null) len = s.length;
+	if(pos < 0) {
+		pos = s.length + pos;
+		if(pos < 0) pos = 0;
+	} else if(len < 0) len = s.length + len - pos;
+	return s.substr(pos,len);
+};
 HxOverrides.iter = function(a) {
 	return { cur : 0, arr : a, hasNext : function() {
 		return this.cur < this.arr.length;
@@ -25,9 +36,36 @@ Lambda.fold = function(it,f,first) {
 	}
 	return first;
 };
+var List = function() {
+	this.length = 0;
+};
+List.__name__ = ["List"];
+List.prototype = {
+	add: function(item) {
+		var x = [item];
+		if(this.h == null) this.h = x; else this.q[1] = x;
+		this.q = x;
+		this.length++;
+	}
+	,pop: function() {
+		if(this.h == null) return null;
+		var x = this.h[0];
+		this.h = this.h[1];
+		if(this.h == null) this.q = null;
+		this.length--;
+		return x;
+	}
+	,isEmpty: function() {
+		return this.h == null;
+	}
+};
 var IMap = function() { };
 IMap.__name__ = ["IMap"];
 Math.__name__ = ["Math"];
+var StringBuf = function() {
+	this.b = "";
+};
+StringBuf.__name__ = ["StringBuf"];
 var Type = function() { };
 Type.__name__ = ["Type"];
 Type.getClassName = function(c) {
@@ -35,6 +73,104 @@ Type.getClassName = function(c) {
 	return a.join(".");
 };
 var haxe = {};
+haxe.StackItem = { __constructs__ : ["CFunction","Module","FilePos","Method","LocalFunction"] };
+haxe.StackItem.CFunction = ["CFunction",0];
+haxe.StackItem.CFunction.toString = $estr;
+haxe.StackItem.CFunction.__enum__ = haxe.StackItem;
+haxe.StackItem.Module = function(m) { var $x = ["Module",1,m]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; };
+haxe.StackItem.FilePos = function(s,file,line) { var $x = ["FilePos",2,s,file,line]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; };
+haxe.StackItem.Method = function(classname,method) { var $x = ["Method",3,classname,method]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; };
+haxe.StackItem.LocalFunction = function(v) { var $x = ["LocalFunction",4,v]; $x.__enum__ = haxe.StackItem; $x.toString = $estr; return $x; };
+haxe.CallStack = function() { };
+haxe.CallStack.__name__ = ["haxe","CallStack"];
+haxe.CallStack.callStack = function() {
+	var oldValue = Error.prepareStackTrace;
+	Error.prepareStackTrace = function(error,callsites) {
+		var stack = [];
+		var _g = 0;
+		while(_g < callsites.length) {
+			var site = callsites[_g];
+			++_g;
+			var method = null;
+			var fullName = site.getFunctionName();
+			if(fullName != null) {
+				var idx = fullName.lastIndexOf(".");
+				if(idx >= 0) {
+					var className = HxOverrides.substr(fullName,0,idx);
+					var methodName = HxOverrides.substr(fullName,idx + 1,null);
+					method = haxe.StackItem.Method(className,methodName);
+				}
+			}
+			stack.push(haxe.StackItem.FilePos(method,site.getFileName(),site.getLineNumber()));
+		}
+		return stack;
+	};
+	var a = haxe.CallStack.makeStack(new Error().stack);
+	a.shift();
+	Error.prepareStackTrace = oldValue;
+	return a;
+};
+haxe.CallStack.toString = function(stack) {
+	var b = new StringBuf();
+	var _g = 0;
+	while(_g < stack.length) {
+		var s = stack[_g];
+		++_g;
+		b.b += "\nCalled from ";
+		haxe.CallStack.itemToString(b,s);
+	}
+	return b.b;
+};
+haxe.CallStack.itemToString = function(b,s) {
+	switch(s[1]) {
+	case 0:
+		b.b += "a C function";
+		break;
+	case 1:
+		var m = s[2];
+		b.b += "module ";
+		if(m == null) b.b += "null"; else b.b += "" + m;
+		break;
+	case 2:
+		var line = s[4];
+		var file = s[3];
+		var s1 = s[2];
+		if(s1 != null) {
+			haxe.CallStack.itemToString(b,s1);
+			b.b += " (";
+		}
+		if(file == null) b.b += "null"; else b.b += "" + file;
+		b.b += " line ";
+		if(line == null) b.b += "null"; else b.b += "" + line;
+		if(s1 != null) b.b += ")";
+		break;
+	case 3:
+		var meth = s[3];
+		var cname = s[2];
+		if(cname == null) b.b += "null"; else b.b += "" + cname;
+		b.b += ".";
+		if(meth == null) b.b += "null"; else b.b += "" + meth;
+		break;
+	case 4:
+		var n = s[2];
+		b.b += "local function #";
+		if(n == null) b.b += "null"; else b.b += "" + n;
+		break;
+	}
+};
+haxe.CallStack.makeStack = function(s) {
+	if(typeof(s) == "string") {
+		var stack = s.split("\n");
+		var m = [];
+		var _g = 0;
+		while(_g < stack.length) {
+			var line = stack[_g];
+			++_g;
+			m.push(haxe.StackItem.Module(line));
+		}
+		return m;
+	} else return s;
+};
 haxe.ds = {};
 haxe.ds.IntMap = function() {
 	this.h = { };
@@ -57,7 +193,557 @@ haxe.ds.IntMap.prototype = {
 		return true;
 	}
 };
+haxe.ds.Option = { __constructs__ : ["Some","None"] };
+haxe.ds.Option.Some = function(v) { var $x = ["Some",0,v]; $x.__enum__ = haxe.ds.Option; $x.toString = $estr; return $x; };
+haxe.ds.Option.None = ["None",1];
+haxe.ds.Option.None.toString = $estr;
+haxe.ds.Option.None.__enum__ = haxe.ds.Option;
+var promhx = {};
+promhx.base = {};
+promhx.base.AsyncBase = function(d) {
+	this._resolved = false;
+	this._pending = false;
+	this._errorPending = false;
+	this._fulfilled = false;
+	this._update = [];
+	this._error = [];
+	this._errored = false;
+	if(d != null) promhx.base.AsyncBase.link(d,this,function(x) {
+		return x;
+	});
+};
+promhx.base.AsyncBase.__name__ = ["promhx","base","AsyncBase"];
+promhx.base.AsyncBase.link = function(current,next,f) {
+	current._update.push({ async : next, linkf : function(x) {
+		next.handleResolve(f(x));
+	}});
+	promhx.base.AsyncBase.immediateLinkUpdate(current,next,f);
+};
+promhx.base.AsyncBase.immediateLinkUpdate = function(current,next,f) {
+	if(current._errored) next.handleError(current._errorVal);
+	if(current._resolved && !current._pending) try {
+		next.handleResolve(f(current._val));
+	} catch( e ) {
+		next.handleError(e);
+	}
+};
+promhx.base.AsyncBase.linkAll = function(all,next) {
+	var cthen = function(arr,current,v) {
+		if(arr.length == 0 || promhx.base.AsyncBase.allFulfilled(arr)) {
+			var vals;
+			var _g = [];
+			var $it0 = $iterator(all)();
+			while( $it0.hasNext() ) {
+				var a = $it0.next();
+				_g.push(a == current?v:a._val);
+			}
+			vals = _g;
+			next.handleResolve(vals);
+		}
+		return null;
+	};
+	var $it1 = $iterator(all)();
+	while( $it1.hasNext() ) {
+		var a1 = $it1.next();
+		a1._update.push({ async : next, linkf : (function(f,a11,a2) {
+			return function(v1) {
+				return f(a11,a2,v1);
+			};
+		})(cthen,(function($this) {
+			var $r;
+			var _g1 = [];
+			var $it2 = $iterator(all)();
+			while( $it2.hasNext() ) {
+				var a21 = $it2.next();
+				if(a21 != a1) _g1.push(a21);
+			}
+			$r = _g1;
+			return $r;
+		}(this)),a1)});
+	}
+	if(promhx.base.AsyncBase.allFulfilled(all)) next.handleResolve((function($this) {
+		var $r;
+		var _g2 = [];
+		var $it3 = $iterator(all)();
+		while( $it3.hasNext() ) {
+			var a3 = $it3.next();
+			_g2.push(a3._val);
+		}
+		$r = _g2;
+		return $r;
+	}(this)));
+};
+promhx.base.AsyncBase.pipeLink = function(current,ret,f) {
+	var linked = false;
+	var linkf = function(x) {
+		if(!linked) {
+			linked = true;
+			var pipe_ret = f(x);
+			pipe_ret._update.push({ async : ret, linkf : $bind(ret,ret.handleResolve)});
+			promhx.base.AsyncBase.immediateLinkUpdate(pipe_ret,ret,function(x1) {
+				return x1;
+			});
+		}
+	};
+	current._update.push({ async : ret, linkf : linkf});
+	if(current._resolved && !current._pending) try {
+		linkf(current._val);
+	} catch( e ) {
+		ret.handleError(e);
+	}
+};
+promhx.base.AsyncBase.allResolved = function($as) {
+	var $it0 = $iterator($as)();
+	while( $it0.hasNext() ) {
+		var a = $it0.next();
+		if(!a._resolved) return false;
+	}
+	return true;
+};
+promhx.base.AsyncBase.allFulfilled = function($as) {
+	var $it0 = $iterator($as)();
+	while( $it0.hasNext() ) {
+		var a = $it0.next();
+		if(!a._fulfilled) return false;
+	}
+	return true;
+};
+promhx.base.AsyncBase.prototype = {
+	catchError: function(f) {
+		this._error.push(f);
+		return this;
+	}
+	,errorThen: function(f) {
+		this._errorMap = f;
+		return this;
+	}
+	,isResolved: function() {
+		return this._resolved;
+	}
+	,isErrored: function() {
+		return this._errored;
+	}
+	,isFulfilled: function() {
+		return this._fulfilled;
+	}
+	,isPending: function() {
+		return this._pending;
+	}
+	,handleResolve: function(val) {
+		this._resolve(val);
+	}
+	,_resolve: function(val) {
+		var _g = this;
+		if(this._pending) promhx.base.EventLoop.enqueue((function(f,a1) {
+			return function() {
+				return f(a1);
+			};
+		})($bind(this,this._resolve),val)); else {
+			this._resolved = true;
+			this._pending = true;
+			promhx.base.EventLoop.queue.add(function() {
+				_g._val = val;
+				var _g1 = 0;
+				var _g2 = _g._update;
+				while(_g1 < _g2.length) {
+					var up = _g2[_g1];
+					++_g1;
+					try {
+						up.linkf(val);
+					} catch( e ) {
+						up.async.handleError(e);
+					}
+				}
+				_g._fulfilled = true;
+				_g._pending = false;
+			});
+			promhx.base.EventLoop.continueOnNextLoop();
+		}
+	}
+	,handleError: function(error) {
+		this._handleError(error);
+	}
+	,_handleError: function(error) {
+		var _g = this;
+		var update_errors = function(e) {
+			if(_g._error.length > 0) {
+				var _g1 = 0;
+				var _g2 = _g._error;
+				while(_g1 < _g2.length) {
+					var ef = _g2[_g1];
+					++_g1;
+					ef(e);
+				}
+			} else if(_g._update.length > 0) {
+				var _g11 = 0;
+				var _g21 = _g._update;
+				while(_g11 < _g21.length) {
+					var up = _g21[_g11];
+					++_g11;
+					up.async.handleError(e);
+				}
+			} else {
+				console.log("Call Stack: " + haxe.CallStack.toString(haxe.CallStack.callStack()));
+				throw e;
+			}
+			_g._errorPending = false;
+		};
+		if(!this._errorPending) {
+			this._errorPending = true;
+			this._errored = true;
+			this._errorVal = error;
+			promhx.base.EventLoop.queue.add(function() {
+				if(_g._errorMap != null) try {
+					_g._resolve(_g._errorMap(error));
+				} catch( e1 ) {
+					update_errors(e1);
+				} else update_errors(error);
+			});
+			promhx.base.EventLoop.continueOnNextLoop();
+		}
+	}
+	,then: function(f) {
+		var ret = new promhx.base.AsyncBase();
+		promhx.base.AsyncBase.link(this,ret,f);
+		return ret;
+	}
+	,unlink: function(to) {
+		var _g = this;
+		promhx.base.EventLoop.queue.add(function() {
+			_g._update = _g._update.filter(function(x) {
+				return x.async != to;
+			});
+		});
+		promhx.base.EventLoop.continueOnNextLoop();
+	}
+	,isLinked: function(to) {
+		var updated = false;
+		var _g = 0;
+		var _g1 = this._update;
+		while(_g < _g1.length) {
+			var u = _g1[_g];
+			++_g;
+			if(u.async == to) return true;
+		}
+		return updated;
+	}
+};
+promhx.Deferred = $hx_exports.promhx.Deferred = function() {
+	promhx.base.AsyncBase.call(this);
+};
+promhx.Deferred.__name__ = ["promhx","Deferred"];
+promhx.Deferred.__super__ = promhx.base.AsyncBase;
+promhx.Deferred.prototype = $extend(promhx.base.AsyncBase.prototype,{
+	resolve: function(val) {
+		this.handleResolve(val);
+	}
+	,throwError: function(e) {
+		this.handleError(e);
+	}
+	,promise: function() {
+		return new promhx.Promise(this);
+	}
+	,stream: function() {
+		return new promhx.Stream(this);
+	}
+	,publicStream: function() {
+		return new promhx.PublicStream(this);
+	}
+});
+promhx.Promise = $hx_exports.promhx.Promise = function(d) {
+	promhx.base.AsyncBase.call(this,d);
+	this._rejected = false;
+};
+promhx.Promise.__name__ = ["promhx","Promise"];
+promhx.Promise.whenAll = function(itb) {
+	var ret = new promhx.Promise();
+	promhx.base.AsyncBase.linkAll(itb,ret);
+	return ret;
+};
+promhx.Promise.promise = function(_val) {
+	var ret = new promhx.Promise();
+	ret.handleResolve(_val);
+	return ret;
+};
+promhx.Promise.__super__ = promhx.base.AsyncBase;
+promhx.Promise.prototype = $extend(promhx.base.AsyncBase.prototype,{
+	isRejected: function() {
+		return this._rejected;
+	}
+	,reject: function(e) {
+		this._rejected = true;
+		this.handleError(e);
+	}
+	,handleResolve: function(val) {
+		if(this._resolved) {
+			var msg = "Promise has already been resolved";
+			throw promhx.error.PromiseError.AlreadyResolved(msg);
+		}
+		this._resolve(val);
+	}
+	,then: function(f) {
+		var ret = new promhx.Promise();
+		promhx.base.AsyncBase.link(this,ret,f);
+		return ret;
+	}
+	,unlink: function(to) {
+		var _g = this;
+		promhx.base.EventLoop.queue.add(function() {
+			if(!_g._fulfilled) {
+				var msg = "Downstream Promise is not fullfilled";
+				_g.handleError(promhx.error.PromiseError.DownstreamNotFullfilled(msg));
+			} else _g._update = _g._update.filter(function(x) {
+				return x.async != to;
+			});
+		});
+		promhx.base.EventLoop.continueOnNextLoop();
+	}
+	,handleError: function(error) {
+		this._rejected = true;
+		this._handleError(error);
+	}
+	,pipe: function(f) {
+		var ret = new promhx.Promise();
+		promhx.base.AsyncBase.pipeLink(this,ret,f);
+		return ret;
+	}
+	,errorPipe: function(f) {
+		var ret = new promhx.Promise();
+		this.catchError(function(e) {
+			var piped = f(e);
+			piped.then($bind(ret,ret._resolve));
+		});
+		this.then($bind(ret,ret._resolve));
+		return ret;
+	}
+});
+promhx.Stream = $hx_exports.promhx.Stream = function(d) {
+	promhx.base.AsyncBase.call(this,d);
+	this._end_deferred = new promhx.Deferred();
+	this._end_promise = this._end_deferred.promise();
+};
+promhx.Stream.__name__ = ["promhx","Stream"];
+promhx.Stream.foreach = function(itb) {
+	var s = new promhx.Stream();
+	var $it0 = $iterator(itb)();
+	while( $it0.hasNext() ) {
+		var i = $it0.next();
+		s.handleResolve(i);
+	}
+	s.end();
+	return s;
+};
+promhx.Stream.wheneverAll = function(itb) {
+	var ret = new promhx.Stream();
+	promhx.base.AsyncBase.linkAll(itb,ret);
+	return ret;
+};
+promhx.Stream.concatAll = function(itb) {
+	var ret = new promhx.Stream();
+	var $it0 = $iterator(itb)();
+	while( $it0.hasNext() ) {
+		var i = $it0.next();
+		ret.concat(i);
+	}
+	return ret;
+};
+promhx.Stream.mergeAll = function(itb) {
+	var ret = new promhx.Stream();
+	var $it0 = $iterator(itb)();
+	while( $it0.hasNext() ) {
+		var i = $it0.next();
+		ret.merge(i);
+	}
+	return ret;
+};
+promhx.Stream.stream = function(_val) {
+	var ret = new promhx.Stream();
+	ret.handleResolve(_val);
+	return ret;
+};
+promhx.Stream.__super__ = promhx.base.AsyncBase;
+promhx.Stream.prototype = $extend(promhx.base.AsyncBase.prototype,{
+	then: function(f) {
+		var ret = new promhx.Stream();
+		promhx.base.AsyncBase.link(this,ret,f);
+		this._end_promise.then(function(x) {
+			ret.end();
+		});
+		return ret;
+	}
+	,detachStream: function(str) {
+		var filtered = [];
+		var removed = false;
+		var _g = 0;
+		var _g1 = this._update;
+		while(_g < _g1.length) {
+			var u = _g1[_g];
+			++_g;
+			if(u.async == str) removed = true; else filtered.push(u);
+		}
+		this._update = filtered;
+		return removed;
+	}
+	,first: function() {
+		var s = new promhx.Promise();
+		this.then(function(x) {
+			if(!s._resolved) s.handleResolve(x);
+		});
+		return s;
+	}
+	,handleResolve: function(val) {
+		if(!this._end && !this._pause) this._resolve(val);
+	}
+	,pause: function(set) {
+		if(set == null) set = !this._pause;
+		this._pause = set;
+	}
+	,pipe: function(f) {
+		var ret = new promhx.Stream();
+		promhx.base.AsyncBase.pipeLink(this,ret,f);
+		this._end_promise.then(function(x) {
+			ret.end();
+		});
+		return ret;
+	}
+	,errorPipe: function(f) {
+		var ret = new promhx.Stream();
+		this.catchError(function(e) {
+			var piped = f(e);
+			piped.then($bind(ret,ret._resolve));
+			piped._end_promise.then(($_=ret._end_promise,$bind($_,$_._resolve)));
+		});
+		this.then($bind(ret,ret._resolve));
+		this._end_promise.then(function(x) {
+			ret.end();
+		});
+		return ret;
+	}
+	,handleEnd: function() {
+		if(this._pending) {
+			promhx.base.EventLoop.queue.add($bind(this,this.handleEnd));
+			promhx.base.EventLoop.continueOnNextLoop();
+		} else if(this._end_promise._resolved) return; else {
+			this._end = true;
+			var o;
+			if(this._resolved) o = haxe.ds.Option.Some(this._val); else o = haxe.ds.Option.None;
+			this._end_promise.handleResolve(o);
+			this._update = [];
+			this._error = [];
+		}
+	}
+	,end: function() {
+		promhx.base.EventLoop.queue.add($bind(this,this.handleEnd));
+		promhx.base.EventLoop.continueOnNextLoop();
+		return this;
+	}
+	,endThen: function(f) {
+		return this._end_promise.then(f);
+	}
+	,filter: function(f) {
+		var ret = new promhx.Stream();
+		this._update.push({ async : ret, linkf : function(x) {
+			if(f(x)) ret.handleResolve(x);
+		}});
+		promhx.base.AsyncBase.immediateLinkUpdate(this,ret,function(x1) {
+			return x1;
+		});
+		return ret;
+	}
+	,concat: function(s) {
+		var ret = new promhx.Stream();
+		this._update.push({ async : ret, linkf : $bind(ret,ret.handleResolve)});
+		promhx.base.AsyncBase.immediateLinkUpdate(this,ret,function(x) {
+			return x;
+		});
+		this._end_promise.then(function(_) {
+			s.pipe(function(x1) {
+				ret.handleResolve(x1);
+				return ret;
+			});
+			s._end_promise.then(function(_1) {
+				ret.end();
+			});
+		});
+		return ret;
+	}
+	,merge: function(s) {
+		var ret = new promhx.Stream();
+		this._update.push({ async : ret, linkf : $bind(ret,ret.handleResolve)});
+		s._update.push({ async : ret, linkf : $bind(ret,ret.handleResolve)});
+		promhx.base.AsyncBase.immediateLinkUpdate(this,ret,function(x) {
+			return x;
+		});
+		promhx.base.AsyncBase.immediateLinkUpdate(s,ret,function(x1) {
+			return x1;
+		});
+		return ret;
+	}
+});
+promhx.PublicStream = $hx_exports.promhx.PublicStream = function(def) {
+	promhx.Stream.call(this,def);
+};
+promhx.PublicStream.__name__ = ["promhx","PublicStream"];
+promhx.PublicStream.publicstream = function(val) {
+	var ps = new promhx.PublicStream();
+	ps.handleResolve(val);
+	return ps;
+};
+promhx.PublicStream.__super__ = promhx.Stream;
+promhx.PublicStream.prototype = $extend(promhx.Stream.prototype,{
+	resolve: function(val) {
+		this.handleResolve(val);
+	}
+	,throwError: function(e) {
+		this.handleError(e);
+	}
+	,update: function(val) {
+		this.handleResolve(val);
+	}
+});
+promhx.base.EventLoop = function() { };
+promhx.base.EventLoop.__name__ = ["promhx","base","EventLoop"];
+promhx.base.EventLoop.enqueue = function(eqf) {
+	promhx.base.EventLoop.queue.add(eqf);
+	promhx.base.EventLoop.continueOnNextLoop();
+};
+promhx.base.EventLoop.set_nextLoop = function(f) {
+	if(promhx.base.EventLoop.nextLoop != null) throw "nextLoop has already been set"; else promhx.base.EventLoop.nextLoop = f;
+	return promhx.base.EventLoop.nextLoop;
+};
+promhx.base.EventLoop.queueEmpty = function() {
+	return promhx.base.EventLoop.queue.isEmpty();
+};
+promhx.base.EventLoop.finish = function(max_iterations) {
+	if(max_iterations == null) max_iterations = 1000;
+	var fn = null;
+	while(max_iterations-- > 0 && (fn = promhx.base.EventLoop.queue.pop()) != null) fn();
+	return promhx.base.EventLoop.queue.isEmpty();
+};
+promhx.base.EventLoop.clear = function() {
+	promhx.base.EventLoop.queue = new List();
+};
+promhx.base.EventLoop.f = function() {
+	var fn = promhx.base.EventLoop.queue.pop();
+	if(fn != null) fn();
+	if(!promhx.base.EventLoop.queue.isEmpty()) promhx.base.EventLoop.continueOnNextLoop();
+};
+promhx.base.EventLoop.continueOnNextLoop = function() {
+	if(promhx.base.EventLoop.nextLoop != null) promhx.base.EventLoop.nextLoop(promhx.base.EventLoop.f); else setImmediate(promhx.base.EventLoop.f);
+};
+promhx.error = {};
+promhx.error.PromiseError = { __constructs__ : ["AlreadyResolved","DownstreamNotFullfilled"] };
+promhx.error.PromiseError.AlreadyResolved = function(message) { var $x = ["AlreadyResolved",0,message]; $x.__enum__ = promhx.error.PromiseError; $x.toString = $estr; return $x; };
+promhx.error.PromiseError.DownstreamNotFullfilled = function(message) { var $x = ["DownstreamNotFullfilled",1,message]; $x.__enum__ = promhx.error.PromiseError; $x.toString = $estr; return $x; };
 var verb = {};
+verb.exe = {};
+verb.exe.AsyncObject = function() { };
+verb.exe.AsyncObject.__name__ = ["verb","exe","AsyncObject"];
+verb.exe.AsyncObject.prototype = {
+	applyMethod: function(classType,methodName,args) {
+		return verb.exe.Dispatcher.instance().applyMethod(Type.getClassName(classType),methodName,args);
+	}
+};
 verb.NurbsCurve = $hx_exports.NurbsCurve = function(data) {
 	this._data = data;
 };
@@ -65,7 +751,8 @@ verb.NurbsCurve.__name__ = ["verb","NurbsCurve"];
 verb.NurbsCurve.byControlPointsWeights = function(degree,knots,controlPoints,weights) {
 	return new verb.NurbsCurve(new verb.core.types.CurveData(degree,knots.slice(),verb.core.Eval.homogenize1d(controlPoints,weights)));
 };
-verb.NurbsCurve.prototype = {
+verb.NurbsCurve.__super__ = verb.exe.AsyncObject;
+verb.NurbsCurve.prototype = $extend(verb.exe.AsyncObject.prototype,{
 	data: function() {
 		return new verb.core.types.CurveData(this.degree(),this.knots(),verb.core.Eval.homogenize1d(this.controlPoints(),this.weights()));
 	}
@@ -84,40 +771,66 @@ verb.NurbsCurve.prototype = {
 	,point: function(u) {
 		return verb.core.Eval.rationalCurvePoint(this._data,u);
 	}
-	,pointAsync: function(u,callback) {
-		return verb.exe.Dispatcher.instance()["eval"](Type.getClassName(verb.core.Eval),"rationalCurvePoint",[this._data,u],callback);
+	,pointAsync: function(u) {
+		return this.applyMethod(verb.core.Eval,"rationalCurvePoint",[this._data,u]);
 	}
-	,derivatives: function(u,numDerivatives) {
-		if(numDerivatives == null) numDerivatives = 1;
-		return verb.core.Eval.rationalCurveDerivatives(this._data,u,numDerivatives);
+	,derivatives: function(u,numDerivs) {
+		if(numDerivs == null) numDerivs = 1;
+		return verb.core.Eval.rationalCurveDerivatives(this._data,u,numDerivs);
+	}
+	,derivativesAsync: function(u,numDerivs) {
+		if(numDerivs == null) numDerivs = 1;
+		return this.applyMethod(verb.core.Eval,"rationalCurveDerivatives",[this._data,u,numDerivs]);
 	}
 	,closestPoint: function(pt) {
-		return this.point(this.closestParam(pt));
+		return verb.core.Analyze.rationalCurveClosestPoint(this._data,pt);
+	}
+	,closestPointAsync: function(pt) {
+		return this.applyMethod(verb.core.Analyze,"rationalCurveClosestPoint",[this._data,pt]);
 	}
 	,closestParam: function(pt) {
-		return verb.core.Analyze.rationalCurveClosestPoint(this._data,pt);
+		return verb.core.Analyze.rationalCurveClosestParam(this._data,pt);
+	}
+	,closestParamAsync: function(pt) {
+		return this.applyMethod(verb.core.Analyze,"rationalCurveClosestParam",[this._data,pt]);
 	}
 	,length: function() {
 		return verb.core.Analyze.rationalCurveArcLength(this._data);
 	}
+	,lengthAsync: function() {
+		return this.applyMethod(verb.core.Analyze,"rationalCurveArcLength",[this._data]);
+	}
 	,lengthAtParam: function(u) {
 		return verb.core.Analyze.rationalCurveArcLength(this._data,u);
+	}
+	,lengthAtParamAsync: function() {
+		return this.applyMethod(verb.core.Analyze,"rationalCurveArcLength",[this._data]);
 	}
 	,paramAtLength: function(len,tolerance) {
 		return verb.core.Analyze.rationalCurveParamAtArcLength(this._data,len,tolerance);
 	}
+	,paramAtLengthAsync: function(len,tolerance) {
+		return this.applyMethod(verb.core.Analyze,"rationalCurveParamAtArcLength",[this._data,len,tolerance]);
+	}
 	,divideByEqualArcLength: function(divisions) {
-		return verb.core.Divide.rationalCurveEquallyByArcLength(this._data,divisions);
+		return verb.core.Divide.rationalCurveByEqualArcLength(this._data,divisions);
+	}
+	,divideByEqualArcLengthAsync: function(divisions) {
+		return this.applyMethod(verb.core.Divide,"rationalCurveByEqualArcLength",[this._data,divisions]);
 	}
 	,divideByArcLength: function(arcLength) {
 		return verb.core.Divide.rationalCurveByArcLength(this._data,arcLength);
 	}
+	,divideByArcLengthAsync: function(divisions) {
+		return this.applyMethod(verb.core.Divide,"rationalCurveByArcLength",[this._data,divisions]);
+	}
 	,tessellate: function(tolerance) {
 		return verb.core.Tess.rationalCurveAdaptiveSample(this._data,tolerance,false);
 	}
+	,tessellateAsync: function(tolerance) {
+		return this.applyMethod(verb.core.Tess,"rationalCurveAdaptiveSample",[this._data,tolerance,false]);
+	}
 	,split: function(u) {
-		var domain = this.domain();
-		if(u <= domain.min || u >= domain.max) throw "Cannot split outside of the domain of the curve!";
 		return verb.core.Modify.curveSplit(this._data,u).map(function(x) {
 			return new verb.NurbsCurve(x);
 		});
@@ -140,7 +853,7 @@ verb.NurbsCurve.prototype = {
 	,clone: function() {
 		return new verb.NurbsCurve(this._data);
 	}
-};
+});
 verb.Arc = $hx_exports.Arc = function(center,xaxis,yaxis,radius,minAngle,maxAngle) {
 	verb.NurbsCurve.call(this,verb.core.Make.arc(center,xaxis,yaxis,radius,minAngle,maxAngle));
 	this._center = center;
@@ -290,6 +1003,24 @@ verb.Init.__name__ = ["verb","Init"];
 verb.Init.main = function() {
 	console.log("verb 0.2.0");
 };
+verb.Line = $hx_exports.Line = function(start,end) {
+	verb.NurbsCurve.call(this,verb.core.Make.polyline([start,end]));
+	this._start = start;
+	this._end = end;
+};
+verb.Line.__name__ = ["verb","Line"];
+verb.Line.byEnds = function(start,end) {
+	return new verb.Line(start,end);
+};
+verb.Line.__super__ = verb.NurbsCurve;
+verb.Line.prototype = $extend(verb.NurbsCurve.prototype,{
+	start: function() {
+		return this._start;
+	}
+	,end: function() {
+		return this._end;
+	}
+});
 verb.core = {};
 verb.core.Analyze = $hx_exports.core.Analyze = function() { };
 verb.core.Analyze.__name__ = ["verb","core","Analyze"];
@@ -380,6 +1111,9 @@ verb.core.Analyze.rationalSurfaceClosestPoint = function(surface,p) {
 	return cuv;
 };
 verb.core.Analyze.rationalCurveClosestPoint = function(curve,p) {
+	return verb.core.Eval.rationalCurvePoint(curve,verb.core.Analyze.rationalCurveClosestParam(curve,p));
+};
+verb.core.Analyze.rationalCurveClosestParam = function(curve,p) {
 	var tol = 1.0e-3;
 	var min = Math.POSITIVE_INFINITY;
 	var u = 0.0;
@@ -613,7 +1347,7 @@ verb.core.Constants = $hx_exports.core.Constants = function() { };
 verb.core.Constants.__name__ = ["verb","core","Constants"];
 verb.core.Divide = $hx_exports.core.Divide = function() { };
 verb.core.Divide.__name__ = ["verb","core","Divide"];
-verb.core.Divide.rationalCurveEquallyByArcLength = function(curve,num) {
+verb.core.Divide.rationalCurveByEqualArcLength = function(curve,num) {
 	var tlen = verb.core.Analyze.rationalCurveArcLength(curve);
 	var inc = tlen / num;
 	return verb.core.Divide.rationalCurveByArcLength(curve,inc);
@@ -1877,7 +2611,7 @@ verb.core.Make.ellipseArc = function(center,xaxis,yaxis,xradius,yradius,startAng
 verb.core.Make.arc = function(center,xaxis,yaxis,radius,start_angle,end_angle) {
 	return verb.core.Make.ellipseArc(center,xaxis,yaxis,radius,radius,start_angle,end_angle);
 };
-verb.core.Make.polylineCurve = function(pts) {
+verb.core.Make.polyline = function(pts) {
 	var knots = [0.0,0.0];
 	var lsum = 0.0;
 	var _g1 = 0;
@@ -3830,7 +4564,6 @@ verb.core.types.VolumeData = $hx_exports.core.VolumeData = function(degreeU,degr
 	this.controlPoints = controlPoints;
 };
 verb.core.types.VolumeData.__name__ = ["verb","core","types","VolumeData"];
-verb.exe = {};
 verb.exe.Dispatcher = function() {
 	this._workerPool = new verb.exe.WorkerPool(verb.exe.Dispatcher.THREADS);
 };
@@ -3840,8 +4573,13 @@ verb.exe.Dispatcher.instance = function() {
 	return verb.exe.Dispatcher._instance;
 };
 verb.exe.Dispatcher.prototype = {
-	'eval': function(className,methodName,args,callback) {
+	applyMethod: function(className,methodName,args) {
+		var def = new promhx.Deferred();
+		var callback = function(x) {
+			def.resolve(x);
+		};
 		this._workerPool.addWork(className,methodName,args,callback);
+		return new promhx.Promise(def);
 	}
 };
 verb.exe.Work = function(className,methodName,args) {
@@ -3932,6 +4670,7 @@ if(Array.prototype.filter == null) Array.prototype.filter = function(f1) {
 	}
 	return a1;
 };
+promhx.base.EventLoop.queue = new List();
 verb.BoundingBox.TOLERANCE = 1e-4;
 verb.core.Analyze.Tvalues = [[],[],[-0.5773502691896257645091487805019574556476,0.5773502691896257645091487805019574556476],[0,-0.7745966692414833770358530799564799221665,0.7745966692414833770358530799564799221665],[-0.3399810435848562648026657591032446872005,0.3399810435848562648026657591032446872005,-0.8611363115940525752239464888928095050957,0.8611363115940525752239464888928095050957],[0,-0.5384693101056830910363144207002088049672,0.5384693101056830910363144207002088049672,-0.9061798459386639927976268782993929651256,0.9061798459386639927976268782993929651256],[0.6612093864662645136613995950199053470064,-0.6612093864662645136613995950199053470064,-0.2386191860831969086305017216807119354186,0.2386191860831969086305017216807119354186,-0.9324695142031520278123015544939946091347,0.9324695142031520278123015544939946091347],[0,0.4058451513773971669066064120769614633473,-0.4058451513773971669066064120769614633473,-0.7415311855993944398638647732807884070741,0.7415311855993944398638647732807884070741,-0.9491079123427585245261896840478512624007,0.9491079123427585245261896840478512624007],[-0.1834346424956498049394761423601839806667,0.1834346424956498049394761423601839806667,-0.5255324099163289858177390491892463490419,0.5255324099163289858177390491892463490419,-0.7966664774136267395915539364758304368371,0.7966664774136267395915539364758304368371,-0.9602898564975362316835608685694729904282,0.9602898564975362316835608685694729904282],[0,-0.8360311073266357942994297880697348765441,0.8360311073266357942994297880697348765441,-0.9681602395076260898355762029036728700494,0.9681602395076260898355762029036728700494,-0.3242534234038089290385380146433366085719,0.3242534234038089290385380146433366085719,-0.6133714327005903973087020393414741847857,0.6133714327005903973087020393414741847857],[-0.1488743389816312108848260011297199846175,0.1488743389816312108848260011297199846175,-0.4333953941292471907992659431657841622000,0.4333953941292471907992659431657841622000,-0.6794095682990244062343273651148735757692,0.6794095682990244062343273651148735757692,-0.8650633666889845107320966884234930485275,0.8650633666889845107320966884234930485275,-0.9739065285171717200779640120844520534282,0.9739065285171717200779640120844520534282],[0,-0.2695431559523449723315319854008615246796,0.2695431559523449723315319854008615246796,-0.5190961292068118159257256694586095544802,0.5190961292068118159257256694586095544802,-0.7301520055740493240934162520311534580496,0.7301520055740493240934162520311534580496,-0.8870625997680952990751577693039272666316,0.8870625997680952990751577693039272666316,-0.9782286581460569928039380011228573907714,0.9782286581460569928039380011228573907714],[-0.1252334085114689154724413694638531299833,0.1252334085114689154724413694638531299833,-0.3678314989981801937526915366437175612563,0.3678314989981801937526915366437175612563,-0.5873179542866174472967024189405342803690,0.5873179542866174472967024189405342803690,-0.7699026741943046870368938332128180759849,0.7699026741943046870368938332128180759849,-0.9041172563704748566784658661190961925375,0.9041172563704748566784658661190961925375,-0.9815606342467192506905490901492808229601,0.9815606342467192506905490901492808229601],[0,-0.2304583159551347940655281210979888352115,0.2304583159551347940655281210979888352115,-0.4484927510364468528779128521276398678019,0.4484927510364468528779128521276398678019,-0.6423493394403402206439846069955156500716,0.6423493394403402206439846069955156500716,-0.8015780907333099127942064895828598903056,0.8015780907333099127942064895828598903056,-0.9175983992229779652065478365007195123904,0.9175983992229779652065478365007195123904,-0.9841830547185881494728294488071096110649,0.9841830547185881494728294488071096110649],[-0.1080549487073436620662446502198347476119,0.1080549487073436620662446502198347476119,-0.3191123689278897604356718241684754668342,0.3191123689278897604356718241684754668342,-0.5152486363581540919652907185511886623088,0.5152486363581540919652907185511886623088,-0.6872929048116854701480198030193341375384,0.6872929048116854701480198030193341375384,-0.8272013150697649931897947426503949610397,0.8272013150697649931897947426503949610397,-0.9284348836635735173363911393778742644770,0.9284348836635735173363911393778742644770,-0.9862838086968123388415972667040528016760,0.9862838086968123388415972667040528016760],[0,-0.2011940939974345223006283033945962078128,0.2011940939974345223006283033945962078128,-0.3941513470775633698972073709810454683627,0.3941513470775633698972073709810454683627,-0.5709721726085388475372267372539106412383,0.5709721726085388475372267372539106412383,-0.7244177313601700474161860546139380096308,0.7244177313601700474161860546139380096308,-0.8482065834104272162006483207742168513662,0.8482065834104272162006483207742168513662,-0.9372733924007059043077589477102094712439,0.9372733924007059043077589477102094712439,-0.9879925180204854284895657185866125811469,0.9879925180204854284895657185866125811469],[-0.0950125098376374401853193354249580631303,0.0950125098376374401853193354249580631303,-0.2816035507792589132304605014604961064860,0.2816035507792589132304605014604961064860,-0.4580167776572273863424194429835775735400,0.4580167776572273863424194429835775735400,-0.6178762444026437484466717640487910189918,0.6178762444026437484466717640487910189918,-0.7554044083550030338951011948474422683538,0.7554044083550030338951011948474422683538,-0.8656312023878317438804678977123931323873,0.8656312023878317438804678977123931323873,-0.9445750230732325760779884155346083450911,0.9445750230732325760779884155346083450911,-0.9894009349916499325961541734503326274262,0.9894009349916499325961541734503326274262],[0,-0.1784841814958478558506774936540655574754,0.1784841814958478558506774936540655574754,-0.3512317634538763152971855170953460050405,0.3512317634538763152971855170953460050405,-0.5126905370864769678862465686295518745829,0.5126905370864769678862465686295518745829,-0.6576711592166907658503022166430023351478,0.6576711592166907658503022166430023351478,-0.7815140038968014069252300555204760502239,0.7815140038968014069252300555204760502239,-0.8802391537269859021229556944881556926234,0.8802391537269859021229556944881556926234,-0.9506755217687677612227169578958030214433,0.9506755217687677612227169578958030214433,-0.9905754753144173356754340199406652765077,0.9905754753144173356754340199406652765077],[-0.0847750130417353012422618529357838117333,0.0847750130417353012422618529357838117333,-0.2518862256915055095889728548779112301628,0.2518862256915055095889728548779112301628,-0.4117511614628426460359317938330516370789,0.4117511614628426460359317938330516370789,-0.5597708310739475346078715485253291369276,0.5597708310739475346078715485253291369276,-0.6916870430603532078748910812888483894522,0.6916870430603532078748910812888483894522,-0.8037049589725231156824174550145907971032,0.8037049589725231156824174550145907971032,-0.8926024664975557392060605911271455154078,0.8926024664975557392060605911271455154078,-0.9558239495713977551811958929297763099728,0.9558239495713977551811958929297763099728,-0.9915651684209309467300160047061507702525,0.9915651684209309467300160047061507702525],[0,-0.1603586456402253758680961157407435495048,0.1603586456402253758680961157407435495048,-0.3165640999636298319901173288498449178922,0.3165640999636298319901173288498449178922,-0.4645707413759609457172671481041023679762,0.4645707413759609457172671481041023679762,-0.6005453046616810234696381649462392798683,0.6005453046616810234696381649462392798683,-0.7209661773352293786170958608237816296571,0.7209661773352293786170958608237816296571,-0.8227146565371428249789224867127139017745,0.8227146565371428249789224867127139017745,-0.9031559036148179016426609285323124878093,0.9031559036148179016426609285323124878093,-0.9602081521348300308527788406876515266150,0.9602081521348300308527788406876515266150,-0.9924068438435844031890176702532604935893,0.9924068438435844031890176702532604935893],[-0.0765265211334973337546404093988382110047,0.0765265211334973337546404093988382110047,-0.2277858511416450780804961953685746247430,0.2277858511416450780804961953685746247430,-0.3737060887154195606725481770249272373957,0.3737060887154195606725481770249272373957,-0.5108670019508270980043640509552509984254,0.5108670019508270980043640509552509984254,-0.6360536807265150254528366962262859367433,0.6360536807265150254528366962262859367433,-0.7463319064601507926143050703556415903107,0.7463319064601507926143050703556415903107,-0.8391169718222188233945290617015206853296,0.8391169718222188233945290617015206853296,-0.9122344282513259058677524412032981130491,0.9122344282513259058677524412032981130491,-0.9639719272779137912676661311972772219120,0.9639719272779137912676661311972772219120,-0.9931285991850949247861223884713202782226,0.9931285991850949247861223884713202782226],[0,-0.1455618541608950909370309823386863301163,0.1455618541608950909370309823386863301163,-0.2880213168024010966007925160646003199090,0.2880213168024010966007925160646003199090,-0.4243421202074387835736688885437880520964,0.4243421202074387835736688885437880520964,-0.5516188358872198070590187967243132866220,0.5516188358872198070590187967243132866220,-0.6671388041974123193059666699903391625970,0.6671388041974123193059666699903391625970,-0.7684399634756779086158778513062280348209,0.7684399634756779086158778513062280348209,-0.8533633645833172836472506385875676702761,0.8533633645833172836472506385875676702761,-0.9200993341504008287901871337149688941591,0.9200993341504008287901871337149688941591,-0.9672268385663062943166222149076951614246,0.9672268385663062943166222149076951614246,-0.9937521706203895002602420359379409291933,0.9937521706203895002602420359379409291933],[-0.0697392733197222212138417961186280818222,0.0697392733197222212138417961186280818222,-0.2078604266882212854788465339195457342156,0.2078604266882212854788465339195457342156,-0.3419358208920842251581474204273796195591,0.3419358208920842251581474204273796195591,-0.4693558379867570264063307109664063460953,0.4693558379867570264063307109664063460953,-0.5876404035069115929588769276386473488776,0.5876404035069115929588769276386473488776,-0.6944872631866827800506898357622567712673,0.6944872631866827800506898357622567712673,-0.7878168059792081620042779554083515213881,0.7878168059792081620042779554083515213881,-0.8658125777203001365364256370193787290847,0.8658125777203001365364256370193787290847,-0.9269567721871740005206929392590531966353,0.9269567721871740005206929392590531966353,-0.9700604978354287271239509867652687108059,0.9700604978354287271239509867652687108059,-0.9942945854823992920730314211612989803930,0.9942945854823992920730314211612989803930],[0,-0.1332568242984661109317426822417661370104,0.1332568242984661109317426822417661370104,-0.2641356809703449305338695382833096029790,0.2641356809703449305338695382833096029790,-0.3903010380302908314214888728806054585780,0.3903010380302908314214888728806054585780,-0.5095014778460075496897930478668464305448,0.5095014778460075496897930478668464305448,-0.6196098757636461563850973116495956533871,0.6196098757636461563850973116495956533871,-0.7186613631319501944616244837486188483299,0.7186613631319501944616244837486188483299,-0.8048884016188398921511184069967785579414,0.8048884016188398921511184069967785579414,-0.8767523582704416673781568859341456716389,0.8767523582704416673781568859341456716389,-0.9329710868260161023491969890384229782357,0.9329710868260161023491969890384229782357,-0.9725424712181152319560240768207773751816,0.9725424712181152319560240768207773751816,-0.9947693349975521235239257154455743605736,0.9947693349975521235239257154455743605736],[-0.0640568928626056260850430826247450385909,0.0640568928626056260850430826247450385909,-0.1911188674736163091586398207570696318404,0.1911188674736163091586398207570696318404,-0.3150426796961633743867932913198102407864,0.3150426796961633743867932913198102407864,-0.4337935076260451384870842319133497124524,0.4337935076260451384870842319133497124524,-0.5454214713888395356583756172183723700107,0.5454214713888395356583756172183723700107,-0.6480936519369755692524957869107476266696,0.6480936519369755692524957869107476266696,-0.7401241915785543642438281030999784255232,0.7401241915785543642438281030999784255232,-0.8200019859739029219539498726697452080761,0.8200019859739029219539498726697452080761,-0.8864155270044010342131543419821967550873,0.8864155270044010342131543419821967550873,-0.9382745520027327585236490017087214496548,0.9382745520027327585236490017087214496548,-0.9747285559713094981983919930081690617411,0.9747285559713094981983919930081690617411,-0.9951872199970213601799974097007368118745,0.9951872199970213601799974097007368118745]];
 verb.core.Analyze.Cvalues = [[],[],[1.0,1.0],[0.8888888888888888888888888888888888888888,0.5555555555555555555555555555555555555555,0.5555555555555555555555555555555555555555],[0.6521451548625461426269360507780005927646,0.6521451548625461426269360507780005927646,0.3478548451374538573730639492219994072353,0.3478548451374538573730639492219994072353],[0.5688888888888888888888888888888888888888,0.4786286704993664680412915148356381929122,0.4786286704993664680412915148356381929122,0.2369268850561890875142640407199173626432,0.2369268850561890875142640407199173626432],[0.3607615730481386075698335138377161116615,0.3607615730481386075698335138377161116615,0.4679139345726910473898703439895509948116,0.4679139345726910473898703439895509948116,0.1713244923791703450402961421727328935268,0.1713244923791703450402961421727328935268],[0.4179591836734693877551020408163265306122,0.3818300505051189449503697754889751338783,0.3818300505051189449503697754889751338783,0.2797053914892766679014677714237795824869,0.2797053914892766679014677714237795824869,0.1294849661688696932706114326790820183285,0.1294849661688696932706114326790820183285],[0.3626837833783619829651504492771956121941,0.3626837833783619829651504492771956121941,0.3137066458778872873379622019866013132603,0.3137066458778872873379622019866013132603,0.2223810344533744705443559944262408844301,0.2223810344533744705443559944262408844301,0.1012285362903762591525313543099621901153,0.1012285362903762591525313543099621901153],[0.3302393550012597631645250692869740488788,0.1806481606948574040584720312429128095143,0.1806481606948574040584720312429128095143,0.0812743883615744119718921581105236506756,0.0812743883615744119718921581105236506756,0.3123470770400028400686304065844436655987,0.3123470770400028400686304065844436655987,0.2606106964029354623187428694186328497718,0.2606106964029354623187428694186328497718],[0.2955242247147528701738929946513383294210,0.2955242247147528701738929946513383294210,0.2692667193099963550912269215694693528597,0.2692667193099963550912269215694693528597,0.2190863625159820439955349342281631924587,0.2190863625159820439955349342281631924587,0.1494513491505805931457763396576973324025,0.1494513491505805931457763396576973324025,0.0666713443086881375935688098933317928578,0.0666713443086881375935688098933317928578],[0.2729250867779006307144835283363421891560,0.2628045445102466621806888698905091953727,0.2628045445102466621806888698905091953727,0.2331937645919904799185237048431751394317,0.2331937645919904799185237048431751394317,0.1862902109277342514260976414316558916912,0.1862902109277342514260976414316558916912,0.1255803694649046246346942992239401001976,0.1255803694649046246346942992239401001976,0.0556685671161736664827537204425485787285,0.0556685671161736664827537204425485787285],[0.2491470458134027850005624360429512108304,0.2491470458134027850005624360429512108304,0.2334925365383548087608498989248780562594,0.2334925365383548087608498989248780562594,0.2031674267230659217490644558097983765065,0.2031674267230659217490644558097983765065,0.1600783285433462263346525295433590718720,0.1600783285433462263346525295433590718720,0.1069393259953184309602547181939962242145,0.1069393259953184309602547181939962242145,0.0471753363865118271946159614850170603170,0.0471753363865118271946159614850170603170],[0.2325515532308739101945895152688359481566,0.2262831802628972384120901860397766184347,0.2262831802628972384120901860397766184347,0.2078160475368885023125232193060527633865,0.2078160475368885023125232193060527633865,0.1781459807619457382800466919960979955128,0.1781459807619457382800466919960979955128,0.1388735102197872384636017768688714676218,0.1388735102197872384636017768688714676218,0.0921214998377284479144217759537971209236,0.0921214998377284479144217759537971209236,0.0404840047653158795200215922009860600419,0.0404840047653158795200215922009860600419],[0.2152638534631577901958764433162600352749,0.2152638534631577901958764433162600352749,0.2051984637212956039659240656612180557103,0.2051984637212956039659240656612180557103,0.1855383974779378137417165901251570362489,0.1855383974779378137417165901251570362489,0.1572031671581935345696019386238421566056,0.1572031671581935345696019386238421566056,0.1215185706879031846894148090724766259566,0.1215185706879031846894148090724766259566,0.0801580871597602098056332770628543095836,0.0801580871597602098056332770628543095836,0.0351194603317518630318328761381917806197,0.0351194603317518630318328761381917806197],[0.2025782419255612728806201999675193148386,0.1984314853271115764561183264438393248186,0.1984314853271115764561183264438393248186,0.1861610000155622110268005618664228245062,0.1861610000155622110268005618664228245062,0.1662692058169939335532008604812088111309,0.1662692058169939335532008604812088111309,0.1395706779261543144478047945110283225208,0.1395706779261543144478047945110283225208,0.1071592204671719350118695466858693034155,0.1071592204671719350118695466858693034155,0.0703660474881081247092674164506673384667,0.0703660474881081247092674164506673384667,0.0307532419961172683546283935772044177217,0.0307532419961172683546283935772044177217],[0.1894506104550684962853967232082831051469,0.1894506104550684962853967232082831051469,0.1826034150449235888667636679692199393835,0.1826034150449235888667636679692199393835,0.1691565193950025381893120790303599622116,0.1691565193950025381893120790303599622116,0.1495959888165767320815017305474785489704,0.1495959888165767320815017305474785489704,0.1246289712555338720524762821920164201448,0.1246289712555338720524762821920164201448,0.0951585116824927848099251076022462263552,0.0951585116824927848099251076022462263552,0.0622535239386478928628438369943776942749,0.0622535239386478928628438369943776942749,0.0271524594117540948517805724560181035122,0.0271524594117540948517805724560181035122],[0.1794464703562065254582656442618856214487,0.1765627053669926463252709901131972391509,0.1765627053669926463252709901131972391509,0.1680041021564500445099706637883231550211,0.1680041021564500445099706637883231550211,0.1540457610768102880814315948019586119404,0.1540457610768102880814315948019586119404,0.1351363684685254732863199817023501973721,0.1351363684685254732863199817023501973721,0.1118838471934039710947883856263559267358,0.1118838471934039710947883856263559267358,0.0850361483171791808835353701910620738504,0.0850361483171791808835353701910620738504,0.0554595293739872011294401653582446605128,0.0554595293739872011294401653582446605128,0.0241483028685479319601100262875653246916,0.0241483028685479319601100262875653246916],[0.1691423829631435918406564701349866103341,0.1691423829631435918406564701349866103341,0.1642764837458327229860537764659275904123,0.1642764837458327229860537764659275904123,0.1546846751262652449254180038363747721932,0.1546846751262652449254180038363747721932,0.1406429146706506512047313037519472280955,0.1406429146706506512047313037519472280955,0.1225552067114784601845191268002015552281,0.1225552067114784601845191268002015552281,0.1009420441062871655628139849248346070628,0.1009420441062871655628139849248346070628,0.0764257302548890565291296776166365256053,0.0764257302548890565291296776166365256053,0.0497145488949697964533349462026386416808,0.0497145488949697964533349462026386416808,0.0216160135264833103133427102664524693876,0.0216160135264833103133427102664524693876],[0.1610544498487836959791636253209167350399,0.1589688433939543476499564394650472016787,0.1589688433939543476499564394650472016787,0.1527660420658596667788554008976629984610,0.1527660420658596667788554008976629984610,0.1426067021736066117757461094419029724756,0.1426067021736066117757461094419029724756,0.1287539625393362276755157848568771170558,0.1287539625393362276755157848568771170558,0.1115666455473339947160239016817659974813,0.1115666455473339947160239016817659974813,0.0914900216224499994644620941238396526609,0.0914900216224499994644620941238396526609,0.0690445427376412265807082580060130449618,0.0690445427376412265807082580060130449618,0.0448142267656996003328381574019942119517,0.0448142267656996003328381574019942119517,0.0194617882297264770363120414644384357529,0.0194617882297264770363120414644384357529],[0.1527533871307258506980843319550975934919,0.1527533871307258506980843319550975934919,0.1491729864726037467878287370019694366926,0.1491729864726037467878287370019694366926,0.1420961093183820513292983250671649330345,0.1420961093183820513292983250671649330345,0.1316886384491766268984944997481631349161,0.1316886384491766268984944997481631349161,0.1181945319615184173123773777113822870050,0.1181945319615184173123773777113822870050,0.1019301198172404350367501354803498761666,0.1019301198172404350367501354803498761666,0.0832767415767047487247581432220462061001,0.0832767415767047487247581432220462061001,0.0626720483341090635695065351870416063516,0.0626720483341090635695065351870416063516,0.0406014298003869413310399522749321098790,0.0406014298003869413310399522749321098790,0.0176140071391521183118619623518528163621,0.0176140071391521183118619623518528163621],[0.1460811336496904271919851476833711882448,0.1445244039899700590638271665537525436099,0.1445244039899700590638271665537525436099,0.1398873947910731547221334238675831108927,0.1398873947910731547221334238675831108927,0.1322689386333374617810525744967756043290,0.1322689386333374617810525744967756043290,0.1218314160537285341953671771257335983563,0.1218314160537285341953671771257335983563,0.1087972991671483776634745780701056420336,0.1087972991671483776634745780701056420336,0.0934444234560338615532897411139320884835,0.0934444234560338615532897411139320884835,0.0761001136283793020170516533001831792261,0.0761001136283793020170516533001831792261,0.0571344254268572082836358264724479574912,0.0571344254268572082836358264724479574912,0.0369537897708524937999506682993296661889,0.0369537897708524937999506682993296661889,0.0160172282577743333242246168584710152658,0.0160172282577743333242246168584710152658],[0.1392518728556319933754102483418099578739,0.1392518728556319933754102483418099578739,0.1365414983460151713525738312315173965863,0.1365414983460151713525738312315173965863,0.1311735047870623707329649925303074458757,0.1311735047870623707329649925303074458757,0.1232523768105124242855609861548144719594,0.1232523768105124242855609861548144719594,0.1129322960805392183934006074217843191142,0.1129322960805392183934006074217843191142,0.1004141444428809649320788378305362823508,0.1004141444428809649320788378305362823508,0.0859416062170677274144436813727028661891,0.0859416062170677274144436813727028661891,0.0697964684245204880949614189302176573987,0.0697964684245204880949614189302176573987,0.0522933351526832859403120512732112561121,0.0522933351526832859403120512732112561121,0.0337749015848141547933022468659129013491,0.0337749015848141547933022468659129013491,0.0146279952982722006849910980471854451902,0.0146279952982722006849910980471854451902],[0.1336545721861061753514571105458443385831,0.1324620394046966173716424647033169258050,0.1324620394046966173716424647033169258050,0.1289057221880821499785953393997936532597,0.1289057221880821499785953393997936532597,0.1230490843067295304675784006720096548158,0.1230490843067295304675784006720096548158,0.1149966402224113649416435129339613014914,0.1149966402224113649416435129339613014914,0.1048920914645414100740861850147438548584,0.1048920914645414100740861850147438548584,0.0929157660600351474770186173697646486034,0.0929157660600351474770186173697646486034,0.0792814117767189549228925247420432269137,0.0792814117767189549228925247420432269137,0.0642324214085258521271696151589109980391,0.0642324214085258521271696151589109980391,0.0480376717310846685716410716320339965612,0.0480376717310846685716410716320339965612,0.0309880058569794443106942196418845053837,0.0309880058569794443106942196418845053837,0.0134118594871417720813094934586150649766,0.0134118594871417720813094934586150649766],[0.1279381953467521569740561652246953718517,0.1279381953467521569740561652246953718517,0.1258374563468282961213753825111836887264,0.1258374563468282961213753825111836887264,0.1216704729278033912044631534762624256070,0.1216704729278033912044631534762624256070,0.1155056680537256013533444839067835598622,0.1155056680537256013533444839067835598622,0.1074442701159656347825773424466062227946,0.1074442701159656347825773424466062227946,0.0976186521041138882698806644642471544279,0.0976186521041138882698806644642471544279,0.0861901615319532759171852029837426671850,0.0861901615319532759171852029837426671850,0.0733464814110803057340336152531165181193,0.0733464814110803057340336152531165181193,0.0592985849154367807463677585001085845412,0.0592985849154367807463677585001085845412,0.0442774388174198061686027482113382288593,0.0442774388174198061686027482113382288593,0.0285313886289336631813078159518782864491,0.0285313886289336631813078159518782864491,0.0123412297999871995468056670700372915759,0.0123412297999871995468056670700372915759]];

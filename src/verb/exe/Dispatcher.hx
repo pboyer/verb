@@ -6,6 +6,8 @@ package verb.exe;
     import verb.exe.WorkerPool;
 #end
 
+import promhx.Deferred;
+import promhx.Promise;
 class Dispatcher {
 
     public static var THREADS : Int = 1;
@@ -33,10 +35,15 @@ class Dispatcher {
         return _instance;
     }
 
-    public function eval(className : String,
-                         methodName : String,
-                         args : Array<Dynamic>,
-                         callback : Dynamic -> Dynamic ) : Void {
+    public function applyMethod<T>( className : String,
+                                    methodName : String,
+                                    args : Array<Dynamic> ) : Promise<T> {
+
+        var def = new Deferred<T>();
+
+        var callback = function(x){
+            def.resolve( x );
+        };
 
         #if js
 
@@ -49,6 +56,8 @@ class Dispatcher {
             var result = Reflect.callMethod(type, Reflect.field(type, methodName), args );
             callback( result );
         #end
+
+        return new Promise<T>( def );
     }
 
 }

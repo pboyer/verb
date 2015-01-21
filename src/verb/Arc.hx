@@ -15,13 +15,12 @@ class Arc extends NurbsCurve {
     private var _minAngle : Float;
     private var _maxAngle : Float;
 
-    function new(   center : Point,
+    private function new(   center : Point,
                     xaxis : Vector,
                     yaxis : Vector,
                     radius : Float,
                     minAngle : Float,
                     maxAngle : Float ) {
-
         super( Make.arc(center, xaxis, yaxis, radius, minAngle, maxAngle ) );
 
         _center = center;
@@ -30,40 +29,32 @@ class Arc extends NurbsCurve {
         _radius = radius;
         _minAngle = minAngle;
         _maxAngle = maxAngle;
-
     }
 
+    //
+    // Create an arc
+    //
+    // **params**
+    // + *Array*, Length 3 array representing the center of the arc
+    // + *Array*, Length 3 array representing the xaxis
+    // + *Array*, Length 3 array representing the perpendicular yaxis
+    // + *Number*, Radius of the arc
+    // + *Interval*, Interval object representing the interval of the arc
+    //
     public static function byCenterAxesRadius(  center : Point,
                                                 xaxis : Vector,
                                                 yaxis : Vector,
                                                 radius : Float,
                                                 minAngle : Float,
-                                                maxAngle : Float ) {
-
+                                                maxAngle : Float ) : Arc {
         return new Arc(center, xaxis, yaxis, radius, minAngle, maxAngle );
     }
 
-    public function center(){
-        return _center;
-    }
+    public function center(){ return _center; }
+    public function xaxis(){ return _xaxis; }
+    public function yaxis(){ return _yaxis; }
+    public function radius(){ return _radius; }
+    public function minAngle(){ return _minAngle; }
+    public function maxAngle(){ return _maxAngle; }
 
-    public function xaxis(){
-        return _xaxis;
-    }
-
-    public function yaxis(){
-        return _yaxis;
-    }
-
-    public function radius(){
-        return _radius;
-    }
-
-    public function minAngle(){
-        return _minAngle;
-    }
-
-    public function maxAngle(){
-        return _maxAngle;
-    }
 }

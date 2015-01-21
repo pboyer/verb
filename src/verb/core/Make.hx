@@ -227,7 +227,7 @@ class Make {
     // + a CurveData object representing a NURBS curve
     //
 
-    public static function polylineCurve( pts : Array<Point>) : CurveData {
+    public static function polyline( pts : Array<Point>) : CurveData {
 
         var knots = [0.0,0.0];
         var lsum = 0.0;

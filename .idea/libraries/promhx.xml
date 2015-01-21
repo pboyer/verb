@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="promhx" type="Haxe">
+    <CLASSES>
+      <root url="file:///usr/lib/haxe/lib/promhx/1,0,16/src/main/promhx" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

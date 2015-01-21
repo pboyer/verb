@@ -26,7 +26,7 @@ class WorkerPool {
     private var _queue : Array<Work> = [];
     private var _pool : Array<Worker> = [];
     private var _working = new IntMap<Worker>();
-    private var _callbacks = new IntMap<Dynamic -> Dynamic>();
+    private var _callbacks = new IntMap<Dynamic>();
 
     public function new( numThreads : Int, fileName : String = "/Users/peter/Dropbox/Github/personal/verb2/verb/build/verb.js" ) {
 
@@ -38,7 +38,7 @@ class WorkerPool {
     public function addWork( className : String,
                              methodName : String,
                              arguments : Array<Dynamic>,
-                             callback : Dynamic->Dynamic ) : Void {
+                             callback : Dynamic ) : Void {
 
         var work = new Work( className, methodName, arguments );
         _callbacks.set(work.id, callback);

@@ -1,4 +1,7 @@
+-lib promhx
 -main verb.Init
 -cp src
 -js build/verbHaxe.js
 -dce std
+-D nodejs
+-lib nodejs

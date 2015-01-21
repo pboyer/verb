@@ -1,13 +1,3 @@
-// ###new Arc(center, xaxis, yaxis, radius, interval) 
-//
-// Constructor for Arc
-//
-// **params**
-// + *Array*, Length 3 array representing the center of the arc
-// + *Array*, Length 3 array representing the xaxis
-// + *Array*, Length 3 array representing the perpendicular yaxis
-// + *Number*, Radius of the arc
-// + *Interval*, Interval object representing the interval of the arc
 
 verb.Arc = function(center, xaxis, yaxis, radius, interval) {
 

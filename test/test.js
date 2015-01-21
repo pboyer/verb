@@ -2022,7 +2022,7 @@ describe("verb.core.Make.arc",function(){
 
 });
 
-describe("verb.core.Make.polylineCurve",function(){
+describe("verb.core.Make.polyline",function(){
 
 	it('can create a polyline with correct structure', function(){
 
@@ -2031,7 +2031,7 @@ describe("verb.core.Make.polylineCurve",function(){
 			, controlPoints = [ [0, 0, 0], [10, 10, 0], [14, 20, 0], [10, 32, 4], [12, 16, 22] ]
 			, weights = [1, 1, 1, 1, 1];
 
-		var comps = verb.core.Make.polylineCurve( controlPoints );
+		var comps = verb.core.Make.polyline( controlPoints );
 
 		comps.degree.should.equal(degree);
 		comps.controlPoints.should.eql( verb.core.Eval.homogenize1d( controlPoints, weights ));
@@ -2717,7 +2717,7 @@ describe("verb.core.Divide.rationalCurveByArcLength",function(){
 
 });
 
-describe("verb.core.Divide.rationalCurveEquallyByArcLength",function(){
+describe("verb.core.Divide.rationalCurveByEqualArcLength",function(){
 
 	it('can divide a straight NURBS curve', function(){
 
@@ -2729,7 +2729,7 @@ describe("verb.core.Divide.rationalCurveEquallyByArcLength",function(){
 			, tol = 1e-3
 			, d = 4 / divs;
 
-		var res = verb.core.Divide.rationalCurveEquallyByArcLength(curve, divs );
+		var res = verb.core.Divide.rationalCurveByEqualArcLength(curve, divs );
 
 		var s = 0;
 		res.forEach(function(u){
@@ -2744,7 +2744,7 @@ describe("verb.core.Divide.rationalCurveEquallyByArcLength",function(){
 
 });
 
-describe("verb.core.Analyze.rationalCurveClosestPoint",function(){
+describe("verb.core.Analyze.rationalCurveClosestParam",function(){
 
 	it('can get closest point to a straight curve', function(){
 
@@ -2754,24 +2754,24 @@ describe("verb.core.Analyze.rationalCurveClosestPoint",function(){
 			, curve = new verb.core.CurveData( degree, knots, controlPoints )
 			, pt = [1,0.2,0];
 
-		var res = verb.core.Analyze.rationalCurveClosestPoint(curve, [1,0.2,0] );
+		var res = verb.core.Analyze.rationalCurveClosestParam(curve, [1,0.2,0] );
 		var p = verb.core.Eval.rationalCurvePoint( curve, res );
 
 		vecShouldBe( [1,0,0], p, 1e-3 );
 
-		res = verb.core.Analyze.rationalCurveClosestPoint(curve, [2,0.2,0] );
+		res = verb.core.Analyze.rationalCurveClosestParam(curve, [2,0.2,0] );
 		p = verb.core.Eval.rationalCurvePoint( curve, res );
 
 		vecShouldBe( [2,0,0], p, 1e-3 );
 
 		// before start
-		res = verb.core.Analyze.rationalCurveClosestPoint(curve, [-1,0.2,1] );
+		res = verb.core.Analyze.rationalCurveClosestParam(curve, [-1,0.2,1] );
 		p = verb.core.Eval.rationalCurvePoint( curve, res );
 
 		vecShouldBe( [0,0,0], p, 1e-3 );
 
 		// beyond end
-		res = verb.core.Analyze.rationalCurveClosestPoint(curve, [5,0.2,0] );
+		res = verb.core.Analyze.rationalCurveClosestParam(curve, [5,0.2,0] );
 		p = verb.core.Eval.rationalCurvePoint( curve, res );
 
 		vecShouldBe( [4,0,0], p, 1e-3 );
@@ -4235,7 +4235,7 @@ describe("Arc.constructor",function(){
 
 	it('has correct properties', function(){
 
-		var arc = new verb.Arc([0,0,0], [1,0,0], [0,1,0], 5, 0, Math.PI/ 2 );
+		var arc = verb.Arc.byCenterAxesRadius([0,0,0], [1,0,0], [0,1,0], 5, 0, Math.PI/ 2 );
 
 		should.exist( arc );
 
@@ -4254,7 +4254,7 @@ describe("Arc.point",function(){
 
 	it('returns expected results', function(){
 
-		var arc = new verb.Arc([0,0,1], [1,0,0], [0,1,0], 1, 0, Math.PI/ 2 );
+		var arc = verb.Arc.byCenterAxesRadius([0,0,1], [1,0,0], [0,1,0], 1, 0, Math.PI/ 2 );
 		var p1 = arc.point(0);
 		var p2 = arc.point(0.5);
 		var p3 = arc.point(1);
@@ -4277,9 +4277,9 @@ describe("Arc.point",function(){
 
 	it('creates the expected result when given a callback', function(done){
 
-		var arc = new verb.Arc([0,0,1], [1,0,0], [0,1,0], 1, 0, Math.PI/ 2 );
+		var arc = verb.Arc.byCenterAxesRadius([0,0,1], [1,0,0], [0,1,0], 1, 0, Math.PI/ 2 );
 
-		arc.pointAsync(0.5, function(res){
+		arc.pointAsync(0.5).then(function(res){
 
 			res.should.be.instanceof(Array).and.have.lengthOf(3);
 			res[0].should.be.approximately( Math.sqrt(2)/2, 0.001 );
@@ -4297,12 +4297,89 @@ describe("Arc.tessellate",function(){
 
 	it('should return a list of vertices', function(){
 
-		var arc = new verb.Arc([0,0,1], [1,0,0], [0,1,0], 1, 0, Math.PI/ 2 );
+		var arc = verb.Arc.byCenterAxesRadius([0,0,1], [1,0,0], [0,1,0], 1, 0, Math.PI/ 2 );
 		var pts = arc.tessellate();
 
 		pts.length.should.be.greaterThan(2);
 
 		pts.map( function(e){  e.length.should.be.equal(3); });
+
+	});
+
+});
+
+describe("Line.byEnds",function(){
+
+	it('can create an instance', function(){
+
+		var p1 = [0,0,1]
+			, p2 = [1,0,0];
+
+		var c = verb.Line.byEnds( p1, p2 );
+
+		should.exist(c);
+
+	});
+
+});
+
+describe("Line.point",function(){
+
+	it('evaluates correctly', function(){
+
+		var p1 = [0,0,0]
+			, p2 = [1,1,1];
+
+		var c = verb.Line.byEnds( p1, p2 );
+
+		should.exist(c);
+
+		var p = c.point(0.5);
+
+		p[0].should.be.approximately(0.5, verb.core.Constants.EPSILON );
+		p[1].should.be.approximately(0.5, verb.core.Constants.EPSILON );
+		p[2].should.be.approximately(0.5, verb.core.Constants.EPSILON );
+
+	});
+
+});
+
+describe("Line.derivatives",function(){
+
+	it('gives nice result', function(){
+
+		var p1 = [0,0,0]
+			, p2 = [1,1,1];
+
+		var c = verb.Line.byEnds( p1, p2 );
+
+		should.exist(c);
+
+		var p = c.derivatives(0.5, 1);
+
+		p[0].should.eql([0.5,0.5,0.5]);
+		p[1].should.eql([1,1,1]);
+
+	});
+
+});
+
+describe("Line.tessellate",function(){
+
+	it('gives mesh result', function(){
+
+		var p1 = [0,0,0]
+			, p2 = [1,1,1];
+
+		var c = verb.Line.byEnds( p1, p2 );
+
+		should.exist(c);
+
+		var p = c.tessellate();
+
+		p.length.should.be.equal(2);
+		p[0].length.should.be.equal(3);
+		p[1].length.should.be.equal(3);
 
 	});
 
@@ -4404,82 +4481,7 @@ describe("FourPointSurface.tessellate",function(){
 });
 
 
-describe("Line.constructor",function(){
 
-	it('can create an instance', function(){
-
-		var p1 = [0,0,1]
-			, p2 = [1,0,0];
-
-		var c = new verb.Line( p1, p2 );
-
-		should.exist(c);
-
-	});
-
-});
-
-describe("Line.point",function(){
-
-	it('evaluates correctly', function(){
-
-		var p1 = [0,0,0]
-			, p2 = [1,1,1];
-
-		var c = new verb.Line( p1, p2 );
-
-		should.exist(c);
-
-		var p = c.point(0.5);
-
-		p[0].should.be.approximately(0.5, verb.core.Constants.EPSILON );
-		p[1].should.be.approximately(0.5, verb.core.Constants.EPSILON );
-		p[2].should.be.approximately(0.5, verb.core.Constants.EPSILON );
-
-	});
-
-});
-
-describe("Line.derivatives",function(){
-
-	it('gives nice result', function(){
-
-		var p1 = [0,0,0]
-			, p2 = [1,1,1];
-
-		var c = new verb.Line( p1, p2 );
-
-		should.exist(c);
-
-		var p = c.derivatives(0.5, 1);
-
-		p[0].should.eql([0.5,0.5,0.5]);
-		p[1].should.eql([1,1,1]);
-
-	});
-
-});
-
-describe("Line.tessellate",function(){
-
-	it('gives mesh result', function(){
-
-		var p1 = [0,0,0]
-			, p2 = [1,1,1];
-
-		var c = new verb.Line( p1, p2 );
-
-		should.exist(c);
-
-		var p = c.tessellate();
-
-		p.length.should.be.equal(2);
-		p[0].length.should.be.equal(3);
-		p[1].length.should.be.equal(3);
-
-	});
-
-});
 
 describe("BezierCurve.constructor",function(){
 
@@ -5159,7 +5161,7 @@ describe("Extrusion.constructor",function(){
 
 	it('can create an instance', function(){
 
-		var profile = new verb.Line( [0,0,0], [1,1,1] )
+		var profile = verb.Line.byEnds( [0,0,0], [1,1,1] )
 			, axis = [0,0,1]
 			, length = 3;
 
@@ -5175,7 +5177,7 @@ describe("Extrusion.point",function(){
 
 	it('evaluates correctly for middle of surface', function(){
 
-		var profile = new verb.Line( [0,0,0], [1,1,0] )
+		var profile = verb.Line.byEnds( [0,0,0], [1,1,0] )
 			, axis = [0,0,1]
 			, length = 3;
 
@@ -5197,7 +5199,7 @@ describe("Extrusion.derivatives",function(){
 
 	it('gives expected result for middle of surface', function(){
 
-		var profile = new verb.Line( [0,0,0], [1,1,0] )
+		var profile = verb.Line.byEnds( [0,0,0], [1,1,0] )
 			, axis = [0,0,1]
 			, length = 3;
 
@@ -5228,7 +5230,7 @@ describe("Extrusion.tessellate",function(){
 
 	it('gives mesh result', function(){
 
-		var profile = new verb.Line( [0,0,0], [1,1,0] )
+		var profile = verb.Line.byEnds( [0,0,0], [1,1,0] )
 			, axis = [0,0,1]
 			, length = 3;
 
@@ -5366,7 +5368,7 @@ describe("RevolvedSurface.constructor",function(){
 		var base = [0,0,0]
 			, axis = [0,0,1]
 			, angle = Math.PI
-			, profile = new verb.Line( [1, 0, 10], [10, 0, 1] );
+			, profile = verb.Line.byEnds( [1, 0, 10], [10, 0, 1] );
 
 		var srf = new verb.RevolvedSurface( base, axis, angle, profile );
 
@@ -5383,7 +5385,7 @@ describe("RevolvedSurface.point",function(){
 		var base = [0,0,0]
 			, axis = [0,0,1]
 			, angle = Math.PI
-			, profile = new verb.Line( [1, 0, 10], [10, 0, 1] );
+			, profile = verb.Line.byEnds( [1, 0, 10], [10, 0, 1] );
 
 		var srf = new verb.RevolvedSurface( base, axis, angle, profile );
 
@@ -5406,7 +5408,7 @@ describe("RevolvedSurface.derivatives",function(){
 		var base = [0,0,0]
 			, axis = [0,0,1]
 			, angle = Math.PI
-			, profile = new verb.Line( [1, 0, 10], [10, 0, 1] );
+			, profile = verb.Line.byEnds( [1, 0, 10], [10, 0, 1] );
 
 		var srf = new verb.RevolvedSurface( base, axis, angle, profile );
 
@@ -5441,7 +5443,7 @@ describe("RevolvedSurface.tessellate",function(){
 		var base = [0,0,0]
 			, axis = [0,0,1]
 			, angle = Math.PI
-			, profile = new verb.Line( [1, 0, 10], [10, 0, 1] );
+			, profile = verb.Line.byEnds( [1, 0, 10], [10, 0, 1] );
 
 		var srf = new verb.RevolvedSurface( base, axis, angle, profile );
 
@@ -5574,7 +5576,7 @@ describe("SweepOneRail.constructor",function(){
 			, p4 = [3,0,0];
 
 		var rail = new verb.BezierCurve( [p1, p2, p3, p4] )
-			, profile = new verb.Line( [0,1,0], [0,-1,0]  );
+			, profile = verb.Line.byEnds( [0,1,0], [0,-1,0]  );
 
 		var srf = new verb.SweepOneRail( rail, profile );
 
@@ -5594,7 +5596,7 @@ describe("SweepOneRail.point",function(){
 			, p4 = [3,0,0];
 
 		var rail = new verb.BezierCurve( [p1, p2, p3, p4] )
-			, profile = new verb.Line( [0,1,0], [0,-1,0]  )
+			, profile = verb.Line.byEnds( [0,1,0], [0,-1,0]  )
 
 		var srf = new verb.SweepOneRail( rail, profile );
 
@@ -5622,7 +5624,7 @@ describe("SweepOneRail.derivatives",function(){
 			, p4 = [3,0,0];
 
 		var rail = new verb.BezierCurve( [p1, p2, p3, p4] )
-			, profile = new verb.Line( [0,1,0], [0,-1,0]  )
+			, profile = verb.Line.byEnds( [0,1,0], [0,-1,0]  )
 
 		var srf = new verb.SweepOneRail( rail, profile );
 
@@ -5657,7 +5659,7 @@ describe("SweepOneRail.tessellate",function(){
 			, p4 = [3,0,0];
 
 		var rail = new verb.BezierCurve( [p1, p2, p3, p4] )
-			, profile = new verb.Line( [0,1,0], [0,-1,0]  )
+			, profile = verb.Line.byEnds( [0,1,0], [0,-1,0]  )
 
 		var srf = new verb.SweepOneRail( rail, profile );
 
