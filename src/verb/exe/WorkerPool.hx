@@ -21,17 +21,20 @@ class Work {
     }
 }
 
+@:expose("exe.WorkerPool")
 class WorkerPool {
+
+    public static var basePath  = "";
 
     private var _queue : Array<Work> = [];
     private var _pool : Array<Worker> = [];
     private var _working = new IntMap<Worker>();
     private var _callbacks = new IntMap<Dynamic>();
 
-    public function new( numThreads : Int, fileName : String = "/Users/peter/Dropbox/Github/personal/verb2/verb/build/verb.js" ) {
+    public function new( numThreads : Int, fileName : String = "verb.js" ) {
 
         for (i in 0...numThreads){
-           _pool.push( new Worker(fileName) );
+           _pool.push( new Worker( basePath + fileName) );
         }
     }
 

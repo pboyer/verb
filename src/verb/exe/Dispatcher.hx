@@ -35,7 +35,7 @@ class Dispatcher {
         return _instance;
     }
 
-    public function applyMethod<T>( className : String,
+    public function deferMethod<T>( className : String,
                                     methodName : String,
                                     args : Array<Dynamic> ) : Promise<T> {
 

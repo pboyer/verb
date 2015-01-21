@@ -3,9 +3,9 @@ package verb.exe;
 import promhx.Promise;
 
 class AsyncObject {
-    public function applyMethod<T>( classType : Class<Dynamic>,
+    public function deferMethod<T>( classType : Class<Dynamic>,
                                     methodName : String,
                                     args : Array<Dynamic>  ) : Promise<T> {
-        return Dispatcher.instance().applyMethod( Type.getClassName(classType), methodName, args );
+        return Dispatcher.instance().deferMethod( Type.getClassName(classType), methodName, args );
     }
 }

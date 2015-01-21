@@ -1,6 +1,9 @@
 var should = require('should')
 	, verb = require('../build/verb.js');
 
+// necessary for multi-threading
+verb.exe.WorkerPool.basePath = process.cwd() + "/build/";
+
 // some testing utilities
 function vecShouldBe( expected, test, tol ){
 
@@ -4070,20 +4073,31 @@ describe("NurbsCurve.lengthAtParam",function(){
 
 describe("NurbsCurve.paramAtLength",function(){
 
+	var degree = 3
+		, knots = [0,0,0,0,0.5,1,1,1,1]
+		, controlPoints = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
+		, weights = [ 1, 1, 1, 1, 1 ]
+		, pt = [1,0.2,0];
+
+	var crv = verb.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
+
 	it('can get closest point to straight curve', function(){
 
-		var degree = 3
-			, knots = [0,0,0,0,0.5,1,1,1,1]
-			, controlPoints = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
-			, weights = [ 1, 1, 1, 1, 1 ]
-			, pt = [1,0.2,0];
-
-		var crv = verb.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
 		var res = crv.paramAtLength( 2 );
-
 		var p = crv.point( res );
 
 		vecShouldBe( [2,0,0], p, 1e-3 );
+
+	});
+
+	it('can get closest point to straight curve async', function(done){
+
+		crv.paramAtLengthAsync( 2 ).then(function(res){
+			var p = crv.point( res );
+			vecShouldBe( [2,0,0], p, 1e-3 );
+
+			done();
+		});
 
 	});
 
@@ -4091,16 +4105,17 @@ describe("NurbsCurve.paramAtLength",function(){
 
 describe("NurbsCurve.divideByEqualArcLength",function(){
 
+	var degree = 3
+		, knots = [0,0,0,0,0.5,1,1,1,1]
+		, controlPoints = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
+		, weights = [ 1, 1, 1, 1, 1 ]
+		, divs = 10
+		, d = 4 / divs;
+
+	var crv = verb.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
+
 	it('can divide straight curve', function(){
 
-		var degree = 3
-			, knots = [0,0,0,0,0.5,1,1,1,1]
-			, controlPoints = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
-			, weights = [ 1, 1, 1, 1, 1 ]
-			, divs = 10
-			, d = 4 / divs;
-
-		var crv = verb.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
 		var res = crv.divideByEqualArcLength( divs );
 
 		var tol = 1e-3;
@@ -4118,22 +4133,45 @@ describe("NurbsCurve.divideByEqualArcLength",function(){
 
 	});
 
+	it('can divide straight curve async', function(done){
+
+		crv.divideByEqualArcLengthAsync( divs ).then(function(res){
+
+			var tol = 1e-3;
+
+			var s = 0;
+			res.forEach(function(u){
+
+				var pt = crv.point( u.u );
+				u.len.should.be.approximately( s, tol );
+
+				pt[0].should.be.approximately( s, tol );
+				s += d;
+
+			});
+
+			done();
+
+		})
+
+	});
+
 });
 
 describe("NurbsCurve.divideByArcLength",function(){
 
+	var degree = 3
+		, knots = [0,0,0,0,0.5,1,1,1,1]
+		, controlPoints = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
+		, weights = [ 1, 1, 1, 1, 1 ]
+		, divs = 10
+		, d = 4 / divs;
+
+	var crv = verb.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
+	var tol = 1e-3;
+
 	it('can divide straight curve', function(){
 
-		var degree = 3
-			, knots = [0,0,0,0,0.5,1,1,1,1]
-			, controlPoints = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
-			, weights = [ 1, 1, 1, 1, 1 ]
-			, divs = 10
-			, d = 4 / divs;
-
-		var tol = 1e-3;
-
-		var crv = verb.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
 		var res = crv.divideByArcLength( d );
 
 		var s = 0;
@@ -4149,22 +4187,40 @@ describe("NurbsCurve.divideByArcLength",function(){
 
 	});
 
+	it('can divide straight curve async', function(){
+
+		crv.divideByArcLengthAsync( d ).then(function(res){
+
+			var s = 0;
+			res.forEach(function(u){
+
+				var pt = crv.point( u.u );
+				u.len.should.be.approximately( s, tol );
+
+				pt[0].should.be.approximately( s, tol );
+				s += d;
+
+			});
+
+		})
+
+	});
+
 });
 
 describe("NurbsCurve.closestParam",function(){
 
+	var degree = 3
+		, knots = [0,0,0,0,0.5,1,1,1,1]
+		, controlPoints = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
+		, weights = [ 1, 1, 1, 1, 1 ];
+
+	var crv = verb.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
+
 	it('can get point on straight curve', function(){
 
-		var degree = 3
-			, knots = [0,0,0,0,0.5,1,1,1,1]
-			, controlPoints = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
-			, weights = [ 1, 1, 1, 1, 1 ]
-			, pt = [1,0,0];
-
-
-		var crv = verb.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
+		var pt = [1,0,0];
 		var res = crv.closestParam( pt );
-
 		var p = crv.point( res );
 
 		vecShouldBe( [1,0,0], p, 1e-3 );
@@ -4173,19 +4229,23 @@ describe("NurbsCurve.closestParam",function(){
 
 	it('can get closest point to straight curve', function(){
 
-		var degree = 3
-			, knots = [0,0,0,0,0.5,1,1,1,1]
-			, controlPoints = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
-			, weights = [ 1, 1, 1, 1, 1 ]
-			, pt = [1,1,0];
-
-
-		var crv = verb.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
+		var pt = [1,1,0];
 		var res = crv.closestParam(pt);
-
 		var p = crv.point( res );
 
 		vecShouldBe( [1,0,0], p, 1e-3 );
+
+	});
+
+	it('can get closest point to straight curve async', function(done){
+
+		var pt = [1,1,0];
+		crv.closestParamAsync(pt).then(function(res){
+			var p = crv.point( res );
+
+			vecShouldBe( [1,0,0], p, 1e-3 );
+			done();
+		});
 
 	});
 
@@ -4193,20 +4253,26 @@ describe("NurbsCurve.closestParam",function(){
 
 describe("NurbsCurve.split",function(){
 
-	function cubicSplit(u){
+	var degree = 3
+		, knots = [ 0, 0, 0, 0, 1, 2, 3, 4, 5, 5, 5, 5 ];
 
-		var degree = 3
-			, knots = [ 0, 0, 0, 0, 1, 2, 3, 4, 5, 5, 5, 5 ];
+	var controlPoints = [];
+	var weights = [];
+	for (var i = 0; i < 8; i++) {
+		weights.push(1);
+		controlPoints.push([i, 0, 0]);
+	}
 
-		var controlPoints = [];
-		var weights = [];
-		for (var i = 0; i < 8; i++) {
-			weights.push(1);
-			controlPoints.push([i, 0, 0]);
-		}
+	var crv = verb.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
 
-		var crv = verb.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
-		var res = crv.split(0.5);
+	function cubicSplitAsync(u, done){
+
+		var res = crv.splitAsync(0.5);
+		check(u, res);
+
+	}
+
+	function check(u, res){
 
 		var crv0 = res[0];
 		var crv1 = res[1];
@@ -4221,10 +4287,21 @@ describe("NurbsCurve.split",function(){
 
 	}
 
-	it('returns expected results when inserting multiple knots in the middle of aNurbsCurve', function(){
+	it('returns expected results when splitting curve', function(){
 
-		cubicSplit( 0.5 );
-		cubicSplit( 3.5 );
+		var res = crv.split( 2.5 );
+		check(2.5, res);
+
+	});
+
+	it('returns expected results when splitting curve async', function(done){
+
+		crv.splitAsync( 2.5 ).then(function(res){
+
+			check(2.5, res);
+			done();
+
+		});
 
 	});
 

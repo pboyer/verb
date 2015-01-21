@@ -1,4 +1,5 @@
 (function ($hx_exports) { "use strict";
+$hx_exports.exe = $hx_exports.exe || {};
 $hx_exports.core = $hx_exports.core || {};
 $hx_exports.promhx = $hx_exports.promhx || {};
 var $estr = function() { return js.Boot.__string_rec(this,''); };
@@ -740,8 +741,8 @@ verb.exe = {};
 verb.exe.AsyncObject = function() { };
 verb.exe.AsyncObject.__name__ = ["verb","exe","AsyncObject"];
 verb.exe.AsyncObject.prototype = {
-	applyMethod: function(classType,methodName,args) {
-		return verb.exe.Dispatcher.instance().applyMethod(Type.getClassName(classType),methodName,args);
+	deferMethod: function(classType,methodName,args) {
+		return verb.exe.Dispatcher.instance().deferMethod(Type.getClassName(classType),methodName,args);
 	}
 };
 verb.NurbsCurve = $hx_exports.NurbsCurve = function(data) {
@@ -768,75 +769,11 @@ verb.NurbsCurve.prototype = $extend(verb.exe.AsyncObject.prototype,{
 	,weights: function() {
 		return verb.core.Eval.weight1d(this._data.controlPoints);
 	}
-	,point: function(u) {
-		return verb.core.Eval.rationalCurvePoint(this._data,u);
-	}
-	,pointAsync: function(u) {
-		return this.applyMethod(verb.core.Eval,"rationalCurvePoint",[this._data,u]);
-	}
-	,derivatives: function(u,numDerivs) {
-		if(numDerivs == null) numDerivs = 1;
-		return verb.core.Eval.rationalCurveDerivatives(this._data,u,numDerivs);
-	}
-	,derivativesAsync: function(u,numDerivs) {
-		if(numDerivs == null) numDerivs = 1;
-		return this.applyMethod(verb.core.Eval,"rationalCurveDerivatives",[this._data,u,numDerivs]);
-	}
-	,closestPoint: function(pt) {
-		return verb.core.Analyze.rationalCurveClosestPoint(this._data,pt);
-	}
-	,closestPointAsync: function(pt) {
-		return this.applyMethod(verb.core.Analyze,"rationalCurveClosestPoint",[this._data,pt]);
-	}
-	,closestParam: function(pt) {
-		return verb.core.Analyze.rationalCurveClosestParam(this._data,pt);
-	}
-	,closestParamAsync: function(pt) {
-		return this.applyMethod(verb.core.Analyze,"rationalCurveClosestParam",[this._data,pt]);
-	}
-	,length: function() {
-		return verb.core.Analyze.rationalCurveArcLength(this._data);
-	}
-	,lengthAsync: function() {
-		return this.applyMethod(verb.core.Analyze,"rationalCurveArcLength",[this._data]);
-	}
-	,lengthAtParam: function(u) {
-		return verb.core.Analyze.rationalCurveArcLength(this._data,u);
-	}
-	,lengthAtParamAsync: function() {
-		return this.applyMethod(verb.core.Analyze,"rationalCurveArcLength",[this._data]);
-	}
-	,paramAtLength: function(len,tolerance) {
-		return verb.core.Analyze.rationalCurveParamAtArcLength(this._data,len,tolerance);
-	}
-	,paramAtLengthAsync: function(len,tolerance) {
-		return this.applyMethod(verb.core.Analyze,"rationalCurveParamAtArcLength",[this._data,len,tolerance]);
-	}
-	,divideByEqualArcLength: function(divisions) {
-		return verb.core.Divide.rationalCurveByEqualArcLength(this._data,divisions);
-	}
-	,divideByEqualArcLengthAsync: function(divisions) {
-		return this.applyMethod(verb.core.Divide,"rationalCurveByEqualArcLength",[this._data,divisions]);
-	}
-	,divideByArcLength: function(arcLength) {
-		return verb.core.Divide.rationalCurveByArcLength(this._data,arcLength);
-	}
-	,divideByArcLengthAsync: function(divisions) {
-		return this.applyMethod(verb.core.Divide,"rationalCurveByArcLength",[this._data,divisions]);
-	}
-	,tessellate: function(tolerance) {
-		return verb.core.Tess.rationalCurveAdaptiveSample(this._data,tolerance,false);
-	}
-	,tessellateAsync: function(tolerance) {
-		return this.applyMethod(verb.core.Tess,"rationalCurveAdaptiveSample",[this._data,tolerance,false]);
-	}
-	,split: function(u) {
-		return verb.core.Modify.curveSplit(this._data,u).map(function(x) {
-			return new verb.NurbsCurve(x);
-		});
-	}
 	,domain: function() {
 		return new verb.core.types.Interval(this._data.knots[0],verb.core.ArrayExtensions.last(this._data.knots));
+	}
+	,clone: function() {
+		return new verb.NurbsCurve(this._data);
 	}
 	,transform: function(mat) {
 		var pts = this.controlPoints();
@@ -850,8 +787,79 @@ verb.NurbsCurve.prototype = $extend(verb.exe.AsyncObject.prototype,{
 		}
 		return new verb.NurbsCurve(new verb.core.types.CurveData(this.degree(),this.knots(),verb.core.Eval.homogenize1d(pts,this.weights())));
 	}
-	,clone: function() {
-		return new verb.NurbsCurve(this._data);
+	,point: function(u) {
+		return verb.core.Eval.rationalCurvePoint(this._data,u);
+	}
+	,pointAsync: function(u) {
+		return this.deferMethod(verb.core.Eval,"rationalCurvePoint",[this._data,u]);
+	}
+	,derivatives: function(u,numDerivs) {
+		if(numDerivs == null) numDerivs = 1;
+		return verb.core.Eval.rationalCurveDerivatives(this._data,u,numDerivs);
+	}
+	,derivativesAsync: function(u,numDerivs) {
+		if(numDerivs == null) numDerivs = 1;
+		return this.deferMethod(verb.core.Eval,"rationalCurveDerivatives",[this._data,u,numDerivs]);
+	}
+	,closestPoint: function(pt) {
+		return verb.core.Analyze.rationalCurveClosestPoint(this._data,pt);
+	}
+	,closestPointAsync: function(pt) {
+		return this.deferMethod(verb.core.Analyze,"rationalCurveClosestPoint",[this._data,pt]);
+	}
+	,closestParam: function(pt) {
+		return verb.core.Analyze.rationalCurveClosestParam(this._data,pt);
+	}
+	,closestParamAsync: function(pt) {
+		return this.deferMethod(verb.core.Analyze,"rationalCurveClosestParam",[this._data,pt]);
+	}
+	,length: function() {
+		return verb.core.Analyze.rationalCurveArcLength(this._data);
+	}
+	,lengthAsync: function() {
+		return this.deferMethod(verb.core.Analyze,"rationalCurveArcLength",[this._data]);
+	}
+	,lengthAtParam: function(u) {
+		return verb.core.Analyze.rationalCurveArcLength(this._data,u);
+	}
+	,lengthAtParamAsync: function() {
+		return this.deferMethod(verb.core.Analyze,"rationalCurveArcLength",[this._data]);
+	}
+	,paramAtLength: function(len,tolerance) {
+		return verb.core.Analyze.rationalCurveParamAtArcLength(this._data,len,tolerance);
+	}
+	,paramAtLengthAsync: function(len,tolerance) {
+		return this.deferMethod(verb.core.Analyze,"rationalCurveParamAtArcLength",[this._data,len,tolerance]);
+	}
+	,divideByEqualArcLength: function(divisions) {
+		return verb.core.Divide.rationalCurveByEqualArcLength(this._data,divisions);
+	}
+	,divideByEqualArcLengthAsync: function(divisions) {
+		return this.deferMethod(verb.core.Divide,"rationalCurveByEqualArcLength",[this._data,divisions]);
+	}
+	,divideByArcLength: function(arcLength) {
+		return verb.core.Divide.rationalCurveByArcLength(this._data,arcLength);
+	}
+	,divideByArcLengthAsync: function(divisions) {
+		return this.deferMethod(verb.core.Divide,"rationalCurveByArcLength",[this._data,divisions]);
+	}
+	,tessellate: function(tolerance) {
+		return verb.core.Tess.rationalCurveAdaptiveSample(this._data,tolerance,false);
+	}
+	,tessellateAsync: function(tolerance) {
+		return this.deferMethod(verb.core.Tess,"rationalCurveAdaptiveSample",[this._data,tolerance,false]);
+	}
+	,split: function(u) {
+		return verb.core.Modify.curveSplit(this._data,u).map(function(x) {
+			return new verb.NurbsCurve(x);
+		});
+	}
+	,splitAsync: function(u) {
+		return this.deferMethod(verb.core.Modify,"curveSplit",[this._data,u]).then(function(cs) {
+			return cs.map(function(x) {
+				return new verb.NurbsCurve(x);
+			});
+		});
 	}
 });
 verb.Arc = $hx_exports.Arc = function(center,xaxis,yaxis,radius,minAngle,maxAngle) {
@@ -4573,7 +4581,7 @@ verb.exe.Dispatcher.instance = function() {
 	return verb.exe.Dispatcher._instance;
 };
 verb.exe.Dispatcher.prototype = {
-	applyMethod: function(className,methodName,args) {
+	deferMethod: function(className,methodName,args) {
 		var def = new promhx.Deferred();
 		var callback = function(x) {
 			def.resolve(x);
@@ -4589,8 +4597,8 @@ verb.exe.Work = function(className,methodName,args) {
 	this.id = verb.exe.Work.uuid++;
 };
 verb.exe.Work.__name__ = ["verb","exe","Work"];
-verb.exe.WorkerPool = function(numThreads,fileName) {
-	if(fileName == null) fileName = "/Users/peter/Dropbox/Github/personal/verb2/verb/build/verb.js";
+verb.exe.WorkerPool = $hx_exports.exe.WorkerPool = function(numThreads,fileName) {
+	if(fileName == null) fileName = "verb.js";
 	this._callbacks = new haxe.ds.IntMap();
 	this._working = new haxe.ds.IntMap();
 	this._pool = [];
@@ -4598,7 +4606,7 @@ verb.exe.WorkerPool = function(numThreads,fileName) {
 	var _g = 0;
 	while(_g < numThreads) {
 		var i = _g++;
-		this._pool.push(new Worker(fileName));
+		this._pool.push(new Worker(verb.exe.WorkerPool.basePath + fileName));
 	}
 };
 verb.exe.WorkerPool.__name__ = ["verb","exe","WorkerPool"];
@@ -4679,5 +4687,6 @@ verb.core.Constants.TOLERANCE = 1e-6;
 verb.core.Constants.EPSILON = 1e-10;
 verb.exe.Dispatcher.THREADS = 1;
 verb.exe.Work.uuid = 0;
+verb.exe.WorkerPool.basePath = "";
 verb.Init.main();
 })(typeof window != "undefined" ? window : exports);
