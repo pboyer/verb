@@ -5,13 +5,12 @@ import verb.core.Make;
 import verb.core.Mat.Vector;
 import verb.core.types.CurveData.Point;
 
-@:expose("Line")
-class Line extends NurbsCurve {
+@:expose("BezierCurve")
+class BezierCurve extends NurbsCurve {
 
-    private var _start : Point;
-    private var _end : Point;
+    private var _points : Point;
 
-    private function new( start : Point, end : Point ) {
+    private function new( start : Point ) {
         super( Make.polyline( [ start, end ] ) );
 
         _start = start;
@@ -25,8 +24,8 @@ class Line extends NurbsCurve {
     // + *Array*, Length 3 array representing the start point
     // + *Array*, Length 3 array representing the end point
     //
-    public static function byEnds(  start : Point, end : Point ) : Line {
-        return new Line(start, end );
+    public static function byEnds(  start : Point, end : Point ) : BezierCurve {
+        return new BezierCurve(start, end );
     }
 
     public function start(){ return _start; }

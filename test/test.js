@@ -4461,6 +4461,90 @@ describe("verb.Line.tessellate",function(){
 
 });
 
+describe("verb.BezierCurve.constructor",function(){
+
+	it('can create an instance', function(){
+
+		var p1 = [0,0,0]
+			, p2 = [1,0,1]
+			, p3 = [2,0,-1]
+			, p4 = [3,0,0];
+
+		var c = new verb.BezierCurve( [p1, p2, p3, p4] );
+
+		should.exist(c);
+
+	});
+
+});
+
+describe("verb.BezierCurve.point",function(){
+
+	it('evaluates correctly', function(){
+
+		var p1 = [0,0,0]
+			, p2 = [1,0,1]
+			, p3 = [2,0,-1]
+			, p4 = [3,0,0];
+
+		var c = new verb.BezierCurve( [p1, p2, p3, p4] );
+
+		should.exist(c);
+
+		var p = c.point(0.5);
+
+		p.should.eql([1.5,0,0]);
+
+	});
+
+});
+
+describe("verb.BezierCurve.derivatives",function(){
+
+	it('gives nice result', function(){
+
+
+		var p1 = [0,0,0]
+			, p2 = [1,0,1]
+			, p3 = [2,0,-1]
+			, p4 = [3,0,0];
+
+		var c = new verb.BezierCurve( [p1, p2, p3, p4] );
+
+		should.exist(c);
+
+		var p = c.derivatives(0.5, 1);
+
+		p[0].should.eql([1.5,0,0]);
+		p[1].should.eql([3, 0, -1.5]);
+
+	});
+
+});
+
+describe("verb.BezierCurve.tessellate",function(){
+
+	it('gives mesh result', function(){
+
+		var p1 = [0,0,0]
+			, p2 = [1,0,1]
+			, p3 = [2,0,-1]
+			, p4 = [3,0,0];
+
+		var c = new verb.BezierCurve( [p1, p2, p3, p4] );
+
+		should.exist(c);
+
+		var pts = c.tessellate();
+
+		pts.length.should.be.greaterThan(2);
+
+		pts.map( function(e){  e.length.should.be.equal(3); });
+
+	});
+
+});
+
 /*
 
 describe("FourPointSurface.constructor",function(){
@@ -4559,89 +4643,7 @@ describe("FourPointSurface.tessellate",function(){
 
 
 
-describe("BezierCurve.constructor",function(){
 
-	it('can create an instance', function(){
-
-		var p1 = [0,0,0]
-			, p2 = [1,0,1]
-			, p3 = [2,0,-1]
-			, p4 = [3,0,0];
-
-		var c = new verb.BezierCurve( [p1, p2, p3, p4] );
-
-		should.exist(c);
-
-	});
-
-});
-
-describe("BezierCurve.point",function(){
-
-	it('evaluates correctly', function(){
-
-		var p1 = [0,0,0]
-			, p2 = [1,0,1]
-			, p3 = [2,0,-1]
-			, p4 = [3,0,0];
-
-		var c = new verb.BezierCurve( [p1, p2, p3, p4] );
-
-		should.exist(c);
-
-		var p = c.point(0.5);
-
-		p.should.eql([1.5,0,0]);
-
-	});
-
-});
-
-describe("BezierCurve.derivatives",function(){
-
-	it('gives nice result', function(){
-
-
-		var p1 = [0,0,0]
-			, p2 = [1,0,1]
-			, p3 = [2,0,-1]
-			, p4 = [3,0,0];
-
-		var c = new verb.BezierCurve( [p1, p2, p3, p4] );
-
-		should.exist(c);
-
-		var p = c.derivatives(0.5, 1);
-
-		p[0].should.eql([1.5,0,0]);
-		p[1].should.eql([3, 0, -1.5]);
-
-	});
-
-});
-
-describe("BezierCurve.tessellate",function(){
-
-	it('gives mesh result', function(){
-
-		var p1 = [0,0,0]
-			, p2 = [1,0,1]
-			, p3 = [2,0,-1]
-			, p4 = [3,0,0];
-
-		var c = new verb.BezierCurve( [p1, p2, p3, p4] );
-
-		should.exist(c);
-
-		var pts = c.tessellate();
-
-		pts.length.should.be.greaterThan(2);
-
-		pts.map( function(e){  e.length.should.be.equal(3); });
-
-	});
-
-});
 
 describe("Circle.constructor",function(){
 
