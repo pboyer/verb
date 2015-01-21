@@ -20,7 +20,6 @@ function last(a){
 	return a[a.length-1];
 }
 
-console.log(verb);
 
 describe("verb.core.Eval.knotSpanGivenN",function(){
 
@@ -1094,7 +1093,7 @@ describe("verb.core.Modify.surfaceSplit", function(){
 
 });
 
-describe("BoundingBox.init",function(){
+describe("verb.BoundingBox.init",function(){
 
 	it('should allow array of point arguments', function(){
 
@@ -1112,7 +1111,7 @@ describe("BoundingBox.init",function(){
 
 });
 
-describe("BoundingBox.intersects",function(){
+describe("verb.BoundingBox.intersects",function(){
 
 	it('returns expected results', function(){
 
@@ -1128,7 +1127,7 @@ describe("BoundingBox.intersects",function(){
 
 });
 
-describe("BoundingBox.intersect",function(){
+describe("verb.BoundingBox.intersect",function(){
 
 	it('returns expected results', function(){
 
@@ -1156,7 +1155,7 @@ describe("BoundingBox.intersect",function(){
 
 });
 
-describe("BoundingBox.intervalsOverlap",function(){
+describe("verb.BoundingBox.intervalsOverlap",function(){
 
 	it('returns expected results', function(){
 
@@ -1169,7 +1168,7 @@ describe("BoundingBox.intervalsOverlap",function(){
 
 });
 
-describe("BoundingBox.contains",function(){
+describe("verb.BoundingBox.contains",function(){
 
 	it('returns expected results', function(){
 
@@ -1186,7 +1185,7 @@ describe("BoundingBox.contains",function(){
 
 });
 
-describe("BoundingBox.contains",function(){
+describe("verb.BoundingBox.contains",function(){
 
 	it('BoundingBox.clear', function(){
 
@@ -1197,7 +1196,7 @@ describe("BoundingBox.contains",function(){
 	});
 });
 
-describe("BoundingBox.getAxisLength",function(){
+describe("verb.BoundingBox.getAxisLength",function(){
 
 	it('should return correct value', function(){
 
@@ -1210,7 +1209,7 @@ describe("BoundingBox.getAxisLength",function(){
 
 });
 
-describe("BoundingBox.getLongestAxis",function(){
+describe("verb.BoundingBox.getLongestAxis",function(){
 
 	it('should return correct value', function(){
 
@@ -1221,7 +1220,7 @@ describe("BoundingBox.getLongestAxis",function(){
 
 });
 
-describe("BoundingBox.getAxisLength",function(){
+describe("verb.BoundingBox.getAxisLength",function(){
 
 	it('should return 0 when given out of bounds index', function(){
 
@@ -1235,7 +1234,7 @@ describe("BoundingBox.getAxisLength",function(){
 
 });
 
-describe("BoundingBox.getAxisLength",function(){
+describe("verb.BoundingBox.getAxisLength",function(){
 
 	it('should return 0 when given out of bounds index', function(){
 
@@ -1249,7 +1248,7 @@ describe("BoundingBox.getAxisLength",function(){
 
 });
 
-describe("BoundingBox.clear",function(){
+describe("verb.BoundingBox.clear",function(){
 
 	it('should set initialized to false', function(){
 
@@ -4051,7 +4050,7 @@ describe("verb.core.Eval.volumePoint",function(){
 
 });
 
-describe("NurbsCurve.lengthAtParam",function(){
+describe("verb.NurbsCurve.lengthAtParam",function(){
 
 	it('can get closest point to straight curve', function(){
 
@@ -4071,7 +4070,7 @@ describe("NurbsCurve.lengthAtParam",function(){
 });
 
 
-describe("NurbsCurve.paramAtLength",function(){
+describe("verb.NurbsCurve.paramAtLength",function(){
 
 	var degree = 3
 		, knots = [0,0,0,0,0.5,1,1,1,1]
@@ -4103,7 +4102,7 @@ describe("NurbsCurve.paramAtLength",function(){
 
 });
 
-describe("NurbsCurve.divideByEqualArcLength",function(){
+describe("verb.NurbsCurve.divideByEqualArcLength",function(){
 
 	var degree = 3
 		, knots = [0,0,0,0,0.5,1,1,1,1]
@@ -4158,7 +4157,7 @@ describe("NurbsCurve.divideByEqualArcLength",function(){
 
 });
 
-describe("NurbsCurve.divideByArcLength",function(){
+describe("verb.NurbsCurve.divideByArcLength",function(){
 
 	var degree = 3
 		, knots = [0,0,0,0,0.5,1,1,1,1]
@@ -4208,7 +4207,7 @@ describe("NurbsCurve.divideByArcLength",function(){
 
 });
 
-describe("NurbsCurve.closestParam",function(){
+describe("verb.NurbsCurve.closestParam",function(){
 
 	var degree = 3
 		, knots = [0,0,0,0,0.5,1,1,1,1]
@@ -4251,7 +4250,7 @@ describe("NurbsCurve.closestParam",function(){
 
 });
 
-describe("NurbsCurve.split",function(){
+describe("verb.NurbsCurve.split",function(){
 
 	var degree = 3
 		, knots = [ 0, 0, 0, 0, 1, 2, 3, 4, 5, 5, 5, 5 ];
@@ -4308,7 +4307,7 @@ describe("NurbsCurve.split",function(){
 });
 
 
-describe("Arc.constructor",function(){
+describe("verb.Arc.constructor",function(){
 
 	it('has correct properties', function(){
 
@@ -4327,7 +4326,7 @@ describe("Arc.constructor",function(){
 
 });
 
-describe("Arc.point",function(){
+describe("verb.Arc.point",function(){
 
 	it('returns expected results', function(){
 
@@ -4370,7 +4369,7 @@ describe("Arc.point",function(){
 
 });
 
-describe("Arc.tessellate",function(){
+describe("verb.Arc.tessellate",function(){
 
 	it('should return a list of vertices', function(){
 
@@ -4385,7 +4384,7 @@ describe("Arc.tessellate",function(){
 
 });
 
-describe("Line.byEnds",function(){
+describe("verb.Line.byEnds",function(){
 
 	it('can create an instance', function(){
 
@@ -4400,7 +4399,7 @@ describe("Line.byEnds",function(){
 
 });
 
-describe("Line.point",function(){
+describe("verb.Line.point",function(){
 
 	it('evaluates correctly', function(){
 
@@ -4421,7 +4420,7 @@ describe("Line.point",function(){
 
 });
 
-describe("Line.derivatives",function(){
+describe("verb.Line.derivatives",function(){
 
 	it('gives nice result', function(){
 
@@ -4441,7 +4440,7 @@ describe("Line.derivatives",function(){
 
 });
 
-describe("Line.tessellate",function(){
+describe("verb.Line.tessellate",function(){
 
 	it('gives mesh result', function(){
 
