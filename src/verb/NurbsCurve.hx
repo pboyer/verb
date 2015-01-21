@@ -46,7 +46,7 @@ class NurbsCurve extends AsyncObject {
     // Determine the valid domain of the curve
     //
     // **returns**
-    // + *Array*, An array representing the high and end point of the domain of the curve
+    // + An array representing the high and end point of the domain of the curve
 
     public function domain() : Interval<Float> {
         return new Interval( _data.knots.first(), _data.knots.last());
@@ -55,7 +55,7 @@ class NurbsCurve extends AsyncObject {
     // Obtain a copy of the curve
     //
     // **returns**
-    // + *NurbsCurve*, The copied curve
+    // + The copied curve
 
     public function clone(){
         return new NurbsCurve( this._data );
@@ -64,10 +64,10 @@ class NurbsCurve extends AsyncObject {
     // Transform a curve with the given matrix.
     //
     // **params**
-    // + *Array*, 4d array representing the transform
+    // + 4d array representing the transform
     //
     // **returns**
-    // + *Array*, An array if called synchronously, otherwise nothing
+    // + An array if called synchronously, otherwise nothing
 
     public function transform( mat : Matrix ) : NurbsCurve {
         var pts = controlPoints();
@@ -86,10 +86,10 @@ class NurbsCurve extends AsyncObject {
     // Sample a point at the given parameter
     //
     // **params**
-    // + *Number*, The parameter to sample the curve
+    // + The parameter to sample the curve
     //
     // **returns**
-    // + *Array*, An array if called synchronously, otherwise nothing
+    // + An array if called synchronously, otherwise nothing
 
     public function point( u : Float ) : Point {
         return Eval.rationalCurvePoint( _data, u );
@@ -102,11 +102,11 @@ class NurbsCurve extends AsyncObject {
     // Get derivatives at a given parameter
     //
     // **params**
-    // + *Number*, The parameter to sample the curve
-    // + *Number*, The number of derivatives to obtain
+    // + The parameter to sample the curve
+    // + The number of derivatives to obtain
     //
     // **returns**
-    // + *Array*, An array if called synchronously, otherwise nothing
+    // + An array if called synchronously, otherwise nothing
 
     public function derivatives( u : Float, numDerivs : Int = 1 ) : Array<Point> {
         return Eval.rationalCurveDerivatives( _data, u, numDerivs );
@@ -119,10 +119,10 @@ class NurbsCurve extends AsyncObject {
     // Determine the closest point on the curve to the given point
     //
     // **params**
-    // + *Array*, A length 3 array representing the point
+    // + A length 3 array representing the point
     //
     // **returns**
-    // + *Number*, The closest point
+    // + The closest point
 
     public function closestPoint( pt : Point ) : Point {
         return Analyze.rationalCurveClosestPoint( _data, pt );
@@ -135,10 +135,10 @@ class NurbsCurve extends AsyncObject {
     // Determine the closest parameter on the curve to the given point
     //
     // **params**
-    // + *Array*, A length 3 array representing the point
+    // + A length 3 array representing the point
     //
     // **returns**
-    // + *Number*, The closest parameter
+    // + The closest parameter
 
     public function closestParam( pt : Point ) : Float {
         return Analyze.rationalCurveClosestParam( _data, pt );
@@ -151,7 +151,7 @@ class NurbsCurve extends AsyncObject {
     // Determine the arc length of the curve
     //
     // **returns**
-    // + *Number*, The length of the curve
+    // + The length of the curve
 
     public function length() : Float {
         return Analyze.rationalCurveArcLength( _data );
@@ -164,10 +164,10 @@ class NurbsCurve extends AsyncObject {
     // Determine the arc length of the curve at the given parameter
     //
     // **params**
-    // + *Number*, The parameter at which to evaluate
+    // + The parameter at which to evaluate
     //
     // **returns**
-    // + *Number*, The length of the curve at the given parameter
+    // + The length of the curve at the given parameter
 
     public function lengthAtParam( u : Float ) : Float {
         return Analyze.rationalCurveArcLength( _data, u );
@@ -180,10 +180,10 @@ class NurbsCurve extends AsyncObject {
     // Determine the parameter of the curve at the given arc length
     //
     // **params**
-    // + *Number*, The arc length at which to determine the parameter
+    // + The arc length at which to determine the parameter
     //
     // **returns**
-    // + *Number*, The length of the curve at the given parameter
+    // + The length of the curve at the given parameter
 
     public function paramAtLength( len : Float, tolerance : Float = null ) : Float {
         return Analyze.rationalCurveParamAtArcLength( _data, len, tolerance );
@@ -196,10 +196,10 @@ class NurbsCurve extends AsyncObject {
     // Determine the parameters necessary to divide the curve into equal arc length segments
     //
     // **params**
-    // + *Number*, Number of divisions of the curve
+    // + Number of divisions of the curve
     //
     // **returns**
-    // + *Array*, A collection of parameters
+    // + A collection of parameters
 
     public function divideByEqualArcLength( divisions : Int ) : Array<CurveLengthSample> {
         return Divide.rationalCurveByEqualArcLength( _data, divisions );
@@ -212,10 +212,10 @@ class NurbsCurve extends AsyncObject {
     // Given the distance to divide the curve, determine the parameters necessary to divide the curve into equal arc length segments
     //
     // **params**
-    // + *Number*, Arc length of each segment
+    // + Arc length of each segment
     //
     // **returns**
-    // + *Array*, A collection of parameters
+    // + A collection of parameters
 
     public function divideByArcLength( arcLength : Float ) : Array<CurveLengthSample> {
         return Divide.rationalCurveByArcLength( _data, arcLength );
@@ -228,11 +228,11 @@ class NurbsCurve extends AsyncObject {
     // Tessellate a curve at a given tolerance
     //
     // **params**
-    // + *Number*, The parameter to sample the curve
-    // + *Number*, The number of derivatives to obtain
+    // + The parameter to sample the curve
+    // + The number of derivatives to obtain
     //
     // **returns**
-    // + *Array*, An array if called synchronously, otherwise nothing
+    // + An array if called synchronously, otherwise nothing
 
     public function tessellate(tolerance : Float = null) : Array<Point> {
         return Tess.rationalCurveAdaptiveSample( _data, tolerance, false );
@@ -245,10 +245,10 @@ class NurbsCurve extends AsyncObject {
     // Split the curve at the given parameter
     //
     // **params**
-    // + *Number*, The parameter at which to split the curve
+    // + The parameter at which to split the curve
     //
     // **returns**
-    // + *Array*, Two curves - one at the lower end of the parameter range and one at the higher end.
+    // + Two curves - one at the lower end of the parameter range and one at the higher end.
 
     public function split( u : Float ) : Array<NurbsCurve> {
         return Modify.curveSplit( _data, u ).map(function(x){ return new NurbsCurve(x); });

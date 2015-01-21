@@ -4,6 +4,8 @@ import verb.BoundingBox;
 import verb.NurbsCurve;
 import verb.Arc;
 import verb.Line;
+import verb.BezierCurve;
+import verb.Circle;
 import verb.core.Constants;
 import verb.core.Trig;
 import verb.core.Numeric;

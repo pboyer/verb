@@ -934,6 +934,16 @@ verb.Arc.prototype = $extend(verb.NurbsCurve.prototype,{
 		return this._maxAngle;
 	}
 });
+verb.BezierCurve = $hx_exports.BezierCurve = function(points,weights) {
+	verb.NurbsCurve.call(this,verb.core.Make.rationalBezierCurve(points,weights));
+};
+verb.BezierCurve.__name__ = ["verb","BezierCurve"];
+verb.BezierCurve.byControlPoints = function(points) {
+	return new verb.BezierCurve(points);
+};
+verb.BezierCurve.__super__ = verb.NurbsCurve;
+verb.BezierCurve.prototype = $extend(verb.NurbsCurve.prototype,{
+});
 verb.BoundingBox = $hx_exports.BoundingBox = function(pts) {
 	this.max = null;
 	this.min = null;
@@ -1044,6 +1054,16 @@ verb.BoundingBox.prototype = {
 		return new verb.BoundingBox([minbb,maxbb]);
 	}
 };
+verb.Circle = $hx_exports.Circle = function(center,xaxis,yaxis,radius) {
+	verb.Arc.call(this,center,xaxis,yaxis,radius,0,Math.PI * 2);
+};
+verb.Circle.__name__ = ["verb","Circle"];
+verb.Circle.byCenterAxesRadius = function(center,xaxis,yaxis,radius) {
+	return new verb.Circle(center,xaxis,yaxis,radius);
+};
+verb.Circle.__super__ = verb.Arc;
+verb.Circle.prototype = $extend(verb.Arc.prototype,{
+});
 verb.Init = function() { };
 verb.Init.__name__ = ["verb","Init"];
 verb.Init.main = function() {
@@ -2541,6 +2561,32 @@ verb.core.BinaryHeap.prototype = {
 };
 verb.core.Make = $hx_exports.core.Make = function() { };
 verb.core.Make.__name__ = ["verb","core","Make"];
+verb.core.Make.rationalBezierCurve = function(controlPoints,weights) {
+	var degree = controlPoints.length - 1;
+	var knots = [];
+	var _g1 = 0;
+	var _g = degree + 1;
+	while(_g1 < _g) {
+		var i = _g1++;
+		knots.push(0.0);
+	}
+	var _g11 = 0;
+	var _g2 = degree + 1;
+	while(_g11 < _g2) {
+		var i1 = _g11++;
+		knots.push(1.0);
+	}
+	if(weights == null) {
+		weights = [];
+		var _g12 = 0;
+		var _g3 = controlPoints.length;
+		while(_g12 < _g3) {
+			var i2 = _g12++;
+			weights.push(1.0);
+		}
+	}
+	return new verb.core.types.CurveData(degree,knots,verb.core.Eval.homogenize1d(controlPoints,weights));
+};
 verb.core.Make.fourPointSurface = function(p1,p2,p3,p4,degree) {
 	if(degree == null) degree = 3;
 	var degreeFloat = degree;

@@ -9,18 +9,46 @@ using verb.core.ArrayExtensions;
 @:expose("core.Make")
 class Make {
 
-    //
-    // Generate the control points, weights, and knots of a surface defined by 4 points
+    // Generate the control points, weights, and knots for a bezier curve of any degree
     //
     // **params**
-    // + *Array*, first point in counter-clockwise form
-    // + *Array*, second point in counter-clockwise form
-    // + *Array*, third point in counter-clockwise form
-    // + *Array*, forth point in counter-clockwise form
+    // + first point in counter-clockwise form
+    // + second point in counter-clockwise form
+    // + third point in counter-clockwise form
+    // + forth point in counter-clockwise form
     //
     // **returns**
     // + SurfaceData object
+
+    public static function rationalBezierCurve( controlPoints : Array<Point>, weights : Array<Float> = null ) : CurveData {
+
+        var degree = controlPoints.length - 1;
+
+        var knots = [];
+        for (i in 0...degree+1) { knots.push(0.0); }
+        for (i in 0...degree+1) { knots.push(1.0); }
+
+        // if weights aren't provided, build uniform weights
+        if (weights == null){
+            weights = [];
+            for (i in 0...controlPoints.length){
+                weights.push(1.0);
+            }
+        }
+
+        return new CurveData( degree, knots, Eval.homogenize1d( controlPoints, weights ));
+    }
+
+    // Generate the control points, weights, and knots of a surface defined by 4 points
     //
+    // **params**
+    // + first point in counter-clockwise form
+    // + second point in counter-clockwise form
+    // + third point in counter-clockwise form
+    // + forth point in counter-clockwise form
+    //
+    // **returns**
+    // + SurfaceData object
 
    public static function fourPointSurface( p1 : Point, p2 : Point, p3 : Point, p4 : Point, degree : Int = 3 ) : SurfaceData {
 
@@ -60,7 +88,7 @@ class Make {
     //
     // **returns**
     // + SurfaceData object
-    //
+
     public static function sweep1_surface( profile : CurveData, rail : CurveData ) : SurfaceData {
 
         // for each point on rail, move all of the points
@@ -94,7 +122,6 @@ class Make {
         return new SurfaceData( rail.degree, profile.degree, rail.knots, profile.knots, Eval.homogenize2d( controlPoints, weights) );
     }
 
-    //
     // Generate the control points, weights, and knots of an elliptical arc
     //
     // **params**
@@ -108,7 +135,6 @@ class Make {
     //
     // **returns**
     // + a CurveData object representing a NURBS curve
-    //
 
     public static function ellipseArc( center : Point, xaxis : Point, yaxis : Point, xradius : Float,
                                         yradius : Float, startAngle : Float, endAngle : Float ) : CurveData {
@@ -195,7 +221,6 @@ class Make {
     }
 
 
-    //
     // Generate the control points, weights, and knots of an arbitrary arc
     // (Corresponds to Algorithm A7.1 from Piegl & Tiller)
     //
@@ -209,15 +234,12 @@ class Make {
     //
     // **returns**
     // + a CurveData object representing a NURBS curve
-    //
 
     public static function arc( center : Point, xaxis : Vector, yaxis : Vector, radius : Float, start_angle : Float,
                                 end_angle : Float ) : CurveData {
         return ellipseArc( center, xaxis, yaxis, radius, radius, start_angle, end_angle );
     }
 
-
-    //
     // Generate the control points, weights, and knots of a polyline curve
     //
     // **params**
@@ -225,7 +247,6 @@ class Make {
     //
     // **returns**
     // + a CurveData object representing a NURBS curve
-    //
 
     public static function polyline( pts : Array<Point>) : CurveData {
 
@@ -247,7 +268,6 @@ class Make {
 
     }
 
-    //
     // Generate the control points, weights, and knots of an extruded surface
     //
     // **params**
@@ -257,7 +277,6 @@ class Make {
     //
     // **returns**
     // + an object with the following properties: controlPoints, weights, knots, degree
-    //
 
     public static function extrudedSurface( axis : Point, length : Float, profile : CurveData ) : SurfaceData {
 
@@ -285,7 +304,6 @@ class Make {
         return new SurfaceData( 2, profile.degree, [0,0,0,1,1,1], profile.knots, Eval.homogenize2d( controlPoints, weights) );
     }
 
-    //
     // Generate the control points, weights, and knots of a cylinder
     //
     // **params**
@@ -297,7 +315,6 @@ class Make {
     //
     // **returns**
     // + an object with the following properties: controlPoints, weights, knotsU, knotsV, degreeU, degreeV
-    //
 
     public static function cylinderSurface( axis : Point, xaxis : Point, base : Point, height : Float, radius : Float ) : SurfaceData {
 
@@ -309,8 +326,6 @@ class Make {
 
     }
 
-
-    //
     // Generate the control points, weights, and knots of a revolved surface
     // (Corresponds to Algorithm A7.1 from Piegl & Tiller)
     //
@@ -324,7 +339,6 @@ class Make {
     //
     // **returns**
     // + an object with the following properties: controlPoints, weights, knots, degree
-    //
 
     public static function revolvedSurface( center : Point, axis : Point, theta : Float, profile : CurveData ) : SurfaceData {
 

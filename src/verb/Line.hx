@@ -18,13 +18,12 @@ class Line extends NurbsCurve {
         _end = end;
     }
 
-    //
     // Create a line
     //
     // **params**
-    // + *Array*, Length 3 array representing the start point
-    // + *Array*, Length 3 array representing the end point
-    //
+    // + Length 3 array representing the start point
+    // + Length 3 array representing the end point
+
     public static function byEnds(  start : Point, end : Point ) : Line {
         return new Line(start, end );
     }

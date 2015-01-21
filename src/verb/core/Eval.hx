@@ -864,10 +864,10 @@ class Eval {
 	// + *Number*, integer knot span index
 	// + *Number*, float parameter
 	// + *Number*, integer degree of function
-	// + *Array*, array of nondecreasing knot values
+	// + array of nondecreasing knot values
 	//
 	// **returns**
-	// + *Array*, list of non-vanishing basis functions
+	// + list of non-vanishing basis functions
 	//
 	
 	public static function basisFunctionsGivenKnotSpanIndex( knotSpan_index : Int,

@@ -35,11 +35,11 @@ class Arc extends NurbsCurve {
     // Create an arc
     //
     // **params**
-    // + *Array*, Length 3 array representing the center of the arc
-    // + *Array*, Length 3 array representing the xaxis
-    // + *Array*, Length 3 array representing the perpendicular yaxis
-    // + *Number*, Radius of the arc
-    // + *Interval*, Interval object representing the interval of the arc
+    // + Length 3 array representing the center of the arc
+    // + Length 3 array representing the xaxis
+    // + Length 3 array representing the perpendicular yaxis
+    // + Radius of the arc
+    // + Interval object representing the interval of the arc
     //
     public static function byCenterAxesRadius(  center : Point,
                                                 xaxis : Vector,

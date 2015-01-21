@@ -7,28 +7,17 @@ import verb.core.types.CurveData.Point;
 
 @:expose("BezierCurve")
 class BezierCurve extends NurbsCurve {
-
-    private var _points : Point;
-
-    private function new( start : Point ) {
-        super( Make.polyline( [ start, end ] ) );
-
-        _start = start;
-        _end = end;
+    private function new( points : Array<Point>, weights : Array<Float> = null ) {
+        super( Make.rationalBezierCurve( points, weights ) );
     }
 
-    //
-    // Create a line
+    // Create a bezier curve
     //
     // **params**
-    // + *Array*, Length 3 array representing the start point
-    // + *Array*, Length 3 array representing the end point
-    //
-    public static function byEnds(  start : Point, end : Point ) : BezierCurve {
-        return new BezierCurve(start, end );
+    // + Length 3 array representing the start point
+    // + Length 3 array representing the end point
+
+    public static function byControlPoints( points : Array<Point> ) : BezierCurve {
+        return new BezierCurve( points );
     }
-
-    public function start(){ return _start; }
-    public function end(){ return _end; }
-
 }

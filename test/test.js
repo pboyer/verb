@@ -4470,7 +4470,7 @@ describe("verb.BezierCurve.constructor",function(){
 			, p3 = [2,0,-1]
 			, p4 = [3,0,0];
 
-		var c = new verb.BezierCurve( [p1, p2, p3, p4] );
+		var c = verb.BezierCurve.byControlPoints( [p1, p2, p3, p4] );
 
 		should.exist(c);
 
@@ -4487,7 +4487,7 @@ describe("verb.BezierCurve.point",function(){
 			, p3 = [2,0,-1]
 			, p4 = [3,0,0];
 
-		var c = new verb.BezierCurve( [p1, p2, p3, p4] );
+		var c = verb.BezierCurve.byControlPoints( [p1, p2, p3, p4] );
 
 		should.exist(c);
 
@@ -4509,7 +4509,7 @@ describe("verb.BezierCurve.derivatives",function(){
 			, p3 = [2,0,-1]
 			, p4 = [3,0,0];
 
-		var c = new verb.BezierCurve( [p1, p2, p3, p4] );
+		var c = verb.BezierCurve.byControlPoints( [p1, p2, p3, p4] );
 
 		should.exist(c);
 
@@ -4531,7 +4531,7 @@ describe("verb.BezierCurve.tessellate",function(){
 			, p3 = [2,0,-1]
 			, p4 = [3,0,0];
 
-		var c = new verb.BezierCurve( [p1, p2, p3, p4] );
+		var c = verb.BezierCurve.byControlPoints( [p1, p2, p3, p4] );
 
 		should.exist(c);
 
@@ -4539,6 +4539,78 @@ describe("verb.BezierCurve.tessellate",function(){
 
 		pts.length.should.be.greaterThan(2);
 
+		pts.map( function(e){  e.length.should.be.equal(3); });
+
+	});
+
+});
+
+describe("verb.Circle.constructor",function(){
+
+	it('can create an instance', function(){
+
+		var c = verb.Circle.byCenterAxesRadius([0,0,0], [1,0,0], [0,1,0], 5);
+
+		should.exist(c);
+
+	});
+
+});
+
+describe("verb.Circle.point",function(){
+
+	it('evaluates correctly', function(){
+
+		var c = verb.Circle.byCenterAxesRadius([0,0,0], [1,0,0], [0,1,0], 5);
+
+		should.exist(c);
+
+		var p = c.point(0.5);
+
+		p[0].should.be.approximately(-5, verb.core.Constants.TOLERANCE );
+		p[1].should.be.approximately(0, verb.core.Constants.TOLERANCE );
+		p[2].should.be.approximately(0, verb.core.Constants.TOLERANCE );
+
+	});
+
+});
+
+describe("verb.Circle.derivatives",function(){
+
+	it('gives correct result', function(){
+
+		var c = verb.Circle.byCenterAxesRadius([0,0,0], [1,0,0], [0,1,0], 5);
+
+		should.exist(c);
+
+		var p = c.derivatives(0.5, 1);
+
+		p[0][0].should.be.approximately(-5, verb.core.Constants.TOLERANCE );
+		p[0][1].should.be.approximately(0, verb.core.Constants.TOLERANCE );
+		p[0][2].should.be.approximately(0, verb.core.Constants.TOLERANCE );
+
+		// normalize the derivative
+		p[1] = verb.core.Vec.div( p[1], verb.core.Vec.norm(p[1]) );
+
+		p[1][0].should.be.approximately(0, verb.core.Constants.TOLERANCE );
+		p[1][1].should.be.approximately(-1, verb.core.Constants.TOLERANCE );
+		p[1][2].should.be.approximately(0, verb.core.Constants.TOLERANCE );
+
+	});
+
+});
+
+describe("verb.Circle.tessellate",function(){
+
+	it('gives correct result', function(){
+
+		var c = verb.Circle.byCenterAxesRadius([0,0,0], [1,0,0], [0,1,0], 5);
+
+		should.exist(c);
+
+		var pts = c.tessellate();
+
+		pts.length.should.be.greaterThan(2);
 		pts.map( function(e){  e.length.should.be.equal(3); });
 
 	});
@@ -4645,77 +4717,6 @@ describe("FourPointSurface.tessellate",function(){
 
 
 
-describe("Circle.constructor",function(){
-
-	it('can create an instance', function(){
-
-		var c = new verb.Circle([0,0,0], [1,0,0], [0,1,0], 5);
-
-		should.exist(c);
-
-	});
-
-});
-
-describe("Circle.point",function(){
-
-	it('evaluates correctly', function(){
-
-		var c = new verb.Circle([0,0,0], [1,0,0], [0,1,0], 5);
-
-		should.exist(c);
-
-		var p = c.point(0.5);
-
-		p[0].should.be.approximately(-5, verb.core.Constants.TOLERANCE );
-		p[1].should.be.approximately(0, verb.core.Constants.TOLERANCE );
-		p[2].should.be.approximately(0, verb.core.Constants.TOLERANCE );
-
-	});
-
-});
-
-describe("Circle.derivatives",function(){
-
-	it('gives correct result', function(){
-
-		var c = new verb.Circle([0,0,0], [1,0,0], [0,1,0], 5);
-
-		should.exist(c);
-
-		var p = c.derivatives(0.5, 1);
-
-		p[0][0].should.be.approximately(-5, verb.core.Constants.TOLERANCE );
-		p[0].mult.should.be.approximately(0, verb.core.Constants.TOLERANCE );
-		p[0][2].should.be.approximately(0, verb.core.Constants.TOLERANCE );
-
-		// normalize the derivative
-		p[1] = verb.core.Vec.div( p[1], verb.core.Vec.norm(p[1]) );
-
-		p[1][0].should.be.approximately(0, verb.core.Constants.TOLERANCE );
-		p[1].mult.should.be.approximately(-1, verb.core.Constants.TOLERANCE );
-		p[1][2].should.be.approximately(0, verb.core.Constants.TOLERANCE );
-
-	});
-
-});
-
-describe("Circle.tessellate",function(){
-
-	it('gives correct result', function(){
-
-		var c = new verb.Circle([0,0,0], [1,0,0], [0,1,0], 5);
-
-		should.exist(c);
-
-		var pts = c.tessellate();
-
-		pts.length.should.be.greaterThan(2);
-		pts.map( function(e){  e.length.should.be.equal(3); });
-
-	});
-
-});
 
 
 
@@ -5653,7 +5654,7 @@ describe("SweepOneRail.constructor",function(){
 			, p3 = [2,0,-1]
 			, p4 = [3,0,0];
 
-		var rail = new verb.BezierCurve( [p1, p2, p3, p4] )
+		var rail = verb.BezierCurve.byControlPoints( [p1, p2, p3, p4] )
 			, profile = verb.Line.byEnds( [0,1,0], [0,-1,0]  );
 
 		var srf = new verb.SweepOneRail( rail, profile );
@@ -5673,7 +5674,7 @@ describe("SweepOneRail.point",function(){
 			, p3 = [2,0,-1]
 			, p4 = [3,0,0];
 
-		var rail = new verb.BezierCurve( [p1, p2, p3, p4] )
+		var rail = verb.BezierCurve.byControlPoints( [p1, p2, p3, p4] )
 			, profile = verb.Line.byEnds( [0,1,0], [0,-1,0]  )
 
 		var srf = new verb.SweepOneRail( rail, profile );
@@ -5701,7 +5702,7 @@ describe("SweepOneRail.derivatives",function(){
 			, p3 = [2,0,-1]
 			, p4 = [3,0,0];
 
-		var rail = new verb.BezierCurve( [p1, p2, p3, p4] )
+		var rail = verb.BezierCurve.byControlPoints( [p1, p2, p3, p4] )
 			, profile = verb.Line.byEnds( [0,1,0], [0,-1,0]  )
 
 		var srf = new verb.SweepOneRail( rail, profile );
@@ -5736,7 +5737,7 @@ describe("SweepOneRail.tessellate",function(){
 			, p3 = [2,0,-1]
 			, p4 = [3,0,0];
 
-		var rail = new verb.BezierCurve( [p1, p2, p3, p4] )
+		var rail = verb.BezierCurve.byControlPoints( [p1, p2, p3, p4] )
 			, profile = verb.Line.byEnds( [0,1,0], [0,-1,0]  )
 
 		var srf = new verb.SweepOneRail( rail, profile );
@@ -5770,7 +5771,7 @@ describe("verb.intersectCurves",function(){
 			, p3 = [2,0,1]
 			, p4 = [3,0,0];
 
-		var curve1 = new verb.BezierCurve( [p1, p2, p3, p4] );
+		var curve1 = verb.BezierCurve.byControlPoints( [p1, p2, p3, p4] );
 
 		// build another
 		var c1 = [-5,0,3]
@@ -5778,7 +5779,7 @@ describe("verb.intersectCurves",function(){
 			, c3 = [2,0,0]
 			, c4 = [3,0,1];
 
-		var curve2 = new verb.BezierCurve( [c1, c2, c3, c4] );
+		var curve2 = verb.BezierCurve.byControlPoints( [c1, c2, c3, c4] );
 
 		// make sync work
 		var res = verb.intersectCurves( curve1, curve2 );
@@ -5810,7 +5811,7 @@ describe("verb.intersectCurveSurface",function(){
 			, vlength = 10;
 
 		var srf = new verb.PlanarSurface( base, uaxis, vaxis, ulength, vlength );
-		var crv = new verb.BezierCurve( [ [5.2,5.2,5], [5.4,4.8,0], [5.2,5.2,-5] ] );
+		var crv = verb.BezierCurve.byControlPoints( [ [5.2,5.2,5], [5.4,4.8,0], [5.2,5.2,-5] ] );
 
 		var options = {
 			sampleTolerance: 1e-12,
