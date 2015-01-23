@@ -148,19 +148,16 @@ class Eval {
 														v : Float,
 														numDerivs : Int = 1) : Array<Array<Array<Float>>> {
 
-		var ders = surfaceDerivatives( surface, numDerivs
-		, u, v )
+		var ders = surfaceDerivatives( surface, u, v, numDerivs)
 		, Aders = rational2d(ders)
 		, wders = weight2d(ders)
 		, SKL = new Array<Array<Array<Float>>>()
 		, dim = Aders[0][0].length;
 
-		for (k in 0...numDerivs
-		+1){
+		for (k in 0...numDerivs+1){
 			SKL.push( new Array<Array<Float>>() );
 
-			for (l in 0...numDerivs
-			-k+1){
+			for (l in 0...numDerivs-k+1){
 				var v = Aders[k][l];
 
 				for (j in 1...l+1){
@@ -451,12 +448,12 @@ class Eval {
 	//
 
 	
-	public static function surfaceDerivatives( surface : SurfaceData, numDerivs : Int, u : Float, v : Float ) : Array<Array<Point>> {
+	public static function surfaceDerivatives( surface : SurfaceData, u : Float, v : Float, numDerivs : Int ) : Array<Array<Point>> {
 
 		var n = surface.knotsU.length - surface.degreeU - 2
 		, m = surface.knotsV.length - surface.degreeV - 2;
 
-		return surfaceDerivativesGivenNM( n, m, surface, numDerivs, u, v );
+		return surfaceDerivativesGivenNM( n, m, surface, u, v, numDerivs );
 
 	}
 
@@ -478,9 +475,9 @@ class Eval {
 	public static function surfaceDerivativesGivenNM( n : Int,
 													 m : Int,
 													 surface : SurfaceData,
-													 numDerivs : Int,
 													 u : Float,
-													 v: Float) : Array<Array<Point>>{
+													 v: Float,
+													 numDerivs : Int ) : Array<Array<Point>>{
 
 		var degreeU = surface.degreeU
 		, degreeV = surface.degreeV

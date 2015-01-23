@@ -1,5 +1,6 @@
 package verb;
 
+import verb.core.Modify;
 import verb.core.Analyze;
 import verb.core.ArrayExtensions;
 using verb.core.ArrayExtensions;
@@ -55,7 +56,7 @@ class NurbsSurface extends AsyncObject {
     }
 
     public function derivatives( u : Float, v : Float, numDerivs : Int = 1 ) : Array<Array<Vector>> {
-        return Eval.rationalSurfaceDerivatives( _data, u, v );
+        return Eval.rationalSurfaceDerivatives( _data, u, v, numDerivs );
     }
 
     public function closestParam( pt : Point ) : Float {
@@ -64,6 +65,10 @@ class NurbsSurface extends AsyncObject {
 
     public function closestPoint( pt : Point ) : Point {
         return Analyze.rationalSurfaceClosestPoint( _data, pt );
+    }
+
+    public function split( u : Float, v : Float, useV : Bool = false) : Array<NurbSurface> {
+        return Modify.surfaceSplit( _data, u, useV ).map(function(x){ return new NurbsSurface(x); });
     }
 
 }

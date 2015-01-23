@@ -67,7 +67,7 @@ class NurbsCurve extends AsyncObject {
     // + 4d array representing the transform
     //
     // **returns**
-    // + An array if called synchronously, otherwise nothing
+    // + A point represented as an array
 
     public function transform( mat : Matrix ) : NurbsCurve {
         var pts = controlPoints();
@@ -89,7 +89,7 @@ class NurbsCurve extends AsyncObject {
     // + The parameter to sample the curve
     //
     // **returns**
-    // + An array if called synchronously, otherwise nothing
+    // + A point represented as an array
 
     public function point( u : Float ) : Point {
         return Eval.rationalCurvePoint( _data, u );
@@ -99,8 +99,21 @@ class NurbsCurve extends AsyncObject {
         return deferMethod( Eval, 'rationalCurvePoint', [ _data,  u ] );
     }
 
+    // Obtain the curve tangent at the given parameter.  This is the first derivative and is
+    // not normalized
+    //
+    // **params**
+    // + The parameter to sample the curve
+    //
+    // **returns**
+    // + A point represented as an array
+
     public function tangent( u : Float ) : Vector {
         return Eval.rationalCurveTangent( _data, u );
+    }
+
+    public function tangentAsync( u : Float ) : Promise<Vector> {
+        return deferMethod( Eval, 'rationalCurveTangent', [ _data, u ] );
     }
 
     // Get derivatives at a given parameter
@@ -110,7 +123,7 @@ class NurbsCurve extends AsyncObject {
     // + The number of derivatives to obtain
     //
     // **returns**
-    // + An array if called synchronously, otherwise nothing
+    // + A point represented as an array
 
     public function derivatives( u : Float, numDerivs : Int = 1 ) : Array<Point> {
         return Eval.rationalCurveDerivatives( _data, u, numDerivs );
@@ -236,7 +249,7 @@ class NurbsCurve extends AsyncObject {
     // + The number of derivatives to obtain
     //
     // **returns**
-    // + An array if called synchronously, otherwise nothing
+    // + A point represented as an array
 
     public function tessellate(tolerance : Float = null) : Array<Point> {
         return Tess.rationalCurveAdaptiveSample( _data, tolerance, false );

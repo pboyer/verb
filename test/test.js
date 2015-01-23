@@ -4073,6 +4073,68 @@ describe("verb.NurbsCurve.lengthAtParam",function(){
 
 });
 
+describe("verb.NurbsCurve.derivatives",function(){
+
+	var degree = 3
+		, knots = [0,0,0,0,0.5,1,1,1,1]
+		, controlPoints = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
+		, weights = [ 1, 1, 1, 1, 1 ]
+		, pt = [1,0.2,0];
+
+	var crv = verb.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
+
+	it('returns the derivatives for a straight curve', function(){
+
+		var p = crv.derivatives( 0.5 );
+
+		vecShouldBe( [2,0,0], p[0], 1e-3 );
+		vecShouldBe( [3,0,0], p[1], 1e-3 );
+
+	});
+
+	it('returns the derivatives for a straight curve async', function(done){
+
+		crv.derivativesAsync( 0.5 ).then(function(p){
+
+			vecShouldBe( [2,0,0], p[0], 1e-3 );
+			vecShouldBe( [3,0,0], p[1], 1e-3 );
+
+			done();
+		});
+
+	});
+});
+
+describe("verb.NurbsCurve.tangent",function(){
+
+	var degree = 3
+		, knots = [0,0,0,0,0.5,1,1,1,1]
+		, controlPoints = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
+		, weights = [ 1, 1, 1, 1, 1 ]
+		, pt = [1,0.2,0];
+
+	var crv = verb.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
+
+	it('can get the tangent for a straight curve', function(){
+
+		var p = crv.tangent( 0.5 );
+
+		vecShouldBe( [3,0,0], p, 1e-3 );
+
+	});
+
+	it('can get the tangent for a straight curve async', function(done){
+
+		crv.tangentAsync( 0.5 ).then(function(p){
+
+			vecShouldBe( [3,0,0], p, 1e-3 );
+
+			done();
+		});
+
+	});
+
+});
 
 describe("verb.NurbsCurve.paramAtLength",function(){
 

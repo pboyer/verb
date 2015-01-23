@@ -2,38 +2,10 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="938890c0-f1ce-4fbd-8322-63610af7f5e6" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/verb/eval/eval.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/verb/eval/geom.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/verb/eval/header.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/verb/eval/intersect.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/verb/eval/tessellate.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/verb/geom/Interval.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/verb/geom/Interval2.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/verb/geom/WatchObject.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/verb/geom/uid.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/verb/intersect/curveCurve.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/verb/intersect/curveSurface.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/verb/verb.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/out/production/verb/verb/Geometry.hx" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/types/AdaptiveRefinementNode.hx" afterPath="$PROJECT_DIR$/src/verb/core/types/AdaptiveRefinementNode.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/Analyze.hx" afterPath="$PROJECT_DIR$/src/verb/core/Analyze.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/Arc.hx" afterPath="$PROJECT_DIR$/src/verb/Arc.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/verb/verb/core/ArrayExtensions.hx" afterPath="$PROJECT_DIR$/out/production/verb/verb/core/ArrayExtensions.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/verb/verb/BoundingBox.hx" afterPath="$PROJECT_DIR$/out/production/verb/verb/BoundingBox.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/verb/verb/exe/Dispatcher.hx" afterPath="$PROJECT_DIR$/out/production/verb/verb/exe/Dispatcher.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/exe/Dispatcher.hx" afterPath="$PROJECT_DIR$/src/verb/exe/Dispatcher.hx" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/verb/verb/core/Eval.hx" afterPath="$PROJECT_DIR$/out/production/verb/verb/core/Eval.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/Eval.hx" afterPath="$PROJECT_DIR$/src/verb/core/Eval.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/verb/verb/Init.hx" afterPath="$PROJECT_DIR$/out/production/verb/verb/Init.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/Init.hx" afterPath="$PROJECT_DIR$/src/verb/Init.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/Intersect.hx" afterPath="$PROJECT_DIR$/src/verb/core/Intersect.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/verb/verb/core/Make.hx" afterPath="$PROJECT_DIR$/out/production/verb/verb/core/Make.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/Make.hx" afterPath="$PROJECT_DIR$/src/verb/core/Make.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/verb/verb/NurbsCurve.hx" afterPath="$PROJECT_DIR$/out/production/verb/verb/NurbsCurve.hx" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/NurbsCurve.hx" afterPath="$PROJECT_DIR$/src/verb/NurbsCurve.hx" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/verb/verb/NurbsSurface.hx" afterPath="$PROJECT_DIR$/out/production/verb/verb/NurbsSurface.hx" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/NurbsSurface.hx" afterPath="$PROJECT_DIR$/src/verb/NurbsSurface.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/Tess.hx" afterPath="$PROJECT_DIR$/src/verb/core/Tess.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/out/production/verb/verb/exe/WorkerPool.hx" afterPath="$PROJECT_DIR$/out/production/verb/verb/exe/WorkerPool.hx" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/test.js" afterPath="$PROJECT_DIR$/test/test.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/verb.js" afterPath="$PROJECT_DIR$/build/verb.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/verbHaxe.js" afterPath="$PROJECT_DIR$/build/verbHaxe.js" />
@@ -75,8 +47,8 @@
       <file leaf-file-name="NurbsCurve.hx" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/verb/NurbsCurve.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1521" max-vertical-offset="4110">
-              <caret line="111" column="18" selection-start-line="111" selection-start-column="18" selection-end-line="111" selection-end-column="18" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="1305" max-vertical-offset="4305">
+              <caret line="110" column="51" selection-start-line="110" selection-start-column="51" selection-end-line="110" selection-end-column="51" />
               <folding />
             </state>
           </provider>
@@ -92,41 +64,31 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Ellipse.hx" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/verb/Ellipse.hx">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="510">
-              <caret line="26" column="0" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="NurbsSurface.hx" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/verb/NurbsSurface.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="349" max-vertical-offset="1125">
-              <caret line="50" column="5" selection-start-line="50" selection-start-column="5" selection-end-line="50" selection-end-column="5" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="424" max-vertical-offset="1200">
+              <caret line="72" column="0" selection-start-line="72" selection-start-column="0" selection-end-line="72" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="test.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="test.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/test/test.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="4494" max-vertical-offset="89805">
-              <caret line="328" column="0" selection-start-line="328" selection-start-column="0" selection-end-line="328" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.45876288" vertical-offset="61474" max-vertical-offset="90735">
+              <caret line="4122" column="0" selection-start-line="4122" selection-start-column="0" selection-end-line="4122" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Eval.hx" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Eval.hx" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/verb/core/Eval.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.59881425" vertical-offset="2037" max-vertical-offset="16335">
-              <caret line="156" column="35" selection-start-line="156" selection-start-column="35" selection-end-line="156" selection-end-column="35" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="1992" max-vertical-offset="16335">
+              <caret line="154" column="35" selection-start-line="154" selection-start-column="35" selection-end-line="154" selection-end-column="35" />
               <folding />
             </state>
           </provider>
@@ -214,15 +176,15 @@
         <option value="$PROJECT_DIR$/src/verb/Ellipse.hx" />
         <option value="$PROJECT_DIR$/src/verb/Circle.hx" />
         <option value="$PROJECT_DIR$/src/verb/Init.hx" />
-        <option value="$PROJECT_DIR$/src/verb/NurbsSurface.hx" />
         <option value="$PROJECT_DIR$/src/verb/EllipseArc.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/types/AdaptiveRefinementNode.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Tess.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Analyze.hx" />
-        <option value="$PROJECT_DIR$/src/verb/NurbsCurve.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Intersect.hx" />
-        <option value="$PROJECT_DIR$/test/test.js" />
         <option value="$PROJECT_DIR$/src/verb/core/Eval.hx" />
+        <option value="$PROJECT_DIR$/src/verb/NurbsSurface.hx" />
+        <option value="$PROJECT_DIR$/src/verb/NurbsCurve.hx" />
+        <option value="$PROJECT_DIR$/test/test.js" />
       </list>
     </option>
   </component>
@@ -324,28 +286,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="verb" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="verb" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="verb" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="src" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="verb" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="core" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -626,7 +566,7 @@
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.33582088" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.0" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
@@ -729,16 +669,6 @@
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2505">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/core/Modify.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="732" max-vertical-offset="6255">
-          <caret line="64" column="5" selection-start-line="64" selection-start-column="5" selection-end-line="64" selection-end-column="5" />
-          <folding>
-            <element signature="e#5542#5919#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1004,14 +934,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/NurbsSurface.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="349" max-vertical-offset="1125">
-          <caret line="50" column="5" selection-start-line="50" selection-start-column="5" selection-end-line="50" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/verb/Ellipse.hx">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="510">
@@ -1054,14 +976,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/NurbsCurve.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1521" max-vertical-offset="4110">
-          <caret line="111" column="18" selection-start-line="111" selection-start-column="18" selection-end-line="111" selection-end-column="18" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/verb/core/Intersect.hx">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="1101" max-vertical-offset="15285">
@@ -1070,18 +984,44 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/test.js">
+    <entry file="file://$PROJECT_DIR$/src/verb/core/Eval.hx">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="4494" max-vertical-offset="89805">
-          <caret line="328" column="0" selection-start-line="328" selection-start-column="0" selection-end-line="328" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="1992" max-vertical-offset="16335">
+          <caret line="154" column="35" selection-start-line="154" selection-start-column="35" selection-end-line="154" selection-end-column="35" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/core/Eval.hx">
+    <entry file="file://$PROJECT_DIR$/src/verb/core/Modify.hx">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.59881425" vertical-offset="2037" max-vertical-offset="16335">
-          <caret line="156" column="35" selection-start-line="156" selection-start-column="35" selection-end-line="156" selection-end-column="35" />
+        <state vertical-scroll-proportion="0.243083" vertical-offset="822" max-vertical-offset="6255">
+          <caret line="63" column="0" selection-start-line="63" selection-start-column="0" selection-end-line="63" selection-end-column="0" />
+          <folding>
+            <element signature="e#5542#5919#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/NurbsSurface.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="424" max-vertical-offset="1200">
+          <caret line="72" column="0" selection-start-line="72" selection-start-column="0" selection-end-line="72" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/NurbsCurve.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="1305" max-vertical-offset="4305">
+          <caret line="110" column="51" selection-start-line="110" selection-start-column="51" selection-end-line="110" selection-end-column="51" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/test.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.45876288" vertical-offset="61474" max-vertical-offset="90735">
+          <caret line="4122" column="0" selection-start-line="4122" selection-start-column="0" selection-end-line="4122" selection-end-column="0" />
           <folding />
         </state>
       </provider>

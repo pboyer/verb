@@ -796,6 +796,9 @@ verb.NurbsCurve.prototype = $extend(verb.exe.AsyncObject.prototype,{
 	,tangent: function(u) {
 		return verb.core.Eval.rationalCurveTangent(this._data,u);
 	}
+	,tangentAsync: function(u) {
+		return this.deferMethod(verb.core.Eval,"rationalCurveTangent",[this._data,u]);
+	}
 	,derivatives: function(u,numDerivs) {
 		if(numDerivs == null) numDerivs = 1;
 		return verb.core.Eval.rationalCurveDerivatives(this._data,u,numDerivs);
