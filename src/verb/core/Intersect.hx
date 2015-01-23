@@ -85,14 +85,14 @@ class Intersect {
 
         do {
             // 1) eval normals, pts on respective surfaces (p, q, pn, qn)
-            pds = Eval.rationalSurfaceDerivatives( surface0, 1, uv1[0], uv1[1] );
+            pds = Eval.rationalSurfaceDerivatives( surface0, uv1[0], uv1[1], 1 );
             p = pds[0][0];
             pu = pds[1][0];
             pv = pds[0][1];
             pn = Vec.normalized( Vec.cross( pu, pv ) );
             pd = Vec.dot( pn, p );
 
-            qds = Eval.rationalSurfaceDerivatives( surface0, 1, uv2[0], uv2[1] );
+            qds = Eval.rationalSurfaceDerivatives( surface0, uv2[0], uv2[1], 1 );
             q = qds[0][0];
             qu = qds[1][0];
             qv = qds[0][1];

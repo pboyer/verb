@@ -100,7 +100,7 @@ class AdaptiveRefinementNode {
 
     public function evalSrf( u : Float, v : Float, srfPt : SurfacePoint = null ) : SurfacePoint {
 
-        var derivs = Eval.rationalSurfaceDerivatives( this.srf, 1, u, v );
+        var derivs = Eval.rationalSurfaceDerivatives( this.srf, u, v, 1 );
         var pt = derivs[0][0];
         var norm = Vec.cross(  derivs[0][1], derivs[1][0] );
         var degen = Vec.isZero( norm );

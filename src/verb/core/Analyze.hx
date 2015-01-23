@@ -24,7 +24,12 @@ class Analyze {
         return true;
     }
 
-    public static function rationalSurfaceClosestPoint( surface : SurfaceData, p : Point ) : UV {
+    public static function rationalSurfaceClosestPoint( surface : SurfaceData, p : Point ) : Point {
+        var uv = Analyze.rationalSurfaceClosestParam( surface, p );
+        return Eval.rationalSurfacePoint( surface, uv[0], uv[1] );
+    }
+
+    public static function rationalSurfaceClosestParam( surface : SurfaceData, p : Point ) : UV {
 
         // for surfaces, we try to minimize the following:
         //
@@ -98,7 +103,7 @@ class Analyze {
         }
 
         function f(uv : UV) : Array<Array<Point>> {
-            return Eval.rationalSurfaceDerivatives( surface, 2, uv[0], uv[1] );
+            return Eval.rationalSurfaceDerivatives( surface, uv[0], uv[1], 2 );
         }
 
         function n(uv : UV, e : Array<Array<Point>>, r : Array<Float>) : UV {

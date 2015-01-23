@@ -12,11 +12,10 @@ class BoundingBox {
     var min : Point = null;
     var max : Point = null;
 
-    //
     // BoundingBox Constructor
     //
     // **params**
-    // + *Array*, Points to add, if desired.  Otherwise, will not be initialized until add is called.
+    // + Points to add, if desired.  Otherwise, will not be initialized until add is called.
 
     public function new( pts : Array<Point> = null ) {
         if ( pts != null ) {
@@ -27,26 +26,23 @@ class BoundingBox {
     // Create a bounding box initialized with a single element
     //
     // **params**
-    // + *Array*, A array of numbers
+    // + A array of numbers
     //
     // **returns**
     // + This BoundingBox for chaining
-    //
 
     public function fromPoint( pt ){
         return new verb.BoundingBox( [ pt ] );
     }
 
-    //
     // Adds a point to the bounding box, expanding the bounding box if the point is outside of it.
     // If the bounding box is not initialized, this method has that side effect.
     //
     // **params**
-    // + *Array*, A length-n array of numbers
+    // + A length-n array of numbers
     //
     // **returns**
     // + This BoundingBox for chaining
-    //
 
     public function add( point : Point ) : BoundingBox
     {
@@ -69,15 +65,13 @@ class BoundingBox {
 
     }
 
-    //
     // Asynchronously add an array of points to the bounding box
     //
     // **params**
-    // + *Array*, An array of length-n array of numbers
+    // + An array of length-n array of numbers
     //
     // **returns**
     // + this BoundingBox for chaining
-    //
 
     public function addRange( points : Array<Point> ) : BoundingBox
     {
@@ -90,7 +84,6 @@ class BoundingBox {
         return this;
     }
 
-    //
     // Determines if point is contained in the bounding box
     //
     // **params**
@@ -99,7 +92,6 @@ class BoundingBox {
     //
     // **returns**
     // + true if the two intervals overlap, otherwise false
-    //
 
     public function contains(point : Point, tol : Float = -1) : Bool {
 
@@ -111,7 +103,6 @@ class BoundingBox {
         return this.intersects( new verb.BoundingBox([point]), tol );
     }
 
-    //
     // Determines if two intervals on the real number line intersect
     //
     // **params**
@@ -122,7 +113,6 @@ class BoundingBox {
     //
     // **returns**
     // + true if the two intervals overlap, otherwise false
-    //
 
     public static function intervalsOverlap( a1 : Float, a2: Float, b1: Float, b2: Float, tol : Float = -1 ) : Bool {
 
@@ -135,7 +125,6 @@ class BoundingBox {
         return (x1 >= y1 && x1 <= y2) || (x2 >= y1 && x2 <= y2) || (y1 >= x1 && y1 <= x2) || (y2 >= x1 && y2 <= x2) ;
     }
 
-    //
     // Determines if this bounding box intersects with another
     //
     // **params**
@@ -143,7 +132,6 @@ class BoundingBox {
     //
     // **returns**
     // +  true if the two bounding boxes intersect, otherwise false
-    //
 
     public function intersects( bb : BoundingBox, tol : Float = -1 ) : Bool {
 
@@ -161,25 +149,21 @@ class BoundingBox {
         return true;
     }
 
-    //
     // Clear the bounding box, leaving it in an uninitialized state.  Call add, addRange in order to
     // initialize
     //
     // **returns**
     // + this BoundingBox for chaining
-    //
 
     public function clear() : BoundingBox {
         this.initialized = false;
         return this;
     }
 
-    //
     // Get longest axis of bounding box
     //
     // **returns**
     // + Index of longest axis
-    //
 
     public function getLongestAxis() : Int {
 
@@ -197,7 +181,6 @@ class BoundingBox {
         return id;
     }
 
-    //
     // Get length of given axis.
     //
     // **params**
@@ -205,14 +188,12 @@ class BoundingBox {
     //
     // **returns**
     // + Length of the given axis.  If axis is out of bounds, returns 0.
-    //
 
     public function getAxisLength( i : Int ) : Float {
         if (i < 0 || i > this.dim-1) return 0.0;
         return Math.abs( this.min[i] - this.max[i] );
     }
 
-    //
     // Compute the boolean intersection of this with another axis-aligned bounding box.  If the two
     // bounding boxes do not intersect, returns null.
     //
@@ -221,7 +202,6 @@ class BoundingBox {
     //
     // **returns**
     // + The bounding box formed by the intersection or null if there is no intersection.
-    //
 
     public function intersect( bb : BoundingBox, tol : Float ) : BoundingBox {
 

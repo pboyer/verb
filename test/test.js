@@ -95,22 +95,26 @@ describe("verb.core.Eval.curvePoint",function(){
 			, controlPoints = [ [10, 0], [20, 10], [30, 20], [40, 30], [50, 40], [60, 30], [70, 80]]
 			, crv = new verb.core.CurveData( degree, knots, controlPoints  );
 
-		var p = verb.core.Eval.curvePoint_given_n( n, crv, 2.5);
+		var p = verb.core.Eval.curvePointGivenN( n, crv, 2.5);
 
 		should.equal( p[0], 40 );
 		should.equal( p[1], 30 );
 
-		var p_start = verb.core.Eval.curvePoint_given_n( n, crv, 0);
+		var p_start = verb.core.Eval.curvePointGivenN( n, crv, 0);
 
 		should.equal( p_start[0], 10 );
 		should.equal( p_start[1], 0 );
 
-		var p_end = verb.core.Eval.curvePoint_given_n( n, crv, 5);
+		var p_end = verb.core.Eval.curvePointGivenN( n, crv, 5);
 
 		should.equal( p_end[0], 70 );
 		should.equal( p_end[1], 80 );
 
 	});
+
+});
+
+describe("verb.core.Eval.curvePointGivenN",function(){
 
 	it('returns correct result for simple curve', function(){
 
@@ -323,7 +327,7 @@ describe("verb.core.Eval.surfaceDerivativesGivenNM",function(){
 			, num_derivatives = 1
 			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
 
-		var p = verb.core.Eval.surfaceDerivativesGivenNM( n, m, surface, num_derivatives, 0, 0 );
+		var p = verb.core.Eval.surfaceDerivativesGivenNM( n, m, surface, 0, 0, num_derivatives );
 
 		// 0th derivative with respect to u & v
 		should.equal( p[0][0][0], 0 );
@@ -366,7 +370,7 @@ describe("verb.core.Eval.surfaceDerivatives",function(){
 			, num_derivatives = 1
 			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
 
-		var p = verb.core.Eval.surfaceDerivatives( surface, num_derivatives, 0, 0 );
+		var p = verb.core.Eval.surfaceDerivatives( surface, 0, 0, num_derivatives );
 
 		// 0th derivative with respect to u & v
 		should.equal( p[0][0][0], 0 );
@@ -597,7 +601,7 @@ describe("verb.core.Eval.rationalSurfaceDerivatives",function(){
 			, num_derivatives = 1
 			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
 
-		var p = verb.core.Eval.rationalSurfaceDerivatives( surface, num_derivatives, 0, 0);
+		var p = verb.core.Eval.rationalSurfaceDerivatives( surface, 0, 0, num_derivatives );
 
 		should.equal( p[0][0][0], 1 );
 		should.equal( p[0][0][1], 1 );
@@ -611,7 +615,7 @@ describe("verb.core.Eval.rationalSurfaceDerivatives",function(){
 		should.equal( p[1][0][1], 0 );
 		should.equal( p[1][0][2], 0 );
 
-		p = verb.core.Eval.rationalSurfaceDerivatives( surface, num_derivatives, 1, 1);
+		p = verb.core.Eval.rationalSurfaceDerivatives( surface, 1, 1, num_derivatives);
 
 		should.equal( p[0][0][0], -1 );
 		should.equal( p[0][0][1], 0 );
@@ -1733,14 +1737,14 @@ describe("verb.core.Make.ellipseArc",function(){
 	it('returns correct result for unit arc from 0 to 90 deg', function(){
 
 		var center = [0,0,0]
-			, x = [1,0,0]
-			, y = [0,1,0]
 			, rx = 5
-			, ry = 1
+      		, ry = 1
+			, x = [rx,0,0]
+			, y = [0,ry,0]
 			, start = 0
 			, end = Math.PI/2;
 
-		var ellipse = verb.core.Make.ellipseArc(center, x, y, rx, ry, start, end);
+		var ellipse = verb.core.Make.ellipseArc(center, x, y, start, end);
 
 		// the typical parametric rep of an ellipse
 		var xmid = rx * Math.cos( Math.PI / 4 )
@@ -1769,14 +1773,14 @@ describe("verb.core.Make.ellipseArc",function(){
 	it('returns correct result for unit arc from 0 to 90 deg', function(){
 
 		var center = [0,0,0]
-			, x = [1,0,0]
-			, y = [0,1,0]
 			, rx = 5
-			, ry = 1
+      		, ry = 1
+			, x = [rx,0,0]
+			, y = [0,ry,0]
 			, start = 0
 			, end = Math.PI / 2;
 
-		var arc = verb.core.Make.ellipseArc(center, x, y, rx, ry, start, end);
+		var arc = verb.core.Make.ellipseArc(center, x, y, start, end);
 
 		var p = verb.core.Eval.rationalCurvePoint( arc, 1);
 		
@@ -1789,14 +1793,14 @@ describe("verb.core.Make.ellipseArc",function(){
 	it('returns correct result for unit arc from 45 to 135 deg', function(){
 
 		var center = [0,0,0]
-			, x = [1,0,0]
-			, y = [0,1,0]
 			, rx = 1
-			, ry = 10
+      		, ry = 10
+			, x = [rx,0,0]
+			, y = [0,ry,0]
 			, start = Math.PI/4
 			, end = 3 * Math.PI/4;
 
-		var arc = verb.core.Make.ellipseArc(center, x, y, rx, ry, start, end);
+		var arc = verb.core.Make.ellipseArc(center, x, y, start, end);
 
 		var p = verb.core.Eval.rationalCurvePoint( arc, 1);
 		
@@ -1813,14 +1817,14 @@ describe("verb.core.Make.ellipseArc",function(){
 	it('returns correct result for complete ellipse', function(){
 
 		var center = [0,0,0]
-			, x = [1,0,0]
-			, y = [0,1,0]
 			, rx = 1
-			, ry = 10
+      		, ry = 10
+			, x = [rx,0,0]
+			, y = [0,ry,0]
 			, start = 0
 			, end = Math.PI * 2;
 
-		var ellipse = verb.core.Make.ellipseArc(center, x, y, rx, ry, start, end);
+		var ellipse = verb.core.Make.ellipseArc(center, x, y, start, end);
 
 		// the typical parametric rep of an ellipse
 		var xmid = rx * Math.cos( Math.PI / 4 )
@@ -2782,7 +2786,7 @@ describe("verb.core.Analyze.rationalCurveClosestParam",function(){
 
 });
 
-describe("verb.core.Analyze.rationalSurfaceClosestPoint",function(){
+describe("verb.core.Analyze.rationalSurfaceClosestParam",function(){
 
 	it('can get closest point to flat bezier patch', function(){
 
@@ -2797,7 +2801,7 @@ describe("verb.core.Analyze.rationalSurfaceClosestPoint",function(){
 			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints )
 			, point = [12,-20,5];
 
-		var res = verb.core.Analyze.rationalSurfaceClosestPoint( surface, point );
+		var res = verb.core.Analyze.rationalSurfaceClosestParam( surface, point );
 		var p = verb.core.Eval.rationalSurfacePoint( surface, res[0], res[1] );
 
 		vecShouldBe( [12,-20,0], p, 1e-3 );
@@ -4311,7 +4315,7 @@ describe("verb.Arc.constructor",function(){
 
 	it('has correct properties', function(){
 
-		var arc = verb.Arc.byCenterAxesRadius([0,0,0], [1,0,0], [0,1,0], 5, 0, Math.PI/ 2 );
+		var arc = verb.Arc.byCenterAxesRadiusSpan([0,0,0], [1,0,0], [0,1,0], 5, 0, Math.PI/ 2 );
 
 		should.exist( arc );
 
@@ -4330,7 +4334,7 @@ describe("verb.Arc.point",function(){
 
 	it('returns expected results', function(){
 
-		var arc = verb.Arc.byCenterAxesRadius([0,0,1], [1,0,0], [0,1,0], 1, 0, Math.PI/ 2 );
+		var arc = verb.Arc.byCenterAxesRadiusSpan([0,0,1], [1,0,0], [0,1,0], 1, 0, Math.PI/ 2 );
 		var p1 = arc.point(0);
 		var p2 = arc.point(0.5);
 		var p3 = arc.point(1);
@@ -4353,7 +4357,7 @@ describe("verb.Arc.point",function(){
 
 	it('creates the expected result when given a callback', function(done){
 
-		var arc = verb.Arc.byCenterAxesRadius([0,0,1], [1,0,0], [0,1,0], 1, 0, Math.PI/ 2 );
+		var arc = verb.Arc.byCenterAxesRadiusSpan([0,0,1], [1,0,0], [0,1,0], 1, 0, Math.PI/ 2 );
 
 		arc.pointAsync(0.5).then(function(res){
 
@@ -4373,7 +4377,7 @@ describe("verb.Arc.tessellate",function(){
 
 	it('should return a list of vertices', function(){
 
-		var arc = verb.Arc.byCenterAxesRadius([0,0,1], [1,0,0], [0,1,0], 1, 0, Math.PI/ 2 );
+		var arc = verb.Arc.byCenterAxesRadiusSpan([0,0,1], [1,0,0], [0,1,0], 1, 0, Math.PI/ 2 );
 		var pts = arc.tessellate();
 
 		pts.length.should.be.greaterThan(2);
@@ -4617,6 +4621,169 @@ describe("verb.Circle.tessellate",function(){
 
 });
 
+describe("verb.Ellipse.constructor",function(){
+
+	it('can create an instance', function(){
+
+		var c = verb.Ellipse.byCenterAxes([0,0,0], [5,0,0], [0,10,0]);
+
+		should.exist(c);
+
+	});
+
+});
+
+describe("verb.Ellipse.point",function(){
+
+	it('evaluates correctly', function(){
+
+		var c = verb.Ellipse.byCenterAxes([0,0,0], [5,0,0], [0,10,0]);
+
+		should.exist(c);
+
+		var p = c.point(0.5);
+
+		p[0].should.be.approximately(-5, verb.core.Constants.TOLERANCE );
+		p[1].should.be.approximately(0, verb.core.Constants.TOLERANCE );
+		p[2].should.be.approximately(0, verb.core.Constants.TOLERANCE );
+
+		var p = c.point(0.25);
+
+		p[0].should.be.approximately(0, verb.core.Constants.TOLERANCE );
+		p[1].should.be.approximately(10, verb.core.Constants.TOLERANCE );
+		p[2].should.be.approximately(0, verb.core.Constants.TOLERANCE );
+
+	});
+
+});
+
+describe("verb.Ellipse.derivatives",function(){
+
+	it('gives correct result', function(){
+
+		var c = verb.Ellipse.byCenterAxes([0,0,0], [5,0,0], [0,10,0]);
+
+		should.exist(c);
+
+		var p = c.derivatives(0.5, 1);
+
+		p[0][0].should.be.approximately(-5, verb.core.Constants.TOLERANCE );
+		p[0][1].should.be.approximately(0, verb.core.Constants.TOLERANCE );
+		p[0][2].should.be.approximately(0, verb.core.Constants.TOLERANCE );
+
+		// normalize the derivative
+		p[1] = verb.core.Vec.div( p[1], verb.core.Vec.norm(p[1]) );
+
+		p[1][0].should.be.approximately(0, verb.core.Constants.TOLERANCE );
+		p[1][1].should.be.approximately(-1, verb.core.Constants.TOLERANCE );
+		p[1][2].should.be.approximately(0, verb.core.Constants.TOLERANCE );
+
+		p = c.derivatives(0.25, 1);
+
+		p[0][0].should.be.approximately(0, verb.core.Constants.TOLERANCE );
+		p[0][1].should.be.approximately(10, verb.core.Constants.TOLERANCE );
+		p[0][2].should.be.approximately(0, verb.core.Constants.TOLERANCE );
+
+		// normalize the derivative
+		p[1] = verb.core.Vec.div( p[1], verb.core.Vec.norm(p[1]) );
+
+		p[1][0].should.be.approximately(-1, verb.core.Constants.TOLERANCE );
+		p[1][1].should.be.approximately(0, verb.core.Constants.TOLERANCE );
+		p[1][2].should.be.approximately(0, verb.core.Constants.TOLERANCE );
+
+	});
+
+});
+
+describe("verb.Ellipse.tessellate",function(){
+
+	it('gives correct result', function(){
+
+		var c = verb.Ellipse.byCenterAxes([0,0,0], [5,0,0], [0,10,0]);
+
+		should.exist(c);
+
+		var pts = c.tessellate();
+
+		pts.length.should.be.greaterThan(2);
+		pts.map( function(e){  e.length.should.be.equal(3); });
+
+	});
+
+});
+
+describe("verb.EllipseArc.constructor",function(){
+
+	it('can create an instance', function(){
+
+		var c = verb.EllipseArc.byCenterAxesSpan([0,0,0], [1,0,0], [0,1,0], 0, Math.PI);
+
+		should.exist(c);
+
+	});
+
+});
+
+describe("verb.EllipseArc.point",function(){
+
+	it('evaluates correctly', function(){
+
+		var c = verb.EllipseArc.byCenterAxesSpan([0,0,0], [1,0,0], [0,10,0], 0, Math.PI);
+
+		should.exist(c);
+
+		var p = c.point(0.5);
+
+		p[0].should.be.approximately(0, verb.core.Constants.TOLERANCE );
+		p[1].should.be.approximately(10, verb.core.Constants.TOLERANCE );
+		p[2].should.be.approximately(0, verb.core.Constants.TOLERANCE );
+
+	});
+
+});
+
+describe("verb.EllipseArc.derivatives",function(){
+
+	it('gives correct result', function(){
+
+		var c = verb.EllipseArc.byCenterAxesSpan([0,0,0], [1,0,0], [0,10,0], 0, Math.PI);
+
+		should.exist(c);
+
+		var p = c.derivatives(0.5, 1);
+
+		p[0][0].should.be.approximately(0, verb.core.Constants.TOLERANCE );
+		p[0][1].should.be.approximately(10, verb.core.Constants.TOLERANCE );
+		p[0][2].should.be.approximately(0, verb.core.Constants.TOLERANCE );
+
+		// normalize the derivative
+		p[1] = verb.core.Vec.div( p[1], verb.core.Vec.norm(p[1]) );
+
+		p[1][0].should.be.approximately(-1, verb.core.Constants.TOLERANCE );
+		p[1][1].should.be.approximately(0, verb.core.Constants.TOLERANCE );
+		p[1][2].should.be.approximately(0, verb.core.Constants.TOLERANCE );
+
+	});
+
+});
+
+describe("verb.EllipseArc.tessellate",function(){
+
+	it('gives correct result', function(){
+
+		var c = verb.EllipseArc.byCenterAxesSpan([0,0,0], [1,0,0], [0,10,0], 0, Math.PI);
+
+		should.exist(c);
+
+		var pts = c.tessellate();
+
+		pts.length.should.be.greaterThan(2);
+		pts.map( function(e){  e.length.should.be.equal(3); });
+
+	});
+
+});
+
 /*
 
 describe("FourPointSurface.constructor",function(){
@@ -4675,7 +4842,7 @@ describe("FourPointSurface.derivatives",function(){
 		var p = srf.derivatives(0.5, 0.5, 1);
 
 		p[0][0].should.eql([0.5,0.5,0.5]);
-		p[0].mult.should.eql([0,1,0]);
+		p[0][1].should.eql([0,1,0]);
 		p[1][0].should.eql([1,0,0]);
 
 	});
@@ -4707,177 +4874,6 @@ describe("FourPointSurface.tessellate",function(){
 		p.faces.map(function(e){ e.length.should.be.equal(3); });
 		p.normals.map(function(e){ e.length.should.be.equal(3); });
 
-
-	});
-
-});
-
-
-
-
-
-
-
-
-
-describe("Ellipse.constructor",function(){
-
-	it('can create an instance', function(){
-
-		var c = new verb.Ellipse([0,0,0], [1,0,0], [0,1,0], 5, 10);
-
-		should.exist(c);
-
-	});
-
-});
-
-describe("Ellipse.point",function(){
-
-	it('evaluates correctly', function(){
-
-		var c = new verb.Ellipse([0,0,0], [1,0,0], [0,1,0], 5, 10);
-
-		should.exist(c);
-
-		var p = c.point(0.5);
-
-		p[0].should.be.approximately(-5, verb.core.Constants.TOLERANCE );
-		p[1].should.be.approximately(0, verb.core.Constants.TOLERANCE );
-		p[2].should.be.approximately(0, verb.core.Constants.TOLERANCE );
-
-		var p = c.point(0.25);
-
-		p[0].should.be.approximately(0, verb.core.Constants.TOLERANCE );
-		p[1].should.be.approximately(10, verb.core.Constants.TOLERANCE );
-		p[2].should.be.approximately(0, verb.core.Constants.TOLERANCE );
-
-	});
-
-});
-
-describe("Ellipse.derivatives",function(){
-
-	it('gives correct result', function(){
-
-		var c = new verb.Ellipse([0,0,0], [1,0,0], [0,1,0], 5, 10);
-
-		should.exist(c);
-
-		var p = c.derivatives(0.5, 1);
-
-		p[0][0].should.be.approximately(-5, verb.core.Constants.TOLERANCE );
-		p[0].mult.should.be.approximately(0, verb.core.Constants.TOLERANCE );
-		p[0][2].should.be.approximately(0, verb.core.Constants.TOLERANCE );
-
-		// normalize the derivative
-		p[1] = verb.core.Vec.div( p[1], verb.core.Vec.norm(p[1]) );
-
-		p[1][0].should.be.approximately(0, verb.core.Constants.TOLERANCE );
-		p[1].mult.should.be.approximately(-1, verb.core.Constants.TOLERANCE );
-		p[1][2].should.be.approximately(0, verb.core.Constants.TOLERANCE );
-
-		p = c.derivatives(0.25, 1);
-
-		p[0][0].should.be.approximately(0, verb.core.Constants.TOLERANCE );
-		p[0].mult.should.be.approximately(10, verb.core.Constants.TOLERANCE );
-		p[0][2].should.be.approximately(0, verb.core.Constants.TOLERANCE );
-
-		// normalize the derivative
-		p[1] = verb.core.Vec.div( p[1], verb.core.Vec.norm(p[1]) );
-
-		p[1][0].should.be.approximately(-1, verb.core.Constants.TOLERANCE );
-		p[1].mult.should.be.approximately(0, verb.core.Constants.TOLERANCE );
-		p[1][2].should.be.approximately(0, verb.core.Constants.TOLERANCE );
-
-	});
-
-});
-
-describe("Ellipse.tessellate",function(){
-
-	it('gives correct result', function(){
-
-		var c = new verb.Ellipse([0,0,0], [1,0,0], [0,1,0], 5, 10);
-
-		should.exist(c);
-
-		var pts = c.tessellate();
-
-		pts.length.should.be.greaterThan(2);
-		pts.map( function(e){  e.length.should.be.equal(3); });
-
-	});
-
-});
-
-describe("EllipseArc.constructor",function(){
-
-	it('can create an instance', function(){
-
-		var c = new verb.EllipseArc([0,0,0], [1,0,0], [0,1,0], 5, 10, new verb.Interval(0, Math.PI));
-
-		should.exist(c);
-
-	});
-
-});
-
-describe("EllipseArc.point",function(){
-
-	it('evaluates correctly', function(){
-
-		var c = new verb.EllipseArc([0,0,0], [1,0,0], [0,1,0], 5, 10, new verb.Interval(0, Math.PI));
-
-		should.exist(c);
-
-		var p = c.point(0.5);
-
-		p[0].should.be.approximately(0, verb.core.Constants.TOLERANCE );
-		p[1].should.be.approximately(10, verb.core.Constants.TOLERANCE );
-		p[2].should.be.approximately(0, verb.core.Constants.TOLERANCE );
-
-	});
-
-});
-
-describe("EllipseArc.derivatives",function(){
-
-	it('gives correct result', function(){
-
-		var c = new verb.EllipseArc([0,0,0], [1,0,0], [0,1,0], 5, 10, new verb.Interval(0, Math.PI));
-
-		should.exist(c);
-
-		var p = c.derivatives(0.5, 1);
-
-		p[0][0].should.be.approximately(0, verb.core.Constants.TOLERANCE );
-		p[0].mult.should.be.approximately(10, verb.core.Constants.TOLERANCE );
-		p[0][2].should.be.approximately(0, verb.core.Constants.TOLERANCE );
-
-		// normalize the derivative
-		p[1] = verb.core.Vec.div( p[1], verb.core.Vec.norm(p[1]) );
-
-		p[1][0].should.be.approximately(-1, verb.core.Constants.TOLERANCE );
-		p[1].mult.should.be.approximately(0, verb.core.Constants.TOLERANCE );
-		p[1][2].should.be.approximately(0, verb.core.Constants.TOLERANCE );
-
-	});
-
-});
-
-describe("EllipseArc.tessellate",function(){
-
-	it('gives correct result', function(){
-
-		var c = new verb.EllipseArc([0,0,0], [1,0,0], [0,1,0], 5, 10, new verb.Interval(0, Math.PI));
-
-		should.exist(c);
-
-		var pts = c.tessellate();
-
-		pts.length.should.be.greaterThan(2);
-		pts.map( function(e){  e.length.should.be.equal(3); });
 
 	});
 
@@ -4927,7 +4923,7 @@ describe("PolyLine.derivatives",function(){
 		p[1] = verb.core.Vec.div( p[1], verb.core.Vec.norm(p[1]) );
 
 		p[1][0].should.be.approximately(-Math.sqrt(2) / 2, verb.core.Constants.TOLERANCE );
-		p[1].mult.should.be.approximately(Math.sqrt(2) / 2, verb.core.Constants.TOLERANCE );
+		p[1][1].should.be.approximately(Math.sqrt(2) / 2, verb.core.Constants.TOLERANCE );
 		p[1][2].should.be.approximately(0, verb.core.Constants.TOLERANCE );
 
 	});
@@ -4996,7 +4992,7 @@ describe("PolyLine.derivatives",function(){
 		p[1] = verb.core.Vec.div( p[1], verb.core.Vec.norm(p[1]) );
 
 		p[1][0].should.be.approximately(-Math.sqrt(2) / 2, verb.core.Constants.TOLERANCE );
-		p[1].mult.should.be.approximately(Math.sqrt(2) / 2, verb.core.Constants.TOLERANCE );
+		p[1][1].should.be.approximately(Math.sqrt(2) / 2, verb.core.Constants.TOLERANCE );
 		p[1][2].should.be.approximately(0, verb.core.Constants.TOLERANCE );
 
 	});
@@ -5079,17 +5075,17 @@ describe("Cone.derivatives",function(){
 		var p = srf.derivatives(0.5, 0.5, 1);
 
 		p[0][0][0].should.be.approximately(-1.5, verb.core.Constants.EPSILON );
-		p[0][0].mult.should.be.approximately(0, verb.core.Constants.EPSILON );
+		p[0][0][1].should.be.approximately(0, verb.core.Constants.EPSILON );
 		p[0][0][2].should.be.approximately(2.5, verb.core.Constants.EPSILON );
 
 		p[0][1][0].should.be.approximately(-3, verb.core.Constants.EPSILON );
-		p[0][1].mult.should.be.approximately(0, verb.core.Constants.EPSILON );
+		p[0][1][1].should.be.approximately(0, verb.core.Constants.EPSILON );
 		p[0][1][2].should.be.approximately(-5, verb.core.Constants.EPSILON );
 
 		p[1][0] = verb.core.Vec.div( p[1][0], verb.core.Vec.norm(p[1][0]) );
 
 		p[1][0][0].should.be.approximately(0, verb.core.Constants.EPSILON );
-		p[1][0].mult.should.be.approximately(-1, verb.core.Constants.EPSILON );
+		p[1][0][1].should.be.approximately(-1, verb.core.Constants.EPSILON );
 		p[1][0][2].should.be.approximately(0, verb.core.Constants.EPSILON );
 
 	});
@@ -5187,17 +5183,17 @@ describe("Cylinder.derivatives",function(){
 		var p = srf.derivatives(0.5, 0.5, 1);
 
 		p[0][0][0].should.be.approximately(-3, verb.core.Constants.EPSILON );
-		p[0][0].mult.should.be.approximately(0, verb.core.Constants.EPSILON );
+		p[0][0][1].should.be.approximately(0, verb.core.Constants.EPSILON );
 		p[0][0][2].should.be.approximately(2.5, verb.core.Constants.EPSILON );
 
 		p[1][0][0].should.be.approximately(0, verb.core.Constants.EPSILON );
-		p[1][0].mult.should.be.approximately(0, verb.core.Constants.EPSILON );
+		p[1][0][1].should.be.approximately(0, verb.core.Constants.EPSILON );
 		p[1][0][2].should.be.approximately(-5, verb.core.Constants.EPSILON );
 
 		p[0][1] = verb.core.Vec.div( p[0][1], verb.core.Vec.norm(p[0][1]) );
 
 		p[0][1][0].should.be.approximately(0, verb.core.Constants.EPSILON );
-		p[0][1].mult.should.be.approximately(-1, verb.core.Constants.EPSILON );
+		p[0][1][1].should.be.approximately(-1, verb.core.Constants.EPSILON );
 		p[0][1][2].should.be.approximately(0, verb.core.Constants.EPSILON );
 
 	});
@@ -5289,15 +5285,15 @@ describe("Extrusion.derivatives",function(){
 		var p = srf.derivatives(0.5, 0.5, 1);
 
 		p[0][0][0].should.be.approximately(0.5, verb.core.Constants.EPSILON );
-		p[0][0].mult.should.be.approximately(0.5, verb.core.Constants.EPSILON );
+		p[0][0][1].should.be.approximately(0.5, verb.core.Constants.EPSILON );
 		p[0][0][2].should.be.approximately(1.5, verb.core.Constants.EPSILON );
 
 		p[0][1][0].should.be.approximately(1, verb.core.Constants.EPSILON );
-		p[0][1].mult.should.be.approximately(1, verb.core.Constants.EPSILON );
+		p[0][1][1].should.be.approximately(1, verb.core.Constants.EPSILON );
 		p[0][1][2].should.be.approximately(0, verb.core.Constants.EPSILON );
 
 		p[1][0][0].should.be.approximately(0, verb.core.Constants.EPSILON );
-		p[1][0].mult.should.be.approximately(0, verb.core.Constants.EPSILON );
+		p[1][0][1].should.be.approximately(0, verb.core.Constants.EPSILON );
 		p[1][0][2].should.be.approximately(-3, verb.core.Constants.EPSILON );
 
 	});
@@ -5393,21 +5389,20 @@ describe("PlanarSurface.derivatives",function(){
 		var p = srf.derivatives(0.5, 0.5, 1);
 
 		p[0][0][0].should.be.approximately(5, verb.core.Constants.EPSILON );
-		p[0][0].mult.should.be.approximately(2, verb.core.Constants.EPSILON );
+		p[0][0][1].should.be.approximately(2, verb.core.Constants.EPSILON );
 		p[0][0][2].should.be.approximately(0, verb.core.Constants.EPSILON );
 
 		p[0][1][0].should.be.approximately(0, verb.core.Constants.EPSILON );
-		p[0][1].mult.should.be.approximately(4, verb.core.Constants.EPSILON );
+		p[0][1][1].should.be.approximately(4, verb.core.Constants.EPSILON );
 		p[0][1][2].should.be.approximately(0, verb.core.Constants.EPSILON );
 
 		p[1][0][0].should.be.approximately(10, verb.core.Constants.EPSILON );
-		p[1][0].mult.should.be.approximately(0, verb.core.Constants.EPSILON );
+		p[1][0][1].should.be.approximately(0, verb.core.Constants.EPSILON );
 		p[1][0][2].should.be.approximately(0, verb.core.Constants.EPSILON );
 
 	});
 
 });
-
 
 describe("PlanarSurface.tessellate",function(){
 
@@ -5496,18 +5491,18 @@ describe("RevolvedSurface.derivatives",function(){
 		var p = srf.derivatives(0.5, 0.5, 1);
 
 		p[0][0][0].should.be.approximately(0, verb.core.Constants.EPSILON );
-		p[0][0].mult.should.be.approximately(5.5, verb.core.Constants.EPSILON );
+		p[0][0][1].should.be.approximately(5.5, verb.core.Constants.EPSILON );
 		p[0][0][2].should.be.approximately(5.5, verb.core.Constants.EPSILON );
 
 
 		p[0][1][0].should.be.approximately(0, verb.core.Constants.EPSILON );
-		p[0][1].mult.should.be.approximately(9, verb.core.Constants.EPSILON );
+		p[0][1][1].should.be.approximately(9, verb.core.Constants.EPSILON );
 		p[0][1][2].should.be.approximately(-9, verb.core.Constants.EPSILON );
 
 	  p[1][0] = verb.core.Vec.normalized( p[1][0] );
 
 		p[1][0][0].should.be.approximately(-1, verb.core.Constants.EPSILON );
-		p[1][0].mult.should.be.approximately(0, verb.core.Constants.EPSILON );
+		p[1][0][1].should.be.approximately(0, verb.core.Constants.EPSILON );
 		p[1][0][2].should.be.approximately(0, verb.core.Constants.EPSILON );
 
 	});
@@ -5598,25 +5593,24 @@ describe("Sphere.derivatives",function(){
 		var p = srf.derivatives(0.5, 0.5, 1);
 
 		p[0][0][0].should.be.approximately(-radius, verb.core.Constants.EPSILON );
-		p[0][0].mult.should.be.approximately(0, verb.core.Constants.EPSILON );
+		p[0][0][1].should.be.approximately(0, verb.core.Constants.EPSILON );
 		p[0][0][2].should.be.approximately(0, verb.core.Constants.EPSILON );
 
 		p[0][1] = verb.core.Vec.normalized( p[0][1] );
 
 		p[0][1][0].should.be.approximately(0, verb.core.Constants.EPSILON );
-		p[0][1].mult.should.be.approximately(0, verb.core.Constants.EPSILON );
+		p[0][1][1].should.be.approximately(0, verb.core.Constants.EPSILON );
 		p[0][1][2].should.be.approximately(1, verb.core.Constants.EPSILON );
 
 	  p[1][0] = verb.core.Vec.normalized( p[1][0] );
 
 		p[1][0][0].should.be.approximately(0, verb.core.Constants.EPSILON );
-		p[1][0].mult.should.be.approximately(-1, verb.core.Constants.EPSILON );
+		p[1][0][1].should.be.approximately(-1, verb.core.Constants.EPSILON );
 		p[1][0][2].should.be.approximately(0, verb.core.Constants.EPSILON );
 
 	});
 
 });
-
 
 describe("Sphere.tessellate",function(){
 
@@ -5712,15 +5706,15 @@ describe("SweepOneRail.derivatives",function(){
 		var p = srf.derivatives(0.5, 0.5, 1);
 
 		p[0][0][0].should.be.greaterThan( 0 );
-		p[0][0].mult.should.be.approximately(0, verb.core.Constants.EPSILON );
+		p[0][0][1].should.be.approximately(0, verb.core.Constants.EPSILON );
 		p[0][0][2].should.be.greaterThan(0, verb.core.Constants.EPSILON );
 
 		p[0][1][0].should.be.approximately(0, verb.core.Constants.EPSILON );
-		p[0][1].mult.should.be.approximately(-2, verb.core.Constants.EPSILON );
+		p[0][1][1].should.be.approximately(-2, verb.core.Constants.EPSILON );
 		p[0][1][2].should.be.approximately(0, verb.core.Constants.EPSILON );
 
 		p[0][0][0].should.be.greaterThan( 0 );
-		p[0][0].mult.should.be.approximately(0, verb.core.Constants.EPSILON );
+		p[0][0][1].should.be.approximately(0, verb.core.Constants.EPSILON );
 		p[0][0][2].should.be.greaterThan( 0  );
 
 	});
@@ -5789,10 +5783,10 @@ describe("verb.intersectCurves",function(){
 		res[1].length.should.be.equal(3);
 
 		res[0][0].should.be.approximately(0.23545561131691756, verb.core.Constants.TOLERANCE);
-		res[0].mult.should.be.approximately(0.4756848757799639, verb.core.Constants.TOLERANCE);
+		res[0][1].should.be.approximately(0.4756848757799639, verb.core.Constants.TOLERANCE);
 
 		res[1][0].should.be.approximately(0.7756197831105017, verb.core.Constants.TOLERANCE);
-		res[1].mult.should.be.approximately(0.7908648647054176, verb.core.Constants.TOLERANCE);
+		res[1][1].should.be.approximately(0.7908648647054176, verb.core.Constants.TOLERANCE);
 
 
 	});

@@ -126,19 +126,21 @@ class Make {
     //
     // **params**
     // + the center
-    // + the xaxis
-    // + orthogonal yaxis
-    // + xradius of the ellipse arc
-    // + yradius of the ellipse arc
+    // + the scaled x axis
+    // + the scaled y axis
     // + start angle of the ellipse arc, between 0 and 2pi, where 0 points at the xaxis
     // + end angle of the arc, between 0 and 2pi, greater than the start angle
     //
     // **returns**
     // + a CurveData object representing a NURBS curve
 
-    public static function ellipseArc( center : Point, xaxis : Point, yaxis : Point, xradius : Float,
-                                        yradius : Float, startAngle : Float, endAngle : Float ) : CurveData {
+    public static function ellipseArc( center : Point, xaxis : Point, yaxis : Point, startAngle : Float, endAngle : Float ) : CurveData {
 
+        var xradius = Vec.norm( xaxis );
+        var yradius = Vec.norm( yaxis );
+
+        xaxis = Vec.normalized( xaxis );
+        yaxis = Vec.normalized( yaxis );
 
         // if the end angle is less than the start angle, do a circle
         if (endAngle < startAngle) endAngle = 2.0 * Math.PI + startAngle;
@@ -235,9 +237,9 @@ class Make {
     // **returns**
     // + a CurveData object representing a NURBS curve
 
-    public static function arc( center : Point, xaxis : Vector, yaxis : Vector, radius : Float, start_angle : Float,
-                                end_angle : Float ) : CurveData {
-        return ellipseArc( center, xaxis, yaxis, radius, radius, start_angle, end_angle );
+    public static function arc( center : Point, xaxis : Vector, yaxis : Vector, radius : Float, startAngle : Float,
+                                endAngle : Float ) : CurveData {
+        return ellipseArc(  center, Vec.mul( radius, Vec.normalized( xaxis ) ), Vec.mul( radius, Vec.normalized( yaxis ) ), startAngle, endAngle );
     }
 
     // Generate the control points, weights, and knots of a polyline curve

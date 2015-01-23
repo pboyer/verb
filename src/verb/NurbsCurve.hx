@@ -1,11 +1,11 @@
 package verb;
 
 import promhx.Promise;
-
 import verb.exe.AsyncObject;
+
 import verb.core.types.CurveData;
 import verb.core.Mat;
-import verb.exe.Dispatcher;
+
 import verb.core.ArrayExtensions;
 using verb.core.ArrayExtensions;
 
@@ -99,6 +99,10 @@ class NurbsCurve extends AsyncObject {
         return deferMethod( Eval, 'rationalCurvePoint', [ _data,  u ] );
     }
 
+    public function tangent( u : Float ) : Vector {
+        return Eval.rationalCurveTangent( _data, u );
+    }
+
     // Get derivatives at a given parameter
     //
     // **params**
@@ -144,7 +148,7 @@ class NurbsCurve extends AsyncObject {
         return Analyze.rationalCurveClosestParam( _data, pt );
     }
 
-    public function closestParamAsync( pt : Point ) : Promise<Point> {
+    public function closestParamAsync( pt : Dynamic ) : Promise<Point> {
         return deferMethod( Analyze, 'rationalCurveClosestParam', [ _data,  pt ] );
     }
 

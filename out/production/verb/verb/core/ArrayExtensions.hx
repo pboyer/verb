@@ -37,10 +37,10 @@ class ArrayExtensions {
     // Get the first half of an array including the pivot
     //
     // **params**
-    // + *Array*, array of stuff
+    // + array of stuff
     //
     // **returns**
-    // + *Array*, the left half
+    // + the left half
     //
 
     public static function left<T>(arr : Array<T>) : Array<T>{
@@ -53,10 +53,10 @@ class ArrayExtensions {
     // Get the second half of an array, not including the pivot
     //
     // **params**
-    // + *Array*, array of stuff
+    // + array of stuff
     //
     // **returns**
-    // + *Array*, the right half
+    // + the right half
     //
 
     public static function right<T>(arr : Array<T>) : Array<T>{
@@ -69,10 +69,10 @@ class ArrayExtensions {
     // Get the second half of an array including the pivot
     //
     // **params**
-    // + *Array*, array of stuff
+    // + array of stuff
     //
     // **returns**
-    // + *Array*, the right half
+    // + the right half
     //
 
     public static function rightWithPivot<T>(arr : Array<T>) : Array<T>{
@@ -85,12 +85,12 @@ class ArrayExtensions {
     // Obtain the unique set of elements in an array
     //
     // **params**
-    // + *Array*, array of stuff
+    // + array of stuff
     // + *Function*, a function that receives two arguments (two objects from the array).  Returning true indicates
     // the objects are equal.
     //
     // **returns**
-    // + *Array*, array of unique elements
+    // + array of unique elements
     //
 
     public static function unique<T>( arr : Array<T>, comp : T -> T -> Bool ){

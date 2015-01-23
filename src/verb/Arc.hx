@@ -41,12 +41,12 @@ class Arc extends NurbsCurve {
     // + Radius of the arc
     // + Interval object representing the interval of the arc
     //
-    public static function byCenterAxesRadius(  center : Point,
-                                                xaxis : Vector,
-                                                yaxis : Vector,
-                                                radius : Float,
-                                                minAngle : Float,
-                                                maxAngle : Float ) : Arc {
+    public static function byCenterAxesRadiusSpan(  center : Point,
+                                                    xaxis : Vector,
+                                                    yaxis : Vector,
+                                                    radius : Float,
+                                                    minAngle : Float,
+                                                    maxAngle : Float ) : Arc {
         return new Arc(center, xaxis, yaxis, radius, minAngle, maxAngle );
     }
 

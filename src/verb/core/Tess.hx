@@ -186,7 +186,7 @@ class Tess {
 
 				uvs.push( [pt_u, pt_v] );
 
-				var derivs = Eval.rationalSurfaceDerivatives( surface, 1, pt_u, pt_v );
+				var derivs = Eval.rationalSurfaceDerivatives( surface, pt_u, pt_v, 1 );
 				var pt = derivs[0][0];
 
 				points.push( pt );
@@ -262,7 +262,7 @@ class Tess {
 				, v = vmin + dv * i;
 
 				// todo: make this faster by specifying n,m
-				var ds = Eval.rationalSurfaceDerivatives( surface, 1, u, v );
+				var ds = Eval.rationalSurfaceDerivatives( surface, u, v, 1 );
 
 				var norm = Vec.normalized( Vec.cross(  ds[0][1], ds[1][0] ) );
 				ptrow.push( new SurfacePoint( ds[0][0], norm, [u,v], -1, Vec.isZero( norm ) ) );
