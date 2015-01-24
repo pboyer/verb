@@ -93,7 +93,7 @@ describe("verb.core.Eval.curvePoint",function(){
 			, n = 6
 			, knots = [0, 0, 0, 1, 2, 3, 4, 5, 5, 5]
 			, controlPoints = [ [10, 0], [20, 10], [30, 20], [40, 30], [50, 40], [60, 30], [70, 80]]
-			, crv = new verb.core.CurveData( degree, knots, controlPoints  );
+			, crv = new verb.core.NurbsCurveData( degree, knots, controlPoints  );
 
 		var p = verb.core.Eval.curvePointGivenN( n, crv, 2.5);
 
@@ -123,7 +123,7 @@ describe("verb.core.Eval.curvePointGivenN",function(){
 			, u = 0
 			, knots = [0, 0, 0, 0, 1, 1, 1, 1]
 			, controlPoints = [ [10, 0], [20, 10], [30, 20], [50, 50] ]
-			, crv = new verb.core.CurveData( degree, knots, controlPoints );
+			, crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
 		var p = verb.core.Eval.curvePoint( crv, u);
 
@@ -191,7 +191,7 @@ describe("verb.core.Eval.curveDerivativesGivenN",function(){
 			, knots = [0, 0, 0, 0, 1, 1, 1, 1]
 			, controlPoints = [ [10, 0], [20, 10], [30, 20], [50, 50] ]
 			, num_derivs = 2
-			, crv = new verb.core.CurveData( degree, knots, controlPoints );
+			, crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
 		var p = verb.core.Eval.curveDerivativesGivenN( n, crv, u, num_derivs ) ;
 
@@ -213,7 +213,7 @@ describe("verb.core.Eval.curveDerivatives",function(){
 			, knots = [0, 0, 0, 0, 1, 1, 1, 1]
 			, controlPoints = [ [10, 0], [20, 10], [30, 20], [50, 50] ]
 			, num_derivs = 2
-			, crv = new verb.core.CurveData( degree, knots, controlPoints );
+			, crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
 		var p = verb.core.Eval.curveDerivatives( crv, u, num_derivs ) ;
 
@@ -239,7 +239,7 @@ describe("verb.core.Eval.surfacePointGivenNM",function(){
 														[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] 	],
 														[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] 	],
 														[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
-			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints )
+			, surface = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints )
 			, n = 3
 			, m = 3;
 
@@ -272,7 +272,7 @@ describe("verb.core.Eval.surfacePoint",function(){
 									[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] 	],
 									[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] 	],
 									[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
-			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
+			, surface = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
 
 		var p = verb.core.Eval.surfacePoint( surface, 0, 0 );
 
@@ -296,7 +296,7 @@ describe("verb.core.Eval.surfacePoint",function(){
 			, knotsV =	[0, 0, 0, 0, 1, 1, 1, 1]
 			, controlPoints = [ 	[ [0, 0, 50], 		[10, 0, 0], 		[20, 0, 0], 		[30, 0, 0] 		],
 									[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] 	] ]
-			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
+			, surface = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
 
 		var p = verb.core.Eval.surfacePoint( surface, 0, 0 );
 
@@ -325,7 +325,7 @@ describe("verb.core.Eval.surfaceDerivativesGivenNM",function(){
 			, n = 3
 			, m = 3
 			, num_derivatives = 1
-			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
+			, surface = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
 
 		var p = verb.core.Eval.surfaceDerivativesGivenNM( n, m, surface, 0, 0, num_derivatives );
 
@@ -368,7 +368,7 @@ describe("verb.core.Eval.surfaceDerivatives",function(){
 			, n = 3
 			, m = 3
 			, num_derivatives = 1
-			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
+			, surface = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
 
 		var p = verb.core.Eval.surfaceDerivatives( surface, 0, 0, num_derivatives );
 
@@ -496,7 +496,7 @@ describe("verb.core.Eval.rationalCurvePoint",function(){
 		var degree = 2
 			, knots = [0, 0, 0, 1, 1, 1 ]
 			, controlPoints = [ [1, 0, 1], [1,1,1], [0,2,2] ]
-			, crv = new verb.core.CurveData( degree, knots, controlPoints );
+			, crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
 		var p = verb.core.Eval.rationalCurvePoint( crv, 0);
 
@@ -528,7 +528,7 @@ describe("verb.core.Eval.rationalSurfacePoint",function(){
 			, knotsV = [0, 0, 0, 1, 1, 1 ]
 			, controlPoints = [ [ [1, 1, 0, 1], 	[1, 1, 1, 1], [2, 0, 2, 2] ],
 													 		  [ [-1, 1, 0, 1], 	[-1, 1, 1, 1], [-2, 0, 2, 2] ] ]
-			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
+			, surface = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
 
 		var p = verb.core.Eval.rationalSurfacePoint( surface, 0, 0 );
 
@@ -559,7 +559,7 @@ describe("verb.core.Eval.rationalCurveDerivatives",function(){
 		var degree = 2
 			, knots = [0, 0, 0, 1, 1, 1 ]
 			, controlPoints = [ [1,0,1], [1,1,1], [0,2,2] ]
-			, crv = new verb.core.CurveData( degree, knots, controlPoints );
+			, crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
 		var p = verb.core.Eval.rationalCurveDerivatives( crv, 0, 2);
 
@@ -599,7 +599,7 @@ describe("verb.core.Eval.rationalSurfaceDerivatives",function(){
 			, controlPoints = [ [ [1, 1, 0, 1], 	[1, 1, 1, 1], [2, 0, 2, 2] ],
 													 		  [ [-1, 1, 0, 1], 	[-1, 1, 1, 1], [-2, 0, 2, 2] ] ]
 			, num_derivatives = 1
-			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
+			, surface = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
 
 		var p = verb.core.Eval.rationalSurfaceDerivatives( surface, 0, 0, num_derivatives );
 
@@ -643,7 +643,7 @@ describe("verb.core.Eval.rationalCurvePoint",function(){
 			, u1 = 0.0
 			, u2 = 0.5
 			, u3 = 1.0
-			, crv = new verb.core.CurveData( degree, knots, controlPoints );
+			, crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
 		var p1 = verb.core.Eval.rationalCurvePoint( crv, u1);
 		var p2 = verb.core.Eval.rationalCurvePoint( crv, u2);
@@ -669,7 +669,7 @@ describe("verb.core.Modify.curveKnotInsert",function(){
 		var controlPoints = [];
 		for (var i = 0; i < 8; i++) controlPoints.push([i, 0, 0]);
 
-		var crv = new verb.core.CurveData( degree, knots, controlPoints );
+		var crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
 		var after = verb.core.Modify.curveKnotInsert( crv, u, r );
 
@@ -702,7 +702,7 @@ describe("verb.core.Modify.curveKnotInsert",function(){
 		var controlPoints = [];
 		for (var i = 0; i < 8; i++) controlPoints.push([i, 0, 0]);
 		
-		var crv = new verb.core.CurveData( degree, knots, controlPoints );
+		var crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
 		var after = verb.core.Modify.curveKnotInsert( crv, u, r );
 
@@ -731,7 +731,7 @@ describe("verb.core.Modify.curveKnotInsert",function(){
 		var controlPoints = [];
 		for (var i = 0; i < 8; i++) controlPoints.push([i, 0, 0]);
 
-		var crv = new verb.core.CurveData( degree, knots, controlPoints );
+		var crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 		var after = verb.core.Modify.curveKnotInsert( crv, u, r );
 
 		after.controlPoints.forEach(function(cp){ should.exist(cp); });
@@ -759,7 +759,7 @@ describe("verb.core.Modify.curveKnotInsert",function(){
 		var controlPoints = [];
 		for (var i = 0; i < 6; i++) controlPoints.push([i, 0, 0]);
 
-		var crv = new verb.core.CurveData( degree, knots, controlPoints );
+		var crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 		var after = verb.core.Modify.curveKnotInsert( crv, u, r );
 
 		after.controlPoints.forEach(function(cp){ should.exist(cp); });
@@ -793,7 +793,7 @@ describe("verb.core.Eval.curveKnotRefine",function(){
 		var controlPoints = [];
 		for (var i = 0; i < 8; i++) controlPoints.push([i, 0, 0]);
 
-		var crv = new verb.core.CurveData( degree, knots, controlPoints );
+		var crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 		var after = verb.core.Modify.curveKnotRefine( crv, new_knots );
 
 		after.controlPoints.forEach(function(cp){ should.exist(cp); });
@@ -840,7 +840,7 @@ describe("verb.core.Modify.curveSplit",function(){
 		var controlPoints = [];
 		for (var i = 0; i < 8; i++) controlPoints.push([i, 0, 0, 1]);
 
-		var crv = new verb.core.CurveData( degree, knots, controlPoints );
+		var crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 		var after = verb.core.Modify.curveSplit( crv, u );
 
 		for (var i = 0; i < degree + 1; i++ ){
@@ -910,7 +910,7 @@ describe("verb.core.Modify.decomposeCurveIntoBeziers",function(){
 			controlPoints.push([i, 0, 0]);
 		}
 
-		var crv = new verb.core.CurveData( degree, knots, controlPoints );
+		var crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 		var res = verb.core.Modify.decomposeCurveIntoBeziers( crv );
 
 		res.length.should.be.equal( 5 );
@@ -952,7 +952,7 @@ describe("verb.core.Modify.surfaceKnotRefine",function(){
 					[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] , 	[40, -20, -2],	[50, -20, 0] 	],
 					[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, -23], [30, -30, 0] , 	[40, -30, 0], 	[50, -30, 0]     ],
 					[ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , 	[40, -40, -20],	[50, -40, 0]     ] ]
-		, surface = new verb.core.SurfaceData( degree, degree, knotsU, knotsV, controlPoints );
+		, surface = new verb.core.NurbsSurfaceData( degree, degree, knotsU, knotsV, controlPoints );
 
 	it('can add knots into a surface in the u direction', function(){
 
@@ -1023,7 +1023,7 @@ describe("verb.core.Modify.surfaceSplit", function(){
 					[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] , 	[40, -20, -2],	[50, -20, 0] 	],
 					[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, -23], [30, -30, 0] , 	[40, -30, 0], 	[50, -30, 0]     ],
 					[ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , 	[40, -40, -20],	[50, -40, 0]     ] ]
-		, surface = new verb.core.SurfaceData( degree, degree, knotsU, knotsV, controlPoints );
+		, surface = new verb.core.NurbsSurfaceData( degree, degree, knotsU, knotsV, controlPoints );
 
 	it('can split a surface in the u direction', function(){
 
@@ -1271,7 +1271,7 @@ describe("verb.core.Eval.rationalCurveRegularSample",function(){
 			, knots = [0, 0, 0, 1, 1, 1 ]
 			, controlPoints = [ [1, 0, 0, 1], [1, 1, 0, 1], [0, 2, 0, 2] ]
 			, numSamples = 10
-			, curve = new verb.core.CurveData( degree, knots, controlPoints );
+			, curve = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
 		var p = verb.core.Tess.rationalCurveRegularSample( curve, numSamples);
 
@@ -1304,7 +1304,7 @@ describe("verb.core.Tess.rationalCurveAdaptiveSample",function(){
 		var degree = 1
 			, knots = [0, 0, 1, 1]
 			, controlPoints = [ [0, 0, 0, 1], [10, 0, 0, 1] ]
-			, curve = new verb.core.CurveData( degree, knots, controlPoints );
+			, curve = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
 		var p = verb.core.Tess.rationalCurveAdaptiveSample( curve, 1e-5);
 		
@@ -1320,7 +1320,7 @@ describe("verb.core.Tess.rationalCurveAdaptiveSample",function(){
 		var degree = 1
 			, knots = [0, 0, 0.25, 0.5, 0.75, 1, 1]
 			, controlPoints = [ [0, 0, 0, 1], [10, 10, 0, 1], [14, 20, 0, 1], [10, 32, 4, 1], [12, 16, 22, 1]]
-			, curve = new verb.core.CurveData( degree, knots, controlPoints );
+			, curve = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
 		var p = verb.core.Tess.rationalCurveAdaptiveSample( curve, 1e-5);
 		
@@ -1339,7 +1339,7 @@ describe("verb.core.Tess.rationalCurveAdaptiveSample",function(){
 			, knots = [0, 0, 0, 1, 1, 1 ]
 			, v = Math.sqrt(2) / 2
 			, controlPoints = [ [1, 0, 0, 1], [v, v, 0, v], [0, 1, 0, 1] ]
-			, curve = new verb.core.CurveData( degree, knots, controlPoints );
+			, curve = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
 		var p = verb.core.Tess.rationalCurveAdaptiveSample( curve, 1e-8, true);
 		var p2 = verb.core.Tess.rationalCurveAdaptiveSample( curve, 1e-4, true);
@@ -1867,7 +1867,7 @@ describe("verb.core.Make.extrudedSurface",function(){
 			, prof_degree = 1
 			, prof_ctrl_pts = [[0,1,0,1], [1,0,0,1]]
 			, prof_knots = [0,0,1,1]
-			, profile = new verb.core.CurveData( prof_degree, prof_knots, prof_ctrl_pts  );
+			, profile = new verb.core.NurbsCurveData( prof_degree, prof_knots, prof_ctrl_pts  );
 
 		var comps = verb.core.Make.extrudedSurface(axis, length, profile);
 
@@ -1897,7 +1897,7 @@ describe("verb.core.Make.extrudedSurface",function(){
 			, prof_ctrl_pts = [[0,1,0], [1,1,0], [1,0,0]]
 			, prof_knots = [0,0,0,1,1,1]
 			, prof_weights = [1, Math.sqrt(2) / 2, 1]
-			, profile = new verb.core.CurveData( prof_degree, prof_knots,
+			, profile = new verb.core.NurbsCurveData( prof_degree, prof_knots,
 													verb.core.Eval.homogenize1d(prof_ctrl_pts, prof_weights)  );
 
 		var comps = verb.core.Make.extrudedSurface(axis, length, profile);
@@ -2111,7 +2111,7 @@ describe("verb.core.Make.revolvedSurface",function(){
 			, prof_degree = 1
 			, prof_ctrl_pts = [[0,0,1,1], [1,0,0,1]]
 			, prof_knots = [0,0,1,1]
-			, profile = new verb.core.CurveData( prof_degree, prof_knots, prof_ctrl_pts );
+			, profile = new verb.core.NurbsCurveData( prof_degree, prof_knots, prof_ctrl_pts );
 
 		var comps = verb.core.Make.revolvedSurface(profile, center, axis, angle );
 
@@ -2144,7 +2144,7 @@ describe("verb.core.Make.revolvedSurface",function(){
 			, prof_degree = 1
 			, prof_ctrl_pts = [[0,0,1,1], [1,0,0,1]]
 			, prof_knots = [0,0,1,1]
-			, profile = new verb.core.CurveData( prof_degree, prof_knots, prof_ctrl_pts );
+			, profile = new verb.core.NurbsCurveData( prof_degree, prof_knots, prof_ctrl_pts );
 
 		var comps = verb.core.Make.revolvedSurface( profile, center, axis, angle );
 
@@ -2178,7 +2178,7 @@ describe("verb.core.Make.revolvedSurface",function(){
 			, prof_degree = 1
 			, prof_ctrl_pts = [[0,0,1,1], [1,0,0,1]]
 			, prof_knots = [0,0,1,1]
-			, profile = new verb.core.CurveData( prof_degree, prof_knots, prof_ctrl_pts );
+			, profile = new verb.core.NurbsCurveData( prof_degree, prof_knots, prof_ctrl_pts );
 
 		var comps = verb.core.Make.revolvedSurface( profile, center, axis, angle );
 
@@ -2502,7 +2502,7 @@ describe("verb.core.Analyze.rationalBezierCurveArcLength",function(){
 		var degree = 3
 			, knots = [0,0,0,0,1,1,1,1]
 			, controlPoints = [ [0,0,0,1], [1.5,0,0,1], [2,0,0,1], [3,0,0,1] ]
-			, curve = new verb.core.CurveData( degree, knots, controlPoints );
+			, curve = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
 		var res = verb.core.Analyze.rationalBezierCurveArcLength( curve, 1 );
 
@@ -2515,7 +2515,7 @@ describe("verb.core.Analyze.rationalBezierCurveArcLength",function(){
 		var degree = 3
 			, knots = [1,1,1,1,4,4,4,4]
 			, controlPoints = [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1] ]
-			, curve = new verb.core.CurveData( degree, knots, controlPoints );
+			, curve = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
 		var res = verb.core.Analyze.rationalBezierCurveArcLength( curve, 4 );
 
@@ -2532,7 +2532,7 @@ describe("verb.core.Analyze.rationalCurveArcLength",function(){
 		var degree = 3
 			, knots = [0,0,0,0,0.5,2,2,2,2]
 			, controlPoints = [ [0,0,0,1], [1.5,0,0,1], [1.8,0,0,1], [2,0,0,1], [3,0,0,1] ]
-			, curve = new verb.core.CurveData( degree, knots, controlPoints );
+			, curve = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
 		var u = 0;
 		var steps = 2;
@@ -2552,7 +2552,7 @@ describe("verb.core.Analyze.rationalCurveArcLength",function(){
 		var degree = 3
 			, knots = [0,0,0,0,0.5,1,1,1,1]
 			, controlPoints = [ [1,1,1,1], [1.5,0,1,1], [1.8,0,0,1], [2,0.1,5,1], [3.1,0,0,1] ]
-			, curve = new verb.core.CurveData( degree, knots, controlPoints );
+			, curve = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
 		var gaussLen = verb.core.Analyze.rationalCurveArcLength( curve );
 
@@ -2572,7 +2572,7 @@ describe("verb.core.Analyze.rationalCurveArcLength",function(){
 		var degree = 3
 			, knots = [0,0,0,0,0.5,2,2,2,2]
 			, controlPoints = [ [0,0,0,1], [1.5,0,0,1], [1.8,0,0,1], [2,0,0,1], [3,0,0,1] ]
-			, curve = new verb.core.CurveData( degree, knots, controlPoints );
+			, curve = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
 		var u = 0;
 		var steps = 10;
@@ -2598,7 +2598,7 @@ describe("verb.core.Analyze.rationalBezierCurveParamAtArcLength",function(){
 		var degree = 3
 			, knots = [0,0,0,0,1,1,1,1]
 			, controlPoints = [ [0,0,0,1], [1.5,0,0,1], [2,0,0,1], [3,0,0,1] ]
-			, curve = new verb.core.CurveData( degree, knots, controlPoints );
+			, curve = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
 		var tol = 1e-3;
 		var d = 0;
@@ -2622,7 +2622,7 @@ describe("verb.core.Analyze.rationalBezierCurveParamAtArcLength",function(){
 		var degree = 3
 			, knots = [0,0,0,0,1,1,1,1]
 			, controlPoints = [ [1,0,0,1], [1,0,-1,1], [2,0,0,1], [5,0,0,1] ]
-			, curve = new verb.core.CurveData( degree, knots, controlPoints );
+			, curve = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
 		var tol = 1e-3;
 		var d = 0;
@@ -2650,7 +2650,7 @@ describe("verb.core.Analyze.rationalCurveParamAtArcLength",function(){
 		var degree = 3
 			, knots = [0,0,0,0,0.5,1,1,1,1]
 			, controlPoints = [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1], [4,0,0,1] ]
-			, curve = new verb.core.CurveData( degree, knots, controlPoints );
+			, curve = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
 		var tol = 1e-3;
 		var d = 0;
@@ -2676,7 +2676,7 @@ describe("verb.core.Analyze.rationalCurveParamAtArcLength",function(){
 		var degree = 3
 			, knots = [0,0,0,0,0.5,1,1,1,1]
 			, controlPoints = [ [1,0,0,1], [1,0,-1,1], [2,0,0,1], [3,0,1,1], [5,0,0,1] ]
-			, curve = new verb.core.CurveData( degree, knots, controlPoints );
+			, curve = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
 		var tol = 1e-3;
 		var d = 0;
@@ -2704,7 +2704,7 @@ describe("verb.core.Divide.rationalCurveByArcLength",function(){
 		var degree = 3
 			, knots = [0,0,0,0,0.5,1,1,1,1]
 			, controlPoints = [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1], [4,0,0,1] ]
-			, curve = new verb.core.CurveData( degree, knots, controlPoints )
+			, curve = new verb.core.NurbsCurveData( degree, knots, controlPoints )
 			, d = 0.5
 			, tol = 1e-3;
 
@@ -2730,7 +2730,7 @@ describe("verb.core.Divide.rationalCurveByEqualArcLength",function(){
 		var degree = 3
 			, knots = [0,0,0,0,0.5,1,1,1,1]
 			, controlPoints = [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1], [4,0,0,1] ]
-			, curve = new verb.core.CurveData( degree, knots, controlPoints )
+			, curve = new verb.core.NurbsCurveData( degree, knots, controlPoints )
 			, divs = 8
 			, tol = 1e-3
 			, d = 4 / divs;
@@ -2757,7 +2757,7 @@ describe("verb.core.Analyze.rationalCurveClosestParam",function(){
 		var degree = 3
 			, knots = [0,0,0,0,0.5,1,1,1,1]
 			, controlPoints = [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1], [4,0,0,1] ]
-			, curve = new verb.core.CurveData( degree, knots, controlPoints )
+			, curve = new verb.core.NurbsCurveData( degree, knots, controlPoints )
 			, pt = [1,0.2,0];
 
 		var res = verb.core.Analyze.rationalCurveClosestParam(curve, [1,0.2,0] );
@@ -2798,7 +2798,7 @@ describe("verb.core.Analyze.rationalSurfaceClosestParam",function(){
 									[ [0, -10, 0, 1], 	[10, -10, 0, 1], 	[20, -10, 0, 1], 	[30, -10, 0, 1] 	],
 									[ [0, -20, 0, 1], 	[10, -20, 0, 1], 	[20, -20, 0, 1], 	[30, -20, 0, 1] 	],
 									[ [0, -30, 0, 1], 	[10, -30, 0, 1], 	[20, -30, 0, 1], 	[30, -30, 0, 1] 	] ]
-			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints )
+			, surface = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints )
 			, point = [12,-20,5];
 
 		var res = verb.core.Analyze.rationalSurfaceClosestParam( surface, point );
@@ -3598,11 +3598,11 @@ describe("verb.core.Intersect.curves",function(){
 		var degree1 = 1,
 				knots1 = [0,0,1,1],
 				controlPoints1 = [[0,0,0,1], [2,0,0,1]],
-				curve1 = new verb.core.CurveData( degree1, knots1, controlPoints1 ),
+				curve1 = new verb.core.NurbsCurveData( degree1, knots1, controlPoints1 ),
 				degree2 = 1,
 				knots2 = [0,0,1,1],
 				controlPoints2 = [[0.5,0.5,0,1], [0.5,-1.5,0,1]]
-				curve2 = new verb.core.CurveData( degree2, knots2, controlPoints2 );
+				curve2 = new verb.core.NurbsCurveData( degree2, knots2, controlPoints2 );
 
 		var res = verb.core.Intersect.curves( curve1, curve2, verb.core.Constants.TOLERANCE );
 
@@ -3618,11 +3618,11 @@ describe("verb.core.Intersect.curves",function(){
 		var degree1 = 1,
 				knots1 = [0,0,1,1],
 				controlPoints1 = [[0,0,0,1], [2,0,0,1]],
-				curve1 = new verb.core.CurveData( degree1, knots1, controlPoints1 ),
+				curve1 = new verb.core.NurbsCurveData( degree1, knots1, controlPoints1 ),
 				degree2 = 2,
 				knots2 = [0,0,0,1,1,1],
 				controlPoints2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]]
-				curve2 = new verb.core.CurveData( degree2, knots2, controlPoints2 );
+				curve2 = new verb.core.NurbsCurveData( degree2, knots2, controlPoints2 );
 
 		var res = verb.core.Intersect.curves( 	curve1,curve2, verb.core.Constants.TOLERANCE );
 
@@ -3638,11 +3638,11 @@ describe("verb.core.Intersect.curves",function(){
 		var degree1 = 1,
 				knots1 = [0,0,1,1],
 				controlPoints1 = [[0,0,0,1], [2,0,0,1]],
-				curve1 = new verb.core.CurveData( degree1, knots1, controlPoints1 ),
+				curve1 = new verb.core.NurbsCurveData( degree1, knots1, controlPoints1 ),
 				degree2 = 2,
 				knots2 = [0,0,0,1,1,1],
 				controlPoints2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]]
-				curve2 = new verb.core.CurveData( degree2, knots2, controlPoints2 );
+				curve2 = new verb.core.NurbsCurveData( degree2, knots2, controlPoints2 );
 
 		var res = verb.core.Intersect.curves(curve2, curve1, verb.core.Constants.TOLERANCE );
 
@@ -3658,11 +3658,11 @@ describe("verb.core.Intersect.curves",function(){
 		var degree1 = 2,
 				knots1 = [0,0,0,1,1,1],
 				controlPoints1 = [[0,0,0,1], [0.5,0.1,0,1],  [2,0,0,1]],
-				curve1 = new verb.core.CurveData( degree1, knots1, controlPoints1 ),
+				curve1 = new verb.core.NurbsCurveData( degree1, knots1, controlPoints1 ),
 				degree2 = 2,
 				knots2 = [0,0,0,1,1,1],
 				controlPoints2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]]
-				curve2 = new verb.core.CurveData( degree2, knots2, controlPoints2 );
+				curve2 = new verb.core.NurbsCurveData( degree2, knots2, controlPoints2 );
 
 		var res = verb.core.Intersect.curves( curve1,curve2, verb.core.Constants.TOLERANCE );
 
@@ -3685,13 +3685,13 @@ describe("verb.core.Intersect.curveAndSurface",function(){
 			, degreeV = 1
 			, knotsU = [0,0,1,1]
 			, knotsV = [0,0,1,1]
-			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, homo_controlPoints_srf );
+			, surface = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, homo_controlPoints_srf );
 
 		// line from [5,5,5] to [5,5,-5]
 		var degree_crv = 1
 			, knots_crv = [0,0,1,1]
 			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.2,5.2,-10,1] ]
-			, curve = new verb.core.CurveData( degree_crv, knots_crv, homo_controlPoints_crv );
+			, curve = new verb.core.NurbsCurveData( degree_crv, knots_crv, homo_controlPoints_crv );
 
 		var res = verb.core.Intersect.curveAndSurface( curve, surface, verb.core.Constants.TOLERANCE );
 
@@ -3711,13 +3711,13 @@ describe("verb.core.Intersect.curveAndSurface",function(){
 			, degreeV = 1
 			, knotsU = [0,0,1,1]
 			, knotsV = [0,0,1,1]
-			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, homo_controlPoints_srf );
+			, surface = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, homo_controlPoints_srf );
 
 		// line from [5,5,5] to [5,5,-5]
 		var degree_crv = 1
 			, knots_crv = [0,0,0.5,1,1]
 			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.2,5.2,-2.5,1], [5.2,5.2,-10,1] ]
-			, curve = new verb.core.CurveData( degree_crv, knots_crv, homo_controlPoints_crv );
+			, curve = new verb.core.NurbsCurveData( degree_crv, knots_crv, homo_controlPoints_crv );
 
 		var res = verb.core.Intersect.curveAndSurface( curve, surface, verb.core.Constants.TOLERANCE );
 
@@ -3736,13 +3736,13 @@ describe("verb.core.Intersect.curveAndSurface",function(){
 			, degreeV = 1
 			, knotsU = [0,0,1,1]
 			, knotsV = [0,0,1,1]
-			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, homo_controlPoints_srf );
+			, surface = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, homo_controlPoints_srf );
 
 		// line from [5,5,5] to [5,5,-5]
 		var degree_crv = 2
 			, knots_crv = [0,0,0,1,1,1]
 			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.4,4.8,0,1], [5.2,5.2,-5,1] ]
-			, curve = new verb.core.CurveData( degree_crv, knots_crv, homo_controlPoints_crv );
+			, curve = new verb.core.NurbsCurveData( degree_crv, knots_crv, homo_controlPoints_crv );
 
 		var res =  verb.core.Intersect.curveAndSurface( curve, surface, verb.core.Constants.TOLERANCE  );
 
@@ -3761,13 +3761,13 @@ describe("verb.core.Intersect.curveAndSurface",function(){
 			, degreeV = 1
 			, knotsU = [0,0,1,1]
 			, knotsV = [0,0,1,1]
-			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, homo_controlPoints_srf );
+			, surface = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, homo_controlPoints_srf );
 
 		// line from [5,5,5] to [5,5,-5]
 		var degree_crv = 1
 			, knots_crv = [0,0,1,1]
 			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.2,5.2,2,1] ]
-			, curve = new verb.core.CurveData( degree_crv, knots_crv, homo_controlPoints_crv );
+			, curve = new verb.core.NurbsCurveData( degree_crv, knots_crv, homo_controlPoints_crv );
 
 		var res =  verb.core.Intersect.curveAndSurface( curve, surface );
 		res.length.should.be.equal( 0 );
@@ -3785,12 +3785,12 @@ describe("verb.core.Intersect.curveAndSurfaceWithEstimate",function(){
 			, degreeV = 1
 			, knotsU = [0,0,1,1]
 			, knotsV = [0,0,1,1]
-			, surface = new verb.core.SurfaceData( degreeU, degreeV, knotsU, knotsV, homo_controlPoints_srf );
+			, surface = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, homo_controlPoints_srf );
 
 		var degree_crv = 2
 			, knots_crv = [0,0,0,1,1,1]
 			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.4,4.8,0,1], [5.2,5.2,-5,1] ]
-			, curve = new verb.core.CurveData( degree_crv, knots_crv, homo_controlPoints_crv );
+			, curve = new verb.core.NurbsCurveData( degree_crv, knots_crv, homo_controlPoints_crv );
 
 		var start_params = [ 0.45, 0.25, 0.55 ];
 

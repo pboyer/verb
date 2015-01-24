@@ -1,6 +1,6 @@
 package verb.core.types;
 
-import verb.core.types.CurveData.Point;
+import verb.core.types.NurbsCurveData.Point;
 import verb.core.Mat.Vector;
 
 @:expose("core.Ray")

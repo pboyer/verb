@@ -1,14 +1,9 @@
 package verb.core.types;
 
-import verb.core.types.CurveData;
+import verb.core.types.NurbsCurveData;
 
-@:expose("core.SurfaceData")
-class SurfaceData {
-
-    @:isVar public var foo(get, never) : Int;
-    public function get_foo(){
-        return foo;
-    }
+@:expose("core.NurbsSurfaceData")
+class NurbsSurfaceData {
 
     // integer degree of surface in u direction
     public var degreeU : Int;

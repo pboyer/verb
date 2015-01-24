@@ -1,13 +1,13 @@
 package verb.core;
 
-import verb.core.types.CurveData;
+import verb.core.types.NurbsCurveData;
 import verb.core.types.CurveLengthSample;
 using Lambda;
 
 @:expose("core.Divide")
 class Divide {
 
-    public static function rationalCurveByEqualArcLength(curve : CurveData, num : Int) : Array<CurveLengthSample> {
+    public static function rationalCurveByEqualArcLength(curve : NurbsCurveData, num : Int) : Array<CurveLengthSample> {
 
         var tlen = Analyze.rationalCurveArcLength( curve );
         var inc = tlen / num;
@@ -16,7 +16,7 @@ class Divide {
 
     }
 
-    public static function rationalCurveByArcLength(curve : CurveData, l : Float) : Array<CurveLengthSample> {
+    public static function rationalCurveByArcLength(curve : NurbsCurveData, l : Float) : Array<CurveLengthSample> {
 
         var crvs = Modify.decomposeCurveIntoBeziers( curve )
         , crvlens = crvs.map(function(x){ return Analyze.rationalBezierCurveArcLength(x); })

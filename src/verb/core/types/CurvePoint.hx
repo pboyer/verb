@@ -1,6 +1,6 @@
 package verb.core.types;
 
-import verb.core.types.CurveData.Point;
+import verb.core.types.NurbsCurveData.Point;
 
 @:expose("core.CurvePoint")
 class CurvePoint {

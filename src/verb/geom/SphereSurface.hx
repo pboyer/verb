@@ -1,7 +1,7 @@
 package verb.geom;
 
 import verb.core.Make;
-import verb.core.types.CurveData;
+import verb.core.types.NurbsCurveData;
 import verb.core.Mat;
 
 @:expose("geom.SphereSurface")

@@ -13,7 +13,7 @@ package verb.core;
  */
 
 import verb.core.types.Pair;
-import verb.core.types.CurveData.Point;
+import verb.core.types.NurbsCurveData.Point;
 
 @:expose("core.KdPoint")
 class KdPoint<T> {

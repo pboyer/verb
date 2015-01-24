@@ -4,7 +4,7 @@ import verb.core.Make;
 import promhx.Promise;
 import verb.exe.AsyncObject;
 
-import verb.core.types.CurveData;
+import verb.core.types.NurbsCurveData;
 import verb.core.Mat;
 
 import verb.core.ArrayExtensions;
@@ -17,14 +17,14 @@ import verb.core.Divide;
 import verb.core.Analyze;
 import verb.core.Eval;
 import verb.core.types.Interval;
-import verb.core.types.CurveData;
+import verb.core.types.NurbsCurveData;
 
 @:expose("geom.NurbsCurve")
 class NurbsCurve extends AsyncObject implements ICurve {
 
     // underlying serializable, data object
 
-    private var _data : CurveData;
+    private var _data : NurbsCurveData;
 
     // public properties
 
@@ -41,7 +41,7 @@ class NurbsCurve extends AsyncObject implements ICurve {
     // **returns**
     // + A new NurbsCurve
 
-    public function new( data : CurveData ) {
+    public function new( data : NurbsCurveData ) {
         this._data = data;
     }
 
@@ -60,7 +60,7 @@ class NurbsCurve extends AsyncObject implements ICurve {
                                                     knots : KnotArray,
                                                     controlPoints : Array<Point>,
                                                     weights : Array<Float> ) : NurbsCurve {
-        return new NurbsCurve( new CurveData( degree, knots.copy(), Eval.homogenize1d(controlPoints, weights) ) );
+        return new NurbsCurve( new NurbsCurveData( degree, knots.copy(), Eval.homogenize1d(controlPoints, weights) ) );
     }
 
     // Construct a NurbsCurve by interpolating a collection of points.  The resultant curve
@@ -82,8 +82,8 @@ class NurbsCurve extends AsyncObject implements ICurve {
     // **returns**
     // + A new CurveData object
 
-    public function data() : CurveData {
-        return new CurveData( degree(), knots(), Eval.homogenize1d( controlPoints(), weights() ));
+    public function data() : NurbsCurveData {
+        return new NurbsCurveData( degree(), knots(), Eval.homogenize1d( controlPoints(), weights() ));
     }
 
 
@@ -313,7 +313,7 @@ class NurbsCurve extends AsyncObject implements ICurve {
 
     public function splitAsync( u : Float ) : Promise<Array<NurbsCurve>> {
         return defer( Modify, 'curveSplit', [ _data, u ])
-            .then(function(cs : Array<CurveData>) : Array<NurbsCurve>{
+            .then(function(cs : Array<NurbsCurveData>) : Array<NurbsCurve>{
                 return cs.map(function(x){ return new NurbsCurve(x); });
             });
     }

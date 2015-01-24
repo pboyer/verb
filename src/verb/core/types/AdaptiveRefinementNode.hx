@@ -14,7 +14,7 @@ class AdaptiveRefinementOptions {
 @:expose("core.AdaptiveRefinementNode")
 class AdaptiveRefinementNode {
 
-    var srf : SurfaceData;
+    var srf : NurbsSurfaceData;
     public var neighbors : Array<AdaptiveRefinementNode>;
     var children : Array<AdaptiveRefinementNode>;
     var corners : Array<SurfacePoint>;
@@ -26,7 +26,7 @@ class AdaptiveRefinementNode {
     var u05 : Float;
     var v05 : Float;
 
-    public function new( srf : SurfaceData, corners : Array<SurfacePoint>, neighbors : Array<AdaptiveRefinementNode> = null ) {
+    public function new( srf : NurbsSurfaceData, corners : Array<SurfacePoint>, neighbors : Array<AdaptiveRefinementNode> = null ) {
 
         //
         // Structure of the child nodes

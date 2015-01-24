@@ -4,7 +4,7 @@ import verb.core.types.BoundingBox;
 import verb.core.types.Pair;
 import verb.core.types.BoundingBoxNode;
 import verb.core.types.MeshData;
-import verb.core.types.CurveData.Point;
+import verb.core.types.NurbsCurveData.Point;
 
 using verb.core.ArrayExtensions;
 

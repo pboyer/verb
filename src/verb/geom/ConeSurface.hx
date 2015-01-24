@@ -2,7 +2,7 @@ package verb.geom;
 
 import verb.core.Make;
 import verb.core.Mat.Vector;
-import verb.core.types.CurveData.Point;
+import verb.core.types.NurbsCurveData.Point;
 
 @:expose("geom.ConeSurface")
 class ConeSurface extends NurbsSurface {

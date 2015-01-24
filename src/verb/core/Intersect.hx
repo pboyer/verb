@@ -15,14 +15,14 @@ import verb.core.types.Interval;
 import verb.core.types.LazyMeshBoundingBoxTree;
 import verb.core.types.MeshIntersectionPoint;
 import verb.core.types.SurfaceSurfaceIntersectionPoint;
-import verb.core.types.SurfaceData;
+import verb.core.types.NurbsSurfaceData;
 import verb.core.KdTree.KdPoint;
 import verb.core.types.AdaptiveRefinementNode.AdaptiveRefinementOptions;
 import verb.core.types.BoundingBoxNode;
 import verb.core.types.Pair;
 import verb.core.Mat.Vector;
 import verb.core.types.MeshData;
-import verb.core.types.CurveData;
+import verb.core.types.NurbsCurveData;
 
 using verb.core.ArrayExtensions;
 
@@ -39,7 +39,7 @@ class Intersect {
     // **returns**
     // + array of CurveData objects
     //
-    public static function surfaces( surface0 : SurfaceData, surface1 : SurfaceData, tol : Float) : Array<CurveData> {
+    public static function surfaces( surface0 : NurbsSurfaceData, surface1 : NurbsSurfaceData, tol : Float) : Array<NurbsCurveData> {
 
         // 1) tessellate the two surfaces
         var tess1 = Tess.rationalSurfaceAdaptive( surface0 );
@@ -73,8 +73,8 @@ class Intersect {
     // **returns**
     // + a SurfaceSurfaceIntersectionPoint object
     //
-    public static function surfaces_at_point_with_estimate(surface0 : SurfaceData,
-                                                           surface1 : SurfaceData,
+    public static function surfaces_at_point_with_estimate(surface0 : NurbsSurfaceData,
+                                                           surface1 : NurbsSurfaceData,
                                                            uv1 : UV,
                                                            uv2 : UV,
                                                            tol : Float ) : SurfaceSurfaceIntersectionPoint {
@@ -353,8 +353,8 @@ class Intersect {
     // + array of CurveSurfaceIntersection objects
     //
 
-    public static function curveAndSurface( curve : CurveData,
-                                              surface : SurfaceData,
+    public static function curveAndSurface( curve : NurbsCurveData,
+                                              surface : NurbsSurfaceData,
                                               tol : Float = 1e-3 )  {
 
         var ints = Intersect.bounding_box_trees(
@@ -399,8 +399,8 @@ class Intersect {
     // + a CurveSurfaceIntersection object
     //
 
-    public static function curveAndSurfaceWithEstimate(    curve : CurveData,
-                                                               surface : SurfaceData,
+    public static function curveAndSurfaceWithEstimate(    curve : NurbsCurveData,
+                                                               surface : NurbsSurfaceData,
                                                                start_params : Array<Float>,
                                                                tol : Float = 1e-3 ) : CurveSurfaceIntersection {
 
@@ -504,13 +504,13 @@ class Intersect {
     // + the intersections
     //
 
-    public static function curves( curve1 : CurveData, curve2 : CurveData, tolerance : Float ) : Array<CurveCurveIntersection> {
+    public static function curves( curve1 : NurbsCurveData, curve2 : NurbsCurveData, tolerance : Float ) : Array<CurveCurveIntersection> {
 
         var ints = Intersect.bounding_box_trees(
             new LazyCurveBoundingBoxTree( curve1 ),
             new LazyCurveBoundingBoxTree( curve2 ), 0 );
 
-        return ints.map(function(x : Pair<CurveData, CurveData>) : CurveCurveIntersection {
+        return ints.map(function(x : Pair<NurbsCurveData, NurbsCurveData>) : CurveCurveIntersection {
             return Intersect.curves_with_estimate( curve1, curve2, x.item0.knots.first(), x.item1.knots.first(), tolerance );
         });
     }
@@ -530,8 +530,8 @@ class Intersect {
     // + array of CurveCurveIntersection objects
     //
 
-    private static function curves_with_estimate( curve0 : CurveData,
-                                                  curve1 : CurveData,
+    private static function curves_with_estimate( curve0 : NurbsCurveData,
+                                                  curve1 : NurbsCurveData,
                                                   u0 : Float,
                                                   u1 : Float,
                                                   tolerance : Float ) : CurveCurveIntersection

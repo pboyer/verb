@@ -1,9 +1,9 @@
 package verb.core;
 
 import verb.core.Mat.Matrix;
-import verb.core.types.CurveData;
-import verb.core.types.CurveData;
-import verb.core.types.SurfaceData;
+import verb.core.types.NurbsCurveData;
+import verb.core.types.NurbsCurveData;
+import verb.core.types.NurbsSurfaceData;
 
 @:expose("core.KnotMultiplicity")
 class KnotMultiplicity {
@@ -23,7 +23,7 @@ class KnotMultiplicity {
 @:expose("core.Modify")
 class Modify {
 
-    public static function rationalSurfaceTransform( surface : SurfaceData, mat : Matrix ) : SurfaceData {
+    public static function rationalSurfaceTransform( surface : NurbsSurfaceData, mat : Matrix ) : NurbsSurfaceData {
 
         var pts = Eval.dehomogenize2d( surface.controlPoints );
 
@@ -36,10 +36,10 @@ class Modify {
             }
         }
 
-        return new SurfaceData( surface.degreeU, surface.degreeV, surface.knotsU.copy(), surface.knotsV.copy(), Eval.homogenize2d(pts, Eval.weight2d( surface.controlPoints)) );
+        return new NurbsSurfaceData( surface.degreeU, surface.degreeV, surface.knotsU.copy(), surface.knotsV.copy(), Eval.homogenize2d(pts, Eval.weight2d( surface.controlPoints)) );
     }
 
-    public static function rationalCurveTransform( curve : CurveData, mat : Matrix ) : CurveData {
+    public static function rationalCurveTransform( curve : NurbsCurveData, mat : Matrix ) : NurbsCurveData {
 
         var pts = Eval.dehomogenize1d( curve.controlPoints );
 
@@ -51,11 +51,11 @@ class Modify {
             pts[i] = Mat.dot( mat, homoPt ).slice( 0, homoPt.length - 1 );
         }
 
-        return new CurveData( curve.degree, curve.knots.copy(), Eval.homogenize1d( pts, Eval.weight1d( curve.controlPoints) ) );
+        return new NurbsCurveData( curve.degree, curve.knots.copy(), Eval.homogenize1d( pts, Eval.weight1d( curve.controlPoints) ) );
 
     }
 
-    public static function surfaceKnotRefine( surface : SurfaceData, knots_to_insert : Array<Float>, useV : Bool ) : SurfaceData {
+    public static function surfaceKnotRefine( surface : NurbsSurfaceData, knots_to_insert : Array<Float>, useV : Bool ) : NurbsSurfaceData {
 
         // TODO: make this faster by taking advantage of repeat computations in every row
         // 			 i.e. no reason to recompute the knot vectors on every row
@@ -78,9 +78,9 @@ class Modify {
         }
 
         // do knot refinement on every row
-        var c : CurveData = null;
+        var c : NurbsCurveData = null;
         for (cptrow in ctrlPts){
-            c = curveKnotRefine( new CurveData(degree, knots, cptrow), knots_to_insert );
+            c = curveKnotRefine( new NurbsCurveData(degree, knots, cptrow), knots_to_insert );
             newPts.push( c.controlPoints );
         }
 
@@ -89,15 +89,15 @@ class Modify {
         // u dir
         if (!useV){
             newPts = Mat.transpose( newPts );
-            return new SurfaceData( surface.degreeU, surface.degreeV, newknots, surface.knotsV.copy(), newPts );
+            return new NurbsSurfaceData( surface.degreeU, surface.degreeV, newknots, surface.knotsV.copy(), newPts );
         // v dir
         } else {
-            return new SurfaceData( surface.degreeU, surface.degreeV, surface.knotsU.copy(), newknots, newPts );
+            return new NurbsSurfaceData( surface.degreeU, surface.degreeV, surface.knotsU.copy(), newknots, newPts );
         }
 
     }
 
-    public static function surfaceSplit( surface : SurfaceData, u : Float, useV : Bool = false) : Array<SurfaceData> {
+    public static function surfaceSplit( surface : NurbsSurfaceData, u : Float, useV : Bool = false) : Array<NurbsSurfaceData> {
 
         var knots
         , degree
@@ -123,11 +123,11 @@ class Modify {
         , newpts1 = new Array<Array<Point>>();
 
         var s = Eval.knotSpan( degree, u, knots );
-        var res : CurveData = null;
+        var res : NurbsCurveData = null;
 
         for (cps in controlPoints){
 
-            res = curveKnotRefine( new CurveData(degree, knots, cps), knots_to_insert );
+            res = curveKnotRefine( new NurbsCurveData(degree, knots, cps), knots_to_insert );
 
             newpts0.push( res.controlPoints.slice( 0, s + 1 ) );
             newpts1.push( res.controlPoints.slice( s + 1 ) );
@@ -141,13 +141,13 @@ class Modify {
             newpts0 = Mat.transpose( newpts0 );
             newpts1 = Mat.transpose( newpts1 );
 
-            return [ new SurfaceData(degree, surface.degreeV, knots0, surface.knotsV.copy(), newpts0 ),
-                new SurfaceData(degree, surface.degreeV, knots1, surface.knotsV.copy(), newpts1 ) ];
+            return [ new NurbsSurfaceData(degree, surface.degreeV, knots0, surface.knotsV.copy(), newpts0 ),
+                new NurbsSurfaceData(degree, surface.degreeV, knots1, surface.knotsV.copy(), newpts1 ) ];
          }
 
         // v dir
-        return [ new SurfaceData(surface.degreeU, degree, surface.knotsU.copy(), knots0, newpts0 ),
-                    new SurfaceData(surface.degreeU, degree, surface.knotsU.copy(), knots1, newpts1 ) ];
+        return [ new NurbsSurfaceData(surface.degreeU, degree, surface.knotsU.copy(), knots0, newpts0 ),
+                    new NurbsSurfaceData(surface.degreeU, degree, surface.knotsU.copy(), knots1, newpts1 ) ];
     }
 
     //
@@ -161,7 +161,7 @@ class Modify {
     // **returns**
     // + *Array* of CurveData objects, defined by degree, knots, and control points
     //
-    public static function decomposeCurveIntoBeziers( curve : CurveData ) : Array<CurveData> {
+    public static function decomposeCurveIntoBeziers( curve : NurbsCurveData ) : Array<NurbsCurveData> {
 
         var degree = curve.degree
         , controlPoints = curve.controlPoints
@@ -178,7 +178,7 @@ class Modify {
             if ( knotmult.mult < reqMult ){
 
                 var knotsInsert = Vec.rep( reqMult - knotmult.mult, knotmult.knot );
-                var res = curveKnotRefine( new CurveData(degree, knots, controlPoints), knotsInsert );
+                var res = curveKnotRefine( new NurbsCurveData(degree, knots, controlPoints), knotsInsert );
 
                 knots = res.knots;
                 controlPoints = res.controlPoints;
@@ -195,7 +195,7 @@ class Modify {
             var kts = knots.slice( i, i + crvKnotLength );
             var pts = controlPoints.slice( i, i + reqMult );
 
-            crvs.push( new CurveData(degree, kts, pts ) );
+            crvs.push( new NurbsCurveData(degree, kts, pts ) );
 
             i += reqMult;
         }
@@ -239,7 +239,7 @@ class Modify {
     // **returns**
     // + *Array* two new curves, defined by degree, knots, and control points
     //
-    public static function curveSplit( curve : CurveData, u : Float ) : Array<CurveData> {
+    public static function curveSplit( curve : NurbsCurveData, u : Float ) : Array<NurbsCurveData> {
 
         var degree = curve.degree
         , controlPoints = curve.controlPoints
@@ -257,8 +257,8 @@ class Modify {
         var cpts1 = res.controlPoints.slice( s + 1 );
 
         return [
-            new CurveData( degree, knots0, cpts0 ),
-            new CurveData( degree, knots1, cpts1 )
+            new NurbsCurveData( degree, knots0, cpts0 ),
+            new NurbsCurveData( degree, knots1, cpts1 )
         ];
 
     }
@@ -275,7 +275,7 @@ class Modify {
     // +  CurveData object representing the curve
     //
 
-    public static function curveKnotRefine( curve : CurveData, knots_to_insert : Array<Float> ) : CurveData {
+    public static function curveKnotRefine( curve : NurbsCurveData, knots_to_insert : Array<Float> ) : NurbsCurveData {
 
         var degree = curve.degree
         , controlPoints = curve.controlPoints
@@ -348,7 +348,7 @@ class Modify {
 
         }
 
-        return new CurveData(degree, knots_post, controlPoints_post );
+        return new NurbsCurveData(degree, knots_post, controlPoints_post );
     }
 
     // Insert a knot along a rational curve.  Note that this algorithm only works
@@ -369,7 +369,7 @@ class Modify {
     // + *Object* the new curve, defined by knots and controlPoints
     //
 
-    public static function curveKnotInsert( curve : CurveData, u : Float, r : Int ) : CurveData {
+    public static function curveKnotInsert( curve : NurbsCurveData, u : Float, r : Int ) : NurbsCurveData {
 
         var degree = curve.degree
         , controlPoints = curve.controlPoints
@@ -453,7 +453,7 @@ class Modify {
             controlPoints_post[i] = controlPoints_temp[ i - L ];
         }
 
-        return new CurveData(degree, knots_post, controlPoints_post);
+        return new NurbsCurveData(degree, knots_post, controlPoints_post);
     }
 
 }

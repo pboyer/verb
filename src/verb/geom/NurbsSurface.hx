@@ -12,9 +12,9 @@ import verb.core.ArrayExtensions;
 using verb.core.ArrayExtensions;
 
 import verb.core.types.Interval;
-import verb.core.types.CurveData;
+import verb.core.types.NurbsCurveData;
 import verb.core.Eval;
-import verb.core.types.SurfaceData;
+import verb.core.types.NurbsSurfaceData;
 import verb.exe.AsyncObject;
 import verb.core.Mat;
 
@@ -22,7 +22,7 @@ import verb.core.Mat;
 class NurbsSurface extends AsyncObject implements ISurface {
 
     // underlying serializable, data object
-    private var _data : SurfaceData;
+    private var _data : NurbsSurfaceData;
 
     // public properties
 
@@ -41,7 +41,7 @@ class NurbsSurface extends AsyncObject implements ISurface {
     // **returns**
     // + A new NurbsSurface
 
-    public function new( data : SurfaceData ) {
+    public function new( data : NurbsSurfaceData ) {
         _data = data;
     }
 
@@ -64,7 +64,7 @@ class NurbsSurface extends AsyncObject implements ISurface {
                                                    knotsV : KnotArray,
                                                    controlPoints : Array<Array<Point>>,
                                                    weights : Array<Array<Float>> ) : NurbsSurface {
-        return new NurbsSurface( new SurfaceData( degreeU, degreeV, knotsU, knotsV, Eval.homogenize2d(controlPoints, weights) ) );
+        return new NurbsSurface( new NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, Eval.homogenize2d(controlPoints, weights) ) );
     }
 
     // Construct a NurbsSurface from four perimeter points in counter-clockwise order
@@ -87,8 +87,8 @@ class NurbsSurface extends AsyncObject implements ISurface {
     // **returns**
     // + A new SurfaceData object
 
-    public function data() : SurfaceData {
-        return new SurfaceData( degreeU(), degreeV(), knotsU(), knotsV(), Eval.homogenize2d( controlPoints(), weights() ));
+    public function data() : NurbsSurfaceData {
+        return new NurbsSurfaceData( degreeU(), degreeV(), knotsU(), knotsV(), Eval.homogenize2d( controlPoints(), weights() ));
     }
 
     // Obtain a copy of the Surface
