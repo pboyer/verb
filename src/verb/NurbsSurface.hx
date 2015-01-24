@@ -1,5 +1,8 @@
 package verb;
 
+import verb.core.types.MeshData;
+import verb.core.types.AdaptiveRefinementNode.AdaptiveRefinementOptions;
+import verb.core.Tess;
 import verb.core.Modify;
 import verb.core.Analyze;
 import verb.core.ArrayExtensions;
@@ -28,8 +31,8 @@ class NurbsSurface extends AsyncObject {
     public function degreeV() : Int { return _data.degreeV; }
     public function knotsU() : Array<Float> { return _data.knotsU.slice(0); }
     public function knotsV() : Array<Float> { return _data.knotsV.slice(0); }
-    public function controlPoints() : Array<Point> { return Eval.dehomogenize2d(_data.controlPoints); }
-    public function weights() : Array<Float> { return Eval.weight2d(_data.controlPoints); }
+    public function controlPoints() : Array<Array<Point>> { return Eval.dehomogenize2d(_data.controlPoints); }
+    public function weights() : Array<Array<Float>> { return Eval.weight2d(_data.controlPoints); }
 
     public function data() : SurfaceData {
         return new SurfaceData( degreeU(), degreeV(), knotsU(), knotsV, Eval.homogenize2d( controlPoints(), weights() ));
@@ -69,6 +72,18 @@ class NurbsSurface extends AsyncObject {
 
     public function split( u : Float, v : Float, useV : Bool = false) : Array<NurbSurface> {
         return Modify.surfaceSplit( _data, u, useV ).map(function(x){ return new NurbsSurface(x); });
+    }
+
+    public function tessellate(options : AdaptiveRefinementOptions = null) : MeshData {
+        return Tess.rationalSurfaceAdaptive( _data, options );
+    }
+
+    public function transform( mat : Matrix ) : NurbsSurface {
+        return new NurbsSurface( Modify.rationalSurfaceTransform( _data, mat ) );
+    }
+
+    public function transformAsync( mat : Matrix ) : NurbsSurface {
+        return defer( Modify, 'rationalSurfaceTransform', [ _data,  mat ] );
     }
 
 }

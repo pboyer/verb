@@ -1,5 +1,6 @@
 package verb.core;
 
+import verb.core.Mat.Matrix;
 import verb.core.types.CurveData;
 import verb.core.types.CurveData;
 import verb.core.types.SurfaceData;
@@ -21,6 +22,39 @@ class KnotMultiplicity {
 
 @:expose("core.Modify")
 class Modify {
+
+    public static function rationalSurfaceTransform( surface : SurfaceData, mat : Matrix ) : SurfaceData {
+
+        var pts = Eval.dehomogenize2d( surface.controlPoints );
+
+        for (i in 0...pts.length){
+            for (j in 0...pts[i].length){
+                var homoPt = pts[i][j];
+                homoPt.push(1.0);
+
+                pts[i][j] = Mat.dot( mat, homoPt ).slice( 0, homoPt.length - 2 );
+            }
+        }
+
+        return new SurfaceData( surface.degreeU, surface.degreeV, surface.knotsU.copy(), surface.knotsV.copy(), Eval.homogenize2d(pts, Eval.weight2d( surface.controlPoints)) );
+
+    }
+
+    public static function rationalCurveTransform( curve : CurveData, mat : Matrix ) : CurveData {
+
+        var pts = Eval.dehomogenize1d( curve.controlPoints );
+
+        for (i in 0...pts.length){
+
+            var homoPt = pts[i];
+            homoPt.push(1.0);
+
+            pts[i] = Mat.dot( mat, homoPt ).slice( 0, homoPt.length - 2 );
+        }
+
+        return new CurveData( curve.degree, curve.knots.copy(), Eval.homogenize1d( pts, Eval.weight1d( curve.controlPoints) ) );
+
+    }
 
     public static function surfaceKnotRefine( surface : SurfaceData, knots_to_insert : Array<Float>, useV : Bool ) : SurfaceData {
 

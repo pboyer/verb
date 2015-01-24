@@ -28,8 +28,8 @@ class NurbsSurface extends AsyncObject {
     public function degreeV() : Int { return _data.degreeV; }
     public function knotsU() : Array<Float> { return _data.knotsU.slice(0); }
     public function knotsV() : Array<Float> { return _data.knotsV.slice(0); }
-    public function controlPoints() : Array<Point> { return Eval.dehomogenize2d(_data.controlPoints); }
-    public function weights() : Array<Float> { return Eval.weight2d(_data.controlPoints); }
+    public function controlPoints() : Array<Array<Point>> { return Eval.dehomogenize2d(_data.controlPoints); }
+    public function weights() : Array<Array<Float>> { return Eval.weight2d(_data.controlPoints); }
 
     public function data() : SurfaceData {
         return new SurfaceData( degreeU(), degreeV(), knotsU(), knotsV, Eval.homogenize2d( controlPoints(), weights() ));
@@ -69,6 +69,10 @@ class NurbsSurface extends AsyncObject {
 
     public function split( u : Float, v : Float, useV : Bool = false) : Array<NurbSurface> {
         return Modify.surfaceSplit( _data, u, useV ).map(function(x){ return new NurbsSurface(x); });
+    }
+
+    public function transform( mat : Matrix ) : NurbsSurface {
+        return new NurbsSurface( Modify.rationalSurfaceTransform( _data, mat ) );
     }
 
 }

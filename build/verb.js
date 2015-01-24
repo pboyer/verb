@@ -814,16 +814,7 @@ verb.NurbsCurve.prototype = $extend(verb.exe.AsyncObject.prototype,{
 		return new verb.NurbsCurve(this._data);
 	}
 	,transform: function(mat) {
-		var pts = this.controlPoints();
-		var _g1 = 0;
-		var _g = pts.length;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var homoPt = pts[i];
-			homoPt.push(1.0);
-			pts[i] = verb.core.Mat.dot(mat,homoPt).slice(0,homoPt.length - 2);
-		}
-		return new verb.NurbsCurve(new verb.core.types.CurveData(this.degree(),this.knots(),verb.core.Eval.homogenize1d(pts,this.weights())));
+		return new verb.NurbsCurve(verb.core.Modify.rationalCurveTransform(this._data,mat));
 	}
 	,point: function(u) {
 		return verb.core.Eval.rationalCurvePoint(this._data,u);
@@ -3328,6 +3319,35 @@ verb.core.KnotMultiplicity.prototype = {
 };
 verb.core.Modify = $hx_exports.core.Modify = function() { };
 verb.core.Modify.__name__ = ["verb","core","Modify"];
+verb.core.Modify.rationalSurfaceTransform = function(surface,mat) {
+	var pts = verb.core.Eval.dehomogenize2d(surface.controlPoints);
+	var _g1 = 0;
+	var _g = pts.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		var _g3 = 0;
+		var _g2 = pts[i].length;
+		while(_g3 < _g2) {
+			var j = _g3++;
+			var homoPt = pts[i][j];
+			homoPt.push(1.0);
+			pts[i][j] = verb.core.Mat.dot(mat,homoPt).slice(0,homoPt.length - 2);
+		}
+	}
+	return new verb.core.types.SurfaceData(surface.degreeU,surface.degreeV,surface.knotsU.slice(),surface.knotsV.slice(),verb.core.Eval.homogenize2d(pts,verb.core.Eval.weight2d(surface.controlPoints)));
+};
+verb.core.Modify.rationalCurveTransform = function(curve,mat) {
+	var pts = verb.core.Eval.dehomogenize1d(curve.controlPoints);
+	var _g1 = 0;
+	var _g = pts.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		var homoPt = pts[i];
+		homoPt.push(1.0);
+		pts[i] = verb.core.Mat.dot(mat,homoPt).slice(0,homoPt.length - 2);
+	}
+	return new verb.core.types.CurveData(curve.degree,curve.knots.slice(),verb.core.Eval.homogenize1d(pts,verb.core.Eval.weight1d(curve.controlPoints)));
+};
 verb.core.Modify.surfaceKnotRefine = function(surface,knots_to_insert,useV) {
 	var newPts = [];
 	var knots;
