@@ -4944,9 +4944,6 @@ verb.geom.Ellipse = $hx_exports.geom.Ellipse = function(center,xaxis,yaxis) {
 	verb.geom.EllipseArc.call(this,center,xaxis,yaxis,0,Math.PI * 2);
 };
 verb.geom.Ellipse.__name__ = ["verb","geom","Ellipse"];
-verb.geom.Ellipse.byCenterAxes = function(center,xaxis,yaxis) {
-	return new verb.geom.Ellipse(center,xaxis,yaxis);
-};
 verb.geom.Ellipse.__super__ = verb.geom.EllipseArc;
 verb.geom.Ellipse.prototype = $extend(verb.geom.EllipseArc.prototype,{
 });

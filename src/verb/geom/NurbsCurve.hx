@@ -33,7 +33,7 @@ class NurbsCurve extends AsyncObject implements ICurve {
     public function controlPoints() : Array<Point> { return Eval.dehomogenize1d(_data.controlPoints); }
     public function weights() : Array<Float> { return Eval.weight1d(_data.controlPoints); }
 
-    // Construct a NurbsCurve by a CurveData object
+    // Construct a NurbsCurve by a NurbsCurveData object
     //
     // **params**
     // + The data object
