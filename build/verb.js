@@ -779,7 +779,7 @@ verb.exe = {};
 verb.exe.AsyncObject = function() { };
 verb.exe.AsyncObject.__name__ = ["verb","exe","AsyncObject"];
 verb.exe.AsyncObject.prototype = {
-	deferMethod: function(classType,methodName,args) {
+	defer: function(classType,methodName,args) {
 		return verb.exe.Dispatcher.instance().deferMethod(Type.getClassName(classType),methodName,args);
 	}
 };
@@ -807,26 +807,31 @@ verb.NurbsCurve.prototype = $extend(verb.exe.AsyncObject.prototype,{
 	,weights: function() {
 		return verb.core.Eval.weight1d(this._data.controlPoints);
 	}
-	,domain: function() {
-		return new verb.core.types.Interval(this._data.knots[0],verb.core.ArrayExtensions.last(this._data.knots));
-	}
 	,clone: function() {
 		return new verb.NurbsCurve(this._data);
 	}
+	,domain: function() {
+		return new verb.core.types.Interval(this._data.knots[0],verb.core.ArrayExtensions.last(this._data.knots));
+	}
 	,transform: function(mat) {
 		return new verb.NurbsCurve(verb.core.Modify.rationalCurveTransform(this._data,mat));
+	}
+	,transformAsync: function(mat) {
+		return this.defer(verb.core.Modify,"rationalCurveTransform",[this._data,mat]).then(function(x) {
+			return new verb.NurbsCurve(x);
+		});
 	}
 	,point: function(u) {
 		return verb.core.Eval.rationalCurvePoint(this._data,u);
 	}
 	,pointAsync: function(u) {
-		return this.deferMethod(verb.core.Eval,"rationalCurvePoint",[this._data,u]);
+		return this.defer(verb.core.Eval,"rationalCurvePoint",[this._data,u]);
 	}
 	,tangent: function(u) {
 		return verb.core.Eval.rationalCurveTangent(this._data,u);
 	}
 	,tangentAsync: function(u) {
-		return this.deferMethod(verb.core.Eval,"rationalCurveTangent",[this._data,u]);
+		return this.defer(verb.core.Eval,"rationalCurveTangent",[this._data,u]);
 	}
 	,derivatives: function(u,numDerivs) {
 		if(numDerivs == null) numDerivs = 1;
@@ -834,55 +839,55 @@ verb.NurbsCurve.prototype = $extend(verb.exe.AsyncObject.prototype,{
 	}
 	,derivativesAsync: function(u,numDerivs) {
 		if(numDerivs == null) numDerivs = 1;
-		return this.deferMethod(verb.core.Eval,"rationalCurveDerivatives",[this._data,u,numDerivs]);
+		return this.defer(verb.core.Eval,"rationalCurveDerivatives",[this._data,u,numDerivs]);
 	}
 	,closestPoint: function(pt) {
 		return verb.core.Analyze.rationalCurveClosestPoint(this._data,pt);
 	}
 	,closestPointAsync: function(pt) {
-		return this.deferMethod(verb.core.Analyze,"rationalCurveClosestPoint",[this._data,pt]);
+		return this.defer(verb.core.Analyze,"rationalCurveClosestPoint",[this._data,pt]);
 	}
 	,closestParam: function(pt) {
 		return verb.core.Analyze.rationalCurveClosestParam(this._data,pt);
 	}
 	,closestParamAsync: function(pt) {
-		return this.deferMethod(verb.core.Analyze,"rationalCurveClosestParam",[this._data,pt]);
+		return this.defer(verb.core.Analyze,"rationalCurveClosestParam",[this._data,pt]);
 	}
 	,length: function() {
 		return verb.core.Analyze.rationalCurveArcLength(this._data);
 	}
 	,lengthAsync: function() {
-		return this.deferMethod(verb.core.Analyze,"rationalCurveArcLength",[this._data]);
+		return this.defer(verb.core.Analyze,"rationalCurveArcLength",[this._data]);
 	}
 	,lengthAtParam: function(u) {
 		return verb.core.Analyze.rationalCurveArcLength(this._data,u);
 	}
 	,lengthAtParamAsync: function() {
-		return this.deferMethod(verb.core.Analyze,"rationalCurveArcLength",[this._data]);
+		return this.defer(verb.core.Analyze,"rationalCurveArcLength",[this._data]);
 	}
 	,paramAtLength: function(len,tolerance) {
 		return verb.core.Analyze.rationalCurveParamAtArcLength(this._data,len,tolerance);
 	}
 	,paramAtLengthAsync: function(len,tolerance) {
-		return this.deferMethod(verb.core.Analyze,"rationalCurveParamAtArcLength",[this._data,len,tolerance]);
+		return this.defer(verb.core.Analyze,"rationalCurveParamAtArcLength",[this._data,len,tolerance]);
 	}
 	,divideByEqualArcLength: function(divisions) {
 		return verb.core.Divide.rationalCurveByEqualArcLength(this._data,divisions);
 	}
 	,divideByEqualArcLengthAsync: function(divisions) {
-		return this.deferMethod(verb.core.Divide,"rationalCurveByEqualArcLength",[this._data,divisions]);
+		return this.defer(verb.core.Divide,"rationalCurveByEqualArcLength",[this._data,divisions]);
 	}
 	,divideByArcLength: function(arcLength) {
 		return verb.core.Divide.rationalCurveByArcLength(this._data,arcLength);
 	}
 	,divideByArcLengthAsync: function(divisions) {
-		return this.deferMethod(verb.core.Divide,"rationalCurveByArcLength",[this._data,divisions]);
+		return this.defer(verb.core.Divide,"rationalCurveByArcLength",[this._data,divisions]);
 	}
 	,tessellate: function(tolerance) {
 		return verb.core.Tess.rationalCurveAdaptiveSample(this._data,tolerance,false);
 	}
 	,tessellateAsync: function(tolerance) {
-		return this.deferMethod(verb.core.Tess,"rationalCurveAdaptiveSample",[this._data,tolerance,false]);
+		return this.defer(verb.core.Tess,"rationalCurveAdaptiveSample",[this._data,tolerance,false]);
 	}
 	,split: function(u) {
 		return verb.core.Modify.curveSplit(this._data,u).map(function(x) {
@@ -890,7 +895,7 @@ verb.NurbsCurve.prototype = $extend(verb.exe.AsyncObject.prototype,{
 		});
 	}
 	,splitAsync: function(u) {
-		return this.deferMethod(verb.core.Modify,"curveSplit",[this._data,u]).then(function(cs) {
+		return this.defer(verb.core.Modify,"curveSplit",[this._data,u]).then(function(cs) {
 			return cs.map(function(x) {
 				return new verb.NurbsCurve(x);
 			});
@@ -1122,6 +1127,100 @@ verb.Line.prototype = $extend(verb.NurbsCurve.prototype,{
 	}
 	,end: function() {
 		return this._end;
+	}
+});
+verb.NurbsSurface = function(data) {
+	this._data = data;
+};
+verb.NurbsSurface.__name__ = ["verb","NurbsSurface"];
+verb.NurbsSurface.__super__ = verb.exe.AsyncObject;
+verb.NurbsSurface.prototype = $extend(verb.exe.AsyncObject.prototype,{
+	byControlPointsWeights: function(degreeU,degreeV,knotsU,knotsV,controlPoints,weights) {
+		return new verb.NurbsSurface(new verb.core.types.SurfaceData(degreeU,degreeV,knotsU,knotsV,verb.core.Eval.homogenize2d(controlPoints,weights)));
+	}
+	,degreeU: function() {
+		return this._data.degreeU;
+	}
+	,degreeV: function() {
+		return this._data.degreeV;
+	}
+	,knotsU: function() {
+		return this._data.knotsU.slice(0);
+	}
+	,knotsV: function() {
+		return this._data.knotsV.slice(0);
+	}
+	,controlPoints: function() {
+		return verb.core.Eval.dehomogenize2d(this._data.controlPoints);
+	}
+	,weights: function() {
+		return verb.core.Eval.weight2d(this._data.controlPoints);
+	}
+	,data: function() {
+		return new verb.core.types.SurfaceData(this.degreeU(),this.degreeV(),this.knotsU(),this.knotsV(),verb.core.Eval.homogenize2d(this.controlPoints(),this.weights()));
+	}
+	,clone: function() {
+		return new verb.NurbsSurface(this.data());
+	}
+	,domainU: function() {
+		return new verb.core.types.Interval(this._data.knotsU[0],verb.core.ArrayExtensions.last(this._data.knotsU));
+	}
+	,domainV: function() {
+		return new verb.core.types.Interval(this._data.knotsV[0],verb.core.ArrayExtensions.last(this._data.knotsV));
+	}
+	,point: function(u,v) {
+		return verb.core.Eval.rationalSurfacePoint(this._data,u,v);
+	}
+	,pointAsync: function(u,v) {
+		return this.defer(verb.core.Eval,"rationalSurfacePoint",[this._data,u,v]);
+	}
+	,normal: function(u,v) {
+		return verb.core.Eval.rationalSurfaceNormal(this._data,u,v);
+	}
+	,normalAsync: function(u,v) {
+		return this.defer(verb.core.Eval,"rationalSurfaceNormal",[this._data,u,v]);
+	}
+	,derivatives: function(u,v,numDerivs) {
+		if(numDerivs == null) numDerivs = 1;
+		return verb.core.Eval.rationalSurfaceDerivatives(this._data,u,v,numDerivs);
+	}
+	,derivativesAsync: function(u,v,numDerivs) {
+		if(numDerivs == null) numDerivs = 1;
+		return this.defer(verb.core.Eval,"rationalSurfaceDerivatives",[this._data,u,v,numDerivs]);
+	}
+	,closestParam: function(pt) {
+		return verb.core.Analyze.rationalSurfaceClosestParam(this._data,pt);
+	}
+	,closestParamAsync: function(pt) {
+		return this.defer(verb.core.Analyze,"rationalSurfaceClosestParam",[this._data,pt]);
+	}
+	,closestPoint: function(pt) {
+		return verb.core.Analyze.rationalSurfaceClosestPoint(this._data,pt);
+	}
+	,closestPointAsync: function(pt) {
+		return this.defer(verb.core.Analyze,"rationalSurfaceClosestPoint",[this._data,pt]);
+	}
+	,split: function(u,v,useV) {
+		if(useV == null) useV = false;
+		return verb.core.Modify.surfaceSplit(this._data,u,useV).map(function(x) {
+			return new verb.NurbsSurface(x);
+		});
+	}
+	,splitAsync: function(u,v,useV) {
+		if(useV == null) useV = false;
+		return this.defer(verb.core.Tess,"surfaceSplit",[this._data,u,v,useV]);
+	}
+	,tessellate: function(options) {
+		return verb.core.Tess.rationalSurfaceAdaptive(this._data,options);
+	}
+	,tessellateAsync: function(options) {
+		return this.defer(verb.core.Tess,"rationalSurfaceAdaptive",[this._data,options]);
+	}
+	,transform: function(mat) {
+		return new verb.NurbsSurface(verb.core.Modify.rationalSurfaceTransform(this._data,mat));
+	}
+	,transformAsync: function(mat) {
+		return this.defer(verb.core.Modify,"rationalSurfaceTransform",[this._data,mat]);
 	}
 });
 verb.core = {};

@@ -74,8 +74,9 @@ class NurbsCurve extends AsyncObject {
         return new NurbsCurve( Modify.rationalCurveTransform( _data, mat ) );
     }
 
-    public function transformAsync( mat : Matrix ) : NurbsCurve {
-        return defer( Modify, 'rationalCurveTransform', [ _data,  mat ] );
+    public function transformAsync( mat : Matrix ) : Promise<NurbsCurve> {
+        return defer( Modify, 'rationalCurveTransform', [ _data,  mat ] )
+            .then(function(x){ return new NurbsCurve(x); });
     }
 
     // Sample a point at the given parameter
