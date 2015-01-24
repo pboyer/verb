@@ -1,5 +1,6 @@
 package verb.core;
 
+import verb.core.types.BoundingBox;
 import verb.core.types.Pair;
 import verb.core.types.BoundingBoxNode;
 import verb.core.types.MeshData;
@@ -47,7 +48,7 @@ class Mesh {
 
     public static function makeMeshAabb( mesh : MeshData, faceIndices : Array<Int> ) : BoundingBox {
 
-        var bb = new verb.BoundingBox();
+        var bb = new verb.core.types.BoundingBox();
 
         for ( x in faceIndices ){
             bb.add( mesh.points[ mesh.faces[ x ][0] ] );

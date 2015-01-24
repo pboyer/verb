@@ -1097,11 +1097,11 @@ describe("verb.core.Modify.surfaceSplit", function(){
 
 });
 
-describe("verb.geom.BoundingBox.init",function(){
+describe("verb.core.BoundingBox.init",function(){
 
 	it('should allow array of point arguments', function(){
 
-		var bb1 = new verb.geom.BoundingBox([[5,5,5], [10,10,10]]);
+		var bb1 = new verb.core.BoundingBox([[5,5,5], [10,10,10]]);
 
 		should.equal( bb1.min[0], 5 );
 		should.equal( bb1.min[1], 5 );
@@ -1115,13 +1115,13 @@ describe("verb.geom.BoundingBox.init",function(){
 
 });
 
-describe("verb.geom.BoundingBox.intersects",function(){
+describe("verb.core.BoundingBox.intersects",function(){
 
 	it('returns expected results', function(){
 
-		var bb1 = new verb.geom.BoundingBox([ [5,5,5], [10,10,10] ])
-			, bb2 = new verb.geom.BoundingBox([ [0,0,0], [10,10,10] ])
-			, bb3 = new verb.geom.BoundingBox([ [-2,-2,-2], [-1,-1,-1] ]);
+		var bb1 = new verb.core.BoundingBox([ [5,5,5], [10,10,10] ])
+			, bb2 = new verb.core.BoundingBox([ [0,0,0], [10,10,10] ])
+			, bb3 = new verb.core.BoundingBox([ [-2,-2,-2], [-1,-1,-1] ]);
 
 		should.equal( bb1.intersects(bb2), true );
 		should.equal( bb1.intersects(bb3), false );
@@ -1131,14 +1131,14 @@ describe("verb.geom.BoundingBox.intersects",function(){
 
 });
 
-describe("verb.geom.BoundingBox.intersect",function(){
+describe("verb.core.BoundingBox.intersect",function(){
 
 	it('returns expected results', function(){
 
 		// initialize a bounding box
-		var bb1 = new verb.geom.BoundingBox([ [5,5,5], [10,10,10] ])
-			, bb2 = new verb.geom.BoundingBox([ [0,0,0], [10,10,10] ])
-			, bb3 = new verb.geom.BoundingBox([ [-2,-2,-2], [-1,-1,-1] ]);
+		var bb1 = new verb.core.BoundingBox([ [5,5,5], [10,10,10] ])
+			, bb2 = new verb.core.BoundingBox([ [0,0,0], [10,10,10] ])
+			, bb3 = new verb.core.BoundingBox([ [-2,-2,-2], [-1,-1,-1] ]);
 
 		// intersect bounding boxes
 		var int_bb1_bb2 = bb1.intersect(bb2)
@@ -1159,25 +1159,25 @@ describe("verb.geom.BoundingBox.intersect",function(){
 
 });
 
-describe("verb.geom.BoundingBox.intervalsOverlap",function(){
+describe("verb.core.BoundingBox.intervalsOverlap",function(){
 
 	it('returns expected results', function(){
 
-		should.equal( verb.geom.BoundingBox.intervalsOverlap( 0, 1, 0, 10 ), true );
-		should.equal( verb.geom.BoundingBox.intervalsOverlap( 0, 1, 1, 10 ), true );
-		should.equal( verb.geom.BoundingBox.intervalsOverlap( 0, 1, 1+1e-3, 10 ), false );
-		should.equal( verb.geom.BoundingBox.intervalsOverlap( 0, 1, 2, 10 ), false );
+		should.equal( verb.core.BoundingBox.intervalsOverlap( 0, 1, 0, 10 ), true );
+		should.equal( verb.core.BoundingBox.intervalsOverlap( 0, 1, 1, 10 ), true );
+		should.equal( verb.core.BoundingBox.intervalsOverlap( 0, 1, 1+1e-3, 10 ), false );
+		should.equal( verb.core.BoundingBox.intervalsOverlap( 0, 1, 2, 10 ), false );
 
 	});
 
 });
 
-describe("verb.geom.BoundingBox.contains",function(){
+describe("verb.core.BoundingBox.contains",function(){
 
 	it('returns expected results', function(){
 
-		var bb4 = new verb.geom.BoundingBox([ [0,0,0], [1,1,1] ])
-			, bb5 = new verb.geom.BoundingBox();
+		var bb4 = new verb.core.BoundingBox([ [0,0,0], [1,1,1] ])
+			, bb5 = new verb.core.BoundingBox();
 
 		should.equal( bb4.contains( [0,0,0] ), true );
 		should.equal( bb4.contains( [1,1,1] ), true );
@@ -1189,22 +1189,22 @@ describe("verb.geom.BoundingBox.contains",function(){
 
 });
 
-describe("verb.geom.BoundingBox.contains",function(){
+describe("verb.core.BoundingBox.contains",function(){
 
 	it('BoundingBox.clear', function(){
 
-		var bb1 = new verb.geom.BoundingBox([ [5,5,5], [10,10,10] ]);
+		var bb1 = new verb.core.BoundingBox([ [5,5,5], [10,10,10] ]);
 		bb1.clear();
 		should.equal( bb1.initialized, false );
 
 	});
 });
 
-describe("verb.geom.BoundingBox.getAxisLength",function(){
+describe("verb.core.BoundingBox.getAxisLength",function(){
 
 	it('should return correct value', function(){
 
-		var bb1 = new verb.geom.BoundingBox([ [-1,2,3], [10,10,10] ]);
+		var bb1 = new verb.core.BoundingBox([ [-1,2,3], [10,10,10] ]);
 		should.equal( bb1.getAxisLength(0), 11 );
 		should.equal( bb1.getAxisLength(1), 8 );
 		should.equal( bb1.getAxisLength(2), 7 );
@@ -1213,22 +1213,22 @@ describe("verb.geom.BoundingBox.getAxisLength",function(){
 
 });
 
-describe("verb.geom.BoundingBox.getLongestAxis",function(){
+describe("verb.core.BoundingBox.getLongestAxis",function(){
 
 	it('should return correct value', function(){
 
-		var bb1 = new verb.geom.BoundingBox([ [-1,2,3], [10,10,10] ]);
+		var bb1 = new verb.core.BoundingBox([ [-1,2,3], [10,10,10] ]);
 		should.equal( bb1.getLongestAxis(0), 0 );
 
 	});
 
 });
 
-describe("verb.geom.BoundingBox.getAxisLength",function(){
+describe("verb.core.BoundingBox.getAxisLength",function(){
 
 	it('should return 0 when given out of bounds index', function(){
 
-		var bb1 = new verb.geom.BoundingBox([ [-1,2,3], [10,10,10] ]);
+		var bb1 = new verb.core.BoundingBox([ [-1,2,3], [10,10,10] ]);
 		should.equal( bb1.getAxisLength(8), 0 );
 		should.equal( bb1.getAxisLength(-1), 0 );
 		should.equal( bb1.getAxisLength(4), 0 );
@@ -1238,11 +1238,11 @@ describe("verb.geom.BoundingBox.getAxisLength",function(){
 
 });
 
-describe("verb.geom.BoundingBox.getAxisLength",function(){
+describe("verb.core.BoundingBox.getAxisLength",function(){
 
 	it('should return 0 when given out of bounds index', function(){
 
-		var bb1 = new verb.geom.BoundingBox([ [-1,2,3], [10,10,10] ]);
+		var bb1 = new verb.core.BoundingBox([ [-1,2,3], [10,10,10] ]);
 		should.equal( bb1.getAxisLength(8), 0 );
 		should.equal( bb1.getAxisLength(-1), 0 );
 		should.equal( bb1.getAxisLength(4), 0 );
@@ -1252,11 +1252,11 @@ describe("verb.geom.BoundingBox.getAxisLength",function(){
 
 });
 
-describe("verb.geom.BoundingBox.clear",function(){
+describe("verb.core.BoundingBox.clear",function(){
 
 	it('should set initialized to false', function(){
 
-		var bb1 = new verb.geom.BoundingBox([ [5,5,5], [10,10,10] ]);
+		var bb1 = new verb.core.BoundingBox([ [5,5,5], [10,10,10] ]);
 		bb1.clear();
 		should.equal( bb1.initialized, false );
 
@@ -4381,7 +4381,7 @@ describe("verb.geom.Arc.constructor",function(){
 
 	it('has correct properties', function(){
 
-		var arc = verb.geom.Arc.byCenterAxesRadiusSpan([0,0,0], [1,0,0], [0,1,0], 5, 0, Math.PI/ 2 );
+		var arc = new verb.geom.Arc([0,0,0], [1,0,0], [0,1,0], 5, 0, Math.PI/ 2 );
 
 		should.exist( arc );
 
@@ -4400,7 +4400,7 @@ describe("verb.geom.Arc.point",function(){
 
 	it('returns expected results', function(){
 
-		var arc = verb.geom.Arc.byCenterAxesRadiusSpan([0,0,1], [1,0,0], [0,1,0], 1, 0, Math.PI/ 2 );
+		var arc = new verb.geom.Arc([0,0,1], [1,0,0], [0,1,0], 1, 0, Math.PI/ 2 );
 		var p1 = arc.point(0);
 		var p2 = arc.point(0.5);
 		var p3 = arc.point(1);
@@ -4423,7 +4423,7 @@ describe("verb.geom.Arc.point",function(){
 
 	it('creates the expected result when given a callback', function(done){
 
-		var arc = verb.geom.Arc.byCenterAxesRadiusSpan([0,0,1], [1,0,0], [0,1,0], 1, 0, Math.PI/ 2 );
+		var arc = new verb.geom.Arc([0,0,1], [1,0,0], [0,1,0], 1, 0, Math.PI/ 2 );
 
 		arc.pointAsync(0.5).then(function(res){
 
@@ -4443,7 +4443,7 @@ describe("verb.geom.Arc.tessellate",function(){
 
 	it('should return a list of vertices', function(){
 
-		var arc = verb.geom.Arc.byCenterAxesRadiusSpan([0,0,1], [1,0,0], [0,1,0], 1, 0, Math.PI/ 2 );
+		var arc = new verb.geom.Arc([0,0,1], [1,0,0], [0,1,0], 1, 0, Math.PI/ 2 );
 		var pts = arc.tessellate();
 
 		pts.length.should.be.greaterThan(2);
@@ -4454,14 +4454,14 @@ describe("verb.geom.Arc.tessellate",function(){
 
 });
 
-describe("verb.geom.Line.byEnds",function(){
+describe("new verb.geom.Line",function(){
 
 	it('can create an instance', function(){
 
 		var p1 = [0,0,1]
 			, p2 = [1,0,0];
 
-		var c = verb.geom.Line.byEnds( p1, p2 );
+		var c = new verb.geom.Line( p1, p2 );
 
 		should.exist(c);
 
@@ -4476,7 +4476,7 @@ describe("verb.geom.Line.point",function(){
 		var p1 = [0,0,0]
 			, p2 = [1,1,1];
 
-		var c = verb.geom.Line.byEnds( p1, p2 );
+		var c = new verb.geom.Line( p1, p2 );
 
 		should.exist(c);
 
@@ -4497,7 +4497,7 @@ describe("verb.geom.Line.derivatives",function(){
 		var p1 = [0,0,0]
 			, p2 = [1,1,1];
 
-		var c = verb.geom.Line.byEnds( p1, p2 );
+		var c = new verb.geom.Line( p1, p2 );
 
 		should.exist(c);
 
@@ -4517,7 +4517,7 @@ describe("verb.geom.Line.tessellate",function(){
 		var p1 = [0,0,0]
 			, p2 = [1,1,1];
 
-		var c = verb.geom.Line.byEnds( p1, p2 );
+		var c = new verb.geom.Line( p1, p2 );
 
 		should.exist(c);
 
@@ -4540,7 +4540,7 @@ describe("verb.geom.BezierCurve.constructor",function(){
 			, p3 = [2,0,-1]
 			, p4 = [3,0,0];
 
-		var c = verb.geom.BezierCurve.byControlPoints( [p1, p2, p3, p4] );
+		var c = new verb.geom.BezierCurve( [p1, p2, p3, p4] );
 
 		should.exist(c);
 
@@ -4557,7 +4557,7 @@ describe("verb.geom.BezierCurve.point",function(){
 			, p3 = [2,0,-1]
 			, p4 = [3,0,0];
 
-		var c = verb.geom.BezierCurve.byControlPoints( [p1, p2, p3, p4] );
+		var c = new verb.geom.BezierCurve( [p1, p2, p3, p4] );
 
 		should.exist(c);
 
@@ -4573,13 +4573,12 @@ describe("verb.geom.BezierCurve.derivatives",function(){
 
 	it('gives nice result', function(){
 
-
 		var p1 = [0,0,0]
 			, p2 = [1,0,1]
 			, p3 = [2,0,-1]
 			, p4 = [3,0,0];
 
-		var c = verb.geom.BezierCurve.byControlPoints( [p1, p2, p3, p4] );
+		var c = new verb.geom.BezierCurve( [p1, p2, p3, p4] );
 
 		should.exist(c);
 
@@ -4601,7 +4600,7 @@ describe("verb.geom.BezierCurve.tessellate",function(){
 			, p3 = [2,0,-1]
 			, p4 = [3,0,0];
 
-		var c = verb.geom.BezierCurve.byControlPoints( [p1, p2, p3, p4] );
+		var c = new verb.geom.BezierCurve( [p1, p2, p3, p4] );
 
 		should.exist(c);
 
@@ -4619,7 +4618,7 @@ describe("verb.geom.Circle.constructor",function(){
 
 	it('can create an instance', function(){
 
-		var c = verb.geom.Circle.byCenterAxesRadius([0,0,0], [1,0,0], [0,1,0], 5);
+		var c = new verb.geom.Circle([0,0,0], [1,0,0], [0,1,0], 5);
 
 		should.exist(c);
 
@@ -4631,7 +4630,7 @@ describe("verb.geom.Circle.point",function(){
 
 	it('evaluates correctly', function(){
 
-		var c = verb.geom.Circle.byCenterAxesRadius([0,0,0], [1,0,0], [0,1,0], 5);
+		var c = new verb.geom.Circle([0,0,0], [1,0,0], [0,1,0], 5);
 
 		should.exist(c);
 
@@ -4649,7 +4648,7 @@ describe("verb.geom.Circle.derivatives",function(){
 
 	it('gives correct result', function(){
 
-		var c = verb.geom.Circle.byCenterAxesRadius([0,0,0], [1,0,0], [0,1,0], 5);
+		var c = new verb.geom.Circle([0,0,0], [1,0,0], [0,1,0], 5);
 
 		should.exist(c);
 
@@ -4674,7 +4673,7 @@ describe("verb.geom.Circle.tessellate",function(){
 
 	it('gives correct result', function(){
 
-		var c = verb.geom.Circle.byCenterAxesRadius([0,0,0], [1,0,0], [0,1,0], 5);
+		var c = new verb.geom.Circle([0,0,0], [1,0,0], [0,1,0], 5);
 
 		should.exist(c);
 
@@ -4691,7 +4690,7 @@ describe("verb.geom.Ellipse.constructor",function(){
 
 	it('can create an instance', function(){
 
-		var c = verb.geom.Ellipse.byCenterAxes([0,0,0], [5,0,0], [0,10,0]);
+		var c = new verb.geom.Ellipse([0,0,0], [5,0,0], [0,10,0]);
 
 		should.exist(c);
 
@@ -4703,7 +4702,7 @@ describe("verb.geom.Ellipse.point",function(){
 
 	it('evaluates correctly', function(){
 
-		var c = verb.geom.Ellipse.byCenterAxes([0,0,0], [5,0,0], [0,10,0]);
+		var c = new verb.geom.Ellipse([0,0,0], [5,0,0], [0,10,0]);
 
 		should.exist(c);
 
@@ -4727,7 +4726,7 @@ describe("verb.geom.Ellipse.derivatives",function(){
 
 	it('gives correct result', function(){
 
-		var c = verb.geom.Ellipse.byCenterAxes([0,0,0], [5,0,0], [0,10,0]);
+		var c = new verb.geom.Ellipse([0,0,0], [5,0,0], [0,10,0]);
 
 		should.exist(c);
 
@@ -4765,7 +4764,7 @@ describe("verb.geom.Ellipse.tessellate",function(){
 
 	it('gives correct result', function(){
 
-		var c = verb.geom.Ellipse.byCenterAxes([0,0,0], [5,0,0], [0,10,0]);
+		var c = new verb.geom.Ellipse([0,0,0], [5,0,0], [0,10,0]);
 
 		should.exist(c);
 
@@ -4782,7 +4781,7 @@ describe("verb.geom.EllipseArc.constructor",function(){
 
 	it('can create an instance', function(){
 
-		var c = verb.geom.EllipseArc.byCenterAxesSpan([0,0,0], [1,0,0], [0,1,0], 0, Math.PI);
+		var c = new verb.geom.EllipseArc([0,0,0], [1,0,0], [0,1,0], 0, Math.PI);
 
 		should.exist(c);
 
@@ -4794,7 +4793,7 @@ describe("verb.geom.EllipseArc.point",function(){
 
 	it('evaluates correctly', function(){
 
-		var c = verb.geom.EllipseArc.byCenterAxesSpan([0,0,0], [1,0,0], [0,10,0], 0, Math.PI);
+		var c = new verb.geom.EllipseArc([0,0,0], [1,0,0], [0,10,0], 0, Math.PI);
 
 		should.exist(c);
 
@@ -4812,7 +4811,7 @@ describe("verb.geom.EllipseArc.derivatives",function(){
 
 	it('gives correct result', function(){
 
-		var c = verb.geom.EllipseArc.byCenterAxesSpan([0,0,0], [1,0,0], [0,10,0], 0, Math.PI);
+		var c = new verb.geom.EllipseArc([0,0,0], [1,0,0], [0,10,0], 0, Math.PI);
 
 		should.exist(c);
 
@@ -4837,7 +4836,7 @@ describe("verb.geom.EllipseArc.tessellate",function(){
 
 	it('gives correct result', function(){
 
-		var c = verb.geom.EllipseArc.byCenterAxesSpan([0,0,0], [1,0,0], [0,10,0], 0, Math.PI);
+		var c = new verb.geom.EllipseArc([0,0,0], [1,0,0], [0,10,0], 0, Math.PI);
 
 		should.exist(c);
 
@@ -5190,113 +5189,6 @@ describe("Cone.tessellate",function(){
 
 });
 
-describe("Cylinder.constructor",function(){
-
-	it('can create an instance', function(){
-
-		var axis = [0,0,1]
-			, xaxis = [1,0,0]
-			, base = [0,0,0]
-			, height = 5
-			, radius = 3;
-
-		var srf = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
-
-		should.exist(srf);
-
-	});
-
-});
-
-describe("Cylinder.point",function(){
-
-	it('evaluates correctly for middle of surface', function(){
-
-		var axis = [0,0,1]
-			, xaxis = [1,0,0]
-			, base = [0,0,0]
-			, height = 5
-			, radius = 3;
-
-		var srf = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
-
-		should.exist(srf);
-
-		var p = srf.point(0.5,0.5);
-
-		p[0].should.be.approximately(-3, verb.core.Constants.EPSILON );
-		p[1].should.be.approximately(0, verb.core.Constants.EPSILON );
-		p[2].should.be.approximately(2.5, verb.core.Constants.EPSILON );
-
-	});
-
-});
-
-describe("Cylinder.derivatives",function(){
-
-	it('gives expected result for middle of surface', function(){
-
-		var axis = [0,0,1]
-			, xaxis = [1,0,0]
-			, base = [0,0,0]
-			, height = 5
-			, radius = 3;
-
-		var srf = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
-
-		should.exist(srf);
-
-		var p = srf.derivatives(0.5, 0.5, 1);
-
-		p[0][0][0].should.be.approximately(-3, verb.core.Constants.EPSILON );
-		p[0][0][1].should.be.approximately(0, verb.core.Constants.EPSILON );
-		p[0][0][2].should.be.approximately(2.5, verb.core.Constants.EPSILON );
-
-		p[1][0][0].should.be.approximately(0, verb.core.Constants.EPSILON );
-		p[1][0][1].should.be.approximately(0, verb.core.Constants.EPSILON );
-		p[1][0][2].should.be.approximately(-5, verb.core.Constants.EPSILON );
-
-		p[0][1] = verb.core.Vec.div( p[0][1], verb.core.Vec.norm(p[0][1]) );
-
-		p[0][1][0].should.be.approximately(0, verb.core.Constants.EPSILON );
-		p[0][1][1].should.be.approximately(-1, verb.core.Constants.EPSILON );
-		p[0][1][2].should.be.approximately(0, verb.core.Constants.EPSILON );
-
-	});
-
-});
-
-
-describe("Cylinder.tessellate",function(){
-
-	it('gives mesh result', function(){
-
-		var axis = [0,0,1]
-			, xaxis = [1,0,0]
-			, base = [0,0,0]
-			, height = 5
-			, radius = 3;
-
-		var srf = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
-
-		should.exist(srf);
-
-		var p = srf.tessellate();
-
-		p.uvs.length.should.be.greaterThan(10);
-		p.points.length.should.be.greaterThan(10);
-		p.faces.length.should.be.greaterThan(10);
-		p.normals.length.should.be.greaterThan(10);
-
-		p.points.map(function(e){ e.length.should.be.equal(3); });
-		p.uvs.map(function(e){ e.length.should.be.equal(2); });
-		p.faces.map(function(e){ e.length.should.be.equal(3); });
-		p.normals.map(function(e){ e.length.should.be.equal(3); });
-
-
-	});
-
-});
 
 
 
@@ -5311,8 +5203,8 @@ describe("SweepOneRail.constructor",function(){
 			, p3 = [2,0,-1]
 			, p4 = [3,0,0];
 
-		var rail = verb.geom.BezierCurve.byControlPoints( [p1, p2, p3, p4] )
-			, profile = verb.geom.Line.byEnds( [0,1,0], [0,-1,0]  );
+		var rail = new verb.geom.BezierCurve( [p1, p2, p3, p4] )
+			, profile = new verb.geom.Line( [0,1,0], [0,-1,0]  );
 
 		var srf = new verb.geom.SweepOneRail( rail, profile );
 
@@ -5331,8 +5223,8 @@ describe("SweepOneRail.point",function(){
 			, p3 = [2,0,-1]
 			, p4 = [3,0,0];
 
-		var rail = verb.geom.BezierCurve.byControlPoints( [p1, p2, p3, p4] )
-			, profile = verb.geom.Line.byEnds( [0,1,0], [0,-1,0]  )
+		var rail = new verb.geom.BezierCurve( [p1, p2, p3, p4] )
+			, profile = new verb.geom.Line( [0,1,0], [0,-1,0]  )
 
 		var srf = new verb.geom.SweepOneRail( rail, profile );
 
@@ -5359,8 +5251,8 @@ describe("SweepOneRail.derivatives",function(){
 			, p3 = [2,0,-1]
 			, p4 = [3,0,0];
 
-		var rail = verb.geom.BezierCurve.byControlPoints( [p1, p2, p3, p4] )
-			, profile = verb.geom.Line.byEnds( [0,1,0], [0,-1,0]  )
+		var rail = new verb.geom.BezierCurve( [p1, p2, p3, p4] )
+			, profile = new verb.geom.Line( [0,1,0], [0,-1,0]  )
 
 		var srf = new verb.geom.SweepOneRail( rail, profile );
 
@@ -5394,8 +5286,8 @@ describe("SweepOneRail.tessellate",function(){
 			, p3 = [2,0,-1]
 			, p4 = [3,0,0];
 
-		var rail = verb.geom.BezierCurve.byControlPoints( [p1, p2, p3, p4] )
-			, profile = verb.geom.Line.byEnds( [0,1,0], [0,-1,0]  )
+		var rail = new verb.geom.BezierCurve( [p1, p2, p3, p4] )
+			, profile = new verb.geom.Line( [0,1,0], [0,-1,0]  )
 
 		var srf = new verb.geom.SweepOneRail( rail, profile );
 
@@ -5428,7 +5320,7 @@ describe("verb.intersectCurves",function(){
 			, p3 = [2,0,1]
 			, p4 = [3,0,0];
 
-		var curve1 = verb.geom.BezierCurve.byControlPoints( [p1, p2, p3, p4] );
+		var curve1 = new verb.geom.BezierCurve( [p1, p2, p3, p4] );
 
 		// build another
 		var c1 = [-5,0,3]
@@ -5436,7 +5328,7 @@ describe("verb.intersectCurves",function(){
 			, c3 = [2,0,0]
 			, c4 = [3,0,1];
 
-		var curve2 = verb.geom.BezierCurve.byControlPoints( [c1, c2, c3, c4] );
+		var curve2 = new verb.geom.BezierCurve( [c1, c2, c3, c4] );
 
 		// make sync work
 		var res = verb.intersectCurves( curve1, curve2 );
@@ -5468,7 +5360,7 @@ describe("verb.intersectCurveSurface",function(){
 			, vlength = 10;
 
 		var srf = new verb.geom.PlanarSurface( base, uaxis, vaxis, ulength, vlength );
-		var crv = verb.geom.BezierCurve.byControlPoints( [ [5.2,5.2,5], [5.4,4.8,0], [5.2,5.2,-5] ] );
+		var crv = new verb.geom.BezierCurve( [ [5.2,5.2,5], [5.4,4.8,0], [5.2,5.2,-5] ] );
 
 		var options = {
 			sampleTolerance: 1e-12,
@@ -5499,7 +5391,7 @@ describe("verb.core.Eval.rational_surface_curvature ",function(){
 			, height = 1
 			, radius = 1;
 
-		var srf = new verb.geom.Cylinder( axis, xaxis, base, height, radius );
+		var srf = new verb.geom.CylinderSurface( axis, xaxis, base, height, radius );
 
 		var res = verb.core.Eval.rational_surface_curvature( srf.get('degreeU'),
 																													srf.get('knotsU'),
@@ -5538,7 +5430,7 @@ describe("verb.core.Eval.rational_surface_curvature ",function(){
 		var center = [0,0,0]
 			, radius = 1;
 
-		var srf = verb.geom.Sphere.byCenterRadius( center, radius );
+		var srf = new verb.geom.SphereSurface( center, radius );
 
 		var res = verb.core.Eval.rational_surface_curvature( srf.get('degreeU'),
 																													srf.get('knotsU'),
@@ -5959,7 +5851,6 @@ describe("verb.geom.NurbsSurface.transform",function(){
 
 describe("verb.geom.NurbsCurve.byPoints",function(){
 
-
 	function shouldInterpPoints(curve, pts){
 
 		// // the internal points are interped
@@ -5993,52 +5884,15 @@ describe("verb.geom.NurbsCurve.byPoints",function(){
 
 });
 
-describe("verb.geom.NurbsSurface.byExtrusion",function(){
-
-	function shouldInterpPoints(curve, pts){
-
-		// // the internal points are interped
-		var tess = curve.tessellate( 1e-8  );
-
-		for (var j = 0; j < pts.length; j++){
-
-			var min = Number.MAX_VALUE;
-			for (var i = 1; i < tess.length; i++){
-
-				var pt = pts[j];
-				var o = tess[i-1];
-				var r = verb.core.Vec.normalized( verb.core.Vec.sub( tess[i], tess[i-1] ) );
-
-				var dist = verb.core.Trig.distToRay( pt, o, r );
-
-				if (dist < min) {
-					min = dist;
-				}
-			}
-
-			min.should.be.lessThan( 1e-3 );
-		}
-	}
-
-	var pts = [ [0, 0, 1], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ];
-
-	it('can compute valid cubic interpolating curve for 4 points', function(){
-		shouldInterpPoints( verb.geom.NurbsCurve.byPoints( pts ), pts );
-	});
-
-});
-
-
-
-describe("verb.geom.NurbsCurve.byExtrusion",function(){
+describe("verb.geom.ExtrudedSurface",function(){
 
 	it('can create an instance', function(){
 
-		var profile = verb.geom.Line.byEnds( [0,0,0], [1,1,1] )
+		var profile = new verb.geom.Line( [0,0,0], [1,1,1] )
 			, axis = [0,0,1]
 			, length = 3;
 
-		var srf = verb.geom.NurbsSurface.byExtrusion( profile, axis, length);
+		var srf = new verb.geom.ExtrudedSurface( profile, axis, length);
 
 		should.exist(srf);
 
@@ -6046,14 +5900,14 @@ describe("verb.geom.NurbsCurve.byExtrusion",function(){
 
 });
 
-describe("verb.geom.NurbsCurve.byExtrusion -> verb.geom.NurbsCurve.point",function(){
+describe("verb.geom.ExtrudedSurface.point",function(){
 
 	it('evaluates correctly for middle of surface', function(){
 
-		var profile = verb.geom.Line.byEnds( [0,0,0], [1,1,0] )
+		var profile = new verb.geom.Line( [0,0,0], [1,1,0] )
 			, axis = [0,0,3];
 
-		var srf = verb.geom.NurbsSurface.byExtrusion( profile, axis );
+		var srf = new verb.geom.ExtrudedSurface( profile, axis );
 
 		should.exist(srf);
 
@@ -6067,14 +5921,14 @@ describe("verb.geom.NurbsCurve.byExtrusion -> verb.geom.NurbsCurve.point",functi
 
 });
 
-describe("verb.geom.NurbsCurve.byExtrusion -> verb.geom.NurbsCurve.derivatives",function(){
+describe("verb.geom.ExtrudedSurface.derivatives",function(){
 
 	it('gives expected result for middle of surface', function(){
 
-		var profile = verb.geom.Line.byEnds( [0,0,0], [1,1,0] )
+		var profile = new verb.geom.Line( [0,0,0], [1,1,0] )
 			, axis = [0,0,3];
 
-		var srf = verb.geom.NurbsSurface.byExtrusion( profile, axis );
+		var srf = new verb.geom.ExtrudedSurface( profile, axis );
 
 		should.exist(srf);
 
@@ -6097,14 +5951,14 @@ describe("verb.geom.NurbsCurve.byExtrusion -> verb.geom.NurbsCurve.derivatives",
 });
 
 
-describe("verb.geom.NurbsCurve.byExtrusion -> verb.geom.NurbsCurve.tessellate",function(){
+describe("verb.geom.ExtrudedSurface.tessellate",function(){
 
 	it('gives mesh result', function(){
 
-		var profile = verb.geom.Line.byEnds( [0,0,0], [1,1,0] )
+		var profile = new verb.geom.Line( [0,0,0], [1,1,0] )
 			, axis = [0,0,3];
 
-		var srf = verb.geom.NurbsSurface.byExtrusion( profile, axis );
+		var srf = new verb.geom.ExtrudedSurface( profile, axis );
 
 		should.exist(srf);
 
@@ -6125,16 +5979,16 @@ describe("verb.geom.NurbsCurve.byExtrusion -> verb.geom.NurbsCurve.tessellate",f
 
 });
 
-describe("verb.geom.NurbsSurface.byRevolution",function(){
+describe("verb.geom.RevolvedSurface.constructor",function(){
 
 	it('can create an instance', function(){
 
 		var base = [0,0,0]
 			, axis = [0,0,1]
 			, angle = Math.PI
-			, profile = verb.geom.Line.byEnds( [1, 0, 10], [10, 0, 1] );
+			, profile = new verb.geom.Line( [1, 0, 10], [10, 0, 1] );
 
-		var srf = verb.geom.NurbsSurface.byRevolution( profile, base, axis, angle );
+		var srf = new verb.geom.RevolvedSurface( profile, base, axis, angle );
 
 		should.exist(srf);
 
@@ -6142,16 +5996,16 @@ describe("verb.geom.NurbsSurface.byRevolution",function(){
 
 });
 
-describe("verb.geom.NurbsSurface.byRevolution -> verb.geom.NurbsSurface.point",function(){
+describe("verb.geom.RevolvedSurface.point",function(){
 
 	it('evaluates correctly for middle of surface', function(){
 
 		var base = [0,0,0]
 			, axis = [0,0,1]
 			, angle = Math.PI
-			, profile = verb.geom.Line.byEnds( [1, 0, 10], [10, 0, 1] );
+			, profile = new verb.geom.Line( [1, 0, 10], [10, 0, 1] );
 
-		var srf = verb.geom.NurbsSurface.byRevolution( profile, base, axis, angle );
+		var srf = new verb.geom.RevolvedSurface( profile, base, axis, angle );
 
 		should.exist(srf);
 
@@ -6165,16 +6019,16 @@ describe("verb.geom.NurbsSurface.byRevolution -> verb.geom.NurbsSurface.point",f
 
 });
 
-describe("verb.geom.NurbsSurface.byRevolution -> verb.geom.NurbsSurface.derivatives",function(){
+describe("verb.geom.RevolvedSurface.derivatives",function(){
 
 	it('gives expected result for middle of surface', function(){
 
 		var base = [0,0,0]
 			, axis = [0,0,1]
 			, angle = Math.PI
-			, profile = verb.geom.Line.byEnds( [1, 0, 10], [10, 0, 1] );
+			, profile = new verb.geom.Line( [1, 0, 10], [10, 0, 1] );
 
-		var srf = verb.geom.NurbsSurface.byRevolution( profile, base, axis, angle );
+		var srf = new verb.geom.RevolvedSurface( profile, base, axis, angle );
 
 		should.exist(srf);
 
@@ -6199,16 +6053,16 @@ describe("verb.geom.NurbsSurface.byRevolution -> verb.geom.NurbsSurface.derivati
 
 });
 
-describe("verb.geom.NurbsSurface.byRevolution -> verb.geom.NurbsSurface.tessellate",function(){
+describe("verb.geom.RevolvedSurface.tessellate",function(){
 
 	it('gives mesh result', function(){
 
 		var base = [0,0,0]
 			, axis = [0,0,1]
 			, angle = Math.PI
-			, profile = verb.geom.Line.byEnds( [1, 0, 10], [10, 0, 1] );
+			, profile = new verb.geom.Line( [1, 0, 10], [10, 0, 1] );
 
-		var srf = verb.geom.NurbsSurface.byRevolution( profile, base, axis, angle );
+		var srf = new verb.geom.RevolvedSurface( profile, base, axis, angle );
 
 		should.exist(srf);
 
@@ -6229,14 +6083,14 @@ describe("verb.geom.NurbsSurface.byRevolution -> verb.geom.NurbsSurface.tessella
 
 });
 
-describe("verb.geom.Sphere.constructor",function(){
+describe("verb.geom.SphereSurface.constructor",function(){
 
 	it('can create an instance', function(){
 
 		var center = [0,0,0]
 			, radius = 5;
 
-		var srf = verb.geom.Sphere.byCenterRadius( center, radius );
+		var srf = new verb.geom.SphereSurface( center, radius );
 
 		should.exist(srf);
 
@@ -6244,14 +6098,14 @@ describe("verb.geom.Sphere.constructor",function(){
 
 });
 
-describe("verb.geom.Sphere.point",function(){
+describe("verb.geom.SphereSurface.point",function(){
 
 	it('evaluates correctly for middle of surface', function(){
 
 		var center = [0,0,0]
 			, radius = 5;
 
-		var srf = verb.geom.Sphere.byCenterRadius( center, radius );
+		var srf = new verb.geom.SphereSurface( center, radius );
 
 		should.exist(srf);
 
@@ -6265,14 +6119,14 @@ describe("verb.geom.Sphere.point",function(){
 
 });
 
-describe("verb.geom.Sphere.derivatives",function(){
+describe("verb.geom.SphereSurface.derivatives",function(){
 
 	it('gives expected result for middle of surface', function(){
 
 		var center = [0,0,0]
 			, radius = 5;
 
-		var srf = verb.geom.Sphere.byCenterRadius( center, radius );
+		var srf = new verb.geom.SphereSurface( center, radius );
 
 		should.exist(srf);
 
@@ -6298,14 +6152,14 @@ describe("verb.geom.Sphere.derivatives",function(){
 
 });
 
-describe("verb.geom.Sphere.tessellate",function(){
+describe("verb.geom.SphereSurface.tessellate",function(){
 
 	it('gives mesh result', function(){
 
 		var center = [0,0,0]
 			, radius = 5;
 
-		var srf = verb.geom.Sphere.byCenterRadius( center, radius );
+		var srf = new verb.geom.SphereSurface( center, radius );
 
 		should.exist(srf);
 
@@ -6323,4 +6177,112 @@ describe("verb.geom.Sphere.tessellate",function(){
 
 
 	});
+});
+
+
+describe("verb.geom.CylinderSurface.constructor",function(){
+
+	it('can create an instance', function(){
+
+		var axis = [0,0,1]
+			, xaxis = [1,0,0]
+			, base = [0,0,0]
+			, height = 5
+			, radius = 3;
+
+		var srf = new verb.geom.CylinderSurface( axis, xaxis, base, height, radius );
+
+		should.exist(srf);
+
+	});
+
+});
+
+describe("verb.geom.CylinderSurface.point",function(){
+
+	it('evaluates correctly for middle of surface', function(){
+
+		var axis = [0,0,1]
+			, xaxis = [1,0,0]
+			, base = [0,0,0]
+			, height = 5
+			, radius = 3;
+
+		var srf = new verb.geom.CylinderSurface( axis, xaxis, base, height, radius );
+
+		should.exist(srf);
+
+		var p = srf.point(0.5,0.5);
+
+		p[0].should.be.approximately(-3, verb.core.Constants.EPSILON );
+		p[1].should.be.approximately(0, verb.core.Constants.EPSILON );
+		p[2].should.be.approximately(2.5, verb.core.Constants.EPSILON );
+
+	});
+
+});
+
+describe("verb.geom.CylinderSurface.derivatives",function(){
+
+	it('gives expected result for middle of surface', function(){
+
+		var axis = [0,0,1]
+			, xaxis = [1,0,0]
+			, base = [0,0,0]
+			, height = 5
+			, radius = 3;
+
+		var srf = new verb.geom.CylinderSurface( axis, xaxis, base, height, radius );
+
+		should.exist(srf);
+
+		var p = srf.derivatives(0.5, 0.5, 1);
+
+		p[0][0][0].should.be.approximately(-3, verb.core.Constants.EPSILON );
+		p[0][0][1].should.be.approximately(0, verb.core.Constants.EPSILON );
+		p[0][0][2].should.be.approximately(2.5, verb.core.Constants.EPSILON );
+
+		p[1][0][0].should.be.approximately(0, verb.core.Constants.EPSILON );
+		p[1][0][1].should.be.approximately(0, verb.core.Constants.EPSILON );
+		p[1][0][2].should.be.approximately(-5, verb.core.Constants.EPSILON );
+
+		p[0][1] = verb.core.Vec.div( p[0][1], verb.core.Vec.norm(p[0][1]) );
+
+		p[0][1][0].should.be.approximately(0, verb.core.Constants.EPSILON );
+		p[0][1][1].should.be.approximately(-1, verb.core.Constants.EPSILON );
+		p[0][1][2].should.be.approximately(0, verb.core.Constants.EPSILON );
+
+	});
+
+});
+
+describe("verb.geom.CylinderSurface.tessellate",function(){
+
+	it('gives mesh result', function(){
+
+		var axis = [0,0,1]
+			, xaxis = [1,0,0]
+			, base = [0,0,0]
+			, height = 5
+			, radius = 3;
+
+		var srf = new verb.geom.CylinderSurface( axis, xaxis, base, height, radius );
+
+		should.exist(srf);
+
+		var p = srf.tessellate();
+
+		p.uvs.length.should.be.greaterThan(10);
+		p.points.length.should.be.greaterThan(10);
+		p.faces.length.should.be.greaterThan(10);
+		p.normals.length.should.be.greaterThan(10);
+
+		p.points.map(function(e){ e.length.should.be.equal(3); });
+		p.uvs.map(function(e){ e.length.should.be.equal(2); });
+		p.faces.map(function(e){ e.length.should.be.equal(3); });
+		p.normals.map(function(e){ e.length.should.be.equal(3); });
+
+
+	});
+
 });

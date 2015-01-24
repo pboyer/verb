@@ -1,7 +1,5 @@
 package verb;
 
-import verb.geom.BoundingBox;
-
 // curves
 import verb.geom.NurbsCurve;
 import verb.geom.Arc;
@@ -13,9 +11,13 @@ import verb.geom.EllipseArc;
 
 // surfaces
 import verb.geom.NurbsSurface;
-import verb.geom.Sphere;
+import verb.geom.SphereSurface;
+import verb.geom.RevolvedSurface;
+import verb.geom.ExtrudedSurface;
+import verb.geom.CylinderSurface;
 
 // core
+import verb.core.types.BoundingBox;
 import verb.core.Constants;
 import verb.core.Trig;
 import verb.core.Numeric;

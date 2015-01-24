@@ -19,10 +19,9 @@ import verb.exe.AsyncObject;
 import verb.core.Mat;
 
 @:expose("geom.NurbsSurface")
-class NurbsSurface extends AsyncObject {
+class NurbsSurface extends AsyncObject implements ISurface {
 
     // underlying serializable, data object
-
     private var _data : SurfaceData;
 
     // public properties
@@ -68,20 +67,6 @@ class NurbsSurface extends AsyncObject {
         return new NurbsSurface( new SurfaceData( degreeU, degreeV, knotsU, knotsV, Eval.homogenize2d(controlPoints, weights) ) );
     }
 
-    // Construct a NurbsSurface by extruding a curve
-    //
-    // **params**
-    // + The profile curve
-    // + The direction and magnitude of the extrusion
-    //
-    // **returns**
-    // + A new NurbsSurface
-
-    public static function byExtrusion( profile : NurbsCurve, direction : Vector ) : NurbsSurface {
-        return new NurbsSurface(
-            Make.extrudedSurface( Vec.normalized( direction ), Vec.norm( direction ), profile.data() ));
-    }
-
     // Construct a NurbsSurface from four perimeter points in counter-clockwise order
     //
     // **params**
@@ -93,23 +78,8 @@ class NurbsSurface extends AsyncObject {
     // **returns**
     // + A new NurbsSurface
 
-    public static function byFourPoints( point0 : Point, point1 : Point, point2 : Point, point3 : Point ) : NurbsSurface {
+    public static function byCorners( point0 : Point, point1 : Point, point2 : Point, point3 : Point ) : NurbsSurface {
         return new NurbsSurface( Make.fourPointSurface( point0, point1, point2, point3 ) );
-    }
-
-    // Construct a revolved NurbsSurface
-    //
-    // **params**
-    // + The profile curve
-    // + A point on the axis of revolution
-    // + The direction of the axis of revolution
-    // + The angle to revolve around.  2 * Math.PI corresponds to a complete revolution
-    //
-    // **returns**
-    // + A new NurbsSurface
-
-    public static function byRevolution( profile : NurbsCurve, center : Point, axis : Point, angle : Float ) : NurbsSurface {
-        return new NurbsSurface( Make.revolvedSurface( profile.data(), center, axis, angle ) );
     }
 
     // Obtain a copy of the underlying data structure for the Surface. Used with verb.core.

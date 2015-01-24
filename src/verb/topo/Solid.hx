@@ -1,5 +1,5 @@
-package verb.geom;
-class Cone {
+package verb.topo;
+class Solid {
     public function new() {
     }
 }

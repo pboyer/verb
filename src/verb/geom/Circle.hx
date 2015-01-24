@@ -7,13 +7,6 @@ import verb.core.Make;
 @:expose("geom.Circle")
 class Circle extends Arc {
 
-    private function new(   center : Point,
-                            xaxis : Vector,
-                            yaxis : Vector,
-                            radius : Float ) {
-        super( center, xaxis, yaxis, radius, 0, Math.PI * 2 );
-    }
-
     // Create a circle
     //
     // **params**
@@ -21,12 +14,11 @@ class Circle extends Arc {
     // + Length 3 array representing the xaxis
     // + Length 3 array representing the perpendicular yaxis
     // + Radius of the circle
-    //
-    public static function byCenterAxesRadius(  center : Point,
-                                                xaxis : Vector,
-                                                yaxis : Vector,
-                                                radius : Float ) : Circle {
-        return new Circle(center, xaxis, yaxis, radius );
-    }
 
+    public function new(   center : Point,
+                            xaxis : Vector,
+                            yaxis : Vector,
+                            radius : Float ) {
+        super( center, xaxis, yaxis, radius, 0, Math.PI * 2 );
+    }
 }

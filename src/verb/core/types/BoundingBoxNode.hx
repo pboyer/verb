@@ -1,11 +1,10 @@
 package verb.core.types;
 
-import verb.geom.BoundingBox;
 @:expose("core.BoundingBoxNode")
 class BoundingBoxNode {
     public var boundingBox : BoundingBox;
 
-    private function new(bb : BoundingBox){
+    public function new(bb : BoundingBox){
         this.boundingBox = bb;
     }
 }

@@ -20,7 +20,7 @@ import verb.core.types.Interval;
 import verb.core.types.CurveData;
 
 @:expose("geom.NurbsCurve")
-class NurbsCurve extends AsyncObject {
+class NurbsCurve extends AsyncObject implements ICurve {
 
     // underlying serializable, data object
 
@@ -41,7 +41,7 @@ class NurbsCurve extends AsyncObject {
     // **returns**
     // + A new NurbsCurve
 
-    private function new( data : CurveData ) {
+    public function new( data : CurveData ) {
         this._data = data;
     }
 
@@ -165,11 +165,11 @@ class NurbsCurve extends AsyncObject {
     // **returns**
     // + A point represented as an array
 
-    public function derivatives( u : Float, numDerivs : Int = 1 ) : Array<Point> {
+    public function derivatives( u : Float, numDerivs : Int = 1 ) : Array<Vector> {
         return Eval.rationalCurveDerivatives( _data, u, numDerivs );
     }
 
-    public function derivativesAsync( u : Float, numDerivs : Int = 1 ) : Promise<Array<Point>> {
+    public function derivativesAsync( u : Float, numDerivs : Int = 1 ) : Promise<Array<Vector>> {
         return defer( Eval, 'rationalCurveDerivatives', [ _data, u, numDerivs ] );
     }
 

@@ -4,7 +4,7 @@ package verb.core.types;
 class BoundingBoxNode {
     public var boundingBox : BoundingBox;
 
-    private function new(bb : BoundingBox){
+    public function new(bb : BoundingBox){
         this.boundingBox = bb;
     }
 }

@@ -342,7 +342,7 @@ class Make {
     // **returns**
     // + an object with the following properties: controlPoints, weights, knots, degree
 
-    public static function revolvedSurface( center : Point, axis : Point, theta : Float, profile : CurveData ) : SurfaceData {
+    public static function revolvedSurface( profile : CurveData, center : Point, axis : Point, theta : Float ) : SurfaceData {
 
         var prof_controlPoints = Eval.dehomogenize1d( profile.controlPoints )
             , prof_weights = Eval.weight1d( profile.controlPoints );
@@ -480,7 +480,7 @@ class Make {
     public static function sphereSurface( center : Point, axis : Point, xaxis : Point, radius : Float ){
 
         var arc = arc(center, Vec.mul( -1.0, axis ), xaxis, radius, 0.0, Math.PI );
-        return revolvedSurface( center, axis, 2 * Math.PI, arc );
+        return revolvedSurface( arc, center, axis, 2 * Math.PI );
 
     }
 
@@ -506,7 +506,7 @@ class Make {
         , prof_weights = [1.0,1.0]
         , prof = new CurveData( prof_degree, prof_knots, Eval.homogenize1d( prof_ctrl_pts, prof_weights ) );
 
-        return revolvedSurface(base, axis, angle, prof);
+        return revolvedSurface(prof, base, axis, angle );
 
     }
 

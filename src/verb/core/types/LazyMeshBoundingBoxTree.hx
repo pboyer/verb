@@ -1,6 +1,5 @@
 package verb.core.types;
 
-import verb.geom.BoundingBox;
 using verb.core.ArrayExtensions;
 
 class LazyMeshBoundingBoxTree implements IBoundingBoxTree<Int> {

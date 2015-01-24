@@ -20,7 +20,7 @@ class Dispatcher {
         private var _workerPool : WorkerPool;
     #end
 
-    private function new() {
+    public function new() {
         #if (neko || cpp)
             _threadPool = new ThreadPool( THREADS );
         #elseif js

@@ -2876,7 +2876,7 @@ verb.core.Mesh.getTriangleNorm = function(points,tri) {
 	return verb.core.Vec.mul(1 / verb.core.Vec.norm(n),n);
 };
 verb.core.Mesh.makeMeshAabb = function(mesh,faceIndices) {
-	var bb = new verb.geom.BoundingBox();
+	var bb = new verb.core.types.BoundingBox();
 	var _g = 0;
 	while(_g < faceIndices.length) {
 		var x = faceIndices[_g];
@@ -4097,6 +4097,116 @@ verb.core.types.AdaptiveRefinementNode.prototype = {
 		return mesh;
 	}
 };
+verb.core.types.BoundingBox = $hx_exports.core.BoundingBox = function(pts) {
+	this.max = null;
+	this.min = null;
+	this.dim = 3;
+	this.initialized = false;
+	if(pts != null) this.addRange(pts);
+};
+verb.core.types.BoundingBox.__name__ = ["verb","core","types","BoundingBox"];
+verb.core.types.BoundingBox.intervalsOverlap = function(a1,a2,b1,b2,tol) {
+	if(tol == null) tol = -1;
+	var tol1;
+	if(tol < 0) tol1 = verb.core.types.BoundingBox.TOLERANCE; else tol1 = tol;
+	var x1 = Math.min(a1,a2) - tol1;
+	var x2 = Math.max(a1,a2) + tol1;
+	var y1 = Math.min(b1,b2) - tol1;
+	var y2 = Math.max(b1,b2) + tol1;
+	return x1 >= y1 && x1 <= y2 || x2 >= y1 && x2 <= y2 || y1 >= x1 && y1 <= x2 || y2 >= x1 && y2 <= x2;
+};
+verb.core.types.BoundingBox.prototype = {
+	fromPoint: function(pt) {
+		return new verb.core.types.BoundingBox([pt]);
+	}
+	,add: function(point) {
+		if(!this.initialized) {
+			this.dim = point.length;
+			this.min = point.slice(0);
+			this.max = point.slice(0);
+			this.initialized = true;
+			return this;
+		}
+		var _g1 = 0;
+		var _g = this.dim;
+		while(_g1 < _g) {
+			var i = _g1++;
+			if(point[i] > this.max[i]) this.max[i] = point[i];
+			if(point[i] < this.min[i]) this.min[i] = point[i];
+		}
+		return this;
+	}
+	,addRange: function(points) {
+		var l = points.length;
+		var _g = 0;
+		while(_g < l) {
+			var i = _g++;
+			this.add(points[i]);
+		}
+		return this;
+	}
+	,contains: function(point,tol) {
+		if(tol == null) tol = -1;
+		if(!this.initialized) return false;
+		return this.intersects(new verb.core.types.BoundingBox([point]),tol);
+	}
+	,intersects: function(bb,tol) {
+		if(tol == null) tol = -1;
+		if(!this.initialized || !bb.initialized) return false;
+		var a1 = this.min;
+		var a2 = this.max;
+		var b1 = bb.min;
+		var b2 = bb.max;
+		var _g1 = 0;
+		var _g = this.dim;
+		while(_g1 < _g) {
+			var i = _g1++;
+			if(!verb.core.types.BoundingBox.intervalsOverlap(a1[i],a2[i],b1[i],b2[i],tol)) return false;
+		}
+		return true;
+	}
+	,clear: function() {
+		this.initialized = false;
+		return this;
+	}
+	,getLongestAxis: function() {
+		var max = 0.0;
+		var id = 0;
+		var _g1 = 0;
+		var _g = this.dim;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var l = this.getAxisLength(i);
+			if(l > max) {
+				max = l;
+				id = i;
+			}
+		}
+		return id;
+	}
+	,getAxisLength: function(i) {
+		if(i < 0 || i > this.dim - 1) return 0.0;
+		return Math.abs(this.min[i] - this.max[i]);
+	}
+	,intersect: function(bb,tol) {
+		if(!this.initialized) return null;
+		var a1 = this.min;
+		var a2 = this.max;
+		var b1 = bb.min;
+		var b2 = bb.max;
+		if(!this.intersects(bb,tol)) return null;
+		var maxbb = [];
+		var minbb = [];
+		var _g1 = 0;
+		var _g = this.dim;
+		while(_g1 < _g) {
+			var i = _g1++;
+			maxbb.push(Math.min(a2[i],b2[i]));
+			minbb.push(Math.max(a1[i],b1[i]));
+		}
+		return new verb.core.types.BoundingBox([minbb,maxbb]);
+	}
+};
 verb.core.types.BoundingBoxNode = $hx_exports.core.BoundingBoxNode = function(bb) {
 	this.boundingBox = bb;
 };
@@ -4170,7 +4280,7 @@ verb.core.types.LazyCurveBoundingBoxTree.prototype = {
 		return new verb.core.types.Pair(new verb.core.types.LazyCurveBoundingBoxTree(crvs[0],this._knotTol),new verb.core.types.LazyCurveBoundingBoxTree(crvs[1],this._knotTol));
 	}
 	,boundingBox: function() {
-		if(this._boundingBox == null) this._boundingBox = new verb.geom.BoundingBox(verb.core.Eval.dehomogenize1d(this._curve.controlPoints));
+		if(this._boundingBox == null) this._boundingBox = new verb.core.types.BoundingBox(verb.core.Eval.dehomogenize1d(this._curve.controlPoints));
 		return this._boundingBox;
 	}
 	,'yield': function() {
@@ -4239,7 +4349,7 @@ verb.core.types.LazyPolylineBoundingBoxTree.prototype = {
 		return new verb.core.types.Pair(new verb.core.types.LazyPolylineBoundingBoxTree(this._polyline,l),new verb.core.types.LazyPolylineBoundingBoxTree(this._polyline,r));
 	}
 	,boundingBox: function() {
-		if(this._boundingBox == null) this._boundingBox = new verb.geom.BoundingBox(this._polyline.points);
+		if(this._boundingBox == null) this._boundingBox = new verb.core.types.BoundingBox(this._polyline.points);
 		return this._boundingBox;
 	}
 	,'yield': function() {
@@ -4282,7 +4392,7 @@ verb.core.types.LazySurfaceBoundingBoxTree.prototype = {
 	}
 	,boundingBox: function() {
 		if(this._boundingBox == null) {
-			this._boundingBox = new verb.geom.BoundingBox();
+			this._boundingBox = new verb.core.types.BoundingBox();
 			var _g = 0;
 			var _g1 = this._surface.controlPoints;
 			while(_g < _g1.length) {
@@ -4477,10 +4587,13 @@ verb.exe.WorkerPool.prototype = {
 	}
 };
 verb.geom = {};
+verb.geom.ICurve = function() { };
+verb.geom.ICurve.__name__ = ["verb","geom","ICurve"];
 verb.geom.NurbsCurve = $hx_exports.geom.NurbsCurve = function(data) {
 	this._data = data;
 };
 verb.geom.NurbsCurve.__name__ = ["verb","geom","NurbsCurve"];
+verb.geom.NurbsCurve.__interfaces__ = [verb.geom.ICurve];
 verb.geom.NurbsCurve.byControlPointsWeights = function(degree,knots,controlPoints,weights) {
 	return new verb.geom.NurbsCurve(new verb.core.types.CurveData(degree,knots.slice(),verb.core.Eval.homogenize1d(controlPoints,weights)));
 };
@@ -4610,9 +4723,6 @@ verb.geom.Arc = $hx_exports.geom.Arc = function(center,xaxis,yaxis,radius,minAng
 	this._maxAngle = maxAngle;
 };
 verb.geom.Arc.__name__ = ["verb","geom","Arc"];
-verb.geom.Arc.byCenterAxesRadiusSpan = function(center,xaxis,yaxis,radius,minAngle,maxAngle) {
-	return new verb.geom.Arc(center,xaxis,yaxis,radius,minAngle,maxAngle);
-};
 verb.geom.Arc.__super__ = verb.geom.NurbsCurve;
 verb.geom.Arc.prototype = $extend(verb.geom.NurbsCurve.prototype,{
 	center: function() {
@@ -4638,205 +4748,28 @@ verb.geom.BezierCurve = $hx_exports.geom.BezierCurve = function(points,weights) 
 	verb.geom.NurbsCurve.call(this,verb.core.Make.rationalBezierCurve(points,weights));
 };
 verb.geom.BezierCurve.__name__ = ["verb","geom","BezierCurve"];
-verb.geom.BezierCurve.byControlPoints = function(points) {
-	return new verb.geom.BezierCurve(points);
-};
 verb.geom.BezierCurve.__super__ = verb.geom.NurbsCurve;
 verb.geom.BezierCurve.prototype = $extend(verb.geom.NurbsCurve.prototype,{
 });
-verb.geom.BoundingBox = $hx_exports.geom.BoundingBox = function(pts) {
-	this.max = null;
-	this.min = null;
-	this.dim = 3;
-	this.initialized = false;
-	if(pts != null) this.addRange(pts);
-};
-verb.geom.BoundingBox.__name__ = ["verb","geom","BoundingBox"];
-verb.geom.BoundingBox.intervalsOverlap = function(a1,a2,b1,b2,tol) {
-	if(tol == null) tol = -1;
-	var tol1;
-	if(tol < 0) tol1 = verb.geom.BoundingBox.TOLERANCE; else tol1 = tol;
-	var x1 = Math.min(a1,a2) - tol1;
-	var x2 = Math.max(a1,a2) + tol1;
-	var y1 = Math.min(b1,b2) - tol1;
-	var y2 = Math.max(b1,b2) + tol1;
-	return x1 >= y1 && x1 <= y2 || x2 >= y1 && x2 <= y2 || y1 >= x1 && y1 <= x2 || y2 >= x1 && y2 <= x2;
-};
-verb.geom.BoundingBox.prototype = {
-	fromPoint: function(pt) {
-		return new verb.geom.BoundingBox([pt]);
-	}
-	,add: function(point) {
-		if(!this.initialized) {
-			this.dim = point.length;
-			this.min = point.slice(0);
-			this.max = point.slice(0);
-			this.initialized = true;
-			return this;
-		}
-		var _g1 = 0;
-		var _g = this.dim;
-		while(_g1 < _g) {
-			var i = _g1++;
-			if(point[i] > this.max[i]) this.max[i] = point[i];
-			if(point[i] < this.min[i]) this.min[i] = point[i];
-		}
-		return this;
-	}
-	,addRange: function(points) {
-		var l = points.length;
-		var _g = 0;
-		while(_g < l) {
-			var i = _g++;
-			this.add(points[i]);
-		}
-		return this;
-	}
-	,contains: function(point,tol) {
-		if(tol == null) tol = -1;
-		if(!this.initialized) return false;
-		return this.intersects(new verb.geom.BoundingBox([point]),tol);
-	}
-	,intersects: function(bb,tol) {
-		if(tol == null) tol = -1;
-		if(!this.initialized || !bb.initialized) return false;
-		var a1 = this.min;
-		var a2 = this.max;
-		var b1 = bb.min;
-		var b2 = bb.max;
-		var _g1 = 0;
-		var _g = this.dim;
-		while(_g1 < _g) {
-			var i = _g1++;
-			if(!verb.geom.BoundingBox.intervalsOverlap(a1[i],a2[i],b1[i],b2[i],tol)) return false;
-		}
-		return true;
-	}
-	,clear: function() {
-		this.initialized = false;
-		return this;
-	}
-	,getLongestAxis: function() {
-		var max = 0.0;
-		var id = 0;
-		var _g1 = 0;
-		var _g = this.dim;
-		while(_g1 < _g) {
-			var i = _g1++;
-			var l = this.getAxisLength(i);
-			if(l > max) {
-				max = l;
-				id = i;
-			}
-		}
-		return id;
-	}
-	,getAxisLength: function(i) {
-		if(i < 0 || i > this.dim - 1) return 0.0;
-		return Math.abs(this.min[i] - this.max[i]);
-	}
-	,intersect: function(bb,tol) {
-		if(!this.initialized) return null;
-		var a1 = this.min;
-		var a2 = this.max;
-		var b1 = bb.min;
-		var b2 = bb.max;
-		if(!this.intersects(bb,tol)) return null;
-		var maxbb = [];
-		var minbb = [];
-		var _g1 = 0;
-		var _g = this.dim;
-		while(_g1 < _g) {
-			var i = _g1++;
-			maxbb.push(Math.min(a2[i],b2[i]));
-			minbb.push(Math.max(a1[i],b1[i]));
-		}
-		return new verb.geom.BoundingBox([minbb,maxbb]);
-	}
-};
 verb.geom.Circle = $hx_exports.geom.Circle = function(center,xaxis,yaxis,radius) {
 	verb.geom.Arc.call(this,center,xaxis,yaxis,radius,0,Math.PI * 2);
 };
 verb.geom.Circle.__name__ = ["verb","geom","Circle"];
-verb.geom.Circle.byCenterAxesRadius = function(center,xaxis,yaxis,radius) {
-	return new verb.geom.Circle(center,xaxis,yaxis,radius);
-};
 verb.geom.Circle.__super__ = verb.geom.Arc;
 verb.geom.Circle.prototype = $extend(verb.geom.Arc.prototype,{
 });
-verb.geom.EllipseArc = $hx_exports.geom.EllipseArc = function(center,xaxis,yaxis,minAngle,maxAngle) {
-	verb.geom.NurbsCurve.call(this,verb.core.Make.ellipseArc(center,xaxis,yaxis,minAngle,maxAngle));
-	this._center = center;
-	this._xaxis = xaxis;
-	this._yaxis = yaxis;
-	this._minAngle = minAngle;
-	this._maxAngle = maxAngle;
-};
-verb.geom.EllipseArc.__name__ = ["verb","geom","EllipseArc"];
-verb.geom.EllipseArc.byCenterAxesSpan = function(center,xaxis,yaxis,minAngle,maxAngle) {
-	return new verb.geom.EllipseArc(center,xaxis,yaxis,minAngle,maxAngle);
-};
-verb.geom.EllipseArc.__super__ = verb.geom.NurbsCurve;
-verb.geom.EllipseArc.prototype = $extend(verb.geom.NurbsCurve.prototype,{
-	center: function() {
-		return this._center;
-	}
-	,xaxis: function() {
-		return this._xaxis;
-	}
-	,yaxis: function() {
-		return this._yaxis;
-	}
-	,minAngle: function() {
-		return this._minAngle;
-	}
-	,maxAngle: function() {
-		return this._maxAngle;
-	}
-});
-verb.geom.Ellipse = $hx_exports.geom.Ellipse = function(center,xaxis,yaxis) {
-	verb.geom.EllipseArc.call(this,center,xaxis,yaxis,0,Math.PI * 2);
-};
-verb.geom.Ellipse.__name__ = ["verb","geom","Ellipse"];
-verb.geom.Ellipse.byCenterAxes = function(center,xaxis,yaxis) {
-	return new verb.geom.Ellipse(center,xaxis,yaxis);
-};
-verb.geom.Ellipse.__super__ = verb.geom.EllipseArc;
-verb.geom.Ellipse.prototype = $extend(verb.geom.EllipseArc.prototype,{
-});
-verb.geom.Line = $hx_exports.geom.Line = function(start,end) {
-	verb.geom.NurbsCurve.call(this,verb.core.Make.polyline([start,end]));
-	this._start = start;
-	this._end = end;
-};
-verb.geom.Line.__name__ = ["verb","geom","Line"];
-verb.geom.Line.byEnds = function(start,end) {
-	return new verb.geom.Line(start,end);
-};
-verb.geom.Line.__super__ = verb.geom.NurbsCurve;
-verb.geom.Line.prototype = $extend(verb.geom.NurbsCurve.prototype,{
-	start: function() {
-		return this._start;
-	}
-	,end: function() {
-		return this._end;
-	}
-});
+verb.geom.ISurface = function() { };
+verb.geom.ISurface.__name__ = ["verb","geom","ISurface"];
 verb.geom.NurbsSurface = $hx_exports.geom.NurbsSurface = function(data) {
 	this._data = data;
 };
 verb.geom.NurbsSurface.__name__ = ["verb","geom","NurbsSurface"];
+verb.geom.NurbsSurface.__interfaces__ = [verb.geom.ISurface];
 verb.geom.NurbsSurface.byControlPointsWeights = function(degreeU,degreeV,knotsU,knotsV,controlPoints,weights) {
 	return new verb.geom.NurbsSurface(new verb.core.types.SurfaceData(degreeU,degreeV,knotsU,knotsV,verb.core.Eval.homogenize2d(controlPoints,weights)));
 };
-verb.geom.NurbsSurface.byExtrusion = function(profile,direction) {
-	return new verb.geom.NurbsSurface(verb.core.Make.extrudedSurface(verb.core.Vec.normalized(direction),verb.core.Vec.norm(direction),profile.data()));
-};
-verb.geom.NurbsSurface.byFourPoints = function(point0,point1,point2,point3) {
+verb.geom.NurbsSurface.byCorners = function(point0,point1,point2,point3) {
 	return new verb.geom.NurbsSurface(verb.core.Make.fourPointSurface(point0,point1,point2,point3));
-};
-verb.geom.NurbsSurface.byRevolution = function(profile,center,axis,angle) {
-	return new verb.geom.NurbsSurface(verb.core.Make.revolvedSurface(profile.data(),center,axis,angle));
 };
 verb.geom.NurbsSurface.__super__ = verb.exe.AsyncObject;
 verb.geom.NurbsSurface.prototype = $extend(verb.exe.AsyncObject.prototype,{
@@ -4931,15 +4864,91 @@ verb.geom.NurbsSurface.prototype = $extend(verb.exe.AsyncObject.prototype,{
 		});
 	}
 });
-verb.geom.Sphere = $hx_exports.geom.Sphere = function(center,radius) {
+verb.geom.CylinderSurface = $hx_exports.geom.CylinderSurface = function(axis,xaxis,base,height,radius) {
+	verb.geom.NurbsSurface.call(this,verb.core.Make.cylinderSurface(axis,xaxis,base,height,radius));
+};
+verb.geom.CylinderSurface.__name__ = ["verb","geom","CylinderSurface"];
+verb.geom.CylinderSurface.__super__ = verb.geom.NurbsSurface;
+verb.geom.CylinderSurface.prototype = $extend(verb.geom.NurbsSurface.prototype,{
+});
+verb.geom.EllipseArc = $hx_exports.geom.EllipseArc = function(center,xaxis,yaxis,minAngle,maxAngle) {
+	verb.geom.NurbsCurve.call(this,verb.core.Make.ellipseArc(center,xaxis,yaxis,minAngle,maxAngle));
+	this._center = center;
+	this._xaxis = xaxis;
+	this._yaxis = yaxis;
+	this._minAngle = minAngle;
+	this._maxAngle = maxAngle;
+};
+verb.geom.EllipseArc.__name__ = ["verb","geom","EllipseArc"];
+verb.geom.EllipseArc.__super__ = verb.geom.NurbsCurve;
+verb.geom.EllipseArc.prototype = $extend(verb.geom.NurbsCurve.prototype,{
+	center: function() {
+		return this._center;
+	}
+	,xaxis: function() {
+		return this._xaxis;
+	}
+	,yaxis: function() {
+		return this._yaxis;
+	}
+	,minAngle: function() {
+		return this._minAngle;
+	}
+	,maxAngle: function() {
+		return this._maxAngle;
+	}
+});
+verb.geom.Ellipse = $hx_exports.geom.Ellipse = function(center,xaxis,yaxis) {
+	verb.geom.EllipseArc.call(this,center,xaxis,yaxis,0,Math.PI * 2);
+};
+verb.geom.Ellipse.__name__ = ["verb","geom","Ellipse"];
+verb.geom.Ellipse.byCenterAxes = function(center,xaxis,yaxis) {
+	return new verb.geom.Ellipse(center,xaxis,yaxis);
+};
+verb.geom.Ellipse.__super__ = verb.geom.EllipseArc;
+verb.geom.Ellipse.prototype = $extend(verb.geom.EllipseArc.prototype,{
+});
+verb.geom.ExtrudedSurface = $hx_exports.geom.ExtrudedSurface = function(profile,direction) {
+	verb.geom.NurbsSurface.call(this,verb.core.Make.extrudedSurface(verb.core.Vec.normalized(direction),verb.core.Vec.norm(direction),profile.data()));
+};
+verb.geom.ExtrudedSurface.__name__ = ["verb","geom","ExtrudedSurface"];
+verb.geom.ExtrudedSurface.__super__ = verb.geom.NurbsSurface;
+verb.geom.ExtrudedSurface.prototype = $extend(verb.geom.NurbsSurface.prototype,{
+});
+verb.geom.Line = $hx_exports.geom.Line = function(start,end) {
+	verb.geom.NurbsCurve.call(this,verb.core.Make.polyline([start,end]));
+	this._start = start;
+	this._end = end;
+};
+verb.geom.Line.__name__ = ["verb","geom","Line"];
+verb.geom.Line.__super__ = verb.geom.NurbsCurve;
+verb.geom.Line.prototype = $extend(verb.geom.NurbsCurve.prototype,{
+	start: function() {
+		return this._start;
+	}
+	,end: function() {
+		return this._end;
+	}
+});
+verb.geom.RevolvedSurface = $hx_exports.geom.RevolvedSurface = function(profile,center,axis,angle) {
+	verb.geom.NurbsSurface.call(this,verb.core.Make.revolvedSurface(profile.data(),center,axis,angle));
+};
+verb.geom.RevolvedSurface.__name__ = ["verb","geom","RevolvedSurface"];
+verb.geom.RevolvedSurface.__super__ = verb.geom.NurbsSurface;
+verb.geom.RevolvedSurface.prototype = $extend(verb.geom.NurbsSurface.prototype,{
+});
+verb.geom.SphereSurface = $hx_exports.geom.SphereSurface = function(center,radius) {
 	verb.geom.NurbsSurface.call(this,verb.core.Make.sphereSurface(center,[0,0,1],[1,0,0],radius));
 };
-verb.geom.Sphere.__name__ = ["verb","geom","Sphere"];
-verb.geom.Sphere.byCenterRadius = function(center,radius) {
-	return new verb.geom.Sphere(center,radius);
-};
-verb.geom.Sphere.__super__ = verb.geom.NurbsSurface;
-verb.geom.Sphere.prototype = $extend(verb.geom.NurbsSurface.prototype,{
+verb.geom.SphereSurface.__name__ = ["verb","geom","SphereSurface"];
+verb.geom.SphereSurface.__super__ = verb.geom.NurbsSurface;
+verb.geom.SphereSurface.prototype = $extend(verb.geom.NurbsSurface.prototype,{
+	center: function() {
+		return this._center;
+	}
+	,radius: function() {
+		return this._radius;
+	}
 });
 function $iterator(o) { if( o instanceof Array ) return function() { return HxOverrides.iter(o); }; return typeof(o.iterator) == 'function' ? $bind(o,o.iterator) : o.iterator; }
 var $_, $fid = 0;
@@ -4982,9 +4991,9 @@ verb.core.Analyze.Cvalues = [[],[],[1.0,1.0],[0.88888888888888888888888888888888
 verb.core.Binomial.memo = new haxe.ds.IntMap();
 verb.core.Constants.TOLERANCE = 1e-6;
 verb.core.Constants.EPSILON = 1e-10;
+verb.core.types.BoundingBox.TOLERANCE = 1e-4;
 verb.exe.Dispatcher.THREADS = 1;
 verb.exe.Work.uuid = 0;
 verb.exe.WorkerPool.basePath = "";
-verb.geom.BoundingBox.TOLERANCE = 1e-4;
 verb.Init.main();
 })(typeof window != "undefined" ? window : exports);

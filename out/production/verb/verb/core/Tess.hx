@@ -235,8 +235,8 @@ class Tess {
 		options.minDivsU = options.minDivsV != null ? options.minDivsV : 1;
 		options.refine = options.refine != null ? options.refine : true;
 
-		var minU = (surface.controlPoints.length - 1) * 3;
-		var minV = (surface.controlPoints[0].length - 1) * 3;
+		var minU = (surface.controlPoints.length - 1) * 2;
+		var minV = (surface.controlPoints[0].length - 1) * 2;
 
 		var divsU = options.minDivsU = options.minDivsU > minU ? options.minDivsU : minU;
 		var divsV = options.minDivsV = options.minDivsV > minV ? options.minDivsV : minV;
