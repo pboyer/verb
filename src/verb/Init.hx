@@ -15,6 +15,7 @@ import verb.geom.SphereSurface;
 import verb.geom.RevolvedSurface;
 import verb.geom.ExtrudedSurface;
 import verb.geom.CylinderSurface;
+import verb.geom.ConeSurface;
 
 // core
 import verb.core.types.BoundingBox;

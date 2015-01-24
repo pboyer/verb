@@ -4851,349 +4851,6 @@ describe("verb.geom.EllipseArc.tessellate",function(){
 
 /*
 
-describe("FourPointSurface.constructor",function(){
-
-	it('can create an instance', function(){
-
-		var p1 = [0,0,1]
-			, p2 = [1,0,0]
-			, p3 = [1,1,1]
-			, p4 = [0,1,0];
-
-		var srf = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
-
-		should.exist(srf);
-
-	});
-
-});
-
-describe("FourPointSurface.point",function(){
-
-	it('evaluates correctly for hypar', function(){
-
-		var p1 = [0,0,1]
-			, p2 = [1,0,0]
-			, p3 = [1,1,1]
-			, p4 = [0,1,0];
-
-		var srf = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
-
-		should.exist(srf);
-
-		var p = srf.point(0.5,0.5);
-
-		p[0].should.be.approximately(0.5, verb.core.Constants.EPSILON );
-		p[1].should.be.approximately(0.5, verb.core.Constants.EPSILON );
-		p[2].should.be.approximately(0.5, verb.core.Constants.EPSILON );
-
-	});
-
-});
-
-describe("FourPointSurface.derivatives",function(){
-
-	it('gives nice result', function(){
-
-		var p1 = [0,0,1]
-			, p2 = [1,0,0]
-			, p3 = [1,1,1]
-			, p4 = [0,1,0];
-
-		var srf = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
-
-		should.exist(srf);
-
-		var p = srf.derivatives(0.5, 0.5, 1);
-
-		p[0][0].should.eql([0.5,0.5,0.5]);
-		p[0][1].should.eql([0,1,0]);
-		p[1][0].should.eql([1,0,0]);
-
-	});
-
-});
-
-describe("FourPointSurface.tessellate",function(){
-
-	it('gives mesh result', function(){
-
-		var p1 = [0,0,1]
-			, p2 = [1,0,0]
-			, p3 = [1,1,1]
-			, p4 = [0,1,0];
-
-		var srf = new verb.geom.FourPointSurface( p1, p2, p3, p4 );
-
-		should.exist(srf);
-
-		var p = srf.tessellate();
-
-		p.uvs.length.should.be.greaterThan(10);
-		p.points.length.should.be.greaterThan(10);
-		p.faces.length.should.be.greaterThan(10);
-		p.normals.length.should.be.greaterThan(10);
-
-		p.points.map(function(e){ e.length.should.be.equal(3); });
-		p.uvs.map(function(e){ e.length.should.be.equal(2); });
-		p.faces.map(function(e){ e.length.should.be.equal(3); });
-		p.normals.map(function(e){ e.length.should.be.equal(3); });
-
-
-	});
-
-});
-
-describe("PolyLine.constructor",function(){
-
-	it('can create an instance', function(){
-
-		var c = new verb.geom.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
-
-		should.exist(c);
-
-	});
-
-});
-
-describe("PolyLine.point",function(){
-
-	it('evaluates correctly', function(){
-
-		var c = new verb.geom.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
-
-		should.exist(c);
-
-		var p = c.point(0.5);
-
-		p.should.eql( [1,0,0] );
-
-	});
-
-});
-
-describe("PolyLine.derivatives",function(){
-
-	it('gives correct result', function(){
-
-		var c = new verb.geom.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
-
-		should.exist(c);
-
-		var p = c.derivatives(0.5, 1);
-
-		p[0].should.eql( [1,0,0] );
-
-		// normalize the derivative
-		p[1] = verb.core.Vec.div( p[1], verb.core.Vec.norm(p[1]) );
-
-		p[1][0].should.be.approximately(-Math.sqrt(2) / 2, verb.core.Constants.TOLERANCE );
-		p[1][1].should.be.approximately(Math.sqrt(2) / 2, verb.core.Constants.TOLERANCE );
-		p[1][2].should.be.approximately(0, verb.core.Constants.TOLERANCE );
-
-	});
-
-});
-
-describe("PolyLine.tessellate",function(){
-
-	it('gives correct result', function(){
-
-		var c = new verb.geom.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
-
-		should.exist(c);
-
-		var pts = c.tessellate();
-
-		pts.length.should.be.equal(3);
-		pts.map( function(e){  e.length.should.be.equal(3); });
-
-	});
-
-});
-
-
-describe("PolyLine.constructor",function(){
-
-	it('can create an instance', function(){
-
-		var c = new verb.geom.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
-
-		should.exist(c);
-
-	});
-
-});
-
-describe("PolyLine.point",function(){
-
-	it('evaluates correctly', function(){
-
-		var c = new verb.geom.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
-
-		should.exist(c);
-
-		var p = c.point(0.5);
-
-		p.should.eql( [1,0,0] );
-
-	});
-
-});
-
-describe("PolyLine.derivatives",function(){
-
-	it('gives correct result', function(){
-
-		var c = new verb.geom.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
-
-		should.exist(c);
-
-		var p = c.derivatives(0.5, 1);
-
-		p[0].should.eql( [1,0,0] );
-
-		// normalize the derivative
-		p[1] = verb.core.Vec.div( p[1], verb.core.Vec.norm(p[1]) );
-
-		p[1][0].should.be.approximately(-Math.sqrt(2) / 2, verb.core.Constants.TOLERANCE );
-		p[1][1].should.be.approximately(Math.sqrt(2) / 2, verb.core.Constants.TOLERANCE );
-		p[1][2].should.be.approximately(0, verb.core.Constants.TOLERANCE );
-
-	});
-
-});
-
-describe("PolyLine.tessellate",function(){
-
-	it('gives correct result', function(){
-
-		var c = new verb.geom.PolyLine( [ [0,0,0], [1,0,0], [0,1,0] ] );
-
-		should.exist(c);
-
-		var pts = c.tessellate();
-
-		pts.length.should.be.equal(3);
-		pts.map( function(e){  e.length.should.be.equal(3); });
-
-	});
-
-});
-
-describe("Cone.constructor",function(){
-
-	it('can create an instance', function(){
-
-		var axis = [0,0,1]
-			, xaxis = [1,0,0]
-			, base = [0,0,0]
-			, height = 5
-			, radius = 3;
-
-		var srf = new verb.geom.Cone( axis, xaxis, base, height, radius );
-
-		should.exist(srf);
-
-	});
-
-});
-
-describe("Cone.point",function(){
-
-	it('evaluates correctly for middle of surface', function(){
-
-		var axis = [0,0,1]
-			, xaxis = [1,0,0]
-			, base = [0,0,0]
-			, height = 5
-			, radius = 3;
-
-		var srf = new verb.geom.Cone( axis, xaxis, base, height, radius );
-
-		should.exist(srf);
-
-		var p = srf.point(0.5,0.5);
-
-		p[0].should.be.approximately(-1.5, verb.core.Constants.EPSILON );
-		p[1].should.be.approximately(0, verb.core.Constants.EPSILON );
-		p[2].should.be.approximately(2.5, verb.core.Constants.EPSILON );
-
-	});
-
-});
-
-describe("Cone.derivatives",function(){
-
-	it('gives expected result for middle of surface', function(){
-
-		var axis = [0,0,1]
-			, xaxis = [1,0,0]
-			, base = [0,0,0]
-			, height = 5
-			, radius = 3;
-
-		var srf = new verb.geom.Cone( axis, xaxis, base, height, radius );
-
-		should.exist(srf);
-
-		var p = srf.derivatives(0.5, 0.5, 1);
-
-		p[0][0][0].should.be.approximately(-1.5, verb.core.Constants.EPSILON );
-		p[0][0][1].should.be.approximately(0, verb.core.Constants.EPSILON );
-		p[0][0][2].should.be.approximately(2.5, verb.core.Constants.EPSILON );
-
-		p[0][1][0].should.be.approximately(-3, verb.core.Constants.EPSILON );
-		p[0][1][1].should.be.approximately(0, verb.core.Constants.EPSILON );
-		p[0][1][2].should.be.approximately(-5, verb.core.Constants.EPSILON );
-
-		p[1][0] = verb.core.Vec.div( p[1][0], verb.core.Vec.norm(p[1][0]) );
-
-		p[1][0][0].should.be.approximately(0, verb.core.Constants.EPSILON );
-		p[1][0][1].should.be.approximately(-1, verb.core.Constants.EPSILON );
-		p[1][0][2].should.be.approximately(0, verb.core.Constants.EPSILON );
-
-	});
-
-});
-
-
-describe("Cone.tessellate",function(){
-
-	it('gives mesh result', function(){
-
-		var axis = [0,0,1]
-			, xaxis = [1,0,0]
-			, base = [0,0,0]
-			, height = 5
-			, radius = 3;
-
-		var srf = new verb.geom.Cone( axis, xaxis, base, height, radius );
-
-		should.exist(srf);
-
-		var p = srf.tessellate();
-
-		p.uvs.length.should.be.greaterThan(10);
-		p.points.length.should.be.greaterThan(10);
-		p.faces.length.should.be.greaterThan(10);
-		p.normals.length.should.be.greaterThan(10);
-
-		p.points.map(function(e){ e.length.should.be.equal(3); });
-		p.uvs.map(function(e){ e.length.should.be.equal(2); });
-		p.faces.map(function(e){ e.length.should.be.equal(3); });
-		p.normals.map(function(e){ e.length.should.be.equal(3); });
-
-
-	});
-
-});
-
-
-
-
-
-
 describe("SweepOneRail.constructor",function(){
 
 	it('can create an instance', function(){
@@ -6267,6 +5924,208 @@ describe("verb.geom.CylinderSurface.tessellate",function(){
 			, radius = 3;
 
 		var srf = new verb.geom.CylinderSurface( axis, xaxis, base, height, radius );
+
+		should.exist(srf);
+
+		var p = srf.tessellate();
+
+		p.uvs.length.should.be.greaterThan(10);
+		p.points.length.should.be.greaterThan(10);
+		p.faces.length.should.be.greaterThan(10);
+		p.normals.length.should.be.greaterThan(10);
+
+		p.points.map(function(e){ e.length.should.be.equal(3); });
+		p.uvs.map(function(e){ e.length.should.be.equal(2); });
+		p.faces.map(function(e){ e.length.should.be.equal(3); });
+		p.normals.map(function(e){ e.length.should.be.equal(3); });
+
+
+	});
+
+});
+
+describe("verb.geom.NurbsSurface.byCorners",function(){
+
+	it('can create an instance', function(){
+
+		var p1 = [0,0,1]
+			, p2 = [1,0,0]
+			, p3 = [1,1,1]
+			, p4 = [0,1,0];
+
+		var srf = verb.geom.NurbsSurface.byCorners( p1, p2, p3, p4 );
+
+		should.exist(srf);
+
+	});
+
+});
+
+describe("verb.geom.NurbsSurface.byCorners -> verb.geom.NurbsSurface.point",function(){
+
+	it('evaluates correctly for hypar', function(){
+
+		var p1 = [0,0,1]
+			, p2 = [1,0,0]
+			, p3 = [1,1,1]
+			, p4 = [0,1,0];
+
+		var srf = verb.geom.NurbsSurface.byCorners( p1, p2, p3, p4 );
+
+		should.exist(srf);
+
+		var p = srf.point(0.5,0.5);
+
+		p[0].should.be.approximately(0.5, verb.core.Constants.EPSILON );
+		p[1].should.be.approximately(0.5, verb.core.Constants.EPSILON );
+		p[2].should.be.approximately(0.5, verb.core.Constants.EPSILON );
+
+	});
+
+});
+
+describe("verb.geom.NurbsSurface.byCorners -> verb.geom.NurbsSurface.derivatives",function(){
+
+	it('gives nice result', function(){
+
+		var p1 = [0,0,1]
+			, p2 = [1,0,0]
+			, p3 = [1,1,1]
+			, p4 = [0,1,0];
+
+		var srf = verb.geom.NurbsSurface.byCorners( p1, p2, p3, p4 );
+
+		should.exist(srf);
+
+		var p = srf.derivatives(0.5, 0.5, 1);
+
+		vecShouldBe( [0.5,0.5,0.5], p[0][0] );
+		vecShouldBe( [0,1,0], p[0][1] );
+		vecShouldBe( [1,0,0], p[1][0] );
+
+	});
+
+});
+
+describe("verb.geom.NurbsSurface.byCorners -> verb.geom.NurbsSurface.tessellate",function(){
+
+	it('gives mesh result', function(){
+
+		var p1 = [0,0,1]
+			, p2 = [1,0,0]
+			, p3 = [1,1,1]
+			, p4 = [0,1,0];
+
+		var srf = verb.geom.NurbsSurface.byCorners( p1, p2, p3, p4 );
+
+		should.exist(srf);
+
+		var p = srf.tessellate();
+
+		p.uvs.length.should.be.greaterThan(10);
+		p.points.length.should.be.greaterThan(10);
+		p.faces.length.should.be.greaterThan(10);
+		p.normals.length.should.be.greaterThan(10);
+
+		p.points.map(function(e){ e.length.should.be.equal(3); });
+		p.uvs.map(function(e){ e.length.should.be.equal(2); });
+		p.faces.map(function(e){ e.length.should.be.equal(3); });
+		p.normals.map(function(e){ e.length.should.be.equal(3); });
+
+
+	});
+
+});
+
+
+describe("verb.geom.ConeSurface.constructor",function(){
+
+	it('can create an instance', function(){
+
+		var axis = [0,0,1]
+			, xaxis = [1,0,0]
+			, base = [0,0,0]
+			, height = 5
+			, radius = 3;
+
+		var srf = new verb.geom.ConeSurface( axis, xaxis, base, height, radius );
+
+		should.exist(srf);
+
+	});
+
+});
+
+describe("verb.geom.ConeSurface.point",function(){
+
+	it('evaluates correctly for middle of surface', function(){
+
+		var axis = [0,0,1]
+			, xaxis = [1,0,0]
+			, base = [0,0,0]
+			, height = 5
+			, radius = 3;
+
+		var srf = new verb.geom.ConeSurface( axis, xaxis, base, height, radius );
+
+		should.exist(srf);
+
+		var p = srf.point(0.5,0.5);
+
+		p[0].should.be.approximately(-1.5, verb.core.Constants.EPSILON );
+		p[1].should.be.approximately(0, verb.core.Constants.EPSILON );
+		p[2].should.be.approximately(2.5, verb.core.Constants.EPSILON );
+
+	});
+
+});
+
+describe("verb.geom.ConeSurface.derivatives",function(){
+
+	it('gives expected result for middle of surface', function(){
+
+		var axis = [0,0,1]
+			, xaxis = [1,0,0]
+			, base = [0,0,0]
+			, height = 5
+			, radius = 3;
+
+		var srf = new verb.geom.ConeSurface( axis, xaxis, base, height, radius );
+
+		should.exist(srf);
+
+		var p = srf.derivatives(0.5, 0.5, 1);
+
+		p[0][0][0].should.be.approximately(-1.5, verb.core.Constants.EPSILON );
+		p[0][0][1].should.be.approximately(0, verb.core.Constants.EPSILON );
+		p[0][0][2].should.be.approximately(2.5, verb.core.Constants.EPSILON );
+
+		p[0][1][0].should.be.approximately(-3, verb.core.Constants.EPSILON );
+		p[0][1][1].should.be.approximately(0, verb.core.Constants.EPSILON );
+		p[0][1][2].should.be.approximately(-5, verb.core.Constants.EPSILON );
+
+		p[1][0] = verb.core.Vec.div( p[1][0], verb.core.Vec.norm(p[1][0]) );
+
+		p[1][0][0].should.be.approximately(0, verb.core.Constants.EPSILON );
+		p[1][0][1].should.be.approximately(-1, verb.core.Constants.EPSILON );
+		p[1][0][2].should.be.approximately(0, verb.core.Constants.EPSILON );
+
+	});
+
+});
+
+
+describe("verb.geom.ConeSurface.tessellate",function(){
+
+	it('gives mesh result', function(){
+
+		var axis = [0,0,1]
+			, xaxis = [1,0,0]
+			, base = [0,0,0]
+			, height = 5
+			, radius = 3;
+
+		var srf = new verb.geom.ConeSurface( axis, xaxis, base, height, radius );
 
 		should.exist(srf);
 

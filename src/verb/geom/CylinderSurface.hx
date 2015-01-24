@@ -1,19 +1,42 @@
 package verb.geom;
 
+import verb.core.types.CurveData.Point;
 import verb.core.Make;
+import verb.core.Mat;
+
 @:expose("geom.CylinderSurface")
 class CylinderSurface extends NurbsSurface {
+
+    public var _axis : Vector;
+    public var _xaxis : Vector;
+    public var _base : Point;
+    public var _height : Float;
+    public var _radius : Float;
+
+    // public properties
+
+    public function axis(){ return _axis; }
+    public function xaxis(){ return _xaxis; }
+    public function base(){ return _base; }
+    public function height(){ return _height; }
+    public function radius(){ return _radius; }
 
     // Constructor for Cylinder
     //
     // **params**
-    // + *Array*, Length 3 array representing the axis of the cylinder
-    // + *Array*, Length 3 array representing the x axis, perpendicular to the axis
-    // + *Array*, Length 3 array representing the base of the cylinder
-    // + *Number*, Height of the cylinder
-    // + *Number*, Radius of the cylinder
+    // + Length 3 array representing the axis of the cylinder
+    // + Length 3 array representing the x axis, perpendicular to the axis
+    // + Length 3 array representing the base of the cylinder
+    // + Height of the cylinder
+    // + Radius of the cylinder
 
-    public function new(axis, xaxis, base, height, radius) {
+    public function new(axis : Vector, xaxis : Vector, base : Point, height : Float, radius : Float) {
         super(Make.cylinderSurface(axis, xaxis, base, height, radius));
+
+        _axis = axis;
+        _xaxis = xaxis;
+        _base = base;
+        _height = height;
+        _radius = radius;
     }
 }
