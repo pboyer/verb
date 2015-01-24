@@ -1604,7 +1604,7 @@ verb.core.Intersect.surfaces = function(surface0,surface1,tol) {
 	var resApprox = verb.core.Intersect.meshes(tess1,tess2);
 	var exactPls = resApprox.map(function(pl) {
 		return pl.map(function(inter) {
-			return verb.core.Intersect.surfaces_at_point_with_estimate(surface0,surface1,inter.uv0,inter.uv1,tol);
+			return verb.core.Intersect.surfacesAtPointWithEstimate(surface0,surface1,inter.uv0,inter.uv1,tol);
 		});
 	});
 	return exactPls.map(function(x) {
@@ -1613,7 +1613,7 @@ verb.core.Intersect.surfaces = function(surface0,surface1,tol) {
 		}),3);
 	});
 };
-verb.core.Intersect.surfaces_at_point_with_estimate = function(surface0,surface1,uv1,uv2,tol) {
+verb.core.Intersect.surfacesAtPointWithEstimate = function(surface0,surface1,uv1,uv2,tol) {
 	var pds;
 	var p;
 	var pn;
@@ -4469,26 +4469,24 @@ verb.exe.AsyncObject = function() { };
 verb.exe.AsyncObject.__name__ = ["verb","exe","AsyncObject"];
 verb.exe.AsyncObject.prototype = {
 	defer: function(classType,methodName,args) {
-		return verb.exe.Dispatcher.instance().deferMethod(Type.getClassName(classType),methodName,args);
+		return verb.exe.Dispatcher.dispatchMethod(Type.getClassName(classType),methodName,args);
 	}
 };
-verb.exe.Dispatcher = function() {
-	this._workerPool = new verb.exe.WorkerPool(verb.exe.Dispatcher.THREADS);
-};
+verb.exe.Dispatcher = function() { };
 verb.exe.Dispatcher.__name__ = ["verb","exe","Dispatcher"];
-verb.exe.Dispatcher.instance = function() {
-	if(verb.exe.Dispatcher._instance == null) verb.exe.Dispatcher._instance = new verb.exe.Dispatcher();
-	return verb.exe.Dispatcher._instance;
+verb.exe.Dispatcher.init = function() {
+	if(verb.exe.Dispatcher._init) return;
+	verb.exe.Dispatcher._workerPool = new verb.exe.WorkerPool(verb.exe.Dispatcher.THREADS);
+	verb.exe.Dispatcher._init = true;
 };
-verb.exe.Dispatcher.prototype = {
-	deferMethod: function(className,methodName,args) {
-		var def = new promhx.Deferred();
-		var callback = function(x) {
-			def.resolve(x);
-		};
-		this._workerPool.addWork(className,methodName,args,callback);
-		return new promhx.Promise(def);
-	}
+verb.exe.Dispatcher.dispatchMethod = function(className,methodName,args) {
+	verb.exe.Dispatcher.init();
+	var def = new promhx.Deferred();
+	var callback = function(x) {
+		def.resolve(x);
+	};
+	verb.exe.Dispatcher._workerPool.addWork(className,methodName,args,callback);
+	return new promhx.Promise(def);
 };
 verb.exe.Work = function(className,methodName,args) {
 	this.className = className;
@@ -4924,6 +4922,38 @@ verb.geom.ExtrudedSurface.prototype = $extend(verb.geom.NurbsSurface.prototype,{
 		return this._direction;
 	}
 });
+verb.geom.Intersect = $hx_exports.geom.Intersect = function() { };
+verb.geom.Intersect.__name__ = ["verb","geom","Intersect"];
+verb.geom.Intersect.curves = function(first,second,tol) {
+	if(tol == null) tol = 1e-3;
+	return verb.core.Intersect.curves(first.data(),second.data(),tol);
+};
+verb.geom.Intersect.curvesAsync = function(first,second,tol) {
+	if(tol == null) tol = 1e-3;
+	return verb.exe.Dispatcher.dispatchMethod("verb.core.Intersect","curves",[first.data(),second.data(),tol]);
+};
+verb.geom.Intersect.curveAndSurface = function(curve,surface,tol) {
+	if(tol == null) tol = 1e-3;
+	return verb.core.Intersect.curveAndSurface(curve.data(),surface.data(),tol);
+};
+verb.geom.Intersect.curveAndSurfaceAsync = function(curve,surface,tol) {
+	if(tol == null) tol = 1e-3;
+	return verb.exe.Dispatcher.dispatchMethod("verb.core.Intersect","curveAndSurface",[curve.data(),surface.data(),tol]);
+};
+verb.geom.Intersect.surfaces = function(first,second,tol) {
+	if(tol == null) tol = 1e-3;
+	return verb.core.Intersect.surfaces(first.data(),second.data(),tol).map(function(cd) {
+		return new verb.geom.NurbsCurve(cd);
+	});
+};
+verb.geom.Intersect.surfacesAsync = function(first,second,tol) {
+	if(tol == null) tol = 1e-3;
+	return verb.exe.Dispatcher.dispatchMethod("verb.core.Intersect","surfaces",[first.data(),second.data(),tol]).then(function(cds) {
+		return cds.map(function(cd) {
+			return new verb.geom.NurbsCurve(cd);
+		});
+	});
+};
 verb.geom.Line = $hx_exports.geom.Line = function(start,end) {
 	verb.geom.NurbsCurve.call(this,verb.core.Make.polyline([start,end]));
 	this._start = start;
@@ -5020,6 +5050,7 @@ verb.core.Constants.TOLERANCE = 1e-6;
 verb.core.Constants.EPSILON = 1e-10;
 verb.core.types.BoundingBox.TOLERANCE = 1e-4;
 verb.exe.Dispatcher.THREADS = 1;
+verb.exe.Dispatcher._init = false;
 verb.exe.Work.uuid = 0;
 verb.exe.WorkerPool.basePath = "";
 verb.Init.main();

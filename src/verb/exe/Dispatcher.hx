@@ -12,33 +12,34 @@ import promhx.Promise;
 class Dispatcher {
 
     public static var THREADS : Int = 1;
+
     private static var _instance: Dispatcher = null;
 
     #if (neko || cpp)
-        private var _threadPool : ThreadPool;
+        private static var _threadPool : ThreadPool;
     #elseif js
-        private var _workerPool : WorkerPool;
+        private static var _workerPool : WorkerPool;
     #end
 
-    public function new() {
+    private static var _init : Bool = false;
+
+    private static function init() : Void {
+
+        if (_init) return;
+
         #if (neko || cpp)
             _threadPool = new ThreadPool( THREADS );
         #elseif js
             _workerPool = new WorkerPool( THREADS );
         #end
+
+        _init = true;
+
     }
 
-    public static function instance() : Dispatcher {
-        if (_instance == null){
-            _instance = new Dispatcher();
-        }
+    public static function dispatchMethod<T>( className : String, methodName : String, args : Array<Dynamic> ) : Promise<T> {
 
-        return _instance;
-    }
-
-    public function deferMethod<T>( className : String,
-                                    methodName : String,
-                                    args : Array<Dynamic> ) : Promise<T> {
+        init();
 
         var def = new Deferred<T>();
 

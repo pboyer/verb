@@ -355,7 +355,7 @@ class Intersect {
 
     public static function curveAndSurface( curve : NurbsCurveData,
                                               surface : NurbsSurfaceData,
-                                              tol : Float = 1e-3 )  {
+                                              tol : Float = 1e-3 ) : Array<CurveSurfaceIntersection>  {
 
         var ints = Intersect.bounding_box_trees(
             new LazyCurveBoundingBoxTree( curve ),

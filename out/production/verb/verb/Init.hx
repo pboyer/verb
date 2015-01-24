@@ -1,5 +1,8 @@
 package verb;
 
+// intersection
+import verb.geom.Intersect;
+
 // curves
 import verb.geom.NurbsCurve;
 import verb.geom.Arc;
