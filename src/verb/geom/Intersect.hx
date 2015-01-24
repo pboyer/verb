@@ -23,7 +23,7 @@ class Intersect {
     }
 
     public static function curvesAsync( first : ICurve, second : ICurve, tol : Float = 1e-3 ) : Promise<Array<CurveCurveIntersection>> {
-        return Dispatcher.dispatchMethod( Intersect, "curves", [first.asNurbs(), second.asNurbs(), tol ]);
+        return Dispatcher.dispatchMethod( verb.core.Intersect, "curves", [first.asNurbs(), second.asNurbs(), tol ]);
     }
 
     // Determine the intersection of a curve and a surface
@@ -41,7 +41,7 @@ class Intersect {
     }
 
     public static function curveAndSurfaceAsync( curve : ICurve, surface : ISurface, tol : Float = 1e-3 ) : Promise<Array<CurveSurfaceIntersection>> {
-        return Dispatcher.dispatchMethod( Intersect, "curveAndSurface", [curve.asNurbs(), surface.asNurbs(), tol ]);
+        return Dispatcher.dispatchMethod( verb.core.Intersect, "curveAndSurface", [curve.asNurbs(), surface.asNurbs(), tol ]);
     }
 
     // Determine the intersection of two surfaces
@@ -59,7 +59,7 @@ class Intersect {
     }
 
     public static function surfacesAsync( first : ISurface, second : ISurface, tol : Float = 1e-3  ) : Promise<Array<NurbsCurve>> {
-        return Dispatcher.dispatchMethod( Intersect, "surfaces", [first.asNurbs(), second.asNurbs(), tol])
+        return Dispatcher.dispatchMethod( verb.core.Intersect, "surfaces", [first.asNurbs(), second.asNurbs(), tol])
             .then(function(cds){
                 return cds.map(function(cd){ return new NurbsCurve(cd); });
             });

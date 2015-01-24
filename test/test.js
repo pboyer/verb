@@ -6160,3 +6160,81 @@ describe("verb.geom.ConicalSurface.tessellate",function(){
 	});
 
 });
+
+describe("verb.geom.Intersect.curves",function(){
+
+	var curve1 = new verb.geom.BezierCurve( [[0,0,0], 		[0.5,0.1,0], [2,0,0]] ),
+		curve2 = new verb.geom.BezierCurve( [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]] );
+
+	it('gives valid result for 2 planar degree 2 beziers', function(){
+
+		var res = verb.geom.Intersect.curves( curve1, curve2, verb.core.Constants.TOLERANCE );
+
+		res.length.should.be.equal(1);
+
+		res[0].u0.should.be.approximately(0.416208132514572, verb.core.Constants.TOLERANCE );
+		res[0].u1.should.be.approximately(0.3374987853196129, verb.core.Constants.TOLERANCE );
+
+	});
+
+	it('gives valid result for 2 planar degree 2 beziers', function(done){
+
+		verb.geom.Intersect.curvesAsync( curve1, curve2, verb.core.Constants.TOLERANCE )
+			.then(function(res){
+
+				res.length.should.be.equal(1);
+
+				res[0].u0.should.be.approximately(0.416208132514572, verb.core.Constants.TOLERANCE );
+				res[0].u1.should.be.approximately(0.3374987853196129, verb.core.Constants.TOLERANCE );
+
+				done();
+			});
+	});
+
+});
+
+describe("verb.geom.Intersect.curveAndSurface",function(){
+
+	// build planar surface in the xy plane
+	var homo_controlPoints_srf = [ [ [0,0,0,1], [0,10,0,1] ], [[20,0,0,1], [20,10,0,1] ] ]
+		, degreeU  = 1
+		, degreeV = 1
+		, knotsU = [0,0,1,1]
+		, knotsV = [0,0,1,1]
+		, surfaceData = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, homo_controlPoints_srf )
+		, surface = new verb.geom.NurbsSurface( surfaceData );
+
+	// line from [5,5,5] to [5,5,-5]
+	var degree_crv = 2
+		, knots_crv = [0,0,0,1,1,1]
+		, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.4,4.8,0,1], [5.2,5.2,-5,1] ]
+		, curveData = new verb.core.NurbsCurveData( degree_crv, knots_crv, homo_controlPoints_crv )
+		, curve = new verb.geom.NurbsCurve( curveData );
+
+	it('gives valid result for planar surface and degree 2 bezier', function(){
+
+		var res =  verb.geom.Intersect.curveAndSurface( curve, surface, verb.core.Constants.TOLERANCE  );
+
+		res.length.should.be.equal( 1 );
+		res[0].u.should.be.approximately( 0.5, 1e-3 );
+		res[0].uv[0].should.be.approximately( 0.265, 1e-3 );
+		res[0].uv[1].should.be.approximately( 0.5, 1e-3 );
+
+	});
+
+	it('gives valid result for planar surface and degree 2 bezier async', function(done){
+
+		verb.geom.Intersect.curveAndSurfaceAsync( curve, surface, verb.core.Constants.TOLERANCE  )
+			.then(function(res){
+
+				res.length.should.be.equal( 1 );
+				res[0].u.should.be.approximately( 0.5, 1e-3 );
+				res[0].uv[0].should.be.approximately( 0.265, 1e-3 );
+				res[0].uv[1].should.be.approximately( 0.5, 1e-3 );
+
+				done();
+			});
+	});
+
+});
+

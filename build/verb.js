@@ -4968,7 +4968,7 @@ verb.geom.Intersect.curves = function(first,second,tol) {
 };
 verb.geom.Intersect.curvesAsync = function(first,second,tol) {
 	if(tol == null) tol = 1e-3;
-	return verb.exe.Dispatcher.dispatchMethod(verb.geom.Intersect,"curves",[first.asNurbs(),second.asNurbs(),tol]);
+	return verb.exe.Dispatcher.dispatchMethod(verb.core.Intersect,"curves",[first.asNurbs(),second.asNurbs(),tol]);
 };
 verb.geom.Intersect.curveAndSurface = function(curve,surface,tol) {
 	if(tol == null) tol = 1e-3;
@@ -4976,7 +4976,7 @@ verb.geom.Intersect.curveAndSurface = function(curve,surface,tol) {
 };
 verb.geom.Intersect.curveAndSurfaceAsync = function(curve,surface,tol) {
 	if(tol == null) tol = 1e-3;
-	return verb.exe.Dispatcher.dispatchMethod(verb.geom.Intersect,"curveAndSurface",[curve.asNurbs(),surface.asNurbs(),tol]);
+	return verb.exe.Dispatcher.dispatchMethod(verb.core.Intersect,"curveAndSurface",[curve.asNurbs(),surface.asNurbs(),tol]);
 };
 verb.geom.Intersect.surfaces = function(first,second,tol) {
 	if(tol == null) tol = 1e-3;
@@ -4986,7 +4986,7 @@ verb.geom.Intersect.surfaces = function(first,second,tol) {
 };
 verb.geom.Intersect.surfacesAsync = function(first,second,tol) {
 	if(tol == null) tol = 1e-3;
-	return verb.exe.Dispatcher.dispatchMethod(verb.geom.Intersect,"surfaces",[first.asNurbs(),second.asNurbs(),tol]).then(function(cds) {
+	return verb.exe.Dispatcher.dispatchMethod(verb.core.Intersect,"surfaces",[first.asNurbs(),second.asNurbs(),tol]).then(function(cds) {
 		return cds.map(function(cd) {
 			return new verb.geom.NurbsCurve(cd);
 		});
