@@ -11,11 +11,11 @@ import verb.geom.EllipseArc;
 
 // surfaces
 import verb.geom.NurbsSurface;
-import verb.geom.SphereSurface;
+import verb.geom.SphericalSurface;
 import verb.geom.RevolvedSurface;
 import verb.geom.ExtrudedSurface;
-import verb.geom.CylinderSurface;
-import verb.geom.ConeSurface;
+import verb.geom.CylindricalSurface;
+import verb.geom.ConicalSurface;
 
 // core
 import verb.core.types.BoundingBox;

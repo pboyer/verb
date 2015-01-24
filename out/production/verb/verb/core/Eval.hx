@@ -1,8 +1,8 @@
 package verb.core;
 
 import verb.core.types.VolumeData;
-import verb.core.types.SurfaceData;
-import verb.core.types.CurveData;
+import verb.core.types.NurbsSurfaceData;
+import verb.core.types.NurbsCurveData;
 
 import verb.core.Binomial;
 
@@ -112,7 +112,7 @@ class Eval {
 	// **returns**
 	// + a Vector represented by an array of length (dim)
 
-	public static function rationalCurveTangent( curve : CurveData, u : Float ) : Array<Float> {
+	public static function rationalCurveTangent( curve : NurbsCurveData, u : Float ) : Array<Float> {
 		var derivs = rationalCurveDerivatives( curve, u, 1 );
 		return derivs[1];
 	}
@@ -127,7 +127,7 @@ class Eval {
 	// **returns**
 	// + a Vector represented by an array of length (dim)
 
-	public static function rationalSurfaceNormal( surface : SurfaceData, u : Float, v : Float) : Array<Float> {
+	public static function rationalSurfaceNormal( surface : NurbsSurfaceData, u : Float, v : Float) : Array<Float> {
 		var derivs = rationalSurfaceDerivatives( surface, u, v, 1 );
 		return Vec.cross( derivs[1][0], derivs[0][1] );
 	}
@@ -143,7 +143,7 @@ class Eval {
 	// **returns**
 	// + a point represented by an array of length (dim)
 
-	public static function rationalSurfaceDerivatives( 	surface : SurfaceData,
+	public static function rationalSurfaceDerivatives( 	surface : NurbsSurfaceData,
 														u : Float,
 														v : Float,
 														numDerivs : Int = 1) : Array<Array<Array<Float>>> {
@@ -201,7 +201,7 @@ class Eval {
 	// + a point represented by an array of length (dim)
 	//
 
-	public static function rationalSurfacePoint( surface : SurfaceData, u : Float, v : Float ) : Point {
+	public static function rationalSurfacePoint( surface : NurbsSurfaceData, u : Float, v : Float ) : Point {
 		return dehomogenize( surfacePoint( surface, u, v ) );
 	}
 
@@ -216,7 +216,7 @@ class Eval {
 	// **returns**
 	// + a point represented by an array of length (dim)
 	//
-	public static function rationalCurveDerivatives( curve : CurveData, u : Float, numDerivs : Int = 1  ) : Array<Point> {
+	public static function rationalCurveDerivatives( curve : NurbsCurveData, u : Float, numDerivs : Int = 1  ) : Array<Point> {
 
 		var ders = curveDerivatives( curve, u, numDerivs )
 		, Aders = rational1d(ders)
@@ -251,7 +251,7 @@ class Eval {
 	// + a point represented by an array of length (dim)
 	//
 
-	public static function rationalCurvePoint( curve : CurveData, u : Float) : Point {
+	public static function rationalCurvePoint( curve : NurbsCurveData, u : Float) : Point {
 		return dehomogenize( curvePoint( curve, u) );
 	}
 
@@ -448,7 +448,7 @@ class Eval {
 	//
 
 	
-	public static function surfaceDerivatives( surface : SurfaceData, u : Float, v : Float, numDerivs : Int ) : Array<Array<Point>> {
+	public static function surfaceDerivatives( surface : NurbsSurfaceData, u : Float, v : Float, numDerivs : Int ) : Array<Array<Point>> {
 
 		var n = surface.knotsU.length - surface.degreeU - 2
 		, m = surface.knotsV.length - surface.degreeV - 2;
@@ -474,7 +474,7 @@ class Eval {
 	
 	public static function surfaceDerivativesGivenNM( n : Int,
 													 m : Int,
-													 surface : SurfaceData,
+													 surface : NurbsSurfaceData,
 													 u : Float,
 													 v: Float,
 													 numDerivs : Int ) : Array<Array<Point>>{
@@ -539,7 +539,7 @@ class Eval {
 	//
 
 	
-	public static function surfacePoint( surface : SurfaceData, u : Float, v : Float) : Point {
+	public static function surfacePoint( surface : NurbsSurfaceData, u : Float, v : Float) : Point {
 
 		var n = surface.knotsU.length - surface.degreeU - 2
 		, m = surface.knotsV.length - surface.degreeV - 2;
@@ -563,7 +563,7 @@ class Eval {
 	//
 
 	
-	public static function surfacePointGivenNM( n : Int, m : Int, surface : SurfaceData, u : Float, v : Float ) : Point {
+	public static function surfacePointGivenNM( n : Int, m : Int, surface : NurbsSurfaceData, u : Float, v : Float ) : Point {
 
 		var degreeU = surface.degreeU
 		, degreeV = surface.degreeV
@@ -616,7 +616,7 @@ class Eval {
 	// + a point represented by an array of length (dim)
 	//
 
-	public static function curveDerivatives( crv : CurveData, u : Float, numDerivs : Int ) : Array<Point> {
+	public static function curveDerivatives( crv : NurbsCurveData, u : Float, numDerivs : Int ) : Array<Point> {
 
 		var n = crv.knots.length - crv.degree - 2;
 		return curveDerivativesGivenN( n, crv, u, numDerivs
@@ -637,7 +637,7 @@ class Eval {
 	//
 
 	
-	public static function curveDerivativesGivenN( n : Int, curve : CurveData, u : Float, numDerivs : Int ) : Array<Point> {
+	public static function curveDerivativesGivenN( n : Int, curve : NurbsCurveData, u : Float, numDerivs : Int ) : Array<Point> {
 
 		var degree = curve.degree
 		, controlPoints = curve.controlPoints
@@ -674,7 +674,7 @@ class Eval {
 	//
 
 	
-	public static function curvePoint( curve : CurveData, u : Float) {
+	public static function curvePoint( curve : NurbsCurveData, u : Float) {
 		var n = curve.knots.length - curve.degree - 2;
 		return curvePointGivenN( n, curve, u);
 	}
@@ -709,7 +709,7 @@ class Eval {
 	//
 
 	
-	public static function curvePointGivenN( n : Int, curve : CurveData, u : Float) : Point {
+	public static function curvePointGivenN( n : Int, curve : NurbsCurveData, u : Float) : Point {
 
 		var degree = curve.degree
 			, controlPoints = curve.controlPoints

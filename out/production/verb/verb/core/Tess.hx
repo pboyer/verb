@@ -5,9 +5,9 @@ using verb.core.ArrayExtensions;
 import verb.core.types.SurfacePoint;
 import verb.core.types.MeshData;
 import verb.core.types.AdaptiveRefinementNode;
-import verb.core.types.SurfaceData;
+import verb.core.types.NurbsSurfaceData;
 
-import verb.core.types.CurveData;
+import verb.core.types.NurbsCurveData;
 
 @:expose("core.Tess")
 class Tess {
@@ -24,7 +24,7 @@ class Tess {
 	// + an array of points, prepended by the point param if required
 	//
 
-	public static function rationalCurveRegularSample( curve : CurveData, numSamples : Int, includeU : Bool ) : Array<Point> {
+	public static function rationalCurveRegularSample( curve : NurbsCurveData, numSamples : Int, includeU : Bool ) : Array<Point> {
 		return rationalCurveRegularSampleRange( curve, curve.knots[0], curve.knots.last(), numSamples, includeU);
 	}
 
@@ -42,7 +42,7 @@ class Tess {
 	// + an dictionary of parameter - point pairs
 	//
 
-	public static function rationalCurveRegularSampleRange( curve : CurveData, start : Float, end : Float,
+	public static function rationalCurveRegularSampleRange( curve : NurbsCurveData, start : Float, end : Float,
 																numSamples : Int, includeU  : Bool) : Array<Point>  {
 
 		if (numSamples < 1){
@@ -81,7 +81,7 @@ class Tess {
 	// + an array of dim + 1 length where the first element is the param where it was sampled and the remaining the pt
 	//
 
-	public static function rationalCurveAdaptiveSample( curve : CurveData, tol : Float = 1e-6, includeU : Bool = false ) : Array<Point> {
+	public static function rationalCurveAdaptiveSample( curve : NurbsCurveData, tol : Float = 1e-6, includeU : Bool = false ) : Array<Point> {
 
 		// if degree is 1, just return the dehomogenized control points
 		if (curve.degree == 1){
@@ -110,7 +110,7 @@ class Tess {
 	// + an array of dim + 1 length where the first element is the param where it was sampled and the remaining the pt
 	//
 
-	public static function rationalCurveAdaptiveSample_range( curve : CurveData, start, end, tol, includeU ) : Array<Point>{
+	public static function rationalCurveAdaptiveSample_range( curve : NurbsCurveData, start, end, tol, includeU ) : Array<Point>{
 
 		// sample curve at three pts
 		var p1 = Eval.rationalCurvePoint(curve, start),
@@ -157,7 +157,7 @@ class Tess {
 	// + MeshData object
 	//
 
-	public static function rationalSurfaceNaive( surface : SurfaceData, divs_u : Int, divs_v : Int ) : MeshData {
+	public static function rationalSurfaceNaive( surface : NurbsSurfaceData, divs_u : Int, divs_v : Int ) : MeshData {
 
 		if ( divs_u < 1 ) { divs_u = 1; }
 		if ( divs_v < 1 ) { divs_v = 1; }
@@ -227,7 +227,7 @@ class Tess {
 	// + MeshData object
 	//
 
-	public static function divideRationalSurfaceAdaptive( surface : SurfaceData, options : AdaptiveRefinementOptions = null ): Array<AdaptiveRefinementNode> {
+	public static function divideRationalSurfaceAdaptive( surface : NurbsSurfaceData, options : AdaptiveRefinementOptions = null ): Array<AdaptiveRefinementNode> {
 
 		if (options == null) options = new AdaptiveRefinementOptions();
 
@@ -331,7 +331,7 @@ class Tess {
 
 	}
 
-	public static function rationalSurfaceAdaptive( surface : SurfaceData, options : AdaptiveRefinementOptions = null ) : MeshData {
+	public static function rationalSurfaceAdaptive( surface : NurbsSurfaceData, options : AdaptiveRefinementOptions = null ) : MeshData {
 
 		options = options != null ? options : new AdaptiveRefinementOptions();
 

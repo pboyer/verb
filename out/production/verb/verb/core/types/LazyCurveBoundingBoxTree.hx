@@ -2,9 +2,9 @@ package verb.core.types;
 
 using verb.core.ArrayExtensions;
 
-class LazyCurveBoundingBoxTree implements IBoundingBoxTree<CurveData> {
+class LazyCurveBoundingBoxTree implements IBoundingBoxTree<NurbsCurveData> {
 
-    var _curve : CurveData;
+    var _curve : NurbsCurveData;
     var _boundingBox : BoundingBox = null;
     var _knotTol : Float;
 
@@ -16,14 +16,14 @@ class LazyCurveBoundingBoxTree implements IBoundingBoxTree<CurveData> {
         _knotTol = knotTol;
     }
 
-    public function split() : Pair<IBoundingBoxTree<CurveData>, IBoundingBoxTree<CurveData>> {
+    public function split() : Pair<IBoundingBoxTree<NurbsCurveData>, IBoundingBoxTree<NurbsCurveData>> {
         var min = _curve.knots.first();
         var max = _curve.knots.last();
         var dom = max - min;
 
         var crvs = Modify.curveSplit( _curve, (max + min) / 2.0 + dom * 0.01 * Math.random() );
 
-        return new Pair<IBoundingBoxTree<CurveData>, IBoundingBoxTree<CurveData>>(
+        return new Pair<IBoundingBoxTree<NurbsCurveData>, IBoundingBoxTree<NurbsCurveData>>(
             new LazyCurveBoundingBoxTree( crvs[0], _knotTol ),
             new LazyCurveBoundingBoxTree( crvs[1], _knotTol ));
     }

@@ -2051,7 +2051,7 @@ describe("verb.core.Make.polyline",function(){
 
 });
 
-describe("verb.core.Make.cylinderSurface",function(){
+describe("verb.core.Make.CylindricalSurface",function(){
 
 	it('can create a cylinder', function(){
 
@@ -2061,7 +2061,7 @@ describe("verb.core.Make.cylinderSurface",function(){
 			, height = 5
 			, radius = 5;
 
-		var comps = verb.core.Make.cylinderSurface(axis, xaxis, base, height, radius);
+		var comps = verb.core.Make.CylindricalSurface(axis, xaxis, base, height, radius);
 
 		comps.degreeU.should.equal(2);
 		comps.degreeV.should.equal(2);
@@ -2239,7 +2239,7 @@ describe("verb.core.Trig.distToRay",function(){
 
 });
 
-describe("verb.core.Make.coneSurface",function(){
+describe("verb.core.Make.ConicalSurface",function(){
 
 	it('can create a cone', function(){
 
@@ -2249,7 +2249,7 @@ describe("verb.core.Make.coneSurface",function(){
 			, height = 5
 			, radius = 10;
 
-		var comps = verb.core.Make.coneSurface(axis, xaxis, base, height, radius);
+		var comps = verb.core.Make.ConicalSurface(axis, xaxis, base, height, radius);
 
 		comps.degreeU.should.equal(2);
 		comps.degreeV.should.equal(1);
@@ -2290,7 +2290,7 @@ describe("verb.core.Make.coneSurface",function(){
 
 });
 
-describe("verb.core.Make.sphereSurface",function(){
+describe("verb.core.Make.SphericalSurface",function(){
 
 	it('can create a unit sphere', function(){
 
@@ -2299,7 +2299,7 @@ describe("verb.core.Make.sphereSurface",function(){
 			, xaxis = [1,0,0]
 			, radius = 1;
 
-		var comps = verb.core.Make.sphereSurface(center, axis, xaxis, radius);
+		var comps = verb.core.Make.SphericalSurface(center, axis, xaxis, radius);
 
 		comps.degreeU.should.equal(2);
 		comps.degreeV.should.equal(2);
@@ -5048,7 +5048,7 @@ describe("verb.core.Eval.rational_surface_curvature ",function(){
 			, height = 1
 			, radius = 1;
 
-		var srf = new verb.geom.CylinderSurface( axis, xaxis, base, height, radius );
+		var srf = new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius );
 
 		var res = verb.core.Eval.rational_surface_curvature( srf.get('degreeU'),
 																													srf.get('knotsU'),
@@ -5087,7 +5087,7 @@ describe("verb.core.Eval.rational_surface_curvature ",function(){
 		var center = [0,0,0]
 			, radius = 1;
 
-		var srf = new verb.geom.SphereSurface( center, radius );
+		var srf = new verb.geom.SphericalSurface( center, radius );
 
 		var res = verb.core.Eval.rational_surface_curvature( srf.get('degreeU'),
 																													srf.get('knotsU'),
@@ -5740,14 +5740,14 @@ describe("verb.geom.RevolvedSurface.tessellate",function(){
 
 });
 
-describe("verb.geom.SphereSurface.constructor",function(){
+describe("verb.geom.SphericalSurface.constructor",function(){
 
 	it('can create an instance', function(){
 
 		var center = [0,0,0]
 			, radius = 5;
 
-		var srf = new verb.geom.SphereSurface( center, radius );
+		var srf = new verb.geom.SphericalSurface( center, radius );
 
 		should.exist(srf);
 
@@ -5758,14 +5758,14 @@ describe("verb.geom.SphereSurface.constructor",function(){
 
 });
 
-describe("verb.geom.SphereSurface.point",function(){
+describe("verb.geom.SphericalSurface.point",function(){
 
 	it('evaluates correctly for middle of surface', function(){
 
 		var center = [0,0,0]
 			, radius = 5;
 
-		var srf = new verb.geom.SphereSurface( center, radius );
+		var srf = new verb.geom.SphericalSurface( center, radius );
 
 		should.exist(srf);
 
@@ -5779,14 +5779,14 @@ describe("verb.geom.SphereSurface.point",function(){
 
 });
 
-describe("verb.geom.SphereSurface.derivatives",function(){
+describe("verb.geom.SphericalSurface.derivatives",function(){
 
 	it('gives expected result for middle of surface', function(){
 
 		var center = [0,0,0]
 			, radius = 5;
 
-		var srf = new verb.geom.SphereSurface( center, radius );
+		var srf = new verb.geom.SphericalSurface( center, radius );
 
 		should.exist(srf);
 
@@ -5812,14 +5812,14 @@ describe("verb.geom.SphereSurface.derivatives",function(){
 
 });
 
-describe("verb.geom.SphereSurface.tessellate",function(){
+describe("verb.geom.SphericalSurface.tessellate",function(){
 
 	it('gives mesh result', function(){
 
 		var center = [0,0,0]
 			, radius = 5;
 
-		var srf = new verb.geom.SphereSurface( center, radius );
+		var srf = new verb.geom.SphericalSurface( center, radius );
 
 		should.exist(srf);
 
@@ -5840,7 +5840,7 @@ describe("verb.geom.SphereSurface.tessellate",function(){
 });
 
 
-describe("verb.geom.CylinderSurface.constructor",function(){
+describe("verb.geom.CylindricalSurface.constructor",function(){
 
 	it('can create an instance', function(){
 
@@ -5850,7 +5850,7 @@ describe("verb.geom.CylinderSurface.constructor",function(){
 			, height = 5
 			, radius = 3;
 
-		var srf = new verb.geom.CylinderSurface( axis, xaxis, base, height, radius );
+		var srf = new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius );
 
 		should.exist(srf);
 
@@ -5864,7 +5864,7 @@ describe("verb.geom.CylinderSurface.constructor",function(){
 
 });
 
-describe("verb.geom.CylinderSurface.point",function(){
+describe("verb.geom.CylindricalSurface.point",function(){
 
 	it('evaluates correctly for middle of surface', function(){
 
@@ -5874,7 +5874,7 @@ describe("verb.geom.CylinderSurface.point",function(){
 			, height = 5
 			, radius = 3;
 
-		var srf = new verb.geom.CylinderSurface( axis, xaxis, base, height, radius );
+		var srf = new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius );
 
 		should.exist(srf);
 
@@ -5888,7 +5888,7 @@ describe("verb.geom.CylinderSurface.point",function(){
 
 });
 
-describe("verb.geom.CylinderSurface.derivatives",function(){
+describe("verb.geom.CylindricalSurface.derivatives",function(){
 
 	it('gives expected result for middle of surface', function(){
 
@@ -5898,7 +5898,7 @@ describe("verb.geom.CylinderSurface.derivatives",function(){
 			, height = 5
 			, radius = 3;
 
-		var srf = new verb.geom.CylinderSurface( axis, xaxis, base, height, radius );
+		var srf = new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius );
 
 		should.exist(srf);
 
@@ -5922,7 +5922,7 @@ describe("verb.geom.CylinderSurface.derivatives",function(){
 
 });
 
-describe("verb.geom.CylinderSurface.tessellate",function(){
+describe("verb.geom.CylindricalSurface.tessellate",function(){
 
 	it('gives mesh result', function(){
 
@@ -5932,7 +5932,7 @@ describe("verb.geom.CylinderSurface.tessellate",function(){
 			, height = 5
 			, radius = 3;
 
-		var srf = new verb.geom.CylinderSurface( axis, xaxis, base, height, radius );
+		var srf = new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius );
 
 		should.exist(srf);
 
@@ -6047,7 +6047,7 @@ describe("verb.geom.NurbsSurface.byCorners -> verb.geom.NurbsSurface.tessellate"
 });
 
 
-describe("verb.geom.ConeSurface.constructor",function(){
+describe("verb.geom.ConicalSurface.constructor",function(){
 
 	it('can create an instance', function(){
 
@@ -6057,7 +6057,7 @@ describe("verb.geom.ConeSurface.constructor",function(){
 			, height = 5
 			, radius = 3;
 
-		var srf = new verb.geom.ConeSurface( axis, xaxis, base, height, radius );
+		var srf = new verb.geom.ConicalSurface( axis, xaxis, base, height, radius );
 
 		should.exist(srf);
 
@@ -6071,7 +6071,7 @@ describe("verb.geom.ConeSurface.constructor",function(){
 
 });
 
-describe("verb.geom.ConeSurface.point",function(){
+describe("verb.geom.ConicalSurface.point",function(){
 
 	it('evaluates correctly for middle of surface', function(){
 
@@ -6081,7 +6081,7 @@ describe("verb.geom.ConeSurface.point",function(){
 			, height = 5
 			, radius = 3;
 
-		var srf = new verb.geom.ConeSurface( axis, xaxis, base, height, radius );
+		var srf = new verb.geom.ConicalSurface( axis, xaxis, base, height, radius );
 
 		should.exist(srf);
 
@@ -6095,7 +6095,7 @@ describe("verb.geom.ConeSurface.point",function(){
 
 });
 
-describe("verb.geom.ConeSurface.derivatives",function(){
+describe("verb.geom.ConicalSurface.derivatives",function(){
 
 	it('gives expected result for middle of surface', function(){
 
@@ -6105,7 +6105,7 @@ describe("verb.geom.ConeSurface.derivatives",function(){
 			, height = 5
 			, radius = 3;
 
-		var srf = new verb.geom.ConeSurface( axis, xaxis, base, height, radius );
+		var srf = new verb.geom.ConicalSurface( axis, xaxis, base, height, radius );
 
 		should.exist(srf);
 
@@ -6130,7 +6130,7 @@ describe("verb.geom.ConeSurface.derivatives",function(){
 });
 
 
-describe("verb.geom.ConeSurface.tessellate",function(){
+describe("verb.geom.ConicalSurface.tessellate",function(){
 
 	it('gives mesh result', function(){
 
@@ -6140,7 +6140,7 @@ describe("verb.geom.ConeSurface.tessellate",function(){
 			, height = 5
 			, radius = 3;
 
-		var srf = new verb.geom.ConeSurface( axis, xaxis, base, height, radius );
+		var srf = new verb.geom.ConicalSurface( axis, xaxis, base, height, radius );
 
 		should.exist(srf);
 

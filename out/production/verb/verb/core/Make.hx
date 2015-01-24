@@ -1,8 +1,8 @@
 package verb.core;
 
 import verb.core.Mat.Vector;
-import verb.core.types.SurfaceData;
-import verb.core.types.CurveData;
+import verb.core.types.NurbsSurfaceData;
+import verb.core.types.NurbsCurveData;
 
 using verb.core.ArrayExtensions;
 
@@ -20,7 +20,7 @@ class Make {
     // **returns**
     // + SurfaceData object
 
-    public static function rationalBezierCurve( controlPoints : Array<Point>, weights : Array<Float> = null ) : CurveData {
+    public static function rationalBezierCurve( controlPoints : Array<Point>, weights : Array<Float> = null ) : NurbsCurveData {
 
         var degree = controlPoints.length - 1;
 
@@ -36,7 +36,7 @@ class Make {
             }
         }
 
-        return new CurveData( degree, knots, Eval.homogenize1d( controlPoints, weights ));
+        return new NurbsCurveData( degree, knots, Eval.homogenize1d( controlPoints, weights ));
     }
 
     // Generate the control points, weights, and knots of a surface defined by 4 points
@@ -50,7 +50,7 @@ class Make {
     // **returns**
     // + SurfaceData object
 
-   public static function fourPointSurface( p1 : Point, p2 : Point, p3 : Point, p4 : Point, degree : Int = 3 ) : SurfaceData {
+   public static function fourPointSurface( p1 : Point, p2 : Point, p3 : Point, p4 : Point, degree : Int = 3 ) : NurbsSurfaceData {
 
         var degreeFloat : Float = degree;
 
@@ -76,7 +76,7 @@ class Make {
        var zeros = Vec.rep(degree+1, 0.0);
        var ones = Vec.rep(degree+1, 1.0);
 
-       return new SurfaceData( degree, degree, zeros.concat(ones), zeros.concat(ones), pts );
+       return new NurbsSurfaceData( degree, degree, zeros.concat(ones), zeros.concat(ones), pts );
 
     }
 
@@ -89,7 +89,7 @@ class Make {
     // **returns**
     // + SurfaceData object
 
-    public static function sweep1_surface( profile : CurveData, rail : CurveData ) : SurfaceData {
+    public static function sweep1_surface( profile : NurbsCurveData, rail : NurbsCurveData ) : NurbsSurfaceData {
 
         // for each point on rail, move all of the points
         var rail_start = Eval.rationalCurvePoint( rail, 0.0 )
@@ -119,7 +119,7 @@ class Make {
             weights.push( row_weights );
         }
 
-        return new SurfaceData( rail.degree, profile.degree, rail.knots, profile.knots, Eval.homogenize2d( controlPoints, weights) );
+        return new NurbsSurfaceData( rail.degree, profile.degree, rail.knots, profile.knots, Eval.homogenize2d( controlPoints, weights) );
     }
 
     // Generate the control points, weights, and knots of an elliptical arc
@@ -134,7 +134,7 @@ class Make {
     // **returns**
     // + a CurveData object representing a NURBS curve
 
-    public static function ellipseArc( center : Point, xaxis : Point, yaxis : Point, startAngle : Float, endAngle : Float ) : CurveData {
+    public static function ellipseArc( center : Point, xaxis : Point, yaxis : Point, startAngle : Float, endAngle : Float ) : NurbsCurveData {
 
         var xradius = Vec.norm( xaxis );
         var yradius = Vec.norm( yaxis );
@@ -219,7 +219,7 @@ class Make {
                 knots[7] = knots[8] = 0.75;
         }
 
-        return new CurveData( 2, knots, Eval.homogenize1d( controlPoints, weights ));
+        return new NurbsCurveData( 2, knots, Eval.homogenize1d( controlPoints, weights ));
     }
 
 
@@ -238,7 +238,7 @@ class Make {
     // + a CurveData object representing a NURBS curve
 
     public static function arc( center : Point, xaxis : Vector, yaxis : Vector, radius : Float, startAngle : Float,
-                                endAngle : Float ) : CurveData {
+                                endAngle : Float ) : NurbsCurveData {
         return ellipseArc(  center, Vec.mul( radius, Vec.normalized( xaxis ) ), Vec.mul( radius, Vec.normalized( yaxis ) ), startAngle, endAngle );
     }
 
@@ -250,7 +250,7 @@ class Make {
     // **returns**
     // + a CurveData object representing a NURBS curve
 
-    public static function polyline( pts : Array<Point>) : CurveData {
+    public static function polyline( pts : Array<Point>) : NurbsCurveData {
 
         var knots = [0.0,0.0];
         var lsum = 0.0;
@@ -266,7 +266,7 @@ class Make {
 
         var weights = [ for (i in 0...pts.length) 1.0 ];
 
-        return new CurveData( 1, knots, Eval.homogenize1d(pts.slice(0), weights ));
+        return new NurbsCurveData( 1, knots, Eval.homogenize1d(pts.slice(0), weights ));
 
     }
 
@@ -280,7 +280,7 @@ class Make {
     // **returns**
     // + an object with the following properties: controlPoints, weights, knots, degree
 
-    public static function extrudedSurface( axis : Point, length : Float, profile : CurveData ) : SurfaceData {
+    public static function extrudedSurface( axis : Point, length : Float, profile : NurbsCurveData ) : NurbsSurfaceData {
 
         var controlPoints = [[],[],[]]
         , weights = [[],[],[]];
@@ -303,7 +303,7 @@ class Make {
             weights[2][j] = prof_weights[j];
         }
 
-        return new SurfaceData( 2, profile.degree, [0,0,0,1,1,1], profile.knots, Eval.homogenize2d( controlPoints, weights) );
+        return new NurbsSurfaceData( 2, profile.degree, [0,0,0,1,1,1], profile.knots, Eval.homogenize2d( controlPoints, weights) );
     }
 
     // Generate the control points, weights, and knots of a cylinder
@@ -318,7 +318,7 @@ class Make {
     // **returns**
     // + an object with the following properties: controlPoints, weights, knotsU, knotsV, degreeU, degreeV
 
-    public static function cylinderSurface( axis : Point, xaxis : Point, base : Point, height : Float, radius : Float ) : SurfaceData {
+    public static function CylindricalSurface( axis : Point, xaxis : Point, base : Point, height : Float, radius : Float ) : NurbsSurfaceData {
 
         var yaxis = Vec.cross( axis, xaxis )
         , angle = 2.0 * Math.PI
@@ -342,7 +342,7 @@ class Make {
     // **returns**
     // + an object with the following properties: controlPoints, weights, knots, degree
 
-    public static function revolvedSurface( profile : CurveData, center : Point, axis : Point, theta : Float ) : SurfaceData {
+    public static function revolvedSurface( profile : NurbsCurveData, center : Point, axis : Point, theta : Float ) : NurbsSurfaceData {
 
         var prof_controlPoints = Eval.dehomogenize1d( profile.controlPoints )
             , prof_weights = Eval.weight1d( profile.controlPoints );
@@ -460,7 +460,7 @@ class Make {
             }
         }
 
-        return new SurfaceData( 2, profile.degree, knotsU, profile.knots, Eval.homogenize2d( controlPoints, weights ) );
+        return new NurbsSurfaceData( 2, profile.degree, knotsU, profile.knots, Eval.homogenize2d( controlPoints, weights ) );
 
     }
 
@@ -477,7 +477,7 @@ class Make {
     // + an object with the following properties: controlPoints, weights, knotsU, knotsV, degreeU, degreeV
     //
 
-    public static function sphereSurface( center : Point, axis : Point, xaxis : Point, radius : Float ){
+    public static function SphericalSurface( center : Point, axis : Point, xaxis : Point, radius : Float ){
 
         var arc = arc(center, Vec.mul( -1.0, axis ), xaxis, radius, 0.0, Math.PI );
         return revolvedSurface( arc, center, axis, 2 * Math.PI );
@@ -497,21 +497,21 @@ class Make {
     // + an object with the following properties: controlPoints, weights, knots, degree
     //
 
-    public static function coneSurface( axis : Point, xaxis : Point, base : Point, height : Float, radius : Float ) : SurfaceData {
+    public static function ConicalSurface( axis : Point, xaxis : Point, base : Point, height : Float, radius : Float ) : NurbsSurfaceData {
 
         var angle = 2 * Math.PI
         , prof_degree = 1
         , prof_ctrl_pts = [ Vec.add( base, Vec.mul( height, axis ) ), Vec.add( base, Vec.mul( radius, xaxis ) )]
         , prof_knots = [0.0,0.0,1.0,1.0]
         , prof_weights = [1.0,1.0]
-        , prof = new CurveData( prof_degree, prof_knots, Eval.homogenize1d( prof_ctrl_pts, prof_weights ) );
+        , prof = new NurbsCurveData( prof_degree, prof_knots, Eval.homogenize1d( prof_ctrl_pts, prof_weights ) );
 
         return revolvedSurface(prof, base, axis, angle );
 
     }
 
     public static function rationalInterpCurve( points : Array<Point>, degree : Int = 3,
-                                                  start_tangent : Point = null, end_tangent : Point = null ) : CurveData {
+                                                  start_tangent : Point = null, end_tangent : Point = null ) : NurbsCurveData {
 
         // 0) build knot vector for curve by normalized chord length
         // 1) construct effective basis function in square matrix (W)
@@ -617,7 +617,7 @@ class Make {
         var controlPts = Mat.transpose(xs);
         var weights = Vec.rep(controlPts.length, 1.0);
 
-        return new CurveData( degree, knots, Eval.homogenize1d(controlPts, weights) );
+        return new NurbsCurveData( degree, knots, Eval.homogenize1d(controlPts, weights) );
 
     }
 }

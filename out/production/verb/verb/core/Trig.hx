@@ -1,6 +1,6 @@
 package verb.core;
 
-import verb.core.types.CurveData.Point;
+import verb.core.types.NurbsCurveData.Point;
 @:expose("core.Trig")
 class Trig {
 

@@ -2,9 +2,9 @@ package verb.core.types;
 
 using verb.core.ArrayExtensions;
 
-class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<SurfaceData> {
+class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
 
-    var _surface : SurfaceData;
+    var _surface : NurbsSurfaceData;
     var _boundingBox : BoundingBox = null;
     var _splitV : Bool;
     var _knotTolU : Float;
@@ -26,7 +26,7 @@ class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<SurfaceData> {
         _knotTolV = knotTolV;
     }
 
-    public function split() : Pair<IBoundingBoxTree<SurfaceData>, IBoundingBoxTree<SurfaceData>> {
+    public function split() : Pair<IBoundingBoxTree<NurbsSurfaceData>, IBoundingBoxTree<NurbsSurfaceData>> {
 
         var min : Float;
         var max : Float;
@@ -44,7 +44,7 @@ class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<SurfaceData> {
 
         var srfs = Modify.surfaceSplit(_surface, pivot, _splitV );
 
-        return new Pair<IBoundingBoxTree<SurfaceData>, IBoundingBoxTree<SurfaceData>>(
+        return new Pair<IBoundingBoxTree<NurbsSurfaceData>, IBoundingBoxTree<NurbsSurfaceData>>(
         new LazySurfaceBoundingBoxTree( srfs[0], !_splitV, _knotTolU, _knotTolV ),
         new LazySurfaceBoundingBoxTree( srfs[1], !_splitV, _knotTolU, _knotTolV ));
     }

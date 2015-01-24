@@ -4,8 +4,8 @@ import verb.core.Make;
 import verb.core.types.NurbsCurveData;
 import verb.core.Mat;
 
-@:expose("geom.SphereSurface")
-class SphereSurface extends NurbsSurface {
+@:expose("geom.SphericalSurface")
+class SphericalSurface extends NurbsSurface {
 
     private var _center : Point;
     private var _radius : Float;
@@ -23,7 +23,7 @@ class SphereSurface extends NurbsSurface {
 
     public function new(   center : Point,
                            radius : Float ) {
-        super( Make.sphereSurface( center, [0,0,1], [1,0,0], radius ));
+        super( Make.SphericalSurface( center, [0,0,1], [1,0,0], radius ));
 
         _center = center;
         _radius = radius;

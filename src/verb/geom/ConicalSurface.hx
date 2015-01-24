@@ -4,8 +4,8 @@ import verb.core.Make;
 import verb.core.Mat.Vector;
 import verb.core.types.NurbsCurveData.Point;
 
-@:expose("geom.ConeSurface")
-class ConeSurface extends NurbsSurface {
+@:expose("geom.ConicalSurface")
+class ConicalSurface extends NurbsSurface {
 
     public var _axis : Vector;
     public var _xaxis : Vector;
@@ -31,7 +31,7 @@ class ConeSurface extends NurbsSurface {
     // + Radius of the cone
 
     public function new(axis : Vector, xaxis : Vector, base : Point, height : Float, radius : Float )  {
-        super( Make.coneSurface(axis, xaxis, base, height, radius ));
+        super( Make.ConicalSurface(axis, xaxis, base, height, radius ));
 
         _axis = axis;
         _xaxis = xaxis;

@@ -1,9 +1,9 @@
 package verb.core;
 
 import verb.core.types.AdaptiveRefinementNode.AdaptiveRefinementOptions;
-import verb.core.types.SurfaceData;
+import verb.core.types.NurbsSurfaceData;
 import verb.core.types.MeshData.UV;
-import verb.core.types.CurveData;
+import verb.core.types.NurbsCurveData;
 
 using verb.core.ArrayExtensions;
 using Lambda;
@@ -12,7 +12,7 @@ using verb.core.Mat;
 @:expose("core.Analyze")
 class Analyze {
 
-    public static function isRationalSurfaceClosed(surface : SurfaceData, uDir : Bool = true ) : Bool {
+    public static function isRationalSurfaceClosed(surface : NurbsSurfaceData, uDir : Bool = true ) : Bool {
 
         var cpts = if (uDir) surface.controlPoints else surface.controlPoints.transpose();
 
@@ -24,12 +24,12 @@ class Analyze {
         return true;
     }
 
-    public static function rationalSurfaceClosestPoint( surface : SurfaceData, p : Point ) : Point {
+    public static function rationalSurfaceClosestPoint( surface : NurbsSurfaceData, p : Point ) : Point {
         var uv = Analyze.rationalSurfaceClosestParam( surface, p );
         return Eval.rationalSurfacePoint( surface, uv[0], uv[1] );
     }
 
-    public static function rationalSurfaceClosestParam( surface : SurfaceData, p : Point ) : UV {
+    public static function rationalSurfaceClosestParam( surface : NurbsSurfaceData, p : Point ) : UV {
 
         // for surfaces, we try to minimize the following:
         //
@@ -217,11 +217,11 @@ class Analyze {
 
     }
 
-    public static function rationalCurveClosestPoint( curve : CurveData, p : Point ) : Point {
+    public static function rationalCurveClosestPoint( curve : NurbsCurveData, p : Point ) : Point {
         return Eval.rationalCurvePoint( curve, rationalCurveClosestParam(curve, p));
     }
 
-    public static function rationalCurveClosestParam( curve : CurveData, p : Point ) : Float {
+    public static function rationalCurveClosestParam( curve : NurbsCurveData, p : Point ) : Float {
 
         //  We want to solve:
         //
@@ -352,10 +352,10 @@ class Analyze {
 
     }
 
-    public static function rationalCurveParamAtArcLength(curve : CurveData,
+    public static function rationalCurveParamAtArcLength(curve : NurbsCurveData,
                                                          len : Float,
                                                          tol : Float = 1e-3,
-                                                         beziers : Array<CurveData> = null,
+                                                         beziers : Array<NurbsCurveData> = null,
                                                          bezierLengths : Array<Float> = null) : Float {
 
         if (len < Constants.EPSILON) return curve.knots[0];
@@ -395,7 +395,7 @@ class Analyze {
     // **returns**
     // + the parameter
     //
-    public static function rationalBezierCurveParamAtArcLength(curve : CurveData,
+    public static function rationalBezierCurveParamAtArcLength(curve : NurbsCurveData,
                                                                len : Float,
                                                                tol : Float = null,
                                                                totalLength : Float = null) : Float {
@@ -442,7 +442,7 @@ class Analyze {
     // **returns**
     // + the approximate length
     //
-    public static function rationalCurveArcLength(curve : CurveData, u : Float = null, gaussDegIncrease : Int = 16){
+    public static function rationalCurveArcLength(curve : NurbsCurveData, u : Float = null, gaussDegIncrease : Int = 16){
         u = (u == null) ? curve.knots.last() : u;
 
         var crvs = Modify.decomposeCurveIntoBeziers( curve )
@@ -470,7 +470,7 @@ class Analyze {
     // **returns**
     // + the approximate length
     //
-    public static function rationalBezierCurveArcLength(curve : CurveData, u : Float = null, gaussDegIncrease : Int = 16) : Float {
+    public static function rationalBezierCurveArcLength(curve : NurbsCurveData, u : Float = null, gaussDegIncrease : Int = 16) : Float {
 
         var u = u == null ? curve.knots.last() : u
         , z = (u - curve.knots[0]) / 2

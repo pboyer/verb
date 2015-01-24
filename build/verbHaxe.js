@@ -2420,7 +2420,7 @@ verb.core.Make.extrudedSurface = function(axis,length,profile) {
 	}
 	return new verb.core.types.NurbsSurfaceData(2,profile.degree,[0,0,0,1,1,1],profile.knots,verb.core.Eval.homogenize2d(controlPoints,weights));
 };
-verb.core.Make.cylinderSurface = function(axis,xaxis,base,height,radius) {
+verb.core.Make.CylindricalSurface = function(axis,xaxis,base,height,radius) {
 	var yaxis = verb.core.Vec.cross(axis,xaxis);
 	var angle = 2.0 * Math.PI;
 	var circ = verb.core.Make.arc(base,xaxis,yaxis,radius,0.0,2 * Math.PI);
@@ -2517,11 +2517,11 @@ verb.core.Make.revolvedSurface = function(profile,center,axis,theta) {
 	}
 	return new verb.core.types.NurbsSurfaceData(2,profile.degree,knotsU,profile.knots,verb.core.Eval.homogenize2d(controlPoints1,weights1));
 };
-verb.core.Make.sphereSurface = function(center,axis,xaxis,radius) {
+verb.core.Make.SphericalSurface = function(center,axis,xaxis,radius) {
 	var arc = verb.core.Make.arc(center,verb.core.Vec.mul(-1.0,axis),xaxis,radius,0.0,Math.PI);
 	return verb.core.Make.revolvedSurface(arc,center,axis,2 * Math.PI);
 };
-verb.core.Make.coneSurface = function(axis,xaxis,base,height,radius) {
+verb.core.Make.ConicalSurface = function(axis,xaxis,base,height,radius) {
 	var angle = 2 * Math.PI;
 	var prof_degree = 1;
 	var prof_ctrl_pts = [verb.core.Vec.add(base,verb.core.Vec.mul(height,axis)),verb.core.Vec.add(base,verb.core.Vec.mul(radius,xaxis))];
@@ -4821,17 +4821,17 @@ verb.geom.NurbsSurface.prototype = $extend(verb.exe.AsyncObject.prototype,{
 		});
 	}
 });
-verb.geom.ConeSurface = $hx_exports.geom.ConeSurface = function(axis,xaxis,base,height,radius) {
-	verb.geom.NurbsSurface.call(this,verb.core.Make.coneSurface(axis,xaxis,base,height,radius));
+verb.geom.ConicalSurface = $hx_exports.geom.ConicalSurface = function(axis,xaxis,base,height,radius) {
+	verb.geom.NurbsSurface.call(this,verb.core.Make.ConicalSurface(axis,xaxis,base,height,radius));
 	this._axis = axis;
 	this._xaxis = xaxis;
 	this._base = base;
 	this._height = height;
 	this._radius = radius;
 };
-verb.geom.ConeSurface.__name__ = ["verb","geom","ConeSurface"];
-verb.geom.ConeSurface.__super__ = verb.geom.NurbsSurface;
-verb.geom.ConeSurface.prototype = $extend(verb.geom.NurbsSurface.prototype,{
+verb.geom.ConicalSurface.__name__ = ["verb","geom","ConicalSurface"];
+verb.geom.ConicalSurface.__super__ = verb.geom.NurbsSurface;
+verb.geom.ConicalSurface.prototype = $extend(verb.geom.NurbsSurface.prototype,{
 	axis: function() {
 		return this._axis;
 	}
@@ -4848,17 +4848,17 @@ verb.geom.ConeSurface.prototype = $extend(verb.geom.NurbsSurface.prototype,{
 		return this._radius;
 	}
 });
-verb.geom.CylinderSurface = $hx_exports.geom.CylinderSurface = function(axis,xaxis,base,height,radius) {
-	verb.geom.NurbsSurface.call(this,verb.core.Make.cylinderSurface(axis,xaxis,base,height,radius));
+verb.geom.CylindricalSurface = $hx_exports.geom.CylindricalSurface = function(axis,xaxis,base,height,radius) {
+	verb.geom.NurbsSurface.call(this,verb.core.Make.CylindricalSurface(axis,xaxis,base,height,radius));
 	this._axis = axis;
 	this._xaxis = xaxis;
 	this._base = base;
 	this._height = height;
 	this._radius = radius;
 };
-verb.geom.CylinderSurface.__name__ = ["verb","geom","CylinderSurface"];
-verb.geom.CylinderSurface.__super__ = verb.geom.NurbsSurface;
-verb.geom.CylinderSurface.prototype = $extend(verb.geom.NurbsSurface.prototype,{
+verb.geom.CylindricalSurface.__name__ = ["verb","geom","CylindricalSurface"];
+verb.geom.CylindricalSurface.__super__ = verb.geom.NurbsSurface;
+verb.geom.CylindricalSurface.prototype = $extend(verb.geom.NurbsSurface.prototype,{
 	axis: function() {
 		return this._axis;
 	}
@@ -4965,14 +4965,14 @@ verb.geom.RevolvedSurface.prototype = $extend(verb.geom.NurbsSurface.prototype,{
 		return this._angle;
 	}
 });
-verb.geom.SphereSurface = $hx_exports.geom.SphereSurface = function(center,radius) {
-	verb.geom.NurbsSurface.call(this,verb.core.Make.sphereSurface(center,[0,0,1],[1,0,0],radius));
+verb.geom.SphericalSurface = $hx_exports.geom.SphericalSurface = function(center,radius) {
+	verb.geom.NurbsSurface.call(this,verb.core.Make.SphericalSurface(center,[0,0,1],[1,0,0],radius));
 	this._center = center;
 	this._radius = radius;
 };
-verb.geom.SphereSurface.__name__ = ["verb","geom","SphereSurface"];
-verb.geom.SphereSurface.__super__ = verb.geom.NurbsSurface;
-verb.geom.SphereSurface.prototype = $extend(verb.geom.NurbsSurface.prototype,{
+verb.geom.SphericalSurface.__name__ = ["verb","geom","SphericalSurface"];
+verb.geom.SphericalSurface.__super__ = verb.geom.NurbsSurface;
+verb.geom.SphericalSurface.prototype = $extend(verb.geom.NurbsSurface.prototype,{
 	center: function() {
 		return this._center;
 	}
