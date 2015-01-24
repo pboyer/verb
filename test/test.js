@@ -2113,7 +2113,7 @@ describe("verb.core.Make.revolvedSurface",function(){
 			, prof_knots = [0,0,1,1]
 			, profile = new verb.core.CurveData( prof_degree, prof_knots, prof_ctrl_pts );
 
-		var comps = verb.core.Make.revolvedSurface(center, axis, angle, profile );
+		var comps = verb.core.Make.revolvedSurface(profile, center, axis, angle );
 
 		// the first row are the profile control pts
 		should.equal( 0, comps.controlPoints[0][0][0] );
@@ -2146,7 +2146,7 @@ describe("verb.core.Make.revolvedSurface",function(){
 			, prof_knots = [0,0,1,1]
 			, profile = new verb.core.CurveData( prof_degree, prof_knots, prof_ctrl_pts );
 
-		var comps = verb.core.Make.revolvedSurface(center, axis, angle, profile);
+		var comps = verb.core.Make.revolvedSurface( profile, center, axis, angle );
 
 		// the first row are the profile control pts
 		should.equal( 0, comps.controlPoints[0][0][0] );
@@ -2180,7 +2180,7 @@ describe("verb.core.Make.revolvedSurface",function(){
 			, prof_knots = [0,0,1,1]
 			, profile = new verb.core.CurveData( prof_degree, prof_knots, prof_ctrl_pts );
 
-		var comps = verb.core.Make.revolvedSurface(center, axis, angle, profile);
+		var comps = verb.core.Make.revolvedSurface( profile, center, axis, angle );
 
 		// the first row are the profile control pts
 		should.equal( 0, comps.controlPoints[0][0][0] );

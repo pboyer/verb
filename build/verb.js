@@ -1136,6 +1136,15 @@ verb.NurbsSurface.__name__ = ["verb","NurbsSurface"];
 verb.NurbsSurface.byControlPointsWeights = function(degreeU,degreeV,knotsU,knotsV,controlPoints,weights) {
 	return new verb.NurbsSurface(new verb.core.types.SurfaceData(degreeU,degreeV,knotsU,knotsV,verb.core.Eval.homogenize2d(controlPoints,weights)));
 };
+verb.NurbsSurface.byExtrusion = function(profile,direction) {
+	return new verb.NurbsSurface(verb.core.Make.extrudedSurface(verb.core.Vec.normalized(direction),verb.core.Vec.norm(direction),profile.data()));
+};
+verb.NurbsSurface.byFourPoints = function(point0,point1,point2,point3) {
+	return new verb.NurbsSurface(verb.core.Make.fourPointSurface(point0,point1,point2,point3));
+};
+verb.NurbsSurface.byRevolution = function(profile,center,axis,angle) {
+	return new verb.NurbsSurface(verb.core.Make.revolvedSurface(profile.data(),center,axis,angle));
+};
 verb.NurbsSurface.__super__ = verb.exe.AsyncObject;
 verb.NurbsSurface.prototype = $extend(verb.exe.AsyncObject.prototype,{
 	degreeU: function() {
@@ -2912,7 +2921,7 @@ verb.core.Make.cylinderSurface = function(axis,xaxis,base,height,radius) {
 	var circ = verb.core.Make.arc(base,xaxis,yaxis,radius,0.0,2 * Math.PI);
 	return verb.core.Make.extrudedSurface(axis,height,circ);
 };
-verb.core.Make.revolvedSurface = function(center,axis,theta,profile) {
+verb.core.Make.revolvedSurface = function(profile,center,axis,theta) {
 	var prof_controlPoints = verb.core.Eval.dehomogenize1d(profile.controlPoints);
 	var prof_weights = verb.core.Eval.weight1d(profile.controlPoints);
 	var narcs;
@@ -3005,7 +3014,7 @@ verb.core.Make.revolvedSurface = function(center,axis,theta,profile) {
 };
 verb.core.Make.sphereSurface = function(center,axis,xaxis,radius) {
 	var arc = verb.core.Make.arc(center,verb.core.Vec.mul(-1.0,axis),xaxis,radius,0.0,Math.PI);
-	return verb.core.Make.revolvedSurface(center,axis,2 * Math.PI,arc);
+	return verb.core.Make.revolvedSurface(arc,center,axis,2 * Math.PI);
 };
 verb.core.Make.coneSurface = function(axis,xaxis,base,height,radius) {
 	var angle = 2 * Math.PI;
@@ -3014,7 +3023,7 @@ verb.core.Make.coneSurface = function(axis,xaxis,base,height,radius) {
 	var prof_knots = [0.0,0.0,1.0,1.0];
 	var prof_weights = [1.0,1.0];
 	var prof = new verb.core.types.CurveData(prof_degree,prof_knots,verb.core.Eval.homogenize1d(prof_ctrl_pts,prof_weights));
-	return verb.core.Make.revolvedSurface(base,axis,angle,prof);
+	return verb.core.Make.revolvedSurface(prof,base,axis,angle);
 };
 verb.core.Make.rationalInterpCurve = function(points,degree,start_tangent,end_tangent) {
 	if(degree == null) degree = 3;

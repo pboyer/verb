@@ -34,7 +34,7 @@ class NurbsCurve extends AsyncObject {
         return new NurbsCurve( new CurveData( degree, knots.copy(), Eval.homogenize1d(controlPoints, weights) ) );
     }
 
-    function data() : CurveData {
+    public function data() : CurveData {
         return new CurveData( degree(), knots(), Eval.homogenize1d( controlPoints(), weights() ));
     }
 
@@ -273,5 +273,4 @@ class NurbsCurve extends AsyncObject {
                 return cs.map(function(x){ return new NurbsCurve(x); });
             });
     }
-
 }

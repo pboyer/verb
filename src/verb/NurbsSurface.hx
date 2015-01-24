@@ -1,5 +1,7 @@
 package verb;
 
+import verb.core.Vec;
+import verb.core.Make;
 import promhx.Promise;
 import verb.core.types.MeshData;
 import verb.core.types.AdaptiveRefinementNode.AdaptiveRefinementOptions;
@@ -25,8 +27,26 @@ class NurbsSurface extends AsyncObject {
         _data = data;
     }
 
-    public static function byControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights ) {
+    public static function byControlPointsWeights( degreeU : Int,
+                                                   degreeV : Int,
+                                                   knotsU : KnotArray,
+                                                   knotsV : KnotArray,
+                                                   controlPoints : Array<Array<Point>>,
+                                                   weights : Array<Array<Float>> ) : NurbsSurface {
         return new NurbsSurface( new SurfaceData( degreeU, degreeV, knotsU, knotsV, Eval.homogenize2d(controlPoints, weights) ) );
+    }
+
+    public static function byExtrusion( profile : NurbsCurve, direction : Vector ) : NurbsSurface {
+        return new NurbsSurface(
+            Make.extrudedSurface( Vec.normalized( direction ), Vec.norm( direction ), profile.data() ));
+    }
+
+    public static function byFourPoints( point0 : Point, point1 : Point, point2 : Point, point3 : Point ) : NurbsSurface {
+        return new NurbsSurface( Make.fourPointSurface( point0, point1, point2, point3 ) );
+    }
+
+    public static function byRevolution( profile : NurbsCurve, center : Point, axis : Point, angle : Float ) : NurbsSurface {
+        return new NurbsSurface( Make.revolvedSurface( profile.data(), center, axis, angle ) );
     }
 
     public function degreeU() : Int { return _data.degreeU; }
