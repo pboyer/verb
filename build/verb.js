@@ -4866,10 +4866,30 @@ verb.geom.NurbsSurface.prototype = $extend(verb.exe.AsyncObject.prototype,{
 });
 verb.geom.ConeSurface = $hx_exports.geom.ConeSurface = function(axis,xaxis,base,height,radius) {
 	verb.geom.NurbsSurface.call(this,verb.core.Make.coneSurface(axis,xaxis,base,height,radius));
+	this._axis = axis;
+	this._xaxis = xaxis;
+	this._base = base;
+	this._height = height;
+	this._radius = radius;
 };
 verb.geom.ConeSurface.__name__ = ["verb","geom","ConeSurface"];
 verb.geom.ConeSurface.__super__ = verb.geom.NurbsSurface;
 verb.geom.ConeSurface.prototype = $extend(verb.geom.NurbsSurface.prototype,{
+	axis: function() {
+		return this._axis;
+	}
+	,xaxis: function() {
+		return this._xaxis;
+	}
+	,base: function() {
+		return this._base;
+	}
+	,height: function() {
+		return this._height;
+	}
+	,radius: function() {
+		return this._radius;
+	}
 });
 verb.geom.CylinderSurface = $hx_exports.geom.CylinderSurface = function(axis,xaxis,base,height,radius) {
 	verb.geom.NurbsSurface.call(this,verb.core.Make.cylinderSurface(axis,xaxis,base,height,radius));
@@ -4990,6 +5010,8 @@ verb.geom.RevolvedSurface.prototype = $extend(verb.geom.NurbsSurface.prototype,{
 });
 verb.geom.SphereSurface = $hx_exports.geom.SphereSurface = function(center,radius) {
 	verb.geom.NurbsSurface.call(this,verb.core.Make.sphereSurface(center,[0,0,1],[1,0,0],radius));
+	this._center = center;
+	this._radius = radius;
 };
 verb.geom.SphereSurface.__name__ = ["verb","geom","SphereSurface"];
 verb.geom.SphereSurface.__super__ = verb.geom.NurbsSurface;

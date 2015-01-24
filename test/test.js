@@ -5751,6 +5751,9 @@ describe("verb.geom.SphereSurface.constructor",function(){
 
 		should.exist(srf);
 
+		srf.center().should.eql( center );
+		srf.radius().should.eql( radius );
+
 	});
 
 });
@@ -5850,6 +5853,12 @@ describe("verb.geom.CylinderSurface.constructor",function(){
 		var srf = new verb.geom.CylinderSurface( axis, xaxis, base, height, radius );
 
 		should.exist(srf);
+
+		srf.axis().should.eql( axis );
+		srf.xaxis().should.eql( xaxis );
+		srf.base().should.eql( base );
+		srf.height().should.eql( height );
+		srf.radius().should.eql( radius );
 
 	});
 
@@ -6051,6 +6060,12 @@ describe("verb.geom.ConeSurface.constructor",function(){
 		var srf = new verb.geom.ConeSurface( axis, xaxis, base, height, radius );
 
 		should.exist(srf);
+
+		srf.axis().should.eql( axis );
+		srf.xaxis().should.eql( xaxis );
+		srf.base().should.eql( base );
+		srf.height().should.eql( height );
+		srf.radius().should.eql( radius );
 
 	});
 

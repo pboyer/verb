@@ -3,19 +3,8 @@
   <component name="ChangeListManager">
     <list default="true" id="938890c0-f1ce-4fbd-8322-63610af7f5e6" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/geom/ConeSurface.hx" afterPath="$PROJECT_DIR$/src/verb/geom/ConeSurface.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/geom/CylinderSurface.hx" afterPath="$PROJECT_DIR$/src/verb/geom/CylinderSurface.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/geom/ExtrudedSurface.hx" afterPath="$PROJECT_DIR$/src/verb/geom/ExtrudedSurface.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/topo/Face.hx" afterPath="$PROJECT_DIR$/src/verb/topo/Face.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/topo/HalfEdge.hx" afterPath="$PROJECT_DIR$/src/verb/topo/HalfEdge.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/Init.hx" afterPath="$PROJECT_DIR$/src/verb/Init.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/geom/RevolvedSurface.hx" afterPath="$PROJECT_DIR$/src/verb/geom/RevolvedSurface.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/topo/Shell.hx" afterPath="$PROJECT_DIR$/src/verb/topo/Shell.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/topo/Solid.hx" afterPath="$PROJECT_DIR$/src/verb/topo/Solid.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/topo/Vertex.hx" afterPath="$PROJECT_DIR$/src/verb/topo/Vertex.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/topo/Wire.hx" afterPath="$PROJECT_DIR$/src/verb/topo/Wire.hx" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/geom/SphereSurface.hx" afterPath="$PROJECT_DIR$/src/verb/geom/SphereSurface.hx" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/test.js" afterPath="$PROJECT_DIR$/test/test.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/verb.js" afterPath="$PROJECT_DIR$/build/verb.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/verbHaxe.js" afterPath="$PROJECT_DIR$/build/verbHaxe.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="verb.iws" />
@@ -51,26 +40,6 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CylinderSurface.hx" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/verb/geom/CylinderSurface.hx">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="720">
-              <caret line="15" column="24" selection-start-line="15" selection-start-column="24" selection-end-line="15" selection-end-column="24" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Circle.hx" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/verb/geom/Circle.hx">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="450">
-              <caret line="24" column="0" selection-start-line="24" selection-start-column="0" selection-end-line="24" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="NurbsSurface.hx" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/verb/geom/NurbsSurface.hx">
           <provider selected="true" editor-type-id="text-editor">
@@ -94,18 +63,38 @@
       <file leaf-file-name="SphereSurface.hx" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/verb/geom/SphereSurface.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.5412371" vertical-offset="0" max-vertical-offset="776">
-              <caret line="28" column="0" selection-start-line="28" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.560567" vertical-offset="0" max-vertical-offset="776">
+              <caret line="29" column="5" selection-start-line="29" selection-start-column="5" selection-end-line="29" selection-end-column="5" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="BezierCurve.hx" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/verb/geom/BezierCurve.hx">
+      <file leaf-file-name="test.js" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/test/test.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="360">
-              <caret line="18" column="1" selection-start-line="18" selection-start-column="1" selection-end-line="18" selection-end-column="1" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="90609" max-vertical-offset="92520">
+              <caret line="6066" column="42" selection-start-line="6066" selection-start-column="42" selection-end-line="6066" selection-end-column="42" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="ConeSurface.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/geom/ConeSurface.hx">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="720">
+              <caret line="10" column="31" selection-start-line="10" selection-start-column="31" selection-end-line="10" selection-end-column="31" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="CylinderSurface.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/geom/CylinderSurface.hx">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="720">
+              <caret line="35" column="0" selection-start-line="35" selection-start-column="0" selection-end-line="39" selection-end-column="25" />
               <folding />
             </state>
           </provider>
@@ -186,9 +175,7 @@
         <option value="$PROJECT_DIR$/src/verb/geom/NurbsCurve.hx" />
         <option value="$PROJECT_DIR$/src/verb/geom/ISurface.hx" />
         <option value="$PROJECT_DIR$/src/verb/geom/ICurve.hx" />
-        <option value="$PROJECT_DIR$/src/verb/geom/SphereSurface.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/types/BoundingBox.hx" />
-        <option value="$PROJECT_DIR$/test/test.js" />
         <option value="$PROJECT_DIR$/src/verb/topo/Face.hx" />
         <option value="$PROJECT_DIR$/src/verb/topo/HalfEdge.hx" />
         <option value="$PROJECT_DIR$/src/verb/topo/Shell.hx" />
@@ -196,10 +183,12 @@
         <option value="$PROJECT_DIR$/src/verb/topo/Vertex.hx" />
         <option value="$PROJECT_DIR$/src/verb/topo/Wire.hx" />
         <option value="$PROJECT_DIR$/src/verb/Init.hx" />
-        <option value="$PROJECT_DIR$/src/verb/geom/ConeSurface.hx" />
         <option value="$PROJECT_DIR$/src/verb/geom/ExtrudedSurface.hx" />
         <option value="$PROJECT_DIR$/src/verb/geom/RevolvedSurface.hx" />
         <option value="$PROJECT_DIR$/src/verb/geom/CylinderSurface.hx" />
+        <option value="$PROJECT_DIR$/test/test.js" />
+        <option value="$PROJECT_DIR$/src/verb/geom/ConeSurface.hx" />
+        <option value="$PROJECT_DIR$/src/verb/geom/SphereSurface.hx" />
       </list>
     </option>
   </component>
@@ -937,14 +926,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/test.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="91519" max-vertical-offset="92295">
-          <caret line="6127" column="2" selection-start-line="6127" selection-start-column="0" selection-end-line="6127" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/verb/Init.hx">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="675">
@@ -973,22 +954,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="540">
           <caret line="8" column="0" selection-start-line="8" selection-start-column="0" selection-end-line="9" selection-end-column="36" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/geom/ConeSurface.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="420">
-          <caret line="22" column="0" selection-start-line="22" selection-start-column="0" selection-end-line="22" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/geom/CylinderSurface.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="720">
-          <caret line="15" column="24" selection-start-line="15" selection-start-column="24" selection-end-line="15" selection-end-column="24" />
           <folding />
         </state>
       </provider>
@@ -1057,10 +1022,34 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/test/test.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="90609" max-vertical-offset="92520">
+          <caret line="6066" column="42" selection-start-line="6066" selection-start-column="42" selection-end-line="6066" selection-end-column="42" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/geom/CylinderSurface.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="720">
+          <caret line="35" column="0" selection-start-line="35" selection-start-column="0" selection-end-line="39" selection-end-column="25" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/geom/ConeSurface.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="720">
+          <caret line="10" column="31" selection-start-line="10" selection-start-column="31" selection-end-line="10" selection-end-column="31" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/verb/geom/SphereSurface.hx">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.5412371" vertical-offset="0" max-vertical-offset="776">
-          <caret line="28" column="0" selection-start-line="28" selection-start-column="0" selection-end-line="28" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.560567" vertical-offset="0" max-vertical-offset="776">
+          <caret line="29" column="5" selection-start-line="29" selection-start-column="5" selection-end-line="29" selection-end-column="5" />
           <folding />
         </state>
       </provider>
