@@ -1,11 +1,11 @@
-package verb;
+package verb.geom;
 
 import verb.core.Eval;
 import verb.core.Make;
 import verb.core.Mat.Vector;
 import verb.core.types.CurveData.Point;
 
-@:expose("Arc")
+@:expose("geom.Arc")
 class Arc extends NurbsCurve {
 
     private var _center : Point;

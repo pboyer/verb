@@ -1,5 +1,6 @@
-package verb;
+package verb.geom;
 
+import verb.core.Make;
 import promhx.Promise;
 import verb.exe.AsyncObject;
 
@@ -18,14 +19,42 @@ import verb.core.Eval;
 import verb.core.types.Interval;
 import verb.core.types.CurveData;
 
-@:expose("NurbsCurve")
+@:expose("geom.NurbsCurve")
 class NurbsCurve extends AsyncObject {
 
+    // underlying serializable, data object
+
     private var _data : CurveData;
+
+    // public properties
+
+    public function degree() : Int { return _data.degree; }
+    public function knots() : KnotArray { return _data.knots.slice(0); }
+    public function controlPoints() : Array<Point> { return Eval.dehomogenize1d(_data.controlPoints); }
+    public function weights() : Array<Float> { return Eval.weight1d(_data.controlPoints); }
+
+    // Construct a NurbsCurve by a CurveData object
+    //
+    // **params**
+    // + The data object
+    //
+    // **returns**
+    // + A new NurbsCurve
 
     private function new( data : CurveData ) {
         this._data = data;
     }
+
+    // Construct a NurbsCurve by degree, knots, control points, weights
+    //
+    // **params**
+    // + The degree
+    // + The knot array
+    // + Array of control points
+    // + Array of weight values
+    //
+    // **returns**
+    // + A new NurbsCurve
 
     public static function byControlPointsWeights(  degree : Int,
                                                     knots : KnotArray,
@@ -34,14 +63,29 @@ class NurbsCurve extends AsyncObject {
         return new NurbsCurve( new CurveData( degree, knots.copy(), Eval.homogenize1d(controlPoints, weights) ) );
     }
 
+    // Construct a NurbsCurve by interpolating a collection of points.  The resultant curve
+    // will pass through all of the points.
+    //
+    // **params**
+    // + An array of points
+    // + Optional : The degree of resultant curve
+    //
+    // **returns**
+    // + A new NurbsCurve
+
+    public static function byPoints( points : Array<Point>, degree : Int = 3 ) : NurbsCurve {
+        return new NurbsCurve( Make.rationalInterpCurve(points, degree) );
+    }
+
+    // Obtain a copy of the underlying data structure for the Curve. Used with verb.core.
+    //
+    // **returns**
+    // + A new CurveData object
+
     public function data() : CurveData {
         return new CurveData( degree(), knots(), Eval.homogenize1d( controlPoints(), weights() ));
     }
 
-    public function degree() : Int { return _data.degree; }
-    public function knots() : KnotArray { return _data.knots.slice(0); }
-    public function controlPoints() : Array<Point> { return Eval.dehomogenize1d(_data.controlPoints); }
-    public function weights() : Array<Float> { return Eval.weight1d(_data.controlPoints); }
 
     // Obtain a copy of the curve
     //

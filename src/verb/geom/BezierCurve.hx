@@ -1,11 +1,11 @@
-package verb;
+package verb.geom;
 
 import verb.core.Eval;
 import verb.core.Make;
 import verb.core.Mat.Vector;
 import verb.core.types.CurveData.Point;
 
-@:expose("BezierCurve")
+@:expose("geom.BezierCurve")
 class BezierCurve extends NurbsCurve {
     private function new( points : Array<Point>, weights : Array<Float> = null ) {
         super( Make.rationalBezierCurve( points, weights ) );

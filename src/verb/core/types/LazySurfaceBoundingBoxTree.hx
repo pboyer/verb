@@ -1,5 +1,6 @@
 package verb.core.types;
 
+import verb.geom.BoundingBox;
 using verb.core.ArrayExtensions;
 
 class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<SurfaceData> {

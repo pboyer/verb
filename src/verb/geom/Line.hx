@@ -1,11 +1,11 @@
-package verb;
+package verb.geom;
 
 import verb.core.Eval;
 import verb.core.Make;
 import verb.core.Mat.Vector;
 import verb.core.types.CurveData.Point;
 
-@:expose("Line")
+@:expose("geom.Line")
 class Line extends NurbsCurve {
 
     private var _start : Point;

@@ -1,9 +1,9 @@
-package verb;
+package verb.geom;
 
 import verb.core.types.CurveData.Point;
 using Lambda;
 
-@:expose("BoundingBox")
+@:expose("geom.BoundingBox")
 class BoundingBox {
 
     public static var TOLERANCE : Float = 1e-4;
@@ -32,7 +32,7 @@ class BoundingBox {
     // + This BoundingBox for chaining
 
     public function fromPoint( pt ){
-        return new verb.BoundingBox( [ pt ] );
+        return new BoundingBox( [ pt ] );
     }
 
     // Adds a point to the bounding box, expanding the bounding box if the point is outside of it.
@@ -100,7 +100,7 @@ class BoundingBox {
             return false;
         }
 
-        return this.intersects( new verb.BoundingBox([point]), tol );
+        return this.intersects( new BoundingBox([point]), tol );
     }
 
     // Determines if two intervals on the real number line intersect

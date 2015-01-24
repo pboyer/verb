@@ -1,10 +1,10 @@
-package verb;
+package verb.geom;
 
 import verb.core.Mat.Vector;
 import verb.core.types.CurveData.Point;
 import verb.core.Make;
 
-@:expose("Circle")
+@:expose("geom.Circle")
 class Circle extends Arc {
 
     private function new(   center : Point,

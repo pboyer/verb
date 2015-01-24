@@ -1,9 +1,9 @@
-package verb;
+package verb.geom;
 
 import verb.core.Mat.Vector;
 import verb.core.types.CurveData.Point;
 
-@:expose("Ellipse")
+@:expose("geom.Ellipse")
 class Ellipse extends EllipseArc {
 
     private function new(   center : Point,

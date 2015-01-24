@@ -1,17 +1,21 @@
 package verb;
 
-import verb.BoundingBox;
+import verb.geom.BoundingBox;
 
-import verb.NurbsCurve;
-import verb.Arc;
-import verb.Line;
-import verb.BezierCurve;
-import verb.Circle;
-import verb.Ellipse;
-import verb.EllipseArc;
+// curves
+import verb.geom.NurbsCurve;
+import verb.geom.Arc;
+import verb.geom.Line;
+import verb.geom.BezierCurve;
+import verb.geom.Circle;
+import verb.geom.Ellipse;
+import verb.geom.EllipseArc;
 
-import verb.NurbsSurface;
+// surfaces
+import verb.geom.NurbsSurface;
+import verb.geom.Sphere;
 
+// core
 import verb.core.Constants;
 import verb.core.Trig;
 import verb.core.Numeric;

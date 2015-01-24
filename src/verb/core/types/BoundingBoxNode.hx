@@ -1,5 +1,6 @@
 package verb.core.types;
 
+import verb.geom.BoundingBox;
 @:expose("core.BoundingBoxNode")
 class BoundingBoxNode {
     public var boundingBox : BoundingBox;

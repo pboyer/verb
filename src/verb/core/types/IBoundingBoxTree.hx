@@ -1,5 +1,6 @@
 package verb.core.types;
 
+import verb.geom.BoundingBox;
 interface IBoundingBoxTree<T> {
     public function boundingBox() : BoundingBox;
     public function split() : Pair<IBoundingBoxTree<T>, IBoundingBoxTree<T>>;
