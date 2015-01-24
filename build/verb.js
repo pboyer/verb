@@ -4507,7 +4507,7 @@ verb.exe.AsyncObject = function() { };
 verb.exe.AsyncObject.__name__ = ["verb","exe","AsyncObject"];
 verb.exe.AsyncObject.prototype = {
 	defer: function(classType,methodName,args) {
-		return verb.exe.Dispatcher.dispatchMethod(Type.getClassName(classType),methodName,args);
+		return verb.exe.Dispatcher.dispatchMethod(classType,methodName,args);
 	}
 };
 verb.exe.Dispatcher = function() { };
@@ -4517,13 +4517,13 @@ verb.exe.Dispatcher.init = function() {
 	verb.exe.Dispatcher._workerPool = new verb.exe.WorkerPool(verb.exe.Dispatcher.THREADS);
 	verb.exe.Dispatcher._init = true;
 };
-verb.exe.Dispatcher.dispatchMethod = function(className,methodName,args) {
+verb.exe.Dispatcher.dispatchMethod = function(classType,methodName,args) {
 	verb.exe.Dispatcher.init();
 	var def = new promhx.Deferred();
 	var callback = function(x) {
 		def.resolve(x);
 	};
-	verb.exe.Dispatcher._workerPool.addWork(className,methodName,args,callback);
+	verb.exe.Dispatcher._workerPool.addWork(Type.getClassName(classType),methodName,args,callback);
 	return new promhx.Promise(def);
 };
 verb.exe.Work = function(className,methodName,args) {
@@ -4608,7 +4608,7 @@ verb.geom.NurbsCurve.prototype = $extend(verb.exe.AsyncObject.prototype,{
 	,weights: function() {
 		return verb.core.Eval.weight1d(this._data.controlPoints);
 	}
-	,data: function() {
+	,asNurbs: function() {
 		return new verb.core.types.NurbsCurveData(this.degree(),this.knots(),verb.core.Eval.homogenize1d(this.controlPoints(),this.weights()));
 	}
 	,clone: function() {
@@ -4784,11 +4784,11 @@ verb.geom.NurbsSurface.prototype = $extend(verb.exe.AsyncObject.prototype,{
 	,weights: function() {
 		return verb.core.Eval.weight2d(this._data.controlPoints);
 	}
-	,data: function() {
+	,asNurbs: function() {
 		return new verb.core.types.NurbsSurfaceData(this.degreeU(),this.degreeV(),this.knotsU(),this.knotsV(),verb.core.Eval.homogenize2d(this.controlPoints(),this.weights()));
 	}
 	,clone: function() {
-		return new verb.geom.NurbsSurface(this.data());
+		return new verb.geom.NurbsSurface(this.asNurbs());
 	}
 	,domainU: function() {
 		return new verb.core.types.Interval(this._data.knotsU[0],verb.core.ArrayExtensions.last(this._data.knotsU));
@@ -4946,7 +4946,7 @@ verb.geom.Ellipse.__super__ = verb.geom.EllipseArc;
 verb.geom.Ellipse.prototype = $extend(verb.geom.EllipseArc.prototype,{
 });
 verb.geom.ExtrudedSurface = $hx_exports.geom.ExtrudedSurface = function(profile,direction) {
-	verb.geom.NurbsSurface.call(this,verb.core.Make.extrudedSurface(verb.core.Vec.normalized(direction),verb.core.Vec.norm(direction),profile.data()));
+	verb.geom.NurbsSurface.call(this,verb.core.Make.extrudedSurface(verb.core.Vec.normalized(direction),verb.core.Vec.norm(direction),profile.asNurbs()));
 	this._profile = profile;
 	this._direction = direction;
 };
@@ -4964,29 +4964,29 @@ verb.geom.Intersect = $hx_exports.geom.Intersect = function() { };
 verb.geom.Intersect.__name__ = ["verb","geom","Intersect"];
 verb.geom.Intersect.curves = function(first,second,tol) {
 	if(tol == null) tol = 1e-3;
-	return verb.core.Intersect.curves(first.data(),second.data(),tol);
+	return verb.core.Intersect.curves(first.asNurbs(),second.asNurbs(),tol);
 };
 verb.geom.Intersect.curvesAsync = function(first,second,tol) {
 	if(tol == null) tol = 1e-3;
-	return verb.exe.Dispatcher.dispatchMethod("verb.core.Intersect","curves",[first.data(),second.data(),tol]);
+	return verb.exe.Dispatcher.dispatchMethod(verb.geom.Intersect,"curves",[first.asNurbs(),second.asNurbs(),tol]);
 };
 verb.geom.Intersect.curveAndSurface = function(curve,surface,tol) {
 	if(tol == null) tol = 1e-3;
-	return verb.core.Intersect.curveAndSurface(curve.data(),surface.data(),tol);
+	return verb.core.Intersect.curveAndSurface(curve.asNurbs(),surface.asNurbs(),tol);
 };
 verb.geom.Intersect.curveAndSurfaceAsync = function(curve,surface,tol) {
 	if(tol == null) tol = 1e-3;
-	return verb.exe.Dispatcher.dispatchMethod("verb.core.Intersect","curveAndSurface",[curve.data(),surface.data(),tol]);
+	return verb.exe.Dispatcher.dispatchMethod(verb.geom.Intersect,"curveAndSurface",[curve.asNurbs(),surface.asNurbs(),tol]);
 };
 verb.geom.Intersect.surfaces = function(first,second,tol) {
 	if(tol == null) tol = 1e-3;
-	return verb.core.Intersect.surfaces(first.data(),second.data(),tol).map(function(cd) {
+	return verb.core.Intersect.surfaces(first.asNurbs(),second.asNurbs(),tol).map(function(cd) {
 		return new verb.geom.NurbsCurve(cd);
 	});
 };
 verb.geom.Intersect.surfacesAsync = function(first,second,tol) {
 	if(tol == null) tol = 1e-3;
-	return verb.exe.Dispatcher.dispatchMethod("verb.core.Intersect","surfaces",[first.data(),second.data(),tol]).then(function(cds) {
+	return verb.exe.Dispatcher.dispatchMethod(verb.geom.Intersect,"surfaces",[first.asNurbs(),second.asNurbs(),tol]).then(function(cds) {
 		return cds.map(function(cd) {
 			return new verb.geom.NurbsCurve(cd);
 		});
@@ -5008,7 +5008,7 @@ verb.geom.Line.prototype = $extend(verb.geom.NurbsCurve.prototype,{
 	}
 });
 verb.geom.RevolvedSurface = $hx_exports.geom.RevolvedSurface = function(profile,center,axis,angle) {
-	verb.geom.NurbsSurface.call(this,verb.core.Make.revolvedSurface(profile.data(),center,axis,angle));
+	verb.geom.NurbsSurface.call(this,verb.core.Make.revolvedSurface(profile.asNurbs(),center,axis,angle));
 	this._profile = profile;
 	this._center = center;
 	this._axis = axis;

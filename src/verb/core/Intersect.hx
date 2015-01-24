@@ -32,11 +32,11 @@ class Intersect {
     // Intersect two NURBS surfaces, yielding a list of curves
     //
     // **params**
-    // + SurfaceData for the first surface
-    // + SurfaceData for the second
+    // + NurbsSurfaceData for the first surface
+    // + NurbsSurfaceData for the second
     //
     // **returns**
-    // + array of CurveData objects
+    // + array of NurbsCurveData objects
 
     public static function surfaces( surface0 : NurbsSurfaceData, surface1 : NurbsSurfaceData, tol : Float) : Array<NurbsCurveData> {
 
@@ -63,8 +63,8 @@ class Intersect {
     // Refine a pair of surface points to a point where the two surfaces intersect
     //
     // **params**
-    // + SurfaceData for the first surface
-    // + SurfaceData for the second
+    // + NurbsSurfaceData for the first surface
+    // + NurbsSurfaceData for the second
     // + the UV for the point on the first surface
     // + the UV for the point on the second surface
     // + a tolerance value to terminate the refinement procedure
@@ -336,8 +336,8 @@ class Intersect {
     // Get the intersection of a NURBS curve and a NURBS surface without an estimate
     //
     // **params**
-    // + CurveData
-    // + SurfaceData
+    // + NurbsCurveData
+    // + NurbsSurfaceData
     // + tolerance for the curve intersection
     //
     // **returns**
@@ -380,8 +380,8 @@ class Intersect {
     // so the caller is responsible for providing a very good initial guess.
     //
     // **params**
-    // + CurveData
-    // + SurfaceData
+    // + NurbsCurveData
+    // + NurbsSurfaceData
     // + array of initial parameter values [ u_crv, u_srf, v_srf ]
     //
     // **returns**
@@ -480,8 +480,8 @@ class Intersect {
     // Approximate the intersection of two NURBS curves
     //
     // **params**
-    // + CurveData object representing the first NURBS curve
-    // + CurveData object representing the second NURBS curve
+    // + NurbsCurveData object representing the first NURBS curve
+    // + NurbsCurveData object representing the second NURBS curve
     // + tolerance for the intersection
     //
     // **returns**
@@ -502,8 +502,8 @@ class Intersect {
     // so the caller is responsible for providing a very good initial guess.
     //
     // **params**
-    // + CurveData object representing the first NURBS curve
-    // + CurveData object representing the second NURBS curve
+    // + NurbsCurveData object representing the first NURBS curve
+    // + NurbsCurveData object representing the second NURBS curve
     // + guess for first parameter
     // + guess for second parameter
     // + tolerance for the intersection

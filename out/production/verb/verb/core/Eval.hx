@@ -105,7 +105,7 @@ class Eval {
 	// Compute the tangent at a point on a NURBS curve
 	//
 	// **params**
-	// + CurveData object representing the curve
+	// + NurbsCurveData object representing the curve
 	// + u parameter
 	// + v parameter
 	//
@@ -120,7 +120,7 @@ class Eval {
 	// Compute the derivatives at a point on a NURBS surface
 	//
 	// **params**
-	// + SurfaceData object representing the surface
+	// + NurbsSurfaceData object representing the surface
 	// + u parameter
 	// + v parameter
 	//
@@ -135,7 +135,7 @@ class Eval {
 	// Compute the derivatives at a point on a NURBS surface
 	//
 	// **params**
-	// + SurfaceData object representing the surface
+	// + NurbsSurfaceData object representing the surface
 	// + number of derivatives to evaluate
 	// + u parameter at which to evaluate the derivatives
 	// + v parameter at which to evaluate the derivatives
@@ -209,7 +209,7 @@ class Eval {
 	// Determine the derivatives of a NURBS curve at a given parameter
 	//
 	// **params**
-	// + CurveData object representing the curve - the control points are in homogeneous coordinates
+	// + NurbsCurveData object representing the curve - the control points are in homogeneous coordinates
 	// + parameter on the curve at which the point is to be evaluated
 	// + number of derivatives to evaluate
 	//
@@ -438,7 +438,7 @@ class Eval {
 	// Compute the derivatives on a non-uniform, non-rational B spline surface
 	//
 	// **params**
-	// + SurfaceData object representing the surface
+	// + NurbsSurfaceData object representing the surface
 	// + number of derivatives to evaluate
 	// + u parameter at which to evaluate the derivatives
 	// + v parameter at which to evaluate the derivatives
@@ -463,7 +463,7 @@ class Eval {
 	// **params**
 	// + integer number of basis functions in u dir - 1 = knotsU.length - degreeU - 2
 	// + integer number of basis functions in v dir - 1 = knotsU.length - degreeU - 2
-	// + SurfaceData object representing the surface
+	// + NurbsSurfaceData object representing the surface
 	// + u parameter at which to evaluate the derivatives
 	// + v parameter at which to evaluate the derivatives
 	//
@@ -530,7 +530,7 @@ class Eval {
 	// Compute a point on a non-uniform, non-rational B-spline surface
 	//
 	// **params**
-	// + SurfaceData object representing the surface
+	// + NurbsSurfaceData object representing the surface
 	// + u parameter at which to evaluate the surface point
 	// + v parameter at which to evaluate the surface point
 	//
@@ -554,7 +554,7 @@ class Eval {
 	// **params**
 	// + integer number of basis functions in u dir - 1 = knotsU.length - degreeU - 2
 	// + integer number of basis functions in v dir - 1 = knotsV.length - degreeV - 2
-	// + SurfaceData object representing the surface
+	// + NurbsSurfaceData object representing the surface
 	// + u parameter at which to evaluate the surface point
 	// + v parameter at which to evaluate the surface point
 	//
@@ -608,7 +608,7 @@ class Eval {
 	// Determine the derivatives of a non-uniform, non-rational B-spline curve at a given parameter
 	//
 	// **params**
-	// + CurveData object representing the curve
+	// + NurbsCurveData object representing the curve
 	// + parameter on the curve at which the point is to be evaluated
 	// + number of derivatives to evaluate
 	//
@@ -629,7 +629,7 @@ class Eval {
 	//
 	// **params**
 	// + integer number of basis functions - 1 = knots.length - degree - 2
-	// + CurveData object representing the curve
+	// + NurbsCurveData object representing the curve
 	// + parameter on the curve at which the point is to be evaluated
 	//
 	// **returns**
@@ -666,7 +666,7 @@ class Eval {
 	// Compute a point on a non-uniform, non-rational b-spline curve
 	//
 	// **params**
-	// + CurveData object representing the curve
+	// + NurbsCurveData object representing the curve
 	// + parameter on the curve at which the point is to be evaluated
 	//
 	// **returns**
@@ -701,7 +701,7 @@ class Eval {
 	//
 	// **params**
 	// + integer number of basis functions - 1 = knots.length - degree - 2
-	// + CurveData object representing the curve
+	// + NurbsCurveData object representing the curve
 	// + parameter on the curve at which the point is to be evaluated
 	//
 	// **returns**

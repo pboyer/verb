@@ -80,9 +80,9 @@ class NurbsCurve extends AsyncObject implements ICurve {
     // Obtain a copy of the underlying data structure for the Curve. Used with verb.core.
     //
     // **returns**
-    // + A new CurveData object
+    // + A new NurbsCurveData object
 
-    public function data() : NurbsCurveData {
+    public function asNurbs() : NurbsCurveData {
         return new NurbsCurveData( degree(), knots(), Eval.homogenize1d( controlPoints(), weights() ));
     }
 

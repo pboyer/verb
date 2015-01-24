@@ -387,7 +387,7 @@ class Analyze {
     // Get the curve parameter at an arc length
     //
     // **params**
-    // + CurveData object representing the curve
+    // + NurbsCurveData object representing the curve
     // + the arc length to find the parameter
     // + the tolerance - increasing the tolerance can make this computation quite expensive
     // + the total length of the curve, if already computed
@@ -435,7 +435,7 @@ class Analyze {
     // Approximate the length of a rational curve by gaussian quadrature - assumes a smooth curve
     //
     // **params**
-    // + CurveData object representing the curve
+    // + NurbsCurveData object representing the curve
     // + the parameter at which to approximate the length
     // + the degree of gaussian quadrature to perform - a higher number yields a more exact result
     //
@@ -463,7 +463,7 @@ class Analyze {
     // Approximate the length of a rational bezier curve by gaussian quadrature - assumes a smooth curve
     //
     // **params**
-    // + CurveData object representing the curve
+    // + NurbsCurveData object representing the curve
     // + the parameter at which to approximate the length
     // + the degree of gaussian quadrature to perform - a higher number yields a more exact result
     //

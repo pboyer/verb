@@ -37,7 +37,7 @@ class Dispatcher {
 
     }
 
-    public static function dispatchMethod<T>( className : String, methodName : String, args : Array<Dynamic> ) : Promise<T> {
+    public static function dispatchMethod<T>( classType : Class<Dynamic>, methodName : String, args : Array<Dynamic> ) : Promise<T> {
 
         init();
 
@@ -50,12 +50,11 @@ class Dispatcher {
         #if js
 
             // use WorkerPool
-            _workerPool.addWork( className, methodName, args, callback );
+            _workerPool.addWork( Type.getClassName( classType ), methodName, args, callback );
 
         #else
             // TODO: neko || cpp use ThreadPool
-            var type = Type.resolveClass(className );
-            var result = Reflect.callMethod(type, Reflect.field(type, methodName), args );
+            var result = Reflect.callMethod(classType, Reflect.field(classType, methodName), args );
             callback( result );
         #end
 

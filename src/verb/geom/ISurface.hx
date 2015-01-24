@@ -7,7 +7,7 @@ import verb.core.Mat;
 
 interface ISurface {
 
-    function data() : NurbsSurfaceData;
+    function asNurbs() : NurbsSurfaceData;
     function domainU() : Interval<Float>;
     function domainV() : Interval<Float>;
     function point(u : Float, v : Float) : Point;

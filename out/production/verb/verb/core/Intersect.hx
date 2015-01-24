@@ -29,16 +29,15 @@ using verb.core.ArrayExtensions;
 @:expose("core.Intersect")
 class Intersect {
 
-    //
     // Intersect two NURBS surfaces, yielding a list of curves
     //
     // **params**
-    // + SurfaceData for the first surface
-    // + SurfaceData for the second
+    // + NurbsSurfaceData for the first surface
+    // + NurbsSurfaceData for the second
     //
     // **returns**
-    // + array of CurveData objects
-    //
+    // + array of NurbsCurveData objects
+
     public static function surfaces( surface0 : NurbsSurfaceData, surface1 : NurbsSurfaceData, tol : Float) : Array<NurbsCurveData> {
 
         // 1) tessellate the two surfaces
@@ -50,7 +49,7 @@ class Intersect {
         // 2) refine the intersection points so that they lie on both surfaces
         var exactPls = resApprox.map(function(pl){
             return pl.map( function(inter : MeshIntersectionPoint){
-                return Intersect.surfaces_at_point_with_estimate( surface0, surface1, inter.uv0, inter.uv1, tol );
+                return Intersect.surfacesAtPointWithEstimate( surface0, surface1, inter.uv0, inter.uv1, tol );
             });
         });
 
@@ -60,20 +59,20 @@ class Intersect {
         });
     }
 
-    //
+
     // Refine a pair of surface points to a point where the two surfaces intersect
     //
     // **params**
-    // + SurfaceData for the first surface
-    // + SurfaceData for the second
+    // + NurbsSurfaceData for the first surface
+    // + NurbsSurfaceData for the second
     // + the UV for the point on the first surface
     // + the UV for the point on the second surface
     // + a tolerance value to terminate the refinement procedure
     //
     // **returns**
     // + a SurfaceSurfaceIntersectionPoint object
-    //
-    public static function surfaces_at_point_with_estimate(surface0 : NurbsSurfaceData,
+
+    public static function surfacesAtPointWithEstimate(surface0 : NurbsSurfaceData,
                                                            surface1 : NurbsSurfaceData,
                                                            uv1 : UV,
                                                            uv2 : UV,
@@ -144,7 +143,6 @@ class Intersect {
         return new SurfaceSurfaceIntersectionPoint(uv1, uv2, p, dist);
     }
 
-    //
     // Intersect two meshes, yielding a list of polylines
     //
     // **params**
@@ -153,7 +151,6 @@ class Intersect {
     //
     // **returns**
     // + array of array of MeshIntersectionPoints
-    //
 
     public static function meshes( mesh0 : MeshData, mesh1 : MeshData ) : Array<Array<MeshIntersectionPoint>> {
 
@@ -201,7 +198,6 @@ class Intersect {
 
     }
 
-    //
     // Given a list of unstructured mesh intersection segments, reconstruct into polylines
     //
     // **params**
@@ -209,7 +205,6 @@ class Intersect {
     //
     // **returns**
     // + array of array of MeshIntersectionPoint
-    //
 
     public static function makeMeshIntersectionPolylines( segments : Array<Interval<MeshIntersectionPoint>> ) : Array<Array<MeshIntersectionPoint>> {
 
@@ -291,7 +286,6 @@ class Intersect {
         return pls;
     }
 
-    //
     // Form a KD-tree from a collection of mesh intersection segments
     //
     // **params**
@@ -299,7 +293,6 @@ class Intersect {
     //
     // **returns**
     // + array of array of MeshIntersectionPoint
-    //
 
     private static function kdTreeFromSegments( segments: Array<Interval<MeshIntersectionPoint>> ) : KdTree<MeshIntersectionPoint> {
 
@@ -315,7 +308,6 @@ class Intersect {
         return new KdTree(treePoints, Vec.distSquared);
     }
 
-    //
     // Given a segment end
     //
     // **params**
@@ -341,17 +333,15 @@ class Intersect {
 
     }
 
-    //
     // Get the intersection of a NURBS curve and a NURBS surface without an estimate
     //
     // **params**
-    // + CurveData
-    // + SurfaceData
+    // + NurbsCurveData
+    // + NurbsSurfaceData
     // + tolerance for the curve intersection
     //
     // **returns**
     // + array of CurveSurfaceIntersection objects
-    //
 
     public static function curveAndSurface( curve : NurbsCurveData,
                                               surface : NurbsSurfaceData,
@@ -386,18 +376,16 @@ class Intersect {
         });
     }
 
-    //
     // Refine an intersection pair for a surface and curve given an initial guess.  This is an unconstrained minimization,
     // so the caller is responsible for providing a very good initial guess.
     //
     // **params**
-    // + CurveData
-    // + SurfaceData
+    // + NurbsCurveData
+    // + NurbsSurfaceData
     // + array of initial parameter values [ u_crv, u_srf, v_srf ]
     //
     // **returns**
     // + a CurveSurfaceIntersection object
-    //
 
     public static function curveAndSurfaceWithEstimate(    curve : NurbsCurveData,
                                                                surface : NurbsSurfaceData,
@@ -418,7 +406,6 @@ class Intersect {
         return new CurveSurfaceIntersection( final[0], [ final[1], final[2] ] );
     }
 
-    //
     // Approximate the intersection of a polyline and mesh while maintaining parameter information
     //
     // **params**
@@ -427,7 +414,6 @@ class Intersect {
     //
     // **returns**
     // + an array of PolylineMeshIntersection object
-    //
 
     public static function polyline_and_mesh( polyline : PolylineData,
                                               mesh : MeshData,
@@ -462,7 +448,6 @@ class Intersect {
         return Intersect.bounding_box_trees(new LazyMeshBoundingBoxTree(a), new LazyMeshBoundingBoxTree(b), tol );
     }
 
-    //
     // The core algorithm for bounding box tree intersection, supporting both lazy and pre-computed bounding box trees
     // via the IBoundingBoxTree interface
     //
@@ -473,7 +458,7 @@ class Intersect {
     //
     // **returns**
     // + an array of Pair objects extracted from the yield method of IBoundingBoxTree
-    //
+
     public static function bounding_box_trees<T1, T2>( a : IBoundingBoxTree<T1>, b : IBoundingBoxTree<T2>, tol : Float = 1e-9 )
         : Array<Pair<T1,T2>> {
 
@@ -492,17 +477,15 @@ class Intersect {
             .concat( Intersect.bounding_box_trees( asplit.item1, bsplit.item1, tol  ) );
     }
 
-    //
     // Approximate the intersection of two NURBS curves
     //
     // **params**
-    // + CurveData object representing the first NURBS curve
-    // + CurveData object representing the second NURBS curve
+    // + NurbsCurveData object representing the first NURBS curve
+    // + NurbsCurveData object representing the second NURBS curve
     // + tolerance for the intersection
     //
     // **returns**
     // + the intersections
-    //
 
     public static function curves( curve1 : NurbsCurveData, curve2 : NurbsCurveData, tolerance : Float ) : Array<CurveCurveIntersection> {
 
@@ -515,20 +498,18 @@ class Intersect {
         });
     }
 
-    //
     // Refine an intersection pair for two curves given an initial guess.  This is an unconstrained minimization,
     // so the caller is responsible for providing a very good initial guess.
     //
     // **params**
-    // + CurveData object representing the first NURBS curve
-    // + CurveData object representing the second NURBS curve
+    // + NurbsCurveData object representing the first NURBS curve
+    // + NurbsCurveData object representing the second NURBS curve
     // + guess for first parameter
     // + guess for second parameter
     // + tolerance for the intersection
     //
     // **returns**
     // + array of CurveCurveIntersection objects
-    //
 
     private static function curves_with_estimate( curve0 : NurbsCurveData,
                                                   curve1 : NurbsCurveData,
@@ -555,7 +536,6 @@ class Intersect {
         return new CurveCurveIntersection(p1, p2, u1, u2);
     }
 
-    //
     // Intersect two triangles
     //
     // **params**
@@ -566,7 +546,6 @@ class Intersect {
     //
     // **returns**
     // + a point represented by an array of length (dim)
-    //
 
     public static function triangles( mesh0 : MeshData, faceIndex0 : Int, mesh1 : MeshData, faceIndex1 : Int ) : Interval<MeshIntersectionPoint>{
 
@@ -688,7 +667,6 @@ class Intersect {
         return res;
     }
 
-    //
     // Intersect two planes, yielding a Ray
     //
     // **params**
@@ -699,7 +677,6 @@ class Intersect {
     //
     // **returns**
     // + a point represented by an array of length (dim)
-    //
 
     public static function planes(origin0 : Point, normal0 : Vector, origin1 : Point, normal1: Vector) : Ray {
 
@@ -764,7 +741,6 @@ class Intersect {
 
     }
 
-    //
     // Intersect three planes, expects the planes to form a single point of
     // intersection
     //
@@ -778,7 +754,7 @@ class Intersect {
     //
     // **returns**
     // + the point representing the intersection
-    //
+
     public static function threePlanes(n0 : Point, d0 : Float, n1 : Point, d1 : Float, n2 : Point, d2 : Float) : Point {
 
         var u = Vec.cross( n1, n2 );
@@ -793,7 +769,6 @@ class Intersect {
 
     }
 
-    //
     // Intersect two polyline curves, keeping track of parameterization on each
     //
     // **params**
@@ -803,7 +778,6 @@ class Intersect {
     //
     // **returns**
     // + array of parameter pairs representing the intersection of the two parameteric polylines
-    //
 
     public static function polylines( polyline0 : PolylineData, polyline1 : PolylineData, tol : Float )
         : Array<CurveCurveIntersection> {
@@ -833,7 +807,6 @@ class Intersect {
         return finalResults;
     }
 
-    //
     // Find the closest parameter on two rays, see http://geomalgorithms.com/a07-_distance.html
     //
     // **params**
@@ -845,7 +818,6 @@ class Intersect {
     //
     // **returns**
     // + a CurveCurveIntersection object
-    //
 
     public static function segments( a0 : Point, a1 : Point, b0 : Point, b1 : Point, tol : Float ) : CurveCurveIntersection {
 
@@ -873,7 +845,6 @@ class Intersect {
         return null;
     }
 
-    //
     // Find the closest parameter on two rays, see http://geomalgorithms.com/a07-_distance.html
     //
     // **params**
@@ -884,7 +855,6 @@ class Intersect {
     //
     // **returns**
     // + a CurveCurveIntersection object
-    //
 
     public static function rays( a0 : Point, a : Point, b0 : Point, b : Point ) : CurveCurveIntersection {
 
@@ -912,8 +882,6 @@ class Intersect {
         return new CurveCurveIntersection( p0, p1, t, w );
     }
 
-
-    //
     //  Intersect segment with triangle (from http://geomalgorithms.com/a06-_intersect-2.html)
     //
     // **params**
@@ -924,7 +892,6 @@ class Intersect {
     //
     // **returns**
     // + a TriangleSegmentIntersection or null if failed
-    //
 
     public static function segmentWithTriangle( p0 : Point, p1 : Point, points : Array<Point>, tri : Tri ) : TriSegmentIntersection {
 
@@ -978,7 +945,7 @@ class Intersect {
         return new TriSegmentIntersection(pt, s, t, r );
 
     }
-    //
+
     //  Intersect ray/segment with plane (from http://geomalgorithms.com/a06-_intersect-2.html)
     //
     //  If intersecting a ray, the param needs to be between 0 and 1 and the caller is responsible
@@ -992,7 +959,6 @@ class Intersect {
     //
     // **returns**
     // null or an object with a p property representing the param on the segment
-    //
 
     public static function segment_with_plane( p0 : Point, p1 : Point, v0 : Point, n : Point ) {
 

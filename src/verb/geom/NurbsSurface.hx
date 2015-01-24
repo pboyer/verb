@@ -33,7 +33,7 @@ class NurbsSurface extends AsyncObject implements ISurface {
     public function controlPoints() : Array<Array<Point>> { return Eval.dehomogenize2d(_data.controlPoints); }
     public function weights() : Array<Point> { return Eval.weight2d(_data.controlPoints); }
 
-    // Construct a NurbsSurface by a SurfaceData object
+    // Construct a NurbsSurface by a NurbsSurfaceData object
     //
     // **params**
     // + The data object
@@ -85,9 +85,9 @@ class NurbsSurface extends AsyncObject implements ISurface {
     // Obtain a copy of the underlying data structure for the Surface. Used with verb.core.
     //
     // **returns**
-    // + A new SurfaceData object
+    // + A new NurbsSurfaceData object
 
-    public function data() : NurbsSurfaceData {
+    public function asNurbs() : NurbsSurfaceData {
         return new NurbsSurfaceData( degreeU(), degreeV(), knotsU(), knotsV(), Eval.homogenize2d( controlPoints(), weights() ));
     }
 
@@ -97,7 +97,7 @@ class NurbsSurface extends AsyncObject implements ISurface {
     // + A new NurbsSurface
 
     public function clone() : NurbsSurface {
-        return new NurbsSurface( data() );
+        return new NurbsSurface( asNurbs() );
     }
 
     // The parametric domain in the U direction

@@ -16,7 +16,7 @@ class Tess {
 	// Sample a NURBS curve at equally spaced parametric intervals
 	//
 	// **params**
-	// + CurveData object
+	// + NurbsCurveData object
 	// + integer number of samples
 	// + whether to prefix the point with the parameter
 	//
@@ -32,7 +32,7 @@ class Tess {
 	// Sample a range of a NURBS curve at equally spaced parametric intervals
 	//
 	// **params**
-	// + CurveData object
+	// + NurbsCurveData object
 	// + start parameter for sampling
 	// + end parameter for sampling
 	// + integer number of samples
@@ -73,7 +73,7 @@ class Tess {
 	// Sample a NURBS curve over its entire domain, corresponds to http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf
 	//
 	// **params**
-	// + CurveData object
+	// + NurbsCurveData object
 	// + tol for the adaptive scheme
 	// + whether to prefix the point with the parameter
 	//
@@ -101,7 +101,7 @@ class Tess {
 	// Sample a NURBS curve at 3 points, facilitating adaptive sampling
 	//
 	// **params**
-	// + CurveData object
+	// + NurbsCurveData object
 	// + start parameter for sampling
 	// + end parameter for sampling
 	// + whether to prefix the point with the parameter
@@ -149,7 +149,7 @@ class Tess {
 	// Tessellate a NURBS surface on equal spaced intervals in the parametric domain
 	//
 	// **params**
-	// + SurfaceData object
+	// + NurbsSurfaceData object
 	// + number of divisions in the u direction
 	// + number of divisions in the v direction
 	//
@@ -220,7 +220,7 @@ class Tess {
 	// Divide a NURBS surface int equal spaced intervals in the parametric domain as AdaptiveRefinementNodes
 	//
 	// **params**
-	// + SurfaceData object
+	// + NurbsSurfaceData object
 	// + SurfaceDivideOptions object
 	//
 	// **returns**

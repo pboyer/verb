@@ -156,10 +156,10 @@ class Modify {
     // point for intersection, closest point, divide & conquer algorithms
     //
     // **params**
-    // + CurveData object representing the curve
+    // + NurbsCurveData object representing the curve
     //
     // **returns**
-    // + *Array* of CurveData objects, defined by degree, knots, and control points
+    // + *Array* of NurbsCurveData objects, defined by degree, knots, and control points
     //
     public static function decomposeCurveIntoBeziers( curve : NurbsCurveData ) : Array<NurbsCurveData> {
 
@@ -233,7 +233,7 @@ class Modify {
     // Split a curve into two parts
     //
     // **params**
-    // + CurveData object representing the curve
+    // + NurbsCurveData object representing the curve
     // + location to split the curve
     //
     // **returns**
@@ -268,11 +268,11 @@ class Modify {
     // Corresponds to Algorithm A5.4 (Piegl & Tiller)
     //
     // **params**
-    // + CurveData object representing the curve
+    // + NurbsCurveData object representing the curve
     // + array of knots to insert
     //
     // **returns**
-    // +  CurveData object representing the curve
+    // +  NurbsCurveData object representing the curve
     //
 
     public static function curveKnotRefine( curve : NurbsCurveData, knots_to_insert : Array<Float> ) : NurbsCurveData {

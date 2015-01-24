@@ -25,7 +25,7 @@ class RevolvedSurface extends NurbsSurface {
     // + The angle to revolve around.  2 * Math.PI corresponds to a complete revolution
 
     public function new( profile : NurbsCurve, center : Point, axis : Vector, angle : Float )  {
-        super( Make.revolvedSurface( profile.data(), center, axis, angle ) );
+        super( Make.revolvedSurface( profile.asNurbs(), center, axis, angle ) );
 
         _profile = profile;
         _center = center;

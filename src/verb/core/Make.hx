@@ -18,7 +18,7 @@ class Make {
     // + forth point in counter-clockwise form
     //
     // **returns**
-    // + SurfaceData object
+    // + NurbsSurfaceData object
 
     public static function rationalBezierCurve( controlPoints : Array<Point>, weights : Array<Float> = null ) : NurbsCurveData {
 
@@ -48,7 +48,7 @@ class Make {
     // + forth point in counter-clockwise form
     //
     // **returns**
-    // + SurfaceData object
+    // + NurbsSurfaceData object
 
    public static function fourPointSurface( p1 : Point, p2 : Point, p3 : Point, p4 : Point, degree : Int = 3 ) : NurbsSurfaceData {
 
@@ -83,11 +83,11 @@ class Make {
     // Generate the control points, weights, and knots of a swept surface
     //
     // **params**
-    // + profile CurveData
-    // + rail CurveData
+    // + profile NurbsCurveData
+    // + rail NurbsCurveData
     //
     // **returns**
-    // + SurfaceData object
+    // + NurbsSurfaceData object
 
     public static function sweep1_surface( profile : NurbsCurveData, rail : NurbsCurveData ) : NurbsSurfaceData {
 
@@ -132,7 +132,7 @@ class Make {
     // + end angle of the arc, between 0 and 2pi, greater than the start angle
     //
     // **returns**
-    // + a CurveData object representing a NURBS curve
+    // + a NurbsCurveData object representing a NURBS curve
 
     public static function ellipseArc( center : Point, xaxis : Point, yaxis : Point, startAngle : Float, endAngle : Float ) : NurbsCurveData {
 
@@ -235,7 +235,7 @@ class Make {
     // + end angle of the arc, between 0 and 2pi, greater than the start angle
     //
     // **returns**
-    // + a CurveData object representing a NURBS curve
+    // + a NurbsCurveData object representing a NURBS curve
 
     public static function arc( center : Point, xaxis : Vector, yaxis : Vector, radius : Float, startAngle : Float,
                                 endAngle : Float ) : NurbsCurveData {
@@ -248,7 +248,7 @@ class Make {
     // + array of points in curve
     //
     // **returns**
-    // + a CurveData object representing a NURBS curve
+    // + a NurbsCurveData object representing a NURBS curve
 
     public static function polyline( pts : Array<Point>) : NurbsCurveData {
 
@@ -275,7 +275,7 @@ class Make {
     // **params**
     // + axis of the extrusion
     // + length of the extrusion
-    // + a CurveData object representing a NURBS surface
+    // + a NurbsCurveData object representing a NURBS surface
     //
     // **returns**
     // + an object with the following properties: controlPoints, weights, knots, degree
