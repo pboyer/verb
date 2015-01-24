@@ -4056,21 +4056,25 @@ describe("verb.core.Eval.volumePoint",function(){
 
 describe("verb.NurbsCurve.lengthAtParam",function(){
 
-	it('can get closest point to straight curve', function(){
+	var degree = 3
+		, knots = [0,0,0,0,0.5,1,1,1,1]
+		, controlPoints = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
+		, weights = [ 1, 1, 1, 1, 1 ]
+		, pt = [1,0.2,0.1];
 
-		var degree = 3
-			, knots = [0,0,0,0,0.5,1,1,1,1]
-			, controlPoints = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
-			, weights = [ 1, 1, 1, 1, 1 ]
-			, pt = [1,0.2,0.1];
+	var crv = verb.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
 
-		var crv = verb.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
+	it('is correct for basic case', function(){
 		var res = crv.lengthAtParam( 1 );
-
 		res.should.be.approximately(4, 1e-3 )
-
 	});
 
+	it('is correct for basic case async', function(done){
+		crv.lengthAtParamAsync( 1 ).then(function(res){
+			res.should.be.approximately(4, 1e-3 );
+			done();
+		});
+	});
 });
 
 describe("verb.NurbsCurve.derivatives",function(){
@@ -4084,24 +4088,17 @@ describe("verb.NurbsCurve.derivatives",function(){
 	var crv = verb.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
 
 	it('returns the derivatives for a straight curve', function(){
-
 		var p = crv.derivatives( 0.5 );
-
 		vecShouldBe( [2,0,0], p[0], 1e-3 );
 		vecShouldBe( [3,0,0], p[1], 1e-3 );
-
 	});
 
 	it('returns the derivatives for a straight curve async', function(done){
-
 		crv.derivativesAsync( 0.5 ).then(function(p){
-
 			vecShouldBe( [2,0,0], p[0], 1e-3 );
 			vecShouldBe( [3,0,0], p[1], 1e-3 );
-
 			done();
 		});
-
 	});
 });
 
@@ -4116,24 +4113,16 @@ describe("verb.NurbsCurve.tangent",function(){
 	var crv = verb.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
 
 	it('can get the tangent for a straight curve', function(){
-
 		var p = crv.tangent( 0.5 );
-
 		vecShouldBe( [3,0,0], p, 1e-3 );
-
 	});
 
 	it('can get the tangent for a straight curve async', function(done){
-
 		crv.tangentAsync( 0.5 ).then(function(p){
-
 			vecShouldBe( [3,0,0], p, 1e-3 );
-
 			done();
 		});
-
 	});
-
 });
 
 describe("verb.NurbsCurve.paramAtLength",function(){
@@ -4147,25 +4136,18 @@ describe("verb.NurbsCurve.paramAtLength",function(){
 	var crv = verb.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
 
 	it('can get closest point to straight curve', function(){
-
 		var res = crv.paramAtLength( 2 );
 		var p = crv.point( res );
-
 		vecShouldBe( [2,0,0], p, 1e-3 );
-
 	});
 
 	it('can get closest point to straight curve async', function(done){
-
 		crv.paramAtLengthAsync( 2 ).then(function(res){
 			var p = crv.point( res );
 			vecShouldBe( [2,0,0], p, 1e-3 );
-
 			done();
 		});
-
 	});
-
 });
 
 describe("verb.NurbsCurve.divideByEqualArcLength",function(){
@@ -4360,16 +4342,39 @@ describe("verb.NurbsCurve.split",function(){
 	});
 
 	it('returns expected results when splitting curve async', function(done){
-
 		crv.splitAsync( 2.5 ).then(function(res){
-
 			check(2.5, res);
 			done();
-
 		});
-
 	});
 
+});
+
+describe("verb.NurbsCurve.transform",function(){
+
+	var degree = 3
+		, knots = [0,0,0,0,0.5,1,1,1,1]
+		, controlPoints = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
+		, weights = [ 1, 1, 1, 1, 1 ];
+
+	var t = [ [ 1, 0, 0, 5 ],
+			  [ 0, 1, 0, 2 ],
+			  [ 0, 0, 1, -1],
+			  [ 0, 0, 0, 1 ] ];
+
+	var crv = verb.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
+
+	it('works for basic case', function(){
+		var ta = crv.transform( t );
+		ta.point( 0.5 ).should.be.eql([2 + 5, 2, -1 ]);
+	});
+
+	it('works for basic case async', function(done){
+		crv.transformAsync( t ).then(function(ta){
+			ta.point( 0.5 ).should.be.eql([2 + 5, 2, -1 ]);
+			done();
+		});
+	});
 });
 
 describe("verb.Arc.constructor",function(){
