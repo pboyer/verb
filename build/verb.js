@@ -1129,16 +1129,16 @@ verb.Line.prototype = $extend(verb.NurbsCurve.prototype,{
 		return this._end;
 	}
 });
-verb.NurbsSurface = function(data) {
+verb.NurbsSurface = $hx_exports.NurbsSurface = function(data) {
 	this._data = data;
 };
 verb.NurbsSurface.__name__ = ["verb","NurbsSurface"];
+verb.NurbsSurface.byControlPointsWeights = function(degreeU,degreeV,knotsU,knotsV,controlPoints,weights) {
+	return new verb.NurbsSurface(new verb.core.types.SurfaceData(degreeU,degreeV,knotsU,knotsV,verb.core.Eval.homogenize2d(controlPoints,weights)));
+};
 verb.NurbsSurface.__super__ = verb.exe.AsyncObject;
 verb.NurbsSurface.prototype = $extend(verb.exe.AsyncObject.prototype,{
-	byControlPointsWeights: function(degreeU,degreeV,knotsU,knotsV,controlPoints,weights) {
-		return new verb.NurbsSurface(new verb.core.types.SurfaceData(degreeU,degreeV,knotsU,knotsV,verb.core.Eval.homogenize2d(controlPoints,weights)));
-	}
-	,degreeU: function() {
+	degreeU: function() {
 		return this._data.degreeU;
 	}
 	,degreeV: function() {
@@ -1200,15 +1200,19 @@ verb.NurbsSurface.prototype = $extend(verb.exe.AsyncObject.prototype,{
 	,closestPointAsync: function(pt) {
 		return this.defer(verb.core.Analyze,"rationalSurfaceClosestPoint",[this._data,pt]);
 	}
-	,split: function(u,v,useV) {
+	,split: function(u,useV) {
 		if(useV == null) useV = false;
 		return verb.core.Modify.surfaceSplit(this._data,u,useV).map(function(x) {
 			return new verb.NurbsSurface(x);
 		});
 	}
-	,splitAsync: function(u,v,useV) {
+	,splitAsync: function(u,useV) {
 		if(useV == null) useV = false;
-		return this.defer(verb.core.Tess,"surfaceSplit",[this._data,u,v,useV]);
+		return this.defer(verb.core.Modify,"surfaceSplit",[this._data,u,useV]).then(function(s) {
+			return s.map(function(x) {
+				return new verb.NurbsSurface(x);
+			});
+		});
 	}
 	,tessellate: function(options) {
 		return verb.core.Tess.rationalSurfaceAdaptive(this._data,options);
@@ -1220,7 +1224,9 @@ verb.NurbsSurface.prototype = $extend(verb.exe.AsyncObject.prototype,{
 		return new verb.NurbsSurface(verb.core.Modify.rationalSurfaceTransform(this._data,mat));
 	}
 	,transformAsync: function(mat) {
-		return this.defer(verb.core.Modify,"rationalSurfaceTransform",[this._data,mat]);
+		return this.defer(verb.core.Modify,"rationalSurfaceTransform",[this._data,mat]).then(function(x) {
+			return new verb.NurbsSurface(x);
+		});
 	}
 });
 verb.core = {};
@@ -3430,7 +3436,7 @@ verb.core.Modify.rationalSurfaceTransform = function(surface,mat) {
 			var j = _g3++;
 			var homoPt = pts[i][j];
 			homoPt.push(1.0);
-			pts[i][j] = verb.core.Mat.dot(mat,homoPt).slice(0,homoPt.length - 2);
+			pts[i][j] = verb.core.Mat.dot(mat,homoPt).slice(0,homoPt.length - 1);
 		}
 	}
 	return new verb.core.types.SurfaceData(surface.degreeU,surface.degreeV,surface.knotsU.slice(),surface.knotsV.slice(),verb.core.Eval.homogenize2d(pts,verb.core.Eval.weight2d(surface.controlPoints)));
@@ -3443,7 +3449,7 @@ verb.core.Modify.rationalCurveTransform = function(curve,mat) {
 		var i = _g1++;
 		var homoPt = pts[i];
 		homoPt.push(1.0);
-		pts[i] = verb.core.Mat.dot(mat,homoPt).slice(0,homoPt.length - 2);
+		pts[i] = verb.core.Mat.dot(mat,homoPt).slice(0,homoPt.length - 1);
 	}
 	return new verb.core.types.CurveData(curve.degree,curve.knots.slice(),verb.core.Eval.homogenize1d(pts,verb.core.Eval.weight1d(curve.controlPoints)));
 };
@@ -3997,8 +4003,8 @@ verb.core.Tess.divideRationalSurfaceAdaptive = function(surface,options) {
 	if(options.minDivsU != null) options.minDivsU = options.minDivsU; else options.minDivsU = 1;
 	if(options.minDivsV != null) options.minDivsU = options.minDivsV; else options.minDivsU = 1;
 	if(options.refine != null) options.refine = options.refine; else options.refine = true;
-	var minU = (surface.controlPoints.length - 1) * 3;
-	var minV = (surface.controlPoints[0].length - 1) * 3;
+	var minU = (surface.controlPoints.length - 1) * 2;
+	var minV = (surface.controlPoints[0].length - 1) * 2;
 	var divsU;
 	divsU = options.minDivsU > minU?options.minDivsU = options.minDivsU:options.minDivsU = minU;
 	var divsV;

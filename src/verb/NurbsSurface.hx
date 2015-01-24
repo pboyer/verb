@@ -16,6 +16,7 @@ import verb.core.types.SurfaceData;
 import verb.exe.AsyncObject;
 import verb.core.Mat;
 
+@:expose("NurbsSurface")
 class NurbsSurface extends AsyncObject {
 
     private var _data : SurfaceData;
@@ -24,7 +25,7 @@ class NurbsSurface extends AsyncObject {
         _data = data;
     }
 
-    private function byControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights ) {
+    public static function byControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights ) {
         return new NurbsSurface( new SurfaceData( degreeU, degreeV, knotsU, knotsV, Eval.homogenize2d(controlPoints, weights) ) );
     }
 
@@ -91,15 +92,19 @@ class NurbsSurface extends AsyncObject {
         return defer( Analyze, 'rationalSurfaceClosestPoint', [ _data, pt ] );
     }
 
-    public function split( u : Float, v : Float, useV : Bool = false ) : Array<NurbsSurface> {
-        return Modify.surfaceSplit( _data, u, useV ).map(function(x){ return new NurbsSurface(x); });
+    public function split( u : Float, useV : Bool = false ) : Array<NurbsSurface> {
+        return Modify.surfaceSplit( _data, u, useV )
+            .map(function(x){ return new NurbsSurface(x); });
     }
 
-    public function splitAsync( u : Float, v : Float, useV : Bool = false ) : Promise<NurbsSurface> {
-        return defer( Tess, 'surfaceSplit', [ _data, u, v, useV ] );
+    public function splitAsync( u : Float, useV : Bool = false ) : Promise<NurbsSurface> {
+        return defer( Modify, 'surfaceSplit', [ _data, u, useV ] )
+            .then(function(s){
+                return s.map(function(x){ return new NurbsSurface(x); });
+            });
     }
 
-    public function tessellate(options : AdaptiveRefinementOptions = null) : MeshData {
+    public function tessellate( options : AdaptiveRefinementOptions = null) : MeshData {
         return Tess.rationalSurfaceAdaptive( _data, options );
     }
 
@@ -112,6 +117,7 @@ class NurbsSurface extends AsyncObject {
     }
 
     public function transformAsync( mat : Matrix ) : Promise<NurbsSurface> {
-        return defer( Modify, 'rationalSurfaceTransform', [ _data,  mat ] );
+        return defer( Modify, 'rationalSurfaceTransform', [ _data,  mat ] )
+            .then(function(x){ return new NurbsSurface(x); });
     }
 }

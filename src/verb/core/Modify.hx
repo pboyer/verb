@@ -32,12 +32,11 @@ class Modify {
                 var homoPt = pts[i][j];
                 homoPt.push(1.0);
 
-                pts[i][j] = Mat.dot( mat, homoPt ).slice( 0, homoPt.length - 2 );
+                pts[i][j] = Mat.dot( mat, homoPt ).slice( 0, homoPt.length - 1 );
             }
         }
 
         return new SurfaceData( surface.degreeU, surface.degreeV, surface.knotsU.copy(), surface.knotsV.copy(), Eval.homogenize2d(pts, Eval.weight2d( surface.controlPoints)) );
-
     }
 
     public static function rationalCurveTransform( curve : CurveData, mat : Matrix ) : CurveData {
@@ -49,7 +48,7 @@ class Modify {
             var homoPt = pts[i];
             homoPt.push(1.0);
 
-            pts[i] = Mat.dot( mat, homoPt ).slice( 0, homoPt.length - 2 );
+            pts[i] = Mat.dot( mat, homoPt ).slice( 0, homoPt.length - 1 );
         }
 
         return new CurveData( curve.degree, curve.knots.copy(), Eval.homogenize1d( pts, Eval.weight1d( curve.controlPoints) ) );

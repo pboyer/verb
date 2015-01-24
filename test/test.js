@@ -4372,7 +4372,6 @@ describe("verb.NurbsCurve.split",function(){
 
 });
 
-
 describe("verb.Arc.constructor",function(){
 
 	it('has correct properties', function(){
@@ -5950,7 +5949,6 @@ describe("verb.InterpCurve",function(){
 
 });
 
-
 describe("verb.core.Eval.rational_surface_curvature ",function(){
 
 	it('returns expected result for cylinder', function(){
@@ -6036,9 +6034,385 @@ describe("verb.core.Eval.rational_surface_curvature ",function(){
 
 });
 
-
-
-
-
-
 */
+
+describe("verb.NurbsSurface.byControlPointsWeights",function(){
+
+	var degreeU = 3
+		, degreeV = 3
+		, knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
+		, knotsV =	[0, 0, 0, 0, 1, 1, 1, 1]
+		, controlPoints = [ 	[ [0, 0, 0], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] 		],
+								[ [0, -10, 0], 	[10, -10, 0], 	[20, -10, 0], 	[30, -10, 0] 	],
+								[ [0, -20, 0], 	[10, -20, 0], 	[20, -20, 0], 	[30, -20, 0] 	],
+								[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
+		, weights = [ 	[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ] ]
+		, surface = verb.NurbsSurface.byControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
+
+	it('has expected properties', function(){
+
+		surface.degreeU().should.be.equal( 3 );
+		surface.degreeV().should.be.equal( 3 );
+		surface.knotsU().should.be.eql( knotsU );
+		surface.knotsV().should.be.eql( knotsV );
+		surface.controlPoints().should.be.eql( controlPoints );
+		surface.weights().should.be.eql( weights );
+
+	});
+
+});
+
+describe("verb.NurbsSurface.domainU",function(){
+
+	var degreeU = 3
+		, degreeV = 3
+		, knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
+		, knotsV =	[0, 0, 0, 0, 1, 1, 1, 1]
+		, controlPoints = [ 	[ [0, 0, 0], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] 		],
+								[ [0, -10, 0], 	[10, -10, 0], 	[20, -10, 0], 	[30, -10, 0] 	],
+								[ [0, -20, 0], 	[10, -20, 0], 	[20, -20, 0], 	[30, -20, 0] 	],
+								[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
+		, weights = [ 	[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ] ]
+		, surface = verb.NurbsSurface.byControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
+
+	it('is correct for basic case', function(){
+		var d = surface.domainU();
+
+		d.min.should.be.equal( 0 );
+		d.max.should.be.equal( 1 );
+	});
+});
+
+describe("verb.NurbsSurface.domainV",function(){
+
+	var degreeU = 3
+		, degreeV = 3
+		, knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
+		, knotsV =	[0, 0, 0, 0, 2, 2, 2, 2]
+		, controlPoints = [ 	[ [0, 0, 0], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] 		],
+								[ [0, -10, 0], 	[10, -10, 0], 	[20, -10, 0], 	[30, -10, 0] 	],
+								[ [0, -20, 0], 	[10, -20, 0], 	[20, -20, 0], 	[30, -20, 0] 	],
+								[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
+		, weights = [ 	[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ] ]
+		, surface = verb.NurbsSurface.byControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
+
+	it('is correct for basic case', function(){
+		var d = surface.domainU();
+
+		d.min.should.be.equal( 0 );
+		d.max.should.be.equal( 1 );
+	});
+});
+
+describe("verb.NurbsSurface.point",function(){
+
+	var degreeU = 3
+		, degreeV = 3
+		, knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
+		, knotsV =	[0, 0, 0, 0, 1, 1, 1, 1]
+		, controlPoints = [ 	[ [0, 0, 0], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] 		],
+								[ [0, -10, 0], 	[10, -10, 0], 	[20, -10, 0], 	[30, -10, 0] 	],
+								[ [0, -20, 0], 	[10, -20, 0], 	[20, -20, 0], 	[30, -20, 0] 	],
+								[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
+		, weights = [ 	[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ] ]
+		, surface = verb.NurbsSurface.byControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
+
+	it('is correct for basic case', function(){
+
+		vecShouldBe( [15, -15, 0], surface.point(0.5,0.5) );
+
+	});
+
+	it('is correct for basic case async', function(done){
+
+		surface.pointAsync(0.5,0.5).then(function(x){
+			vecShouldBe( [15, -15, 0], x );
+			done();
+		});
+
+	});
+
+});
+
+describe("verb.NurbsSurface.normal",function(){
+
+	var degreeU = 3
+		, degreeV = 3
+		, knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
+		, knotsV =	[0, 0, 0, 0, 1, 1, 1, 1]
+		, controlPoints = [ 	[ [0, 0, 0], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] 		],
+								[ [0, -10, 0], 	[10, -10, 0], 	[20, -10, 0], 	[30, -10, 0] 	],
+								[ [0, -20, 0], 	[10, -20, 0], 	[20, -20, 0], 	[30, -20, 0] 	],
+								[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
+		, weights = [ 	[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ] ]
+		, surface = verb.NurbsSurface.byControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
+
+	it('is correct for basic case', function(){
+		vecShouldBe( [0, 0, 900], surface.normal(0.5,0.5) );
+	});
+
+	it('is correct for basic case async', function(done){
+
+		surface.normalAsync(0.5,0.5).then(function(x){
+			vecShouldBe( [0, 0, 900], x );
+			done();
+		});
+
+	});
+
+});
+
+describe("verb.NurbsSurface.derivatives",function(){
+
+	var degreeU = 3
+		, degreeV = 3
+		, knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
+		, knotsV =	[0, 0, 0, 0, 1, 1, 1, 1]
+		, controlPoints = [ 	[ [0, 0, 0], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] 		],
+								[ [0, -10, 0], 	[10, -10, 0], 	[20, -10, 0], 	[30, -10, 0] 	],
+								[ [0, -20, 0], 	[10, -20, 0], 	[20, -20, 0], 	[30, -20, 0] 	],
+								[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
+		, weights = [ 	[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ] ]
+		, surface = verb.NurbsSurface.byControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
+
+	it('is correct for basic case', function(){
+		var d = surface.derivatives( 0.5, 0.5, 1 );
+
+		vecShouldBe( [15, -15, 0], d[0][0] );
+		vecShouldBe( [0, -30, 0], d[1][0] );
+		vecShouldBe( [30, 0, 0], d[0][1] );
+	});
+
+	it('is correct for basic case async', function(done){
+		surface.derivativesAsync( 0.5, 0.5, 1 ).then(function(d){
+
+			vecShouldBe( [15, -15, 0], d[0][0] );
+			vecShouldBe( [0, -30, 0], d[1][0] );
+			vecShouldBe( [30, 0, 0], d[0][1] );
+
+			done();
+		});
+	});
+
+});
+
+describe("verb.NurbsSurface.closestParam",function(){
+
+	var degreeU = 3
+		, degreeV = 3
+		, knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
+		, knotsV =	[0, 0, 0, 0, 1, 1, 1, 1]
+		, controlPoints = [ 	[ [0, 0, 0], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] 		],
+								[ [0, -10, 0], 	[10, -10, 0], 	[20, -10, 0], 	[30, -10, 0] 	],
+								[ [0, -20, 0], 	[10, -20, 0], 	[20, -20, 0], 	[30, -20, 0] 	],
+								[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
+		, weights = [ 	[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ] ]
+		, surface = verb.NurbsSurface.byControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
+
+	it('is correct for basic case', function(){
+		var d = surface.closestParam( [ 15, -15, 1] );
+		vecShouldBe( [0.5, 0.5], d );
+	});
+
+	it('is correct for basic case async', function(done){
+		surface.closestParamAsync(  [15, -15, 1] ).then(function(d){
+			vecShouldBe( [0.5, 0.5], d );
+			done();
+		});
+	});
+});
+
+describe("verb.NurbsSurface.closestPoint",function(){
+
+	var degreeU = 3
+		, degreeV = 3
+		, knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
+		, knotsV =	[0, 0, 0, 0, 1, 1, 1, 1]
+		, controlPoints = [ 	[ [0, 0, 0], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] 		],
+								[ [0, -10, 0], 	[10, -10, 0], 	[20, -10, 0], 	[30, -10, 0] 	],
+								[ [0, -20, 0], 	[10, -20, 0], 	[20, -20, 0], 	[30, -20, 0] 	],
+								[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
+		, weights = [ 	[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ] ]
+		, surface = verb.NurbsSurface.byControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
+
+	it('is correct for basic case', function(){
+		var d = surface.closestPoint( [ 15, -15, 1] );
+		vecShouldBe( [15, -15, 0], d );
+	});
+
+	it('is correct for basic case async', function(done){
+		surface.closestPointAsync(  [15, -15, 1] ).then(function(d){
+			vecShouldBe( [15, -15, 0], d );
+			done();
+		});
+	});
+});
+
+describe("verb.NurbsSurface.split",function(){
+
+	var degreeU = 3
+		, degreeV = 3
+		, knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
+		, knotsV =	[0, 0, 0, 0, 1, 1, 1, 1]
+		, controlPoints = [ 	[ [0, 0, 0], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] 		],
+								[ [0, -10, 0], 	[10, -10, 0], 	[20, -10, 0], 	[30, -10, 0] 	],
+								[ [0, -20, 0], 	[10, -20, 0], 	[20, -20, 0], 	[30, -20, 0] 	],
+								[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
+		, weights = [ 	[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ] ]
+		, surface = verb.NurbsSurface.byControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
+
+	it('is correct for basic case 1', function(){
+		var d = surface.split( 0.5, true );
+
+		d[0].domainV().min.should.be.equal(0);
+		d[0].domainV().max.should.be.equal(0.5);
+
+		d[0].domainU().min.should.be.equal(0);
+		d[0].domainU().max.should.be.equal(1.0);
+
+		d[1].domainV().min.should.be.equal(0.5);
+		d[1].domainV().max.should.be.equal(1.0);
+
+		d[1].domainU().min.should.be.equal(0);
+		d[1].domainU().max.should.be.equal(1.0);
+	});
+
+	it('is correct for basic case 2', function(){
+		var d = surface.split( 0.5, false );
+
+		d[0].domainV().min.should.be.equal(0);
+		d[0].domainV().max.should.be.equal(1.0);
+
+		d[0].domainU().min.should.be.equal(0);
+		d[0].domainU().max.should.be.equal(0.5);
+
+		d[1].domainV().min.should.be.equal(0);
+		d[1].domainV().max.should.be.equal(1.0);
+
+		d[1].domainU().min.should.be.equal(0.5);
+		d[1].domainU().max.should.be.equal(1.0);
+	});
+
+	it('is correct for basic case async', function(done){
+		surface.splitAsync( 0.5, true ).then(function(d){
+
+			d[0].domainV().min.should.be.equal(0);
+			d[0].domainV().max.should.be.equal(0.5);
+
+			d[0].domainU().min.should.be.equal(0);
+			d[0].domainU().max.should.be.equal(1.0);
+
+			d[1].domainV().min.should.be.equal(0.5);
+			d[1].domainV().max.should.be.equal(1.0);
+
+			d[1].domainU().min.should.be.equal(0);
+			d[1].domainU().max.should.be.equal(1.0);
+
+			done();
+		});
+	});
+});
+
+describe("verb.NurbsSurface.tessellate",function(){
+
+	var degreeU = 3
+		, degreeV = 3
+		, knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
+		, knotsV =	[0, 0, 0, 0, 1, 1, 1, 1]
+		, controlPoints = [ 	[ [0, 0, 0], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] 		],
+								[ [0, -10, 0], 	[10, -10, 0], 	[20, -10, 0], 	[30, -10, 0] 	],
+								[ [0, -20, 0], 	[10, -20, 0], 	[20, -20, 0], 	[30, -20, 0] 	],
+								[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
+		, weights = [ 	[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ] ]
+		, surface = verb.NurbsSurface.byControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
+
+	it('is correct for basic case with no options', function(){
+		var d = surface.tessellate();
+
+		d.faces.length.should.be.greaterThan( 2 );
+		d.normals.length.should.be.greaterThan( 2 );
+		d.points.length.should.be.greaterThan( 2 );
+		d.uvs.length.should.be.greaterThan( 2 );
+
+	});
+
+	it('is correct for basic case async', function(done){
+		surface.tessellateAsync( 0.5, true ).then(function(d){
+
+			d.faces.length.should.be.greaterThan( 2 );
+			d.normals.length.should.be.greaterThan( 2 );
+			d.points.length.should.be.greaterThan( 2 );
+			d.uvs.length.should.be.greaterThan( 2 );
+
+			done();
+		});
+	});
+});
+
+describe("verb.NurbsSurface.transform",function(){
+
+	var degreeU = 3
+		, degreeV = 3
+		, knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
+		, knotsV =	[0, 0, 0, 0, 1, 1, 1, 1]
+		, controlPoints = [ 	[ [0, 0, 0], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] 		],
+								[ [0, -10, 0], 	[10, -10, 0], 	[20, -10, 0], 	[30, -10, 0] 	],
+								[ [0, -20, 0], 	[10, -20, 0], 	[20, -20, 0], 	[30, -20, 0] 	],
+								[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
+		, weights = [ 	[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ],
+						[ 1, 1, 1, 1 ] ]
+		, surface = verb.NurbsSurface.byControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
+
+	var t = [ [ 1, 0, 0, 5 ],
+			  [ 0, 1, 0, 2 ],
+			  [ 0, 0, 1, -1],
+			  [ 0, 0, 0, 1 ] ];
+
+	it('is correct for basic case with no options', function(){
+
+		var ta = surface.transform( t );
+
+		ta.point(0.5,0.5).should.be.eql( [ 15 + 5, -15 + 2, 0 - 1] );
+	});
+
+	it('is correct for basic case async', function(done){
+		surface.transformAsync( t ).then(function(ta){
+
+			ta.point(0.5,0.5).should.be.eql( [ 15 + 5, -15 + 2, 0 - 1] );
+
+			done();
+		});
+	});
+});
