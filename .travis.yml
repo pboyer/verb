@@ -10,4 +10,5 @@ before_install:
   - npm install -g grunt-cli
   - mkdir ~/haxelib                                    # create a folder for installing haxelib
   - haxelib setup ~/haxelib
+  - haxelib install promhx
 install: npm install
