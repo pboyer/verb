@@ -8,4 +8,6 @@ before_install:
   - sudo apt-get update                                # pull info from ppa
   - sudo apt-get install haxe -y                       # install haxe (and neko)
   - npm install -g grunt-cli
+  - haxelib setup
+  - haxelib install promhx
 install: npm install

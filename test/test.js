@@ -6212,18 +6212,15 @@ describe("verb.geom.Intersect.curveAndSurface",function(){
 		, curve = new verb.geom.NurbsCurve( curveData );
 
 	it('gives valid result for planar surface and degree 2 bezier', function(){
-
 		var res =  verb.geom.Intersect.curveAndSurface( curve, surface, verb.core.Constants.TOLERANCE  );
 
 		res.length.should.be.equal( 1 );
 		res[0].u.should.be.approximately( 0.5, 1e-3 );
 		res[0].uv[0].should.be.approximately( 0.265, 1e-3 );
 		res[0].uv[1].should.be.approximately( 0.5, 1e-3 );
-
 	});
 
 	it('gives valid result for planar surface and degree 2 bezier async', function(done){
-
 		verb.geom.Intersect.curveAndSurfaceAsync( curve, surface, verb.core.Constants.TOLERANCE  )
 			.then(function(res){
 
@@ -6235,6 +6232,5 @@ describe("verb.geom.Intersect.curveAndSurface",function(){
 				done();
 			});
 	});
-
 });
 
