@@ -11,4 +11,5 @@ before_install:
   - mkdir ~/haxelib                                    # create a folder for installing haxelib
   - haxelib setup ~/haxelib
   - haxelib install promhx
+  - haxelib install nodejs
 install: npm install
