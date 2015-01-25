@@ -6234,3 +6234,64 @@ describe("verb.geom.Intersect.curveAndSurface",function(){
 	});
 });
 
+describe("verb.core.Modify.curveElevateDegree",function(){
+
+	// line from [5,5,5] to [5,5,-5]
+	var degree_crv = 2
+		, knots_crv = [1,1,1,2,2,2]
+		, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.4,4.8,0,1], [5.2,5.2,-5,1] ]
+		, bezierCurveData = new verb.core.NurbsCurveData( degree_crv, knots_crv, homo_controlPoints_crv );
+
+	var lineCurveData = new verb.core.NurbsCurveData( 1, [0,0,1,1], [[7,3,-10,1], [5,4,3,1]] );
+
+	function sameCurve( crvd0, crvd1 ){
+
+		var u0 = crvd0.knots[0];
+		var u1 = crvd0.knots[crvd0.knots.length-1];
+
+		var u01 = crvd1.knots[0];
+		var u11 = crvd1.knots[crvd1.knots.length-1];
+
+		u0.should.be.approximately(u01, 1e-10);
+		u1.should.be.approximately(u11, 1e-10);
+
+		var numSamples = 100;
+		var step = (u1 - u0) / (numSamples-1);
+
+		for (var i  = 0; i < numSamples; i++ ){
+			var p0 = verb.core.Eval.rationalCurvePoint( crvd0, u0 + step*i );
+			var p1 = verb.core.Eval.rationalCurvePoint( crvd1, u0 + step*i );
+
+			var dist = verb.core.Vec.dist( p0, p1 );
+			dist.should.be.lessThan( verb.core.Constants.TOLERANCE );
+		}
+	}
+
+	it('can elevate degree 2 bezier to degree 3', function(){
+
+		var curveData = verb.core.Modify.curveElevateDegree( bezierCurveData, 3 );
+
+		curveData.degree.should.be.equal( 3 );
+		sameCurve( bezierCurveData, curveData );
+
+	});
+
+	it('can elevate degree 2 bezier to degree 4', function(){
+
+		var curveData = verb.core.Modify.curveElevateDegree( bezierCurveData, 4 );
+
+		curveData.degree.should.be.equal( 4 );
+		sameCurve( bezierCurveData, curveData );
+
+	});
+
+	it('can elevate degree 1 line to degree 3', function(){
+
+		var curveData = verb.core.Modify.curveElevateDegree( lineCurveData, 3 );
+
+		curveData.degree.should.be.equal( 3 );
+		sameCurve( lineCurveData, curveData );
+
+	});
+
+});

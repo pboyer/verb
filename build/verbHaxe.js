@@ -75,7 +75,7 @@ Type.getClassName = function(c) {
 	return a.join(".");
 };
 var haxe = {};
-haxe.StackItem = { __ename__ : true, __constructs__ : ["CFunction","Module","FilePos","Method","LocalFunction"] };
+haxe.StackItem = { __constructs__ : ["CFunction","Module","FilePos","Method","LocalFunction"] };
 haxe.StackItem.CFunction = ["CFunction",0];
 haxe.StackItem.CFunction.toString = $estr;
 haxe.StackItem.CFunction.__enum__ = haxe.StackItem;
@@ -173,11 +173,6 @@ haxe.CallStack.makeStack = function(s) {
 		return m;
 	} else return s;
 };
-haxe.Log = function() { };
-haxe.Log.__name__ = ["haxe","Log"];
-haxe.Log.trace = function(v,infos) {
-	js.Boot.__trace(v,infos);
-};
 haxe.ds = {};
 haxe.ds.IntMap = function() {
 	this.h = { };
@@ -200,100 +195,11 @@ haxe.ds.IntMap.prototype = {
 		return true;
 	}
 };
-haxe.ds.Option = { __ename__ : true, __constructs__ : ["Some","None"] };
+haxe.ds.Option = { __constructs__ : ["Some","None"] };
 haxe.ds.Option.Some = function(v) { var $x = ["Some",0,v]; $x.__enum__ = haxe.ds.Option; $x.toString = $estr; return $x; };
 haxe.ds.Option.None = ["None",1];
 haxe.ds.Option.None.toString = $estr;
 haxe.ds.Option.None.__enum__ = haxe.ds.Option;
-var js = {};
-js.Boot = function() { };
-js.Boot.__name__ = ["js","Boot"];
-js.Boot.__unhtml = function(s) {
-	return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
-};
-js.Boot.__trace = function(v,i) {
-	var msg;
-	if(i != null) msg = i.fileName + ":" + i.lineNumber + ": "; else msg = "";
-	msg += js.Boot.__string_rec(v,"");
-	if(i != null && i.customParams != null) {
-		var _g = 0;
-		var _g1 = i.customParams;
-		while(_g < _g1.length) {
-			var v1 = _g1[_g];
-			++_g;
-			msg += "," + js.Boot.__string_rec(v1,"");
-		}
-	}
-	var d;
-	if(typeof(document) != "undefined" && (d = document.getElementById("haxe:trace")) != null) d.innerHTML += js.Boot.__unhtml(msg) + "<br/>"; else if(typeof console != "undefined" && console.log != null) console.log(msg);
-};
-js.Boot.__string_rec = function(o,s) {
-	if(o == null) return "null";
-	if(s.length >= 5) return "<...>";
-	var t = typeof(o);
-	if(t == "function" && (o.__name__ || o.__ename__)) t = "object";
-	switch(t) {
-	case "object":
-		if(o instanceof Array) {
-			if(o.__enum__) {
-				if(o.length == 2) return o[0];
-				var str = o[0] + "(";
-				s += "\t";
-				var _g1 = 2;
-				var _g = o.length;
-				while(_g1 < _g) {
-					var i = _g1++;
-					if(i != 2) str += "," + js.Boot.__string_rec(o[i],s); else str += js.Boot.__string_rec(o[i],s);
-				}
-				return str + ")";
-			}
-			var l = o.length;
-			var i1;
-			var str1 = "[";
-			s += "\t";
-			var _g2 = 0;
-			while(_g2 < l) {
-				var i2 = _g2++;
-				str1 += (i2 > 0?",":"") + js.Boot.__string_rec(o[i2],s);
-			}
-			str1 += "]";
-			return str1;
-		}
-		var tostr;
-		try {
-			tostr = o.toString;
-		} catch( e ) {
-			return "???";
-		}
-		if(tostr != null && tostr != Object.toString) {
-			var s2 = o.toString();
-			if(s2 != "[object Object]") return s2;
-		}
-		var k = null;
-		var str2 = "{\n";
-		s += "\t";
-		var hasp = o.hasOwnProperty != null;
-		for( var k in o ) {
-		if(hasp && !o.hasOwnProperty(k)) {
-			continue;
-		}
-		if(k == "prototype" || k == "__class__" || k == "__super__" || k == "__interfaces__" || k == "__properties__") {
-			continue;
-		}
-		if(str2.length != 2) str2 += ", \n";
-		str2 += s + k + " : " + js.Boot.__string_rec(o[k],s);
-		}
-		s = s.substring(1);
-		str2 += "\n" + s + "}";
-		return str2;
-	case "function":
-		return "<function>";
-	case "string":
-		return o;
-	default:
-		return String(o);
-	}
-};
 var promhx = {};
 promhx.base = {};
 promhx.base.AsyncBase = function(d) {
@@ -479,7 +385,7 @@ promhx.base.AsyncBase.prototype = {
 					up.async.handleError(e);
 				}
 			} else {
-				haxe.Log.trace("Call Stack: " + haxe.CallStack.toString(haxe.CallStack.callStack()),{ fileName : "AsyncBase.hx", lineNumber : 155, className : "promhx.base.AsyncBase", methodName : "_handleError"});
+				console.log("Call Stack: " + haxe.CallStack.toString(haxe.CallStack.callStack()));
 				throw e;
 			}
 			_g._errorPending = false;
@@ -828,14 +734,14 @@ promhx.base.EventLoop.continueOnNextLoop = function() {
 	if(promhx.base.EventLoop.nextLoop != null) promhx.base.EventLoop.nextLoop(promhx.base.EventLoop.f); else setImmediate(promhx.base.EventLoop.f);
 };
 promhx.error = {};
-promhx.error.PromiseError = { __ename__ : true, __constructs__ : ["AlreadyResolved","DownstreamNotFullfilled"] };
+promhx.error.PromiseError = { __constructs__ : ["AlreadyResolved","DownstreamNotFullfilled"] };
 promhx.error.PromiseError.AlreadyResolved = function(message) { var $x = ["AlreadyResolved",0,message]; $x.__enum__ = promhx.error.PromiseError; $x.toString = $estr; return $x; };
 promhx.error.PromiseError.DownstreamNotFullfilled = function(message) { var $x = ["DownstreamNotFullfilled",1,message]; $x.__enum__ = promhx.error.PromiseError; $x.toString = $estr; return $x; };
 var verb = {};
 verb.Init = function() { };
 verb.Init.__name__ = ["verb","Init"];
 verb.Init.main = function() {
-	haxe.Log.trace("verb 0.2.0",{ fileName : "Init.hx", lineNumber : 41, className : "verb.Init", methodName : "main"});
+	console.log("verb 0.2.0");
 };
 verb.core = {};
 verb.core.Analyze = $hx_exports.core.Analyze = function() { };
@@ -1695,7 +1601,6 @@ verb.core.Intersect.__name__ = ["verb","core","Intersect"];
 verb.core.Intersect.surfaces = function(surface0,surface1,tol) {
 	var tess1 = verb.core.Tess.rationalSurfaceAdaptive(surface0);
 	var tess2 = verb.core.Tess.rationalSurfaceAdaptive(surface1);
-	haxe.Log.trace(tess1.faces.length,{ fileName : "Intersect.hx", lineNumber : 47, className : "verb.core.Intersect", methodName : "surfaces", customParams : [tess2.faces.length]});
 	var resApprox = verb.core.Intersect.meshes(tess1,tess2);
 	var exactPls = resApprox.map(function(pl) {
 		return pl.map(function(inter) {
@@ -3033,6 +2938,200 @@ verb.core.KnotMultiplicity.prototype = {
 };
 verb.core.Modify = $hx_exports.core.Modify = function() { };
 verb.core.Modify.__name__ = ["verb","core","Modify"];
+verb.core.Modify.min = function(a,b) {
+	if(a < b) return a; else return b;
+};
+verb.core.Modify.max = function(a,b) {
+	if(a > b) return a; else return b;
+};
+verb.core.Modify.curveElevateDegree = function(curve,finalDegree) {
+	if(finalDegree <= curve.degree) return curve;
+	var n = curve.knots.length - curve.degree - 2;
+	var newDegree = curve.degree;
+	var knots = curve.knots;
+	var controlPoints = curve.controlPoints;
+	var degreeInc = finalDegree - curve.degree;
+	var dim = curve.controlPoints[0].length;
+	var bezalfs = verb.core.Vec.zeros2d(newDegree + degreeInc + 1,newDegree + 1);
+	var bpts = [];
+	var ebpts = [];
+	var Nextbpts = [];
+	var alphas = [];
+	var m = n + newDegree + 1;
+	var ph = finalDegree;
+	var ph2 = Math.floor(ph / 2);
+	var Qw = [];
+	var Uh = [];
+	var nh;
+	bezalfs[0][0] = 1.0;
+	bezalfs[ph][newDegree] = 1.0;
+	var _g1 = 1;
+	var _g = ph2 + 1;
+	while(_g1 < _g) {
+		var i = _g1++;
+		var inv = 1.0 / verb.core.Binomial.get(ph,i);
+		var mpi;
+		if(newDegree < i) mpi = newDegree; else mpi = i;
+		var _g3 = verb.core.Modify.max(0,i - degreeInc);
+		var _g2 = mpi + 1;
+		while(_g3 < _g2) {
+			var j = _g3++;
+			bezalfs[i][j] = inv * verb.core.Binomial.get(newDegree,j) * verb.core.Binomial.get(degreeInc,i - j);
+		}
+	}
+	var _g4 = ph2 + 1;
+	while(_g4 < ph) {
+		var i1 = _g4++;
+		var mpi1;
+		if(newDegree < i1) mpi1 = newDegree; else mpi1 = i1;
+		var _g21 = verb.core.Modify.max(0,i1 - degreeInc);
+		var _g11 = mpi1 + 1;
+		while(_g21 < _g11) {
+			var j1 = _g21++;
+			bezalfs[i1][j1] = bezalfs[ph - i1][newDegree - j1];
+		}
+	}
+	var mh = ph;
+	var kind = ph + 1;
+	var r = -1;
+	var a = newDegree;
+	var b = newDegree + 1;
+	var cind = 1;
+	var ua = knots[0];
+	Qw[0] = controlPoints[0];
+	var _g12 = 0;
+	var _g5 = ph + 1;
+	while(_g12 < _g5) {
+		var i2 = _g12++;
+		Uh[i2] = ua;
+	}
+	var _g13 = 0;
+	var _g6 = newDegree + 1;
+	while(_g13 < _g6) {
+		var i3 = _g13++;
+		bpts[i3] = controlPoints[i3];
+	}
+	while(b < m) {
+		var i4 = b;
+		while(b < m && knots[b] == knots[b + 1]) b = b + 1;
+		var mul = b - i4 + 1;
+		var mh1 = mh + mul + degreeInc;
+		var ub = knots[b];
+		var oldr = r;
+		r = newDegree - mul;
+		var lbz;
+		if(oldr > 0) lbz = Math.floor((oldr + 2) / 2); else lbz = 1;
+		var rbz;
+		if(r > 0) rbz = Math.floor(ph - (r + 1) / 2); else rbz = ph;
+		if(r > 0) {
+			var numer = ub - ua;
+			var alfs = [];
+			var k = newDegree;
+			while(k > mul) {
+				alfs[k - mul - 1] = numer / (knots[a + k] - ua);
+				k--;
+			}
+			var _g14 = 1;
+			var _g7 = r + 1;
+			while(_g14 < _g7) {
+				var j2 = _g14++;
+				var save = r - j2;
+				var s = mul + j2;
+				var k1 = newDegree;
+				while(k1 >= s) {
+					bpts[k1] = verb.core.Vec.add(verb.core.Vec.mul(alfs[k1 - s],bpts[k1]),verb.core.Vec.mul(1.0 - alfs[k1 - s],bpts[k1 - 1]));
+					k1--;
+				}
+				Nextbpts[save] = bpts[newDegree];
+			}
+		}
+		var _g15 = lbz;
+		var _g8 = ph + 1;
+		while(_g15 < _g8) {
+			var i5 = _g15++;
+			ebpts[i5] = verb.core.Vec.zeros1d(dim);
+			var mpi2;
+			if(newDegree < i5) mpi2 = newDegree; else mpi2 = i5;
+			var _g31 = verb.core.Modify.max(0,i5 - degreeInc);
+			var _g22 = mpi2 + 1;
+			while(_g31 < _g22) {
+				var j3 = _g31++;
+				ebpts[i5] = verb.core.Vec.add(ebpts[i5],verb.core.Vec.mul(bezalfs[i5][j3],bpts[j3]));
+			}
+		}
+		if(oldr > 1) {
+			var first = kind - 2;
+			var last = kind;
+			var den = ub - ua;
+			var bet = (ub - Uh[kind - 1]) / den;
+			var _g9 = 1;
+			while(_g9 < oldr) {
+				var tr = _g9++;
+				var i6 = first;
+				var j4 = last;
+				var kj = j4 - kind + 1;
+				while(j4 - i6 > tr) {
+					if(i6 < cind) {
+						var alf = (ub - Uh[i6]) / (ua - Uh[i6]);
+						Qw[i6] = verb.core.Vec.lerp(alf,Qw[i6],Qw[i6 - 1]);
+					}
+					if(j4 >= lbz) {
+						if(j4 - tr <= kind - ph + oldr) {
+							var gam = (ub - Uh[j4 - tr]) / den;
+							ebpts[kj] = verb.core.Vec.lerp(gam,ebpts[kj],ebpts[kj + 1]);
+						}
+					} else ebpts[kj] = verb.core.Vec.lerp(bet,ebpts[kj],ebpts[kj + 1]);
+					i6 = i6 + 1;
+					j4 = j4 - 1;
+					kj = kj - 1;
+				}
+				first = first - 1;
+				last = last + 1;
+			}
+		}
+		if(a != newDegree) {
+			var _g16 = 0;
+			var _g10 = ph - oldr;
+			while(_g16 < _g10) {
+				var i7 = _g16++;
+				Uh[kind] = ua;
+				kind = kind + 1;
+			}
+		}
+		var _g17 = lbz;
+		var _g18 = rbz + 1;
+		while(_g17 < _g18) {
+			var j5 = _g17++;
+			Qw[cind] = ebpts[j5];
+			cind = cind + 1;
+		}
+		if(b < m) {
+			var _g19 = 0;
+			while(_g19 < r) {
+				var j6 = _g19++;
+				bpts[j6] = Nextbpts[j6];
+			}
+			var _g110 = r;
+			var _g20 = newDegree + 1;
+			while(_g110 < _g20) {
+				var j7 = _g110++;
+				bpts[j7] = controlPoints[b - newDegree + j7];
+			}
+			a = b;
+			b = b + 1;
+			ua = ub;
+		} else {
+			var _g111 = 0;
+			var _g23 = ph + 1;
+			while(_g111 < _g23) {
+				var i8 = _g111++;
+				Uh[kind + i8] = ub;
+			}
+		}
+	}
+	nh = mh - ph - 1;
+	return new verb.core.types.NurbsCurveData(finalDegree,Uh,Qw);
+};
 verb.core.Modify.rationalSurfaceTransform = function(surface,mat) {
 	var pts = verb.core.Eval.dehomogenize2d(surface.controlPoints);
 	var _g1 = 0;
@@ -3805,7 +3904,8 @@ verb.core.Vec.sum = function(a) {
 	},0);
 };
 verb.core.Vec.norm = function(a) {
-	return Math.sqrt(verb.core.Vec.normSquared(a));
+	var norm2 = verb.core.Vec.normSquared(a);
+	if(norm2 != 0.0) return Math.sqrt(norm2); else return norm2;
 };
 verb.core.Vec.normSquared = function(a) {
 	return Lambda.fold(a,function(x,a1) {
@@ -4627,7 +4727,7 @@ verb.exe.WorkerPool.prototype = {
 							_g._callbacks.remove(workId[0]);
 						}
 					} catch( error ) {
-						haxe.Log.trace(error,{ fileName : "WorkerPool.hx", lineNumber : 77, className : "verb.exe.WorkerPool", methodName : "processQueue"});
+						console.log(error);
 					}
 					_g.processQueue();
 				};

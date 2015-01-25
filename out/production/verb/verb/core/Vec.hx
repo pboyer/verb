@@ -67,7 +67,8 @@ class Vec {
     }
 
     public static function norm(a : Iterable<Float> ) : Float {
-        return Math.sqrt( normSquared(a) );
+        var norm2 = normSquared(a);
+        return norm2 != 0.0 ? Math.sqrt( norm2 ) : norm2;
     }
 
     public static function normSquared(a : Iterable<Float> ) : Float {

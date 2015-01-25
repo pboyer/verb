@@ -23,6 +23,179 @@ class KnotMultiplicity {
 @:expose("core.Modify")
 class Modify {
 
+    private static inline function min( a : Int, b : Int ) : Int {
+        return a < b ? a : b;
+    }
+
+    private static inline function max( a : Int, b : Int ) : Int {
+        return a > b ? a : b;
+    }
+
+    public static function curveElevateDegree( curve : NurbsCurveData, finalDegree : Int ) : NurbsCurveData {
+
+        if (finalDegree <= curve.degree) return curve;
+
+        // args
+        var n = curve.knots.length - curve.degree - 2;
+        var newDegree = curve.degree;
+        var knots = curve.knots;
+        var controlPoints = curve.controlPoints;
+        var degreeInc = finalDegree - curve.degree;
+
+        var dim = curve.controlPoints[0].length;
+
+        // intermediate values
+        var bezalfs = Vec.zeros2d( newDegree + degreeInc + 1, newDegree + 1);
+        var bpts = [];
+        var ebpts = [];
+        var Nextbpts = [];
+        var alphas = [];
+
+        var m = n + newDegree + 1;
+        var ph = finalDegree;
+        var ph2 = Math.floor(ph / 2);
+
+        // return values
+        var Qw = [];
+        var Uh = [];
+        var nh;
+
+        bezalfs[0][0] = 1.0;
+        bezalfs[ph][newDegree] = 1.0;
+
+        for (i in 1...ph2+1){
+            var inv = 1.0 / Binomial.get( ph, i );
+            var mpi = min(newDegree,i);
+            for (j in max(0,i-degreeInc)...mpi+1){
+                bezalfs[i][j] = inv * Binomial.get(newDegree,j) * Binomial.get(degreeInc,i-j);
+            }
+        }
+        for (i in ph2+1...ph){
+            var mpi = min(newDegree,i);
+            for (j in max(0,i-degreeInc)...mpi+1){
+                bezalfs[i][j] = bezalfs[ph-i][newDegree-j];
+            }
+        }
+        var mh = ph;
+        var kind = ph+1;
+        var r = -1;
+        var a = newDegree;
+        var b = newDegree+1;
+        var cind = 1;
+        var ua = knots[0];
+        Qw[0] = controlPoints[0];
+        for (i in 0...ph+1){
+            Uh[i] = ua;
+        }
+        for (i in 0...newDegree+1){
+            bpts[i] = controlPoints[i];
+        }
+        while (b < m){
+            var i = b;
+            while( b < m && knots[b] == knots[b+1]){
+                b = b+1;
+            }
+            var mul = b-i+1;
+            var mh = mh+mul+degreeInc;
+            var ub = knots[b];
+            var oldr = r;
+            r = newDegree-mul;
+            // check for integer arithmetic
+            var lbz = oldr > 0 ? Math.floor((oldr+2)/2) : 1;
+            var rbz = r > 0 ? Math.floor(ph-(r+1)/2) : ph;
+            if (r > 0){
+                var numer = ub-ua;
+                var alfs = [];
+                var k = newDegree;
+                while (k > mul){
+                    alfs[k-mul-1] = numer/(knots[a+k]-ua); // integer arithmetic?
+                    k--;
+                }
+                for( j in 1...r+1){
+                    var save = r-j;
+                    var s = mul+j;
+                    var k = newDegree;
+                    while ( k >= s ){
+                        bpts[k] = Vec.add( Vec.mul(alfs[k-s],bpts[k]), Vec.mul(1.0-alfs[k-s], bpts[k-1]));
+                        k--;
+                    }
+                    Nextbpts[save] = bpts[newDegree];
+                }
+            }
+
+            for( i in lbz...ph+1){
+                ebpts[i] = Vec.zeros1d( dim );
+                var mpi = min(newDegree,i);
+                for (j in max(0,i-degreeInc)...mpi+1){
+                    ebpts[i] = Vec.add( ebpts[i], Vec.mul( bezalfs[i][j], bpts[j]));
+                }
+            }
+
+            if (oldr > 1){
+                var first = kind-2;
+                var last = kind;
+                var den = ub-ua;
+                var bet = (ub-Uh[kind-1])/den; // integer arithmetic?
+                for (tr in 1...oldr){
+                    var i = first;
+                    var j = last;
+                    var kj = j-kind+1;
+                    while (j-i > tr){
+                        if (i < cind){
+                            var alf = (ub-Uh[i])/(ua-Uh[i]); // integer arithmetic?
+                            Qw[i] = Vec.lerp(alf, Qw[i], Qw[i-1]);
+                        }
+                        if ( j >= lbz ){
+                            if ( j-tr <= kind-ph+oldr ){
+                                var gam = (ub-Uh[j-tr])/den;
+                                ebpts[kj] = Vec.lerp(gam, ebpts[kj], ebpts[kj+1]);
+                            }
+                        } else {
+                            ebpts[kj] = Vec.lerp(bet, ebpts[kj], ebpts[kj+1]);
+                        }
+                        i = i+1;
+                        j = j-1;
+                        kj = kj-1;
+                    }
+                    first = first-1;
+                    last = last+1;
+                }
+            }
+
+            if (a != newDegree){
+                for (i in 0...ph-oldr){
+                    Uh[kind] = ua;
+                    kind = kind+1;
+                }
+            }
+
+            for (j in lbz...rbz+1){
+                Qw[cind] = ebpts[j];
+                cind = cind + 1;
+            }
+
+            if (b < m){
+                for (j in 0...r){
+                    bpts[j] = Nextbpts[j];
+                }
+                for (j in r...newDegree+1){
+                    bpts[j] = controlPoints[b-newDegree+j];
+                }
+                a = b;
+                b = b+1;
+                ua = ub;
+            }
+            else {
+                for (i in 0...ph+1){
+                    Uh[kind+i] = ub;
+                }
+            }
+        }
+        nh = mh-ph-1;
+
+        return new NurbsCurveData( finalDegree, Uh, Qw );
+    }
+
     public static function rationalSurfaceTransform( surface : NurbsSurfaceData, mat : Matrix ) : NurbsSurfaceData {
 
         var pts = Eval.dehomogenize2d( surface.controlPoints );
