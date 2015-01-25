@@ -1,4 +1,4 @@
-verb.init();
+
 
 // build a planar bezier patch
 var degreeU = 3

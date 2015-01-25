@@ -5,9 +5,6 @@
 <head>
   <title></title>
 
-  <script src="js/numeric-1.2.6.min.js"></script>
-  <script src="js/binomial.js"></script>
-  <script src="js/labor.js"></script>
   <script src="../build/verb.js"></script>
 
 	<style>
@@ -49,8 +46,6 @@
 
 		function getWarpedPlane(){ 
 
-			verb.init();
-
 			var degree = 3
 				, knots = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
 				, pts = [ 	[ [0, 0, -5], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] , 	[40, 0, 0], [50, 0, 0] ],
@@ -66,18 +61,8 @@
 							[ 1, 1, 1, 1, 1, 1],
 							[ 1, 1, 1, 1, 1, 1] ];
 
-			return new verb.NurbsSurface( degree, knots, degree, knots, pts, wts );
+			return verb.geom.NurbsSurface.byControlPointsWeights( degree, degree, knots, knots, pts, wts );
 
-
-			var axis = [-1,0,0]
-				, xaxis = [0,0,1]
-				, base = [8,0,0]
-				, height = 20
-				, radius = 2;
-
-			return new verb.Cylinder( axis, xaxis, base, height, radius );
-
-			return new verb.NurbsSurface( degree, knots, degree, knots, pts, wts );
 		}
 
 		var srf = getWarpedPlane();
@@ -92,8 +77,7 @@
 
 					var p0 = [60 * i / (c-1) - 10, -60 * j / (c-1) + 10, 7 ];
 
-					var uv = srf.closestPoint( p0 );
-					var p = srf.point( uv[0], uv[1] );
+					var p = srf.closestPoint( p0 );
 
 					var l = new THREE.Line( asGeometry( asVector3( [p0, p] )), lineMat );
 

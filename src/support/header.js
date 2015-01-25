@@ -29,7 +29,7 @@ if ( typeof window != 'object'){
 		var method = lookup( e.data.className, e.data.methodName );
 
 		if (!method){
-			return console.error("could not find " = e.data.className + "." + e.data.methodName)
+			return console.error("could not find " + e.data.className + "." + e.data.methodName)
 		}
 
 		postMessage( { result: method.apply( null, e.data.args ), id: e.data.id } );

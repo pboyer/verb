@@ -5,9 +5,6 @@
 <head>
   <title></title>
 
-  <script src="js/numeric-1.2.6.min.js"></script>
-  <script src="js/binomial.js"></script>
-  <script src="js/labor.js"></script>
   <script src="../build/verb.js"></script>
 
 	<style>
@@ -35,23 +32,14 @@
 		renderer.setSize( window.innerWidth, window.innerHeight );
 		document.body.appendChild( renderer.domElement );
 
-		// construct a nurbs surface
-		// verb.init();
-		// var p1 = [0,0,0], p2 = [10,0,0], p3 = [10,10,5], p4 = [0,10,0];
-		// var srf = new verb.FourPointSurface( p1, p2, p3, p4 );
-		// var srf;
-
-		function getWarpedPlane(){ 
-
-			verb.init();
-
+		function getSurface(){
 			var degree = 3
 				, knots = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
 				, pts = [ 	[ [0, 0, -10], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] , 	[40, 0, 0], [50, 0, 0] ],
 							[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] , [40, -10, 0], [50, -10, 0]	],
 							[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] , [40, -20, -2], [50, -20, -12] 	],
-							[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, -23], 	[30, -30, 0] , [40, -30, 0], [50, -30, 0]     ],  
-							[ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , [40, -40, -20], [50, -40, 0]     ],  
+							[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, -23], 	[30, -30, 0] , [40, -30, 0], [50, -30, 0]     ],
+							[ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , [40, -40, -20], [50, -40, 0]     ],
 							[ [0, -50, 12], [10, -50, 0], 	[20, -50, 20], 	[30, -50, 0] , [50, -50, -10], [50, -50, -15]     ],     ]
 				, wts = [ 	[ 1, 1, 1, 1, 1, 1],
 							[ 1, 1, 1, 1, 1, 1],
@@ -60,51 +48,32 @@
 							[ 1, 1, 1, 1, 1, 1],
 							[ 1, 1, 1, 1, 1, 1] ];
 
+			return verb.geom.NurbsSurface.byControlPointsWeights( degree, degree, knots, knots, pts, wts );
+		}
+
+		function getCylinder(){
 			var axis = [-1,0,0]
 				, xaxis = [0,0,1]
 				, base = [8,0,0]
 				, height = 20
 				, radius = 2;
 
-			//srf = new verb.Cylinder( axis, xaxis, base, height, radius );
-
-			//srf = new verb.NurbsSurface( degree, knots, degree, knots, pts, wts );
-
-			// var srfs = srf.split( 0.5 );
-			//srf = srfs[1];
-
-			srf = new verb.Sphere( [0,0,0], 10 );
-
-			var srfObj = {
-				degree_u : srf.get('degreeU'),
-				degree_v : srf.get('degreeV'),
-				knots_u : srf.get('knotsU'),
-				knots_v : srf.get('knotsV'),
-				homo_control_points : srf.homogenize()
-			};
-
-			return srfObj;
+			return new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius );
 		}
 
-		var srfObj = getWarpedPlane();
+		function getSphere(){
+			return new verb.geom.SphericalSurface( [0,0,0], 10 );
+		}
 
-		var mesh = verb.eval.tessellate_rational_surface_adaptive( srf.get('degreeU'),
-			srf.get('knotsU'),
-			srf.get('degreeV'),
-			srf.get('knotsV'), 
-			srf.homogenize() );
+		var srf = getSurface();
 
 		var d1 = Date.now();
 
-		var runs = 10;
+		var runs = 1;
 
 		for (var i = 0; i < runs; i++){
 
-			var mesh = verb.eval.tessellate_rational_surface_adaptive( srf.get('degreeU'),
-				srf.get('knotsU'),
-				srf.get('degreeV'),
-				srf.get('knotsV'), 
-				srf.homogenize(), { normTol: 5e-2});
+			var mesh = srf.tessellate();
 		}
 
 		var d2 = Date.now();
@@ -143,7 +112,7 @@
 
 		var geometry = tessellate(srf, mesh);
 
-		var material = new THREE.MeshNormalMaterial( { side: THREE.DoubleSide, wireframe: false, shading: THREE.SmoothShading,  } );
+		var material = new THREE.MeshNormalMaterial( { side: THREE.DoubleSide, wireframe: true, shading: THREE.SmoothShading,  } );
 		var mesh = new THREE.Mesh( geometry, material );
 
 		scene.add( mesh );

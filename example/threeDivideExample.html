@@ -5,9 +5,6 @@
 <head>
   <title></title>
 
-  <script src="js/numeric-1.2.6.min.js"></script>
-  <script src="js/binomial.js"></script>
-  <script src="js/labor.js"></script>
   <script src="../build/verb.js"></script>
 
 	<style>
@@ -54,10 +51,10 @@
 		}
 
 		// use verb to construct the curve
-		verb.init();
+
 		var p1 = [0,0,0], p2 = [10,0,0], p3 = [10,10,0], p4 = [0,10,0], p5 = [5, 5, 0];
 		var pts = [p1, p2, p3, p4, p5];
-		var interpCurve = new verb.InterpCurve( pts, 3 );
+		var interpCurve = verb.geom.NurbsCurve.byPoints( pts, 3 );
 
 		var interpCurveGeom = tessellateCurve(interpCurve);
 

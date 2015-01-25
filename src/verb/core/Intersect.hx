@@ -73,13 +73,13 @@ class Intersect {
     // + a SurfaceSurfaceIntersectionPoint object
 
     public static function surfacesAtPointWithEstimate(surface0 : NurbsSurfaceData,
-                                                           surface1 : NurbsSurfaceData,
-                                                           uv1 : UV,
-                                                           uv2 : UV,
-                                                           tol : Float ) : SurfaceSurfaceIntersectionPoint {
+                                                       surface1 : NurbsSurfaceData,
+                                                       uv1 : UV,
+                                                       uv2 : UV,
+                                                       tol : Float ) : SurfaceSurfaceIntersectionPoint {
 
         var pds, p, pn, pu, pv, pd, qds, q, qn, qu, qv, qd, dist;
-        var maxits = 10;
+        var maxits = 1;
         var its = 0;
 
         do {

@@ -3,7 +3,7 @@ var Benchmark = require('benchmark')
 
 // callbacks for tests
 function getComplexSurface(){ 
-	verb.init();
+
 
 	var degree = 3
 		, knots = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]

@@ -1,4 +1,4 @@
-verb.init();
+
 
 var geom = [];
 

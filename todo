@@ -1,11 +1,11 @@
-Curve length
-Surface area
-NurbsSurface split - similar to curve knot insertion but on surfaces
+Degree elevation
+LoftedSurface
+SweptSurface
+Mesh intersection has difficulties capturing loops - example/threeMeshIntersectExample.html
+Mesh interesection needs unit tests
+Surface surface intersection fails every time - Intersect.threePlanes may be to blame
+SurfaceClosestPoint occasionally fails when point is far from surface - need to check for wild derivatives
 Curve interpolation with sparse matrices
 Curve approximation
-Tessellation of spheres causes artifacts at start point
-Surface-Surface intersection, marching
-Surface lofting
-Finish sweep (it's incorrect)
-Get rid of eval/header.js - ew ew
-verb.eval.nurbs.rational_interp_curve with tangents is numerically unstable, implementation likely wrong
+Marching surface-Surface intersection
+verb.eval.Make.interpCurve with tangents is numerically unstable, implementation likely wrong
