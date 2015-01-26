@@ -20,7 +20,6 @@ class Eval {
 	//
 	// **returns**
 	// + a point represented by an array of length (dim)
-	//
 
 	public static function volumePoint( volume : VolumeData, u : Float, v : Float, w : Float ) : Point {
 		var n = volume.knotsU.length - volume.degreeU - 2
@@ -41,7 +40,6 @@ class Eval {
 	//
 	// **returns**
 	// + a point represented by an array of length (dim)
-	//
 
 	public static function volumePointGivenNML( volume : VolumeData,
 													 n : Int,
@@ -199,7 +197,6 @@ class Eval {
 	//
 	// **returns**
 	// + a point represented by an array of length (dim)
-	//
 
 	public static function rationalSurfacePoint( surface : NurbsSurfaceData, u : Float, v : Float ) : Point {
 		return dehomogenize( surfacePoint( surface, u, v ) );
@@ -249,7 +246,6 @@ class Eval {
 	//
 	// **returns**
 	// + a point represented by an array of length (dim)
-	//
 
 	public static function rationalCurvePoint( curve : NurbsCurveData, u : Float) : Point {
 		return dehomogenize( curvePoint( curve, u) );
@@ -262,8 +258,6 @@ class Eval {
 	//
 	// **returns**
 	// + a point represented by an array pi with length (dim)
-	//
-
 	
 	public static function dehomogenize( homoPoint : Point ) : Point {
 
@@ -287,8 +281,6 @@ class Eval {
 	//
 	// **returns**
 	// + array of points represented by an array (wi*pi) with length (dim)
-	//
-
 	
 	public static function rational1d( homoPoints : Array<Point> ) : Array<Point> {
 		var dim = homoPoints[0].length - 1;
@@ -303,8 +295,6 @@ class Eval {
 	//
 	// **returns**
 	// +  array of arrays of points, each represented by an array pi with length (dim)
-	//
-
 	
 	public static function rational2d( homoPoints : Array<Array<Point>> ) : Array<Array<Point>> {
 		return homoPoints.map(rational1d);
@@ -318,8 +308,6 @@ class Eval {
 	//
 	// **returns**
 	// + a point represented by an array pi with length (dim)
-	//
-
 	
 	public static function weight1d( homoPoints : Array<Point> ) : Array<Float> {
 		var dim = homoPoints[0].length - 1;
@@ -334,8 +322,6 @@ class Eval {
 	//
 	// **returns**
 	// +  array of arrays of points, each represented by an array pi with length (dim)
-	//
-
 	
 	public static function weight2d( homoPoints : Array<Array<Point>> ) : Array<Array<Float>> {
 		return homoPoints.map(weight1d);
@@ -349,8 +335,6 @@ class Eval {
 	//
 	// **returns**
 	// + an array of points, each of length dim
-	//
-
 	
 	public static function dehomogenize1d( homoPoints : Array<Point> ) : Array<Point>{
 		return homoPoints.map(dehomogenize);
@@ -363,8 +347,6 @@ class Eval {
 	//
 	// **returns**
 	// + array of arrays of points, each of length dim
-	//
-
 	
 	public static function dehomogenize2d( homoPoints : Array<Array<Point>> ) : Array<Array<Point>> {
 		return homoPoints.map(dehomogenize1d);
@@ -380,8 +362,6 @@ class Eval {
 	// + 1d array of control points where each point is (wi*pi, wi) where wi
 	// i the ith control point weight and pi is the ith control point,
 	// hence the dimension of the point is dim + 1
-	//
-
 	
 	public static function homogenize1d( controlPoints : Array<Point>, weights : Array<Float>) : Array<Point> {
 
@@ -419,8 +399,6 @@ class Eval {
 	// + 1d array of control points where each point is (wi*pi, wi) where wi
 	// i the ith control point weight and pi is the ith control point, the size is
 	// (m x n x dim+1)
-	//
-
 	
 	public static function homogenize2d( controlPoints : Array<Array<Point>>,
 										  weights: Array<Array<Float>>) : Array<Array<Point>> {
@@ -434,7 +412,6 @@ class Eval {
 		return homo_controlPoints;
 	}
 
-
 	// Compute the derivatives on a non-uniform, non-rational B spline surface
 	//
 	// **params**
@@ -445,8 +422,6 @@ class Eval {
 	//
 	// **returns**
 	// + a 2d jagged array representing the derivatives - u derivatives increase by row, v by column
-	//
-
 	
 	public static function surfaceDerivatives( surface : NurbsSurfaceData, u : Float, v : Float, numDerivs : Int ) : Array<Array<Point>> {
 
@@ -469,8 +444,6 @@ class Eval {
 	//
 	// **returns**
 	// + a 2d jagged array representing the derivatives - u derivatives increase by row, v by column
-	//
-
 	
 	public static function surfaceDerivativesGivenNM( n : Int,
 													 m : Int,
@@ -536,8 +509,6 @@ class Eval {
 	//
 	// **returns**
 	// + a point represented by an array of length (dim)
-	//
-
 	
 	public static function surfacePoint( surface : NurbsSurfaceData, u : Float, v : Float) : Point {
 
@@ -560,8 +531,6 @@ class Eval {
 	//
 	// **returns**
 	// + a point represented by an array of length (dim)
-	//
-
 	
 	public static function surfacePointGivenNM( n : Int, m : Int, surface : NurbsSurfaceData, u : Float, v : Float ) : Point {
 
@@ -614,7 +583,6 @@ class Eval {
 	//
 	// **returns**
 	// + a point represented by an array of length (dim)
-	//
 
 	public static function curveDerivatives( crv : NurbsCurveData, u : Float, numDerivs : Int ) : Array<Point> {
 
@@ -634,8 +602,6 @@ class Eval {
 	//
 	// **returns**
 	// + a point represented by an array of length (dim)
-	//
-
 	
 	public static function curveDerivativesGivenN( n : Int, curve : NurbsCurveData, u : Float, numDerivs : Int ) : Array<Point> {
 
@@ -671,8 +637,6 @@ class Eval {
 	//
 	// **returns**
 	// + a point represented by an array of length (dim)
-	//
-
 	
 	public static function curvePoint( curve : NurbsCurveData, u : Float) {
 		var n = curve.knots.length - curve.degree - 2;
@@ -689,8 +653,6 @@ class Eval {
 	//
 	// **returns**
 	// + whether the values are correct
-	//
-
 	
 	public static function areValidRelations( degree : Int, num_controlPoints : Int, knots_length : Int ) : Bool {
 		return num_controlPoints + degree + 1 - knots_length == 0;
@@ -706,8 +668,6 @@ class Eval {
 	//
 	// **returns**
 	// + a point represented by an array of length (dim)
-	//
-
 	
 	public static function curvePointGivenN( n : Int, curve : NurbsCurveData, u : Float) : Point {
 
@@ -742,9 +702,7 @@ class Eval {
 	//
 	// **returns**
 	// + 2d array of basis and derivative values of size (n+1, p+1) The nth row is the nth derivative and the first row is made up of the basis function values.
-	//
 
-	
 	public static function derivativeBasisFunctions( u : Float, degree : Int, knots : KnotArray ): Array<Array<Float>>
 	{
 		var knotSpan_index = knotSpan( degree, u, knots )
@@ -766,9 +724,7 @@ class Eval {
 	//
 	// **returns**
 	// + 2d array of basis and derivative values of size (n+1, p+1) The nth row is the nth derivative and the first row is made up of the basis function values.
-	//
 
-	
 	public static function derivativeBasisFunctionsGivenNI( knotSpan_index : Int, u : Float, p : Int,
 															n : Int, knots : KnotArray ) : Array<Array<Float>>
 	{

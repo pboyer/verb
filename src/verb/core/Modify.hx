@@ -1,9 +1,13 @@
 package verb.core;
 
+import verb.core.types.Interval;
 import verb.core.Mat.Matrix;
 import verb.core.types.NurbsCurveData;
 import verb.core.types.NurbsCurveData;
 import verb.core.types.NurbsSurfaceData;
+
+using Lambda;
+using verb.core.ArrayExtensions;
 
 @:expose("core.KnotMultiplicity")
 class KnotMultiplicity {
@@ -23,11 +27,57 @@ class KnotMultiplicity {
 @:expose("core.Modify")
 class Modify {
 
-    private static inline function min( a : Int, b : Int ) : Int {
+    public static function unifyCurveKnotVectors( curves : Array<NurbsCurveData> ) : Array<NurbsCurveData> {
+
+        curves = curves.map(Make.clonedCurve);
+
+        var maxDegree = curves.fold(function(x,a){ return Modify.imax(x.degree, a); }, 0 );
+
+        // elevate all curves to the same degree
+        for (i in 0...curves.length){
+            if (curves[i].degree < maxDegree){
+                curves[i] = Modify.curveElevateDegree( curves[i], maxDegree );
+            }
+        }
+
+        var knotIntervals = [ for (c in curves) new Interval( c.knots.first(), c.knots.last() ) ];
+
+        // shift all knot vectors to start at 0.0
+        for (i in 0...curves.length){
+            var min = knotIntervals[i].min;
+            curves[i].knots = curves[i].knots.map(function(x){ return x - min; });
+        }
+
+        // find the max knot span
+        var knotSpans = knotIntervals.map(function(x){ return x.max - x.min; });
+        var maxKnotSpan = knotSpans.fold(function(x,a){ return Math.max(x, a); }, 0.0 );
+
+        // scale all of the knot vectors to match
+        for (i in 0...curves.length){
+            var scale = maxKnotSpan / knotSpans[i];
+            curves[i].knots = curves[i].knots.map(function(x){ return x * scale; });
+        }
+
+        // merge all of the knot vectors
+        var mergedKnots = curves.fold(function(x,a){ return Vec.sortedSetUnion(x.knots,a); }, []);
+
+        // knot refinement on each curve
+        for (i in 0...curves.length){
+            var rem = Vec.sortedSetSub( mergedKnots, curves[i].knots );
+            if (rem.length == 0) {
+                curves[i] = curves[i];
+            }
+            curves[i] = Modify.curveKnotRefine( curves[i], rem  );
+        }
+
+        return curves;
+    }
+
+    public static inline function imin( a : Int, b : Int ) : Int {
         return a < b ? a : b;
     }
 
-    private static inline function max( a : Int, b : Int ) : Int {
+    public static inline function imax( a : Int, b : Int ) : Int {
         return a > b ? a : b;
     }
 
@@ -65,14 +115,14 @@ class Modify {
 
         for (i in 1...ph2+1){
             var inv = 1.0 / Binomial.get( ph, i );
-            var mpi = min(newDegree,i);
-            for (j in max(0,i-degreeInc)...mpi+1){
+            var mpi = imin(newDegree,i);
+            for (j in imax(0,i-degreeInc)...mpi+1){
                 bezalfs[i][j] = inv * Binomial.get(newDegree,j) * Binomial.get(degreeInc,i-j);
             }
         }
         for (i in ph2+1...ph){
-            var mpi = min(newDegree,i);
-            for (j in max(0,i-degreeInc)...mpi+1){
+            var mpi = imin(newDegree,i);
+            for (j in imax(0,i-degreeInc)...mpi+1){
                 bezalfs[i][j] = bezalfs[ph-i][newDegree-j];
             }
         }
@@ -125,8 +175,8 @@ class Modify {
 
             for( i in lbz...ph+1){
                 ebpts[i] = Vec.zeros1d( dim );
-                var mpi = min(newDegree,i);
-                for (j in max(0,i-degreeInc)...mpi+1){
+                var mpi = imin(newDegree,i);
+                for (j in imax(0,i-degreeInc)...mpi+1){
                     ebpts[i] = Vec.add( ebpts[i], Vec.mul( bezalfs[i][j], bpts[j]));
                 }
             }
@@ -228,7 +278,7 @@ class Modify {
 
     }
 
-    public static function surfaceKnotRefine( surface : NurbsSurfaceData, knots_to_insert : Array<Float>, useV : Bool ) : NurbsSurfaceData {
+    public static function surfaceKnotRefine( surface : NurbsSurfaceData, knotsToInsert : Array<Float>, useV : Bool ) : NurbsSurfaceData {
 
         // TODO: make this faster by taking advantage of repeat computations in every row
         // 			 i.e. no reason to recompute the knot vectors on every row
@@ -253,7 +303,7 @@ class Modify {
         // do knot refinement on every row
         var c : NurbsCurveData = null;
         for (cptrow in ctrlPts){
-            c = curveKnotRefine( new NurbsCurveData(degree, knots, cptrow), knots_to_insert );
+            c = curveKnotRefine( new NurbsCurveData(degree, knots, cptrow), knotsToInsert );
             newPts.push( c.controlPoints );
         }
 
@@ -386,7 +436,7 @@ class Modify {
     // **returns**
     // + *Array* of length 2 arrays, [knotValue, knotMultiplicity]
     //
-    public static function knotMultiplicities( knots : KnotArray) : Array<KnotMultiplicity> {
+    public static function knotMultiplicities( knots : KnotArray ) : Array<KnotMultiplicity> {
 
         var mults = [  new KnotMultiplicity( knots[0], 0 ) ];
         var curr : KnotMultiplicity = mults[0];
@@ -448,7 +498,9 @@ class Modify {
     // +  NurbsCurveData object representing the curve
     //
 
-    public static function curveKnotRefine( curve : NurbsCurveData, knots_to_insert : Array<Float> ) : NurbsCurveData {
+    public static function curveKnotRefine( curve : NurbsCurveData, knotsToInsert : Array<Float> ) : NurbsCurveData {
+
+        if ( knotsToInsert.length == 0 ) return Make.clonedCurve(curve);
 
         var degree = curve.degree
         , controlPoints = curve.controlPoints
@@ -456,9 +508,9 @@ class Modify {
 
         var n = controlPoints.length - 1
         , m = n + degree + 1
-        , r = knots_to_insert.length - 1
-        , a = Eval.knotSpan( degree, knots_to_insert[0], knots )
-        , b = Eval.knotSpan( degree, knots_to_insert[r], knots )
+        , r = knotsToInsert.length - 1
+        , a = Eval.knotSpan( degree, knotsToInsert[0], knots )
+        , b = Eval.knotSpan( degree, knotsToInsert[r], knots )
         , controlPoints_post = new CurvePointArray()
         , knots_post = new KnotArray();
 
@@ -486,13 +538,11 @@ class Modify {
 
         while ( j >= 0 ) {
 
-            while (knots_to_insert[j] <= knots[i] && i > a){
-
+            while (knotsToInsert[j] <= knots[i] && i > a){
                 controlPoints_post[k-degree-1] = controlPoints[i-degree-1];
                 knots_post[k] = knots[i];
                 k = k-1;
                 i = i-1;
-
             }
 
             controlPoints_post[k-degree-1] = controlPoints_post[k-degree];
@@ -500,7 +550,7 @@ class Modify {
             for ( l in 1...degree+1){
 
                 var ind = k-degree+l;
-                var alfa = knots_post[k+l] - knots_to_insert[j];
+                var alfa = knots_post[k+l] - knotsToInsert[j];
 
                 if (Math.abs(alfa) < Constants.EPSILON){
                     controlPoints_post[ind-1] = controlPoints_post[ind];
@@ -514,7 +564,7 @@ class Modify {
 
             }
 
-            knots_post[k] = knots_to_insert[j];
+            knots_post[k] = knotsToInsert[j];
             k = k - 1;
 
             j--;

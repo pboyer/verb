@@ -61,18 +61,28 @@
 			return new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius );
 		}
 
+		function getLoftedSurface(){
+			var c0 = new verb.core.NurbsCurveData( 2, [0,0,0,1,1,1], [ [0,0,0,1], [10,0,0,1], [20,0,0,1] ] );
+			var c1 = new verb.core.NurbsCurveData( 3, [0,0,0,0,1,1,1,1], [ [0,10,10,1], [10,10,10,1], [20,0,10,1], [30,0,10,1] ] );
+			var c2 = new verb.core.NurbsCurveData( 3, [0,0,0,0,0.5,1,1,1,1], [ [0,1,20,1], [10,-10,20,1], [20,4,20,1], [30,0,20,1], [40,0,20,1] ] );
+
+			var curves = [c0, c1, c2]
+			var surface = verb.core.Make.loftedSurface( curves, 2 );
+
+			return new verb.geom.NurbsSurface( surface );
+		}
+
 		function getSphere(){
 			return new verb.geom.SphericalSurface( [0,0,0], 10 );
 		}
 
-		var srf = getSurface();
+		var srf = getLoftedSurface();
 
 		var d1 = Date.now();
 
 		var runs = 1;
 
 		for (var i = 0; i < runs; i++){
-
 			var mesh = srf.tessellate();
 		}
 
@@ -112,15 +122,15 @@
 
 		var geometry = tessellate(srf, mesh);
 
-		var material = new THREE.MeshNormalMaterial( { side: THREE.DoubleSide, wireframe: true, shading: THREE.SmoothShading,  } );
+		var material = new THREE.MeshNormalMaterial( { side: THREE.DoubleSide, wireframe: false, shading: THREE.SmoothShading,  } );
 		var mesh = new THREE.Mesh( geometry, material );
 
 		scene.add( mesh );
 
-		// var material2 = new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide, wireframe: true } );
-		// var mesh2 = new THREE.Mesh( geometry, material2 );
+		var material2 = new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide, wireframe: true } );
+		var mesh2 = new THREE.Mesh( geometry, material2 );
 
-		// scene.add( mesh2 );
+		scene.add( mesh2 );
 
 		var controls = new THREE.OrbitControls(camera, renderer.domElement);
 

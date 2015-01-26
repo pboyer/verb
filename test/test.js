@@ -597,7 +597,7 @@ describe("verb.core.Eval.rationalSurfaceDerivatives",function(){
 			, knotsU = [0, 0, 1, 1 ]
 			, knotsV = [0, 0, 0, 1, 1, 1 ]
 			, controlPoints = [ [ [1, 1, 0, 1], 	[1, 1, 1, 1], [2, 0, 2, 2] ],
-													 		  [ [-1, 1, 0, 1], 	[-1, 1, 1, 1], [-2, 0, 2, 2] ] ]
+							    [ [-1, 1, 0, 1], 	[-1, 1, 1, 1], [-2, 0, 2, 2] ] ]
 			, num_derivatives = 1
 			, surface = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
 
@@ -6234,6 +6234,29 @@ describe("verb.geom.Intersect.curveAndSurface",function(){
 	});
 });
 
+function sameCurve( crvd0, crvd1 ){
+
+	var u0 = crvd0.knots[0];
+	var u1 = crvd0.knots[crvd0.knots.length-1];
+
+	var u01 = crvd1.knots[0];
+	var u11 = crvd1.knots[crvd1.knots.length-1];
+
+	u0.should.be.approximately(u01, 1e-10);
+	u1.should.be.approximately(u11, 1e-10);
+
+	var numSamples = 100;
+	var step = (u1 - u0) / (numSamples-1);
+
+	for (var i  = 0; i < numSamples; i++ ){
+		var p0 = verb.core.Eval.rationalCurvePoint( crvd0, u0 + step*i );
+		var p1 = verb.core.Eval.rationalCurvePoint( crvd1, u0 + step*i );
+
+		var dist = verb.core.Vec.dist( p0, p1 );
+		dist.should.be.lessThan( verb.core.Constants.TOLERANCE );
+	}
+}
+
 describe("verb.core.Modify.curveElevateDegree",function(){
 
 	// line from [5,5,5] to [5,5,-5]
@@ -6244,54 +6267,105 @@ describe("verb.core.Modify.curveElevateDegree",function(){
 
 	var lineCurveData = new verb.core.NurbsCurveData( 1, [0,0,1,1], [[7,3,-10,1], [5,4,3,1]] );
 
-	function sameCurve( crvd0, crvd1 ){
-
-		var u0 = crvd0.knots[0];
-		var u1 = crvd0.knots[crvd0.knots.length-1];
-
-		var u01 = crvd1.knots[0];
-		var u11 = crvd1.knots[crvd1.knots.length-1];
-
-		u0.should.be.approximately(u01, 1e-10);
-		u1.should.be.approximately(u11, 1e-10);
-
-		var numSamples = 100;
-		var step = (u1 - u0) / (numSamples-1);
-
-		for (var i  = 0; i < numSamples; i++ ){
-			var p0 = verb.core.Eval.rationalCurvePoint( crvd0, u0 + step*i );
-			var p1 = verb.core.Eval.rationalCurvePoint( crvd1, u0 + step*i );
-
-			var dist = verb.core.Vec.dist( p0, p1 );
-			dist.should.be.lessThan( verb.core.Constants.TOLERANCE );
-		}
-	}
-
 	it('can elevate degree 2 bezier to degree 3', function(){
-
 		var curveData = verb.core.Modify.curveElevateDegree( bezierCurveData, 3 );
 
 		curveData.degree.should.be.equal( 3 );
 		sameCurve( bezierCurveData, curveData );
-
 	});
 
 	it('can elevate degree 2 bezier to degree 4', function(){
-
 		var curveData = verb.core.Modify.curveElevateDegree( bezierCurveData, 4 );
 
 		curveData.degree.should.be.equal( 4 );
 		sameCurve( bezierCurveData, curveData );
-
 	});
 
 	it('can elevate degree 1 line to degree 3', function(){
-
 		var curveData = verb.core.Modify.curveElevateDegree( lineCurveData, 3 );
 
 		curveData.degree.should.be.equal( 3 );
 		sameCurve( lineCurveData, curveData );
+	});
+});
 
+describe("verb.core.Vec.sortedSetUnion",function(){
+ 	it('can merge two empty arrays', function(){
+		verb.core.Vec.sortedSetUnion([],[]).should.be.eql([]);
+ 	});
+
+	it('can merge array and empty array', function(){
+		verb.core.Vec.sortedSetUnion([],[1,2]).should.be.eql([1,2]);
+		verb.core.Vec.sortedSetUnion([1.3, 2],[]).should.be.eql([1.3,2]);
 	});
 
+	it('can merge two identical arrays', function(){
+		verb.core.Vec.sortedSetUnion([1,2],[1,2]).should.be.eql([1,2]);
+	});
+
+	it('can merge two differing arrays', function(){
+		verb.core.Vec.sortedSetUnion([1,2,3],[1,2,5,6]).should.be.eql([1,2,3,5,6]);
+		verb.core.Vec.sortedSetUnion([1,3],[1,2,5,6]).should.be.eql([1,2,3,5,6]);
+		verb.core.Vec.sortedSetUnion([1,27],[1,2,5,6]).should.be.eql([1,2,5,6,27]);
+		verb.core.Vec.sortedSetUnion([1,1.1,2,5,6,13],[1,2,5,6]).should.be.eql([1,1.1,2,5,6,13]);
+	});
+ });
+
+describe("verb.core.Vec.sortedSetSub",function(){
+
+  	it('can handle two empty arrays', function(){
+ 		verb.core.Vec.sortedSetSub([],[]).should.be.eql([]);
+  	});
+
+ 	it('can subtract empty array from non-empty array', function(){
+ 		verb.core.Vec.sortedSetSub([1,2],[]).should.be.eql([1,2]);
+ 	});
+
+ 	it('can subtract two identical arrays', function(){
+		verb.core.Vec.sortedSetSub([1,2],[1,2]).should.be.eql([]);
+ 	});
+
+ 	it('can subtract two non-equal arrays', function(){
+		verb.core.Vec.sortedSetSub([1,2],[1]).should.be.eql([2]);
+		verb.core.Vec.sortedSetSub([1,2,3],[1,3]).should.be.eql([2]);
+		verb.core.Vec.sortedSetSub([-1,1,2,3],[1,3]).should.be.eql([-1,2]);
+		verb.core.Vec.sortedSetSub([0,0,0,0,0.5,1,1,1,1],[0,0,0,0,0.5,1,1,1,1]).should.be.eql([]);
+ 	});
+
+  });
+
+describe("verb.core.Modify.unifyCurveKnotVectors",function(){
+
+	var c0 = new verb.core.NurbsCurveData( 2, [0,0,0,1,1,1], [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
+	var c1 = new verb.core.NurbsCurveData( 3, [0,0,0,0,1,1,1,1], [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1] ] );
+	var c2 = new verb.core.NurbsCurveData( 3, [0,0,0,0,0.5,1,1,1,1], [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1], [4,0,0,1] ] );
+
+	it('can handle straight beziers', function(){
+
+		var curves = [c0, c1, c2]
+		var res = verb.core.Modify.unifyCurveKnotVectors(curves);
+
+		res.forEach(function(x,i){
+			console.log( x );
+			sameCurve(x, curves[i]);
+			x.knots.should.eql( c2.knots );
+		});
+
+	});
+});
+
+describe("verb.core.Make.loftedSurface",function(){
+
+	var c0 = new verb.core.NurbsCurveData( 2, [0,0,0,1,1,1], [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
+	var c1 = new verb.core.NurbsCurveData( 3, [0,0,0,0,1,1,1,1], [ [0,0,1,1], [1,0,1,1], [2,0,1,1], [3,0,1,1] ] );
+	var c2 = new verb.core.NurbsCurveData( 3, [0,0,0,0,0.5,1,1,1,1], [ [0,0,2,1], [1,0,2,1], [2,0,2,1], [3,0,2,1], [4,0,2,1] ] );
+
+	it('can handle straight beziers', function(){
+
+		var curves = [c0, c1, c2]
+		var surface = verb.core.Make.loftedSurface( curves );
+
+		// verb.core.Eval.rationalSurfacePoint(surface, 0, 0)
+
+	});
 });

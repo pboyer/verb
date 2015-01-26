@@ -792,7 +792,7 @@ verb.core.Analyze.isRationalSurfaceClosed = function(surface,uDir) {
 	var _g = cpts[0].length;
 	while(_g1 < _g) {
 		var i = _g1++;
-		var test = verb.core.Vec.dist(cpts[0][i],cpts[cpts.length - 1][i]) < verb.core.Constants.EPSILON;
+		var test = verb.core.Vec.dist(cpts[0][i],cpts[cpts.length - 1][i]) < 1e-10;
 		if(!test) return false;
 	}
 	return true;
@@ -864,8 +864,8 @@ verb.core.Analyze.rationalSurfaceClosestParam = function(surface,p) {
 		var c2b = c2bv < eps2;
 		if(c1 && c2a && c2b) return cuv;
 		var ct = n(cuv,e,dif);
-		if(ct[0] < minu) if(closedu) ct = [maxu - (ct[0] - minu),ct[1]]; else ct = [minu + verb.core.Constants.EPSILON,ct[1]]; else if(ct[0] > maxu) if(closedu) ct = [minu + (ct[0] - maxu),ct[1]]; else ct = [maxu - verb.core.Constants.EPSILON,ct[1]];
-		if(ct[1] < minv) if(closedv) ct = [ct[0],maxv - (ct[1] - minv)]; else ct = [ct[0],minv + verb.core.Constants.EPSILON]; else if(ct[1] > maxv) if(closedv) ct = [ct[0],minv + (ct[0] - maxv)]; else ct = [ct[0],maxv - verb.core.Constants.EPSILON];
+		if(ct[0] < minu) if(closedu) ct = [maxu - (ct[0] - minu),ct[1]]; else ct = [minu + 1e-10,ct[1]]; else if(ct[0] > maxu) if(closedu) ct = [minu + (ct[0] - maxu),ct[1]]; else ct = [maxu - 1e-10,ct[1]];
+		if(ct[1] < minv) if(closedv) ct = [ct[0],maxv - (ct[1] - minv)]; else ct = [ct[0],minv + 1e-10]; else if(ct[1] > maxv) if(closedv) ct = [ct[0],minv + (ct[0] - maxv)]; else ct = [ct[0],maxv - 1e-10];
 		var c3v0 = verb.core.Vec.norm(verb.core.Vec.mul(ct[0] - cuv[0],e[1][0]));
 		var c3v1 = verb.core.Vec.norm(verb.core.Vec.mul(ct[1] - cuv[1],e[0][1]));
 		if(c3v0 + c3v1 < eps1) return cuv;
@@ -905,7 +905,7 @@ verb.core.Analyze.rationalCurveClosestParam = function(curve,p) {
 	var dif;
 	var minu = curve.knots[0];
 	var maxu = verb.core.ArrayExtensions.last(curve.knots);
-	var closed = verb.core.Vec.normSquared(verb.core.Vec.sub(curve.controlPoints[0],verb.core.ArrayExtensions.last(curve.controlPoints))) < verb.core.Constants.EPSILON;
+	var closed = verb.core.Vec.normSquared(verb.core.Vec.sub(curve.controlPoints[0],verb.core.ArrayExtensions.last(curve.controlPoints))) < 1e-10;
 	var cu = u;
 	var f = function(u2) {
 		return verb.core.Eval.rationalCurveDerivatives(curve,u2,2);
@@ -938,18 +938,18 @@ verb.core.Analyze.rationalCurveClosestParam = function(curve,p) {
 };
 verb.core.Analyze.rationalCurveParamAtArcLength = function(curve,len,tol,beziers,bezierLengths) {
 	if(tol == null) tol = 1e-3;
-	if(len < verb.core.Constants.EPSILON) return curve.knots[0];
+	if(len < 1e-10) return curve.knots[0];
 	var crvs;
 	if(beziers != null) crvs = beziers; else crvs = verb.core.Modify.decomposeCurveIntoBeziers(curve);
 	var i = 0;
 	var cc = crvs[i];
-	var cl = -verb.core.Constants.EPSILON;
+	var cl = -1e-10;
 	var bezier_lengths;
 	if(bezierLengths != null) bezier_lengths = bezierLengths; else bezier_lengths = [];
 	while(cl < len && i < crvs.length) {
 		if(i < bezier_lengths.length) bezier_lengths[i] = bezier_lengths[i]; else bezier_lengths[i] = verb.core.Analyze.rationalBezierCurveArcLength(curve);
 		cl += bezier_lengths[i];
-		if(len < cl + verb.core.Constants.EPSILON) return verb.core.Analyze.rationalBezierCurveParamAtArcLength(curve,len,tol,bezier_lengths[i]);
+		if(len < cl + 1e-10) return verb.core.Analyze.rationalBezierCurveParamAtArcLength(curve,len,tol,bezier_lengths[i]);
 		i++;
 	}
 	return -1;
@@ -966,7 +966,7 @@ verb.core.Analyze.rationalBezierCurveParamAtArcLength = function(curve,len,tol,t
 	var mid_p = 0.0;
 	var mid_l = 0.0;
 	var tol1;
-	if(tol != null) tol1 = tol; else tol1 = verb.core.Constants.TOLERANCE * 2;
+	if(tol != null) tol1 = tol; else tol1 = 2e-06;
 	while(end_l - start_l > tol1) {
 		mid_p = (start_p + end_p) / 2;
 		mid_l = verb.core.Analyze.rationalBezierCurveArcLength(curve,mid_p);
@@ -987,7 +987,7 @@ verb.core.Analyze.rationalCurveArcLength = function(curve,u,gaussDegIncrease) {
 	var i = 0;
 	var cc = crvs[0];
 	var sum = 0.0;
-	while(i < crvs.length && cc.knots[0] + verb.core.Constants.EPSILON < u) {
+	while(i < crvs.length && cc.knots[0] + 1e-10 < u) {
 		var param = Math.min(verb.core.ArrayExtensions.last(cc.knots),u);
 		sum += verb.core.Analyze.rationalBezierCurveArcLength(cc,param,gaussDegIncrease);
 		cc = crvs[++i];
@@ -1132,8 +1132,8 @@ verb.core.Divide.rationalCurveByArcLength = function(curve,l) {
 	var u;
 	while(i < crvs.length) {
 		runsum += crvlens[i];
-		while(lc < runsum + verb.core.Constants.EPSILON) {
-			u = verb.core.Analyze.rationalBezierCurveParamAtArcLength(crvs[i],lc - runsum1,verb.core.Constants.TOLERANCE,crvlens[i]);
+		while(lc < runsum + 1e-10) {
+			u = verb.core.Analyze.rationalBezierCurveParamAtArcLength(crvs[i],lc - runsum1,1e-6,crvlens[i]);
 			pts.push(new verb.core.types.CurveLengthSample(u,lc));
 			lc += inc;
 		}
@@ -1709,7 +1709,7 @@ verb.core.Intersect.meshes = function(mesh0,mesh1) {
 	}).filter(function(x) {
 		return x != null;
 	}).filter(function(x1) {
-		return verb.core.Vec.distSquared(x1.min.point,x1.max.point) > verb.core.Constants.EPSILON;
+		return verb.core.Vec.distSquared(x1.min.point,x1.max.point) > 1e-10;
 	}),function(a,b) {
 		var s1 = verb.core.Vec.sub(a.min.uv0,b.min.uv0);
 		var d1 = verb.core.Vec.dot(s1,s1);
@@ -1719,7 +1719,7 @@ verb.core.Intersect.meshes = function(mesh0,mesh1) {
 		var d3 = verb.core.Vec.dot(s3,s3);
 		var s4 = verb.core.Vec.sub(a.max.uv0,b.min.uv0);
 		var d4 = verb.core.Vec.dot(s4,s4);
-		return d1 < verb.core.Constants.EPSILON && d2 < verb.core.Constants.EPSILON || d3 < verb.core.Constants.EPSILON && d4 < verb.core.Constants.EPSILON;
+		return d1 < 1e-10 && d2 < 1e-10 || d3 < 1e-10 && d4 < 1e-10;
 	});
 	if(segments.length == 0) return [];
 	return verb.core.Intersect.makeMeshIntersectionPolylines(segments);
@@ -1795,7 +1795,7 @@ verb.core.Intersect.lookupAdjacentSegment = function(segEnd,tree,numSegments) {
 	if(numSegments != null) {
 		if(numSegments < 3) numResults = 3; else numResults = numSegments;
 	} else numResults = 3;
-	var adj = tree.nearest(segEnd.point,numResults,verb.core.Constants.EPSILON).filter(function(r) {
+	var adj = tree.nearest(segEnd.point,numResults,1e-10).filter(function(r) {
 		return segEnd != r.item0.obj;
 	}).map(function(r1) {
 		return r1.item0.obj;
@@ -1917,7 +1917,7 @@ verb.core.Intersect.clipRayInCoplanarTriangle = function(ray,mesh,faceIndex) {
 		if(res == null) continue;
 		var useg = res.u0;
 		var uray = res.u1;
-		if(useg < -verb.core.Constants.EPSILON || useg > l[i] + verb.core.Constants.EPSILON) continue;
+		if(useg < -1e-10 || useg > l[i] + 1e-10) continue;
 		if(minU == null || uray < minU.u) minU = new verb.core.types.CurveTriPoint(uray,verb.core.Vec.onRay(ray.origin,ray.dir,uray),verb.core.Vec.onRay(uvs[i],uvd[i],useg / l[i]));
 		if(maxU == null || uray > maxU.u) maxU = new verb.core.types.CurveTriPoint(uray,verb.core.Vec.onRay(ray.origin,ray.dir,uray),verb.core.Vec.onRay(uvs[i],uvd[i],useg / l[i]));
 	}
@@ -1925,7 +1925,7 @@ verb.core.Intersect.clipRayInCoplanarTriangle = function(ray,mesh,faceIndex) {
 	return new verb.core.types.Interval(minU,maxU);
 };
 verb.core.Intersect.mergeTriangleClipIntervals = function(clip1,clip2,mesh1,faceIndex1,mesh2,faceIndex2) {
-	if(clip2.min.u > clip1.max.u + verb.core.Constants.EPSILON || clip1.min.u > clip2.max.u + verb.core.Constants.EPSILON) return null;
+	if(clip2.min.u > clip1.max.u + 1e-10 || clip1.min.u > clip2.max.u + 1e-10) return null;
 	var min;
 	if(clip1.min.u > clip2.min.u) min = new verb.core.types.Pair(clip1.min,0); else min = new verb.core.types.Pair(clip2.min,1);
 	var max;
@@ -1949,7 +1949,7 @@ verb.core.Intersect.mergeTriangleClipIntervals = function(clip1,clip2,mesh1,face
 };
 verb.core.Intersect.planes = function(origin0,normal0,origin1,normal1) {
 	var d = verb.core.Vec.cross(normal0,normal1);
-	if(verb.core.Vec.dot(d,d) < verb.core.Constants.EPSILON) return null;
+	if(verb.core.Vec.dot(d,d) < 1e-10) return null;
 	var li = 0;
 	var mi = Math.abs(d[0]);
 	var m1 = Math.abs(d[1]);
@@ -1994,7 +1994,7 @@ verb.core.Intersect.planes = function(origin0,normal0,origin1,normal1) {
 verb.core.Intersect.threePlanes = function(n0,d0,n1,d1,n2,d2) {
 	var u = verb.core.Vec.cross(n1,n2);
 	var den = verb.core.Vec.dot(n0,u);
-	if(Math.abs(den) < verb.core.Constants.EPSILON) return null;
+	if(Math.abs(den) < 1e-10) return null;
 	var diff = verb.core.Vec.sub(verb.core.Vec.mul(d2,n1),verb.core.Vec.mul(d1,n2));
 	var num = verb.core.Vec.add(verb.core.Vec.mul(d0,u),verb.core.Vec.cross(n0,diff));
 	return verb.core.Vec.mul(1 / den,num);
@@ -2043,7 +2043,7 @@ verb.core.Intersect.rays = function(a0,a,b0,b) {
 	var daa = verb.core.Vec.dot(a,a);
 	var dbb = verb.core.Vec.dot(b,b);
 	var div = daa * dbb - dab * dab;
-	if(Math.abs(div) < verb.core.Constants.EPSILON) return null;
+	if(Math.abs(div) < 1e-10) return null;
 	var num = dab * (dab0 - daa0) - daa * (dbb0 - dba0);
 	var w = num / div;
 	var t = (dab0 - daa0 + w * dab) / daa;
@@ -2062,7 +2062,7 @@ verb.core.Intersect.segmentWithTriangle = function(p0,p1,points,tri) {
 	var w0 = verb.core.Vec.sub(p0,v0);
 	var a = -verb.core.Vec.dot(n,w0);
 	var b = verb.core.Vec.dot(n,dir);
-	if(Math.abs(b) < verb.core.Constants.EPSILON) return null;
+	if(Math.abs(b) < 1e-10) return null;
 	var r = a / b;
 	if(r < 0 || r > 1) return null;
 	var pt = verb.core.Vec.add(p0,verb.core.Vec.mul(r,dir));
@@ -2073,15 +2073,15 @@ verb.core.Intersect.segmentWithTriangle = function(p0,p1,points,tri) {
 	var wu = verb.core.Vec.dot(w,u);
 	var wv = verb.core.Vec.dot(w,v);
 	var denom = uv * uv - uu * vv;
-	if(Math.abs(denom) < verb.core.Constants.EPSILON) return null;
+	if(Math.abs(denom) < 1e-10) return null;
 	var s = (uv * wv - vv * wu) / denom;
 	var t = (uv * wu - uu * wv) / denom;
-	if(s > 1.0 + verb.core.Constants.EPSILON || t > 1.0 + verb.core.Constants.EPSILON || t < -verb.core.Constants.EPSILON || s < -verb.core.Constants.EPSILON || s + t > 1.0 + verb.core.Constants.EPSILON) return null;
+	if(s > 1.0000000001 || t > 1.0000000001 || t < -1e-10 || s < -1e-10 || s + t > 1.0000000001) return null;
 	return new verb.core.types.TriSegmentIntersection(pt,s,t,r);
 };
 verb.core.Intersect.segment_with_plane = function(p0,p1,v0,n) {
 	var denom = verb.core.Vec.dot(n,verb.core.Vec.sub(p0,p1));
-	if(Math.abs(denom) < verb.core.Constants.EPSILON) return null;
+	if(Math.abs(denom) < 1e-10) return null;
 	var numer = verb.core.Vec.dot(n,verb.core.Vec.sub(v0,p0));
 	return { p : numer / denom};
 };
@@ -2269,6 +2269,38 @@ verb.core.BinaryHeap.prototype = {
 };
 verb.core.Make = $hx_exports.core.Make = function() { };
 verb.core.Make.__name__ = ["verb","core","Make"];
+verb.core.Make.loftedSurface = function(curves,degreeV) {
+	curves = verb.core.Modify.unifyCurveKnotVectors(curves);
+	var degreeU = curves[0].degree;
+	if(degreeV == null) degreeV = 1;
+	if(degreeV > curves.length - 1) degreeV = curves.length - 1;
+	var knotsU = curves[0].knots;
+	var knotsV = verb.core.Vec.zeros1d(degreeV + 1);
+	var m = curves.length - degreeV - 1;
+	var step = 1.0 / (m + 1);
+	var _g1 = 1;
+	var _g = m + 1;
+	while(_g1 < _g) {
+		var i = _g1++;
+		knotsV.push(step * i);
+	}
+	var _g11 = 0;
+	var _g2 = degreeV + 1;
+	while(_g11 < _g2) {
+		var i1 = _g11++;
+		knotsV.push(1.0);
+	}
+	var controlPoints = curves.map(function(x) {
+		return x.controlPoints;
+	});
+	controlPoints = verb.core.Mat.transpose(controlPoints);
+	return new verb.core.types.NurbsSurfaceData(degreeU,degreeV,knotsU,knotsV,controlPoints);
+};
+verb.core.Make.clonedCurve = function(curve) {
+	return new verb.core.types.NurbsCurveData(curve.degree,curve.knots.slice(),curve.controlPoints.map(function(x) {
+		return x.slice();
+	}));
+};
 verb.core.Make.rationalBezierCurve = function(controlPoints,weights) {
 	var degree = controlPoints.length - 1;
 	var knots = [];
@@ -2521,7 +2553,7 @@ verb.core.Make.revolvedSurface = function(profile,center,axis,theta) {
 		var X = verb.core.Vec.sub(prof_controlPoints[j1],O);
 		var r = verb.core.Vec.norm(X);
 		var Y = verb.core.Vec.cross(axis,X);
-		if(r > verb.core.Constants.EPSILON) {
+		if(r > 1e-10) {
 			X = verb.core.Vec.mul(1 / r,X);
 			Y = verb.core.Vec.mul(1 / r,Y);
 		}
@@ -2976,10 +3008,71 @@ verb.core.KnotMultiplicity.prototype = {
 };
 verb.core.Modify = $hx_exports.core.Modify = function() { };
 verb.core.Modify.__name__ = ["verb","core","Modify"];
-verb.core.Modify.min = function(a,b) {
+verb.core.Modify.unifyCurveKnotVectors = function(curves) {
+	curves = curves.map(verb.core.Make.clonedCurve);
+	var maxDegree = Lambda.fold(curves,function(x,a) {
+		return verb.core.Modify.imax(x.degree,a);
+	},0);
+	var _g1 = 0;
+	var _g = curves.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		if(curves[i].degree < maxDegree) curves[i] = verb.core.Modify.curveElevateDegree(curves[i],maxDegree);
+	}
+	var knotIntervals;
+	var _g2 = [];
+	var _g11 = 0;
+	while(_g11 < curves.length) {
+		var c = curves[_g11];
+		++_g11;
+		_g2.push(new verb.core.types.Interval(c.knots[0],verb.core.ArrayExtensions.last(c.knots)));
+	}
+	knotIntervals = _g2;
+	var _g21 = 0;
+	var _g12 = curves.length;
+	while(_g21 < _g12) {
+		var i1 = _g21++;
+		var min = [knotIntervals[i1].min];
+		curves[i1].knots = curves[i1].knots.map((function(min) {
+			return function(x1) {
+				return x1 - min[0];
+			};
+		})(min));
+	}
+	var knotSpans = knotIntervals.map(function(x2) {
+		return x2.max - x2.min;
+	});
+	var maxKnotSpan = Lambda.fold(knotSpans,function(x3,a1) {
+		return Math.max(x3,a1);
+	},0.0);
+	var _g22 = 0;
+	var _g13 = curves.length;
+	while(_g22 < _g13) {
+		var i2 = _g22++;
+		var scale = [maxKnotSpan / knotSpans[i2]];
+		curves[i2].knots = curves[i2].knots.map((function(scale) {
+			return function(x4) {
+				return x4 * scale[0];
+			};
+		})(scale));
+	}
+	var mergedKnots = Lambda.fold(curves,function(x5,a2) {
+		return verb.core.Vec.sortedSetUnion(x5.knots,a2);
+	},[]);
+	var _g23 = 0;
+	var _g14 = curves.length;
+	while(_g23 < _g14) {
+		var i3 = _g23++;
+		var rem = verb.core.Vec.sortedSetSub(mergedKnots,curves[i3].knots);
+		if(rem.length == 0) curves[i3] = curves[i3];
+		curves[i3] = verb.core.Modify.curveKnotRefine(curves[i3],rem);
+	}
+	return curves;
+};
+verb.core.Modify.imin = function(a,b) {
 	if(a < b) return a; else return b;
 };
-verb.core.Modify.max = function(a,b) {
+verb.core.Modify.imax = function(a,b) {
 	if(a > b) return a; else return b;
 };
 verb.core.Modify.curveElevateDegree = function(curve,finalDegree) {
@@ -3010,7 +3103,7 @@ verb.core.Modify.curveElevateDegree = function(curve,finalDegree) {
 		var inv = 1.0 / verb.core.Binomial.get(ph,i);
 		var mpi;
 		if(newDegree < i) mpi = newDegree; else mpi = i;
-		var _g3 = verb.core.Modify.max(0,i - degreeInc);
+		var _g3 = verb.core.Modify.imax(0,i - degreeInc);
 		var _g2 = mpi + 1;
 		while(_g3 < _g2) {
 			var j = _g3++;
@@ -3022,7 +3115,7 @@ verb.core.Modify.curveElevateDegree = function(curve,finalDegree) {
 		var i1 = _g4++;
 		var mpi1;
 		if(newDegree < i1) mpi1 = newDegree; else mpi1 = i1;
-		var _g21 = verb.core.Modify.max(0,i1 - degreeInc);
+		var _g21 = verb.core.Modify.imax(0,i1 - degreeInc);
 		var _g11 = mpi1 + 1;
 		while(_g21 < _g11) {
 			var j1 = _g21++;
@@ -3090,7 +3183,7 @@ verb.core.Modify.curveElevateDegree = function(curve,finalDegree) {
 			ebpts[i5] = verb.core.Vec.zeros1d(dim);
 			var mpi2;
 			if(newDegree < i5) mpi2 = newDegree; else mpi2 = i5;
-			var _g31 = verb.core.Modify.max(0,i5 - degreeInc);
+			var _g31 = verb.core.Modify.imax(0,i5 - degreeInc);
 			var _g22 = mpi2 + 1;
 			while(_g31 < _g22) {
 				var j3 = _g31++;
@@ -3199,7 +3292,7 @@ verb.core.Modify.rationalCurveTransform = function(curve,mat) {
 	}
 	return new verb.core.types.NurbsCurveData(curve.degree,curve.knots.slice(),verb.core.Eval.homogenize1d(pts,verb.core.Eval.weight1d(curve.controlPoints)));
 };
-verb.core.Modify.surfaceKnotRefine = function(surface,knots_to_insert,useV) {
+verb.core.Modify.surfaceKnotRefine = function(surface,knotsToInsert,useV) {
 	var newPts = [];
 	var knots;
 	var degree;
@@ -3218,7 +3311,7 @@ verb.core.Modify.surfaceKnotRefine = function(surface,knots_to_insert,useV) {
 	while(_g < ctrlPts.length) {
 		var cptrow = ctrlPts[_g];
 		++_g;
-		c = verb.core.Modify.curveKnotRefine(new verb.core.types.NurbsCurveData(degree,knots,cptrow),knots_to_insert);
+		c = verb.core.Modify.curveKnotRefine(new verb.core.types.NurbsCurveData(degree,knots,cptrow),knotsToInsert);
 		newPts.push(c.controlPoints);
 	}
 	var newknots = c.knots;
@@ -3307,7 +3400,7 @@ verb.core.Modify.knotMultiplicities = function(knots) {
 	while(_g < knots.length) {
 		var knot = knots[_g];
 		++_g;
-		if(Math.abs(knot - curr.knot) > verb.core.Constants.EPSILON) {
+		if(Math.abs(knot - curr.knot) > 1e-10) {
 			curr = new verb.core.KnotMultiplicity(knot,0);
 			mults.push(curr);
 		}
@@ -3336,15 +3429,16 @@ verb.core.Modify.curveSplit = function(curve,u) {
 	var cpts1 = res.controlPoints.slice(s + 1);
 	return [new verb.core.types.NurbsCurveData(degree,knots0,cpts0),new verb.core.types.NurbsCurveData(degree,knots1,cpts1)];
 };
-verb.core.Modify.curveKnotRefine = function(curve,knots_to_insert) {
+verb.core.Modify.curveKnotRefine = function(curve,knotsToInsert) {
+	if(knotsToInsert.length == 0) return verb.core.Make.clonedCurve(curve);
 	var degree = curve.degree;
 	var controlPoints = curve.controlPoints;
 	var knots = curve.knots;
 	var n = controlPoints.length - 1;
 	var m = n + degree + 1;
-	var r = knots_to_insert.length - 1;
-	var a = verb.core.Eval.knotSpan(degree,knots_to_insert[0],knots);
-	var b = verb.core.Eval.knotSpan(degree,knots_to_insert[r],knots);
+	var r = knotsToInsert.length - 1;
+	var a = verb.core.Eval.knotSpan(degree,knotsToInsert[0],knots);
+	var b = verb.core.Eval.knotSpan(degree,knotsToInsert[r],knots);
 	var controlPoints_post = new Array();
 	var knots_post = new Array();
 	var _g1 = 0;
@@ -3375,7 +3469,7 @@ verb.core.Modify.curveKnotRefine = function(curve,knots_to_insert) {
 	var k = b + degree + r;
 	var j = r;
 	while(j >= 0) {
-		while(knots_to_insert[j] <= knots[i4] && i4 > a) {
+		while(knotsToInsert[j] <= knots[i4] && i4 > a) {
 			controlPoints_post[k - degree - 1] = controlPoints[i4 - degree - 1];
 			knots_post[k] = knots[i4];
 			k = k - 1;
@@ -3387,13 +3481,13 @@ verb.core.Modify.curveKnotRefine = function(curve,knots_to_insert) {
 		while(_g14 < _g5) {
 			var l = _g14++;
 			var ind = k - degree + l;
-			var alfa = knots_post[k + l] - knots_to_insert[j];
-			if(Math.abs(alfa) < verb.core.Constants.EPSILON) controlPoints_post[ind - 1] = controlPoints_post[ind]; else {
+			var alfa = knots_post[k + l] - knotsToInsert[j];
+			if(Math.abs(alfa) < 1e-10) controlPoints_post[ind - 1] = controlPoints_post[ind]; else {
 				alfa = alfa / (knots_post[k + l] - knots[i4 - degree + l]);
 				controlPoints_post[ind - 1] = verb.core.Vec.add(verb.core.Vec.mul(alfa,controlPoints_post[ind - 1]),verb.core.Vec.mul(1.0 - alfa,controlPoints_post[ind]));
 			}
 		}
-		knots_post[k] = knots_to_insert[j];
+		knots_post[k] = knotsToInsert[j];
 		k = k - 1;
 		j--;
 	}
@@ -3542,7 +3636,7 @@ verb.core.Numeric.uncmin = function(f,x0,tol,gradient,maxit) {
 	var f1 = f0;
 	var df0;
 	if(Math.isNaN(f0)) throw "uncmin: f(x0) is a NaN!";
-	tol = Math.max(tol,verb.core.Constants.EPSILON);
+	tol = Math.max(tol,1e-10);
 	var step;
 	var g0;
 	var g1;
@@ -3845,7 +3939,7 @@ verb.core.Trig.distToSegment = function(a,b,c) {
 	var acv = verb.core.Vec.sub(c,a);
 	var acl = verb.core.Vec.norm(acv);
 	var bma = verb.core.Vec.sub(b,a);
-	if(acl < verb.core.Constants.TOLERANCE) return verb.core.Vec.norm(bma);
+	if(acl < 1e-6) return verb.core.Vec.norm(bma);
 	var ac = verb.core.Vec.mul(1 / acl,acv);
 	var p = verb.core.Vec.dot(bma,ac);
 	var acd = verb.core.Vec.add(a,verb.core.Vec.mul(p,ac));
@@ -3872,7 +3966,7 @@ verb.core.Trig.threePointsAreFlat = function(p1,p2,p3,tol) {
 verb.core.Trig.segmentClosestPoint = function(pt,segpt0,segpt1,u0,u1) {
 	var dif = verb.core.Vec.sub(segpt1,segpt0);
 	var l = verb.core.Vec.norm(dif);
-	if(l < verb.core.Constants.EPSILON) return { u : u0, pt : segpt0};
+	if(l < 1e-10) return { u : u0, pt : segpt0};
 	var o = segpt0;
 	var r = verb.core.Vec.mul(1 / l,dif);
 	var o2pt = verb.core.Vec.sub(pt,o);
@@ -4041,9 +4135,60 @@ verb.core.Vec.isZero = function(vec) {
 	var _g = vec.length;
 	while(_g1 < _g) {
 		var i = _g1++;
-		if(Math.abs(vec[i]) > verb.core.Constants.TOLERANCE) return false;
+		if(Math.abs(vec[i]) > 1e-6) return false;
 	}
 	return true;
+};
+verb.core.Vec.sortedSetUnion = function(a,b) {
+	var merged = [];
+	var ai = 0;
+	var bi = 0;
+	while(ai < a.length || bi < b.length) {
+		if(ai >= a.length) {
+			merged.push(b[bi]);
+			bi++;
+			continue;
+		} else if(bi >= b.length) {
+			merged.push(a[ai]);
+			ai++;
+			continue;
+		}
+		var diff = a[ai] - b[bi];
+		if(Math.abs(diff) < 1e-10) {
+			merged.push(a[ai]);
+			ai++;
+			bi++;
+			continue;
+		}
+		if(diff > 0.0) {
+			merged.push(b[bi]);
+			bi++;
+			continue;
+		}
+		merged.push(a[ai]);
+		ai++;
+	}
+	return merged;
+};
+verb.core.Vec.sortedSetSub = function(a,b) {
+	var result = [];
+	var ai = 0;
+	var bi = 0;
+	while(ai < a.length) {
+		if(bi >= b.length) {
+			result.push(a[ai]);
+			ai++;
+			continue;
+		}
+		if(Math.abs(a[ai] - b[bi]) < 1e-10) {
+			ai++;
+			bi++;
+			continue;
+		}
+		result.push(a[ai]);
+		ai++;
+	}
+	return result;
 };
 verb.core.types = {};
 verb.core.types.AdaptiveRefinementOptions = function() {
@@ -4129,7 +4274,7 @@ verb.core.types.AdaptiveRefinementNode.prototype = {
 		if(this.neighbors[edgeIndex] == null) return baseArr;
 		var corners = this.neighbors[edgeIndex].getEdgeCorners((edgeIndex + 2) % 4);
 		var funcIndex = edgeIndex % 2;
-		var e = verb.core.Constants.EPSILON;
+		var e = 1e-10;
 		var that = this;
 		var rangeFuncMap = [function(c) {
 			return c.uv[0] > that.corners[0].uv[0] + e && c.uv[0] < that.corners[2].uv[0] - e;

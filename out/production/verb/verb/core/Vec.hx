@@ -123,4 +123,75 @@ class Vec {
 
         return true;
     }
+
+    public static function sortedSetUnion( a : Array<Float>, b : Array<Float>) : Array<Float> {
+
+        var merged = [];
+
+        var ai = 0;
+        var bi = 0;
+        while ( ai < a.length || bi < b.length ){
+
+            if ( ai >= a.length ){
+                merged.push( b[bi] );
+                bi++;
+                continue;
+            } else if ( bi >= b.length ){
+                merged.push( a[ai] );
+                ai++;
+                continue;
+            }
+
+            var diff = a[ai] - b[bi];
+
+            if ( Math.abs(diff) < Constants.EPSILON ){
+                merged.push( a[ai] );
+                ai++;
+                bi++;
+                continue;
+            }
+
+            if (diff > 0.0){
+                // add the smaller
+                merged.push( b[bi] );
+                bi++;
+                continue;
+            }
+
+            // thus diff < 0.0
+            merged.push( a[ai] );
+            ai++;
+
+        }
+
+        return merged;
+    }
+
+    // a is superset, hence it is always longer or equal
+    public static function sortedSetSub( a : Array<Float>, b : Array<Float>) : Array<Float> {
+
+        var result = [];
+
+        var ai = 0;
+        var bi = 0;
+        while ( ai < a.length ){
+
+            if ( bi >= b.length ){
+                result.push( a[ai] );
+                ai++;
+                continue;
+            }
+
+            if ( Math.abs( a[ai] - b[bi] ) < Constants.EPSILON ){
+                ai++;
+                bi++;
+                continue;
+            }
+
+            result.push( a[ai] );
+            ai++;
+        }
+
+        return result;
+    }
 }

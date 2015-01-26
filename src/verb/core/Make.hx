@@ -1,5 +1,7 @@
 package verb.core;
 
+import verb.geom.NurbsSurface;
+import verb.core.types.Interval;
 import verb.core.Mat.Vector;
 import verb.core.types.NurbsSurfaceData;
 import verb.core.types.NurbsCurveData;
@@ -8,6 +10,46 @@ using verb.core.ArrayExtensions;
 
 @:expose("core.Make")
 class Make {
+
+    public static function loftedSurface( curves : Array<NurbsCurveData>, degreeV : Int = null ) : NurbsSurfaceData {
+
+        curves = Modify.unifyCurveKnotVectors( curves );
+
+        // degree
+        var degreeU = curves[0].degree;
+        if (degreeV == null) degreeV = 3;
+        if (degreeV > curves.length - 1){
+            degreeV = curves.length - 1;
+        }
+
+        // knots
+        var knotsU = curves[0].knots;
+        var knotsV = Vec.zeros1d( degreeV + 1 );
+
+        var m = curves.length - degreeV - 1;
+
+        var step = 1.0 / (m + 1);
+
+        for ( i in 1...m+1 ){
+            knotsV.push( step * i );
+        }
+
+        for ( i in 0...degreeV+1 ){
+            knotsV.push(1.0);
+        }
+
+        // controlPoints
+        var controlPoints = curves.map(function(x){
+            return x.controlPoints;
+        });
+        controlPoints = Mat.transpose( controlPoints );
+
+        return new NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
+    }
+
+    public static function clonedCurve( curve : NurbsCurveData ) : NurbsCurveData {
+        return new NurbsCurveData( curve.degree, curve.knots.copy(), curve.controlPoints.map(function(x){ return x.copy(); }) );
+    }
 
     // Generate the control points, weights, and knots for a bezier curve of any degree
     //
