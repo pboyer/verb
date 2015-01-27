@@ -2,43 +2,42 @@
 
 #verb
 ###A CAD Library for the Web
-####Current version: 0.1.0
+####Current version: 0.2.0
 
-<strong>verb</strong> is a JavaScript library for creating and manipulating NURBS surfaces and curves in the browser or node.js.  It provides a rich set of features with <a href="http://verbnurbs.com/geometry.html">many types of surfaces and curves</a> in a <a href="http://verbnurbs.com.s3-website-us-east-1.amazonaws.com/js/verb.min.js">10kb (gzipped, minified) package</a>.
+<strong>verb</strong> is a library for creating and manipulating NURBS surfaces and curves in many languages.
 
-verb also provides advanced tools like derivative evaluation, adaptive tesselation, and intersection.  Geometry can be "watched" in a backbone-like style and defaults to multi-threaded parallel execution via WebWorkers in modern browsers.  
-
-###Documentation
-
-The latest build of the documentation is located [here](http://verbnurbs.com.s3-website-us-east-1.amazonaws.com/docs/verb.html)
-
-###Latest build
-
-The *kernel* provides nice geometric types like NurbsSurface and an abstraction around external execution of the *library*, which is the stripped down stateless library.  
-
-+ [Latest kernel 0.1.0](https://raw.github.com/pboyer/verb/master/build/verb.min.js)
-+ [Latest library 0.1.0](https://raw.github.com/pboyer/verb/master/build/verbEval.min.js)
+verb provides advanced tools like derivative evaluation, adaptive tessellation, and intersection.  Verb provides a parallel execution runtime via WebWorkers in modern browsers.
 
 ###Getting started
 
-Install dependencies:
+Install <a href="http://haxe.org/">haxe</a> and <a href="http://haxe.org/">node.js</a>
+
+Install haxe dependencies:
+
+	haxelib install promhx
+	haxelib install nodejs
+
+Install node.js dependencies:
 
 	npm install
 
-Build compiled library and documentation:
+Install grunt:
 
-	grunt 
+	npm install -g grunt-cli
 
-Run all unit tests (>160 in total):
+Build compiled as javascript:
+
+	grunt build
+
+Run all unit tests (>260 in total):
 
 	grunt test
-
 
 ###License
 
 The MIT License (MIT)
 
-Copyright (c) Peter Boyer 2014
+Copyright (c) Peter Boyer 2015
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
