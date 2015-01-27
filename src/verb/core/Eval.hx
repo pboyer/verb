@@ -363,13 +363,14 @@ class Eval {
 	// i the ith control point weight and pi is the ith control point,
 	// hence the dimension of the point is dim + 1
 	
-	public static function homogenize1d( controlPoints : Array<Point>, weights : Array<Float>) : Array<Point> {
+	public static function homogenize1d( controlPoints : Array<Point>, weights : Array<Float> = null) : Array<Point> {
 
 		var rows = controlPoints.length
 		, dim = controlPoints[0].length
 		, homo_controlPoints = new Array<Point>()
 		, wt : Float = 0.0
-		, ref_pt = new Point();
+		, ref_pt = new Point()
+		, weights = weights != null ? weights : Vec.rep( controlPoints.length, 1.0 );
 
 		for (i in 0...rows) {
 
@@ -401,9 +402,10 @@ class Eval {
 	// (m x n x dim+1)
 	
 	public static function homogenize2d( controlPoints : Array<Array<Point>>,
-										  weights: Array<Array<Float>>) : Array<Array<Point>> {
+										  weights: Array<Array<Float>> = null ) : Array<Array<Point>> {
 		var rows = controlPoints.length
-		, homo_controlPoints = new Array<Array<Point>>();
+		, homo_controlPoints = new Array<Array<Point>>()
+		, weights = weights != null ? weights : [ for (i in 0...rows ) Vec.rep( controlPoints[0].length, 1.0 ) ];
 
 		for (i in 0...rows) {
 			homo_controlPoints.push( homogenize1d(controlPoints[i], weights[i]) );

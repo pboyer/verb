@@ -24,25 +24,21 @@ class Make {
 
         // knots
         var knotsU = curves[0].knots;
-        var knotsV = Vec.zeros1d( degreeV + 1 );
 
-        var m = curves.length - degreeV - 1;
+        var knotsV = [];
+        var controlPoints = [];
+        for ( i in 0...curves[0].controlPoints.length ){
 
-        var step = 1.0 / (m + 1);
+            // extract the ith control pt of each curve
+            var points = curves.map(function(x){
+                return x.controlPoints[i];
+            });
 
-        for ( i in 1...m+1 ){
-            knotsV.push( step * i );
+            // construct an interpolating curve using this list
+            var c = Make.rationalInterpCurve( points, degreeV, true );
+            controlPoints.push( c.controlPoints );
+            knotsV = c.knots; // redundant computation
         }
-
-        for ( i in 0...degreeV+1 ){
-            knotsV.push(1.0);
-        }
-
-        // controlPoints
-        var controlPoints = curves.map(function(x){
-            return x.controlPoints;
-        });
-        controlPoints = Mat.transpose( controlPoints );
 
         return new NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
     }
@@ -552,8 +548,11 @@ class Make {
 
     }
 
-    public static function rationalInterpCurve( points : Array<Point>, degree : Int = 3,
-                                                  start_tangent : Point = null, end_tangent : Point = null ) : NurbsCurveData {
+    public static function rationalInterpCurve( points : Array<Point>,
+                                                degree : Int = 3,
+                                                homogeneousPoints : Bool = false,
+                                                start_tangent : Point = null,
+                                                end_tangent : Point = null ) : NurbsCurveData {
 
         // 0) build knot vector for curve by normalized chord length
         // 1) construct effective basis function in square matrix (W)
@@ -657,9 +656,13 @@ class Make {
         }
 
         var controlPts = Mat.transpose(xs);
-        var weights = Vec.rep(controlPts.length, 1.0);
 
-        return new NurbsCurveData( degree, knots, Eval.homogenize1d(controlPts, weights) );
+        if (!homogeneousPoints){
+            var weights = Vec.rep(controlPts.length, 1.0);
+            controlPts = Eval.homogenize1d(controlPts, weights);
+        }
+
+        return new NurbsCurveData( degree, knots, controlPts );
 
     }
 }

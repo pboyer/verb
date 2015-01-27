@@ -1277,12 +1277,14 @@ verb.core.Eval.homogenize1d = function(controlPoints,weights) {
 	var homo_controlPoints = new Array();
 	var wt = 0.0;
 	var ref_pt = new Array();
+	var weights1;
+	if(weights != null) weights1 = weights; else weights1 = verb.core.Vec.rep(controlPoints.length,1.0);
 	var _g = 0;
 	while(_g < rows) {
 		var i = _g++;
 		var pt = [];
 		ref_pt = controlPoints[i];
-		wt = weights[i];
+		wt = weights1[i];
 		var _g1 = 0;
 		while(_g1 < dim) {
 			var k = _g1++;
@@ -1296,10 +1298,20 @@ verb.core.Eval.homogenize1d = function(controlPoints,weights) {
 verb.core.Eval.homogenize2d = function(controlPoints,weights) {
 	var rows = controlPoints.length;
 	var homo_controlPoints = new Array();
-	var _g = 0;
-	while(_g < rows) {
-		var i = _g++;
-		homo_controlPoints.push(verb.core.Eval.homogenize1d(controlPoints[i],weights[i]));
+	var weights1;
+	if(weights != null) weights1 = weights; else {
+		var _g = [];
+		var _g1 = 0;
+		while(_g1 < rows) {
+			var i = _g1++;
+			_g.push(verb.core.Vec.rep(controlPoints[0].length,1.0));
+		}
+		weights1 = _g;
+	}
+	var _g11 = 0;
+	while(_g11 < rows) {
+		var i1 = _g11++;
+		homo_controlPoints.push(verb.core.Eval.homogenize1d(controlPoints[i1],weights1[i1]));
 	}
 	return homo_controlPoints;
 };
@@ -2237,25 +2249,21 @@ verb.core.Make.loftedSurface = function(curves,degreeV) {
 	if(degreeV == null) degreeV = 3;
 	if(degreeV > curves.length - 1) degreeV = curves.length - 1;
 	var knotsU = curves[0].knots;
-	var knotsV = verb.core.Vec.zeros1d(degreeV + 1);
-	var m = curves.length - degreeV - 1;
-	var step = 1.0 / (m + 1);
-	var _g1 = 1;
-	var _g = m + 1;
+	var knotsV = [];
+	var controlPoints = [];
+	var _g1 = 0;
+	var _g = curves[0].controlPoints.length;
 	while(_g1 < _g) {
-		var i = _g1++;
-		knotsV.push(step * i);
+		var i = [_g1++];
+		var points = curves.map((function(i) {
+			return function(x) {
+				return x.controlPoints[i[0]];
+			};
+		})(i));
+		var c = verb.core.Make.rationalInterpCurve(points,degreeV,true);
+		controlPoints.push(c.controlPoints);
+		knotsV = c.knots;
 	}
-	var _g11 = 0;
-	var _g2 = degreeV + 1;
-	while(_g11 < _g2) {
-		var i1 = _g11++;
-		knotsV.push(1.0);
-	}
-	var controlPoints = curves.map(function(x) {
-		return x.controlPoints;
-	});
-	controlPoints = verb.core.Mat.transpose(controlPoints);
 	return new verb.core.types.NurbsSurfaceData(degreeU,degreeV,knotsU,knotsV,controlPoints);
 };
 verb.core.Make.clonedCurve = function(curve) {
@@ -2562,7 +2570,8 @@ verb.core.Make.ConicalSurface = function(axis,xaxis,base,height,radius) {
 	var prof = new verb.core.types.NurbsCurveData(prof_degree,prof_knots,verb.core.Eval.homogenize1d(prof_ctrl_pts,prof_weights));
 	return verb.core.Make.revolvedSurface(prof,base,axis,angle);
 };
-verb.core.Make.rationalInterpCurve = function(points,degree,start_tangent,end_tangent) {
+verb.core.Make.rationalInterpCurve = function(points,degree,homogeneousPoints,start_tangent,end_tangent) {
+	if(homogeneousPoints == null) homogeneousPoints = false;
 	if(degree == null) degree = 3;
 	if(points.length < degree + 1) throw "You need to supply at least degree + 1 points!";
 	var us = [0.0];
@@ -2652,8 +2661,11 @@ verb.core.Make.rationalInterpCurve = function(points,degree,start_tangent,end_ta
 		xs.push(x1);
 	}
 	var controlPts = verb.core.Mat.transpose(xs);
-	var weights = verb.core.Vec.rep(controlPts.length,1.0);
-	return new verb.core.types.NurbsCurveData(degree,knots,verb.core.Eval.homogenize1d(controlPts,weights));
+	if(!homogeneousPoints) {
+		var weights = verb.core.Vec.rep(controlPts.length,1.0);
+		controlPts = verb.core.Eval.homogenize1d(controlPts,weights);
+	}
+	return new verb.core.types.NurbsCurveData(degree,knots,controlPts);
 };
 verb.core.LUDecomp = function(lu,p) {
 	this.LU = lu;
@@ -4889,7 +4901,7 @@ verb.geom.NurbsCurve = $hx_exports.geom.NurbsCurve = function(data) {
 };
 verb.geom.NurbsCurve.__name__ = ["verb","geom","NurbsCurve"];
 verb.geom.NurbsCurve.__interfaces__ = [verb.geom.ICurve];
-verb.geom.NurbsCurve.byControlPointsWeights = function(degree,knots,controlPoints,weights) {
+verb.geom.NurbsCurve.byKnotsControlPointsWeights = function(degree,knots,controlPoints,weights) {
 	return new verb.geom.NurbsCurve(new verb.core.types.NurbsCurveData(degree,knots.slice(),verb.core.Eval.homogenize1d(controlPoints,weights)));
 };
 verb.geom.NurbsCurve.byPoints = function(points,degree) {
@@ -5060,11 +5072,27 @@ verb.geom.NurbsSurface = $hx_exports.geom.NurbsSurface = function(data) {
 };
 verb.geom.NurbsSurface.__name__ = ["verb","geom","NurbsSurface"];
 verb.geom.NurbsSurface.__interfaces__ = [verb.geom.ISurface];
-verb.geom.NurbsSurface.byControlPointsWeights = function(degreeU,degreeV,knotsU,knotsV,controlPoints,weights) {
+verb.geom.NurbsSurface.byKnotsControlPointsWeights = function(degreeU,degreeV,knotsU,knotsV,controlPoints,weights) {
 	return new verb.geom.NurbsSurface(new verb.core.types.NurbsSurfaceData(degreeU,degreeV,knotsU,knotsV,verb.core.Eval.homogenize2d(controlPoints,weights)));
 };
 verb.geom.NurbsSurface.byCorners = function(point0,point1,point2,point3) {
 	return new verb.geom.NurbsSurface(verb.core.Make.fourPointSurface(point0,point1,point2,point3));
+};
+verb.geom.NurbsSurface.byLoftingCurves = function(curves,degreeV) {
+	return new verb.geom.NurbsSurface(verb.core.Make.loftedSurface((function($this) {
+		var $r;
+		var _g = [];
+		{
+			var _g1 = 0;
+			while(_g1 < curves.length) {
+				var c = curves[_g1];
+				++_g1;
+				_g.push(c.asNurbs());
+			}
+		}
+		$r = _g;
+		return $r;
+	}(this)),degreeV));
 };
 verb.geom.NurbsSurface.__super__ = verb.exe.AsyncObject;
 verb.geom.NurbsSurface.prototype = $extend(verb.exe.AsyncObject.prototype,{

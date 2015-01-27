@@ -7,6 +7,7 @@
 
   <script src="../build/verb.js"></script>
 
+
 	<style>
 		body {
 			margin: 0;
@@ -19,6 +20,7 @@
 
   <script src="js/three.min.js"></script>
   <script src="js/OrbitControls.js"></script>
+  <script src="js/threeBasic.js"></script>
   
 	<script>
 
@@ -65,9 +67,10 @@
 			var c0 = new verb.core.NurbsCurveData( 2, [0,0,0,1,1,1], [ [0,0,0,1], [10,0,0,1], [20,0,0,1] ] );
 			var c1 = new verb.core.NurbsCurveData( 3, [0,0,0,0,1,1,1,1], [ [0,10,10,1], [10,10,10,1], [20,0,10,1], [30,0,10,1] ] );
 			var c2 = new verb.core.NurbsCurveData( 3, [0,0,0,0,0.5,1,1,1,1], [ [0,1,20,1], [10,-10,20,1], [20,4,20,1], [30,0,20,1], [40,0,20,1] ] );
+			var c3 = new verb.core.NurbsCurveData( 3, [0,0,0,0,0.5,1,1,1,1], [ [0,1,40,1], [10,-10,40,1], [20,4,30,1], [30,0,40,1], [40,0,40,1] ] );
 
-			var curves = [c0, c1, c2]
-			var surface = verb.core.Make.loftedSurface( curves, 2 );
+			var curves = [c0, c1, c2, c3]
+			var surface = verb.core.Make.loftedSurface( curves, 1 );
 
 			return new verb.geom.NurbsSurface( surface );
 		}
@@ -80,15 +83,21 @@
 
 		var d1 = Date.now();
 
-		var runs = 1;
+		var runs = 50;
 
 		for (var i = 0; i < runs; i++){
-			var mesh = srf.tessellate();
+			var mesh = srf.tessellate( { normTol: 1e-2 } );
 		}
 
 		var d2 = Date.now();
 
 		console.log( (d2 - d1) / runs, " ms to make ", mesh.faces.length, " triangles " );
+
+		var pts = srf.asNurbs().controlPoints.reduce(function(a,x){
+			return a.concat(x);
+		}, []);
+
+		addPointsToScene( pts );
 
 		// verb.NurbsSurface -> THREE.Geometry
 		function tessellate(srf, tess) {

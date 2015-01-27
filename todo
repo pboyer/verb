@@ -1,5 +1,5 @@
-Degree elevation
 LoftedSurface
+More efficient representation for surface tessellation, don't use 2d arrays
 SweptSurface
 Mesh intersection has difficulties capturing loops - example/threeMeshIntersectExample.html
 Mesh interesection needs unit tests

@@ -56,11 +56,11 @@ class NurbsCurve extends AsyncObject implements ICurve {
     // **returns**
     // + A new NurbsCurve
 
-    public static function byControlPointsWeights(  degree : Int,
-                                                    knots : KnotArray,
-                                                    controlPoints : Array<Point>,
-                                                    weights : Array<Float> ) : NurbsCurve {
-        return new NurbsCurve( new NurbsCurveData( degree, knots.copy(), Eval.homogenize1d(controlPoints, weights) ) );
+    public static function byKnotsControlPointsWeights( degree : Int,
+                                                        knots : KnotArray,
+                                                        controlPoints : Array<Point>,
+                                                        weights : Array<Float> = null ) : NurbsCurve {
+        return new NurbsCurve( new NurbsCurveData( degree, knots.copy(), Eval.homogenize1d( controlPoints, weights) ) );
     }
 
     // Construct a NurbsCurve by interpolating a collection of points.  The resultant curve

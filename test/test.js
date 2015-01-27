@@ -2378,9 +2378,9 @@ describe("verb.core.Mat.solve",function(){
 
 describe("verb.core.Make.rationalInterpCurve",function(){
 
-	function shouldInterpPointsWithTangents(pts, degree, start_tangent, end_tangent){
+	function shouldInterpPointsWithTangents(pts, degree, isHomo, start_tangent, end_tangent){
 
-		var crv = shouldInterpPoints(pts, degree, start_tangent, end_tangent);
+		var crv = shouldInterpPoints(pts, degree, isHomo, start_tangent, end_tangent);
 
 		var tan0 = verb.core.Eval.rationalCurveDerivatives( crv, 0, 1)[1];
 		var tan1 = verb.core.Eval.rationalCurveDerivatives( crv, 1, 1)[1];
@@ -2390,9 +2390,9 @@ describe("verb.core.Make.rationalInterpCurve",function(){
 
 	}
 
-	function shouldInterpPoints(pts, degree, start_tangent, end_tangent){
+	function shouldInterpPoints(pts, degree, isHomo, start_tangent, end_tangent){
 
-		var crv = verb.core.Make.rationalInterpCurve( pts, degree, start_tangent, end_tangent );
+		var crv = verb.core.Make.rationalInterpCurve( pts, degree, isHomo, start_tangent, end_tangent );
 
 		crv.degree.should.be.equal( degree );
 
@@ -2472,7 +2472,7 @@ describe("verb.core.Make.rationalInterpCurve",function(){
 
 		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ];
 
-		shouldInterpPointsWithTangents( pts, 3, [1,0,0], [0,1,0] );
+		shouldInterpPointsWithTangents( pts, 3, false, [1,0,0], [0,1,0] );
 
 	});
 
@@ -2481,7 +2481,7 @@ describe("verb.core.Make.rationalInterpCurve",function(){
 
 	// 	var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ];
 
-	// 	shouldInterpPointsWithTangents( pts, 2, [1,0,0], [0,1,0] );
+	// 	shouldInterpPointsWithTangents( pts, 2, false, [1,0,0], [0,1,0] );
 
 	// });
 
@@ -2489,7 +2489,7 @@ describe("verb.core.Make.rationalInterpCurve",function(){
 
 	// 	var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ];
 
-	// 	shouldInterpPointsWithTangents( pts, 4, [1,0,0], [0,1,0] );
+	// 	shouldInterpPointsWithTangents( pts, 4, false, [1,0,0], [0,1,0] );
 
 	// });
 
@@ -4062,7 +4062,7 @@ describe("verb.geom.NurbsCurve.lengthAtParam",function(){
 		, weights = [ 1, 1, 1, 1, 1 ]
 		, pt = [1,0.2,0.1];
 
-	var crv = verb.geom.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
+	var crv = verb.geom.NurbsCurve.byKnotsControlPointsWeights( degree, knots, controlPoints, weights );
 
 	it('is correct for basic case', function(){
 		var res = crv.lengthAtParam( 1 );
@@ -4085,7 +4085,7 @@ describe("verb.geom.NurbsCurve.derivatives",function(){
 		, weights = [ 1, 1, 1, 1, 1 ]
 		, pt = [1,0.2,0];
 
-	var crv = verb.geom.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
+	var crv = verb.geom.NurbsCurve.byKnotsControlPointsWeights( degree, knots, controlPoints, weights );
 
 	it('returns the derivatives for a straight curve', function(){
 		var p = crv.derivatives( 0.5 );
@@ -4110,7 +4110,7 @@ describe("verb.geom.NurbsCurve.tangent",function(){
 		, weights = [ 1, 1, 1, 1, 1 ]
 		, pt = [1,0.2,0];
 
-	var crv = verb.geom.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
+	var crv = verb.geom.NurbsCurve.byKnotsControlPointsWeights( degree, knots, controlPoints, weights );
 
 	it('can get the tangent for a straight curve', function(){
 		var p = crv.tangent( 0.5 );
@@ -4133,7 +4133,7 @@ describe("verb.geom.NurbsCurve.paramAtLength",function(){
 		, weights = [ 1, 1, 1, 1, 1 ]
 		, pt = [1,0.2,0];
 
-	var crv = verb.geom.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
+	var crv = verb.geom.NurbsCurve.byKnotsControlPointsWeights( degree, knots, controlPoints, weights );
 
 	it('can get closest point to straight curve', function(){
 		var res = crv.paramAtLength( 2 );
@@ -4159,7 +4159,7 @@ describe("verb.geom.NurbsCurve.divideByEqualArcLength",function(){
 		, divs = 10
 		, d = 4 / divs;
 
-	var crv = verb.geom.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
+	var crv = verb.geom.NurbsCurve.byKnotsControlPointsWeights( degree, knots, controlPoints, weights );
 
 	it('can divide straight curve', function(){
 
@@ -4214,7 +4214,7 @@ describe("verb.geom.NurbsCurve.divideByArcLength",function(){
 		, divs = 10
 		, d = 4 / divs;
 
-	var crv = verb.geom.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
+	var crv = verb.geom.NurbsCurve.byKnotsControlPointsWeights( degree, knots, controlPoints, weights );
 	var tol = 1e-3;
 
 	it('can divide straight curve', function(){
@@ -4262,7 +4262,7 @@ describe("verb.geom.NurbsCurve.closestParam",function(){
 		, controlPoints = [ [0,0,0], [1,0,0], [2,0,0], [3,0,0], [4,0,0] ]
 		, weights = [ 1, 1, 1, 1, 1 ];
 
-	var crv = verb.geom.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
+	var crv = verb.geom.NurbsCurve.byKnotsControlPointsWeights( degree, knots, controlPoints, weights );
 
 	it('can get point on straight curve', function(){
 
@@ -4310,7 +4310,7 @@ describe("verb.geom.NurbsCurve.split",function(){
 		controlPoints.push([i, 0, 0]);
 	}
 
-	var crv = verb.geom.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
+	var crv = verb.geom.NurbsCurve.byKnotsControlPointsWeights( degree, knots, controlPoints, weights );
 
 	function cubicSplitAsync(u, done){
 
@@ -4362,7 +4362,7 @@ describe("verb.geom.NurbsCurve.transform",function(){
 			  [ 0, 0, 1, -1],
 			  [ 0, 0, 0, 1 ] ];
 
-	var crv = verb.geom.NurbsCurve.byControlPointsWeights( degree, knots, controlPoints, weights );
+	var crv = verb.geom.NurbsCurve.byKnotsControlPointsWeights( degree, knots, controlPoints, weights );
 
 	it('works for basic case', function(){
 		var ta = crv.transform( t );
@@ -5125,7 +5125,7 @@ describe("verb.core.Eval.rational_surface_curvature ",function(){
 
 */
 
-describe("verb.geom.NurbsSurface.byControlPointsWeights",function(){
+describe("verb.geom.NurbsSurface.byKnotsControlPointsWeights",function(){
 
 	var degreeU = 3
 		, degreeV = 3
@@ -5139,7 +5139,7 @@ describe("verb.geom.NurbsSurface.byControlPointsWeights",function(){
 						[ 1, 1, 1, 1 ],
 						[ 1, 1, 1, 1 ],
 						[ 1, 1, 1, 1 ] ]
-		, surface = verb.geom.NurbsSurface.byControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
+		, surface = verb.geom.NurbsSurface.byKnotsControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
 
 	it('has expected properties', function(){
 
@@ -5168,7 +5168,7 @@ describe("verb.geom.NurbsSurface.domainU",function(){
 						[ 1, 1, 1, 1 ],
 						[ 1, 1, 1, 1 ],
 						[ 1, 1, 1, 1 ] ]
-		, surface = verb.geom.NurbsSurface.byControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
+		, surface = verb.geom.NurbsSurface.byKnotsControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
 
 	it('is correct for basic case', function(){
 		var d = surface.domainU();
@@ -5192,7 +5192,7 @@ describe("verb.geom.NurbsSurface.domainV",function(){
 						[ 1, 1, 1, 1 ],
 						[ 1, 1, 1, 1 ],
 						[ 1, 1, 1, 1 ] ]
-		, surface = verb.geom.NurbsSurface.byControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
+		, surface = verb.geom.NurbsSurface.byKnotsControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
 
 	it('is correct for basic case', function(){
 		var d = surface.domainU();
@@ -5216,7 +5216,7 @@ describe("verb.geom.NurbsSurface.point",function(){
 						[ 1, 1, 1, 1 ],
 						[ 1, 1, 1, 1 ],
 						[ 1, 1, 1, 1 ] ]
-		, surface = verb.geom.NurbsSurface.byControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
+		, surface = verb.geom.NurbsSurface.byKnotsControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
 
 	it('is correct for basic case', function(){
 
@@ -5249,7 +5249,7 @@ describe("verb.geom.NurbsSurface.normal",function(){
 						[ 1, 1, 1, 1 ],
 						[ 1, 1, 1, 1 ],
 						[ 1, 1, 1, 1 ] ]
-		, surface = verb.geom.NurbsSurface.byControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
+		, surface = verb.geom.NurbsSurface.byKnotsControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
 
 	it('is correct for basic case', function(){
 		vecShouldBe( [0, 0, 900], surface.normal(0.5,0.5) );
@@ -5280,7 +5280,7 @@ describe("verb.geom.NurbsSurface.derivatives",function(){
 						[ 1, 1, 1, 1 ],
 						[ 1, 1, 1, 1 ],
 						[ 1, 1, 1, 1 ] ]
-		, surface = verb.geom.NurbsSurface.byControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
+		, surface = verb.geom.NurbsSurface.byKnotsControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
 
 	it('is correct for basic case', function(){
 		var d = surface.derivatives( 0.5, 0.5, 1 );
@@ -5317,7 +5317,7 @@ describe("verb.geom.NurbsSurface.closestParam",function(){
 						[ 1, 1, 1, 1 ],
 						[ 1, 1, 1, 1 ],
 						[ 1, 1, 1, 1 ] ]
-		, surface = verb.geom.NurbsSurface.byControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
+		, surface = verb.geom.NurbsSurface.byKnotsControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
 
 	it('is correct for basic case', function(){
 		var d = surface.closestParam( [ 15, -15, 1] );
@@ -5346,7 +5346,7 @@ describe("verb.geom.NurbsSurface.closestPoint",function(){
 						[ 1, 1, 1, 1 ],
 						[ 1, 1, 1, 1 ],
 						[ 1, 1, 1, 1 ] ]
-		, surface = verb.geom.NurbsSurface.byControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
+		, surface = verb.geom.NurbsSurface.byKnotsControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
 
 	it('is correct for basic case', function(){
 		var d = surface.closestPoint( [ 15, -15, 1] );
@@ -5375,7 +5375,7 @@ describe("verb.geom.NurbsSurface.split",function(){
 						[ 1, 1, 1, 1 ],
 						[ 1, 1, 1, 1 ],
 						[ 1, 1, 1, 1 ] ]
-		, surface = verb.geom.NurbsSurface.byControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
+		, surface = verb.geom.NurbsSurface.byKnotsControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
 
 	it('is correct for basic case 1', function(){
 		var d = surface.split( 0.5, true );
@@ -5443,7 +5443,7 @@ describe("verb.geom.NurbsSurface.tessellate",function(){
 						[ 1, 1, 1, 1 ],
 						[ 1, 1, 1, 1 ],
 						[ 1, 1, 1, 1 ] ]
-		, surface = verb.geom.NurbsSurface.byControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
+		, surface = verb.geom.NurbsSurface.byKnotsControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
 
 	it('is correct for basic case with no options', function(){
 		var d = surface.tessellate();
@@ -5482,7 +5482,7 @@ describe("verb.geom.NurbsSurface.transform",function(){
 						[ 1, 1, 1, 1 ],
 						[ 1, 1, 1, 1 ],
 						[ 1, 1, 1, 1 ] ]
-		, surface = verb.geom.NurbsSurface.byControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
+		, surface = verb.geom.NurbsSurface.byKnotsControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
 
 	var t = [ [ 1, 0, 0, 5 ],
 			  [ 0, 1, 0, 2 ],
@@ -6346,7 +6346,6 @@ describe("verb.core.Modify.unifyCurveKnotVectors",function(){
 		var res = verb.core.Modify.unifyCurveKnotVectors(curves);
 
 		res.forEach(function(x,i){
-			console.log( x );
 			sameCurve(x, curves[i]);
 			x.knots.should.eql( c2.knots );
 		});
@@ -6362,10 +6361,12 @@ describe("verb.core.Make.loftedSurface",function(){
 
 	it('can handle straight beziers', function(){
 
-		var curves = [c0, c1, c2]
+		var curves = [c0, c1, c2];
 		var surface = verb.core.Make.loftedSurface( curves );
 
-		// verb.core.Eval.rationalSurfacePoint(surface, 0, 0)
+		// TODO
+
+//		console.log( surface.knotsU, surface.knotsV );
 
 	});
 });

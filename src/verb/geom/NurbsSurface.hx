@@ -58,12 +58,12 @@ class NurbsSurface extends AsyncObject implements ISurface {
     // **returns**
     // + A new NurbsSurface
 
-    public static function byControlPointsWeights( degreeU : Int,
-                                                   degreeV : Int,
-                                                   knotsU : KnotArray,
-                                                   knotsV : KnotArray,
-                                                   controlPoints : Array<Array<Point>>,
-                                                   weights : Array<Array<Float>> ) : NurbsSurface {
+    public static function byKnotsControlPointsWeights(degreeU : Int,
+                                                       degreeV : Int,
+                                                       knotsU : KnotArray,
+                                                       knotsV : KnotArray,
+                                                       controlPoints : Array<Array<Point>>,
+                                                       weights : Array<Array<Float>> = null ) : NurbsSurface {
         return new NurbsSurface( new NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, Eval.homogenize2d(controlPoints, weights) ) );
     }
 
@@ -80,6 +80,18 @@ class NurbsSurface extends AsyncObject implements ISurface {
 
     public static function byCorners( point0 : Point, point1 : Point, point2 : Point, point3 : Point ) : NurbsSurface {
         return new NurbsSurface( Make.fourPointSurface( point0, point1, point2, point3 ) );
+    }
+
+    // Construct a NurbsSurface by lofting between a collection of curves
+    //
+    // **params**
+    // + A collection of curves
+    //
+    // **returns**
+    // + A new NurbsSurface
+
+    public static function byLoftingCurves( curves : Array<ICurve>, degreeV : Int = null ) : NurbsSurface {
+        return new NurbsSurface( Make.loftedSurface([for (c in curves) c.asNurbs() ], degreeV ));
     }
 
     // Obtain a copy of the underlying data structure for the Surface. Used with verb.core.
