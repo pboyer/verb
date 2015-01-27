@@ -1,8 +1,7 @@
 [![Build Status](https://travis-ci.org/pboyer/verb.svg?branch=master)](https://travis-ci.org/pboyer/verb)
 
 #verb
-###A CAD Library for the Web
-####Current version: 0.2.0
+###A CAD Library
 
 <strong>verb</strong> is a library for creating and manipulating NURBS surfaces and curves in many languages.
 
