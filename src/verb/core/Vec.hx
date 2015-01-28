@@ -3,6 +3,8 @@ package verb.core;
 import verb.core.types.NurbsCurveData.Point;
 import verb.core.Mat.Vector;
 
+using verb.core.ArrayExtensions;
+
 using Lambda;
 
 @:expose("core.Vec")
@@ -77,6 +79,35 @@ class Vec {
 
     public static function rep<T>(num : Int, ele : T ) : Array<T> {
         return [ for (i in 0...num) ele ];
+    }
+
+    public static function isValidKnotVector(vec : Array<Float>, degree : Int) : Bool {
+
+        if (vec.length == 0) return false;
+        if (vec.length < (degree + 1) * 2 ) return false;
+
+        var rep = vec.first();
+
+        for (i in 0...degree+1){
+            if (Math.abs(vec[i]-rep) > Constants.EPSILON) return false;
+        }
+
+        rep = vec.last();
+
+        for (i in vec.length-degree-1...vec.length){
+            if (Math.abs(vec[i]-rep) > Constants.EPSILON) return false;
+        }
+
+        return isNonDecreasing( vec );
+    }
+
+    public static function isNonDecreasing(vec : Array<Float>){
+        var rep = vec.first();
+        for ( i in 0...vec.length ){
+            if (vec[i] < rep - Constants.EPSILON ) return false;
+            rep = vec[i];
+        }
+        return true;
     }
 
     public static function zeros1d(rows : Int) : Array<Float> {

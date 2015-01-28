@@ -35,6 +35,7 @@ import verb.core.Make;
 import verb.core.Modify;
 import verb.core.Analyze;
 import verb.core.Divide;
+import verb.core.Check;
 
 class Init {
 	public static function main():Void {

@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="BookmarkManager">
-    <bookmark url="file://$PROJECT_DIR$/src/verb/geom/SphericalSurface.hx" line="13" mnemonic="6" />
     <bookmark url="file://$PROJECT_DIR$/Gruntfile.js" description="      build: {&#10;        files: {&#10;          'build/&lt;..." line="8" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="938890c0-f1ce-4fbd-8322-63610af7f5e6" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/Init.hx" afterPath="$PROJECT_DIR$/src/verb/Init.hx" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/geom/NurbsCurve.hx" afterPath="$PROJECT_DIR$/src/verb/geom/NurbsCurve.hx" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/geom/NurbsSurface.hx" afterPath="$PROJECT_DIR$/src/verb/geom/NurbsSurface.hx" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/Vec.hx" afterPath="$PROJECT_DIR$/src/verb/core/Vec.hx" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/test.js" afterPath="$PROJECT_DIR$/test/test.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/verb.js" afterPath="$PROJECT_DIR$/build/verb.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/verbHaxe.js" afterPath="$PROJECT_DIR$/build/verbHaxe.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="verb.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -34,11 +37,21 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="NurbsSurface.hx" pinned="false" current-in-tab="true">
+      <file leaf-file-name="NurbsSurface.hx" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/verb/geom/NurbsSurface.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.53856385" vertical-offset="510" max-vertical-offset="4590">
-              <caret line="61" column="0" selection-start-line="61" selection-start-column="0" selection-end-line="61" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="1843" max-vertical-offset="4230">
+              <caret line="152" column="6" selection-start-line="152" selection-start-column="6" selection-end-line="152" selection-end-column="6" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Vec.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/core/Vec.hx">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="995" max-vertical-offset="3495">
+              <caret line="87" column="0" selection-start-line="87" selection-start-column="0" selection-end-line="87" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -47,28 +60,58 @@
       <file leaf-file-name="NurbsCurve.hx" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/verb/geom/NurbsCurve.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="400" max-vertical-offset="5190">
-              <caret line="47" column="0" selection-start-line="47" selection-start-column="0" selection-end-line="65" selection-end-column="5" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="460" max-vertical-offset="4920">
+              <caret line="51" column="17" selection-start-line="51" selection-start-column="17" selection-end-line="51" selection-end-column="17" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="loftedSurface.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/loftedSurface.html">
+      <file leaf-file-name="Eval.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/core/Eval.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-14.375" vertical-offset="0" max-vertical-offset="555">
-              <caret line="23" column="44" selection-start-line="23" selection-start-column="44" selection-end-line="23" selection-end-column="44" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="12510">
+              <caret line="10" column="0" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+              <folding>
+                <element signature="e#8079#8262#0" expanded="false" />
+                <element signature="e#8652#8766#0" expanded="false" />
+                <element signature="e#9189#9230#0" expanded="false" />
+                <element signature="e#9599#9697#0" expanded="false" />
+                <element signature="e#10118#10157#0" expanded="false" />
+                <element signature="e#10442#10485#0" expanded="false" />
+                <element signature="e#10800#10845#0" expanded="false" />
+                <element signature="e#11428#11933#0" expanded="false" />
+                <element signature="e#12461#12791#0" expanded="false" />
+                <element signature="e#13347#13531#0" expanded="false" />
+                <element signature="e#14389#15836#0" expanded="false" />
+                <element signature="e#16267#16434#0" expanded="false" />
+                <element signature="e#18849#18959#0" expanded="false" />
+                <element signature="e#19551#20262#0" expanded="false" />
+                <element signature="e#20614#20708#0" expanded="false" />
+                <element signature="e#21780#22439#0" expanded="false" />
+                <element signature="e#22908#23095#0" expanded="false" />
+                <element signature="e#25671#25805#0" expanded="false" />
+                <element signature="e#26361#26929#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Check.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/core/Check.hx">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="165" max-vertical-offset="1065">
+              <caret line="36" column="24" selection-start-line="36" selection-start-column="24" selection-end-line="36" selection-end-column="24" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="threeBasic.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/js/threeBasic.js">
+      <file leaf-file-name="Init.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/Init.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="298" max-vertical-offset="1050">
-              <caret line="2" column="28" selection-start-line="2" selection-start-column="28" selection-end-line="2" selection-end-column="28" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="735">
+              <caret line="33" column="22" selection-start-line="33" selection-start-column="22" selection-end-line="33" selection-end-column="22" />
               <folding />
             </state>
           </provider>
@@ -84,26 +127,6 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="meshIntersection.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/meshIntersection.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-6.875" vertical-offset="0" max-vertical-offset="3300">
-              <caret line="11" column="8" selection-start-line="11" selection-start-column="8" selection-end-line="11" selection-end-column="8" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="surface.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/surface.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-16.25" vertical-offset="0" max-vertical-offset="570">
-              <caret line="26" column="0" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
       <file leaf-file-name="curveClosestPoint.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/examples/curveClosestPoint.html">
           <provider selected="true" editor-type-id="text-editor">
@@ -114,21 +137,21 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="divideCurve.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/divideCurve.html">
+      <file leaf-file-name="RevolvedSurface.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/geom/RevolvedSurface.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-16.25" vertical-offset="0" max-vertical-offset="570">
-              <caret line="26" column="18" selection-start-line="26" selection-start-column="18" selection-end-line="26" selection-end-column="18" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="615">
+              <caret line="20" column="17" selection-start-line="20" selection-start-column="17" selection-end-line="20" selection-end-column="17" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="verbToThreeConversion.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/js/verbToThreeConversion.js">
+      <file leaf-file-name="test.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/test/test.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="840">
-              <caret line="3" column="0" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.2819149" vertical-offset="97738" max-vertical-offset="99045">
+              <caret line="6530" column="7" selection-start-line="6530" selection-start-column="7" selection-end-line="6530" selection-end-column="7" />
               <folding />
             </state>
           </provider>
@@ -142,8 +165,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/verb/geom/ExtrudedSurface.hx" />
-        <option value="$PROJECT_DIR$/src/verb/geom/RevolvedSurface.hx" />
         <option value="$PROJECT_DIR$/src/verb/geom/CylinderSurface.hx" />
         <option value="$PROJECT_DIR$/src/verb/geom/ConeSurface.hx" />
         <option value="$PROJECT_DIR$/src/verb/geom/SphereSurface.hx" />
@@ -151,7 +172,6 @@
         <option value="$PROJECT_DIR$/src/verb/core/types/NurbsSurfaceData.hx" />
         <option value="$PROJECT_DIR$/src/verb/geom/Ellipse.hx" />
         <option value="$PROJECT_DIR$/src/verb/geom/Arc.hx" />
-        <option value="$PROJECT_DIR$/src/verb/Init.hx" />
         <option value="$PROJECT_DIR$/src/verb/geom/ICurve.hx" />
         <option value="$PROJECT_DIR$/src/verb/exe/AsyncObject.hx" />
         <option value="$PROJECT_DIR$/src/verb/exe/Dispatcher.hx" />
@@ -166,16 +186,13 @@
         <option value="$PROJECT_DIR$/Gruntfile.js" />
         <option value="$PROJECT_DIR$/example/surface.html" />
         <option value="$PROJECT_DIR$/src/verb/core/Constants.hx" />
-        <option value="$PROJECT_DIR$/src/verb/core/Vec.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Modify.hx" />
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/example/js/threeVerb.js" />
         <option value="$PROJECT_DIR$/example/js/threeSetup.js" />
         <option value="$PROJECT_DIR$/example/js/threeConvert.js" />
-        <option value="$PROJECT_DIR$/src/verb/core/Eval.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Make.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Analyze.hx" />
-        <option value="$PROJECT_DIR$/test/test.js" />
         <option value="$PROJECT_DIR$/example/js/threeBasic.js" />
         <option value="$PROJECT_DIR$/src/verb/core/Intersect.hx" />
         <option value="$PROJECT_DIR$/todo" />
@@ -191,8 +208,14 @@
         <option value="$PROJECT_DIR$/examples/divideCurve.html" />
         <option value="$PROJECT_DIR$/examples/surface.html" />
         <option value="$PROJECT_DIR$/examples/surfaceClosestPoint.html" />
+        <option value="$PROJECT_DIR$/src/verb/core/Vec.hx" />
+        <option value="$PROJECT_DIR$/src/verb/core/Eval.hx" />
+        <option value="$PROJECT_DIR$/src/verb/core/Validate.hx" />
+        <option value="$PROJECT_DIR$/src/verb/Init.hx" />
         <option value="$PROJECT_DIR$/src/verb/geom/NurbsCurve.hx" />
+        <option value="$PROJECT_DIR$/src/verb/core/Check.hx" />
         <option value="$PROJECT_DIR$/src/verb/geom/NurbsSurface.hx" />
+        <option value="$PROJECT_DIR$/test/test.js" />
       </list>
     </option>
   </component>
@@ -314,6 +337,28 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="geom" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="verb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="verb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="verb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="core" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -634,6 +679,7 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="77194" max-vertical-offset="77970">
           <caret line="5191" column="17" selection-start-line="5191" selection-start-column="36" selection-end-line="5191" selection-end-column="46" />
+          <folding />
         </state>
       </provider>
     </entry>
@@ -748,22 +794,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/geom/RevolvedSurface.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="615">
-          <caret line="20" column="17" selection-start-line="20" selection-start-column="17" selection-end-line="20" selection-end-column="17" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/core/Vec.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.35180414" vertical-offset="897" max-vertical-offset="3030">
-          <caret line="78" column="42" selection-start-line="78" selection-start-column="42" selection-end-line="78" selection-end-column="42" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/verb/core/Mat.hx">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2550">
@@ -794,14 +824,6 @@
             <element signature="e#14185#14562#0" expanded="false" />
             <element signature="e#14926#15578#0" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/Init.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="209" max-vertical-offset="720">
-          <caret line="40" column="8" selection-start-line="40" selection-start-column="8" selection-end-line="40" selection-end-column="8" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -845,34 +867,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/core/Eval.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="6138" max-vertical-offset="12510">
-          <caret line="548" column="9" selection-start-line="548" selection-start-column="9" selection-end-line="548" selection-end-column="9" />
-          <folding>
-            <element signature="e#8079#8262#0" expanded="false" />
-            <element signature="e#8652#8766#0" expanded="false" />
-            <element signature="e#9189#9230#0" expanded="false" />
-            <element signature="e#9599#9697#0" expanded="false" />
-            <element signature="e#10118#10157#0" expanded="false" />
-            <element signature="e#10442#10485#0" expanded="false" />
-            <element signature="e#10800#10845#0" expanded="false" />
-            <element signature="e#11428#11933#0" expanded="false" />
-            <element signature="e#12461#12791#0" expanded="false" />
-            <element signature="e#13347#13531#0" expanded="false" />
-            <element signature="e#14389#15836#0" expanded="false" />
-            <element signature="e#16267#16434#0" expanded="false" />
-            <element signature="e#18849#18959#0" expanded="false" />
-            <element signature="e#19551#20262#0" expanded="false" />
-            <element signature="e#20614#20708#0" expanded="false" />
-            <element signature="e#21780#22439#0" expanded="false" />
-            <element signature="e#22908#23095#0" expanded="false" />
-            <element signature="e#25671#25805#0" expanded="false" />
-            <element signature="e#26361#26929#0" expanded="false" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="776">
@@ -889,14 +883,6 @@
             <element signature="e#1466#2222#0" expanded="false" />
             <element signature="e#3068#5198#0" expanded="false" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/test.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="57932" max-vertical-offset="96585">
-          <caret line="3898" column="0" selection-start-line="3898" selection-start-column="0" selection-end-line="3898" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -1004,18 +990,86 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/geom/RevolvedSurface.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="615">
+          <caret line="20" column="17" selection-start-line="20" selection-start-column="17" selection-end-line="20" selection-end-column="17" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/core/Vec.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="995" max-vertical-offset="3495">
+          <caret line="87" column="0" selection-start-line="87" selection-start-column="0" selection-end-line="87" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/core/Eval.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="12510">
+          <caret line="10" column="0" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+          <folding>
+            <element signature="e#8079#8262#0" expanded="false" />
+            <element signature="e#8652#8766#0" expanded="false" />
+            <element signature="e#9189#9230#0" expanded="false" />
+            <element signature="e#9599#9697#0" expanded="false" />
+            <element signature="e#10118#10157#0" expanded="false" />
+            <element signature="e#10442#10485#0" expanded="false" />
+            <element signature="e#10800#10845#0" expanded="false" />
+            <element signature="e#11428#11933#0" expanded="false" />
+            <element signature="e#12461#12791#0" expanded="false" />
+            <element signature="e#13347#13531#0" expanded="false" />
+            <element signature="e#14389#15836#0" expanded="false" />
+            <element signature="e#16267#16434#0" expanded="false" />
+            <element signature="e#18849#18959#0" expanded="false" />
+            <element signature="e#19551#20262#0" expanded="false" />
+            <element signature="e#20614#20708#0" expanded="false" />
+            <element signature="e#21780#22439#0" expanded="false" />
+            <element signature="e#22908#23095#0" expanded="false" />
+            <element signature="e#25671#25805#0" expanded="false" />
+            <element signature="e#26361#26929#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/Init.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="735">
+          <caret line="33" column="22" selection-start-line="33" selection-start-column="22" selection-end-line="33" selection-end-column="22" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/verb/geom/NurbsCurve.hx">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="400" max-vertical-offset="5190">
-          <caret line="47" column="0" selection-start-line="47" selection-start-column="0" selection-end-line="65" selection-end-column="5" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="460" max-vertical-offset="4920">
+          <caret line="51" column="17" selection-start-line="51" selection-start-column="17" selection-end-line="51" selection-end-column="17" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/verb/geom/NurbsSurface.hx">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.53856385" vertical-offset="510" max-vertical-offset="4590">
-          <caret line="61" column="0" selection-start-line="61" selection-start-column="0" selection-end-line="61" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="1843" max-vertical-offset="4230">
+          <caret line="152" column="6" selection-start-line="152" selection-start-column="6" selection-end-line="152" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/core/Check.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="165" max-vertical-offset="1065">
+          <caret line="36" column="24" selection-start-line="36" selection-start-column="24" selection-end-line="36" selection-end-column="24" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/test.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.2819149" vertical-offset="97738" max-vertical-offset="99045">
+          <caret line="6530" column="7" selection-start-line="6530" selection-start-column="7" selection-end-line="6530" selection-end-column="7" />
           <folding />
         </state>
       </provider>

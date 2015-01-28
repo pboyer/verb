@@ -1,5 +1,7 @@
 package verb.geom;
 
+import verb.core.Check;
+import verb.core.Vec;
 import verb.core.Make;
 import promhx.Promise;
 import verb.exe.AsyncObject;
@@ -42,27 +44,7 @@ class NurbsCurve extends AsyncObject implements ICurve {
     // + A new NurbsCurve
 
     public function new( data : NurbsCurveData ) {
-        this._data = validate( data );
-    }
-
-    // Validate a NurbsCurveData object
-    //
-    // **params**
-    // + The data object
-    //
-    // **returns**
-    // + The original, unmodified data
-
-    public static function validate( data : NurbsCurveData ) {
-        if ( data.controlPoints == null ) throw "Control points array cannot be null!";
-        if ( data.degree == null ) throw "Degree cannot be null!";
-        if ( data.knots == null ) throw "Knots cannot be null!";
-
-        if ( data.knots.length != data.controlPoints.length + data.degree + 1 ){
-            throw "controlPoints.length + degree + 1 must equal knots.length!";
-        }
-
-        return data;
+        this._data = Check.nurbsCurveData( data );
     }
 
     // Construct a NurbsCurve by degree, knots, control points, weights

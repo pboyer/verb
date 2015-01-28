@@ -1,5 +1,6 @@
 package verb.geom;
 
+import verb.core.Check;
 import verb.core.Vec;
 import verb.core.Make;
 import promhx.Promise;
@@ -42,34 +43,9 @@ class NurbsSurface extends AsyncObject implements ISurface {
     // + A new NurbsSurface
 
     public function new( data : NurbsSurfaceData ) {
-        _data = validate(data);
+        _data = Check.nurbsSurfaceData(data);
     }
 
-    // Validate a NurbsSurfaceData object
-    //
-    // **params**
-    // + The data object
-    //
-    // **returns**
-    // + The original, unmodified data
-
-    public static function validate( data : NurbsSurfaceData ) : NurbsSurfaceData {
-        if ( data.controlPoints == null ) throw "Control points array cannot be null!";
-        if ( data.degreeU == null ) throw "DegreeU cannot be null!";
-        if ( data.degreeV == null ) throw "DegreeV cannot be null!";
-        if ( data.knotsU == null ) throw "KnotsU cannot be null!";
-        if ( data.knotsV == null ) throw "KnotsV cannot be null!";
-
-        if ( data.knotsU.length != data.controlPoints.length + data.degreeU + 1 ){
-            throw "controlPointsU.length + degreeU + 1 must equal knotsU.length!";
-        }
-
-        if ( data.knotsV.length != data.controlPoints[0].length + data.degreeV + 1 ){
-            throw "controlPointsV.length + degreeV + 1 must equal knotsV.length!";
-        }
-
-        return data;
-    }
 
     // Construct a NurbsSurface by degree, knots, control points, weights
     //

@@ -6432,3 +6432,167 @@ describe("verb.geom.NurbsCurve.byLoftingCurves",function(){
 
 	});
 });
+
+
+describe("verb.core.Check.nurbsCurveData",function(){
+
+	it('is correct for basic case', function(){
+		var c = new verb.core.NurbsCurveData( 2, [0,0,0,1,1,1], [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
+		verb.core.Check.nurbsCurveData(c);
+	});
+
+	it('detects negative degree', function( done ){
+		var c = new verb.core.NurbsCurveData( -1, [0,0,0,1,1,1], [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
+		try { verb.core.Check.nurbsCurveData(c) } catch (e) { done(); }
+	});
+
+	it('detects low degree', function( done ){
+		var c = new verb.core.NurbsCurveData( 1, [0,0,0,1,1,1], [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
+		try { verb.core.Check.nurbsCurveData(c) } catch (e) { done(); }
+	});
+
+	it('detects high degree', function( done ){
+		var c = new verb.core.NurbsCurveData( 3, [0,0,0,1,1,1], [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
+		try { verb.core.Check.nurbsCurveData(c) } catch (e) { done(); }
+	});
+
+	it('detects incorrect knot vector 0', function( done ){
+		var c = new verb.core.NurbsCurveData( 2, [0,0,1,1,1], [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
+		try { verb.core.Check.nurbsCurveData(c) } catch (e) { done(); }
+	});
+
+	it('detects incorrect knot vector 1', function( done ){
+		var c = new verb.core.NurbsCurveData( 2, [0,0,0.5,1,1,1], [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
+		try { verb.core.Check.nurbsCurveData(c) } catch (e) { done(); }
+	});
+
+	it('detects incorrect knot vector 2', function( done ){
+		var c = new verb.core.NurbsCurveData( 2, [0,0,0,1,1,2], [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
+		try { verb.core.Check.nurbsCurveData(c) } catch (e) { done(); }
+	});
+
+	it('detects incorrect knot vector 3', function( done ){
+		var c = new verb.core.NurbsCurveData( 2, [0,0,0,0.5,1,1,2], [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
+		try { verb.core.Check.nurbsCurveData(c) } catch (e) { done(); }
+	});
+
+	it('detects null degree', function( done ){
+		var c = new verb.core.NurbsCurveData( null, [0,0,0,0.5,1,1,2], [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
+		try { verb.core.Check.nurbsCurveData(c) } catch (e) { done(); }
+	});
+
+	it('detects null knots', function( done ){
+		var c = new verb.core.NurbsCurveData( 2, null, [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
+		try { verb.core.Check.nurbsCurveData(c) } catch (e) { done(); }
+	});
+
+	it('detects null control points', function( done ){
+		var c = new verb.core.NurbsCurveData( 2, [0,0,0,0.5,1,1,2], null );
+		try { verb.core.Check.nurbsCurveData(c) } catch (e) { done(); }
+	});
+
+	it('detects too few control points', function( done ){
+		var c = new verb.core.NurbsCurveData( 2, [0,0,0,0.5,1,1,2], [ [0,0,0,1],  [2,0,0,1] ] );
+		try { verb.core.Check.nurbsCurveData(c) } catch (e) { done(); }
+	});
+
+	it('detects too many control points', function( done ){
+		var c = new verb.core.NurbsCurveData( 2, [0,0,0,0.5,1,1,2], [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [2,0,0,1] ] );
+		try { verb.core.Check.nurbsCurveData(c) } catch (e) { done(); }
+	});
+
+});
+
+describe("verb.core.Check.nurbsSurfaceData",function(){
+
+
+	var degreeU = 3
+		, degreeV = 3
+		, knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
+		, knotsV =	[0, 0, 0, 0, 1, 1, 1, 1]
+		, controlPoints = [ 	[ [0, 0, 50], 		[10, 0, 0], 		[20, 0, 0], 		[30, 0, 0] 		],
+													[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] 	],
+													[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] 	],
+													[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ];
+
+	it('is correct for basic case', function(){
+		var c = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
+		verb.core.Check.nurbsSurfaceData(c);
+	});
+
+	it('detects negative degree', function( done ){
+		var c = new verb.core.NurbsSurfaceData( -1, degreeV, knotsU, knotsV, controlPoints );
+		try { verb.core.Check.nurbsSurfaceData(c) } catch (e) { done(); }
+	});
+
+	it('detects negative degree', function( done ){
+		var c = new verb.core.NurbsSurfaceData( degreeU, -1, knotsU, knotsV, controlPoints );
+		try { verb.core.Check.nurbsSurfaceData(c) } catch (e) { done(); }
+	});
+
+	it('detects low degreeU', function( done ){
+		var c = new verb.core.NurbsSurfaceData( degreeU, 1, knotsU, knotsV, controlPoints );
+		try { verb.core.Check.nurbsSurfaceData(c) } catch (e) { done(); }
+	});
+
+	it('detects low degreeV', function( done ){
+		var c = new verb.core.NurbsSurfaceData( 1, degreeV, knotsU, knotsV, controlPoints );
+		try { verb.core.Check.nurbsSurfaceData(c) } catch (e) { done(); }
+	});
+
+	it('detects high degreeU', function( done ){
+		var c = new verb.core.NurbsSurfaceData( degreeU, 5, knotsU, knotsV, controlPoints );
+		try { verb.core.Check.nurbsSurfaceData(c) } catch (e) { done(); }
+	});
+
+	it('detects high degreeV', function( done ){
+		var c = new verb.core.NurbsSurfaceData( 5, degreeV, knotsU, knotsV, controlPoints );
+		try { verb.core.Check.nurbsSurfaceData(c) } catch (e) { done(); }
+	});
+
+	it('detects null degreeU', function( done ){
+		var c = new verb.core.NurbsSurfaceData( degreeU, 1, knotsU, knotsV, controlPoints );
+		try { verb.core.Check.nurbsSurfaceData(c) } catch (e) { done(); }
+	});
+
+	it('detects null degreeV', function( done ){
+		var c = new verb.core.NurbsSurfaceData( 1, degreeV, knotsU, knotsV, controlPoints );
+		try { verb.core.Check.nurbsSurfaceData(c) } catch (e) { done(); }
+	});
+
+	it('detects null knotsU', function( done ){
+		var c = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, null, controlPoints );
+		try { verb.core.Check.nurbsSurfaceData(c) } catch (e) { done(); }
+	});
+
+	it('detects null knotsV', function( done ){
+		var c = new verb.core.NurbsSurfaceData( degreeU, degreeV, null, knotsV, controlPoints );
+		try { verb.core.Check.nurbsSurfaceData(c) } catch (e) { done(); }
+	});
+
+	it('detects null control points', function( done ){
+		var c = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, null );
+		try { verb.core.Check.nurbsSurfaceData(c) } catch (e) { done(); }
+	});
+
+	it('detects too few control points', function( done ){
+		var controlPoints = [ 	[ [0, 0, 50], 		[10, 0, 0], 		[20, 0, 0], 		[30, 0, 0] 		],
+								[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] 	],
+								[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] 	] ];
+		var c = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
+		try { verb.core.Check.nurbsSurfaceData(c) } catch (e) { done(); }
+	});
+
+	it('detects too many control points', function( done ){
+		var controlPoints = [ 	[ [0, 0, 50],   [10, 0, 0],     [20, 0, 0],     [30, 0, 0] 		],
+								[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] 	],
+								[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] 	],
+								[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] 	],
+								[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ];
+
+		var c = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
+		try { verb.core.Check.nurbsSurfaceData(c) } catch (e) { done(); }
+
+	});
+
+});
