@@ -15,11 +15,11 @@
 
 	var c0 = verb.geom.NurbsCurve.byKnotsControlPointsWeights( 2, [0,0,0,1,1,1], [ [0,0,0], [10,0,0], [40,0,0] ], [ 1, 1, 1 ] );
 	var c1 = verb.geom.NurbsCurve.byKnotsControlPointsWeights( 3, [0,0,0,0,1,1,1,1], [ [0,10,10], [10,5,10], [20,-5,10], [40,10,10] ], [ 1, 1, 1, 1 ] );
-	var c2 = verb.geom.NurbsCurve.byKnotsControlPointsWeights( 3, [0,0,0,0,1,1,1,1], [ [0,0,20], [10,0,20], [20,0,20], [40,0,20] ], [ 1, 1, 1, 1, 1 ] );
+	var c2 = verb.geom.NurbsCurve.byKnotsControlPointsWeights( 3, [0,0,0,0,1,1,1,1], [ [0,0,20], [10,0,20], [20,5,20], [40,0,20] ], [ 1, 1, 1, 1, 1 ] );
 	var c3 = verb.geom.NurbsCurve.byKnotsControlPointsWeights( 3, [0,0,0,0,1,1,1,1], [ [0,3,30], [10,-4,30], [20,10,30], [40,0,30] ], [ 1, 1, 1, 1, 1 ] );
 
 	var curves = [c0, c1, c2, c3];
-	var srf = verb.geom.NurbsSurface.byLoftingCurves( curves, 2 );
+	var srf = verb.geom.NurbsSurface.byLoftingCurves( curves, 3 );
 
 	addMeshToScene( srf.toThreeGeometry() );
 

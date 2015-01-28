@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="../build/verb.js"></script>
+	<script src="js/three.min.js"></script>
+	<script src="js/verbToThreeConversion.js"></script>
+	<script src="js/OrbitControls.js"></script>
+	<script src="js/threeBasic.js"></script>
+	<style> body {  margin: 0; } </style>
+</head>
+<body>
+<script>
+
+	threeSetup();
+
+	var p1 = [0,0,0], p2 = [10,0,0], p3 = [10,10,0], p4 = [0,10,0], p5 = [5, 5, 0];
+	var pts = [p1, p2, p3, p4, p5];
+	var interpCurve = verb.geom.NurbsCurve.byPoints( pts, 3 );
+
+	addCurveToScene( interpCurve.toThreeGeometry() );
+
+	var points = interpCurve.divideByEqualArcLength( 20 )
+							.map(function(u){ return interpCurve.point( u.u ); } );
+
+	addPointsToScene( points );
+
+	threeRender();
+
+</script>
+
+</body>
+
+</html>

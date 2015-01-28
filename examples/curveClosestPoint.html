@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src="../build/verb.js"></script>
+	<script src="js/three.min.js"></script>
+	<script src="js/verbToThreeConversion.js"></script>
+	<script src="js/OrbitControls.js"></script>
+	<script src="js/threeBasic.js"></script>
+	<style> body {  margin: 0; } </style>
+</head>
+<body>
+<script>
+	threeSetup();
+
+	var p1 = [0,0,-5], p2 = [10,0,0], p3 = [10,10,-5], p4 = [0,10,5], p5 = [5, 5, 0];
+	var pts = [p1, p2, p3, p4, p5];
+	var interpCurve = verb.geom.NurbsCurve.byPoints( pts, 3 );
+
+	addCurveToScene( interpCurve.toThreeGeometry() );
+
+	var d1 = Date.now();
+
+	var lineMat = new THREE.LineBasicMaterial({ linewidth: 1, color: 0xaaaaaa});
+
+	var w = 0;
+	for (var i = -10; i < 20; i+=4){
+		for (var j = -10; j < 20; j+=4){
+			for (var k = -10; k < 20; k+=4){
+
+				var p0 = [i, j, k ];
+
+				var p = interpCurve.closestPoint( p0 );
+
+				var l = new verb.geom.Line(p, p0);
+				addCurveToScene( l.toThreeGeometry(), lineMat );
+
+				w++;
+			}
+		}
+	}
+
+	var d2 = Date.now();
+
+	console.log( (d2 - d1) / w, " ms per closest pt calculation" )
+
+	threeRender();
+</script>
+
+</body>
+
+</html>

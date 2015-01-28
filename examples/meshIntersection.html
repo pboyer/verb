@@ -1,27 +1,14 @@
-
 <!DOCTYPE html>
 <html>
-
 <head>
-  <title></title>
-
- 	<script src="../build/verb.js"></script>
+	<script src="../build/verb.js"></script>
 	<script src="js/three.min.js"></script>
-	<script src="js/OrbitControls.js"></script>
 	<script src="js/verbToThreeConversion.js"></script>
+	<script src="js/OrbitControls.js"></script>
 	<script src="js/threeBasic.js"></script>
-
-
-	<style>
-		body {
-			margin: 0;
-		}
-	</style>
-
+	<style> body {  margin: 0; } </style>
 </head>
-
 <body>
-
 <script>
 
 	threeSetup();
@@ -185,12 +172,12 @@
 
 	}
 
-	exTorusCylindricalSurface();
+	//exTorusCylindricalSurface();
 	//exGlancingPlaneCylindricalSurface();
 	//exPlanePlane();
 	//exPlanePlane();
 	//exNurbsSurfacePlane();
-	//exTorusCylindricalSurface3();
+	exTorusCylindricalSurface3();
 
 	var tess1 = srf1.tessellate();
 	var tess2 = srf2.tessellate();
@@ -199,7 +186,7 @@
 	addMeshToScene( srf2.toThreeGeometry(), true );
 
 	var res;
-	var runs = 10;
+	var runs = 1;
 
 	var d1 = Date.now();
 
@@ -212,7 +199,7 @@
 	var numLengths = res.reduce(function(a,x){ return a + x.length-1; }, 0);
 
 	console.log( "intersected in ", (d2 - d1) / runs, " ms and " + res.length + " polylines were discovered");
-	console.log( numLengths + " edges were discovered ");
+	console.log( numLengths + " edges were formed in total ");
 
 	for (var i = 0; i < res.length; i++){
 		var res2 = res[i].map(function(x){ return x.point; });

@@ -1,4 +1,14 @@
+// Utility methods to support converting verb.geom types to THREE.Geometry
+
 (function(verb){
+
+    verb.geom.NurbsCurve.prototype.toThreeGeometry = function(){
+        return tessellateCurve( this );
+    }
+
+    verb.geom.NurbsSurface.prototype.toThreeGeometry = function(){
+        return tessellateSurface( this );
+    }
 
     function asVector3(pts){
         return pts.map(function(x){
@@ -38,11 +48,4 @@
         return geometry;
     }
 
-    verb.geom.NurbsCurve.prototype.toThreeGeometry = function(){
-        return tessellateCurve( this );
-    }
-
-    verb.geom.NurbsSurface.prototype.toThreeGeometry = function(){
-        return tessellateSurface( this );
-    }
 })(verb);

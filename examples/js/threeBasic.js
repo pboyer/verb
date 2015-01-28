@@ -1,3 +1,5 @@
+// Some helper methods for the examples
+
 var scene, camera, renderer;
 
 function threeSetup(){
