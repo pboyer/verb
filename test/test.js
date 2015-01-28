@@ -6390,3 +6390,45 @@ describe("verb.core.Make.loftedSurface",function(){
 
 	});
 });
+
+describe("verb.geom.NurbsCurve.byLoftingCurves",function(){
+
+	var c00 = new verb.core.NurbsCurveData( 2, [0,0,0,1,1,1], [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
+	var c10 = new verb.core.NurbsCurveData( 3, [0,0,0,0,1,1,1,1], [ [0,0,1,1], [1,0,1,1], [2,0,1,1], [3,0,1,1] ] );
+	var c20 = new verb.core.NurbsCurveData( 3, [0,0,0,0,0.5,1,1,1,1], [ [0,1,2,1], [1,0,2,1], [2,1,2,1], [3,0,2,1], [4,0,2,1] ] );
+
+	var c0 = new verb.geom.NurbsCurve( c00 );
+	var c1 = new verb.geom.NurbsCurve( c10 );
+	var c2 = new verb.geom.NurbsCurve( c20 );
+
+	it('can handle straight beziers', function(){
+
+		var curves = [c0, c1, c2];
+		var surface = verb.geom.NurbsSurface.byLoftingCurves( curves );
+
+		var p0 = c0.controlPoints()[0];
+		var closest0 = surface.closestPoint( p0 ) ;
+		vecShouldBe( p0, closest0 );
+
+		var p1 = c0.controlPoints()[2];
+		var closest1 = surface.closestPoint( p1 ) ;
+		vecShouldBe( p1, closest1 );
+
+		var p2 = c1.controlPoints()[0];
+		var closest2 = surface.closestPoint( p2 ) ;
+		vecShouldBe( p2, closest2 );
+
+		var p3 = c1.controlPoints()[3];
+		var closest3 = surface.closestPoint( p3 ) ;
+		vecShouldBe( p3, closest3 );
+
+		var p4 = c2.controlPoints()[0];
+		var closest4 = surface.closestPoint( p4 ) ;
+		vecShouldBe( p4, closest4 );
+
+		var p5 = c2.controlPoints()[4];
+		var closest5 = surface.closestPoint( p5 ) ;
+		vecShouldBe( p5, closest5 );
+
+	});
+});

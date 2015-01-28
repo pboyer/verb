@@ -87,6 +87,8 @@ class Analyze {
         , closedv = isRationalSurfaceClosed(surface, false)
         , cuv;
 
+        // todo: divide surface instead of a full on tessellation
+
         // approximate closest point with tessellation
         var tess = Tess.rationalSurfaceAdaptive( surface, new AdaptiveRefinementOptions() );
 
