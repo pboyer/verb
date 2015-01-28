@@ -6604,3 +6604,91 @@ describe("verb.core.Check.isValidKnotVector",function(){
 		verb.core.Check.isValidKnotVector( [0,0,0,0.5,0.25,1,1,1], 2 ).should.be.equal(false);
 	});
 });
+
+describe("verb.core.Intersect.meshes",function(){
+
+	function glancingPlaneCylindricalSurface(){
+
+		var axis = [0,0,1]
+			, xaxis = [1,0,0]
+			, base = [0,0,0]
+			, height = 5
+			, radius = 3;
+
+		var srf1 = new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius );
+
+		var p5 	= [5,5,0]
+			, p6 = [-5,5,0]
+			, p7 = [-5,-5,0]
+			, p8 = [5,-5,0];
+
+		var srf2 = verb.geom.NurbsSurface.byCorners( p5, p6, p7, p8 );
+
+		return [srf1, srf2];
+
+	}
+
+	function nurbsSurfacePlane(){
+
+		var degree = 3
+			, knots = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
+			, pts = [ 	[ [0, 0, -10], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] , 	[40, 0, 0], [50, 0, 9] ],
+						[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] , [40, -10, 0], [50, -10, 0]	],
+						[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] , [40, -20, -2], [50, -20, 0] 	],
+						[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] , [40, -30, 0], [50, -30, 0]     ],
+						[ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , [40, -40, -20], [50, -40, 0]     ],
+						[ [0, -50, 12], [10, -50, 0], 	[20, -50, 0], 	[30, -50, 0] , [50, -50, 0], [50, -50, 15]     ],     ];
+		var srf1 = new verb.geom.NurbsSurface.byKnotsControlPointsWeights( degree, degree, knots, knots, pts );
+
+		var p5 = [50,-50,3]
+			, p6 = [50,0,3]
+			, p7 = [0,0,3]
+			, p8 = [0,-50,5];
+
+		var srf2 = verb.geom.NurbsSurface.byCorners( p5, p6, p7, p8 );
+
+		return [srf1,srf2];
+	}
+
+	function torusCylindricalSurface(){
+		// center, xaxis, yaxis, radius
+		var profile = new verb.geom.Circle( [5,0,0], [1,0,0], [0,0,1], 2 );
+
+		var base = [0,0,0];
+		var axis = [0,0,1];
+		var angle = 2 * Math.PI
+		var srf1 = new verb.geom.RevolvedSurface( profile, base, axis, angle );
+
+		var axis = [-1,0,0]
+			, xaxis = [0,0,1]
+			, base = [8,0,0]
+			, height = 16
+			, radius = 2;
+
+		var srf2 = new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius );
+
+		return [srf1,srf2];
+	}
+
+	it('detects all 4 polylines in nurbs surface plane intersection', function(){
+		var srfs = nurbsSurfacePlane();
+		var res = verb.core.Intersect.meshes( srfs[0].tessellate(), srfs[1].tessellate() );
+
+		res.length.should.be.equal( 4 );
+	});
+
+	it('detects all 8 intersection lines in torus cylinder intersection', function(){
+		var srfs = torusCylindricalSurface();
+		var res = verb.core.Intersect.meshes( srfs[0].tessellate(), srfs[1].tessellate() );
+
+		res.length.should.be.equal( 8 );
+	});
+
+	it('detects glancing intersection between cylinder and plane', function(){
+		var srfs = glancingPlaneCylindricalSurface();
+		var res = verb.core.Intersect.meshes( srfs[0].tessellate(), srfs[1].tessellate() );
+
+		res.length.should.be.equal( 1 );
+	});
+
+});
