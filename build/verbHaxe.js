@@ -4899,10 +4899,17 @@ verb.geom = {};
 verb.geom.ICurve = function() { };
 verb.geom.ICurve.__name__ = ["verb","geom","ICurve"];
 verb.geom.NurbsCurve = $hx_exports.geom.NurbsCurve = function(data) {
-	this._data = data;
+	this._data = verb.geom.NurbsCurve.validate(data);
 };
 verb.geom.NurbsCurve.__name__ = ["verb","geom","NurbsCurve"];
 verb.geom.NurbsCurve.__interfaces__ = [verb.geom.ICurve];
+verb.geom.NurbsCurve.validate = function(data) {
+	if(data.controlPoints == null) throw "Control points array cannot be null!";
+	if(data.degree == null) throw "Degree cannot be null!";
+	if(data.knots == null) throw "Knots cannot be null!";
+	if(data.knots.length != data.controlPoints.length + data.degree + 1) throw "controlPoints.length + degree + 1 must equal knots.length!";
+	return data;
+};
 verb.geom.NurbsCurve.byKnotsControlPointsWeights = function(degree,knots,controlPoints,weights) {
 	return new verb.geom.NurbsCurve(new verb.core.types.NurbsCurveData(degree,knots.slice(),verb.core.Eval.homogenize1d(controlPoints,weights)));
 };
@@ -5070,10 +5077,20 @@ verb.geom.Circle.prototype = $extend(verb.geom.Arc.prototype,{
 verb.geom.ISurface = function() { };
 verb.geom.ISurface.__name__ = ["verb","geom","ISurface"];
 verb.geom.NurbsSurface = $hx_exports.geom.NurbsSurface = function(data) {
-	this._data = data;
+	this._data = verb.geom.NurbsSurface.validate(data);
 };
 verb.geom.NurbsSurface.__name__ = ["verb","geom","NurbsSurface"];
 verb.geom.NurbsSurface.__interfaces__ = [verb.geom.ISurface];
+verb.geom.NurbsSurface.validate = function(data) {
+	if(data.controlPoints == null) throw "Control points array cannot be null!";
+	if(data.degreeU == null) throw "DegreeU cannot be null!";
+	if(data.degreeV == null) throw "DegreeV cannot be null!";
+	if(data.knotsU == null) throw "KnotsU cannot be null!";
+	if(data.knotsV == null) throw "KnotsU cannot be null!";
+	if(data.knotsU.length != data.controlPoints.length + data.degreeU + 1) throw "controlPointsU.length + degreeU + 1 must equal knotsU.length!";
+	if(data.knotsV.length != data.controlPoints[0].length + data.degreeV + 1) throw "controlPointsV.length + degreeV + 1 must equal knotsV.length!";
+	return data;
+};
 verb.geom.NurbsSurface.byKnotsControlPointsWeights = function(degreeU,degreeV,knotsU,knotsV,controlPoints,weights) {
 	return new verb.geom.NurbsSurface(new verb.core.types.NurbsSurfaceData(degreeU,degreeV,knotsU,knotsV,verb.core.Eval.homogenize2d(controlPoints,weights)));
 };
