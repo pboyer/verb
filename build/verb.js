@@ -1109,13 +1109,43 @@ verb.core.Binomial.memoize = function(n,k,val) {
 };
 verb.core.Check = $hx_exports.core.Check = function() { };
 verb.core.Check.__name__ = ["verb","core","Check"];
+verb.core.Check.isValidKnotVector = function(vec,degree) {
+	if(vec.length == 0) return false;
+	if(vec.length < (degree + 1) * 2) return false;
+	var rep = vec[0];
+	var _g1 = 0;
+	var _g = degree + 1;
+	while(_g1 < _g) {
+		var i = _g1++;
+		if(Math.abs(vec[i] - rep) > 1e-10) return false;
+	}
+	rep = vec[vec.length - 1];
+	var _g11 = vec.length - degree - 1;
+	var _g2 = vec.length;
+	while(_g11 < _g2) {
+		var i1 = _g11++;
+		if(Math.abs(vec[i1] - rep) > 1e-10) return false;
+	}
+	return verb.core.Check.isNonDecreasing(vec);
+};
+verb.core.Check.isNonDecreasing = function(vec) {
+	var rep = vec[0];
+	var _g1 = 0;
+	var _g = vec.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		if(vec[i] < rep - 1e-10) return false;
+		rep = vec[i];
+	}
+	return true;
+};
 verb.core.Check.nurbsCurveData = function(data) {
 	if(data.controlPoints == null) throw "Control points array cannot be null!";
 	if(data.degree == null) throw "Degree cannot be null!";
 	if(data.degree < 1) throw "Degree must be greater than 1!";
 	if(data.knots == null) throw "Knots cannot be null!";
 	if(data.knots.length != data.controlPoints.length + data.degree + 1) throw "controlPoints.length + degree + 1 must equal knots.length!";
-	if(!verb.core.Vec.isValidKnotVector(data.knots,data.degree)) throw "Invalid knot vector format!  Should begin with degree + 1 repeats and end with degree + 1 repeats!";
+	if(!verb.core.Check.isValidKnotVector(data.knots,data.degree)) throw "Invalid knot vector format!  Should begin with degree + 1 repeats and end with degree + 1 repeats!";
 	return data;
 };
 verb.core.Check.nurbsSurfaceData = function(data) {
@@ -1128,7 +1158,7 @@ verb.core.Check.nurbsSurfaceData = function(data) {
 	if(data.knotsV == null) throw "KnotsV cannot be null!";
 	if(data.knotsU.length != data.controlPoints.length + data.degreeU + 1) throw "controlPointsU.length + degreeU + 1 must equal knotsU.length!";
 	if(data.knotsV.length != data.controlPoints[0].length + data.degreeV + 1) throw "controlPointsV.length + degreeV + 1 must equal knotsV.length!";
-	if(!verb.core.Vec.isValidKnotVector(data.knotsU,data.degreeU) || !verb.core.Vec.isValidKnotVector(data.knotsV,data.degreeV)) throw "Invalid knot vector format!  Should begin with degree + 1 repeats and end with degree + 1 repeats!";
+	if(!verb.core.Check.isValidKnotVector(data.knotsU,data.degreeU) || !verb.core.Check.isValidKnotVector(data.knotsV,data.degreeV)) throw "Invalid knot vector format!  Should begin with degree + 1 repeats and end with degree + 1 repeats!";
 	return data;
 };
 verb.core.Constants = $hx_exports.core.Constants = function() { };
@@ -4090,36 +4120,6 @@ verb.core.Vec.rep = function(num,ele) {
 		_g.push(ele);
 	}
 	return _g;
-};
-verb.core.Vec.isValidKnotVector = function(vec,degree) {
-	if(vec.length == 0) return false;
-	if(vec.length < (degree + 1) * 2) return false;
-	var rep = vec[0];
-	var _g1 = 0;
-	var _g = degree + 1;
-	while(_g1 < _g) {
-		var i = _g1++;
-		if(Math.abs(vec[i] - rep) > 1e-10) return false;
-	}
-	rep = vec[vec.length - 1];
-	var _g11 = vec.length - degree - 1;
-	var _g2 = vec.length;
-	while(_g11 < _g2) {
-		var i1 = _g11++;
-		if(Math.abs(vec[i1] - rep) > 1e-10) return false;
-	}
-	return verb.core.Vec.isNonDecreasing(vec);
-};
-verb.core.Vec.isNonDecreasing = function(vec) {
-	var rep = vec[0];
-	var _g1 = 0;
-	var _g = vec.length;
-	while(_g1 < _g) {
-		var i = _g1++;
-		if(vec[i] < rep - 1e-10) return false;
-		rep = vec[i];
-	}
-	return true;
 };
 verb.core.Vec.zeros1d = function(rows) {
 	var _g = [];

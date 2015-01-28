@@ -6456,26 +6456,6 @@ describe("verb.core.Check.nurbsCurveData",function(){
 		try { verb.core.Check.nurbsCurveData(c) } catch (e) { done(); }
 	});
 
-	it('detects incorrect knot vector 0', function( done ){
-		var c = new verb.core.NurbsCurveData( 2, [0,0,1,1,1], [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
-		try { verb.core.Check.nurbsCurveData(c) } catch (e) { done(); }
-	});
-
-	it('detects incorrect knot vector 1', function( done ){
-		var c = new verb.core.NurbsCurveData( 2, [0,0,0.5,1,1,1], [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
-		try { verb.core.Check.nurbsCurveData(c) } catch (e) { done(); }
-	});
-
-	it('detects incorrect knot vector 2', function( done ){
-		var c = new verb.core.NurbsCurveData( 2, [0,0,0,1,1,2], [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
-		try { verb.core.Check.nurbsCurveData(c) } catch (e) { done(); }
-	});
-
-	it('detects incorrect knot vector 3', function( done ){
-		var c = new verb.core.NurbsCurveData( 2, [0,0,0,0.5,1,1,2], [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
-		try { verb.core.Check.nurbsCurveData(c) } catch (e) { done(); }
-	});
-
 	it('detects null degree', function( done ){
 		var c = new verb.core.NurbsCurveData( null, [0,0,0,0.5,1,1,2], [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
 		try { verb.core.Check.nurbsCurveData(c) } catch (e) { done(); }
@@ -6595,4 +6575,32 @@ describe("verb.core.Check.nurbsSurfaceData",function(){
 
 	});
 
+});
+
+describe("verb.core.Check.isValidKnotVector",function(){
+
+	it('detects correct knot vector', function(){
+		verb.core.Check.isValidKnotVector( [0,0,0,1,1,1], 2 ).should.be.equal(true);
+		verb.core.Check.isValidKnotVector( [0,0,0,0.5,1,1,1], 2 ).should.be.equal(true);
+	});
+
+	it('detects incorrect knot vector 0', function(){
+		verb.core.Check.isValidKnotVector( [0,0,1,1,1], 2 ).should.be.equal(false);
+	});
+
+	it('detects incorrect knot vector 1', function(){
+		verb.core.Check.isValidKnotVector( [0,0,0.5,1,1,1], 2 ).should.be.equal(false);
+	});
+
+	it('detects incorrect knot vector 2', function(){
+		verb.core.Check.isValidKnotVector( [0,0,0,1,1,2], 2 ).should.be.equal(false);
+	});
+
+	it('detects incorrect knot vector 3', function(){
+		verb.core.Check.isValidKnotVector( [0,0,0,0.5,1,1,2], 2 ).should.be.equal(false);
+	});
+
+	it('detects incorrect knot vector 4', function(){
+		verb.core.Check.isValidKnotVector( [0,0,0,0.5,0.25,1,1,1], 2 ).should.be.equal(false);
+	});
 });

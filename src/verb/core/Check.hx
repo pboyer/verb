@@ -3,8 +3,39 @@ package verb.core;
 import verb.core.types.NurbsSurfaceData;
 import verb.core.types.NurbsCurveData;
 
+using verb.core.ArrayExtensions;
+
 @:expose("core.Check")
 class Check {
+
+    public static function isValidKnotVector(vec : Array<Float>, degree : Int) : Bool {
+
+        if (vec.length == 0) return false;
+        if (vec.length < (degree + 1) * 2 ) return false;
+
+        var rep = vec.first();
+
+        for (i in 0...degree+1){
+            if (Math.abs(vec[i]-rep) > Constants.EPSILON) return false;
+        }
+
+        rep = vec.last();
+
+        for (i in vec.length-degree-1...vec.length){
+            if (Math.abs(vec[i]-rep) > Constants.EPSILON) return false;
+        }
+
+        return isNonDecreasing( vec );
+    }
+
+    public static function isNonDecreasing(vec : Array<Float>){
+        var rep = vec.first();
+        for ( i in 0...vec.length ){
+            if (vec[i] < rep - Constants.EPSILON ) return false;
+            rep = vec[i];
+        }
+        return true;
+    }
 
     // Validate a NurbsCurveData object
     //
@@ -24,7 +55,7 @@ class Check {
             throw "controlPoints.length + degree + 1 must equal knots.length!";
         }
 
-        if (!Vec.isValidKnotVector( data.knots, data.degree )){
+        if (!Check.isValidKnotVector( data.knots, data.degree )){
             throw "Invalid knot vector format!  Should begin with degree + 1 repeats and end with degree + 1 repeats!";
         }
 
@@ -56,7 +87,7 @@ class Check {
             throw "controlPointsV.length + degreeV + 1 must equal knotsV.length!";
         }
 
-        if (!Vec.isValidKnotVector( data.knotsU, data.degreeU ) || !Vec.isValidKnotVector( data.knotsV, data.degreeV )){
+        if (!Check.isValidKnotVector( data.knotsU, data.degreeU ) || !Check.isValidKnotVector( data.knotsV, data.degreeV )){
             throw "Invalid knot vector format!  Should begin with degree + 1 repeats and end with degree + 1 repeats!";
         }
 
