@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="../build/verb.js"></script>
+    <script src="js/three.min.js"></script>
+    <script src="js/verbToThreeConversion.js"></script>
+    <script src="js/OrbitControls.js"></script>
+    <script src="js/threeBasic.js"></script>
+    <style> body {  margin: 0; } </style>
+</head>
+<body>
+<script>
+
+	threeSetup();
+
+	function exNurbsSurfacePlane(){
+
+		var degree = 3
+			, knots = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
+			, pts = [ 	[ [0, 0, -10], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] , 	[40, 0, 0], [50, 0, 9] ],
+						[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] , [40, -10, 0], [50, -10, 0]	],
+						[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] , [40, -20, -2], [50, -20, 0] 	],
+						[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] , [40, -30, 0], [50, -30, 0]     ],
+						[ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , [40, -40, -20], [50, -40, 0]     ],
+						[ [0, -50, 12], [10, -50, 0], 	[20, -50, 0], 	[30, -50, 0] , [50, -50, 0], [50, -50, 15]     ],     ];
+		srf1 = new verb.geom.NurbsSurface.byKnotsControlPointsWeights( degree, degree, knots, knots, pts );
+
+		var p5 = [50,-50,3]
+			, p6 = [50,0,3]
+			, p7 = [0,0,3]
+			, p8 = [0,-50,5];
+
+		srf2 = verb.geom.NurbsSurface.byCorners( p5, p6, p7, p8 );
+
+	}
+
+	exNurbsSurfacePlane();
+
+	var tess1 = srf1.tessellate();
+	var tess2 = srf2.tessellate();
+
+	addMeshToScene( srf1.toThreeGeometry(), true );
+	addMeshToScene( srf2.toThreeGeometry(), true );
+
+	var res;
+	var runs = 1;
+
+	var d1 = Date.now();
+
+	for (var i = 0 ; i < runs; i++){
+		res = verb.geom.Intersect.surfaces( srf1, srf2 );
+	}
+
+	var d2 = Date.now();
+
+	console.log( "intersected in ", (d2 - d1) / runs, " ms and " + res.length + " curves were discovered");
+
+    for (var i = 0; i < res.length; i++){
+		var res2 = res[i].toThreeGeometry();
+		addCurveToScene( res2 );
+	}
+
+	threeRender();
+
+</script>
+
+</body>
+
+</html>

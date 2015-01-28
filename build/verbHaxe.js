@@ -1693,7 +1693,7 @@ verb.core.Intersect.surfacesAtPointWithEstimate = function(surface0,surface1,uv1
 	var qv;
 	var qd;
 	var dist;
-	var maxits = 1;
+	var maxits = 5;
 	var its = 0;
 	do {
 		pds = verb.core.Eval.rationalSurfaceDerivatives(surface0,uv1[0],uv1[1],1);
@@ -1702,7 +1702,7 @@ verb.core.Intersect.surfacesAtPointWithEstimate = function(surface0,surface1,uv1
 		pv = pds[0][1];
 		pn = verb.core.Vec.normalized(verb.core.Vec.cross(pu,pv));
 		pd = verb.core.Vec.dot(pn,p);
-		qds = verb.core.Eval.rationalSurfaceDerivatives(surface0,uv2[0],uv2[1],1);
+		qds = verb.core.Eval.rationalSurfaceDerivatives(surface1,uv2[0],uv2[1],1);
 		q = qds[0][0];
 		qu = qds[1][0];
 		qv = qds[0][1];

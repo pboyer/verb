@@ -79,7 +79,7 @@ class Intersect {
                                                        tol : Float ) : SurfaceSurfaceIntersectionPoint {
 
         var pds, p, pn, pu, pv, pd, qds, q, qn, qu, qv, qd, dist;
-        var maxits = 1;
+        var maxits = 5;
         var its = 0;
 
         do {
@@ -91,7 +91,7 @@ class Intersect {
             pn = Vec.normalized( Vec.cross( pu, pv ) );
             pd = Vec.dot( pn, p );
 
-            qds = Eval.rationalSurfaceDerivatives( surface0, uv2[0], uv2[1], 1 );
+            qds = Eval.rationalSurfaceDerivatives( surface1, uv2[0], uv2[1], 1 );
             q = qds[0][0];
             qu = qds[1][0];
             qv = qds[0][1];
