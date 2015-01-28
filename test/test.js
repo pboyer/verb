@@ -6364,9 +6364,29 @@ describe("verb.core.Make.loftedSurface",function(){
 		var curves = [c0, c1, c2];
 		var surface = verb.core.Make.loftedSurface( curves );
 
-		// TODO
+		var p0 = verb.core.Eval.dehomogenize( c0.controlPoints[0] );
+		var closest0 = verb.core.Analyze.rationalSurfaceClosestPoint( surface, p0 ) ;
+		vecShouldBe( p0, closest0 );
 
-//		console.log( surface.knotsU, surface.knotsV );
+		var p1 = verb.core.Eval.dehomogenize( c0.controlPoints[2] );
+		var closest1 = verb.core.Analyze.rationalSurfaceClosestPoint( surface, p1 ) ;
+		vecShouldBe( p1, closest1 );
+
+		var p2 = verb.core.Eval.dehomogenize( c1.controlPoints[0] );
+		var closest2 = verb.core.Analyze.rationalSurfaceClosestPoint( surface, p2 ) ;
+		vecShouldBe( p2, closest2 );
+
+		var p3 = verb.core.Eval.dehomogenize( c1.controlPoints[3] );
+		var closest3 = verb.core.Analyze.rationalSurfaceClosestPoint( surface, p3 ) ;
+		vecShouldBe( p3, closest3 );
+
+		var p4 = verb.core.Eval.dehomogenize( c2.controlPoints[0] );
+		var closest4 = verb.core.Analyze.rationalSurfaceClosestPoint( surface, p4 ) ;
+		vecShouldBe( p4, closest4 );
+
+		var p5 = verb.core.Eval.dehomogenize( c2.controlPoints[4] );
+		var closest5 = verb.core.Analyze.rationalSurfaceClosestPoint( surface, p5 ) ;
+		vecShouldBe( p5, closest5 );
 
 	});
 });
