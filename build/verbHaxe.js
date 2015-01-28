@@ -1695,10 +1695,10 @@ verb.core.Intersect.meshes = function(mesh0,mesh1) {
 		var d4 = verb.core.Vec.dot(s4,s4);
 		return d1 < 1e-10 && d2 < 1e-10 || d3 < 1e-10 && d4 < 1e-10;
 	});
-	if(segments.length == 0) return [];
 	return verb.core.Intersect.makeMeshIntersectionPolylines(segments);
 };
 verb.core.Intersect.makeMeshIntersectionPolylines = function(segments) {
+	if(segments.length == 0) return [];
 	var _g = 0;
 	while(_g < segments.length) {
 		var s = segments[_g];
@@ -1731,25 +1731,27 @@ verb.core.Intersect.makeMeshIntersectionPolylines = function(segments) {
 	});
 	if(freeEnds.length == 0) freeEnds = ends;
 	var pls = [];
-	var _g3 = 0;
-	while(_g3 < freeEnds.length) {
-		var end = freeEnds[_g3];
-		++_g3;
-		if(end.visited) continue;
-		var pl = [];
-		var curEnd = end;
-		while(curEnd != null) {
-			if(curEnd.visited) throw "Segment end encountered twice!";
-			curEnd.visited = true;
-			curEnd.opp.visited = true;
-			pl.push(curEnd);
-			curEnd = curEnd.opp.adj;
-			if(curEnd == end) break;
+	var numVisitedEnds = 0;
+	while(freeEnds.length != 0) {
+		var end = freeEnds.pop();
+		if(!end.visited) {
+			var pl = [];
+			var curEnd = end;
+			while(curEnd != null) {
+				if(curEnd.visited) break;
+				curEnd.visited = true;
+				curEnd.opp.visited = true;
+				pl.push(curEnd);
+				numVisitedEnds += 2;
+				curEnd = curEnd.opp.adj;
+				if(curEnd == end) break;
+			}
+			if(pl.length > 0) {
+				pl.push(pl[pl.length - 1].opp);
+				pls.push(pl);
+			}
 		}
-		if(pl.length > 0) {
-			pl.push(pl[pl.length - 1].opp);
-			pls.push(pl);
-		}
+		if(freeEnds.length == 0 && numVisitedEnds < ends.length) freeEnds.push(ends.pop());
 	}
 	return pls;
 };

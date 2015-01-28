@@ -22,7 +22,7 @@ function threeRender(){
 }
 
 function addCurveToScene(geom, material){
-    material = material || new THREE.LineBasicMaterial({ linewidth: 2, color: 0xffffff});
+    material = material || new THREE.LineBasicMaterial({ linewidth: 3, color: 0xffffff});
     scene.add( new THREE.Line( geom, material ) );
 }
 
@@ -31,7 +31,7 @@ function addMeshToScene(mesh, wireframe, material){
     scene.add( new THREE.Mesh( mesh, material ) );
 
     if (wireframe){
-        var material2 = new THREE.MeshBasicMaterial( { color: 0xffffff, side: THREE.DoubleSide, wireframe: true } );
+        var material2 = new THREE.MeshBasicMaterial( { color: 0x888888, side: THREE.DoubleSide, wireframe: true } );
         var mesh2 = new THREE.Mesh( mesh, material2 );
         scene.add( mesh2 );
     }
@@ -49,10 +49,14 @@ function asGeometry(threePts){
     return geometry;
 }
 
+function pointsAsGeometry(pts){
+    return asGeometry( asVector3(pts) )
+}
+
 function addPointsToScene(pts){
 
     var geom = asGeometry( asVector3(pts) );
-    var cloudMat2 = new THREE.PointCloudMaterial({ size: 0.5, color: 0xff0000 });
+    var cloudMat2 = new THREE.PointCloudMaterial({ size: 0.5, color: 0xffffff });
     var cloud2 = new THREE.PointCloud( geom, cloudMat2 );
 
     scene.add( cloud2 );

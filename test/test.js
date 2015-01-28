@@ -3890,10 +3890,10 @@ describe("verb.core.Intersect.makeMeshIntersectionPolylines ",function(){
 		// discovers one continuous polyline
 		pls.length.should.be.equal( 1 );
 		pls[0].length.should.be.equal( 4 );
-		pls[0][0].point.should.be.eql( [10,0,0] );
-		pls[0][1].point.should.be.eql( [10,10,0] );
-		pls[0][2].point.should.be.eql( [0,10,0] );
-		pls[0][3].point.should.be.eql( [5,0,0] );
+		pls[0][0].point.should.be.eql( [5,0,0] );
+		pls[0][1].point.should.be.eql( [0,10,0] );
+		pls[0][2].point.should.be.eql( [10,10,0] );
+		pls[0][3].point.should.be.eql( [10,0,0] );
 
 	});
 

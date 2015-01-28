@@ -5,7 +5,12 @@
 <head>
   <title></title>
 
-  <script src="../build/verb.js"></script>
+ 	<script src="../build/verb.js"></script>
+	<script src="js/three.min.js"></script>
+	<script src="js/OrbitControls.js"></script>
+	<script src="js/verbToThreeConversion.js"></script>
+	<script src="js/threeBasic.js"></script>
+
 
 	<style>
 		body {
@@ -17,372 +22,206 @@
 
 <body>
 
-  <script src="js/three.min.js"></script>
-  <script src="js/OrbitControls.js"></script>
-  
-	<script>
+<script>
 
-		// construct the scene & camera
-		var scene = new THREE.Scene();
-		var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-		camera.position.z = 1;
-		camera.position.y = -1;
-		camera.position.x = 2;
-		camera.up.set( 0, 0, 1 );
+	threeSetup();
 
-		var renderer = new THREE.WebGLRenderer();
-		renderer.setSize( window.innerWidth, window.innerHeight );
-		document.body.appendChild( renderer.domElement );
+	function exTorusCylindricalSurface(){
 
-		// add subtle ambient lighting
-		var ambientLight = new THREE.AmbientLight(0x222222);
-		scene.add(ambientLight);
+		// center, xaxis, yaxis, radius
+		var profile = new verb.geom.Circle( [5,0,0], [1,0,0], [0,0,1], 2 );
 
-		// directional lighting
-		var directionalLight = new THREE.DirectionalLight(0xffffff);
-		directionalLight.position.set(1, 1, 1).normalize();
-		scene.add(directionalLight);
+		var base = [0,0,0];
+		var axis = [0,0,1];
+		var angle = 2 * Math.PI
+		srf1 = new verb.geom.RevolvedSurface( profile, base, axis, angle );
 
-		var controls = new THREE.OrbitControls(camera, renderer.domElement);
+		var axis = [-1,0,0]
+			, xaxis = [0,0,1]
+			, base = [8,0,0]
+			, height = 20
+			, radius = 2;
 
-		function render() {
-			requestAnimationFrame( render );
-			renderer.render( scene, camera );
-		}
+		srf2 = new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius );
 
-		function asVector3(pts){
-			return pts.map(function(x){
-				return new THREE.Vector3(x[0],x[1],x[2]);
-			});
-		}
+	}
 
-		function pointsAsGeometry(threePts){
-			var geometry = new THREE.Geometry();
-			geometry.vertices.push.apply( geometry.vertices, threePts );
-			return geometry;
-		}
+	function exTorusCylindricalSurface(){
 
-		function tess(srf){
-			return srf.tessellate();
-		}
+		// center, xaxis, yaxis, radius
+		var profile = new verb.geom.Circle( [5,0,0], [1,0,0], [0,0,1], 2 );
 
-		// verb.geom.NurbsSurface -> THREE.Geometry
-		function tessellate(srf, udivs, vdivs) {
+		var base = [0,0,0];
+		var axis = [0,0,1];
+		var angle = 2 * Math.PI
+		srf1 = new verb.geom.RevolvedSurface( profile, base, axis, angle );
 
-			var tess = srf.tessellate();
+		var axis = [-1,0,0]
+			, xaxis = [0,0,1]
+			, base = [8,0,0]
+			, height = 16
+			, radius = 2;
 
-			var geometry = new THREE.Geometry();
+		srf2 = new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius );
 
-			// convert vertices
-			var threePts = tess.points.map(function(x){
-				return new THREE.Vector3(x[0],x[1],x[2]);
-			});
+	}
 
-			geometry.vertices.push.apply( geometry.vertices, threePts );
+	function exTorusCylindricalSurface2(){
 
-			// convert faces
-			var threeFaces = tess.faces.map(function(faceIndices){
-				var normals = faceIndices.map(function(x){
-					var vn = tess.normals[x];
-					vn = verb.core.Vec.normalized( vn );
-					return new THREE.Vector3( vn[0], vn[1], vn[2] );
-				});
+		// center, xaxis, yaxis, radius
+		var profile = new verb.geom.Circle( [5,0,0], [1,0,0], [0,0,1], 2 );
 
-				return new THREE.Face3(faceIndices[0],faceIndices[1],faceIndices[2], normals);
-			});
+		var base = [0,0,0];
+		var axis = [0,0,1];
+		var angle = 2 * Math.PI
+		srf1 = new verb.geom.RevolvedSurface( profile, base, axis, angle );
 
-			geometry.faces.push.apply(geometry.faces, threeFaces);
+		var axis = [-1,0,0]
+			, xaxis = [0,0,1]
+			, base = [8,0,0]
+			, height = 16
+			, radius = 2;
 
-			return geometry;
+		srf2 = new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius );
 
-		}
+	}
 
-		function addMeshToScene(mesh, wireframe){
+	function exTorusCylindricalSurface3(){
 
-			var material = new THREE.MeshNormalMaterial( { wireframe: wireframe, transparent: true, side: THREE.DoubleSide, opacity: 0.4, shading: THREE.SmoothShading, side: THREE.DoubleSide } );
-			// var material = new THREE.MeshPhongMaterial( { color: 0x444444, side: THREE.DoubleSide, shading: THREE.SmoothShading } );
-			var tm = new THREE.Mesh( mesh, material );
+		// center, xaxis, yaxis, radius
+		var profile = new verb.geom.Circle( [5,0,0], [1,0,0], [0,0,1], 2 );
 
-			scene.add( tm );
+		var base = [0,0,0];
+		var axis = [0,0,1];
+		var angle = 2 * Math.PI
+		srf1 = new verb.geom.RevolvedSurface( profile, base, axis, angle  );
 
-		}
+		var axis = [-1,0,0]
+			, xaxis = [0,0,1]
+			, base = [8,0,2]
+			, height = 16
+			, radius = 2;
 
-		function addLinesToScene(geom){
+		srf2 = new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius );
 
-			var hexString = Math.floor(Math.random()*16777215).toString(16);
-			var hex = parseInt(hexString, 16);
+	}
 
-			var lineMat = new THREE.LineBasicMaterial({ linewidth: 2, color: 0xffffff});
-			var l = new THREE.Line( geom, lineMat );
+	function exGlancingPlaneCylindricalSurface(){
 
-			scene.add( l );
+		var axis = [0,0,1]
+			, xaxis = [1,0,0]
+			, base = [0,0,0]
+			, height = 5
+			, radius = 3;
 
-		}
+		srf1 = new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius );
 
-		var udivs0 = 20;
-		var vdivs0 = 20;
+		var p5 	= [5,5,0]
+			, p6 = [-5,5,0]
+			, p7 = [-5,-5,0]
+			, p8 = [5,-5,0];
 
-		var udivs1 = 20;
-		var vdivs1 = 40;
+		srf2 = verb.geom.NurbsSurface.byCorners( p5, p6, p7, p8 );
 
-		function exampleTorusCylindricalSurfaceSuccess(){
+	}
 
-			// center, xaxis, yaxis, radius
-			var profile = new verb.geom.Circle( [5,0,0], [1,0,0], [0,0,1], 2 );
 
-			var base = [0,0,0];
-			var axis = [0,0,1];
-			var angle = 2 * Math.PI
-			srf1 = new verb.geom.RevolvedSurface( profile, base, axis, angle );
+	function exPlanePlane(){
 
-			var axis = [-1,0,0]
-				, xaxis = [0,0,1]
-				, base = [8,0,0]
-				, height = 20
-				, radius = 2;
+		var p1 =   [5,0,0]
+			, p2 = [5,0,6]
+			, p3 = [0,1,6]
+			, p4 = [0,0,0];
 
-			srf2 = new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius );
+		srf1 = verb.geom.NurbsSurface.byCorners( p1, p2, p3, p4 );
 
-			udivs0 = 40;
-			vdivs0 = 40;
+		var p5 = [5,-5,-5]
+			, p6 = [5,5,5]
+			, p7 = [0,5,9]
+			, p8 = [0,-5,-5];
 
-			udivs1 = 40;
-			vdivs1 = 40;
+		srf2 = verb.geom.NurbsSurface.byCorners( p5, p6, p7, p8 );
 
-		}
+	}
 
+	function exCylindricalSurfaceCylindricalSurface(){
 
-		function exampleTorusCylindricalSurfaceSuccess(){
+		var axis = [0,0,1]
+			, xaxis = [1,0,0]
+			, base = [0,0,0]
+			, height = 5
+			, radius = 3;
 
-			// center, xaxis, yaxis, radius
-			var profile = new verb.geom.Circle( [5,0,0], [1,0,0], [0,0,1], 2 );
+		srf1 = new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius );
 
-			var base = [0,0,0];
-			var axis = [0,0,1];
-			var angle = 2 * Math.PI
-			srf1 = new verb.geom.RevolvedSurface( profile, base, axis, angle );
+		var axis2 = [1,0,0]
+			, xaxis2 = [0,1,0]
+			, base2 = [0,0,-1]
+			, height2 = 10
+			, radius2 = 3;
 
-			var axis = [-1,0,0]
-				, xaxis = [0,0,1]
-				, base = [8,0,0]
-				, height = 16
-				, radius = 2;
+		srf2 = new verb.geom.CylindricalSurface( axis2, xaxis2, base2, height2, radius2 );
 
-			srf2 = new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius );
+	}
 
-			udivs0 = 40;
-			vdivs0 = 20;
+	function exNurbsSurfacePlane(){
 
-			udivs1 = 20;
-			vdivs1 = 20;
+		var degree = 3
+			, knots = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
+			, pts = [ 	[ [0, 0, -10], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] , 	[40, 0, 0], [50, 0, 9] ],
+						[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] , [40, -10, 0], [50, -10, 0]	],
+						[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] , [40, -20, -2], [50, -20, 0] 	],
+						[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] , [40, -30, 0], [50, -30, 0]     ],
+						[ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , [40, -40, -20], [50, -40, 0]     ],
+						[ [0, -50, 12], [10, -50, 0], 	[20, -50, 0], 	[30, -50, 0] , [50, -50, 0], [50, -50, 15]     ],     ];
+		srf1 = new verb.geom.NurbsSurface.byKnotsControlPointsWeights( degree, degree, knots, knots, pts );
 
-		}
+		var p5 = [50,-50,3]
+			, p6 = [50,0,3]
+			, p7 = [0,0,3]
+			, p8 = [0,-50,5];
 
-		function exampleTorusCylindricalSurfaceSuccess2(){
+		srf2 = verb.geom.NurbsSurface.byCorners( p5, p6, p7, p8 );
 
-			// center, xaxis, yaxis, radius
-			var profile = new verb.geom.Circle( [5,0,0], [1,0,0], [0,0,1], 2 );
+	}
 
-			var base = [0,0,0];
-			var axis = [0,0,1];
-			var angle = 2 * Math.PI
-			srf1 = new verb.geom.RevolvedSurface( profile, base, axis, angle );
+	exTorusCylindricalSurface();
+	//exGlancingPlaneCylindricalSurface();
+	//exPlanePlane();
+	//exPlanePlane();
+	//exNurbsSurfacePlane();
+	//exTorusCylindricalSurface3();
 
-			var axis = [-1,0,0]
-				, xaxis = [0,0,1]
-				, base = [8,0,0]
-				, height = 16
-				, radius = 2;
+	var tess1 = srf1.tessellate();
+	var tess2 = srf2.tessellate();
 
-			srf2 = new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius );
+	addMeshToScene( srf1.toThreeGeometry(), true );
+	addMeshToScene( srf2.toThreeGeometry(), true );
 
-			udivs0 = 80;
-			vdivs0 = 40;
+	var res;
+	var runs = 10;
 
-			udivs1 = 2;
-			vdivs1 = 40;
+	var d1 = Date.now();
 
-		}
+	for (var i = 0 ; i < runs; i++){
+		res = verb.core.Intersect.meshes( tess1, tess2 );
+	}
 
+	var d2 = Date.now();
 
-		function exampleTorusCylindricalSurfaceSuccess3(){
+	var numLengths = res.reduce(function(a,x){ return a + x.length-1; }, 0);
 
-			// center, xaxis, yaxis, radius
-			var profile = new verb.geom.Circle( [5,0,0], [1,0,0], [0,0,1], 2 );
+	console.log( "intersected in ", (d2 - d1) / runs, " ms and " + res.length + " polylines were discovered");
+	console.log( numLengths + " edges were discovered ");
 
-			var base = [0,0,0];
-			var axis = [0,0,1];
-			var angle = 2 * Math.PI
-			srf1 = new verb.geom.RevolvedSurface( profile, base, axis, angle  );
+	for (var i = 0; i < res.length; i++){
+		var res2 = res[i].map(function(x){ return x.point; });
+		addCurveToScene( pointsAsGeometry( res2 ));
+	}
 
-			var axis = [-1,0,0]
-				, xaxis = [0,0,1]
-				, base = [8,0,2]
-				, height = 16
-				, radius = 2;
+	threeRender();
 
-			srf2 = new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius );
-
-			udivs0 = 34;
-			vdivs0 = 20;
-
-			udivs1 = 2;
-			vdivs1 = 40;
-
-		}
-
-		function exampleGlancingPlaneCylindricalSurfaceSuccess(){
-
-			var axis = [0,0,1]
-				, xaxis = [1,0,0]
-				, base = [0,0,0]
-				, height = 5
-				, radius = 3;
-
-			srf1 = new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius );
-
-			var p5 	= [5,5,0]
-				, p6 = [-5,5,0]
-				, p7 = [-5,-5,0]
-				, p8 = [5,-5,0];
-
-			srf2 = verb.geom.NurbsSurface.byCorners( p5, p6, p7, p8 );
-
-			udivs0 = 40;
-			vdivs0 = 40;
-
-			udivs1 = 40;
-			vdivs1 = 40;
-
-		}
-
-
-		function examplePlanePlaneSuccess(){
-
-			var p1 =   [5,0,0]
-				, p2 = [5,0,6]
-				, p3 = [0,1,6]
-				, p4 = [0,0,0];
-
-			srf1 = verb.geom.NurbsSurface.byCorners( p1, p2, p3, p4 );
-
-			var p5 = [5,-5,-5]
-				, p6 = [5,5,5]
-				, p7 = [0,5,9]
-				, p8 = [0,-5,-5];
-
-			srf2 = verb.geom.NurbsSurface.byCorners( p5, p6, p7, p8 );
-
-			udivs0 = 15;
-			vdivs0 = 15;
-
-			udivs1 = 15;
-			vdivs1 = 15;
-
-		}
-
-		function exampleCylindricalSurfaceCylindricalSurfaceSuccess(){
-
-			var axis = [0,0,1]
-				, xaxis = [1,0,0]
-				, base = [0,0,0]
-				, height = 5
-				, radius = 3;
-
-			srf1 = new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius );
-
-			var axis2 = [1,0,0]
-				, xaxis2 = [0,1,0]
-				, base2 = [0,0,-1]
-				, height2 = 10
-				, radius2 = 3;
-
-			srf2 = new verb.geom.CylindricalSurface( axis2, xaxis2, base2, height2, radius2 );
-
-			udivs0 = 60;
-			vdivs0 = 60;
-
-			udivs1 = 60;
-			vdivs1 = 60;
-
-		}
-
-		function exampleNurbsSurfacePlane(){
-		
-			var degree = 3
-				, knots = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
-				, pts = [ 	[ [0, 0, -10], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] , 	[40, 0, 0], [50, 0, 9] ],
-							[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] , [40, -10, 0], [50, -10, 0]	],
-							[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] , [40, -20, -2], [50, -20, 0] 	],
-							[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] , [40, -30, 0], [50, -30, 0]     ],  
-							[ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , [40, -40, -20], [50, -40, 0]     ],  
-							[ [0, -50, 12], [10, -50, 0], 	[20, -50, 0], 	[30, -50, 0] , [50, -50, 0], [50, -50, 15]     ],     ]
-				, wts = [ 	[ 1, 1, 1, 1, 1, 1],
-							[ 1, 1, 1, 1, 1, 1],
-							[ 1, 1, 1, 1, 1, 1],
-							[ 1, 1, 1, 1, 1, 1],
-							[ 1, 1, 1, 1, 1, 1],
-							[ 1, 1, 1, 1, 1, 1] ];
-
-			srf1 = new verb.geom.NurbsSurface.byControlPointsWeights( degree, degree, knots, knots, pts, wts );
-
-			var p5 = [50,-50,3]
-				, p6 = [50,0,3]
-				, p7 = [0,0,3]
-				, p8 = [0,-50,5];
-
-			srf2 = verb.geom.NurbsSurface.byCorners( p5, p6, p7, p8 );
-
-			udivs0 =60;
-			vdivs0 =60;
-
-			udivs1 = 2;
-			vdivs1 = 2;
-
-		}
-
-		var srf1, srf2;
-
-		//exampleTorusCylindricalSurfaceSuccess();
-		//exampleGlancingPlaneCylindricalSurfaceSuccess();
-		//examplePlanePlaneSuccess();
-		//exampleTorusCylindricalSurfaceSuccess2();
-		exampleTorusCylindricalSurfaceSuccess3();
-		//examplePlanePlaneSuccess();
-		//exampleNurbsSurfacePlane();
-
-		addMeshToScene( tessellate( srf1 ), false );
-		addMeshToScene( tessellate( srf2 ), false);
-
-		var tess1 = tess(srf1, udivs0, vdivs0);
-		var tess2 = tess(srf2, udivs1, vdivs1);
-
-		var res;
-
-		var runs = 1;
-
-		var d1 = Date.now();
-
-		for (var i = 0 ; i < runs; i++){
-			res = verb.core.Intersect.meshes( tess1, tess2 );
-		}
-
-		var d2 = Date.now();
-
-		console.log("intersected in ", (d2 - d1) / runs, "ms")
-
-		for (var i = 0; i < res.length; i++){
-
-			var res2 = res[i].map(function(x){ return x.point; });
-
-			addLinesToScene( 
-				pointsAsGeometry( 
-					asVector3( res2 )));
-		}
-
-		render();
-
-	</script>
+</script>
 
 </body>
 

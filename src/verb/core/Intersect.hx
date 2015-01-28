@@ -165,11 +165,9 @@ class Intersect {
         })
         .filter(function(x){
             return x != null;
-        })
-        .filter(function(x){
+        }).filter(function(x){
             return Vec.distSquared( x.min.point, x.max.point ) > Constants.EPSILON;
-        })
-        .unique(function(a, b){
+        }).unique(function(a, b){
 
             // TODO: this is too expensive and this only occurs when the intersection
             // 		line is on an edge.  we should mark these to avoid doing all of
@@ -189,13 +187,9 @@ class Intersect {
 
             return ( d1 < Constants.EPSILON && d2 < Constants.EPSILON ) ||
                 ( d3 < Constants.EPSILON && d4 < Constants.EPSILON );
-
         });
 
-        if (segments.length == 0) return [];
-
         return makeMeshIntersectionPolylines( segments );
-
     }
 
     // Given a list of unstructured mesh intersection segments, reconstruct into polylines
@@ -208,8 +202,7 @@ class Intersect {
 
     public static function makeMeshIntersectionPolylines( segments : Array<Interval<MeshIntersectionPoint>> ) : Array<Array<MeshIntersectionPoint>> {
 
-        // debug (return all segments)
-        // return segments;
+        if (segments.length == 0) return [];
 
         // we need to tag the segment ends
         for (s in segments){
@@ -251,35 +244,44 @@ class Intersect {
         }
 
         var pls = [];
+        var numVisitedEnds = 0;
 
-        for (end in freeEnds){
+        while (freeEnds.length != 0){
 
-            if (end.visited) continue;
+            var end = freeEnds.pop();
 
-            // traverse to end
-            var pl = [];
-            var curEnd = end;
+            if (!end.visited){
 
-            while (curEnd != null) {
+                // traverse to end
+                var pl = [];
+                var curEnd = end;
 
-                // debug
-                if (curEnd.visited) throw 'Segment end encountered twice!';
+                while (curEnd != null) {
 
-                // technically we consume both ends of the segment
-                curEnd.visited = true;
-                curEnd.opp.visited = true;
+                    // debug
+                    if (curEnd.visited) break;
 
-                pl.push(curEnd);
+                    // consume both ends of the segment
+                    curEnd.visited = true;
+                    curEnd.opp.visited = true;
 
-                curEnd = curEnd.opp.adj;
+                    pl.push(curEnd);
+                    numVisitedEnds += 2;
 
-                // loop condition
-                if (curEnd == end) break;
+                    curEnd = curEnd.opp.adj;
+
+                    // loop condition
+                    if (curEnd == end) break;
+                }
+
+                if (pl.length > 0) {
+                    pl.push( pl[pl.length-1].opp );
+                    pls.push( pl );
+                }
             }
 
-            if (pl.length > 0) {
-                pl.push( pl[pl.length-1].opp );
-                pls.push( pl );
+            if (freeEnds.length == 0 && numVisitedEnds < ends.length){
+                freeEnds.push( ends.pop() );
             }
         }
 
