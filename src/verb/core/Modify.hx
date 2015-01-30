@@ -9,23 +9,21 @@ import verb.core.types.NurbsSurfaceData;
 using Lambda;
 using verb.core.ArrayExtensions;
 
-@:expose("core.KnotMultiplicity")
-class KnotMultiplicity {
-    public var knot : Float;
-    public var mult : Int;
-
-    public function new(knot : Float, mult : Int ){
-        this.knot = knot;
-        this.mult = mult;
-    }
-
-    public function inc(){
-        mult++;
-    }
-}
-
 @:expose("core.Modify")
 class Modify {
+
+
+    public static function curveReverse( curve : NurbsCurveData ){
+
+
+
+    }
+
+    public static function surfaceReverse( surface : NurbsSurfaceData, useV : Bool ){
+
+
+
+    }
 
     public static function unifyCurveKnotVectors( curves : Array<NurbsCurveData> ) : Array<NurbsCurveData> {
 
@@ -393,7 +391,7 @@ class Modify {
         // find all of the unique knot values and their multiplicity
         // for each, increase their multiplicity to degree + 1
 
-        var knotmults = knotMultiplicities( knots );
+        var knotmults = Analyze.knotMultiplicities( knots );
         var reqMult = degree + 1;
 
         // insert the knots
@@ -425,32 +423,6 @@ class Modify {
 
         return crvs;
 
-    }
-
-    //
-    // Determine the multiplicities of the values in a knot vector
-    //
-    // **params**
-    // + array of nondecreasing knot values
-    //
-    // **returns**
-    // + *Array* of length 2 arrays, [knotValue, knotMultiplicity]
-    //
-    public static function knotMultiplicities( knots : KnotArray ) : Array<KnotMultiplicity> {
-
-        var mults = [  new KnotMultiplicity( knots[0], 0 ) ];
-        var curr : KnotMultiplicity = mults[0];
-
-        for (knot in knots){
-            if ( (Math.abs(knot - curr.knot)) > Constants.EPSILON ){
-                curr = new KnotMultiplicity(knot, 0);
-                mults.push(curr);
-            }
-
-            curr.inc();
-        }
-
-        return mults;
     }
 
     // Split a curve into two parts

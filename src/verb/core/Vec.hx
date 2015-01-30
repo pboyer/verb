@@ -20,6 +20,22 @@ class Vec {
         return l;
     }
 
+    public static function span(min : Float, max : Float, step : Float) : Array<Float> {
+        if (step == null || step < Constants.EPSILON) return []; // infinite
+        if (min > max && step > 0.0) return []; // infinite
+        if (max > min && step < 0.0) return []; // infinite
+
+        var l = [];
+        var cur = min;
+
+        while( cur <= max ){
+            l.push(cur);
+            cur += step;
+        }
+
+        return l;
+    }
+
     public static function neg(arr : Array<Float>) : Array<Float> {
         return arr.map(function(x){ return -x; });
     }

@@ -234,11 +234,29 @@ class NurbsSurface extends AsyncObject implements ISurface {
             .map(function(x){ return new NurbsSurface(x); });
     }
 
-    public function splitAsync( u : Float, useV : Bool = false ) : Promise<NurbsSurface> {
+    public function splitAsync( u : Float, useV : Bool = false ) : Promise<Array<NurbsSurface>> {
         return defer( Modify, 'surfaceSplit', [ _data, u, useV ] )
             .then(function(s){
                 return s.map(function(x){ return new NurbsSurface(x); });
             });
+    }
+
+    // Extract an isocurve from a surface
+    //
+    // **params**
+    // + The parameter at which to obtain the isocurve
+    // + False for a u-iso, true for a v-iso
+    //
+    // **returns**
+    // + A NurbsCurve in the provided direction
+
+    public function isocurve( u : Float, useV : Bool = false ) : NurbsCurve {
+        return new NurbsCurve( Make.surfaceIsocurve( _data, u, useV ) );
+    }
+
+    public function isocurveAsync( u : Float, useV : Bool = false ) : Promise<NurbsCurve> {
+        return defer( Make, 'surfaceIsocurve', [ _data, u, useV ] )
+            .then(function(x){ return new NurbsCurve(x); });
     }
 
     // Tessellate the surface

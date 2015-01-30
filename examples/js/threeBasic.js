@@ -28,7 +28,7 @@ function addCurveToScene(geom, material){
     scene.add( new THREE.Line( geom, material ) );
 }
 
-function addMeshToScene(mesh, wireframe, material){
+function addMeshToScene(mesh, material, wireframe ){
     material = material || new THREE.MeshNormalMaterial( { transparent: true, side: THREE.DoubleSide, opacity: 0.8, shading: THREE.SmoothShading, side: THREE.DoubleSide } );
     scene.add( new THREE.Mesh( mesh, material ) );
 

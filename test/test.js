@@ -872,11 +872,11 @@ describe("verb.core.Modify.curveSplit",function(){
 
 });
 
-describe("verb.core.Modify.knotMultiplicities",function(){
+describe("verb.core.Analyze.knotMultiplicities",function(){
 
 	it('is correct for a basic example', function(){
 
-		var res = verb.core.Modify.knotMultiplicities( [ 0, 0, 0, 0, 1, 1, 2, 2, 2, 3, 3.3] );
+		var res = verb.core.Analyze.knotMultiplicities( [ 0, 0, 0, 0, 1, 1, 2, 2, 2, 3, 3.3] );
 
 		res.length.should.be.equal( 5 );
 
@@ -6690,5 +6690,104 @@ describe("verb.core.Intersect.meshes",function(){
 
 		res.length.should.be.equal( 1 );
 	});
+
+});
+
+describe("verb.core.Make.surfaceIsocurve",function(){
+
+	var degreeU = 3
+		, degreeV = 3
+		, knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
+		, knotsV =	[0, 0, 0, 0, 1, 1, 1, 1]
+		, controlPoints = [ 	[ [0, 0, 0], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] 		],
+								[ [0, -10, 0], 	[10, -10, 0], 	[20, -10, 0], 	[30, -10, 0] 	],
+								[ [0, -20, 0], 	[10, -20, 0], 	[20, -20, 0], 	[30, -20, 0] 	],
+								[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
+		, bezier = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
+
+	it('provides isocurves at expected location in u direction', function(){
+
+		for (var i = 0; i < 1.0; i += 0.1 ){
+
+			var res = verb.core.Make.surfaceIsocurve( bezier, i, false );
+
+			var cpts = res.controlPoints;
+
+			var pt0 = verb.core.Eval.surfacePoint( bezier, i, 0.0 );
+			var pt1 = verb.core.Eval.surfacePoint( bezier, i, 1.0 );
+
+			vecShouldBe( pt0, cpts[0] );
+			vecShouldBe( pt1, cpts[cpts.length-1] );
+
+		}
+
+	});
+
+	it('provides isocurves at expected location in v direction', function(){
+
+		for (var i = 0; i < 1.0; i += 0.1 ){
+
+			var res = verb.core.Make.surfaceIsocurve( bezier, i, true );
+
+			var cpts = res.controlPoints;
+
+			var pt0 = verb.core.Eval.surfacePoint( bezier, 0.0, i );
+			var pt1 = verb.core.Eval.surfacePoint( bezier, 1.0, i );
+
+			vecShouldBe( pt0, cpts[0] );
+			vecShouldBe( pt1, cpts[cpts.length-1] );
+
+		}
+
+	});
+
+});
+
+describe("verb.geom.NurbsSurface.isocurve",function(){
+
+	var degreeU = 3
+		, degreeV = 3
+		, knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
+		, knotsV =	[0, 0, 0, 0, 1, 1, 1, 1]
+		, controlPoints = [ 	[ [0, 0, 0], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] 		],
+								[ [0, -10, 0], 	[10, -10, 0], 	[20, -10, 0], 	[30, -10, 0] 	],
+								[ [0, -20, 0], 	[10, -20, 0], 	[20, -20, 0], 	[30, -20, 0] 	],
+								[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
+		, bezier = verb.geom.NurbsSurface.byKnotsControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints );
+
+	it('provides isocurves at expected location in u direction', function(){
+
+		var i = 0.5;
+		var res = bezier.isocurve( i, false );
+
+		var cpts = res.controlPoints();
+
+		var pt0 = bezier.point( i, 0.0 );
+		var pt1 = bezier.point( i, 1.0 );
+
+		vecShouldBe( pt0, cpts[0] );
+		vecShouldBe( pt1, cpts[cpts.length-1] );
+
+	});
+
+	it('provides isocurves at expected location in u direction async', function(done){
+
+		var i = 0.5;
+		bezier.isocurveAsync( i, false ).then(function(res){
+
+			var cpts = res.controlPoints();
+
+			var pt0 = bezier.point( i, 0.0 );
+			var pt1 = bezier.point( i, 1.0 );
+
+			vecShouldBe( pt0, cpts[0] );
+			vecShouldBe( pt1, cpts[cpts.length-1] );
+
+			done();
+
+		});
+
+	});
+
 
 });

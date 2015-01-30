@@ -9,8 +9,49 @@ using verb.core.ArrayExtensions;
 using Lambda;
 using verb.core.Mat;
 
+@:expose("core.KnotMultiplicity")
+class KnotMultiplicity {
+    public var knot : Float;
+    public var mult : Int;
+
+    public function new(knot : Float, mult : Int ){
+        this.knot = knot;
+        this.mult = mult;
+    }
+
+    public function inc(){
+        mult++;
+    }
+}
+
 @:expose("core.Analyze")
 class Analyze {
+
+    //
+    // Determine the multiplicities of the values in a knot vector
+    //
+    // **params**
+    // + array of nondecreasing knot values
+    //
+    // **returns**
+    // + *Array* of length 2 arrays, [knotValue, knotMultiplicity]
+    //
+    public static function knotMultiplicities( knots : KnotArray ) : Array<KnotMultiplicity> {
+
+        var mults = [  new KnotMultiplicity( knots[0], 0 ) ];
+        var curr : KnotMultiplicity = mults[0];
+
+        for (knot in knots){
+            if ( (Math.abs(knot - curr.knot)) > Constants.EPSILON ){
+                curr = new KnotMultiplicity(knot, 0);
+                mults.push(curr);
+            }
+
+            curr.inc();
+        }
+
+        return mults;
+    }
 
     public static function isRationalSurfaceClosed(surface : NurbsSurfaceData, uDir : Bool = true ) : Bool {
 

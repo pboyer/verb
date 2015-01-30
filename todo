@@ -1,8 +1,10 @@
+Make.surfaceIsocurve
+Modify.curveReverse
+Modify.surfaceReverse
 SweptSurface
 More efficient representation for surface tessellation, don't use 2d arrays
-Surface surface intersection fails every time - Intersect.threePlanes may be to blame
+More exact srf-srf intersection
 Marching surface-Surface intersection
-
 SurfaceClosestPoint occasionally fails when point is far from surface - need to check for wild derivatives
 Curve interpolation with sparse matrices
 Curve approximation

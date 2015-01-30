@@ -11,6 +11,41 @@ using verb.core.ArrayExtensions;
 @:expose("core.Make")
 class Make {
 
+    public static function surfaceIsocurve( surface : NurbsSurfaceData, u : Float, useV : Bool = false ) : NurbsCurveData {
+
+        var knots = useV ? surface.knotsU : surface.knotsV;
+        var degree = useV ? surface.degreeU : surface.degreeV;
+
+        var knotMults = Analyze.knotMultiplicities( knots );
+
+        // if the knot already exists in the array, don't make duplicates
+        var reqKnotIndex : Int = -1;
+        for ( i in 0...knotMults.length ){
+            if ( Math.abs( u - knotMults[i].knot ) < Constants.EPSILON ){
+                reqKnotIndex = i;
+                break;
+            }
+        }
+
+        var numKnotsToInsert = degree + 1;
+        if (reqKnotIndex > 0){
+            numKnotsToInsert = numKnotsToInsert - knotMults[reqKnotIndex].mult;
+        }
+
+        // insert the knots
+        var newSrf = Modify.surfaceKnotRefine( surface, Vec.rep(numKnotsToInsert, u), useV );
+
+        // obtain the correct index of control points to extract
+        var span = Eval.knotSpan( degree, u, knots );
+
+        if (useV){
+            return new NurbsCurveData( newSrf.degreeU, newSrf.knotsU, [ for (row in newSrf.controlPoints) row[span] ]);
+        }
+
+        return new NurbsCurveData( newSrf.degreeV, newSrf.knotsV, newSrf.controlPoints[span] );
+
+    }
+
     public static function loftedSurface( curves : Array<NurbsCurveData>, degreeV : Int = null ) : NurbsSurfaceData {
 
         curves = Modify.unifyCurveKnotVectors( curves );

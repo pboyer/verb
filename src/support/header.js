@@ -11,6 +11,7 @@ if ( typeof exports != 'object' || exports === undefined )
 if ( typeof window != 'object'){
 
 	var global = this;
+	var window = global; // required for promhx
 	var lookup = function(className, methodName){
 
 		var obj = global;

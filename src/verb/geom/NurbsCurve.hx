@@ -284,6 +284,25 @@ class NurbsCurve extends AsyncObject implements ICurve {
         return defer( Divide, 'rationalCurveByArcLength', [ _data, divisions ] );
     }
 
+    // Split the curve at the given parameter
+    //
+    // **params**
+    // + The parameter at which to split the curve
+    //
+    // **returns**
+    // + Two curves - one at the lower end of the parameter range and one at the higher end.
+
+    public function split( u : Float ) : Array<NurbsCurve> {
+        return Modify.curveSplit( _data, u ).map(function(x){ return new NurbsCurve(x); });
+    }
+
+    public function splitAsync( u : Float ) : Promise<Array<NurbsCurve>> {
+        return defer( Modify, 'curveSplit', [ _data, u ])
+        .then(function(cs : Array<NurbsCurveData>) : Array<NurbsCurve>{
+            return cs.map(function(x){ return new NurbsCurve(x); });
+        });
+    }
+
     // Tessellate a curve at a given tolerance
     //
     // **params**
@@ -301,22 +320,4 @@ class NurbsCurve extends AsyncObject implements ICurve {
         return defer( Tess, 'rationalCurveAdaptiveSample', [ _data, tolerance, false ] );
     }
 
-    // Split the curve at the given parameter
-    //
-    // **params**
-    // + The parameter at which to split the curve
-    //
-    // **returns**
-    // + Two curves - one at the lower end of the parameter range and one at the higher end.
-
-    public function split( u : Float ) : Array<NurbsCurve> {
-        return Modify.curveSplit( _data, u ).map(function(x){ return new NurbsCurve(x); });
-    }
-
-    public function splitAsync( u : Float ) : Promise<Array<NurbsCurve>> {
-        return defer( Modify, 'curveSplit', [ _data, u ])
-            .then(function(cs : Array<NurbsCurveData>) : Array<NurbsCurve>{
-                return cs.map(function(x){ return new NurbsCurve(x); });
-            });
-    }
 }
