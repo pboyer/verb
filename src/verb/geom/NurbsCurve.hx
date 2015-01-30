@@ -303,6 +303,20 @@ class NurbsCurve extends AsyncObject implements ICurve {
         });
     }
 
+    // Reverse the parameterization of the curve
+    //
+    // **returns**
+    // + A reversed curve
+
+    public function reverse() : NurbsCurve {
+        return new NurbsCurve( Modify.curveReverse( _data ) );
+    }
+
+    public function reverseAsync() : Promise<NurbsCurve> {
+        return defer( Modify, 'curveReverse', [ _data ])
+            .then(function(c){ return new NurbsCurve(c); });
+    }
+
     // Tessellate a curve at a given tolerance
     //
     // **params**

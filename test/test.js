@@ -6853,14 +6853,69 @@ describe("verb.core.Modify.surfaceReverse",function(){
 
 		var srr = verb.core.Modify.surfaceReverse( sr, false );
 
-		var sp0 = verb.core.Eval.surfacePoint( s, 0, 0 );
-		var sp1 = verb.core.Eval.surfacePoint( srr, 0, 0 );
+		sp0 = verb.core.Eval.surfacePoint( s, 0, 0 );
+		sp1 = verb.core.Eval.surfacePoint( srr, 0, 0 );
 		vecShouldBe( sp0, sp1, verb.core.Constants.EPSILON );
 
-		var sp0 = verb.core.Eval.surfacePoint( s, 1.0, 0 );
-		var sp1 = verb.core.Eval.surfacePoint( srr, 1.0, 0 );
+		sp0 = verb.core.Eval.surfacePoint( s, 1.0, 0 );
+		sp1 = verb.core.Eval.surfacePoint( srr, 1.0, 0 );
 		vecShouldBe( sp0, sp1, verb.core.Constants.EPSILON );
 
 
 	});
+});
+
+describe("verb.geom.NurbsCurve.reverse",function(){
+
+	it('is correct', function(){
+		var cd = new verb.core.NurbsCurveData( 2, [0,0,0,0.24,1,1,1], [ [0,0,0,1], [1,0,0,1], [0.5,1,0,1], [2,0,0,1] ] );
+		var c = new verb.geom.NurbsCurve( cd );
+
+		var cr = c.reverse();
+		var crr = cr.reverse();
+
+		var cp0 = c.point( 0 );
+		var cp1 = cr.point( 1.0 );
+
+		vecShouldBe( cp0, cp1, verb.core.Constants.EPSILON );
+
+		sameCurve( c.asNurbs(), crr.asNurbs() );
+	});
+
+});
+
+describe("verb.geom.NurbsSurface.reverse",function(){
+
+	var degreeU = 3
+		, degreeV = 3
+		, knotsU = [0, 0, 0, 0, 0.25, 1, 1, 1, 1]
+		, knotsV =	[0, 0, 0, 0, 0.70, 1, 1, 1, 1]
+		, controlPoints = [ 	[ [0, 0, 0], 	[10, 0, 0], 	[20, 0, 0],  	[25, 0, 0], 	[30, 0, 0] 		],
+								[ [0, -10, 0], 	[10, -10, 0], 	[20, -10, 0],   [25, -10, 0],	[30, -10, 0] 	],
+								[ [0, -20, 0], 	[10, -20, 0], 	[20, -20, 0], 	[25, -20, 0],   [30, -20, 0] 	],
+								[ [0, -20, 0], 	[10, -20, 0], 	[20, -20, 0], 	[25, -20, 0], 	[30, -20, 0] 	],
+								[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[25, -30, 0], 	[30, -30, 0] 	] ];
+
+	it('is correct for u direction', function(){
+
+		var s = verb.geom.NurbsSurface.byKnotsControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints );
+
+		var sr = s.reverse( true );
+
+		var sp0 = s.point( 0, 0 );
+		var sp1 = sr.point( 0, 1.0 );
+		vecShouldBe( sp0, sp1, verb.core.Constants.EPSILON );
+
+		var srr = sr.reverse( true );
+
+		sp0 = s.point( 0, 0 );
+		sp1 = srr.point( 0, 0 );
+		vecShouldBe( sp0, sp1, verb.core.Constants.EPSILON );
+
+		sp0 = s.point( 1.0, 0 );
+		sp1 = srr.point( 1.0, 0 );
+		vecShouldBe( sp0, sp1, verb.core.Constants.EPSILON );
+
+	});
+
 });

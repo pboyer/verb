@@ -241,6 +241,23 @@ class NurbsSurface extends AsyncObject implements ISurface {
             });
     }
 
+    // Reverse the parameterization of the curve
+    //
+    // **params**
+    // + False to reverse u, true to reverse v
+    //
+    // **returns**
+    // + The reversed surface
+
+    public function reverse( useV : Bool = false ) : NurbsSurface {
+        return new NurbsSurface( Modify.surfaceReverse( _data, useV ) );
+    }
+
+    public function reverseAsync( useV : Bool = false ) : Promise<NurbsSurface> {
+        return defer( Modify, 'surfaceReverse', [ _data, useV ])
+            .then(function(c){ return new NurbsSurface(c); });
+    }
+
     // Extract an isocurve from a surface
     //
     // **params**

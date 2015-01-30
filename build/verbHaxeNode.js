@@ -5158,6 +5158,14 @@ verb.geom.NurbsCurve.prototype = $extend(verb.exe.AsyncObject.prototype,{
 			});
 		});
 	}
+	,reverse: function() {
+		return new verb.geom.NurbsCurve(verb.core.Modify.curveReverse(this._data));
+	}
+	,reverseAsync: function() {
+		return this.defer(verb.core.Modify,"curveReverse",[this._data]).then(function(c) {
+			return new verb.geom.NurbsCurve(c);
+		});
+	}
 	,tessellate: function(tolerance) {
 		return verb.core.Tess.rationalCurveAdaptiveSample(this._data,tolerance,false);
 	}
@@ -5315,6 +5323,16 @@ verb.geom.NurbsSurface.prototype = $extend(verb.exe.AsyncObject.prototype,{
 			return s.map(function(x) {
 				return new verb.geom.NurbsSurface(x);
 			});
+		});
+	}
+	,reverse: function(useV) {
+		if(useV == null) useV = false;
+		return new verb.geom.NurbsSurface(verb.core.Modify.surfaceReverse(this._data,useV));
+	}
+	,reverseAsync: function(useV) {
+		if(useV == null) useV = false;
+		return this.defer(verb.core.Modify,"surfaceReverse",[this._data,useV]).then(function(c) {
+			return new verb.geom.NurbsSurface(c);
 		});
 	}
 	,isocurve: function(u,useV) {
