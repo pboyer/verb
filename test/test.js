@@ -6744,7 +6744,6 @@ describe("verb.core.Make.surfaceIsocurve",function(){
 });
 
 describe("verb.geom.NurbsSurface.isocurve",function(){
-
 	var degreeU = 3
 		, degreeV = 3
 		, knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
@@ -6786,8 +6785,82 @@ describe("verb.geom.NurbsSurface.isocurve",function(){
 			done();
 
 		});
+	});
+});
+
+describe("verb.core.Modify.knotsReverse",function(){
+ 	it('can reverse basic knot array', function(){
+		verb.core.Modify.knotsReverse( [0,1,3,5] ).should.be.eql( [0,2,4,5] );
+ 	});
+ });
+
+describe("verb.core.Modify.curveReverse",function(){
+	it('can reverse curve with uneven parameterization', function(){
+		var c = new verb.core.NurbsCurveData( 2, [0,0,0,0.24,1,1,1], [ [0,0,0,1], [1,0,0,1], [0.5,1,0,1], [2,0,0,1] ] );
+		var cr = verb.core.Modify.curveReverse( c );
+		var crr = verb.core.Modify.curveReverse( cr );
+
+		var cp0 = verb.core.Eval.rationalCurvePoint( c, 0 );
+		var cp1 = verb.core.Eval.rationalCurvePoint( cr, 1.0 );
+
+		vecShouldBe( cp0, cp1, verb.core.Constants.EPSILON );
+
+		sameCurve( c, crr );
+	});
+});
+
+describe("verb.core.Modify.surfaceReverse",function(){
+
+	var degreeU = 3
+		, degreeV = 3
+		, knotsU = [0, 0, 0, 0, 0.25, 1, 1, 1, 1]
+		, knotsV =	[0, 0, 0, 0, 0.70, 1, 1, 1, 1]
+		, controlPoints = [ 	[ [0, 0, 0], 	[10, 0, 0], 	[20, 0, 0],  	[25, 0, 0], 	[30, 0, 0] 		],
+								[ [0, -10, 0], 	[10, -10, 0], 	[20, -10, 0],   [25, -10, 0],	[30, -10, 0] 	],
+								[ [0, -20, 0], 	[10, -20, 0], 	[20, -20, 0], 	[25, -20, 0],   [30, -20, 0] 	],
+								[ [0, -20, 0], 	[10, -20, 0], 	[20, -20, 0], 	[25, -20, 0], 	[30, -20, 0] 	],
+								[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[25, -30, 0], 	[30, -30, 0] 	] ]
+		, s = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
+
+	it('is correct for u direction', function(){
+
+		var sr = verb.core.Modify.surfaceReverse( s, true );
+
+		var sp0 = verb.core.Eval.surfacePoint( s, 0, 0 );
+		var sp1 = verb.core.Eval.surfacePoint( sr, 0, 1.0 );
+		vecShouldBe( sp0, sp1, verb.core.Constants.EPSILON );
+
+		var srr = verb.core.Modify.surfaceReverse( sr, true );
+
+		var sp0 = verb.core.Eval.surfacePoint( s, 0, 0 );
+		var sp1 = verb.core.Eval.surfacePoint( srr, 0, 0 );
+		vecShouldBe( sp0, sp1, verb.core.Constants.EPSILON );
+
+		var sp0 = verb.core.Eval.surfacePoint( s, 1.0, 0 );
+		var sp1 = verb.core.Eval.surfacePoint( srr, 1.0, 0 );
+		vecShouldBe( sp0, sp1, verb.core.Constants.EPSILON );
+
 
 	});
 
+	it('is correct for v direction', function(){
 
+		var sr = verb.core.Modify.surfaceReverse( s, false );
+
+		var sp0 = verb.core.Eval.surfacePoint( s, 0, 0 );
+		var sp1 = verb.core.Eval.surfacePoint( sr, 1.0, 0 );
+		vecShouldBe( sp0, sp1, verb.core.Constants.EPSILON );
+
+		var srr = verb.core.Modify.surfaceReverse( sr, false );
+
+		var sp0 = verb.core.Eval.surfacePoint( s, 0, 0 );
+		var sp1 = verb.core.Eval.surfacePoint( srr, 0, 0 );
+		vecShouldBe( sp0, sp1, verb.core.Constants.EPSILON );
+
+		var sp0 = verb.core.Eval.surfacePoint( s, 1.0, 0 );
+		var sp1 = verb.core.Eval.surfacePoint( srr, 1.0, 0 );
+		vecShouldBe( sp0, sp1, verb.core.Constants.EPSILON );
+
+
+	});
 });

@@ -2,6 +2,20 @@ package verb.core;
 
 class ArrayExtensions {
 
+    // Obtain a reversed copy of an array
+    //
+    // **params**
+    // + array of stuff
+    //
+    // **returns**
+    // + a reversed copy of the array
+
+    public static function reversed<T>(a : Array<T>) : Array<T> {
+        var ac = a.copy();
+        ac.reverse();
+        return ac;
+    }
+
     //
     // Get the last element of an array
     //

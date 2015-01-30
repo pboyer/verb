@@ -1,5 +1,6 @@
 package verb.core;
 
+import verb.geom.NurbsSurface;
 import verb.core.types.Interval;
 import verb.core.Mat.Matrix;
 import verb.core.types.NurbsCurveData;
@@ -13,20 +14,35 @@ using verb.core.ArrayExtensions;
 class Modify {
 
 
-    public static function curveReverse( curve : NurbsCurveData ){
-
-
-
+    public static function curveReverse( curve : NurbsCurveData ) : NurbsCurveData {
+        return new NurbsCurveData( curve.degree, knotsReverse( curve.knots ), curve.controlPoints.reversed() );
     }
 
-    public static function surfaceReverse( surface : NurbsSurfaceData, useV : Bool ){
+    public static function surfaceReverse( surface : NurbsSurfaceData, useV : Bool = false ) : NurbsSurfaceData {
+        if (useV){
+            return new NurbsSurfaceData( surface.degreeU, surface.degreeV, surface.knotsU, knotsReverse(surface.knotsV),
+                [for (row in surface.controlPoints) row.reversed() ]);
 
+        }
 
+        return new NurbsSurfaceData( surface.degreeU, surface.degreeV, knotsReverse(surface.knotsU), surface.knotsV,
+            surface.controlPoints.reversed());
+    }
 
+    public static function knotsReverse( knots : KnotArray ) : KnotArray {
+        var min = knots.first();
+        var max = knots.last();
+
+        var l = [ min ];
+        var len = knots.length;
+        for (i in 1...len){
+            l.push( l[i-1] + ( knots[len-i] - knots[len-i-1] ) );
+        }
+
+        return l;
     }
 
     public static function unifyCurveKnotVectors( curves : Array<NurbsCurveData> ) : Array<NurbsCurveData> {
-
         curves = curves.map(Make.clonedCurve);
 
         var maxDegree = curves.fold(function(x,a){ return Modify.imax(x.degree, a); }, 0 );

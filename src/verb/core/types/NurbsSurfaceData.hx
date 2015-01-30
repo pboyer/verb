@@ -17,7 +17,7 @@ class NurbsSurfaceData {
     // array of nondecreasing knot values in v direction
     public var knotsV : KnotArray;
 
-    // 2d array of control points, where rows are the u dir, and columns run along the positive v direction,
+    // 2d array of control points, the vertical direction (u) increases from top to bottom, the v direction from left to right,
     // and where each control point is an array of length (dim)
     public var controlPoints : Array<Array<Point>>;
 

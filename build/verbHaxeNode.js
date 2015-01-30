@@ -1001,6 +1001,11 @@ verb.core.Analyze.rationalBezierCurveArcLength = function(curve,u,gaussDegIncrea
 };
 verb.core.ArrayExtensions = function() { };
 verb.core.ArrayExtensions.__name__ = ["verb","core","ArrayExtensions"];
+verb.core.ArrayExtensions.reversed = function(a) {
+	var ac = a.slice();
+	ac.reverse();
+	return ac;
+};
 verb.core.ArrayExtensions.last = function(a) {
 	return a[a.length - 1];
 };
@@ -3092,8 +3097,38 @@ verb.core.Mesh.triangleUVFromPoint = function(mesh,faceIndex,f) {
 verb.core.Modify = $hx_exports.core.Modify = function() { };
 verb.core.Modify.__name__ = ["verb","core","Modify"];
 verb.core.Modify.curveReverse = function(curve) {
+	return new verb.core.types.NurbsCurveData(curve.degree,verb.core.Modify.knotsReverse(curve.knots),verb.core.ArrayExtensions.reversed(curve.controlPoints));
 };
 verb.core.Modify.surfaceReverse = function(surface,useV) {
+	if(useV == null) useV = false;
+	if(useV) return new verb.core.types.NurbsSurfaceData(surface.degreeU,surface.degreeV,surface.knotsU,verb.core.Modify.knotsReverse(surface.knotsV),(function($this) {
+		var $r;
+		var _g = [];
+		{
+			var _g1 = 0;
+			var _g2 = surface.controlPoints;
+			while(_g1 < _g2.length) {
+				var row = _g2[_g1];
+				++_g1;
+				_g.push(verb.core.ArrayExtensions.reversed(row));
+			}
+		}
+		$r = _g;
+		return $r;
+	}(this)));
+	return new verb.core.types.NurbsSurfaceData(surface.degreeU,surface.degreeV,verb.core.Modify.knotsReverse(surface.knotsU),surface.knotsV,verb.core.ArrayExtensions.reversed(surface.controlPoints));
+};
+verb.core.Modify.knotsReverse = function(knots) {
+	var min = knots[0];
+	var max = knots[knots.length - 1];
+	var l = [min];
+	var len = knots.length;
+	var _g = 1;
+	while(_g < len) {
+		var i = _g++;
+		l.push(l[i - 1] + (knots[len - i] - knots[len - i - 1]));
+	}
+	return l;
 };
 verb.core.Modify.unifyCurveKnotVectors = function(curves) {
 	curves = curves.map(verb.core.Make.clonedCurve);
