@@ -34,6 +34,25 @@
 
 	}
 
+	function exGlancingPlaneCylindricalSurface(){
+
+		var axis = [0,0,1]
+			, xaxis = [1,0,0]
+			, base = [0,0,0]
+			, height = 5
+			, radius = 3;
+
+		srf1 = new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius );
+
+		var p5 	= [5,5,5]
+			, p6 = [-5,5,5]
+			, p7 = [-5,-5,0]
+			, p8 = [5,-5,0];
+
+		srf2 = verb.geom.NurbsSurface.byCorners( p5, p6, p7, p8 );
+
+	}
+
     function exTorusCylindricalSurface(){
 
 		// center, xaxis, yaxis, radius
@@ -54,8 +73,9 @@
 
 	}
 
-	exNurbsSurfacePlane();
+	//exNurbsSurfacePlane();
 	// exTorusCylindricalSurface();
+	exGlancingPlaneCylindricalSurface();
 
 	addMeshToScene( srf1.toThreeGeometry()  );
 	addMeshToScene( srf2.toThreeGeometry()  );

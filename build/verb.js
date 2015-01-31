@@ -1619,6 +1619,28 @@ verb.core.Eval.knotSpanGivenN = function(n,degree,u,knots) {
 };
 verb.core.Intersect = $hx_exports.core.Intersect = function() { };
 verb.core.Intersect.__name__ = ["verb","core","Intersect"];
+verb.core.Intersect.meshSlices = function(mesh,min,max,step) {
+	var bbtree = new verb.core.types.MeshBoundingBoxTree(mesh);
+	var bb = bbtree.boundingBox();
+	var x0 = bb.min[0];
+	var y0 = bb.min[1];
+	var x1 = bb.max[0];
+	var y1 = bb.max[1];
+	var span = verb.core.Vec.span(min,max,step);
+	var slices = [];
+	var _g = 0;
+	while(_g < span.length) {
+		var z = span[_g];
+		++_g;
+		var pts = [[x0,y0,z],[x1,y0,z],[x1,y1,z],[x0,y1,z]];
+		var uvs = [[0.0,0.0],[1.0,0.0],[1.0,1.0],[0.0,1.0]];
+		var faces = [[0,1,2],[0,2,3]];
+		var plane = new verb.core.types.MeshData(faces,pts,null,uvs);
+		slices.push(verb.core.Intersect.meshes(mesh,plane,bbtree));
+		z += 1.0;
+	}
+	return slices;
+};
 verb.core.Intersect.surfaces = function(surface0,surface1,tol) {
 	var tess1 = verb.core.Tess.rationalSurfaceAdaptive(surface0);
 	var tess2 = verb.core.Tess.rationalSurfaceAdaptive(surface1);
@@ -1685,8 +1707,10 @@ verb.core.Intersect.surfacesAtPointWithEstimate = function(surface0,surface1,uv1
 	} while(its < maxits);
 	return new verb.core.types.SurfaceSurfaceIntersectionPoint(uv1,uv2,p,dist);
 };
-verb.core.Intersect.meshes = function(mesh0,mesh1) {
-	var bbints = verb.core.Intersect.bounding_box_trees(new verb.core.types.LazyMeshBoundingBoxTree(mesh0),new verb.core.types.LazyMeshBoundingBoxTree(mesh1),0);
+verb.core.Intersect.meshes = function(mesh0,mesh1,bbtree0,bbtree1) {
+	if(bbtree0 == null) bbtree0 = new verb.core.types.LazyMeshBoundingBoxTree(mesh0);
+	if(bbtree1 == null) bbtree1 = new verb.core.types.LazyMeshBoundingBoxTree(mesh1);
+	var bbints = verb.core.Intersect.bounding_box_trees(bbtree0,bbtree1,0);
 	var segments = verb.core.ArrayExtensions.unique(bbints.map(function(ids) {
 		return verb.core.Intersect.triangles(mesh0,ids.item0,mesh1,ids.item1);
 	}).filter(function(x) {
@@ -4690,7 +4714,7 @@ verb.core.types.LazyMeshBoundingBoxTree.__name__ = ["verb","core","types","LazyM
 verb.core.types.LazyMeshBoundingBoxTree.__interfaces__ = [verb.core.types.IBoundingBoxTree];
 verb.core.types.LazyMeshBoundingBoxTree.prototype = {
 	split: function() {
-		var $as = verb.core.Mesh.sortTrianglesOnLongestAxis(this._boundingBox,this._mesh,this._faceIndices);
+		var $as = verb.core.Mesh.sortTrianglesOnLongestAxis(this.boundingBox(),this._mesh,this._faceIndices);
 		var l = verb.core.ArrayExtensions.left($as);
 		var r = verb.core.ArrayExtensions.right($as);
 		return new verb.core.types.Pair(new verb.core.types.LazyMeshBoundingBoxTree(this._mesh,l),new verb.core.types.LazyMeshBoundingBoxTree(this._mesh,r));
@@ -4789,6 +4813,51 @@ verb.core.types.LazySurfaceBoundingBoxTree.prototype = {
 	}
 	,empty: function() {
 		return false;
+	}
+};
+verb.core.types.MeshBoundingBoxTree = function(mesh,faceIndices) {
+	this._empty = false;
+	this._face = -1;
+	if(faceIndices == null) {
+		var _g = [];
+		var _g2 = 0;
+		var _g1 = mesh.faces.length;
+		while(_g2 < _g1) {
+			var i = _g2++;
+			_g.push(i);
+		}
+		faceIndices = _g;
+	}
+	this._boundingBox = verb.core.Mesh.makeMeshAabb(mesh,faceIndices);
+	if(faceIndices.length < 1) {
+		this._empty = true;
+		return;
+	} else if(faceIndices.length < 2) {
+		this._face = faceIndices[0];
+		return;
+	}
+	var $as = verb.core.Mesh.sortTrianglesOnLongestAxis(this._boundingBox,mesh,faceIndices);
+	var l = verb.core.ArrayExtensions.left($as);
+	var r = verb.core.ArrayExtensions.right($as);
+	this._children = new verb.core.types.Pair(new verb.core.types.MeshBoundingBoxTree(mesh,l),new verb.core.types.MeshBoundingBoxTree(mesh,r));
+};
+verb.core.types.MeshBoundingBoxTree.__name__ = ["verb","core","types","MeshBoundingBoxTree"];
+verb.core.types.MeshBoundingBoxTree.__interfaces__ = [verb.core.types.IBoundingBoxTree];
+verb.core.types.MeshBoundingBoxTree.prototype = {
+	split: function() {
+		return this._children;
+	}
+	,boundingBox: function() {
+		return this._boundingBox;
+	}
+	,'yield': function() {
+		return this._face;
+	}
+	,indivisible: function(tolerance) {
+		return this._children == null;
+	}
+	,empty: function() {
+		return this._empty;
 	}
 };
 verb.core.types.MeshData = $hx_exports.core.MeshData = function(faces,points,normals,uvs) {

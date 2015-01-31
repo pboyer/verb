@@ -1,6 +1,3 @@
-Make.surfaceIsocurve
-Modify.curveReverse
-Modify.surfaceReverse
 SweptSurface
 More efficient representation for surface tessellation, don't use 2d arrays
 More exact srf-srf intersection

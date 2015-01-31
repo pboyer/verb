@@ -23,7 +23,7 @@
 
 	var srf = verb.geom.NurbsSurface.byKnotsControlPointsWeights( degree, degree, knots, knots, pts );
 
-	addMeshToScene( srf.toThreeGeometry(), true );
+	addMeshToScene( srf.toThreeGeometry() );
 
 	threeRender();
 </script>

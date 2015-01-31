@@ -1,5 +1,6 @@
 package verb.core;
 
+import verb.core.types.MeshBoundingBoxTree;
 import verb.core.types.TriSegmentIntersection;
 import verb.core.types.Ray;
 import verb.core.types.CurveTriPoint;
@@ -28,6 +29,42 @@ using verb.core.ArrayExtensions;
 
 @:expose("core.Intersect")
 class Intersect {
+
+    // Intersect two meshes, yielding a list of polylines
+    //
+    // **params**
+    // + MeshData for the first mesh
+    // + MeshData for the latter
+    //
+    // **returns**
+    // + array of array of MeshIntersectionPoints
+
+    public static function meshSlices( mesh : MeshData, min : Float, max : Float, step : Float ) : Array<Array<Array<MeshIntersectionPoint>>> {
+        var bbtree = new MeshBoundingBoxTree( mesh );
+        var bb = bbtree.boundingBox();
+
+        var x0 = bb.min[0];
+        var y0 = bb.min[1];
+
+        var x1 = bb.max[0];
+        var y1 = bb.max[1];
+
+        var span = Vec.span( min, max, step );
+        var slices = [];
+
+        for ( z in span ){
+            var pts = [ [x0,y0,z], [x1,y0,z], [x1,y1,z], [x0,y1,z] ];
+            var uvs = [ [0.0,0.0], [1.0,0.0], [1.0,1.0], [0.0,1.0] ];
+            var faces = [ [ 0,1,2 ],[0,2,3] ];
+            var plane = new MeshData( faces, pts, null, uvs );
+
+            slices.push( Intersect.meshes( mesh, plane, bbtree ) );
+            z += 1.0;
+        }
+
+        return slices;
+    }
+
 
     // Intersect two NURBS surfaces, yielding a list of curves
     //
@@ -148,16 +185,22 @@ class Intersect {
     // **params**
     // + MeshData for the first mesh
     // + MeshData for the latter
+    // + optional boundingbox tree for first mesh
+    // + optional boundingbox tree for second mesh
     //
     // **returns**
     // + array of array of MeshIntersectionPoints
 
-    public static function meshes( mesh0 : MeshData, mesh1 : MeshData ) : Array<Array<MeshIntersectionPoint>> {
+    public static function meshes( mesh0 : MeshData,
+                                   mesh1 : MeshData,
+                                   bbtree0 : IBoundingBoxTree<Int> = null,
+                                   bbtree1 : IBoundingBoxTree<Int> = null ) : Array<Array<MeshIntersectionPoint>> {
+
+        if (bbtree0 == null) bbtree0 = new LazyMeshBoundingBoxTree( mesh0 );
+        if (bbtree1 == null) bbtree1 = new LazyMeshBoundingBoxTree( mesh1 );
 
         // bounding box intersection to get all of the face pairs
-        var bbints = Intersect.bounding_box_trees(
-            new LazyMeshBoundingBoxTree( mesh0 ),
-            new LazyMeshBoundingBoxTree( mesh1 ), 0 );
+        var bbints = Intersect.bounding_box_trees( bbtree0, bbtree1, 0 );
 
         // get the segments of the intersection crv with uvs
         var segments = bbints.map(function(ids : Pair<Int, Int>){

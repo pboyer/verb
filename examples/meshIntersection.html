@@ -26,26 +26,6 @@
 		var axis = [-1,0,0]
 			, xaxis = [0,0,1]
 			, base = [8,0,0]
-			, height = 20
-			, radius = 2;
-
-		srf2 = new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius );
-
-	}
-
-	function exTorusCylindricalSurface(){
-
-		// center, xaxis, yaxis, radius
-		var profile = new verb.geom.Circle( [5,0,0], [1,0,0], [0,0,1], 2 );
-
-		var base = [0,0,0];
-		var axis = [0,0,1];
-		var angle = 2 * Math.PI
-		srf1 = new verb.geom.RevolvedSurface( profile, base, axis, angle );
-
-		var axis = [-1,0,0]
-			, xaxis = [0,0,1]
-			, base = [8,0,0]
 			, height = 16
 			, radius = 2;
 
@@ -182,8 +162,8 @@
 	var tess1 = srf1.tessellate();
 	var tess2 = srf2.tessellate();
 
-	addMeshToScene( srf1.toThreeGeometry(), true );
-	addMeshToScene( srf2.toThreeGeometry(), true );
+	addMeshToScene( srf1.toThreeGeometry(), null, true );
+	addMeshToScene( srf2.toThreeGeometry(), null, true );
 
 	var res;
 	var runs = 1;

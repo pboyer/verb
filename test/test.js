@@ -6897,7 +6897,6 @@ describe("verb.geom.NurbsSurface.reverse",function(){
 								[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[25, -30, 0], 	[30, -30, 0] 	] ];
 
 	it('is correct for u direction', function(){
-
 		var s = verb.geom.NurbsSurface.byKnotsControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints );
 
 		var sr = s.reverse( true );
@@ -6915,6 +6914,20 @@ describe("verb.geom.NurbsSurface.reverse",function(){
 		sp0 = s.point( 1.0, 0 );
 		sp1 = srr.point( 1.0, 0 );
 		vecShouldBe( sp0, sp1, verb.core.Constants.EPSILON );
+	});
+});
+
+describe("verb.core.Intersect.sliceMeshes",function(){
+
+	it('is correct for basic example', function(){
+
+		var srf = verb.geom.NurbsSurface.byCorners( [0,1,0], [10,0,0], [10,10,10], [0,10,10] );
+		var mesh = srf.tessellate();
+
+		var res = verb.core.Intersect.meshSlices( mesh, 0, 10, 0.5 );
+
+		
+
 
 	});
 

@@ -9,8 +9,8 @@ class BoundingBox {
     public static var TOLERANCE : Float = 1e-4;
     var initialized : Bool = false;
     var dim : Int = 3;
-    var min : Point = null;
-    var max : Point = null;
+    public var min : Point = null;
+    public var max : Point = null;
 
     // BoundingBox Constructor
     //
