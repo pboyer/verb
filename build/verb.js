@@ -1711,11 +1711,13 @@ verb.core.Intersect.meshes = function(mesh0,mesh1,bbtree0,bbtree1) {
 	if(bbtree0 == null) bbtree0 = new verb.core.types.LazyMeshBoundingBoxTree(mesh0);
 	if(bbtree1 == null) bbtree1 = new verb.core.types.LazyMeshBoundingBoxTree(mesh1);
 	var bbints = verb.core.Intersect.bounding_box_trees(bbtree0,bbtree1,0);
-	var segments = verb.core.ArrayExtensions.unique(bbints.map(function(ids) {
+	var segments0 = bbints.map(function(ids) {
 		return verb.core.Intersect.triangles(mesh0,ids.item0,mesh1,ids.item1);
-	}).filter(function(x) {
+	});
+	var segments1 = segments0.filter(function(x) {
 		return x != null;
-	}).filter(function(x1) {
+	});
+	var segments = verb.core.ArrayExtensions.unique(segments1.filter(function(x1) {
 		return verb.core.Vec.distSquared(x1.min.point,x1.max.point) > 1e-10;
 	}),function(a,b) {
 		var s1 = verb.core.Vec.sub(a.min.uv0,b.min.uv0);
@@ -1765,6 +1767,7 @@ verb.core.Intersect.makeMeshIntersectionPolylines = function(segments) {
 	if(freeEnds.length == 0) freeEnds = ends;
 	var pls = [];
 	var numVisitedEnds = 0;
+	var loopDetected = false;
 	while(freeEnds.length != 0) {
 		var end = freeEnds.pop();
 		if(!end.visited) {
@@ -1783,8 +1786,13 @@ verb.core.Intersect.makeMeshIntersectionPolylines = function(segments) {
 				pl.push(pl[pl.length - 1].opp);
 				pls.push(pl);
 			}
+		} else {
 		}
-		if(freeEnds.length == 0 && numVisitedEnds < ends.length) freeEnds.push(ends.pop());
+		if(freeEnds.length == 0 && ends.length > 0 && (loopDetected || numVisitedEnds < ends.length)) {
+			loopDetected = true;
+			var e = ends.pop();
+			freeEnds.push(e);
+		}
 	}
 	return pls;
 };

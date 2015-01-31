@@ -33,15 +33,14 @@
 	var d1 = Date.now();
 
 	for (var i = 0 ; i < runs; i++){
-		res = verb.core.Intersect.meshSlices( mesh, 0, 2, 1 );
+		res = verb.core.Intersect.meshSlices( mesh, -15, 15, 0.5 );
 	}
+
+    console.log( res );
 
 	var d2 = Date.now();
 
-	var numLengths = res.reduce(function(a,x){ return a + x.length-1; }, 0);
-
-	console.log( "intersected in ", (d2 - d1) / runs, " ms and " + res.length + " polylines were discovered");
-	console.log( numLengths + " edges were formed in total ");
+	console.log( res.length," slices in ", (d2 - d1) / runs, " ms");
 
 	for (var i = 0; i < res.length; i++){
 	    for (var j = 0; j < res[i].length; j++){

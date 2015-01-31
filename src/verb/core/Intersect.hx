@@ -203,12 +203,19 @@ class Intersect {
         var bbints = Intersect.bounding_box_trees( bbtree0, bbtree1, 0 );
 
         // get the segments of the intersection crv with uvs
-        var segments = bbints.map(function(ids : Pair<Int, Int>){
+        var segments0 = bbints.map(function(ids : Pair<Int, Int>){
             return Intersect.triangles( mesh0, ids.item0, mesh1, ids.item1 );
-        })
-        .filter(function(x){
+        });
+
+//        trace( "segments0: " + segments0.length );
+
+        var segments1 = segments0.filter(function(x){
             return x != null;
-        }).filter(function(x){
+        });
+
+//        trace( "segments1: " + segments1.length );
+
+        var segments = segments1.filter(function(x){
             return Vec.distSquared( x.min.point, x.max.point ) > Constants.EPSILON;
         }).unique(function(a, b){
 
@@ -231,6 +238,8 @@ class Intersect {
             return ( d1 < Constants.EPSILON && d2 < Constants.EPSILON ) ||
                 ( d3 < Constants.EPSILON && d4 < Constants.EPSILON );
         });
+
+//        trace( "segments: " + segments.length );
 
         return makeMeshIntersectionPolylines( segments );
     }
@@ -264,6 +273,8 @@ class Intersect {
             ends.push(seg.max);
         }
 
+//        trace("ends: " + ends.length);
+
         // step 1: assigning the vertices to the segment ends
         for (segEnd in ends){
             if (segEnd.adj != null) continue;
@@ -286,8 +297,11 @@ class Intersect {
             freeEnds = ends;
         }
 
+//        trace("freeEnds: " + freeEnds.length );
+
         var pls = [];
         var numVisitedEnds = 0;
+        var loopDetected = false;
 
         while (freeEnds.length != 0){
 
@@ -302,7 +316,10 @@ class Intersect {
                 while (curEnd != null) {
 
                     // debug
-                    if (curEnd.visited) break;
+                    if (curEnd.visited) {
+//                        trace('visited');
+                        break;
+                    }
 
                     // consume both ends of the segment
                     curEnd.visited = true;
@@ -314,17 +331,24 @@ class Intersect {
                     curEnd = curEnd.opp.adj;
 
                     // loop condition
-                    if (curEnd == end) break;
+                    if (curEnd == end) {
+//                        trace('loop');
+                        break;
+                    }
                 }
 
                 if (pl.length > 0) {
                     pl.push( pl[pl.length-1].opp );
                     pls.push( pl );
                 }
+            } else {
+//                trace('visited');
             }
 
-            if (freeEnds.length == 0 && numVisitedEnds < ends.length){
-                freeEnds.push( ends.pop() );
+            if (freeEnds.length == 0 && ends.length > 0 && ( loopDetected || numVisitedEnds < ends.length )){
+                loopDetected = true;
+                var e = ends.pop();
+                freeEnds.push( e );
             }
         }
 
