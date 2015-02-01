@@ -7,6 +7,10 @@
 
 verb provides advanced tools like derivative evaluation, adaptive tessellation, and intersection.  Verb provides a parallel execution runtime via WebWorkers in modern browsers.
 
+### API Status : Unstable
+
+verb is in a period of active, heavy development.  
+
 ###Getting started
 
 Install <a href="http://haxe.org/">haxe</a> and <a href="http://haxe.org/">node.js</a>
