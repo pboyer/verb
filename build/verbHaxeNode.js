@@ -1882,11 +1882,7 @@ verb.core.Intersect.kdTreeFromSegments = function(segments) {
 	}
 	return new verb.core.KdTree(treePoints,verb.core.Vec.distSquared);
 };
-verb.core.Intersect.lookupAdjacentSegment = function(segEnd,tree,numSegments) {
-	var numResults;
-	if(numSegments != null) {
-		if(numSegments < 3) numResults = 3; else numResults = numSegments;
-	} else numResults = 3;
+verb.core.Intersect.lookupAdjacentSegment = function(segEnd,tree,numResults) {
 	var adj = tree.nearest(segEnd.point,numResults,1e-10).filter(function(r) {
 		return segEnd != r.item0.obj;
 	}).map(function(r1) {
@@ -2262,12 +2258,10 @@ verb.core.KdTree.prototype = {
 			}
 		};
 		nearestSearch = nearestSearch1;
-		if(maxDistance != null) {
-			var _g4 = 0;
-			while(_g4 < maxNodes) {
-				var i3 = _g4++;
-				bestNodes.push(new verb.core.types.Pair(null,maxDistance));
-			}
+		var _g4 = 0;
+		while(_g4 < maxNodes) {
+			var i3 = _g4++;
+			bestNodes.push(new verb.core.types.Pair(null,maxDistance));
 		}
 		nearestSearch(this.root);
 		var result = [];
@@ -2339,7 +2333,7 @@ verb.core.BinaryHeap.prototype = {
 		while(true) {
 			var child2N = (n + 1) * 2;
 			var child1N = child2N - 1;
-			var swap = null;
+			var swap = -1;
 			var child1Score = 0.0;
 			if(child1N < length) {
 				var child1 = this.content[child1N];
@@ -2349,9 +2343,9 @@ verb.core.BinaryHeap.prototype = {
 			if(child2N < length) {
 				var child2 = this.content[child2N];
 				var child2Score = this.scoreFunction(child2);
-				if(child2Score < (swap == null?elemScore:child1Score)) swap = child2N;
+				if(child2Score < (swap == -1?elemScore:child1Score)) swap = child2N;
 			}
-			if(swap != null) {
+			if(swap != -1) {
 				this.content[n] = this.content[swap];
 				this.content[swap] = element;
 				n = swap;
@@ -2361,6 +2355,36 @@ verb.core.BinaryHeap.prototype = {
 };
 verb.core.Make = $hx_exports.core.Make = function() { };
 verb.core.Make.__name__ = ["verb","core","Make"];
+verb.core.Make.rationalTranslationalSurface = function(profile,rail) {
+	var rail_start = verb.core.Eval.rationalCurvePoint(rail,rail.knots[0]);
+	var startu = rail.knots[0];
+	var endu = verb.core.ArrayExtensions.last(rail.knots);
+	var span = (endu - startu) / (rail.controlPoints.length - 1);
+	var controlPoints = [];
+	var weights = [];
+	var rail_weights = verb.core.Eval.weight1d(rail.controlPoints);
+	var profile_weights = verb.core.Eval.weight1d(profile.controlPoints);
+	var profile_points = verb.core.Eval.dehomogenize1d(profile.controlPoints);
+	var _g1 = 0;
+	var _g = rail.controlPoints.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		var rail_point = verb.core.Eval.rationalCurvePoint(rail,i * span);
+		var rail_offset = verb.core.Vec.sub(rail_point,rail_start);
+		var row_controlPoints = [];
+		var row_weights = [];
+		var _g3 = 0;
+		var _g2 = profile.controlPoints.length;
+		while(_g3 < _g2) {
+			var j = _g3++;
+			row_controlPoints.push(verb.core.Vec.add(rail_offset,profile_points[j]));
+			row_weights.push(profile_weights[j] * rail_weights[i]);
+		}
+		controlPoints.push(row_controlPoints);
+		weights.push(row_weights);
+	}
+	return new verb.core.types.NurbsSurfaceData(rail.degree,profile.degree,rail.knots,profile.knots,verb.core.Eval.homogenize2d(controlPoints,weights));
+};
 verb.core.Make.surfaceIsocurve = function(surface,u,useV) {
 	if(useV == null) useV = false;
 	var knots;
@@ -2442,15 +2466,7 @@ verb.core.Make.rationalBezierCurve = function(controlPoints,weights) {
 		var i1 = _g11++;
 		knots.push(1.0);
 	}
-	if(weights == null) {
-		weights = [];
-		var _g12 = 0;
-		var _g3 = controlPoints.length;
-		while(_g12 < _g3) {
-			var i2 = _g12++;
-			weights.push(1.0);
-		}
-	}
+	if(weights == null) weights = verb.core.Vec.rep(controlPoints.length,1.0);
 	return new verb.core.types.NurbsCurveData(degree,knots,verb.core.Eval.homogenize1d(controlPoints,weights));
 };
 verb.core.Make.fourPointSurface = function(p1,p2,p3,p4,degree) {
@@ -2478,34 +2494,6 @@ verb.core.Make.fourPointSurface = function(p1,p2,p3,p4,degree) {
 	var zeros = verb.core.Vec.rep(degree + 1,0.0);
 	var ones = verb.core.Vec.rep(degree + 1,1.0);
 	return new verb.core.types.NurbsSurfaceData(degree,degree,zeros.concat(ones),zeros.concat(ones),pts);
-};
-verb.core.Make.sweep1_surface = function(profile,rail) {
-	var rail_start = verb.core.Eval.rationalCurvePoint(rail,0.0);
-	var span = 1.0 / rail.controlPoints.length;
-	var controlPoints = [];
-	var weights = [];
-	var rail_weights = verb.core.Eval.weight1d(rail.controlPoints);
-	var profile_weights = verb.core.Eval.weight1d(profile.controlPoints);
-	var profile_points = verb.core.Eval.dehomogenize1d(profile.controlPoints);
-	var _g1 = 0;
-	var _g = rail.controlPoints.length;
-	while(_g1 < _g) {
-		var i = _g1++;
-		var rail_point = verb.core.Eval.rationalCurvePoint(rail,i * span);
-		var rail_offset = verb.core.Vec.sub(rail_point,rail_start);
-		var row_controlPoints = [];
-		var row_weights = [];
-		var _g3 = 0;
-		var _g2 = profile.controlPoints.length;
-		while(_g3 < _g2) {
-			var j = _g3++;
-			row_controlPoints.push(verb.core.Vec.add(rail_offset,profile_points[j]));
-			row_weights.push(profile_weights[j] * rail_weights[i]);
-		}
-		controlPoints.push(row_controlPoints);
-		weights.push(row_weights);
-	}
-	return new verb.core.types.NurbsSurfaceData(rail.degree,profile.degree,rail.knots,profile.knots,verb.core.Eval.homogenize2d(controlPoints,weights));
 };
 verb.core.Make.ellipseArc = function(center,xaxis,yaxis,startAngle,endAngle) {
 	var xradius = verb.core.Vec.norm(xaxis);
@@ -4127,7 +4115,8 @@ verb.core.Vec.range = function(max) {
 	return l;
 };
 verb.core.Vec.span = function(min,max,step) {
-	if(step == null || step < 1e-10) return [];
+	if(step == null) return [];
+	if(step < 1e-10) return [];
 	if(min > max && step > 0.0) return [];
 	if(max > min && step < 0.0) return [];
 	var l = [];
@@ -5623,6 +5612,21 @@ verb.geom.SphericalSurface.prototype = $extend(verb.geom.NurbsSurface.prototype,
 	}
 	,radius: function() {
 		return this._radius;
+	}
+});
+verb.geom.SweptSurface = $hx_exports.geom.SweptSurface = function(profile,rail) {
+	verb.geom.NurbsSurface.call(this,verb.core.Make.rationalTranslationalSurface(profile.asNurbs(),rail.asNurbs()));
+	this._profile = profile;
+	this._rail = rail;
+};
+verb.geom.SweptSurface.__name__ = ["verb","geom","SweptSurface"];
+verb.geom.SweptSurface.__super__ = verb.geom.NurbsSurface;
+verb.geom.SweptSurface.prototype = $extend(verb.geom.NurbsSurface.prototype,{
+	profile: function() {
+		return this._profile;
+	}
+	,rail: function() {
+		return this._rail;
 	}
 });
 function $iterator(o) { if( o instanceof Array ) return function() { return HxOverrides.iter(o); }; return typeof(o.iterator) == 'function' ? $bind(o,o.iterator) : o.iterator; }

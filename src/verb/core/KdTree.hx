@@ -158,10 +158,8 @@ class KdTree<T> {
             }
         }
 
-        if (maxDistance != null) {
-            for (i in 0...maxNodes){
-                bestNodes.push(new Pair<KdNode<T>, Float>(null, maxDistance));
-            }
+        for (i in 0...maxNodes){
+            bestNodes.push(new Pair<KdNode<T>, Float>(null, maxDistance));
         }
 
         nearestSearch( this.root );
@@ -276,7 +274,7 @@ class BinaryHeap<T> {
             var child1N = child2N - 1;
             // This is used to store the new position of the element,
             // if any.
-            var swap = null;
+            var swap = -1;
             var child1Score : Float = 0.0;
 
             // If the first child exists (is inside the array)...
@@ -292,13 +290,13 @@ class BinaryHeap<T> {
             if (child2N < length) {
                 var child2 = this.content[child2N];
                 var child2Score = this.scoreFunction(child2);
-                if (child2Score < (swap == null ? elemScore : child1Score)){
+                if (child2Score < (swap == -1 ? elemScore : child1Score)){
                     swap = child2N;
                 }
             }
 
             // If the element needs to be moved, swap it, and continue.
-            if (swap != null) {
+            if (swap != -1) {
                 this.content[n] = this.content[swap];
                 this.content[swap] = element;
                 n = swap;

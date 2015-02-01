@@ -6926,9 +6926,58 @@ describe("verb.core.Intersect.sliceMeshes",function(){
 
 		var res = verb.core.Intersect.meshSlices( mesh, 0, 10, 0.5 );
 
-		
-
+        // need better example
 
 	});
+});
+
+
+describe("verb.core.Make.rationalTranslationalSurface",function(){
+
+	it('provides expected result for linear rail and profile', function(){
+
+		var rail = verb.core.Make.rationalBezierCurve( [[0,0,0], [1,1,1]] );
+        var prof = verb.core.Make.rationalBezierCurve( [[0,0,0], [1,0,0]] );
+
+        var srf = verb.core.Make.rationalTranslationalSurface( prof, rail );
+
+        vecShouldBe( verb.core.Eval.rationalSurfacePoint( srf, 0, 0 ), [0,0,0] );
+        vecShouldBe( verb.core.Eval.rationalSurfacePoint( srf, 1, 0 ), [1,1,1] );
+        vecShouldBe( verb.core.Eval.rationalSurfacePoint( srf, 1, 1 ), [2,1,1] );
+        vecShouldBe( verb.core.Eval.rationalSurfacePoint( srf, 0, 1 ), [1,0,0] );
+
+	});
+
+    it('provides expected result for linear profile, curved rail', function(){
+
+        var rail = verb.core.Make.rationalBezierCurve( [[0,0,0], [1,0.5,1], [2,1,1]] );
+        var prof = verb.core.Make.rationalBezierCurve( [[0,0,0], [2,0,0]] );
+
+        var srf = verb.core.Make.rationalTranslationalSurface( prof, rail );
+
+        vecShouldBe( verb.core.Eval.rationalSurfacePoint( srf, 0, 0 ), [0,0,0] );
+        vecShouldBe( verb.core.Eval.rationalSurfacePoint( srf, 1, 0 ), [2,1,1] );
+        vecShouldBe( verb.core.Eval.rationalSurfacePoint( srf, 1, 1 ), [4,1,1] );
+        vecShouldBe( verb.core.Eval.rationalSurfacePoint( srf, 0, 1 ), [2,0,0] );
+
+    });
+
+});
+
+describe("verb.geom.SweptSurface",function(){
+
+    it('provides expected result for linear profile, curved rail', function(){
+
+        var rail = new verb.geom.BezierCurve( [[0,0,0], [1,0.5,1], [2,1,1]] );
+        var prof = new verb.geom.BezierCurve( [[0,0,0], [2,0,0]] );
+
+        var srf = new verb.geom.SweptSurface( prof, rail );
+
+        vecShouldBe( srf.point( 0, 0 ), [0,0,0] );
+        vecShouldBe( srf.point( 1, 0 ), [2,1,1] );
+        vecShouldBe( srf.point( 1, 1 ), [4,1,1] );
+        vecShouldBe( srf.point( 0, 1 ), [2,0,0] );
+
+    });
 
 });

@@ -231,9 +231,11 @@ class Tess {
 
 		if (options == null) options = new AdaptiveRefinementOptions();
 
-		options.minDivsU = options.minDivsU != null ? options.minDivsU : 1;
-		options.minDivsU = options.minDivsV != null ? options.minDivsV : 1;
-		options.refine = options.refine != null ? options.refine : true;
+		#if (!cs && !cpp && !java)
+            options.minDivsU = options.minDivsU != null ? options.minDivsU : 1;
+            options.minDivsU = options.minDivsV != null ? options.minDivsV : 1;
+            options.refine = options.refine != null ? options.refine : true;
+        #end
 
 		var minU = (surface.controlPoints.length - 1) * 2;
 		var minV = (surface.controlPoints[0].length - 1) * 2;

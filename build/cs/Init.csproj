@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
+    <OutputType>Exe</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace></RootNamespace>
+    <AssemblyName>Init</AssemblyName>
+    <TargetFrameworkVersion>v2.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Client</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+	
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <PlatformTarget>x86</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+  </PropertyGroup>
+  <ItemGroup>
+  
+  </ItemGroup>
+  <ItemGroup>
+	
+    <Compile Include="src\verb\geom\EllipseArc.cs"/>
+	
+    <Compile Include="src\verb\core\Modify.cs"/>
+	
+    <Compile Include="src\verb\geom\Circle.cs"/>
+	
+    <Compile Include="src\cs\Boot.cs"/>
+	
+    <Compile Include="src\Std.cs"/>
+	
+    <Compile Include="src\cs\internal\Null.cs"/>
+	
+    <Compile Include="src\haxe\Log.cs"/>
+	
+    <Compile Include="src\verb\core\types\BoundingBox.cs"/>
+	
+    <Compile Include="src\Array.cs"/>
+	
+    <Compile Include="src\verb\core\types\Pair.cs"/>
+	
+    <Compile Include="src\verb\core\Trig.cs"/>
+	
+    <Compile Include="src\verb\geom\Line.cs"/>
+	
+    <Compile Include="src\promhx\PublicStream.cs"/>
+	
+    <Compile Include="src\cs\internal\Function.cs"/>
+	
+    <Compile Include="src\verb\core\Eval.cs"/>
+	
+    <Compile Include="src\verb\geom\NurbsCurve.cs"/>
+	
+    <Compile Include="src\verb\geom\ExtrudedSurface.cs"/>
+	
+    <Compile Include="src\verb\core\types\CurveSurfaceIntersection.cs"/>
+	
+    <Compile Include="src\verb\core\types\LazyPolylineBoundingBoxTree.cs"/>
+	
+    <Compile Include="src\verb\core\Make.cs"/>
+	
+    <Compile Include="src\verb\core\ArrayExtensions.cs"/>
+	
+    <Compile Include="src\verb\geom\NurbsSurface.cs"/>
+	
+    <Compile Include="src\verb\core\types\CurveTriPoint.cs"/>
+	
+    <Compile Include="src\verb\core\Mesh.cs"/>
+	
+    <Compile Include="src\verb\core\types\BoundingBoxNode.cs"/>
+	
+    <Compile Include="src\verb\core\types\SurfacePoint.cs"/>
+	
+    <Compile Include="src\verb\core\types\AdaptiveRefinementNode.cs"/>
+	
+    <Compile Include="src\verb\core\Check.cs"/>
+	
+    <Compile Include="src\List.cs"/>
+	
+    <Compile Include="src\verb\geom\Intersect.cs"/>
+	
+    <Compile Include="src\Type.cs"/>
+	
+    <Compile Include="src\haxe\ds\Option.cs"/>
+	
+    <Compile Include="src\verb\core\KdTree.cs"/>
+	
+    <Compile Include="src\verb\geom\Arc.cs"/>
+	
+    <Compile Include="src\promhx\Stream.cs"/>
+	
+    <Compile Include="src\Lambda.cs"/>
+	
+    <Compile Include="src\verb\core\Analyze.cs"/>
+	
+    <Compile Include="src\verb\core\types\MeshBoundingBoxTree.cs"/>
+	
+    <Compile Include="src\promhx\base\AsyncBase.cs"/>
+	
+    <Compile Include="src\StringTools.cs"/>
+	
+    <Compile Include="src\haxe\Int64.cs"/>
+	
+    <Compile Include="src\verb\geom\BezierCurve.cs"/>
+	
+    <Compile Include="src\Map.cs"/>
+	
+    <Compile Include="src\Reflect.cs"/>
+	
+    <Compile Include="src\verb\core\types\SurfaceSurfaceIntersectionPoint.cs"/>
+	
+    <Compile Include="src\verb\core\types\NurbsCurveData.cs"/>
+	
+    <Compile Include="src\verb\core\types\Ray.cs"/>
+	
+    <Compile Include="src\verb\core\types\NurbsSurfaceData.cs"/>
+	
+    <Compile Include="src\verb\geom\ConicalSurface.cs"/>
+	
+    <Compile Include="src\verb\geom\SphericalSurface.cs"/>
+	
+    <Compile Include="src\verb\core\types\LazyMeshBoundingBoxTree.cs"/>
+	
+    <Compile Include="src\verb\core\Mat.cs"/>
+	
+    <Compile Include="src\verb\core\types\LazyCurveBoundingBoxTree.cs"/>
+	
+    <Compile Include="src\verb\geom\RevolvedSurface.cs"/>
+	
+    <Compile Include="src\verb\core\Divide.cs"/>
+	
+    <Compile Include="src\verb\geom\CylindricalSurface.cs"/>
+	
+    <Compile Include="src\promhx\Promise.cs"/>
+	
+    <Compile Include="src\verb\geom\Ellipse.cs"/>
+	
+    <Compile Include="src\verb\core\types\MeshIntersectionPoint.cs"/>
+	
+    <Compile Include="src\verb\geom\SweptSurface.cs"/>
+	
+    <Compile Include="src\verb\exe\Dispatcher.cs"/>
+	
+    <Compile Include="src\verb\core\types\PolylineData.cs"/>
+	
+    <Compile Include="src\verb\core\types\LazySurfaceBoundingBoxTree.cs"/>
+	
+    <Compile Include="src\cs\internal\Iterator.cs"/>
+	
+    <Compile Include="src\cs\internal\StringExt.cs"/>
+	
+    <Compile Include="src\cs\internal\Runtime.cs"/>
+	
+    <Compile Include="src\cs\Lib.cs"/>
+	
+    <Compile Include="src\promhx\base\EventLoop.cs"/>
+	
+    <Compile Include="src\verb\core\Tess.cs"/>
+	
+    <Compile Include="src\verb\core\types\CurveLengthSample.cs"/>
+	
+    <Compile Include="src\cs\internal\HxObject.cs"/>
+	
+    <Compile Include="src\promhx\error\PromiseError.cs"/>
+	
+    <Compile Include="src\verb\core\Constants.cs"/>
+	
+    <Compile Include="src\cs\internal\Exceptions.cs"/>
+	
+    <Compile Include="src\verb\geom\ICurve.cs"/>
+	
+    <Compile Include="src\verb\core\Binomial.cs"/>
+	
+    <Compile Include="src\Math.cs"/>
+	
+    <Compile Include="src\promhx\Deferred.cs"/>
+	
+    <Compile Include="src\verb\core\Vec.cs"/>
+	
+    <Compile Include="src\cs\internal\FieldLookup.cs"/>
+	
+    <Compile Include="src\verb\core\types\MeshData.cs"/>
+	
+    <Compile Include="src\verb\core\types\PolylineMeshIntersection.cs"/>
+	
+    <Compile Include="src\verb\exe\AsyncObject.cs"/>
+	
+    <Compile Include="src\verb\core\types\Interval.cs"/>
+	
+    <Compile Include="src\verb\geom\ISurface.cs"/>
+	
+    <Compile Include="src\verb\Init.cs"/>
+	
+    <Compile Include="src\verb\core\types\VolumeData.cs"/>
+	
+    <Compile Include="src\verb\core\types\TriSegmentIntersection.cs"/>
+	
+    <Compile Include="src\verb\core\types\IBoundingBoxTree.cs"/>
+	
+    <Compile Include="src\verb\core\types\CurveCurveIntersection.cs"/>
+	
+    <Compile Include="src\haxe\ds\IntMap.cs"/>
+	
+    <Compile Include="src\verb\core\Intersect.cs"/>
+	
+    <Compile Include="src\StringBuf.cs"/>
+	
+    <Compile Include="src\verb\core\Numeric.cs"/>
+	
+  </ItemGroup>
+  
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

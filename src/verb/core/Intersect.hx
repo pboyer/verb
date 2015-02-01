@@ -273,8 +273,6 @@ class Intersect {
             ends.push(seg.max);
         }
 
-//        trace("ends: " + ends.length);
-
         // step 1: assigning the vertices to the segment ends
         for (segEnd in ends){
             if (segEnd.adj != null) continue;
@@ -385,9 +383,7 @@ class Intersect {
     // **returns**
     // + array of array of MeshIntersectionPoint
     //
-    public static function lookupAdjacentSegment( segEnd: MeshIntersectionPoint, tree : KdTree<MeshIntersectionPoint>, numSegments : Int ) {
-
-        var numResults : Int = numSegments != null ? (numSegments < 3 ? 3 : numSegments) : 3;
+    public static function lookupAdjacentSegment( segEnd: MeshIntersectionPoint, tree : KdTree<MeshIntersectionPoint>, numResults : Int ) {
 
         // we look up 3 elements because we need to find the unique adj ele
         // we expect one result to be self, one to be neighbor and no more
@@ -399,7 +395,6 @@ class Intersect {
 
         // if its not unique (i.e. were at a branching point) we dont return it
         return (adj.length == 1) ? adj[0] : null;
-
     }
 
     // Get the intersection of a NURBS curve and a NURBS surface without an estimate

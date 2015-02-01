@@ -21,7 +21,10 @@ class Vec {
     }
 
     public static function span(min : Float, max : Float, step : Float) : Array<Float> {
-        if (step == null || step < Constants.EPSILON) return []; // infinite
+        #if (!cs && !cpp && !java)
+            if (step == null) return [];
+        #end
+        if (step < Constants.EPSILON) return []; // infinite
         if (min > max && step > 0.0) return []; // infinite
         if (max > min && step < 0.0) return []; // infinite
 

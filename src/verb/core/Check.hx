@@ -47,7 +47,9 @@ class Check {
 
     public static function nurbsCurveData( data : NurbsCurveData ) : NurbsCurveData {
         if ( data.controlPoints == null ) throw "Control points array cannot be null!";
-        if ( data.degree == null ) throw "Degree cannot be null!";
+        #if (!cpp && !cs && !java)
+            if ( data.degree == null ) throw "Degree cannot be null!";
+        #end
         if ( data.degree < 1 ) throw "Degree must be greater than 1!";
         if ( data.knots == null ) throw "Knots cannot be null!";
 
@@ -72,8 +74,10 @@ class Check {
 
     public static function nurbsSurfaceData( data : NurbsSurfaceData ) : NurbsSurfaceData {
         if ( data.controlPoints == null ) throw "Control points array cannot be null!";
-        if ( data.degreeU == null ) throw "DegreeU cannot be null!";
-        if ( data.degreeV == null ) throw "DegreeV cannot be null!";
+        #if (!cpp && !cs && !java)
+            if ( data.degreeU == null ) throw "DegreeU cannot be null!";
+            if ( data.degreeV == null ) throw "DegreeV cannot be null!";
+        #end
         if ( data.degreeU < 1 ) throw "DegreeU must be greater than 1!";
         if ( data.degreeV < 1 ) throw "DegreeV must be greater than 1!";
         if ( data.knotsU == null ) throw "KnotsU cannot be null!";

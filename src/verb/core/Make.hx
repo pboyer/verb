@@ -11,6 +11,49 @@ using verb.core.ArrayExtensions;
 @:expose("core.Make")
 class Make {
 
+    // Generate a surface by translating a profile curve along a rail curve
+    //
+    // **params**
+    // + profile NurbsCurveData
+    // + rail NurbsCurveData
+    //
+    // **returns**
+    // + NurbsSurfaceData object
+
+    public static function rationalTranslationalSurface( profile : NurbsCurveData, rail : NurbsCurveData ) : NurbsSurfaceData {
+
+        // for each point on rail, move all of the points
+        var rail_start = Eval.rationalCurvePoint( rail, rail.knots.first() )
+        , startu = rail.knots.first()
+        , endu = rail.knots.last()
+        , span = ( endu - startu ) / (rail.controlPoints.length-1)
+        , controlPoints = []
+        , weights = []
+        , rail_weights = Eval.weight1d( rail.controlPoints )
+        , profile_weights = Eval.weight1d( profile.controlPoints )
+        , profile_points = Eval.dehomogenize1d( profile.controlPoints );
+
+        for ( i in 0...rail.controlPoints.length ){
+
+            // translation is from start to pt on rail
+            var rail_point = Eval.rationalCurvePoint( rail, i * span )
+            , rail_offset = Vec.sub( rail_point, rail_start )
+            , row_controlPoints = []
+            , row_weights = [];
+
+            // translate the profile
+            for ( j in 0...profile.controlPoints.length ){
+                row_controlPoints.push( Vec.add(rail_offset, profile_points[j] ) );
+                row_weights.push( profile_weights[j] * rail_weights[i] );
+            }
+
+            controlPoints.push( row_controlPoints);
+            weights.push( row_weights );
+        }
+
+        return new NurbsSurfaceData( rail.degree, profile.degree, rail.knots, profile.knots, Eval.homogenize2d( controlPoints, weights) );
+    }
+
     public static function surfaceIsocurve( surface : NurbsSurfaceData, u : Float, useV : Bool = false ) : NurbsCurveData {
 
         var knots = useV ? surface.knotsU : surface.knotsV;
@@ -102,12 +145,7 @@ class Make {
         for (i in 0...degree+1) { knots.push(1.0); }
 
         // if weights aren't provided, build uniform weights
-        if (weights == null){
-            weights = [];
-            for (i in 0...controlPoints.length){
-                weights.push(1.0);
-            }
-        }
+        if (weights == null) weights = Vec.rep( controlPoints.length, 1.0 );
 
         return new NurbsCurveData( degree, knots, Eval.homogenize1d( controlPoints, weights ));
     }
@@ -151,48 +189,6 @@ class Make {
 
        return new NurbsSurfaceData( degree, degree, zeros.concat(ones), zeros.concat(ones), pts );
 
-    }
-
-    // Generate the control points, weights, and knots of a swept surface
-    //
-    // **params**
-    // + profile NurbsCurveData
-    // + rail NurbsCurveData
-    //
-    // **returns**
-    // + NurbsSurfaceData object
-
-    public static function sweep1_surface( profile : NurbsCurveData, rail : NurbsCurveData ) : NurbsSurfaceData {
-
-        // for each point on rail, move all of the points
-        var rail_start = Eval.rationalCurvePoint( rail, 0.0 )
-            , span = 1.0 / rail.controlPoints.length
-            , controlPoints = []
-            , weights = []
-            , rail_weights = Eval.weight1d( rail.controlPoints )
-            , profile_weights = Eval.weight1d( profile.controlPoints )
-            , profile_points = Eval.dehomogenize1d( profile.controlPoints );
-
-        for ( i in 0...rail.controlPoints.length ){
-
-            // evaluate the point on the curve, subtracting it from the first point
-            var rail_point = Eval.rationalCurvePoint( rail, i * span )
-                , rail_offset = Vec.sub( rail_point, rail_start )
-                , row_controlPoints = []
-                , row_weights = [];
-
-            for ( j in 0...profile.controlPoints.length ){
-
-                row_controlPoints.push( Vec.add(rail_offset, profile_points[j] ) );
-                row_weights.push( profile_weights[j] * rail_weights[i] );
-
-            }
-
-            controlPoints.push( row_controlPoints);
-            weights.push( row_weights );
-        }
-
-        return new NurbsSurfaceData( rail.degree, profile.degree, rail.knots, profile.knots, Eval.homogenize2d( controlPoints, weights) );
     }
 
     // Generate the control points, weights, and knots of an elliptical arc

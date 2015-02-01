@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="../build/verb.js"></script>
+    <script src="js/three.min.js"></script>
+    <script src="js/verbToThreeConversion.js"></script>
+    <script src="js/OrbitControls.js"></script>
+    <script src="js/threeBasic.js"></script>
+    <style> body {  margin: 0; } </style>
+</head>
+<body>
+<script>
+	threeSetup();
+
+    var rail = new verb.geom.BezierCurve( [[0,0,0], [10,5,10], [20,10,10]] );
+    var prof = new verb.geom.BezierCurve( [[0,0,0], [20,0,0]] );
+
+    var srf = new verb.geom.SweptSurface( prof, rail );
+
+	addCurveToScene( rail.toThreeGeometry() );
+	addCurveToScene( prof.toThreeGeometry() );
+	addMeshToScene( srf.toThreeGeometry() );
+
+	threeRender();
+</script>
+
+</body>
+
+</html>
