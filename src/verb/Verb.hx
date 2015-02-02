@@ -38,7 +38,7 @@ import verb.core.Analyze;
 import verb.core.Divide;
 import verb.core.Check;
 
-class Init {
+class Verb {
 	public static function main():Void {
 		trace("verb 0.2.0");
 	}

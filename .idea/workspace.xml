@@ -5,124 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="938890c0-f1ce-4fbd-8322-63610af7f5e6" name="Default" comment="">
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build.hxml" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/Init.csproj" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/bin/Init.exe" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/hxcs_build.txt" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/Array.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/Lambda.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/List.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/Map.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/Math.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/Reflect.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/Std.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/StringBuf.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/StringTools.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/Type.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/cs/Boot.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/cs/Lib.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/cs/internal/Exceptions.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/cs/internal/FieldLookup.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/cs/internal/Function.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/cs/internal/HxObject.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/cs/internal/Iterator.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/cs/internal/Null.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/cs/internal/Runtime.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/cs/internal/StringExt.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/haxe/Int64.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/haxe/Log.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/haxe/ds/IntMap.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/haxe/ds/Option.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/promhx/Deferred.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/promhx/Promise.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/promhx/PublicStream.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/promhx/Stream.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/promhx/base/AsyncBase.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/promhx/base/EventLoop.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/promhx/error/PromiseError.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/Init.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/Analyze.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/ArrayExtensions.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/Binomial.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/Check.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/Constants.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/Divide.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/Eval.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/Intersect.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/KdTree.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/Make.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/Mat.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/Mesh.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/Modify.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/Numeric.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/Tess.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/Trig.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/Vec.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/types/AdaptiveRefinementNode.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/types/BoundingBox.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/types/BoundingBoxNode.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/types/CurveCurveIntersection.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/types/CurveLengthSample.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/types/CurveSurfaceIntersection.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/types/CurveTriPoint.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/types/IBoundingBoxTree.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/types/Interval.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/types/LazyCurveBoundingBoxTree.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/types/LazyMeshBoundingBoxTree.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/types/LazyPolylineBoundingBoxTree.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/types/LazySurfaceBoundingBoxTree.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/types/MeshBoundingBoxTree.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/types/MeshData.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/types/MeshIntersectionPoint.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/types/NurbsCurveData.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/types/NurbsSurfaceData.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/types/Pair.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/types/PolylineData.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/types/PolylineMeshIntersection.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/types/Ray.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/types/SurfacePoint.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/types/SurfaceSurfaceIntersectionPoint.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/types/TriSegmentIntersection.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/core/types/VolumeData.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/exe/AsyncObject.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/exe/Dispatcher.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/geom/Arc.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/geom/BezierCurve.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/geom/Circle.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/geom/ConicalSurface.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/geom/CylindricalSurface.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/geom/Ellipse.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/geom/EllipseArc.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/geom/ExtrudedSurface.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/geom/ICurve.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/geom/ISurface.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/geom/Intersect.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/geom/Line.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/geom/NurbsCurve.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/geom/NurbsSurface.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/geom/RevolvedSurface.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/geom/SphericalSurface.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/cs/src/verb/geom/SweptSurface.cs" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/verb.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/verb.min.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/verbHaxe.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/build/verbHaxeNode.js" afterPath="" />
-      <change type="DELETED" beforePath="$PROJECT_DIR$/buildcs.hxml" afterPath="" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.gitignore" afterPath="$PROJECT_DIR$/.gitignore" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Gruntfile.js" afterPath="$PROJECT_DIR$/Gruntfile.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/KdTree.hx" afterPath="$PROJECT_DIR$/src/verb/core/KdTree.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/curveClosestPoint.html" afterPath="$PROJECT_DIR$/examples/curveClosestPoint.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/divideCurve.html" afterPath="$PROJECT_DIR$/examples/divideCurve.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/loftedSurface.html" afterPath="$PROJECT_DIR$/examples/loftedSurface.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/meshIntersection.html" afterPath="$PROJECT_DIR$/examples/meshIntersection.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/meshSlicing.html" afterPath="$PROJECT_DIR$/examples/meshSlicing.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/surface.html" afterPath="$PROJECT_DIR$/examples/surface.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/surfaceClosestPoint.html" afterPath="$PROJECT_DIR$/examples/surfaceClosestPoint.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/surfaceIntersection.html" afterPath="$PROJECT_DIR$/examples/surfaceIntersection.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/surfaceIsocurve.html" afterPath="$PROJECT_DIR$/examples/surfaceIsocurve.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/surfaceSplit.html" afterPath="$PROJECT_DIR$/examples/surfaceSplit.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/sweptSurface.html" afterPath="$PROJECT_DIR$/examples/sweptSurface.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/test.js" afterPath="$PROJECT_DIR$/test/test.js" />
+      <change type="DELETED" beforePath="$PROJECT_DIR$/src/verb/Init.hx" afterPath="" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/buildcs.hxml" afterPath="$PROJECT_DIR$/buildcs.hxml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/buildjs.hxml" afterPath="$PROJECT_DIR$/buildjs.hxml" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/js/verb.js" afterPath="$PROJECT_DIR$/build/js/verb.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/js/verbHaxe.js" afterPath="$PROJECT_DIR$/build/js/verbHaxe.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="verb.iws" />
@@ -158,10 +45,30 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Gruntfile.js" pinned="false" current-in-tab="true">
+      <file leaf-file-name="SweptSurface.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/geom/SweptSurface.hx">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="525">
+              <caret line="10" column="24" selection-start-line="10" selection-start-column="24" selection-end-line="10" selection-end-column="24" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="RevolvedSurface.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/geom/RevolvedSurface.hx">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="615">
+              <caret line="15" column="46" selection-start-line="15" selection-start-column="46" selection-end-line="15" selection-end-column="46" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Gruntfile.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Gruntfile.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.2819149" vertical-offset="643" max-vertical-offset="1395">
+            <state vertical-scroll-proportion="0.0" vertical-offset="619" max-vertical-offset="1395">
               <caret line="57" column="9" selection-start-line="57" selection-start-column="9" selection-end-line="57" selection-end-column="9" />
               <folding />
             </state>
@@ -171,58 +78,8 @@
       <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/.gitignore">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-8.4" vertical-offset="0" max-vertical-offset="300">
+            <state vertical-scroll-proportion="0.0" vertical-offset="210" max-vertical-offset="300">
               <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="NurbsSurface.hx" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/verb/geom/NurbsSurface.hx">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="4003" max-vertical-offset="4755">
-              <caret line="284" column="26" selection-start-line="284" selection-start-column="26" selection-end-line="284" selection-end-column="26" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="meshIntersection.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/meshIntersection.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-13.125" vertical-offset="0" max-vertical-offset="3000">
-              <caret line="21" column="27" selection-start-line="21" selection-start-column="27" selection-end-line="21" selection-end-column="27" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="curveClosestPoint.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/curveClosestPoint.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-1.875" vertical-offset="0" max-vertical-offset="840">
-              <caret line="3" column="4" selection-start-line="3" selection-start-column="4" selection-end-line="3" selection-end-column="4" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="divideCurve.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/divideCurve.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-1.875" vertical-offset="0" max-vertical-offset="570">
-              <caret line="3" column="4" selection-start-line="3" selection-start-column="4" selection-end-line="3" selection-end-column="4" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="loftedSurface.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/loftedSurface.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-1.875" vertical-offset="0" max-vertical-offset="555">
-              <caret line="3" column="4" selection-start-line="3" selection-start-column="4" selection-end-line="3" selection-end-column="4" />
               <folding />
             </state>
           </provider>
@@ -232,17 +89,27 @@
         <entry file="file://$PROJECT_DIR$/test/test.js">
           <provider selected="true" editor-type-id="text-editor">
             <state vertical-scroll-proportion="0.0" vertical-offset="56927" max-vertical-offset="104820">
-              <caret line="3803" column="0" selection-start-line="3803" selection-start-column="0" selection-end-line="3803" selection-end-column="0" />
+              <caret line="3820" column="0" selection-start-line="3820" selection-start-column="0" selection-end-line="3820" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="buildjs.hxml" pinned="false" current-in-tab="false">
+      <file leaf-file-name="buildjs.hxml" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/buildjs.hxml">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="150">
+            <state vertical-scroll-proportion="0.077319585" vertical-offset="0" max-vertical-offset="776">
               <caret line="4" column="8" selection-start-line="4" selection-start-column="8" selection-end-line="4" selection-end-column="8" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Verb.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/Verb.hx">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="750">
+              <caret line="21" column="6" selection-start-line="21" selection-start-column="6" selection-end-line="21" selection-end-column="6" />
               <folding />
             </state>
           </provider>
@@ -256,7 +123,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/example/js/threeSetup.js" />
         <option value="$PROJECT_DIR$/example/js/threeConvert.js" />
         <option value="$PROJECT_DIR$/example/js/threeBasic.js" />
         <option value="$PROJECT_DIR$/example/threeLoftedSurfaceExample.html" />
@@ -296,7 +162,6 @@
         <option value="$PROJECT_DIR$/src/verb/core/types/AdaptiveRefinementNode.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Vec.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Intersect.hx" />
-        <option value="$PROJECT_DIR$/buildcs.hxml" />
         <option value="$PROJECT_DIR$/src/verb/core/KdTree.hx" />
         <option value="$PROJECT_DIR$/test/test.js" />
         <option value="$PROJECT_DIR$/build.hxml" />
@@ -307,6 +172,8 @@
         <option value="$PROJECT_DIR$/examples/meshIntersection.html" />
         <option value="$PROJECT_DIR$/.gitignore" />
         <option value="$PROJECT_DIR$/Gruntfile.js" />
+        <option value="$PROJECT_DIR$/buildjs.hxml" />
+        <option value="$PROJECT_DIR$/buildcs.hxml" />
       </list>
     </option>
   </component>
@@ -437,6 +304,20 @@
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="verb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="verb" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="build" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
         </subPane>
       </pane>
       <pane id="PackagesPane" />
@@ -531,19 +412,6 @@
       </ExternalSystemSettings>
       <method />
     </configuration>
-    <configuration default="true" type="Applet" factoryName="Applet">
-      <module name="" />
-      <option name="MAIN_CLASS_NAME" />
-      <option name="HTML_FILE_NAME" />
-      <option name="HTML_USED" value="false" />
-      <option name="WIDTH" value="400" />
-      <option name="HEIGHT" value="300" />
-      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
-      <option name="VM_PARAMETERS" />
-      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
-      <option name="ALTERNATIVE_JRE_PATH" />
-      <method />
-    </configuration>
     <configuration default="true" type="TestNG" factoryName="TestNG">
       <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
       <module name="" />
@@ -570,6 +438,19 @@
       <envs />
       <properties />
       <listeners />
+      <method />
+    </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <module name="" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="HTML_FILE_NAME" />
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <option name="VM_PARAMETERS" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
       <method />
     </configuration>
     <configuration default="true" type="Application" factoryName="Application">
@@ -645,7 +526,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="117" y="23" width="1205" height="873" extended-state="0" />
-    <editor active="true" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -653,12 +534,10 @@
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.029850746" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20149253" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -667,7 +546,9 @@
       <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.20414938" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.029850746" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.20149253" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -698,6 +579,86 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/buildcs.hxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="75" max-vertical-offset="165">
+          <caret line="5" column="6" selection-start-line="5" selection-start-column="6" selection-end-line="5" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Gruntfile.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1395">
+          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/.gitignore">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="210" max-vertical-offset="300">
+          <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/geom/NurbsSurface.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="4003" max-vertical-offset="4755">
+          <caret line="284" column="26" selection-start-line="284" selection-start-column="26" selection-end-line="284" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/meshIntersection.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="315" max-vertical-offset="3000">
+          <caret line="21" column="27" selection-start-line="21" selection-start-column="27" selection-end-line="21" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/curveClosestPoint.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="45" max-vertical-offset="840">
+          <caret line="3" column="4" selection-start-line="3" selection-start-column="4" selection-end-line="3" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/divideCurve.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="45" max-vertical-offset="570">
+          <caret line="3" column="4" selection-start-line="3" selection-start-column="4" selection-end-line="3" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/loftedSurface.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="45" max-vertical-offset="555">
+          <caret line="3" column="4" selection-start-line="3" selection-start-column="4" selection-end-line="3" selection-end-column="4" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/test.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="56927" max-vertical-offset="104820">
+          <caret line="3803" column="0" selection-start-line="3803" selection-start-column="0" selection-end-line="3803" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/buildjs.hxml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="60" max-vertical-offset="150">
+          <caret line="4" column="8" selection-start-line="4" selection-start-column="8" selection-end-line="4" selection-end-column="8" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/verb/core/Eval.hx">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-9.222222" vertical-offset="2751" max-vertical-offset="15705">
@@ -710,7 +671,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="34519" max-vertical-offset="35295">
           <caret line="580" column="0" selection-start-line="580" selection-start-column="0" selection-end-line="580" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -734,22 +694,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-10.083333" vertical-offset="193" max-vertical-offset="945">
           <caret line="29" column="12" selection-start-line="29" selection-start-column="12" selection-end-line="29" selection-end-column="12" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/Init.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="111" max-vertical-offset="750">
-          <caret line="21" column="6" selection-start-line="21" selection-start-column="6" selection-end-line="21" selection-end-column="6" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/geom/SweptSurface.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="525">
-          <caret line="10" column="24" selection-start-line="10" selection-start-column="24" selection-end-line="10" selection-end-column="24" />
           <folding />
         </state>
       </provider>
@@ -816,7 +760,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2760">
           <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
         </state>
       </provider>
     </entry>
@@ -920,7 +863,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/examples/curveClosestPoint.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-1.875" vertical-offset="0" max-vertical-offset="840">
+        <state vertical-scroll-proportion="0.0" vertical-offset="45" max-vertical-offset="840">
           <caret line="3" column="4" selection-start-line="3" selection-start-column="4" selection-end-line="3" selection-end-column="4" />
           <folding />
         </state>
@@ -928,7 +871,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/examples/divideCurve.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-1.875" vertical-offset="0" max-vertical-offset="570">
+        <state vertical-scroll-proportion="0.0" vertical-offset="45" max-vertical-offset="570">
           <caret line="3" column="4" selection-start-line="3" selection-start-column="4" selection-end-line="3" selection-end-column="4" />
           <folding />
         </state>
@@ -936,7 +879,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/examples/loftedSurface.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-1.875" vertical-offset="0" max-vertical-offset="555">
+        <state vertical-scroll-proportion="0.0" vertical-offset="45" max-vertical-offset="555">
           <caret line="3" column="4" selection-start-line="3" selection-start-column="4" selection-end-line="3" selection-end-column="4" />
           <folding />
         </state>
@@ -944,7 +887,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/examples/meshIntersection.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-13.125" vertical-offset="0" max-vertical-offset="3000">
+        <state vertical-scroll-proportion="0.0" vertical-offset="315" max-vertical-offset="3000">
           <caret line="21" column="27" selection-start-line="21" selection-start-column="27" selection-end-line="21" selection-end-column="27" />
           <folding />
         </state>
@@ -952,8 +895,16 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-8.4" vertical-offset="0" max-vertical-offset="300">
+        <state vertical-scroll-proportion="0.0" vertical-offset="210" max-vertical-offset="300">
           <caret line="14" column="0" selection-start-line="14" selection-start-column="0" selection-end-line="14" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Gruntfile.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="619" max-vertical-offset="1395">
+          <caret line="57" column="9" selection-start-line="57" selection-start-column="9" selection-end-line="57" selection-end-column="9" />
           <folding />
         </state>
       </provider>
@@ -961,15 +912,31 @@
     <entry file="file://$PROJECT_DIR$/test/test.js">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="56927" max-vertical-offset="104820">
-          <caret line="3803" column="0" selection-start-line="3803" selection-start-column="0" selection-end-line="3803" selection-end-column="0" />
+          <caret line="3820" column="0" selection-start-line="3820" selection-start-column="0" selection-end-line="3820" selection-end-column="0" />
           <folding />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/buildjs.hxml">
+    <entry file="file://$PROJECT_DIR$/src/verb/geom/SweptSurface.hx">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="150">
-          <caret line="4" column="8" selection-start-line="4" selection-start-column="8" selection-end-line="4" selection-end-column="8" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="525">
+          <caret line="10" column="24" selection-start-line="10" selection-start-column="24" selection-end-line="10" selection-end-column="24" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/geom/RevolvedSurface.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="615">
+          <caret line="15" column="46" selection-start-line="15" selection-start-column="46" selection-end-line="15" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/Verb.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="111" max-vertical-offset="750">
+          <caret line="21" column="6" selection-start-line="21" selection-start-column="6" selection-end-line="21" selection-end-column="6" />
           <folding />
         </state>
       </provider>
@@ -982,10 +949,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/Gruntfile.js">
+    <entry file="file://$PROJECT_DIR$/buildjs.hxml">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.2819149" vertical-offset="643" max-vertical-offset="1395">
-          <caret line="57" column="9" selection-start-line="57" selection-start-column="9" selection-end-line="57" selection-end-column="9" />
+        <state vertical-scroll-proportion="0.077319585" vertical-offset="0" max-vertical-offset="776">
+          <caret line="4" column="8" selection-start-line="4" selection-start-column="8" selection-end-line="4" selection-end-column="8" />
           <folding />
         </state>
       </provider>

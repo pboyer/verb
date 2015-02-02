@@ -663,9 +663,9 @@ promhx.error.PromiseError = { __constructs__ : ["AlreadyResolved","DownstreamNot
 promhx.error.PromiseError.AlreadyResolved = function(message) { var $x = ["AlreadyResolved",0,message]; $x.__enum__ = promhx.error.PromiseError; $x.toString = $estr; return $x; };
 promhx.error.PromiseError.DownstreamNotFullfilled = function(message) { var $x = ["DownstreamNotFullfilled",1,message]; $x.__enum__ = promhx.error.PromiseError; $x.toString = $estr; return $x; };
 var verb = {};
-verb.Init = function() { };
-verb.Init.__name__ = ["verb","Init"];
-verb.Init.main = function() {
+verb.Verb = function() { };
+verb.Verb.__name__ = ["verb","Verb"];
+verb.Verb.main = function() {
 	console.log("verb 0.2.0");
 };
 verb.core = {};
@@ -5820,5 +5820,5 @@ verb.exe.Dispatcher.THREADS = 1;
 verb.exe.Dispatcher._init = false;
 verb.exe.Work.uuid = 0;
 verb.exe.WorkerPool.basePath = "";
-verb.Init.main();
+verb.Verb.main();
 })(typeof verb != "undefined" ? verb : exports);
