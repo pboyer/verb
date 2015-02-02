@@ -1,6 +1,5 @@
 -lib promhx
 -main verb.Init
 -cp src
--cs build/cs
+-js build/js/verbHaxe.js
 -dce std
--D dll

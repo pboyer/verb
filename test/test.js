@@ -1,8 +1,8 @@
 var should = require('should')
-	, verb = require('../build/verb.js');
+	, verb = require('../build/js/verb.js');
 
 // necessary for multi-threading
-verb.exe.WorkerPool.basePath = process.cwd() + "/build/";
+verb.exe.WorkerPool.basePath = process.cwd() + "/build/js/";
 
 // some testing utilities
 function vecShouldBe( expected, test, tol ){
@@ -3815,7 +3815,7 @@ describe("verb.core.KdTree",function(){
 	it('gives correct results when requesting a single node', function(){
 
 		var tree = new verb.core.KdTree(pts, verb.core.Vec.distSquared );
-		var res = tree.nearest( [0,2.1,1], 1 );
+		var res = tree.nearest( [0,2.1,1], 1, 1.0 );
 
 		res[0].item0.point.should.eql(pts[1].point);
 
@@ -3824,9 +3824,9 @@ describe("verb.core.KdTree",function(){
 	it('gives correct results for multiple nodes', function(){
 
 		var tree = new verb.core.KdTree(pts, verb.core.Vec.distSquared );
-		var res1 = tree.nearest( [0,1.1,1], 2 );
+		var res1 = tree.nearest( [0,1.1,1], 2, 1.0 );
 
-		res1[1].item0.point.should.eql(pts[0].point);
+		res1[1].item0.point.should.eql(pts[0].point, 1.0);
 		res1[0].item0.point.should.eql(pts[1].point);
 
 	});
@@ -3851,7 +3851,7 @@ describe("verb.core.Intersect.lookupAdjacentSegment",function(){
 		var end = segs[0].min;
 
 		var tree = verb.core.Intersect.kdTreeFromSegments( segs );
-		var nearest = verb.core.Intersect.lookupAdjacentSegment( end, tree );
+		var nearest = verb.core.Intersect.lookupAdjacentSegment( end, tree, 3 );
 
 		should.equal( nearest, null );
 
@@ -3862,7 +3862,7 @@ describe("verb.core.Intersect.lookupAdjacentSegment",function(){
 		var end = new verb.core.MeshIntersectionPoint([0,0], [0,0], [1,2,3], 0, 0 ); // same pos, but different object
 
 		var tree = verb.core.Intersect.kdTreeFromSegments( segs );
-		var nearest = verb.core.Intersect.lookupAdjacentSegment( end, tree );
+		var nearest = verb.core.Intersect.lookupAdjacentSegment( end, tree, 3 );
 
 		nearest.should.be.equal(segs[0].min)
 

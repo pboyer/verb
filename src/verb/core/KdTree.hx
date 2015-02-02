@@ -88,7 +88,7 @@ class KdTree<T> {
         return node;
     }
 
-    public function nearest(point : Point, maxNodes : Int, maxDistance : Float) : Array<Pair<KdPoint<T>, Float>> {
+    public function nearest(point : Point, maxNodes : Int, maxDistance : Float ) : Array<Pair<KdPoint<T>, Float>> {
 
         var bestNodes = new BinaryHeap<KdNode<T>>(
             function (e : Pair<KdNode<T>, Float>) { return -e.item1; }

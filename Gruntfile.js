@@ -8,15 +8,15 @@ module.exports = function(grunt) {
     concat: {
       build: {
         files: {
-          'build/<%= pkg.name %>.js': [ 'src/support/header.js',
-                                        'build/verbHaxe.js']
+          'build/js/<%= pkg.name %>.js': [ 'src/support/header.js',
+                                        'build/js/verbHaxe.js']
         }
       }
     },
 
     replace: {
       build: {
-        src: ['build/verb.js'],
+        src: ['build/js/verb.js'],
         overwrite: true,                 // overwrite matched source files
         replacements: [{
           from: "typeof window != \"undefined\" ? window : exports",
@@ -31,7 +31,7 @@ module.exports = function(grunt) {
       },
       build: {
         files: {
-          'build/<%= pkg.name %>.min.js': ['build/<%= pkg.name %>.js']
+          'build/js/<%= pkg.name %>.min.js': ['build/<%= pkg.name %>.js']
         }
       }
     },
@@ -54,14 +54,14 @@ module.exports = function(grunt) {
 
     haxe: {
         hxml: {
-            hxml: 'build.hxml'
+            hxml: 'buildjs.hxml'
         }
     },
 
     // docs
     docco: {
       debug: {
-        src: ['build/verb.js'],
+        src: ['build/js/verb.js'],
         options: {
           output: 'docs/'
         }
