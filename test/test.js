@@ -2051,7 +2051,7 @@ describe("verb.core.Make.polyline",function(){
 
 });
 
-describe("verb.core.Make.CylindricalSurface",function(){
+describe("verb.core.Make.cylindricalSurface",function(){
 
 	it('can create a cylinder', function(){
 
@@ -2061,7 +2061,7 @@ describe("verb.core.Make.CylindricalSurface",function(){
 			, height = 5
 			, radius = 5;
 
-		var comps = verb.core.Make.CylindricalSurface(axis, xaxis, base, height, radius);
+		var comps = verb.core.Make.cylindricalSurface(axis, xaxis, base, height, radius);
 
 		comps.degreeU.should.equal(2);
 		comps.degreeV.should.equal(2);
@@ -2239,7 +2239,7 @@ describe("verb.core.Trig.distToRay",function(){
 
 });
 
-describe("verb.core.Make.ConicalSurface",function(){
+describe("verb.core.Make.conicalSurface",function(){
 
 	it('can create a cone', function(){
 
@@ -2249,7 +2249,7 @@ describe("verb.core.Make.ConicalSurface",function(){
 			, height = 5
 			, radius = 10;
 
-		var comps = verb.core.Make.ConicalSurface(axis, xaxis, base, height, radius);
+		var comps = verb.core.Make.conicalSurface(axis, xaxis, base, height, radius);
 
 		comps.degreeU.should.equal(2);
 		comps.degreeV.should.equal(1);
@@ -2290,7 +2290,7 @@ describe("verb.core.Make.ConicalSurface",function(){
 
 });
 
-describe("verb.core.Make.SphericalSurface",function(){
+describe("verb.core.Make.sphericalSurface",function(){
 
 	it('can create a unit sphere', function(){
 
@@ -2299,7 +2299,7 @@ describe("verb.core.Make.SphericalSurface",function(){
 			, xaxis = [1,0,0]
 			, radius = 1;
 
-		var comps = verb.core.Make.SphericalSurface(center, axis, xaxis, radius);
+		var comps = verb.core.Make.sphericalSurface(center, axis, xaxis, radius);
 
 		comps.degreeU.should.equal(2);
 		comps.degreeV.should.equal(2);

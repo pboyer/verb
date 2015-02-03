@@ -31,7 +31,7 @@ class CylindricalSurface extends NurbsSurface {
     // + Radius of the cylinder
 
     public function new(axis : Vector, xaxis : Vector, base : Point, height : Float, radius : Float) {
-        super(Make.CylindricalSurface(axis, xaxis, base, height, radius));
+        super(Make.cylindricalSurface(axis, xaxis, base, height, radius));
 
         _axis = axis;
         _xaxis = xaxis;

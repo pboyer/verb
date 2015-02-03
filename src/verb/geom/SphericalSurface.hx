@@ -23,7 +23,7 @@ class SphericalSurface extends NurbsSurface {
 
     public function new(   center : Point,
                            radius : Float ) {
-        super( Make.SphericalSurface( center, [0,0,1], [1,0,0], radius ));
+        super( Make.sphericalSurface( center, [0,0,1], [1,0,0], radius ));
 
         _center = center;
         _radius = radius;

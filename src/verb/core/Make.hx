@@ -387,7 +387,7 @@ class Make {
     // **returns**
     // + an object with the following properties: controlPoints, weights, knotsU, knotsV, degreeU, degreeV
 
-    public static function CylindricalSurface( axis : Point, xaxis : Point, base : Point, height : Float, radius : Float ) : NurbsSurfaceData {
+    public static function cylindricalSurface( axis : Point, xaxis : Point, base : Point, height : Float, radius : Float ) : NurbsSurfaceData {
 
         var yaxis = Vec.cross( axis, xaxis )
         , angle = 2.0 * Math.PI
@@ -546,7 +546,7 @@ class Make {
     // + an object with the following properties: controlPoints, weights, knotsU, knotsV, degreeU, degreeV
     //
 
-    public static function SphericalSurface( center : Point, axis : Point, xaxis : Point, radius : Float ){
+    public static function sphericalSurface( center : Point, axis : Point, xaxis : Point, radius : Float ){
 
         var arc = arc(center, Vec.mul( -1.0, axis ), xaxis, radius, 0.0, Math.PI );
         return revolvedSurface( arc, center, axis, 2 * Math.PI );
@@ -566,7 +566,7 @@ class Make {
     // + an object with the following properties: controlPoints, weights, knots, degree
     //
 
-    public static function ConicalSurface( axis : Point, xaxis : Point, base : Point, height : Float, radius : Float ) : NurbsSurfaceData {
+    public static function conicalSurface( axis : Point, xaxis : Point, base : Point, height : Float, radius : Float ) : NurbsSurfaceData {
 
         var angle = 2 * Math.PI
         , prof_degree = 1
@@ -579,7 +579,7 @@ class Make {
 
     }
 
-    public static function rationalInterpCurve( points : Array<Point>,
+    public static function rationalInterpCurve( points : Array<Array<Float>>,
                                                 degree : Int = 3,
                                                 homogeneousPoints : Bool = false,
                                                 start_tangent : Point = null,

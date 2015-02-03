@@ -31,7 +31,7 @@ class ConicalSurface extends NurbsSurface {
     // + Radius of the cone
 
     public function new(axis : Vector, xaxis : Vector, base : Point, height : Float, radius : Float )  {
-        super( Make.ConicalSurface(axis, xaxis, base, height, radius ));
+        super( Make.conicalSurface(axis, xaxis, base, height, radius ));
 
         _axis = axis;
         _xaxis = xaxis;
