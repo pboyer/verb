@@ -1671,7 +1671,7 @@ verb.core.Intersect.surfacesAtPointWithEstimate = function(surface0,surface1,uv1
 verb.core.Intersect.meshes = function(mesh0,mesh1,bbtree0,bbtree1) {
 	if(bbtree0 == null) bbtree0 = new verb.core.types.LazyMeshBoundingBoxTree(mesh0);
 	if(bbtree1 == null) bbtree1 = new verb.core.types.LazyMeshBoundingBoxTree(mesh1);
-	var bbints = verb.core.Intersect.bounding_box_trees(bbtree0,bbtree1,0);
+	var bbints = verb.core.Intersect.boundingBoxTrees(bbtree0,bbtree1,0);
 	var segments0 = bbints.map(function(ids) {
 		return verb.core.Intersect.triangles(mesh0,ids.item0,mesh1,ids.item1);
 	});
@@ -1778,7 +1778,7 @@ verb.core.Intersect.lookupAdjacentSegment = function(segEnd,tree,numResults) {
 };
 verb.core.Intersect.curveAndSurface = function(curve,surface,tol) {
 	if(tol == null) tol = 1e-3;
-	var ints = verb.core.Intersect.bounding_box_trees(new verb.core.types.LazyCurveBoundingBoxTree(curve),new verb.core.types.LazySurfaceBoundingBoxTree(surface),0);
+	var ints = verb.core.Intersect.boundingBoxTrees(new verb.core.types.LazyCurveBoundingBoxTree(curve),new verb.core.types.LazySurfaceBoundingBoxTree(surface),0);
 	return ints.map(function(inter) {
 		var crvSeg = inter.item0;
 		var srfPart = inter.item1;
@@ -1805,8 +1805,8 @@ verb.core.Intersect.curveAndSurfaceWithEstimate = function(curve,surface,start_p
 	var $final = sol_obj.solution;
 	return new verb.core.types.CurveSurfaceIntersection($final[0],[$final[1],$final[2]]);
 };
-verb.core.Intersect.polyline_and_mesh = function(polyline,mesh,tol) {
-	var res = verb.core.Intersect.bounding_box_trees(new verb.core.types.LazyPolylineBoundingBoxTree(polyline),new verb.core.types.LazyMeshBoundingBoxTree(mesh),tol);
+verb.core.Intersect.polylineAndMesh = function(polyline,mesh,tol) {
+	var res = verb.core.Intersect.boundingBoxTrees(new verb.core.types.LazyPolylineBoundingBoxTree(polyline),new verb.core.types.LazyMeshBoundingBoxTree(mesh),tol);
 	var finalResults = [];
 	var _g = 0;
 	while(_g < res.length) {
@@ -1824,24 +1824,24 @@ verb.core.Intersect.polyline_and_mesh = function(polyline,mesh,tol) {
 	return finalResults;
 };
 verb.core.Intersect.mesh_bounding_boxes = function(a,b,tol) {
-	return verb.core.Intersect.bounding_box_trees(new verb.core.types.LazyMeshBoundingBoxTree(a),new verb.core.types.LazyMeshBoundingBoxTree(b),tol);
+	return verb.core.Intersect.boundingBoxTrees(new verb.core.types.LazyMeshBoundingBoxTree(a),new verb.core.types.LazyMeshBoundingBoxTree(b),tol);
 };
-verb.core.Intersect.bounding_box_trees = function(a,b,tol) {
+verb.core.Intersect.boundingBoxTrees = function(a,b,tol) {
 	if(tol == null) tol = 1e-9;
 	if(a.empty() || b.empty()) return [];
 	if(!a.boundingBox().intersects(b.boundingBox(),tol)) return [];
 	if(a.indivisible(tol) && b.indivisible(tol)) return [new verb.core.types.Pair(a["yield"](),b["yield"]())];
 	var asplit = a.split();
 	var bsplit = b.split();
-	return verb.core.Intersect.bounding_box_trees(asplit.item0,bsplit.item0,tol).concat(verb.core.Intersect.bounding_box_trees(asplit.item0,bsplit.item1,tol)).concat(verb.core.Intersect.bounding_box_trees(asplit.item1,bsplit.item0,tol)).concat(verb.core.Intersect.bounding_box_trees(asplit.item1,bsplit.item1,tol));
+	return verb.core.Intersect.boundingBoxTrees(asplit.item0,bsplit.item0,tol).concat(verb.core.Intersect.boundingBoxTrees(asplit.item0,bsplit.item1,tol)).concat(verb.core.Intersect.boundingBoxTrees(asplit.item1,bsplit.item0,tol)).concat(verb.core.Intersect.boundingBoxTrees(asplit.item1,bsplit.item1,tol));
 };
 verb.core.Intersect.curves = function(curve1,curve2,tolerance) {
-	var ints = verb.core.Intersect.bounding_box_trees(new verb.core.types.LazyCurveBoundingBoxTree(curve1),new verb.core.types.LazyCurveBoundingBoxTree(curve2),0);
+	var ints = verb.core.Intersect.boundingBoxTrees(new verb.core.types.LazyCurveBoundingBoxTree(curve1),new verb.core.types.LazyCurveBoundingBoxTree(curve2),0);
 	return ints.map(function(x) {
-		return verb.core.Intersect.curves_with_estimate(curve1,curve2,x.item0.knots[0],x.item1.knots[0],tolerance);
+		return verb.core.Intersect.curvesWithEstimate(curve1,curve2,x.item0.knots[0],x.item1.knots[0],tolerance);
 	});
 };
-verb.core.Intersect.curves_with_estimate = function(curve0,curve1,u0,u1,tolerance) {
+verb.core.Intersect.curvesWithEstimate = function(curve0,curve1,u0,u1,tolerance) {
 	var objective = function(x) {
 		var p1 = verb.core.Eval.rationalCurvePoint(curve0,x[0]);
 		var p2 = verb.core.Eval.rationalCurvePoint(curve1,x[1]);
@@ -1974,7 +1974,7 @@ verb.core.Intersect.threePlanes = function(n0,d0,n1,d1,n2,d2) {
 	return verb.core.Vec.mul(1 / den,num);
 };
 verb.core.Intersect.polylines = function(polyline0,polyline1,tol) {
-	var res = verb.core.Intersect.bounding_box_trees(new verb.core.types.LazyPolylineBoundingBoxTree(polyline0),new verb.core.types.LazyPolylineBoundingBoxTree(polyline1),tol);
+	var res = verb.core.Intersect.boundingBoxTrees(new verb.core.types.LazyPolylineBoundingBoxTree(polyline0),new verb.core.types.LazyPolylineBoundingBoxTree(polyline1),tol);
 	var finalResults = [];
 	var _g = 0;
 	while(_g < res.length) {
@@ -2053,7 +2053,7 @@ verb.core.Intersect.segmentWithTriangle = function(p0,p1,points,tri) {
 	if(s > 1.0000000001 || t > 1.0000000001 || t < -1e-10 || s < -1e-10 || s + t > 1.0000000001) return null;
 	return new verb.core.types.TriSegmentIntersection(pt,s,t,r);
 };
-verb.core.Intersect.segment_with_plane = function(p0,p1,v0,n) {
+verb.core.Intersect.segmentAndPlane = function(p0,p1,v0,n) {
 	var denom = verb.core.Vec.dot(n,verb.core.Vec.sub(p0,p1));
 	if(Math.abs(denom) < 1e-10) return null;
 	var numer = verb.core.Vec.dot(n,verb.core.Vec.sub(v0,p0));

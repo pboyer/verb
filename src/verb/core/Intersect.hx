@@ -200,7 +200,7 @@ class Intersect {
         if (bbtree1 == null) bbtree1 = new LazyMeshBoundingBoxTree( mesh1 );
 
         // bounding box intersection to get all of the face pairs
-        var bbints = Intersect.bounding_box_trees( bbtree0, bbtree1, 0 );
+        var bbints = Intersect.boundingBoxTrees( bbtree0, bbtree1, 0 );
 
         // get the segments of the intersection crv with uvs
         var segments0 = bbints.map(function(ids : Pair<Int, Int>){
@@ -411,7 +411,7 @@ class Intersect {
                                               surface : NurbsSurfaceData,
                                               tol : Float = 1e-3 ) : Array<CurveSurfaceIntersection>  {
 
-        var ints = Intersect.bounding_box_trees(
+        var ints = Intersect.boundingBoxTrees(
             new LazyCurveBoundingBoxTree( curve ),
             new LazySurfaceBoundingBoxTree( surface ), 0 );
 
@@ -479,11 +479,11 @@ class Intersect {
     // **returns**
     // + an array of PolylineMeshIntersection object
 
-    public static function polyline_and_mesh( polyline : PolylineData,
+    public static function polylineAndMesh( polyline : PolylineData,
                                               mesh : MeshData,
                                               tol : Float ) : Array<PolylineMeshIntersection> {
 
-        var res = Intersect.bounding_box_trees(
+        var res = Intersect.boundingBoxTrees(
             new LazyPolylineBoundingBoxTree( polyline ),
             new LazyMeshBoundingBoxTree( mesh ), tol );
 
@@ -509,7 +509,7 @@ class Intersect {
     }
 
     public static function mesh_bounding_boxes( a : MeshData, b : MeshData, tol : Float ) : Array<Pair<Int,Int>> {
-        return Intersect.bounding_box_trees(new LazyMeshBoundingBoxTree(a), new LazyMeshBoundingBoxTree(b), tol );
+        return Intersect.boundingBoxTrees(new LazyMeshBoundingBoxTree(a), new LazyMeshBoundingBoxTree(b), tol );
     }
 
     // The core algorithm for bounding box tree intersection, supporting both lazy and pre-computed bounding box trees
@@ -523,7 +523,7 @@ class Intersect {
     // **returns**
     // + an array of Pair objects extracted from the yield method of IBoundingBoxTree
 
-    public static function bounding_box_trees<T1, T2>( a : IBoundingBoxTree<T1>, b : IBoundingBoxTree<T2>, tol : Float = 1e-9 )
+    public static function boundingBoxTrees<T1, T2>( a : IBoundingBoxTree<T1>, b : IBoundingBoxTree<T2>, tol : Float = 1e-9 )
         : Array<Pair<T1,T2>> {
 
         if (a.empty() || b.empty()) return [];
@@ -535,10 +535,10 @@ class Intersect {
         var asplit = a.split()
             , bsplit = b.split();
 
-        return     Intersect.bounding_box_trees( asplit.item0, bsplit.item0, tol )
-            .concat( Intersect.bounding_box_trees( asplit.item0, bsplit.item1, tol  ) )
-            .concat( Intersect.bounding_box_trees( asplit.item1, bsplit.item0, tol  ) )
-            .concat( Intersect.bounding_box_trees( asplit.item1, bsplit.item1, tol  ) );
+        return     Intersect.boundingBoxTrees( asplit.item0, bsplit.item0, tol )
+            .concat( Intersect.boundingBoxTrees( asplit.item0, bsplit.item1, tol  ) )
+            .concat( Intersect.boundingBoxTrees( asplit.item1, bsplit.item0, tol  ) )
+            .concat( Intersect.boundingBoxTrees( asplit.item1, bsplit.item1, tol  ) );
     }
 
     // Approximate the intersection of two NURBS curves
@@ -553,12 +553,12 @@ class Intersect {
 
     public static function curves( curve1 : NurbsCurveData, curve2 : NurbsCurveData, tolerance : Float ) : Array<CurveCurveIntersection> {
 
-        var ints = Intersect.bounding_box_trees(
+        var ints = Intersect.boundingBoxTrees(
             new LazyCurveBoundingBoxTree( curve1 ),
             new LazyCurveBoundingBoxTree( curve2 ), 0 );
 
         return ints.map(function(x : Pair<NurbsCurveData, NurbsCurveData>) : CurveCurveIntersection {
-            return Intersect.curves_with_estimate( curve1, curve2, x.item0.knots.first(), x.item1.knots.first(), tolerance );
+            return Intersect.curvesWithEstimate( curve1, curve2, x.item0.knots.first(), x.item1.knots.first(), tolerance );
         });
     }
 
@@ -575,7 +575,7 @@ class Intersect {
     // **returns**
     // + array of CurveCurveIntersection objects
 
-    private static function curves_with_estimate( curve0 : NurbsCurveData,
+    private static function curvesWithEstimate( curve0 : NurbsCurveData,
                                                   curve1 : NurbsCurveData,
                                                   u0 : Float,
                                                   u1 : Float,
@@ -846,7 +846,7 @@ class Intersect {
     public static function polylines( polyline0 : PolylineData, polyline1 : PolylineData, tol : Float )
         : Array<CurveCurveIntersection> {
 
-        var res = Intersect.bounding_box_trees(
+        var res = Intersect.boundingBoxTrees(
             new LazyPolylineBoundingBoxTree( polyline0 ),
             new LazyPolylineBoundingBoxTree( polyline1 ), tol );
 
@@ -1024,7 +1024,7 @@ class Intersect {
     // **returns**
     // null or an object with a p property representing the param on the segment
 
-    public static function segment_with_plane( p0 : Point, p1 : Point, v0 : Point, n : Point ) {
+    public static function segmentAndPlane( p0 : Point, p1 : Point, v0 : Point, n : Point ) {
 
         var denom = Vec.dot( n, Vec.sub(p0,p1) );
 
