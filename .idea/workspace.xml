@@ -6,8 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="938890c0-f1ce-4fbd-8322-63610af7f5e6" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/Intersect.hx" afterPath="$PROJECT_DIR$/src/verb/core/Intersect.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/js/verb.js" afterPath="$PROJECT_DIR$/build/js/verb.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/js/verbHaxe.js" afterPath="$PROJECT_DIR$/build/js/verbHaxe.js" />
     </list>
     <ignored path="verb.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -35,11 +33,11 @@
       <file leaf-file-name="Intersect.hx" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/verb/core/Intersect.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="2.6623712" vertical-offset="12739" max-vertical-offset="15075">
-              <caret line="1031" column="49" selection-start-line="1031" selection-start-column="49" selection-end-line="1031" selection-end-column="49" />
+            <state vertical-scroll-proportion="0.560567" vertical-offset="0" max-vertical-offset="14895">
+              <caret line="29" column="26" selection-start-line="29" selection-start-column="26" selection-end-line="29" selection-end-column="26" />
               <folding>
                 <element signature="e#2575#3331#0" expanded="false" />
-                <element signature="e#16464#17292#0" expanded="false" />
+                <element signature="e#16181#17009#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -1029,11 +1027,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/verb/core/Intersect.hx">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="2.6623712" vertical-offset="12739" max-vertical-offset="15075">
-          <caret line="1031" column="49" selection-start-line="1031" selection-start-column="49" selection-end-line="1031" selection-end-column="49" />
+        <state vertical-scroll-proportion="0.560567" vertical-offset="0" max-vertical-offset="14895">
+          <caret line="29" column="26" selection-start-line="29" selection-start-column="26" selection-end-line="29" selection-end-column="26" />
           <folding>
             <element signature="e#2575#3331#0" expanded="false" />
-            <element signature="e#16464#17292#0" expanded="false" />
+            <element signature="e#16181#17009#0" expanded="false" />
           </folding>
         </state>
       </provider>

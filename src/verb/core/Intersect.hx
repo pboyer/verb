@@ -203,19 +203,11 @@ class Intersect {
         var bbints = Intersect.boundingBoxTrees( bbtree0, bbtree1, 0 );
 
         // get the segments of the intersection crv with uvs
-        var segments0 = bbints.map(function(ids : Pair<Int, Int>){
+        var segments = bbints.map(function(ids : Pair<Int, Int>){
             return Intersect.triangles( mesh0, ids.item0, mesh1, ids.item1 );
-        });
-
-//        trace( "segments0: " + segments0.length );
-
-        var segments1 = segments0.filter(function(x){
+        }).filter(function(x){
             return x != null;
-        });
-
-//        trace( "segments1: " + segments1.length );
-
-        var segments = segments1.filter(function(x){
+        }).filter(function(x){
             return Vec.distSquared( x.min.point, x.max.point ) > Constants.EPSILON;
         }).unique(function(a, b){
 
@@ -238,8 +230,6 @@ class Intersect {
             return ( d1 < Constants.EPSILON && d2 < Constants.EPSILON ) ||
                 ( d3 < Constants.EPSILON && d4 < Constants.EPSILON );
         });
-
-//        trace( "segments: " + segments.length );
 
         return makeMeshIntersectionPolylines( segments );
     }
@@ -294,8 +284,6 @@ class Intersect {
         if (freeEnds.length == 0) {
             freeEnds = ends;
         }
-
-//        trace("freeEnds: " + freeEnds.length );
 
         var pls = [];
         var numVisitedEnds = 0;
