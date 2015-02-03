@@ -5,7 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="938890c0-f1ce-4fbd-8322-63610af7f5e6" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/Intersect.hx" afterPath="$PROJECT_DIR$/src/verb/core/Intersect.hx" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/ExpIntersect.hx" afterPath="$PROJECT_DIR$/src/verb/core/ExpIntersect.hx" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/js/verbHaxe.js" afterPath="$PROJECT_DIR$/build/js/verbHaxe.js" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="verb.iws" />
     <ignored path=".idea/workspace.xml" />
@@ -30,10 +32,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="Intersect.hx" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Intersect.hx" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/verb/core/Intersect.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.560567" vertical-offset="0" max-vertical-offset="14895">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="14895">
               <caret line="29" column="26" selection-start-line="29" selection-start-column="26" selection-end-line="29" selection-end-column="26" />
               <folding>
                 <element signature="e#2575#3331#0" expanded="false" />
@@ -43,11 +45,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="test.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/test/test.js">
+      <file leaf-file-name="ExpIntersect.hx" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/verb/core/ExpIntersect.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="33692" max-vertical-offset="104820">
-              <caret line="2267" column="32" selection-start-line="2267" selection-start-column="32" selection-end-line="2267" selection-end-column="32" />
+            <state vertical-scroll-proportion="0.44458762" vertical-offset="0" max-vertical-offset="1185">
+              <caret line="23" column="38" selection-start-line="23" selection-start-column="38" selection-end-line="23" selection-end-column="38" />
               <folding />
             </state>
           </provider>
@@ -144,7 +146,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/examples/surfaceClosestPoint.html" />
         <option value="$PROJECT_DIR$/src/verb/core/Eval.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Validate.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Analyze.hx" />
@@ -195,6 +196,7 @@
         <option value="$PROJECT_DIR$/src/verb/topo/Face.hx" />
         <option value="$PROJECT_DIR$/src/verb/topo/Edge.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Intersect.hx" />
+        <option value="$PROJECT_DIR$/src/verb/core/ExpIntersect.hx" />
       </list>
     </option>
   </component>
@@ -604,14 +606,6 @@
     <option name="FILTER_TARGETS" value="false" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/src/verb/geom/ISurface.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="776">
-          <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/verb/core/Check.hx">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="801" max-vertical-offset="1590">
@@ -1027,12 +1021,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/verb/core/Intersect.hx">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.560567" vertical-offset="0" max-vertical-offset="14895">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="14895">
           <caret line="29" column="26" selection-start-line="29" selection-start-column="26" selection-end-line="29" selection-end-column="26" />
           <folding>
             <element signature="e#2575#3331#0" expanded="false" />
             <element signature="e#16181#17009#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/core/ExpIntersect.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.44458762" vertical-offset="0" max-vertical-offset="1185">
+          <caret line="23" column="38" selection-start-line="23" selection-start-column="38" selection-end-line="23" selection-end-column="38" />
+          <folding />
         </state>
       </provider>
     </entry>
