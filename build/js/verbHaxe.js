@@ -1578,6 +1578,56 @@ verb.core.Eval.knotSpanGivenN = function(n,degree,u,knots) {
 	}
 	return mid;
 };
+verb.core.ITuple3 = function() { };
+verb.core.ITuple3.__name__ = ["verb","core","ITuple3"];
+verb.core.ITuple4 = function() { };
+verb.core.ITuple4.__name__ = ["verb","core","ITuple4"];
+verb.core.Tuple3 = function(item0,item1,item2) {
+	this.item0 = item0;
+	this.item1 = item1;
+	this.item2 = item2;
+};
+verb.core.Tuple3.__name__ = ["verb","core","Tuple3"];
+verb.core.Tuple3.__interfaces__ = [verb.core.ITuple3];
+verb.core.Tuple4 = function(item0,item1,item2,item3) {
+	this.item0 = item0;
+	this.item1 = item1;
+	this.item2 = item2;
+	this.item3 = item3;
+};
+verb.core.Tuple4.__name__ = ["verb","core","Tuple4"];
+verb.core.Tuple4.__interfaces__ = [verb.core.ITuple4];
+verb.core.ITriple = function() { };
+verb.core.ITriple.__name__ = ["verb","core","ITriple"];
+verb.core.IQuadruple = function() { };
+verb.core.IQuadruple.__name__ = ["verb","core","IQuadruple"];
+verb.core.Triple = function(item0,item1,item2) {
+	this.item0 = item0;
+	this.item1 = item1;
+	this.item2 = item2;
+};
+verb.core.Triple.__name__ = ["verb","core","Triple"];
+verb.core.Triple.__interfaces__ = [verb.core.ITriple];
+verb.core.Quadruple = function(item0,item1,item2,item3) {
+	this.item0 = item0;
+	this.item1 = item1;
+	this.item2 = item2;
+	this.item3 = item3;
+};
+verb.core.Quadruple.__name__ = ["verb","core","Quadruple"];
+verb.core.Quadruple.__interfaces__ = [verb.core.IQuadruple];
+verb.core.ExpIntersect = function() { };
+verb.core.ExpIntersect.__name__ = ["verb","core","ExpIntersect"];
+verb.core.ExpIntersect.surfaceEdges = function(surface) {
+	var c0 = verb.core.Make.surfaceIsocurve(surface,surface.knotsU[0],false);
+	var c1 = verb.core.Make.surfaceIsocurve(surface,verb.core.ArrayExtensions.last(surface.knotsU),false);
+	var c2 = verb.core.Make.surfaceIsocurve(surface,surface.knotsV[0],true);
+	var c3 = verb.core.Make.surfaceIsocurve(surface,verb.core.ArrayExtensions.last(surface.knotsV),true);
+	return new verb.core.Quadruple(c0,c1,c2,c3);
+};
+verb.core.ExpIntersect.intersectEdgeCurves = function() {
+	return null;
+};
 verb.core.Intersect = $hx_exports.core.Intersect = function() { };
 verb.core.Intersect.__name__ = ["verb","core","Intersect"];
 verb.core.Intersect.meshSlices = function(mesh,min,max,step) {

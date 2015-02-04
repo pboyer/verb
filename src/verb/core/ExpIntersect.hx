@@ -2,10 +2,217 @@ package verb.core;
 
 // experimental surface intersection work
 
-class ExpIntersect {
-    public function new() {
+import verb.core.types.MeshData.UV;
+import verb.core.types.LazySurfaceBoundingBoxTree;
+import verb.core.types.CurveSurfaceIntersection;
+using verb.core.ArrayExtensions;
+using verb.core.Vec;
+
+import verb.core.types.NurbsSurfaceData;
+import verb.core.types.NurbsCurveData;
+
+interface ITuple3<T1,T2,T3>{
+
+    public var item0 : T1;
+    public var item1 : T2;
+    public var item2 : T3;
+
+}
+
+interface ITuple4<T1,T2,T3,T4>{
+
+    public var item0 : T1;
+    public var item1 : T2;
+    public var item2 : T3;
+    public var item3 : T4;
+
+}
+
+class Tuple3<T1,T2,T3> implements ITuple3<T1,T2,T3> {
+
+    public var item0 : T1;
+    public var item1 : T2;
+    public var item2 : T3;
+
+    public function new(item0, item1, item2){
+        this.item0 = item0;
+        this.item1 = item1;
+        this.item2 = item2;
     }
 }
+
+class Tuple4<T1,T2,T3,T4> implements ITuple4<T1,T2,T3,T4> {
+
+    public var item0 : T1;
+    public var item1 : T2;
+    public var item2 : T3;
+    public var item3 : T4;
+
+    public function new(item0, item1, item2, item3){
+        this.item0 = item0;
+        this.item1 = item1;
+        this.item2 = item2;
+        this.item3 = item3;
+    }
+}
+
+interface ITriple<T>{
+
+    public var item0 : T;
+    public var item1 : T;
+    public var item2 : T;
+
+}
+
+interface IQuadruple<T>{
+
+    public var item0 : T;
+    public var item1 : T;
+    public var item2 : T;
+    public var item3 : T;
+
+}
+
+class Triple<T> implements ITriple<T> {
+
+    public var item0 : T;
+    public var item1 : T;
+    public var item2 : T;
+
+    public function new(item0, item1, item2){
+        this.item0 = item0;
+        this.item1 = item1;
+        this.item2 = item2;
+    }
+}
+
+class Quadruple<T> implements IQuadruple<T> {
+
+    public var item0 : T;
+    public var item1 : T;
+    public var item2 : T;
+    public var item3 : T;
+
+    public function new(item0, item1, item2, item3){
+        this.item0 = item0;
+        this.item1 = item1;
+        this.item2 = item2;
+        this.item3 = item3;
+    }
+}
+
+class ExpIntersect {
+
+    public static function surfaceBoundaryCurves(surface : NurbsSurfaceData) : IQuadruple<NurbsCurveData>{
+
+        var c0 = Make.surfaceIsocurve( surface, surface.knotsU.first(), false );
+        var c1 = Make.surfaceIsocurve( surface, surface.knotsU.last(), false );
+        var c2 = Make.surfaceIsocurve( surface, surface.knotsV.first(), true );
+        var c3 = Make.surfaceIsocurve( surface, surface.knotsV.last(), true );
+
+        return new Quadruple(c0, c1, c2, c3);
+    }
+
+    public static function intersectBoundaryCurves(surface0 : NurbsSurfaceData, surface1 : NurbsSurfaceData, tol : Float) : Array<CurveSurfaceIntersection> {
+
+        var surface0Boundaries = surfaceBoundaryCurves( surface0 );
+        var surface1Boundaries = surfaceBoundaryCurves( surface1 );
+
+        var ints = [];
+
+        ints = ints.concat(Intersect.curveAndSurface(surface0Boundaries.item0, surface1, tol ));
+        ints = ints.concat(Intersect.curveAndSurface(surface0Boundaries.item1, surface1, tol ));
+        ints = ints.concat(Intersect.curveAndSurface(surface0Boundaries.item2, surface1, tol ));
+        ints = ints.concat(Intersect.curveAndSurface(surface0Boundaries.item3, surface1, tol ));
+
+        ints = ints.concat(Intersect.curveAndSurface(surface1Boundaries.item0, surface0, tol ));
+        ints = ints.concat(Intersect.curveAndSurface(surface1Boundaries.item1, surface0, tol ));
+        ints = ints.concat(Intersect.curveAndSurface(surface1Boundaries.item2, surface0, tol ));
+        ints = ints.concat(Intersect.curveAndSurface(surface1Boundaries.item3, surface0, tol ));
+
+        return ints;
+    }
+
+    public static function surfaces(surface0 : NurbsSurfaceData, surface1 : NurbsSurfaceData, tol : Float) {
+
+
+        var exactOuter = intersectBoundaryCurves( surface0, surface1, tol );
+
+        var approxInner = approxInnerCriticalPts( surface0, surface1 );
+        var refinedInner = refineInnerCriticalPts( surface0, surface1, approxInner );
+
+        return null;
+    }
+
+    public static function refineInnerCriticalPts(surface0 : NurbsSurfaceData, surface1 : NurbsSurfaceData, approx : Array<UV> ){
+
+        // perform minimization of function
+        // the newton iteration?
+
+        return null;
+
+    }
+
+
+    public static function verifyInnerCriticalPts(surface0 : NurbsSurfaceData, surface1 : NurbsSurfaceData, approx : Array<UV> ){
+
+
+
+        return null;
+
+    }
+
+    public static function approxInnerCriticalPts(surface0 : NurbsSurfaceData, surface1 : NurbsSurfaceData) : Array<UV> {
+
+        // yield a collection of intersecting sub patches
+        var maxDivs = 10;
+
+        var div0 = new LazySurfaceBoundingBoxTree( surface0, surface0.knotsU.domain() / maxDivs, surface0.knotsV.domain() / maxDivs );
+        var div1 = new LazySurfaceBoundingBoxTree( surface1, surface1.knotsU.domain() / maxDivs, surface1.knotsV.domain() / maxDivs );
+
+        var res = Intersect.boundingBoxTrees(div0, div1);
+
+        // for each surface pair, construct del phi 2d array
+        for (srfpair in res){
+
+            var subsrf0 = srfpair.item0;
+            var subsrf1 = srfpair.item1;
+
+            // for all control pt pairs, we construct del phi
+            var subsrfdelphi = [];
+
+            for (row in subsrf0.controlPoints){
+
+                var delphirow = [];
+                subsrfdelphi.push(delphirow);
+
+                for (homopt in row){
+
+                    // dehomogenize the pt
+                    var pt = Eval.dehomogenize( homopt );
+
+
+
+
+
+                }
+
+            }
+
+
+        }
+
+        return null;
+    }
+
+
+
+
+
+}
+
+
+
 
 // developing the del phi field
 

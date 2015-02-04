@@ -10,6 +10,10 @@ using Lambda;
 @:expose("core.Vec")
 class Vec {
 
+    public static function domain(a : Array<Float>) : Float {
+        return a.last() - a.first();
+    }
+
     public static function range(max : Int) : Array<Float> {
         var l = [];
         var f = 0.0;

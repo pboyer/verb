@@ -1,6 +1,7 @@
 package verb;
 
 // intersection
+import verb.core.ExpIntersect;
 import verb.geom.Intersect;
 
 // curves

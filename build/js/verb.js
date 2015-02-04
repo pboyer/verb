@@ -1711,13 +1711,11 @@ verb.core.Intersect.meshes = function(mesh0,mesh1,bbtree0,bbtree1) {
 	if(bbtree0 == null) bbtree0 = new verb.core.types.LazyMeshBoundingBoxTree(mesh0);
 	if(bbtree1 == null) bbtree1 = new verb.core.types.LazyMeshBoundingBoxTree(mesh1);
 	var bbints = verb.core.Intersect.boundingBoxTrees(bbtree0,bbtree1,0);
-	var segments0 = bbints.map(function(ids) {
+	var segments = verb.core.ArrayExtensions.unique(bbints.map(function(ids) {
 		return verb.core.Intersect.triangles(mesh0,ids.item0,mesh1,ids.item1);
-	});
-	var segments1 = segments0.filter(function(x) {
+	}).filter(function(x) {
 		return x != null;
-	});
-	var segments = verb.core.ArrayExtensions.unique(segments1.filter(function(x1) {
+	}).filter(function(x1) {
 		return verb.core.Vec.distSquared(x1.min.point,x1.max.point) > 1e-10;
 	}),function(a,b) {
 		var s1 = verb.core.Vec.sub(a.min.uv0,b.min.uv0);

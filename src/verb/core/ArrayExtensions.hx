@@ -2,6 +2,7 @@ package verb.core;
 
 class ArrayExtensions {
 
+
     // Obtain a reversed copy of an array
     //
     // **params**
