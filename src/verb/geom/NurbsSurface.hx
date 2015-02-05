@@ -1,5 +1,6 @@
 package verb.geom;
 
+import verb.core.ExpIntersect.Quadruple;
 import verb.core.Check;
 import verb.core.Vec;
 import verb.core.Make;
@@ -274,6 +275,23 @@ class NurbsSurface extends AsyncObject implements ISurface {
     public function isocurveAsync( u : Float, useV : Bool = false ) : Promise<NurbsCurve> {
         return defer( Make, 'surfaceIsocurve', [ _data, u, useV ] )
             .then(function(x){ return new NurbsCurve(x); });
+    }
+
+    // Extract the boundary curves from a surface
+    //
+    // **returns**
+    // + an array containing 4 elements, first 2 curves in the V direction, then 2 curves in the U direction
+
+    public function boundaries( options : AdaptiveRefinementOptions = null) : Array<NurbsCurve> {
+        return Make.surfaceBoundaryCurves( _data ).map(function(x){ return new NurbsCurve(x); });
+    }
+
+    public function boundariesAsync( options : AdaptiveRefinementOptions = null ) : Promise<Array<NurbsCurve>> {
+        return defer( Make, 'surfaceBoundaryCurves', [ _data ] )
+            .then(function(cs : Array<NurbsCurveData>){
+                return cs.map(function(x){ return new NurbsCurve(x); });
+            });
+
     }
 
     // Tessellate the surface

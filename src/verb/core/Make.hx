@@ -1,5 +1,6 @@
 package verb.core;
 
+import verb.core.ExpIntersect;
 import verb.geom.NurbsSurface;
 import verb.core.types.Interval;
 import verb.core.Mat.Vector;
@@ -22,37 +23,42 @@ class Make {
 
     public static function rationalTranslationalSurface( profile : NurbsCurveData, rail : NurbsCurveData ) : NurbsSurfaceData {
 
-        // for each point on rail, move all of the points
-        var rail_start = Eval.rationalCurvePoint( rail, rail.knots.first() )
-        , startu = rail.knots.first()
-        , endu = rail.knots.last()
-        , span = ( endu - startu ) / (rail.controlPoints.length-1)
-        , controlPoints = []
-        , weights = []
-        , rail_weights = Eval.weight1d( rail.controlPoints )
-        , profile_weights = Eval.weight1d( profile.controlPoints )
-        , profile_points = Eval.dehomogenize1d( profile.controlPoints );
+        var pt0 = Eval.rationalCurvePoint( rail, rail.knots.first() )
+            , startu = rail.knots.first()
+            , endu = rail.knots.last()
+            , numSamples = 2 * rail.controlPoints.length
+            , span = ( endu - startu ) / (numSamples-1);
 
-        for ( i in 0...rail.controlPoints.length ){
+        var crvs = [];
 
-            // translation is from start to pt on rail
-            var rail_point = Eval.rationalCurvePoint( rail, i * span )
-            , rail_offset = Vec.sub( rail_point, rail_start )
-            , row_controlPoints = []
-            , row_weights = [];
+        for ( i in 0...numSamples ){
 
-            // translate the profile
-            for ( j in 0...profile.controlPoints.length ){
-                row_controlPoints.push( Vec.add(rail_offset, profile_points[j] ) );
-                row_weights.push( profile_weights[j] * rail_weights[i] );
-            }
+            var pt = Vec.sub( Eval.rationalCurvePoint( rail, startu + i * span ), pt0 );
 
-            controlPoints.push( row_controlPoints);
-            weights.push( row_weights );
+            var crv = Modify.rationalCurveTransform(profile, [[1,0,0,pt[0]], [0,1,0,pt[1]], [0,0,1,pt[2]], [0,0,0,1]]);
+            crvs.push( crv );
+
         }
 
-        return new NurbsSurfaceData( rail.degree, profile.degree, rail.knots, profile.knots, Eval.homogenize2d( controlPoints, weights) );
+        return Make.loftedSurface( crvs );
     }
+
+    // Extract the boundary curves from a surface
+    //
+    // **returns**
+    // + an array containing 4 elements, first 2 curves in the V direction, then 2 curves in the U direction
+
+    public static function surfaceBoundaryCurves(surface : NurbsSurfaceData) : Array<NurbsCurveData> {
+        var crvs = [];
+
+        var c0 = Make.surfaceIsocurve( surface, surface.knotsU.first(), false );
+        var c1 = Make.surfaceIsocurve( surface, surface.knotsU.last(), false );
+        var c2 = Make.surfaceIsocurve( surface, surface.knotsV.first(), true );
+        var c3 = Make.surfaceIsocurve( surface, surface.knotsV.last(), true );
+
+        return [c0, c1, c2, c3];
+    }
+
 
     public static function surfaceIsocurve( surface : NurbsSurfaceData, u : Float, useV : Bool = false ) : NurbsCurveData {
 

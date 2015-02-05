@@ -103,32 +103,20 @@ class Quadruple<T> implements IQuadruple<T> {
 
 class ExpIntersect {
 
-    public static function surfaceBoundaryCurves(surface : NurbsSurfaceData) : IQuadruple<NurbsCurveData>{
-
-        var c0 = Make.surfaceIsocurve( surface, surface.knotsU.first(), false );
-        var c1 = Make.surfaceIsocurve( surface, surface.knotsU.last(), false );
-        var c2 = Make.surfaceIsocurve( surface, surface.knotsV.first(), true );
-        var c3 = Make.surfaceIsocurve( surface, surface.knotsV.last(), true );
-
-        return new Quadruple(c0, c1, c2, c3);
-    }
-
     public static function intersectBoundaryCurves(surface0 : NurbsSurfaceData, surface1 : NurbsSurfaceData, tol : Float) : Array<CurveSurfaceIntersection> {
 
-        var surface0Boundaries = surfaceBoundaryCurves( surface0 );
-        var surface1Boundaries = surfaceBoundaryCurves( surface1 );
+        var surface0Boundaries = Make.surfaceBoundaryCurves( surface0 );
+        var surface1Boundaries = Make.surfaceBoundaryCurves( surface1 );
 
         var ints = [];
 
-        ints = ints.concat(Intersect.curveAndSurface(surface0Boundaries.item0, surface1, tol ));
-        ints = ints.concat(Intersect.curveAndSurface(surface0Boundaries.item1, surface1, tol ));
-        ints = ints.concat(Intersect.curveAndSurface(surface0Boundaries.item2, surface1, tol ));
-        ints = ints.concat(Intersect.curveAndSurface(surface0Boundaries.item3, surface1, tol ));
+        for (crv in surface0Boundaries){
+            ints = ints.concat(Intersect.curveAndSurface(crv, surface1, tol ));
+        }
 
-        ints = ints.concat(Intersect.curveAndSurface(surface1Boundaries.item0, surface0, tol ));
-        ints = ints.concat(Intersect.curveAndSurface(surface1Boundaries.item1, surface0, tol ));
-        ints = ints.concat(Intersect.curveAndSurface(surface1Boundaries.item2, surface0, tol ));
-        ints = ints.concat(Intersect.curveAndSurface(surface1Boundaries.item3, surface0, tol ));
+        for (crv in surface1Boundaries){
+            ints = ints.concat(Intersect.curveAndSurface(crv, surface0, tol ));
+        }
 
         return ints;
     }

@@ -6942,9 +6942,9 @@ describe("verb.core.Make.rationalTranslationalSurface",function(){
         var srf = verb.core.Make.rationalTranslationalSurface( prof, rail );
 
         vecShouldBe( verb.core.Eval.rationalSurfacePoint( srf, 0, 0 ), [0,0,0] );
-        vecShouldBe( verb.core.Eval.rationalSurfacePoint( srf, 1, 0 ), [1,1,1] );
+        vecShouldBe( verb.core.Eval.rationalSurfacePoint( srf, 1, 0 ), [1,0,0] );
         vecShouldBe( verb.core.Eval.rationalSurfacePoint( srf, 1, 1 ), [2,1,1] );
-        vecShouldBe( verb.core.Eval.rationalSurfacePoint( srf, 0, 1 ), [1,0,0] );
+        vecShouldBe( verb.core.Eval.rationalSurfacePoint( srf, 0, 1 ), [1,1,1] );
 
 	});
 
@@ -6956,9 +6956,9 @@ describe("verb.core.Make.rationalTranslationalSurface",function(){
         var srf = verb.core.Make.rationalTranslationalSurface( prof, rail );
 
         vecShouldBe( verb.core.Eval.rationalSurfacePoint( srf, 0, 0 ), [0,0,0] );
-        vecShouldBe( verb.core.Eval.rationalSurfacePoint( srf, 1, 0 ), [2,1,1] );
+        vecShouldBe( verb.core.Eval.rationalSurfacePoint( srf, 1, 0 ), [2,0,0] );
         vecShouldBe( verb.core.Eval.rationalSurfacePoint( srf, 1, 1 ), [4,1,1] );
-        vecShouldBe( verb.core.Eval.rationalSurfacePoint( srf, 0, 1 ), [2,0,0] );
+        vecShouldBe( verb.core.Eval.rationalSurfacePoint( srf, 0, 1 ), [2,1,1] );
 
     });
 
@@ -6974,9 +6974,43 @@ describe("verb.geom.SweptSurface",function(){
         var srf = new verb.geom.SweptSurface( prof, rail );
 
         vecShouldBe( srf.point( 0, 0 ), [0,0,0] );
-        vecShouldBe( srf.point( 1, 0 ), [2,1,1] );
+        vecShouldBe( srf.point( 1, 0 ), [2,0,0] );
         vecShouldBe( srf.point( 1, 1 ), [4,1,1] );
-        vecShouldBe( srf.point( 0, 1 ), [2,0,0] );
+        vecShouldBe( srf.point( 0, 1 ), [2,1,1] );
+
+    });
+});
+
+describe("verb.core.Make.surfaceBoundaryCurves",function(){
+
+    it('provides expected result for planar surface', function(){
+
+        var a = [0,0,0];
+        var b = [1,0,0];
+        var c = [1,1,0];
+        var d = [0,1,0];
+
+        var srf = verb.core.Make.fourPointSurface( a, b, c, d );
+
+        var crvs = verb.core.Make.surfaceBoundaryCurves( srf );
+
+        crvs[0].degree.should.be.equal( srf.degreeV );
+        crvs[1].degree.should.be.equal( srf.degreeV );
+        crvs[2].degree.should.be.equal( srf.degreeU );
+        crvs[3].degree.should.be.equal( srf.degreeU );
+
+        vecShouldBe( verb.core.Eval.dehomogenize( crvs[0].controlPoints[0] ), a );
+        vecShouldBe( verb.core.Eval.dehomogenize( crvs[0].controlPoints[3] ), d );
+
+        vecShouldBe( verb.core.Eval.dehomogenize( crvs[1].controlPoints[0] ), b );
+        vecShouldBe( verb.core.Eval.dehomogenize( crvs[1].controlPoints[3] ), c );
+
+        vecShouldBe( verb.core.Eval.dehomogenize( crvs[2].controlPoints[0] ), a );
+        vecShouldBe( verb.core.Eval.dehomogenize( crvs[2].controlPoints[3] ), b );
+
+        vecShouldBe( verb.core.Eval.dehomogenize( crvs[3].controlPoints[0] ), d );
+        vecShouldBe( verb.core.Eval.dehomogenize( crvs[3].controlPoints[3] ), c );
+
 
     });
 

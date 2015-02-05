@@ -1618,14 +1618,63 @@ verb.core.Quadruple.__name__ = ["verb","core","Quadruple"];
 verb.core.Quadruple.__interfaces__ = [verb.core.IQuadruple];
 verb.core.ExpIntersect = function() { };
 verb.core.ExpIntersect.__name__ = ["verb","core","ExpIntersect"];
-verb.core.ExpIntersect.surfaceEdges = function(surface) {
-	var c0 = verb.core.Make.surfaceIsocurve(surface,surface.knotsU[0],false);
-	var c1 = verb.core.Make.surfaceIsocurve(surface,verb.core.ArrayExtensions.last(surface.knotsU),false);
-	var c2 = verb.core.Make.surfaceIsocurve(surface,surface.knotsV[0],true);
-	var c3 = verb.core.Make.surfaceIsocurve(surface,verb.core.ArrayExtensions.last(surface.knotsV),true);
-	return new verb.core.Quadruple(c0,c1,c2,c3);
+verb.core.ExpIntersect.intersectBoundaryCurves = function(surface0,surface1,tol) {
+	var surface0Boundaries = verb.core.Make.surfaceBoundaryCurves(surface0);
+	var surface1Boundaries = verb.core.Make.surfaceBoundaryCurves(surface1);
+	var ints = [];
+	var _g = 0;
+	while(_g < surface0Boundaries.length) {
+		var crv = surface0Boundaries[_g];
+		++_g;
+		ints = ints.concat(verb.core.Intersect.curveAndSurface(crv,surface1,tol));
+	}
+	var _g1 = 0;
+	while(_g1 < surface1Boundaries.length) {
+		var crv1 = surface1Boundaries[_g1];
+		++_g1;
+		ints = ints.concat(verb.core.Intersect.curveAndSurface(crv1,surface0,tol));
+	}
+	return ints;
 };
-verb.core.ExpIntersect.intersectEdgeCurves = function() {
+verb.core.ExpIntersect.surfaces = function(surface0,surface1,tol) {
+	var exactOuter = verb.core.ExpIntersect.intersectBoundaryCurves(surface0,surface1,tol);
+	var approxInner = verb.core.ExpIntersect.approxInnerCriticalPts(surface0,surface1);
+	var refinedInner = verb.core.ExpIntersect.refineInnerCriticalPts(surface0,surface1,approxInner);
+	return null;
+};
+verb.core.ExpIntersect.refineInnerCriticalPts = function(surface0,surface1,approx) {
+	return null;
+};
+verb.core.ExpIntersect.verifyInnerCriticalPts = function(surface0,surface1,approx) {
+	return null;
+};
+verb.core.ExpIntersect.approxInnerCriticalPts = function(surface0,surface1) {
+	var maxDivs = 10;
+	var div0 = new verb.core.types.LazySurfaceBoundingBoxTree(surface0,null,verb.core.Vec.domain(surface0.knotsU) / maxDivs,verb.core.Vec.domain(surface0.knotsV) / maxDivs);
+	var div1 = new verb.core.types.LazySurfaceBoundingBoxTree(surface1,null,verb.core.Vec.domain(surface1.knotsU) / maxDivs,verb.core.Vec.domain(surface1.knotsV) / maxDivs);
+	var res = verb.core.Intersect.boundingBoxTrees(div0,div1);
+	var _g = 0;
+	while(_g < res.length) {
+		var srfpair = res[_g];
+		++_g;
+		var subsrf0 = srfpair.item0;
+		var subsrf1 = srfpair.item1;
+		var subsrfdelphi = [];
+		var _g1 = 0;
+		var _g2 = subsrf0.controlPoints;
+		while(_g1 < _g2.length) {
+			var row = _g2[_g1];
+			++_g1;
+			var delphirow = [];
+			subsrfdelphi.push(delphirow);
+			var _g3 = 0;
+			while(_g3 < row.length) {
+				var homopt = row[_g3];
+				++_g3;
+				var pt = verb.core.Eval.dehomogenize(homopt);
+			}
+		}
+	}
 	return null;
 };
 verb.core.Intersect = $hx_exports.core.Intersect = function() { };
@@ -2290,34 +2339,28 @@ verb.core.BinaryHeap.prototype = {
 verb.core.Make = $hx_exports.core.Make = function() { };
 verb.core.Make.__name__ = ["verb","core","Make"];
 verb.core.Make.rationalTranslationalSurface = function(profile,rail) {
-	var rail_start = verb.core.Eval.rationalCurvePoint(rail,rail.knots[0]);
+	var pt0 = verb.core.Eval.rationalCurvePoint(rail,rail.knots[0]);
 	var startu = rail.knots[0];
 	var endu = verb.core.ArrayExtensions.last(rail.knots);
-	var span = (endu - startu) / (rail.controlPoints.length - 1);
-	var controlPoints = [];
-	var weights = [];
-	var rail_weights = verb.core.Eval.weight1d(rail.controlPoints);
-	var profile_weights = verb.core.Eval.weight1d(profile.controlPoints);
-	var profile_points = verb.core.Eval.dehomogenize1d(profile.controlPoints);
-	var _g1 = 0;
-	var _g = rail.controlPoints.length;
-	while(_g1 < _g) {
-		var i = _g1++;
-		var rail_point = verb.core.Eval.rationalCurvePoint(rail,i * span);
-		var rail_offset = verb.core.Vec.sub(rail_point,rail_start);
-		var row_controlPoints = [];
-		var row_weights = [];
-		var _g3 = 0;
-		var _g2 = profile.controlPoints.length;
-		while(_g3 < _g2) {
-			var j = _g3++;
-			row_controlPoints.push(verb.core.Vec.add(rail_offset,profile_points[j]));
-			row_weights.push(profile_weights[j] * rail_weights[i]);
-		}
-		controlPoints.push(row_controlPoints);
-		weights.push(row_weights);
+	var numSamples = 2 * rail.controlPoints.length;
+	var span = (endu - startu) / (numSamples - 1);
+	var crvs = [];
+	var _g = 0;
+	while(_g < numSamples) {
+		var i = _g++;
+		var pt = verb.core.Vec.sub(verb.core.Eval.rationalCurvePoint(rail,startu + i * span),pt0);
+		var crv = verb.core.Modify.rationalCurveTransform(profile,[[1,0,0,pt[0]],[0,1,0,pt[1]],[0,0,1,pt[2]],[0,0,0,1]]);
+		crvs.push(crv);
 	}
-	return new verb.core.types.NurbsSurfaceData(rail.degree,profile.degree,rail.knots,profile.knots,verb.core.Eval.homogenize2d(controlPoints,weights));
+	return verb.core.Make.loftedSurface(crvs);
+};
+verb.core.Make.surfaceBoundaryCurves = function(surface) {
+	var crvs = [];
+	var c0 = verb.core.Make.surfaceIsocurve(surface,surface.knotsU[0],false);
+	var c1 = verb.core.Make.surfaceIsocurve(surface,verb.core.ArrayExtensions.last(surface.knotsU),false);
+	var c2 = verb.core.Make.surfaceIsocurve(surface,surface.knotsV[0],true);
+	var c3 = verb.core.Make.surfaceIsocurve(surface,verb.core.ArrayExtensions.last(surface.knotsV),true);
+	return [c0,c1,c2,c3];
 };
 verb.core.Make.surfaceIsocurve = function(surface,u,useV) {
 	if(useV == null) useV = false;
@@ -4037,6 +4080,9 @@ verb.core.Trig.segmentClosestPoint = function(pt,segpt0,segpt1,u0,u1) {
 };
 verb.core.Vec = $hx_exports.core.Vec = function() { };
 verb.core.Vec.__name__ = ["verb","core","Vec"];
+verb.core.Vec.domain = function(a) {
+	return a[a.length - 1] - a[0];
+};
 verb.core.Vec.range = function(max) {
 	var l = [];
 	var f = 0.0;
@@ -5343,6 +5389,18 @@ verb.geom.NurbsSurface.prototype = $extend(verb.exe.AsyncObject.prototype,{
 		if(useV == null) useV = false;
 		return this.defer(verb.core.Make,"surfaceIsocurve",[this._data,u,useV]).then(function(x) {
 			return new verb.geom.NurbsCurve(x);
+		});
+	}
+	,boundaries: function(options) {
+		return verb.core.Make.surfaceBoundaryCurves(this._data).map(function(x) {
+			return new verb.geom.NurbsCurve(x);
+		});
+	}
+	,boundariesAsync: function(options) {
+		return this.defer(verb.core.Make,"surfaceBoundaryCurves",[this._data]).then(function(cs) {
+			return cs.map(function(x) {
+				return new verb.geom.NurbsCurve(x);
+			});
 		});
 	}
 	,tessellate: function(options) {
