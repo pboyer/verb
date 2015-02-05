@@ -160,32 +160,13 @@ class ExpIntersect {
 
         var res = Intersect.boundingBoxTrees(div0, div1);
 
+        var numSamples = 10;
+
         // for each surface pair, construct del phi 2d array
         for (srfpair in res){
 
-            var subsrf0 = srfpair.item0;
-            var subsrf1 = srfpair.item1;
+            var delphi = approxSurfaceDelPhiField( srfpair.item0, srfpair.item1, numSamples, numSamples );
 
-            // for all control pt pairs, we construct del phi
-            var subsrfdelphi = [];
-
-            for (row in subsrf0.controlPoints){
-
-                var delphirow = [];
-                subsrfdelphi.push(delphirow);
-
-                for (homopt in row){
-
-                    // dehomogenize the pt
-                    var pt = Eval.dehomogenize( homopt );
-
-
-
-
-
-                }
-
-            }
 
 
         }
@@ -195,6 +176,118 @@ class ExpIntersect {
 
 
 
+    public static function approxSurfaceDelPhiField( surface0 : NurbsSurfaceData, surface1 : NurbsSurfaceData, divs_u : Int, divs_v : Int){
+
+        var tess0 = sampleSurfaceRegular( surface0, 10, 10 );
+        var tess1 = sampleSurfaceRegular( surface1, 10, 10 );
+
+        var minuvs = [];
+
+        // get min dist uv
+        for (i in 0...tess0.uvs.length){
+
+            var minuvsrow = [];
+            minuvs.push(minuvsrow);
+
+            for (j in 0...tess0.uvs[i].length){
+
+                var minDist = Math.POSITIVE_INFINITY;
+                var minUV = [Math.POSITIVE_INFINITY,Math.POSITIVE_INFINITY];
+
+                // for each pt in second sampling
+                for (k in 0...tess1.uvs.length){
+                    for (l in 0...tess1.uvs[k].length){
+
+                        var dist = Vec.distSquared( tess0.points[i][j], tess0.points[k][l] );
+                        if (dist < minDist){
+                            minDist = dist;
+                            minUV = tess0.uvs[k][l];
+                        }
+
+                    }
+                }
+                minuvsrow.push( minUV );
+            }
+        }
+
+        // develop del phi field using min uvs
+        var delphifield = [];
+
+        for (i in 0...minuvs.length){
+
+            var delphirow = [];
+            delphifield.push(delphirow);
+
+            for (j in 0...minuvs[i].length){
+
+                var uv0 = tess0.uvs[i][j];
+                var uv1 = minuvs[i][j];
+
+                var derivs0 = Eval.rationalSurfaceDerivatives( surface0, uv0[0], uv0[1] );
+                var derivs1 = Eval.rationalSurfaceDerivatives( surface1, uv1[0], uv1[1] );
+
+                var n2 = Vec.normalized( Vec.cross( derivs1[1][0], derivs1[0][1] ) );
+
+                var ru = derivs0[1][0];
+                var rv = derivs0[0][1];
+
+                var delphi = [ Vec.dot( n2, ru), Vec.dot( n2, rv ) ];
+
+                delphirow.push( delphi );
+            }
+        }
+
+        return { ruvs : tess0.uvs, quvs : minuvs, delphi : delphifield };
+    }
+
+    public static function sampleSurfaceRegular( surface : NurbsSurfaceData, divs_u : Int, divs_v : Int ){
+
+        if ( divs_u < 1 ) { divs_u = 1; }
+        if ( divs_v < 1 ) { divs_v = 1; }
+
+        var degreeU = surface.degreeU
+        , degreeV = surface.degreeV
+        , controlPoints = surface.controlPoints
+        , knotsU = surface.knotsU
+        , knotsV = surface.knotsV;
+
+        var u_span = knotsU.last() - knotsU[0];
+        var v_span = knotsV.last() - knotsV[0];
+
+        var span_u = u_span / divs_u,
+        span_v = v_span / divs_v;
+
+        var points = [];
+        var uvs = [];
+
+        for (i in 0...divs_u+1){
+
+            var uvrow = [];
+            uvs.push(uvrow);
+
+            var pointsrow = [];
+            points.push(pointsrow);
+
+            for (j in 0...divs_v+1){
+
+                var pt_u = i * span_u,
+                pt_v = j * span_v;
+
+                uvrow.push( [pt_u, pt_v] );
+                pointsrow.push( Eval.rationalSurfacePoint( surface, pt_u, pt_v ) );
+            }
+        }
+
+        return { uvs : uvs, points : points };
+    }
+
+    // approximate the rotation number from 4 points on a surface
+
+    public static function approxRotationNumber( v0 : Array<Float>, v1 : Array<Float>, v2 : Array<Float>, v3 : Array<Float> ){
+
+
+
+    }
 
 
 }

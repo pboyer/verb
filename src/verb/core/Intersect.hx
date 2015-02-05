@@ -303,7 +303,6 @@ class Intersect {
 
                     // debug
                     if (curEnd.visited) {
-//                        trace('visited');
                         break;
                     }
 
@@ -318,7 +317,6 @@ class Intersect {
 
                     // loop condition
                     if (curEnd == end) {
-//                        trace('loop');
                         break;
                     }
                 }
@@ -327,8 +325,6 @@ class Intersect {
                     pl.push( pl[pl.length-1].opp );
                     pls.push( pl );
                 }
-            } else {
-//                trace('visited');
             }
 
             if (freeEnds.length == 0 && ends.length > 0 && ( loopDetected || numVisitedEnds < ends.length )){

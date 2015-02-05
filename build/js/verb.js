@@ -1692,29 +1692,108 @@ verb.core.ExpIntersect.approxInnerCriticalPts = function(surface0,surface1) {
 	var div0 = new verb.core.types.LazySurfaceBoundingBoxTree(surface0,null,verb.core.Vec.domain(surface0.knotsU) / maxDivs,verb.core.Vec.domain(surface0.knotsV) / maxDivs);
 	var div1 = new verb.core.types.LazySurfaceBoundingBoxTree(surface1,null,verb.core.Vec.domain(surface1.knotsU) / maxDivs,verb.core.Vec.domain(surface1.knotsV) / maxDivs);
 	var res = verb.core.Intersect.boundingBoxTrees(div0,div1);
+	var numSamples = 10;
 	var _g = 0;
 	while(_g < res.length) {
 		var srfpair = res[_g];
 		++_g;
-		var subsrf0 = srfpair.item0;
-		var subsrf1 = srfpair.item1;
-		var subsrfdelphi = [];
-		var _g1 = 0;
-		var _g2 = subsrf0.controlPoints;
-		while(_g1 < _g2.length) {
-			var row = _g2[_g1];
-			++_g1;
-			var delphirow = [];
-			subsrfdelphi.push(delphirow);
-			var _g3 = 0;
-			while(_g3 < row.length) {
-				var homopt = row[_g3];
-				++_g3;
-				var pt = verb.core.Eval.dehomogenize(homopt);
-			}
-		}
+		var delphi = verb.core.ExpIntersect.approxSurfaceDelPhiField(srfpair.item0,srfpair.item1,numSamples,numSamples);
 	}
 	return null;
+};
+verb.core.ExpIntersect.approxSurfaceDelPhiField = function(surface0,surface1,divs_u,divs_v) {
+	var tess0 = verb.core.ExpIntersect.sampleSurfaceRegular(surface0,10,10);
+	var tess1 = verb.core.ExpIntersect.sampleSurfaceRegular(surface1,10,10);
+	var minuvs = [];
+	var _g1 = 0;
+	var _g = tess0.uvs.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		var minuvsrow = [];
+		minuvs.push(minuvsrow);
+		var _g3 = 0;
+		var _g2 = tess0.uvs[i].length;
+		while(_g3 < _g2) {
+			var j = _g3++;
+			var minDist = Math.POSITIVE_INFINITY;
+			var minUV = [Math.POSITIVE_INFINITY,Math.POSITIVE_INFINITY];
+			var _g5 = 0;
+			var _g4 = tess1.uvs.length;
+			while(_g5 < _g4) {
+				var k = _g5++;
+				var _g7 = 0;
+				var _g6 = tess1.uvs[k].length;
+				while(_g7 < _g6) {
+					var l = _g7++;
+					var dist = verb.core.Vec.distSquared(tess0.points[i][j],tess0.points[k][l]);
+					if(dist < minDist) {
+						minDist = dist;
+						minUV = tess0.uvs[k][l];
+					}
+				}
+			}
+			minuvsrow.push(minUV);
+		}
+	}
+	var delphifield = [];
+	var _g11 = 0;
+	var _g8 = minuvs.length;
+	while(_g11 < _g8) {
+		var i1 = _g11++;
+		var delphirow = [];
+		delphifield.push(delphirow);
+		var _g31 = 0;
+		var _g21 = minuvs[i1].length;
+		while(_g31 < _g21) {
+			var j1 = _g31++;
+			var uv0 = tess0.uvs[i1][j1];
+			var uv1 = minuvs[i1][j1];
+			var derivs0 = verb.core.Eval.rationalSurfaceDerivatives(surface0,uv0[0],uv0[1]);
+			var derivs1 = verb.core.Eval.rationalSurfaceDerivatives(surface1,uv1[0],uv1[1]);
+			var n2 = verb.core.Vec.normalized(verb.core.Vec.cross(derivs1[1][0],derivs1[0][1]));
+			var ru = derivs0[1][0];
+			var rv = derivs0[0][1];
+			var delphi = [verb.core.Vec.dot(n2,ru),verb.core.Vec.dot(n2,rv)];
+			delphirow.push(delphi);
+		}
+	}
+	return { ruvs : tess0.uvs, quvs : minuvs, delphi : delphifield};
+};
+verb.core.ExpIntersect.sampleSurfaceRegular = function(surface,divs_u,divs_v) {
+	if(divs_u < 1) divs_u = 1;
+	if(divs_v < 1) divs_v = 1;
+	var degreeU = surface.degreeU;
+	var degreeV = surface.degreeV;
+	var controlPoints = surface.controlPoints;
+	var knotsU = surface.knotsU;
+	var knotsV = surface.knotsV;
+	var u_span = knotsU[knotsU.length - 1] - knotsU[0];
+	var v_span = knotsV[knotsV.length - 1] - knotsV[0];
+	var span_u = u_span / divs_u;
+	var span_v = v_span / divs_v;
+	var points = [];
+	var uvs = [];
+	var _g1 = 0;
+	var _g = divs_u + 1;
+	while(_g1 < _g) {
+		var i = _g1++;
+		var uvrow = [];
+		uvs.push(uvrow);
+		var pointsrow = [];
+		points.push(pointsrow);
+		var _g3 = 0;
+		var _g2 = divs_v + 1;
+		while(_g3 < _g2) {
+			var j = _g3++;
+			var pt_u = i * span_u;
+			var pt_v = j * span_v;
+			uvrow.push([pt_u,pt_v]);
+			pointsrow.push(verb.core.Eval.rationalSurfacePoint(surface,pt_u,pt_v));
+		}
+	}
+	return { uvs : uvs, points : points};
+};
+verb.core.ExpIntersect.approxRotationNumber = function(v0,v1,v2,v3) {
 };
 verb.core.Intersect = $hx_exports.core.Intersect = function() { };
 verb.core.Intersect.__name__ = ["verb","core","Intersect"];
@@ -1883,7 +1962,6 @@ verb.core.Intersect.makeMeshIntersectionPolylines = function(segments) {
 				pl.push(pl[pl.length - 1].opp);
 				pls.push(pl);
 			}
-		} else {
 		}
 		if(freeEnds.length == 0 && ends.length > 0 && (loopDetected || numVisitedEnds < ends.length)) {
 			loopDetected = true;
@@ -3912,9 +3990,9 @@ verb.core.Tess.rationalCurveAdaptiveSample = function(curve,tol,includeU) {
 			return _g;
 		}
 	}
-	return verb.core.Tess.rationalCurveAdaptiveSample_range(curve,curve.knots[0],verb.core.ArrayExtensions.last(curve.knots),tol,includeU);
+	return verb.core.Tess.rationalCurveAdaptiveSampleRange(curve,curve.knots[0],verb.core.ArrayExtensions.last(curve.knots),tol,includeU);
 };
-verb.core.Tess.rationalCurveAdaptiveSample_range = function(curve,start,end,tol,includeU) {
+verb.core.Tess.rationalCurveAdaptiveSampleRange = function(curve,start,end,tol,includeU) {
 	var p1 = verb.core.Eval.rationalCurvePoint(curve,start);
 	var p3 = verb.core.Eval.rationalCurvePoint(curve,end);
 	var t = 0.5 + 0.2 * Math.random();
@@ -3924,8 +4002,8 @@ verb.core.Tess.rationalCurveAdaptiveSample_range = function(curve,start,end,tol,
 	var diff2 = verb.core.Vec.sub(p1,p2);
 	if(verb.core.Vec.dot(diff,diff) < tol && verb.core.Vec.dot(diff2,diff2) > tol || !verb.core.Trig.threePointsAreFlat(p1,p2,p3,tol)) {
 		var exact_mid = start + (end - start) * 0.5;
-		var left_pts = verb.core.Tess.rationalCurveAdaptiveSample_range(curve,start,exact_mid,tol,includeU);
-		var right_pts = verb.core.Tess.rationalCurveAdaptiveSample_range(curve,exact_mid,end,tol,includeU);
+		var left_pts = verb.core.Tess.rationalCurveAdaptiveSampleRange(curve,start,exact_mid,tol,includeU);
+		var right_pts = verb.core.Tess.rationalCurveAdaptiveSampleRange(curve,exact_mid,end,tol,includeU);
 		return left_pts.slice(0,-1).concat(right_pts);
 	} else if(includeU) return [[start].concat(p1),[end].concat(p3)]; else return [p1,p3];
 };

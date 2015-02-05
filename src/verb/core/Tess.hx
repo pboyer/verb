@@ -94,7 +94,7 @@ class Tess {
 			}
 		}
 
-		return rationalCurveAdaptiveSample_range( curve, curve.knots[0], curve.knots.last(), tol, includeU );
+		return rationalCurveAdaptiveSampleRange( curve, curve.knots[0], curve.knots.last(), tol, includeU );
 	}
 
 	//
@@ -110,7 +110,7 @@ class Tess {
 	// + an array of dim + 1 length where the first element is the param where it was sampled and the remaining the pt
 	//
 
-	public static function rationalCurveAdaptiveSample_range( curve : NurbsCurveData, start, end, tol, includeU ) : Array<Point>{
+	public static function rationalCurveAdaptiveSampleRange( curve : NurbsCurveData, start, end, tol, includeU ) : Array<Point>{
 
 		// sample curve at three pts
 		var p1 = Eval.rationalCurvePoint(curve, start),
@@ -130,8 +130,8 @@ class Tess {
 			var exact_mid = start + (end - start) * 0.5;
 
 			// recurse on the two halves
-			var left_pts = rationalCurveAdaptiveSample_range( curve, start, exact_mid, tol, includeU )
-			, right_pts = rationalCurveAdaptiveSample_range( curve, exact_mid, end, tol, includeU );
+			var left_pts = rationalCurveAdaptiveSampleRange( curve, start, exact_mid, tol, includeU )
+			, right_pts = rationalCurveAdaptiveSampleRange( curve, exact_mid, end, tol, includeU );
 
 			// concatenate the two
 			return left_pts.slice(0, -1).concat(right_pts);
