@@ -1,6 +1,5 @@
 package verb.geom;
 
-import verb.core.ExpIntersect.Quadruple;
 import verb.core.Check;
 import verb.core.Vec;
 import verb.core.Make;

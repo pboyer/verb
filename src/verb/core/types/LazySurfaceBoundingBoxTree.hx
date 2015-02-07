@@ -1,6 +1,7 @@
 package verb.core.types;
 
 using verb.core.ArrayExtensions;
+using verb.core.Vec;
 
 class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
 
@@ -15,11 +16,11 @@ class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
         _splitV = splitV;
 
         if (knotTolU == null){
-            knotTolU = (surface.knotsU.last() - surface.knotsU.first()) / 1000;
+            knotTolU = (surface.knotsU.domain()) / 1000;
         }
 
         if (knotTolV == null){
-            knotTolV = (surface.knotsV.last() - surface.knotsV.first()) / 1000;
+            knotTolV = (surface.knotsV.domain()) / 1000;
         }
 
         _knotTolU = knotTolU;
@@ -40,9 +41,9 @@ class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
         }
 
         var dom = max - min;
-        var pivot = (min + max) / 2.0 + dom * 0.01 * Math.random();
+        var pivot = (min + max) / 2.0; // + dom * 0.01 * Math.random();
 
-        var srfs = Modify.surfaceSplit(_surface, pivot, _splitV );
+        var srfs = Modify.surfaceSplit( _surface, pivot, _splitV );
 
         return new Pair<IBoundingBoxTree<NurbsSurfaceData>, IBoundingBoxTree<NurbsSurfaceData>>(
             new LazySurfaceBoundingBoxTree( srfs[0], !_splitV, _knotTolU, _knotTolV ),
@@ -65,9 +66,9 @@ class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
 
     public function indivisible( tolerance : Float ){
         if (_splitV){
-            return _surface.knotsV.last() - _surface.knotsV.first() < _knotTolV;
+            return _surface.knotsV.domain() < _knotTolV;
         } else {
-            return _surface.knotsU.last() - _surface.knotsU.first() < _knotTolU;
+            return _surface.knotsU.domain() < _knotTolU;
         }
     }
 

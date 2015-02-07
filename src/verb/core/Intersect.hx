@@ -420,7 +420,8 @@ class Intersect {
             var uv = [ (minu + maxu) / 2.0, (minv + maxv) / 2.0 ];
 
             return Intersect.curveAndSurfaceWithEstimate( crvSeg, srfPart, [u].concat(uv), tol );
-
+        }).unique(function(a,b){
+            return Math.abs(a.u - b.u) < tol;
         });
     }
 
@@ -492,10 +493,6 @@ class Intersect {
         return finalResults;
     }
 
-    public static function mesh_bounding_boxes( a : MeshData, b : MeshData, tol : Float ) : Array<Pair<Int,Int>> {
-        return Intersect.boundingBoxTrees(new LazyMeshBoundingBoxTree(a), new LazyMeshBoundingBoxTree(b), tol );
-    }
-
     // The core algorithm for bounding box tree intersection, supporting both lazy and pre-computed bounding box trees
     // via the IBoundingBoxTree interface
     //
@@ -514,15 +511,27 @@ class Intersect {
 
         if ( !a.boundingBox().intersects( b.boundingBox(), tol ) ) return [];
 
-        if (a.indivisible(tol) && b.indivisible(tol) ) return [ new Pair(a.yield(), b.yield()) ];
+        var ai = a.indivisible(tol);
+        var bi = b.indivisible(tol);
 
-        var asplit = a.split()
-            , bsplit = b.split();
+        if (ai && bi) {
+            return [ new Pair(a.yield(), b.yield()) ];
+        } else if (ai && !bi) {
+            var bs = b.split();
+            return     Intersect.boundingBoxTrees( a, bs.item0, tol )
+                .concat( Intersect.boundingBoxTrees( a, bs.item1, tol  ) );
 
-        return     Intersect.boundingBoxTrees( asplit.item0, bsplit.item0, tol )
-            .concat( Intersect.boundingBoxTrees( asplit.item0, bsplit.item1, tol  ) )
-            .concat( Intersect.boundingBoxTrees( asplit.item1, bsplit.item0, tol  ) )
-            .concat( Intersect.boundingBoxTrees( asplit.item1, bsplit.item1, tol  ) );
+        } else if (!ai && bi){
+            var as = a.split();
+            return     Intersect.boundingBoxTrees( as.item0, b, tol )
+                .concat( Intersect.boundingBoxTrees( as.item1, b, tol  ) );
+        }
+
+        var as = a.split(), bs = b.split();
+        return     Intersect.boundingBoxTrees( as.item0, bs.item0, tol )
+            .concat( Intersect.boundingBoxTrees( as.item0, bs.item1, tol  ) )
+            .concat( Intersect.boundingBoxTrees( as.item1, bs.item0, tol  ) )
+            .concat( Intersect.boundingBoxTrees( as.item1, bs.item1, tol  ) );
     }
 
     // Approximate the intersection of two NURBS curves
@@ -543,6 +552,8 @@ class Intersect {
 
         return ints.map(function(x : Pair<NurbsCurveData, NurbsCurveData>) : CurveCurveIntersection {
             return Intersect.curvesWithEstimate( curve1, curve2, x.item0.knots.first(), x.item1.knots.first(), tolerance );
+        }).unique(function(a,b){
+            return Math.abs(a.u0 - b.u0) < tolerance;
         });
     }
 

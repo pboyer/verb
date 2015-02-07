@@ -7015,3 +7015,90 @@ describe("verb.core.Make.surfaceBoundaryCurves",function(){
     });
 
 });
+
+describe("verb.core.ExpIntersect.sampleSurfaceRegular",function(){
+
+    it('provides expected result for planar surface', function(){
+
+        var a = [0,0,0];
+        var b = [1,0,0];
+        var c = [1,1,0];
+        var d = [0,1,0];
+
+        var srf = verb.core.Make.fourPointSurface( a, b, c, d );
+
+        var samples = verb.core.ExpIntersect.sampleSurfaceRegular( srf, 10, 10 );
+
+        samples.uvs[0][0].should.be.eql([0,0]);
+        samples.uvs[0][10].should.be.eql([0,1]);
+
+        samples.uvs[10][0].should.be.eql([1,0]);
+        samples.uvs[10][10].should.be.eql([1,1]);
+
+    });
+
+});
+
+describe("verb.core.ExpIntersect.approxSurfaceDelPhiField",function(){
+
+   it('provides expected result for two planar surfaces', function(){
+
+       var a = [0,0,0];
+       var b = [1,0,0];
+       var c = [1,1,0];
+       var d = [0,1,0];
+
+       var srf = verb.core.Make.fourPointSurface( a, b, c, d );
+
+       var a1 = [0,0,1];
+       var b1 = [1,0,1];
+       var c1 = [1,1,2];
+       var d1 = [0,1,2];
+
+       var srf1 = verb.core.Make.fourPointSurface( a1, b1, c1, d1 );
+
+       var samples = verb.core.ExpIntersect.approxSurfaceDelPhiField( srf, srf1, 10, 10 );
+
+//       console.log(samples.delphi)
+
+   });
+
+});
+
+describe("verb.core.ExpIntersect.approxSurfaceDelPhiField",function(){
+
+    it('provides expected result for two planar surfaces', function(){
+
+        var a = [0,0,0];
+        var b = [1,0,0];
+        var c = [1,1,0];
+        var d = [0,1,0];
+
+        var srf = verb.core.Make.fourPointSurface( a, b, c, d );
+
+        var a1 = [0,0,-1];
+        var b1 = [1,0,-1];
+        var c1 = [1,1,1];
+        var d1 = [0,1,1];
+
+        var srf1 = verb.core.Make.fourPointSurface( a1, b1, c1, d1 );
+
+        var crv = verb.core.Make.surfaceIsocurve( srf, 0, false );
+
+
+//        var crv = verb.core.Make.rationalBezierCurve( [[0,0,-1], [0,0,1]] );
+
+
+        // console.log(crv)
+
+        var int = verb.core.Intersect.curveAndSurface(crv, srf1, 0.0001);
+        console.log(int)
+
+
+//        var samples = verb.core.ExpIntersect.intersectBoundaryCurves( srf, srf1, 1e-3 );
+
+//        console.log(int)
+
+    });
+
+});

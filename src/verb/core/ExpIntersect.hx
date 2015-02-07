@@ -11,96 +11,7 @@ using verb.core.Vec;
 import verb.core.types.NurbsSurfaceData;
 import verb.core.types.NurbsCurveData;
 
-interface ITuple3<T1,T2,T3>{
-
-    public var item0 : T1;
-    public var item1 : T2;
-    public var item2 : T3;
-
-}
-
-interface ITuple4<T1,T2,T3,T4>{
-
-    public var item0 : T1;
-    public var item1 : T2;
-    public var item2 : T3;
-    public var item3 : T4;
-
-}
-
-class Tuple3<T1,T2,T3> implements ITuple3<T1,T2,T3> {
-
-    public var item0 : T1;
-    public var item1 : T2;
-    public var item2 : T3;
-
-    public function new(item0, item1, item2){
-        this.item0 = item0;
-        this.item1 = item1;
-        this.item2 = item2;
-    }
-}
-
-class Tuple4<T1,T2,T3,T4> implements ITuple4<T1,T2,T3,T4> {
-
-    public var item0 : T1;
-    public var item1 : T2;
-    public var item2 : T3;
-    public var item3 : T4;
-
-    public function new(item0, item1, item2, item3){
-        this.item0 = item0;
-        this.item1 = item1;
-        this.item2 = item2;
-        this.item3 = item3;
-    }
-}
-
-interface ITriple<T>{
-
-    public var item0 : T;
-    public var item1 : T;
-    public var item2 : T;
-
-}
-
-interface IQuadruple<T>{
-
-    public var item0 : T;
-    public var item1 : T;
-    public var item2 : T;
-    public var item3 : T;
-
-}
-
-class Triple<T> implements ITriple<T> {
-
-    public var item0 : T;
-    public var item1 : T;
-    public var item2 : T;
-
-    public function new(item0, item1, item2){
-        this.item0 = item0;
-        this.item1 = item1;
-        this.item2 = item2;
-    }
-}
-
-class Quadruple<T> implements IQuadruple<T> {
-
-    public var item0 : T;
-    public var item1 : T;
-    public var item2 : T;
-    public var item3 : T;
-
-    public function new(item0, item1, item2, item3){
-        this.item0 = item0;
-        this.item1 = item1;
-        this.item2 = item2;
-        this.item3 = item3;
-    }
-}
-
+@:expose("core.ExpIntersect")
 class ExpIntersect {
 
     public static function intersectBoundaryCurves(surface0 : NurbsSurfaceData, surface1 : NurbsSurfaceData, tol : Float) : Array<CurveSurfaceIntersection> {
@@ -108,21 +19,23 @@ class ExpIntersect {
         var surface0Boundaries = Make.surfaceBoundaryCurves( surface0 );
         var surface1Boundaries = Make.surfaceBoundaryCurves( surface1 );
 
+        trace( surface0Boundaries[0] );
+        trace( surface1Boundaries );
+
         var ints = [];
 
         for (crv in surface0Boundaries){
-            ints = ints.concat(Intersect.curveAndSurface(crv, surface1, tol ));
+            ints = ints.concat( Intersect.curveAndSurface( crv, surface1, tol ) );
         }
 
         for (crv in surface1Boundaries){
-            ints = ints.concat(Intersect.curveAndSurface(crv, surface0, tol ));
+            ints = ints.concat( Intersect.curveAndSurface( crv, surface0, tol ) );
         }
 
         return ints;
     }
 
     public static function surfaces(surface0 : NurbsSurfaceData, surface1 : NurbsSurfaceData, tol : Float) {
-
 
         var exactOuter = intersectBoundaryCurves( surface0, surface1, tol );
 
@@ -178,21 +91,20 @@ class ExpIntersect {
 
     public static function approxSurfaceDelPhiField( surface0 : NurbsSurfaceData, surface1 : NurbsSurfaceData, divs_u : Int, divs_v : Int){
 
-        var tess0 = sampleSurfaceRegular( surface0, 10, 10 );
-        var tess1 = sampleSurfaceRegular( surface1, 10, 10 );
+        var tess0 = sampleSurfaceRegular( surface0, divs_u, divs_v );
+        var tess1 = sampleSurfaceRegular( surface1, divs_u, divs_v );
 
         var minuvs = [];
 
-        // get min dist uv
         for (i in 0...tess0.uvs.length){
 
             var minuvsrow = [];
-            minuvs.push(minuvsrow);
+            minuvs.push( minuvsrow );
 
             for (j in 0...tess0.uvs[i].length){
 
                 var minDist = Math.POSITIVE_INFINITY;
-                var minUV = [Math.POSITIVE_INFINITY,Math.POSITIVE_INFINITY];
+                var minUV = [ Math.POSITIVE_INFINITY, Math.POSITIVE_INFINITY ];
 
                 // for each pt in second sampling
                 for (k in 0...tess1.uvs.length){
@@ -203,20 +115,19 @@ class ExpIntersect {
                             minDist = dist;
                             minUV = tess0.uvs[k][l];
                         }
-
                     }
                 }
                 minuvsrow.push( minUV );
             }
         }
 
-        // develop del phi field using min uvs
         var delphifield = [];
 
+        // develop del phi field using min uvs
         for (i in 0...minuvs.length){
 
             var delphirow = [];
-            delphifield.push(delphirow);
+            delphifield.push( delphirow );
 
             for (j in 0...minuvs[i].length){
 
@@ -251,17 +162,16 @@ class ExpIntersect {
         , knotsU = surface.knotsU
         , knotsV = surface.knotsV;
 
-        var u_span = knotsU.last() - knotsU[0];
-        var v_span = knotsV.last() - knotsV[0];
+        var u_span = knotsU.domain();
+        var v_span = knotsV.domain();
 
-        var span_u = u_span / divs_u,
-        span_v = v_span / divs_v;
+        var span_u = u_span / divs_u;
+        var span_v = v_span / divs_v;
 
         var points = [];
         var uvs = [];
 
         for (i in 0...divs_u+1){
-
             var uvrow = [];
             uvs.push(uvrow);
 
@@ -269,7 +179,6 @@ class ExpIntersect {
             points.push(pointsrow);
 
             for (j in 0...divs_v+1){
-
                 var pt_u = i * span_u,
                 pt_v = j * span_v;
 

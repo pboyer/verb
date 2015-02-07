@@ -1617,49 +1617,13 @@ verb.core.Eval.knotSpanGivenN = function(n,degree,u,knots) {
 	}
 	return mid;
 };
-verb.core.ITuple3 = function() { };
-verb.core.ITuple3.__name__ = ["verb","core","ITuple3"];
-verb.core.ITuple4 = function() { };
-verb.core.ITuple4.__name__ = ["verb","core","ITuple4"];
-verb.core.Tuple3 = function(item0,item1,item2) {
-	this.item0 = item0;
-	this.item1 = item1;
-	this.item2 = item2;
-};
-verb.core.Tuple3.__name__ = ["verb","core","Tuple3"];
-verb.core.Tuple3.__interfaces__ = [verb.core.ITuple3];
-verb.core.Tuple4 = function(item0,item1,item2,item3) {
-	this.item0 = item0;
-	this.item1 = item1;
-	this.item2 = item2;
-	this.item3 = item3;
-};
-verb.core.Tuple4.__name__ = ["verb","core","Tuple4"];
-verb.core.Tuple4.__interfaces__ = [verb.core.ITuple4];
-verb.core.ITriple = function() { };
-verb.core.ITriple.__name__ = ["verb","core","ITriple"];
-verb.core.IQuadruple = function() { };
-verb.core.IQuadruple.__name__ = ["verb","core","IQuadruple"];
-verb.core.Triple = function(item0,item1,item2) {
-	this.item0 = item0;
-	this.item1 = item1;
-	this.item2 = item2;
-};
-verb.core.Triple.__name__ = ["verb","core","Triple"];
-verb.core.Triple.__interfaces__ = [verb.core.ITriple];
-verb.core.Quadruple = function(item0,item1,item2,item3) {
-	this.item0 = item0;
-	this.item1 = item1;
-	this.item2 = item2;
-	this.item3 = item3;
-};
-verb.core.Quadruple.__name__ = ["verb","core","Quadruple"];
-verb.core.Quadruple.__interfaces__ = [verb.core.IQuadruple];
-verb.core.ExpIntersect = function() { };
+verb.core.ExpIntersect = $hx_exports.core.ExpIntersect = function() { };
 verb.core.ExpIntersect.__name__ = ["verb","core","ExpIntersect"];
 verb.core.ExpIntersect.intersectBoundaryCurves = function(surface0,surface1,tol) {
 	var surface0Boundaries = verb.core.Make.surfaceBoundaryCurves(surface0);
 	var surface1Boundaries = verb.core.Make.surfaceBoundaryCurves(surface1);
+	console.log(surface0Boundaries[0]);
+	console.log(surface1Boundaries);
 	var ints = [];
 	var _g = 0;
 	while(_g < surface0Boundaries.length) {
@@ -1702,8 +1666,8 @@ verb.core.ExpIntersect.approxInnerCriticalPts = function(surface0,surface1) {
 	return null;
 };
 verb.core.ExpIntersect.approxSurfaceDelPhiField = function(surface0,surface1,divs_u,divs_v) {
-	var tess0 = verb.core.ExpIntersect.sampleSurfaceRegular(surface0,10,10);
-	var tess1 = verb.core.ExpIntersect.sampleSurfaceRegular(surface1,10,10);
+	var tess0 = verb.core.ExpIntersect.sampleSurfaceRegular(surface0,divs_u,divs_v);
+	var tess1 = verb.core.ExpIntersect.sampleSurfaceRegular(surface1,divs_u,divs_v);
 	var minuvs = [];
 	var _g1 = 0;
 	var _g = tess0.uvs.length;
@@ -1993,7 +1957,7 @@ verb.core.Intersect.lookupAdjacentSegment = function(segEnd,tree,numResults) {
 verb.core.Intersect.curveAndSurface = function(curve,surface,tol) {
 	if(tol == null) tol = 1e-3;
 	var ints = verb.core.Intersect.boundingBoxTrees(new verb.core.types.LazyCurveBoundingBoxTree(curve),new verb.core.types.LazySurfaceBoundingBoxTree(surface),0);
-	return ints.map(function(inter) {
+	return verb.core.ArrayExtensions.unique(ints.map(function(inter) {
 		var crvSeg = inter.item0;
 		var srfPart = inter.item1;
 		var min = crvSeg.knots[0];
@@ -2005,6 +1969,8 @@ verb.core.Intersect.curveAndSurface = function(curve,surface,tol) {
 		var maxv = verb.core.ArrayExtensions.last(srfPart.knotsV);
 		var uv = [(minu + maxu) / 2.0,(minv + maxv) / 2.0];
 		return verb.core.Intersect.curveAndSurfaceWithEstimate(crvSeg,srfPart,[u].concat(uv),tol);
+	}),function(a,b) {
+		return Math.abs(a.u - b.u) < tol;
 	});
 };
 verb.core.Intersect.curveAndSurfaceWithEstimate = function(curve,surface,start_params,tol) {
@@ -2037,22 +2003,29 @@ verb.core.Intersect.polylineAndMesh = function(polyline,mesh,tol) {
 	}
 	return finalResults;
 };
-verb.core.Intersect.mesh_bounding_boxes = function(a,b,tol) {
-	return verb.core.Intersect.boundingBoxTrees(new verb.core.types.LazyMeshBoundingBoxTree(a),new verb.core.types.LazyMeshBoundingBoxTree(b),tol);
-};
 verb.core.Intersect.boundingBoxTrees = function(a,b,tol) {
 	if(tol == null) tol = 1e-9;
 	if(a.empty() || b.empty()) return [];
 	if(!a.boundingBox().intersects(b.boundingBox(),tol)) return [];
-	if(a.indivisible(tol) && b.indivisible(tol)) return [new verb.core.types.Pair(a["yield"](),b["yield"]())];
-	var asplit = a.split();
-	var bsplit = b.split();
-	return verb.core.Intersect.boundingBoxTrees(asplit.item0,bsplit.item0,tol).concat(verb.core.Intersect.boundingBoxTrees(asplit.item0,bsplit.item1,tol)).concat(verb.core.Intersect.boundingBoxTrees(asplit.item1,bsplit.item0,tol)).concat(verb.core.Intersect.boundingBoxTrees(asplit.item1,bsplit.item1,tol));
+	var ai = a.indivisible(tol);
+	var bi = b.indivisible(tol);
+	if(ai && bi) return [new verb.core.types.Pair(a["yield"](),b["yield"]())]; else if(ai && !bi) {
+		var bs = b.split();
+		return verb.core.Intersect.boundingBoxTrees(a,bs.item0,tol).concat(verb.core.Intersect.boundingBoxTrees(a,bs.item1,tol));
+	} else if(!ai && bi) {
+		var $as = a.split();
+		return verb.core.Intersect.boundingBoxTrees($as.item0,b,tol).concat(verb.core.Intersect.boundingBoxTrees($as.item1,b,tol));
+	}
+	var as1 = a.split();
+	var bs1 = b.split();
+	return verb.core.Intersect.boundingBoxTrees(as1.item0,bs1.item0,tol).concat(verb.core.Intersect.boundingBoxTrees(as1.item0,bs1.item1,tol)).concat(verb.core.Intersect.boundingBoxTrees(as1.item1,bs1.item0,tol)).concat(verb.core.Intersect.boundingBoxTrees(as1.item1,bs1.item1,tol));
 };
 verb.core.Intersect.curves = function(curve1,curve2,tolerance) {
 	var ints = verb.core.Intersect.boundingBoxTrees(new verb.core.types.LazyCurveBoundingBoxTree(curve1),new verb.core.types.LazyCurveBoundingBoxTree(curve2),0);
-	return ints.map(function(x) {
+	return verb.core.ArrayExtensions.unique(ints.map(function(x) {
 		return verb.core.Intersect.curvesWithEstimate(curve1,curve2,x.item0.knots[0],x.item1.knots[0],tolerance);
+	}),function(a,b) {
+		return Math.abs(a.u0 - b.u0) < tolerance;
 	});
 };
 verb.core.Intersect.curvesWithEstimate = function(curve0,curve1,u0,u1,tolerance) {
@@ -4685,7 +4658,7 @@ verb.core.types.BoundingBox.__name__ = ["verb","core","types","BoundingBox"];
 verb.core.types.BoundingBox.intervalsOverlap = function(a1,a2,b1,b2,tol) {
 	if(tol == null) tol = -1;
 	var tol1;
-	if(tol < 0) tol1 = verb.core.types.BoundingBox.TOLERANCE; else tol1 = tol;
+	if(tol < -0.5) tol1 = verb.core.types.BoundingBox.TOLERANCE; else tol1 = tol;
 	var x1 = Math.min(a1,a2) - tol1;
 	var x2 = Math.max(a1,a2) + tol1;
 	var y1 = Math.min(b1,b2) - tol1;
@@ -4837,7 +4810,7 @@ verb.core.types.Interval.__name__ = ["verb","core","types","Interval"];
 verb.core.types.LazyCurveBoundingBoxTree = function(curve,knotTol) {
 	this._boundingBox = null;
 	this._curve = curve;
-	if(knotTol == null) knotTol = verb.core.ArrayExtensions.last(this._curve.knots) - this._curve.knots[0] / 1000;
+	if(knotTol == null) knotTol = verb.core.Vec.domain(this._curve.knots) / 1000;
 	this._knotTol = knotTol;
 };
 verb.core.types.LazyCurveBoundingBoxTree.__name__ = ["verb","core","types","LazyCurveBoundingBoxTree"];
@@ -4847,7 +4820,7 @@ verb.core.types.LazyCurveBoundingBoxTree.prototype = {
 		var min = this._curve.knots[0];
 		var max = verb.core.ArrayExtensions.last(this._curve.knots);
 		var dom = max - min;
-		var crvs = verb.core.Modify.curveSplit(this._curve,(max + min) / 2.0 + dom * 0.01 * Math.random());
+		var crvs = verb.core.Modify.curveSplit(this._curve,(max + min) / 2.0);
 		return new verb.core.types.Pair(new verb.core.types.LazyCurveBoundingBoxTree(crvs[0],this._knotTol),new verb.core.types.LazyCurveBoundingBoxTree(crvs[1],this._knotTol));
 	}
 	,boundingBox: function() {
@@ -4858,7 +4831,7 @@ verb.core.types.LazyCurveBoundingBoxTree.prototype = {
 		return this._curve;
 	}
 	,indivisible: function(tolerance) {
-		return verb.core.ArrayExtensions.last(this._curve.knots) - this._curve.knots[0] < this._knotTol;
+		return verb.core.Vec.domain(this._curve.knots) < this._knotTol;
 	}
 	,empty: function() {
 		return false;
@@ -4938,8 +4911,8 @@ verb.core.types.LazySurfaceBoundingBoxTree = function(surface,splitV,knotTolU,kn
 	this._boundingBox = null;
 	this._surface = surface;
 	this._splitV = splitV;
-	if(knotTolU == null) knotTolU = (verb.core.ArrayExtensions.last(surface.knotsU) - surface.knotsU[0]) / 1000;
-	if(knotTolV == null) knotTolV = (verb.core.ArrayExtensions.last(surface.knotsV) - surface.knotsV[0]) / 1000;
+	if(knotTolU == null) knotTolU = verb.core.Vec.domain(surface.knotsU) / 1000;
+	if(knotTolV == null) knotTolV = verb.core.Vec.domain(surface.knotsV) / 1000;
 	this._knotTolU = knotTolU;
 	this._knotTolV = knotTolV;
 };
@@ -4957,7 +4930,7 @@ verb.core.types.LazySurfaceBoundingBoxTree.prototype = {
 			max = verb.core.ArrayExtensions.last(this._surface.knotsU);
 		}
 		var dom = max - min;
-		var pivot = (min + max) / 2.0 + dom * 0.01 * Math.random();
+		var pivot = (min + max) / 2.0;
 		var srfs = verb.core.Modify.surfaceSplit(this._surface,pivot,this._splitV);
 		return new verb.core.types.Pair(new verb.core.types.LazySurfaceBoundingBoxTree(srfs[0],!this._splitV,this._knotTolU,this._knotTolV),new verb.core.types.LazySurfaceBoundingBoxTree(srfs[1],!this._splitV,this._knotTolU,this._knotTolV));
 	}
@@ -4978,7 +4951,7 @@ verb.core.types.LazySurfaceBoundingBoxTree.prototype = {
 		return this._surface;
 	}
 	,indivisible: function(tolerance) {
-		if(this._splitV) return verb.core.ArrayExtensions.last(this._surface.knotsV) - this._surface.knotsV[0] < this._knotTolV; else return verb.core.ArrayExtensions.last(this._surface.knotsU) - this._surface.knotsU[0] < this._knotTolU;
+		if(this._splitV) return verb.core.Vec.domain(this._surface.knotsV) < this._knotTolV; else return verb.core.Vec.domain(this._surface.knotsU) < this._knotTolU;
 	}
 	,empty: function() {
 		return false;
