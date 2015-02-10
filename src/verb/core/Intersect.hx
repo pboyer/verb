@@ -65,7 +65,6 @@ class Intersect {
         return slices;
     }
 
-
     // Intersect two NURBS surfaces, yielding a list of curves
     //
     // **params**
@@ -95,7 +94,6 @@ class Intersect {
             return Make.rationalInterpCurve( x.map(function(x){ return x.point; }), 3 );
         });
     }
-
 
     // Refine a pair of surface points to a point where the two surfaces intersect
     //
@@ -393,11 +391,14 @@ class Intersect {
 
     public static function curveAndSurface( curve : NurbsCurveData,
                                               surface : NurbsSurfaceData,
-                                              tol : Float = 1e-3 ) : Array<CurveSurfaceIntersection>  {
+                                              tol : Float = 1e-3,
+                                              crvBbTree : IBoundingBoxTree<NurbsCurveData> = null,
+                                              srfBbTree : IBoundingBoxTree<NurbsSurfaceData> = null ) : Array<CurveSurfaceIntersection>  {
 
-        var ints = Intersect.boundingBoxTrees(
-            new LazyCurveBoundingBoxTree( curve ),
-            new LazySurfaceBoundingBoxTree( surface ), 0 );
+        crvBbTree = crvBbTree != null ? crvBbTree : new LazyCurveBoundingBoxTree( curve );
+        srfBbTree = srfBbTree != null ? srfBbTree : new LazySurfaceBoundingBoxTree( surface );
+
+        var ints = Intersect.boundingBoxTrees( crvBbTree, srfBbTree, tol );
 
         return ints.map(function( inter ){
 
@@ -420,8 +421,10 @@ class Intersect {
             var uv = [ (minu + maxu) / 2.0, (minv + maxv) / 2.0 ];
 
             return Intersect.curveAndSurfaceWithEstimate( crvSeg, srfPart, [u].concat(uv), tol );
+        }).filter(function(x){
+            return Vec.distSquared( x.curvePoint, x.surfacePoint ) < tol * tol;
         }).unique(function(a,b){
-            return Math.abs(a.u - b.u) < tol;
+            return Math.abs(a.u - b.u) < 0.5 * tol;
         });
     }
 
@@ -437,9 +440,9 @@ class Intersect {
     // + a CurveSurfaceIntersection object
 
     public static function curveAndSurfaceWithEstimate(    curve : NurbsCurveData,
-                                                               surface : NurbsSurfaceData,
-                                                               start_params : Array<Float>,
-                                                               tol : Float = 1e-3 ) : CurveSurfaceIntersection {
+                                                           surface : NurbsSurfaceData,
+                                                           start_params : Array<Float>,
+                                                           tol : Float = 1e-3 ) : CurveSurfaceIntersection {
 
         var objective = function(x) {
             var p1 = Eval.rationalCurvePoint( curve, x[0])
@@ -449,10 +452,46 @@ class Intersect {
             return Vec.dot(p1_p2, p1_p2);
         }
 
-        var sol_obj = Numeric.uncmin( objective, start_params, tol );
+        // 3 params
+
+        // r = s(u, v) - c(t)
+        // f = r(u,v,t) . r(u,v,t)
+
+        // d = [ du, dv, dt ]
+        // k = - [ f(u,v,t) ]
+        // J = [ df/du, df/dv, df/dt ]
+
+        // dr/dt = -dc/dt
+        // dr/du = ds/du
+        // dr/dv = ds/dv
+
+        // gradient :
+
+        // df/dt = 2 * dr/dt . r(u,v,t)
+        // df/du = 2 * dr/du . r(u,v,t)
+        // df/dv = 2 * dr/dv . r(u,v,t)
+
+        var grad = function(x){
+
+            var dc = Eval.rationalCurveDerivatives( curve, x[0], 1 )
+                , ds = Eval.rationalSurfaceDerivatives( surface, x[1], x[2], 1 );
+
+            var r = Vec.sub(ds[0][0], dc[0]);
+
+            var drdt = Vec.mul(-1.0, dc[1]);
+            var drdu = ds[1][0];
+            var drdv = ds[0][1];
+
+            return [    2.0 * Vec.dot( drdt, r ),
+                        2.0 * Vec.dot( drdu, r ),
+                        2.0 * Vec.dot( drdv, r ) ];
+        }
+
+        var sol_obj = Numeric.uncmin( objective, start_params, tol*tol, grad );
         var final = sol_obj.solution;
 
-        return new CurveSurfaceIntersection( final[0], [ final[1], final[2] ] );
+        return new CurveSurfaceIntersection( final[0], [ final[1], final[2] ],
+            Eval.rationalCurvePoint( curve, final[0] ), Eval.rationalSurfacePoint( surface, final[1], final[2]) );
     }
 
     // Approximate the intersection of a polyline and mesh while maintaining parameter information
@@ -552,8 +591,10 @@ class Intersect {
 
         return ints.map(function(x : Pair<NurbsCurveData, NurbsCurveData>) : CurveCurveIntersection {
             return Intersect.curvesWithEstimate( curve1, curve2, x.item0.knots.first(), x.item1.knots.first(), tolerance );
+        }).filter(function(x){
+            return Vec.distSquared( x.point0, x.point1 ) < tolerance;
         }).unique(function(a,b){
-            return Math.abs(a.u0 - b.u0) < tolerance;
+            return Math.abs(a.u0 - b.u0) < tolerance*5;
         });
     }
 
@@ -584,7 +625,33 @@ class Intersect {
             return Vec.dot(p1_p2, p1_p2);
         }
 
-        var sol_obj = Numeric.uncmin( objective, [u0, u1], tolerance );
+        // 2 params
+
+        // r = c0(u) - c1(t)
+        // f = r(u,t) . r(u,t)
+
+        // dr/du = dc0/du
+        // dr/dt = -dc1/dt
+
+        // gradient :
+
+        // df/du = 2 * dr/du . r(u,t)
+        // df/dt = 2 * dr/dt . r(u,t)
+
+        var grad = function(x){
+            var dc0 = Eval.rationalCurveDerivatives( curve0, x[0], 1 )
+            , dc1 = Eval.rationalCurveDerivatives( curve1, x[1], 1 );
+
+            var r = Vec.sub( dc0[0], dc1[0] );
+
+            var drdu = dc0[1];
+            var drdt = Vec.mul(-1.0, dc1[1]);
+
+            return [    2.0 * Vec.dot( drdu, r ),
+                        2.0 * Vec.dot( drdt, r ) ];
+        }
+
+        var sol_obj = Numeric.uncmin( objective, [u0, u1], tolerance * tolerance, grad );
 
         var u1 = sol_obj.solution[0]
             , u2 = sol_obj.solution[1];

@@ -51,6 +51,14 @@ function asGeometry(threePts){
     return geometry;
 }
 
+function benchmark(func, runs){
+	var d1 = Date.now();
+	for (var i = 0 ; i < runs; i++)
+		res = func();
+	var d2 = Date.now();
+	return { result : res, elapsed : d2-d1, each : (d2-d1)/runs };
+}
+
 function pointsAsGeometry(pts){
     return asGeometry( asVector3(pts) )
 }

@@ -83,7 +83,7 @@ class Analyze {
         //
         //    J d = k
         //
-        //    d =   [ u* - u, v* - v ]
+        //      d =   [ u* - u, v* - v ]
         //		k = - [ f(u,v), g(u,v) ]
         //		J =
         //          |Su|^2   +  Suu * r       Su*Sv  +  Suv * r

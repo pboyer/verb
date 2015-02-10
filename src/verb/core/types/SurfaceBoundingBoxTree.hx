@@ -3,17 +3,14 @@ package verb.core.types;
 using verb.core.ArrayExtensions;
 using verb.core.Vec;
 
-class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
+class SurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
 
+    var _children : Pair<IBoundingBoxTree<NurbsSurfaceData>, IBoundingBoxTree<NurbsSurfaceData>>;
     var _surface : NurbsSurfaceData;
     var _boundingBox : BoundingBox = null;
-    var _splitV : Bool;
-    var _knotTolU : Float;
-    var _knotTolV : Float;
 
     public function new(surface, splitV = false, knotTolU = null, knotTolV = null){
         _surface = surface;
-        _splitV = splitV;
 
         if (knotTolU == null){
             knotTolU = (surface.knotsU.domain()) / 16;
@@ -23,16 +20,20 @@ class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
             knotTolV = (surface.knotsV.domain()) / 16;
         }
 
-        _knotTolU = knotTolU;
-        _knotTolV = knotTolV;
-    }
+        var divisible = false;
 
-    public function split() : Pair<IBoundingBoxTree<NurbsSurfaceData>, IBoundingBoxTree<NurbsSurfaceData>> {
+        if (splitV){
+            divisible = _surface.knotsV.domain() > knotTolV;
+        } else {
+            divisible = _surface.knotsU.domain() > knotTolU;
+        }
+
+        if ( !divisible ) return;
 
         var min : Float;
         var max : Float;
 
-        if (_splitV){
+        if (splitV){
             min = _surface.knotsV.first();
             max = _surface.knotsV.last();
         } else {
@@ -41,13 +42,18 @@ class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
         }
 
         var dom = max - min;
-        var pivot = (min + max) / 2.0 + dom * 0.01 * Math.random();
+        var pivot = (min + max) / 2.0 + dom * 0.1 * Math.random();
 
-        var srfs = Modify.surfaceSplit( _surface, pivot, _splitV );
+        var srfs = Modify.surfaceSplit( _surface, pivot, splitV );
 
-        return new Pair<IBoundingBoxTree<NurbsSurfaceData>, IBoundingBoxTree<NurbsSurfaceData>>(
-            new LazySurfaceBoundingBoxTree( srfs[0], !_splitV, _knotTolU, _knotTolV ),
-            new LazySurfaceBoundingBoxTree( srfs[1], !_splitV, _knotTolU, _knotTolV ));
+        _children = new Pair<IBoundingBoxTree<NurbsSurfaceData>, IBoundingBoxTree<NurbsSurfaceData>>(
+            new SurfaceBoundingBoxTree( srfs[0], !splitV, knotTolU, knotTolV ),
+            new SurfaceBoundingBoxTree( srfs[1], !splitV, knotTolU, knotTolV ));
+
+    }
+
+    public function split() : Pair<IBoundingBoxTree<NurbsSurfaceData>, IBoundingBoxTree<NurbsSurfaceData>> {
+        return _children;
     }
 
     public function boundingBox(){
@@ -65,12 +71,7 @@ class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
     }
 
     public function indivisible( tolerance : Float ){
-
-        if (_splitV){
-            return _surface.knotsV.domain() < _knotTolV;
-        } else {
-            return _surface.knotsU.domain() < _knotTolU;
-        }
+        return _children == null;
     }
 
     public function empty(){

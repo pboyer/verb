@@ -3664,12 +3664,11 @@ describe("verb.core.Intersect.curves",function(){
 				controlPoints2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]]
 				curve2 = new verb.core.NurbsCurveData( degree2, knots2, controlPoints2 );
 
-		var res = verb.core.Intersect.curves( curve1,curve2, verb.core.Constants.TOLERANCE );
+		var res = verb.core.Intersect.curves( curve1, curve2, verb.core.Constants.TOLERANCE );
 
 		res.length.should.be.equal(1);
 
-		res[0].u0.should.be.approximately(0.416208132514572, verb.core.Constants.TOLERANCE );
-		res[0].u1.should.be.approximately(0.3374987853196129, verb.core.Constants.TOLERANCE );
+		verb.core.Vec.dist( res[0].point0, res[0].point1 ).should.be.lessThan( verb.core.Constants.TOLERANCE );
 
 	});
 
@@ -6163,8 +6162,8 @@ describe("verb.geom.ConicalSurface.tessellate",function(){
 
 describe("verb.geom.Intersect.curves",function(){
 
-	var curve1 = new verb.geom.BezierCurve( [[0,0,0], 		[0.5,0.1,0], [2,0,0]] ),
-		curve2 = new verb.geom.BezierCurve( [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]] );
+	var curve1 = new verb.geom.BezierCurve( [[0,0,0], 	[0.5,0.1,0], [2,0,0]] ),
+		curve2 = new verb.geom.BezierCurve( [[0.5,0.5,0], [0.7,0,0], [0.5,-1.5,0]] );
 
 	it('gives valid result for 2 planar degree 2 beziers', function(){
 
@@ -6172,8 +6171,7 @@ describe("verb.geom.Intersect.curves",function(){
 
 		res.length.should.be.equal(1);
 
-		res[0].u0.should.be.approximately(0.416208132514572, verb.core.Constants.TOLERANCE );
-		res[0].u1.should.be.approximately(0.3374987853196129, verb.core.Constants.TOLERANCE );
+		verb.core.Vec.dist( res[0].point0, res[0].point1 ).should.be.lessThan( verb.core.Constants.TOLERANCE );
 
 	});
 
@@ -6184,8 +6182,7 @@ describe("verb.geom.Intersect.curves",function(){
 
 				res.length.should.be.equal(1);
 
-				res[0].u0.should.be.approximately(0.416208132514572, verb.core.Constants.TOLERANCE );
-				res[0].u1.should.be.approximately(0.3374987853196129, verb.core.Constants.TOLERANCE );
+		        verb.core.Vec.dist( res[0].point0, res[0].point1 ).should.be.lessThan( verb.core.Constants.TOLERANCE );
 
 				done();
 			});
@@ -7016,7 +7013,7 @@ describe("verb.core.Make.surfaceBoundaryCurves",function(){
 
 });
 
-describe("verb.core.ExpIntersect.sampleSurfaceRegular",function(){
+describe("verb.core.ExpIntersect.sampleSurfaceInteriorRegular",function(){
 
     it('provides expected result for planar surface', function(){
 
@@ -7029,14 +7026,148 @@ describe("verb.core.ExpIntersect.sampleSurfaceRegular",function(){
 
         var samples = verb.core.ExpIntersect.sampleSurfaceRegular( srf, 10, 10 );
 
-        samples.uvs[0][0].should.be.eql([0,0]);
-        samples.uvs[0][10].should.be.eql([0,1]);
-
-        samples.uvs[10][0].should.be.eql([1,0]);
-        samples.uvs[10][10].should.be.eql([1,1]);
+//        samples.uvs[0][0].should.be.eql([0,0]);
+//        samples.uvs[0][10].should.be.eql([0,1]);
+//
+//        samples.uvs[10][0].should.be.eql([1,0]);
+//        samples.uvs[10][10].should.be.eql([1,1]);
 
     });
 
+});
+
+describe("verb.core.ExpIntersect.approxRotationNumber",function(){
+
+    it('should be non-zero for case 0', function(){
+        var a = [1,0];
+        var b = [0,1];
+        var c = [-1,0];
+        var d = [0,-1];
+
+        verb.core.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.not.equal( 0 );
+    });
+
+    it('should be non-zero for case 1', function(){
+        var a = [1,0];
+        var b = [0,1];
+        var c = verb.core.Vec.normalized([-1,1]);
+        var d = verb.core.Vec.normalized([-1,0.5]);
+
+        verb.core.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.equal( 0 );
+    });
+
+    it('should be non-zero for case 2', function(){
+        var a = [1,0];
+        var b = [0,1];
+        var c = verb.core.Vec.normalized([-1,1]);
+        var d = [-1,0];
+
+        verb.core.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.not.equal( 0 );
+    });
+
+    it('should be zero for case 3', function(){
+        var a = [0,1];
+        var b = [0,1];
+        var c = verb.core.Vec.normalized([-1,1]);
+        var d = [-1,0];
+
+        verb.core.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.equal(0);
+    });
+
+    it('should be non-zero for case 4', function(){
+        var a = [0,1];
+        var b = [1,0];
+        var c = verb.core.Vec.normalized([-1,1]);
+        var d = [-1,0];
+
+        verb.core.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.not.equal(0);
+    });
+
+    it('should be non-zero for case 5', function(){
+        var a = verb.core.Vec.normalized([1,-0.5]);
+        var b = verb.core.Vec.normalized([-1,0.7]);
+        var c = verb.core.Vec.normalized([-1,0]);
+        var d = verb.core.Vec.normalized([1,-1]);
+
+        verb.core.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.not.equal(0);
+    });
+
+    it('should be zero for case 6', function(){
+        var a = verb.core.Vec.normalized([1,-0.5]);
+        verb.core.ExpIntersect.approxRotationNumber( [ a, a, a, a ] ).should.equal(0);
+    });
+
+    it('should be zero for case 7', function(){
+        var a = verb.core.Vec.normalized([1,1]);
+        var b = verb.core.Vec.normalized([1,2]);
+        var c = verb.core.Vec.normalized([-1,1]);
+        var d = verb.core.Vec.normalized([1,0.5]);
+
+        verb.core.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.equal(0);
+    });
+
+    it('should be non-zero for case 8', function(){
+        var a = verb.core.Vec.normalized([1,-0.5]);
+        var b = verb.core.Vec.normalized([-1,-0.1]);
+        var c = verb.core.Vec.normalized([-1,-0.1]);
+        var d = verb.core.Vec.normalized([1,0.4]);
+
+        verb.core.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.not.equal(0);
+    });
+
+    it('should be non-zero for case 9', function(){
+        var a = verb.core.Vec.normalized([2,1]);
+        var b = verb.core.Vec.normalized([-2,1]);
+        var c = verb.core.Vec.normalized([-1,-1]);
+        var d = verb.core.Vec.normalized([0,-1]);
+
+        verb.core.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.not.equal(0);
+    });
+
+    it('should be non-zero for case 10', function(){
+        var a = verb.core.Vec.normalized([0,1]);
+        var b = verb.core.Vec.normalized([1,1]);
+        var c = verb.core.Vec.normalized([1,-1]);
+        var d = verb.core.Vec.normalized([0,-1]);
+
+        verb.core.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.not.equal(0);
+    });
+
+    it('should be non-zero for case 11', function(){
+        var a = verb.core.Vec.normalized([1,-1]);
+        var b = verb.core.Vec.normalized([-1,1]);
+        var c = verb.core.Vec.normalized([0,-1]);
+        var d = verb.core.Vec.normalized([1,-1]);
+
+        verb.core.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.not.equal(0);
+    });
+
+    it('should be non-zero for case 12', function(){
+        var a = verb.core.Vec.normalized([-1,1]);
+        var b = verb.core.Vec.normalized([-1,1]);
+        var c = verb.core.Vec.normalized([-1,1]);
+        var d = verb.core.Vec.normalized([1,-1]);
+
+        verb.core.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.not.equal(0);
+    });
+
+    it('should be zero for case 13', function(){
+        var a = verb.core.Vec.normalized([1,1]);
+        var b = verb.core.Vec.normalized([1,1]);
+        var c = verb.core.Vec.normalized([-1,1]);
+        var d = verb.core.Vec.normalized([-1,1]);
+
+        verb.core.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.equal(0);
+    });
+
+    it('should be zero for case 14', function(){
+        var a = verb.core.Vec.normalized([-1,-1]);
+        var b = verb.core.Vec.normalized([1,-1]);
+        var c = verb.core.Vec.normalized([1,-1]);
+        var d = verb.core.Vec.normalized([-1,-1]);
+
+        verb.core.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.equal(0);
+    });
 });
 
 describe("verb.core.ExpIntersect.approxSurfaceDelPhiField",function(){
@@ -7065,7 +7196,7 @@ describe("verb.core.ExpIntersect.approxSurfaceDelPhiField",function(){
 
 });
 
-describe("verb.core.ExpIntersect.approxSurfaceDelPhiField",function(){
+describe("verb.core.ExpIntersect.surfaces",function(){
 
     it('provides expected result for two planar surfaces', function(){
 
@@ -7083,22 +7214,34 @@ describe("verb.core.ExpIntersect.approxSurfaceDelPhiField",function(){
 
         var srf1 = verb.core.Make.fourPointSurface( a1, b1, c1, d1 );
 
-        var crv = verb.core.Make.surfaceIsocurve( srf, 0, false );
-
-
-//        var crv = verb.core.Make.rationalBezierCurve( [[0,0,-1], [0,0,1]] );
-
-
-        // console.log(crv)
-
-        var int = verb.core.Intersect.curveAndSurface(crv, srf1, 0.0001);
-        console.log(int)
-
-
-//        var samples = verb.core.ExpIntersect.intersectBoundaryCurves( srf, srf1, 1e-3 );
-
-//        console.log(int)
+        var ints = verb.core.ExpIntersect.surfaces( srf, srf1, 1e-3 );
 
     });
+/*
+    it('provides expected result for two nurbs surface and plane', function(){
 
+		var degree = 3
+			, knots = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
+			, pts = [ 	[ [0, 0, -10], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] , 	[40, 0, 0], [50, 0, 9] ],
+						[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] , [40, -10, 0], [50, -10, 0]	],
+						[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] , [40, -20, -2], [50, -20, 0] 	],
+						[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] , [40, -30, 0], [50, -30, 0]     ],
+						[ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , [40, -40, -20], [50, -40, 0]     ],
+						[ [0, -50, 12], [10, -50, 0], 	[20, -50, 0], 	[30, -50, 0] , [50, -50, 0], [50, -50, 15]     ],     ];
+		var srf1 =  new verb.geom.NurbsSurface.byKnotsControlPointsWeights( degree, degree, knots, knots, pts );
+
+		var p5 = [50,-50,3]
+			, p6 = [50,0,3]
+			, p7 = [0,0,3]
+			, p8 = [0,-50,5];
+
+		var srf2 = verb.geom.NurbsSurface.byCorners( p5, p6, p7, p8 );
+
+        var ints = verb.core.ExpIntersect.surfaces( srf1.asNurbs(), srf2.asNurbs(), 1e-4 );
+
+        console.log(ints);
+
+    });
+*/
 });
+

@@ -31,7 +31,6 @@ class Trig {
 
     }
 
-    //
     // Find the closest point on a ray
     //
     // **params**
@@ -41,7 +40,6 @@ class Trig {
     //
     // **returns**
     // + pt
-    //
 
     public static function rayClosestPoint( pt, o, r ) {
 
@@ -53,9 +51,6 @@ class Trig {
 
     }
 
-    //
-    //
-    //
     // Find the distance of a point to a ray
     //
     // **params**
@@ -65,7 +60,6 @@ class Trig {
     //
     // **returns**
     // + the distance
-    //
 
     public static function distToRay( pt, o, r ) {
 
@@ -109,7 +103,6 @@ class Trig {
 
     }
 
-    //
     // Find the closest point on a segment
     //
     // **params**
@@ -121,7 +114,6 @@ class Trig {
     //
     // **returns**
     // + *Object* with u and pt properties
-    //
 
     public static function segmentClosestPoint( pt : Point, segpt0 : Point, segpt1 : Point, u0 : Float, u1 : Float ) {
 

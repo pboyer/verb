@@ -12,7 +12,7 @@ class LazyCurveBoundingBoxTree implements IBoundingBoxTree<NurbsCurveData> {
     public function new(curve, knotTol : Float = null){
         _curve = curve;
         if (knotTol == null){
-            knotTol = _curve.knots.domain() / 1000;
+            knotTol = _curve.knots.domain() / 64;
         }
         _knotTol = knotTol;
     }
@@ -22,7 +22,7 @@ class LazyCurveBoundingBoxTree implements IBoundingBoxTree<NurbsCurveData> {
         var max = _curve.knots.last();
         var dom = max - min;
 
-        var crvs = Modify.curveSplit( _curve, (max + min) / 2.0 ); // + dom * 0.01 * Math.random() );
+        var crvs = Modify.curveSplit( _curve, (max + min) / 2.0 + dom * 0.1 * Math.random());
 
         return new Pair<IBoundingBoxTree<NurbsCurveData>, IBoundingBoxTree<NurbsCurveData>>(
             new LazyCurveBoundingBoxTree( crvs[0], _knotTol ),

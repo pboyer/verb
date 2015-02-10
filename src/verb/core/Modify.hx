@@ -331,7 +331,6 @@ class Modify {
         } else {
             return new NurbsSurfaceData( surface.degreeU, surface.degreeV, surface.knotsU.copy(), newknots, newPts );
         }
-
     }
 
     public static function surfaceSplit( surface : NurbsSurfaceData, u : Float, useV : Bool = false) : Array<NurbsSurfaceData> {
@@ -341,17 +340,13 @@ class Modify {
         , controlPoints;
 
         if (!useV) {
-
             controlPoints = Mat.transpose( surface.controlPoints );
             knots = surface.knotsU;
             degree = surface.degreeU;
-
         } else {
-
             controlPoints = surface.controlPoints;
             knots = surface.knotsV;
             degree = surface.degreeV;
-
         }
 
         var knots_to_insert = [ for (i in 0...degree+1) u ];
@@ -363,12 +358,10 @@ class Modify {
         var res : NurbsCurveData = null;
 
         for (cps in controlPoints){
-
             res = curveKnotRefine( new NurbsCurveData(degree, knots, cps), knots_to_insert );
 
             newpts0.push( res.controlPoints.slice( 0, s + 1 ) );
             newpts1.push( res.controlPoints.slice( s + 1 ) );
-
         }
 
         var knots0 = res.knots.slice(0, s + degree + 2);
@@ -387,7 +380,6 @@ class Modify {
                     new NurbsSurfaceData(surface.degreeU, degree, surface.knotsU.copy(), knots1, newpts1 ) ];
     }
 
-    //
     // Decompose a NURBS curve into a collection of bezier's.  Useful
     // as each bezier fits into it's convex hull.  This is a useful starting
     // point for intersection, closest point, divide & conquer algorithms
@@ -397,7 +389,7 @@ class Modify {
     //
     // **returns**
     // + *Array* of NurbsCurveData objects, defined by degree, knots, and control points
-    //
+
     public static function decomposeCurveIntoBeziers( curve : NurbsCurveData ) : Array<NurbsCurveData> {
 
         var degree = curve.degree

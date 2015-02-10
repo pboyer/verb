@@ -10,6 +10,15 @@ using Lambda;
 @:expose("core.Vec")
 class Vec {
 
+    public static function angleBetween(a : Array<Float>, b : Array<Float>) : Float{
+        return Math.acos( dot(a, b) / ( norm(a) * norm(b) )  );
+    }
+
+    public static function angleBetweenNormalized2d(a : Array<Float>, b : Array<Float>) : Float {
+        var perpDot = a[0] * b[1]-a[1] * b[0];
+        return Math.atan2(perpDot, dot(a, b));
+    }
+
     public static inline function domain(a : Array<Float>) : Float {
         return a.last() - a.first();
     }

@@ -62,6 +62,11 @@ Type.getClassName = function(c) {
 	return a.join(".");
 };
 var haxe = {};
+haxe.Log = function() { };
+haxe.Log.__name__ = ["haxe","Log"];
+haxe.Log.trace = function(v,infos) {
+	js.Boot.__trace(v,infos);
+};
 haxe.ds = {};
 haxe.ds.IntMap = function() {
 	this.h = { };
@@ -84,11 +89,100 @@ haxe.ds.IntMap.prototype = {
 		return true;
 	}
 };
-haxe.ds.Option = { __constructs__ : ["Some","None"] };
+haxe.ds.Option = { __ename__ : true, __constructs__ : ["Some","None"] };
 haxe.ds.Option.Some = function(v) { var $x = ["Some",0,v]; $x.__enum__ = haxe.ds.Option; $x.toString = $estr; return $x; };
 haxe.ds.Option.None = ["None",1];
 haxe.ds.Option.None.toString = $estr;
 haxe.ds.Option.None.__enum__ = haxe.ds.Option;
+var js = {};
+js.Boot = function() { };
+js.Boot.__name__ = ["js","Boot"];
+js.Boot.__unhtml = function(s) {
+	return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
+};
+js.Boot.__trace = function(v,i) {
+	var msg;
+	if(i != null) msg = i.fileName + ":" + i.lineNumber + ": "; else msg = "";
+	msg += js.Boot.__string_rec(v,"");
+	if(i != null && i.customParams != null) {
+		var _g = 0;
+		var _g1 = i.customParams;
+		while(_g < _g1.length) {
+			var v1 = _g1[_g];
+			++_g;
+			msg += "," + js.Boot.__string_rec(v1,"");
+		}
+	}
+	var d;
+	if(typeof(document) != "undefined" && (d = document.getElementById("haxe:trace")) != null) d.innerHTML += js.Boot.__unhtml(msg) + "<br/>"; else if(typeof console != "undefined" && console.log != null) console.log(msg);
+};
+js.Boot.__string_rec = function(o,s) {
+	if(o == null) return "null";
+	if(s.length >= 5) return "<...>";
+	var t = typeof(o);
+	if(t == "function" && (o.__name__ || o.__ename__)) t = "object";
+	switch(t) {
+	case "object":
+		if(o instanceof Array) {
+			if(o.__enum__) {
+				if(o.length == 2) return o[0];
+				var str = o[0] + "(";
+				s += "\t";
+				var _g1 = 2;
+				var _g = o.length;
+				while(_g1 < _g) {
+					var i = _g1++;
+					if(i != 2) str += "," + js.Boot.__string_rec(o[i],s); else str += js.Boot.__string_rec(o[i],s);
+				}
+				return str + ")";
+			}
+			var l = o.length;
+			var i1;
+			var str1 = "[";
+			s += "\t";
+			var _g2 = 0;
+			while(_g2 < l) {
+				var i2 = _g2++;
+				str1 += (i2 > 0?",":"") + js.Boot.__string_rec(o[i2],s);
+			}
+			str1 += "]";
+			return str1;
+		}
+		var tostr;
+		try {
+			tostr = o.toString;
+		} catch( e ) {
+			return "???";
+		}
+		if(tostr != null && tostr != Object.toString) {
+			var s2 = o.toString();
+			if(s2 != "[object Object]") return s2;
+		}
+		var k = null;
+		var str2 = "{\n";
+		s += "\t";
+		var hasp = o.hasOwnProperty != null;
+		for( var k in o ) {
+		if(hasp && !o.hasOwnProperty(k)) {
+			continue;
+		}
+		if(k == "prototype" || k == "__class__" || k == "__super__" || k == "__interfaces__" || k == "__properties__") {
+			continue;
+		}
+		if(str2.length != 2) str2 += ", \n";
+		str2 += s + k + " : " + js.Boot.__string_rec(o[k],s);
+		}
+		s = s.substring(1);
+		str2 += "\n" + s + "}";
+		return str2;
+	case "function":
+		return "<function>";
+	case "string":
+		return o;
+	default:
+		return String(o);
+	}
+};
 var promhx = {};
 promhx.base = {};
 promhx.base.AsyncBase = function(d) {
@@ -620,14 +714,14 @@ promhx.base.EventLoop.continueOnNextLoop = function() {
 	if(promhx.base.EventLoop.nextLoop != null) promhx.base.EventLoop.nextLoop(promhx.base.EventLoop.f); else setImmediate(promhx.base.EventLoop.f);
 };
 promhx.error = {};
-promhx.error.PromiseError = { __constructs__ : ["AlreadyResolved","DownstreamNotFullfilled"] };
+promhx.error.PromiseError = { __ename__ : true, __constructs__ : ["AlreadyResolved","DownstreamNotFullfilled"] };
 promhx.error.PromiseError.AlreadyResolved = function(message) { var $x = ["AlreadyResolved",0,message]; $x.__enum__ = promhx.error.PromiseError; $x.toString = $estr; return $x; };
 promhx.error.PromiseError.DownstreamNotFullfilled = function(message) { var $x = ["DownstreamNotFullfilled",1,message]; $x.__enum__ = promhx.error.PromiseError; $x.toString = $estr; return $x; };
 var verb = {};
 verb.Verb = function() { };
 verb.Verb.__name__ = ["verb","Verb"];
 verb.Verb.main = function() {
-	console.log("verb 0.2.0");
+	haxe.Log.trace("verb 0.2.0",{ fileName : "Verb.hx", lineNumber : 44, className : "verb.Verb", methodName : "main"});
 };
 verb.core = {};
 verb.core.KnotMultiplicity = $hx_exports.core.KnotMultiplicity = function(knot,mult) {
@@ -1580,51 +1674,83 @@ verb.core.Eval.knotSpanGivenN = function(n,degree,u,knots) {
 };
 verb.core.ExpIntersect = $hx_exports.core.ExpIntersect = function() { };
 verb.core.ExpIntersect.__name__ = ["verb","core","ExpIntersect"];
-verb.core.ExpIntersect.intersectBoundaryCurves = function(surface0,surface1,tol) {
-	var surface0Boundaries = verb.core.Make.surfaceBoundaryCurves(surface0);
-	var surface1Boundaries = verb.core.Make.surfaceBoundaryCurves(surface1);
-	console.log(surface0Boundaries[0]);
-	console.log(surface1Boundaries);
-	var ints = [];
-	var _g = 0;
-	while(_g < surface0Boundaries.length) {
-		var crv = surface0Boundaries[_g];
-		++_g;
-		ints = ints.concat(verb.core.Intersect.curveAndSurface(crv,surface1,tol));
-	}
-	var _g1 = 0;
-	while(_g1 < surface1Boundaries.length) {
-		var crv1 = surface1Boundaries[_g1];
-		++_g1;
-		ints = ints.concat(verb.core.Intersect.curveAndSurface(crv1,surface0,tol));
-	}
-	return ints;
-};
 verb.core.ExpIntersect.surfaces = function(surface0,surface1,tol) {
 	var exactOuter = verb.core.ExpIntersect.intersectBoundaryCurves(surface0,surface1,tol);
-	var approxInner = verb.core.ExpIntersect.approxInnerCriticalPts(surface0,surface1);
-	var refinedInner = verb.core.ExpIntersect.refineInnerCriticalPts(surface0,surface1,approxInner);
-	return null;
+	return exactOuter;
 };
-verb.core.ExpIntersect.refineInnerCriticalPts = function(surface0,surface1,approx) {
-	return null;
+verb.core.ExpIntersect.refineInnerCriticalPts = function(surface0,surface1,approx,tol) {
+	return approx.map(function(x) {
+		return verb.core.ExpIntersect.refineCriticalPt(surface0,surface1,x,tol);
+	});
+};
+verb.core.ExpIntersect.refineCriticalPt = function(surface0,surface1,approx,tol) {
+	var obj = function(x) {
+		var d0 = verb.core.Eval.rationalSurfaceDerivatives(surface0,x[0],x[1],1);
+		var d1 = verb.core.Eval.rationalSurfaceDerivatives(surface1,x[2],x[3],1);
+		var n0 = verb.core.Vec.normalized(verb.core.Vec.cross(d0[1][0],d0[0][1]));
+		var n1 = verb.core.Vec.normalized(verb.core.Vec.cross(d1[1][0],d1[0][1]));
+		var vec = verb.core.Vec.sub(d0[0][0],d1[0][0]);
+		var dist = verb.core.Vec.normSquared(vec);
+		var vecnorm = verb.core.Vec.dot(vec,n1);
+		var normdot = verb.core.Vec.dot(n0,n1);
+		return dist - vecnorm * vecnorm + 1 - normdot * normdot;
+	};
+	var start = [approx.item0[0],approx.item0[1],approx.item1[0],approx.item1[1]];
+	var sol = verb.core.Numeric.uncmin(obj,start,tol);
+	var $final = sol.solution;
+	return new verb.core.types.Pair([$final[0],$final[1]],[$final[2],$final[3]]);
 };
 verb.core.ExpIntersect.verifyInnerCriticalPts = function(surface0,surface1,approx) {
 	return null;
 };
 verb.core.ExpIntersect.approxInnerCriticalPts = function(surface0,surface1) {
-	var maxDivs = 10;
-	var div0 = new verb.core.types.LazySurfaceBoundingBoxTree(surface0,null,verb.core.Vec.domain(surface0.knotsU) / maxDivs,verb.core.Vec.domain(surface0.knotsV) / maxDivs);
-	var div1 = new verb.core.types.LazySurfaceBoundingBoxTree(surface1,null,verb.core.Vec.domain(surface1.knotsU) / maxDivs,verb.core.Vec.domain(surface1.knotsV) / maxDivs);
-	var res = verb.core.Intersect.boundingBoxTrees(div0,div1);
-	var numSamples = 10;
+	haxe.Log.trace("SURFACE INTERSECTION",{ fileName : "ExpIntersect.hx", lineNumber : 71, className : "verb.core.ExpIntersect", methodName : "approxInnerCriticalPts"});
+	var div0 = new verb.core.types.LazySurfaceBoundingBoxTree(surface0,false,0.5,0.5);
+	var div1 = new verb.core.types.LazySurfaceBoundingBoxTree(surface1,false,0.5,0.5);
+	var res = verb.core.Intersect.boundingBoxTrees(div0,div1,0);
+	haxe.Log.trace(res.length,{ fileName : "ExpIntersect.hx", lineNumber : 78, className : "verb.core.ExpIntersect", methodName : "approxInnerCriticalPts", customParams : ["TOTAL INTERSECTING SUB-SURFACES"]});
+	var numSamples = 5;
+	var criticalPts = [];
 	var _g = 0;
 	while(_g < res.length) {
 		var srfpair = res[_g];
 		++_g;
-		var delphi = verb.core.ExpIntersect.approxSurfaceDelPhiField(srfpair.item0,srfpair.item1,numSamples,numSamples);
+		var a = verb.core.ExpIntersect.approxSurfaceDelPhiField(srfpair.item0,srfpair.item1,numSamples,numSamples);
+		var f = a.delphi;
+		var uvs0 = a.uvs0;
+		var uvs1 = a.uvs1;
+		var _g2 = 1;
+		var _g1 = f.length;
+		while(_g2 < _g1) {
+			var i = _g2++;
+			var _g4 = 1;
+			var _g3 = f[i].length;
+			while(_g4 < _g3) {
+				var j = _g4++;
+				var num = verb.core.ExpIntersect.approxRotationNumber([f[i][j - 1],f[i][j],f[i - 1][j],f[i - 1][j - 1]]);
+				if(num != 0) {
+					var midU0 = (uvs0[i][j][1] + uvs0[i][j - 1][1]) / 2;
+					var midV0 = (uvs0[i][j][0] + uvs0[i - 1][j][0]) / 2;
+					var midU1 = (uvs1[i][j][1] + uvs1[i][j - 1][1]) / 2;
+					var midV1 = (uvs1[i][j][0] + uvs1[i - 1][j][0]) / 2;
+					criticalPts.push(new verb.core.types.Pair([midU0,midV0],[midU1,midV1]));
+				}
+			}
+		}
 	}
-	return null;
+	return criticalPts;
+};
+verb.core.ExpIntersect.approxRotationNumber = function(vs) {
+	var sum = 0.0;
+	var l = vs.length;
+	var _g1 = 1;
+	var _g = l + 1;
+	while(_g1 < _g) {
+		var i = _g1++;
+		var ang = verb.core.Vec.angleBetweenNormalized2d(vs[i - 1],vs[i % l]);
+		sum += Math.abs(ang);
+	}
+	return Math.floor(Math.abs(sum / (2 * Math.PI)));
 };
 verb.core.ExpIntersect.approxSurfaceDelPhiField = function(surface0,surface1,divs_u,divs_v) {
 	var tess0 = verb.core.ExpIntersect.sampleSurfaceRegular(surface0,divs_u,divs_v);
@@ -1678,11 +1804,11 @@ verb.core.ExpIntersect.approxSurfaceDelPhiField = function(surface0,surface1,div
 			var n2 = verb.core.Vec.normalized(verb.core.Vec.cross(derivs1[1][0],derivs1[0][1]));
 			var ru = derivs0[1][0];
 			var rv = derivs0[0][1];
-			var delphi = [verb.core.Vec.dot(n2,ru),verb.core.Vec.dot(n2,rv)];
+			var delphi = verb.core.Vec.normalized([verb.core.Vec.dot(n2,ru),verb.core.Vec.dot(n2,rv)]);
 			delphirow.push(delphi);
 		}
 	}
-	return { ruvs : tess0.uvs, quvs : minuvs, delphi : delphifield};
+	return { uvs0 : tess0.uvs, uvs1 : minuvs, delphi : delphifield};
 };
 verb.core.ExpIntersect.sampleSurfaceRegular = function(surface,divs_u,divs_v) {
 	if(divs_u < 1) divs_u = 1;
@@ -1692,8 +1818,11 @@ verb.core.ExpIntersect.sampleSurfaceRegular = function(surface,divs_u,divs_v) {
 	var controlPoints = surface.controlPoints;
 	var knotsU = surface.knotsU;
 	var knotsV = surface.knotsV;
-	var u_span = knotsU[knotsU.length - 1] - knotsU[0];
-	var v_span = knotsV[knotsV.length - 1] - knotsV[0];
+	var offset = 0.005;
+	var u_span = knotsU[knotsU.length - 1] - knotsU[0] - 2 * offset;
+	var v_span = knotsV[knotsV.length - 1] - knotsV[0] - 2 * offset;
+	var minu = knotsU[0] + offset;
+	var minv = knotsV[0] + offset;
 	var span_u = u_span / divs_u;
 	var span_v = v_span / divs_v;
 	var points = [];
@@ -1706,19 +1835,79 @@ verb.core.ExpIntersect.sampleSurfaceRegular = function(surface,divs_u,divs_v) {
 		uvs.push(uvrow);
 		var pointsrow = [];
 		points.push(pointsrow);
+		var pt_u = minu + i * span_u;
 		var _g3 = 0;
 		var _g2 = divs_v + 1;
 		while(_g3 < _g2) {
 			var j = _g3++;
-			var pt_u = i * span_u;
-			var pt_v = j * span_v;
+			var pt_v = minv + j * span_v;
 			uvrow.push([pt_u,pt_v]);
 			pointsrow.push(verb.core.Eval.rationalSurfacePoint(surface,pt_u,pt_v));
 		}
 	}
 	return { uvs : uvs, points : points};
 };
-verb.core.ExpIntersect.approxRotationNumber = function(v0,v1,v2,v3) {
+verb.core.ExpIntersect.intersectBoundaryCurves = function(surface0,surface1,tol) {
+	var srf0bs = verb.core.Make.surfaceBoundaryCurves(surface0);
+	var srf1bs = verb.core.Make.surfaceBoundaryCurves(surface1);
+	var ints = [];
+	var _g1 = 0;
+	var _g = srf0bs.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		var crv = srf0bs[i];
+		var res = verb.core.Intersect.curveAndSurface(crv,surface1,tol);
+		var _g2 = 0;
+		while(_g2 < res.length) {
+			var $int = res[_g2];
+			++_g2;
+			var uv;
+			switch(i) {
+			case 0:
+				uv = [surface0.knotsU[0],$int.u];
+				break;
+			case 1:
+				uv = [verb.core.ArrayExtensions.last(surface0.knotsU),$int.u];
+				break;
+			case 2:
+				uv = [$int.u,surface0.knotsV[0]];
+				break;
+			default:
+				uv = [$int.u,verb.core.ArrayExtensions.last(surface0.knotsV)];
+			}
+			ints.push(new verb.core.types.Pair(uv,$int.uv));
+		}
+	}
+	var _g11 = 0;
+	var _g3 = srf1bs.length;
+	while(_g11 < _g3) {
+		var i1 = _g11++;
+		var crv1 = srf1bs[i1];
+		var res1 = verb.core.Intersect.curveAndSurface(crv1,surface0,tol);
+		var _g21 = 0;
+		while(_g21 < res1.length) {
+			var int1 = res1[_g21];
+			++_g21;
+			var uv1;
+			switch(i1) {
+			case 0:
+				uv1 = [surface1.knotsU[0],int1.u];
+				break;
+			case 1:
+				uv1 = [verb.core.ArrayExtensions.last(surface1.knotsU),int1.u];
+				break;
+			case 2:
+				uv1 = [int1.u,surface1.knotsV[0]];
+				break;
+			default:
+				uv1 = [int1.u,verb.core.ArrayExtensions.last(surface1.knotsV)];
+			}
+			ints.push(new verb.core.types.Pair(int1.uv,uv1));
+		}
+	}
+	return verb.core.ArrayExtensions.unique(ints,function(a,b) {
+		return Math.abs(a.item0[0] - b.item0[0]) < tol && Math.abs(a.item0[1] - b.item0[1]) < tol;
+	});
 };
 verb.core.Intersect = $hx_exports.core.Intersect = function() { };
 verb.core.Intersect.__name__ = ["verb","core","Intersect"];
@@ -1915,9 +2104,11 @@ verb.core.Intersect.lookupAdjacentSegment = function(segEnd,tree,numResults) {
 	});
 	if(adj.length == 1) return adj[0]; else return null;
 };
-verb.core.Intersect.curveAndSurface = function(curve,surface,tol) {
+verb.core.Intersect.curveAndSurface = function(curve,surface,tol,crvBbTree,srfBbTree) {
 	if(tol == null) tol = 1e-3;
-	var ints = verb.core.Intersect.boundingBoxTrees(new verb.core.types.LazyCurveBoundingBoxTree(curve),new verb.core.types.LazySurfaceBoundingBoxTree(surface),0);
+	if(crvBbTree != null) crvBbTree = crvBbTree; else crvBbTree = new verb.core.types.LazyCurveBoundingBoxTree(curve);
+	if(srfBbTree != null) srfBbTree = srfBbTree; else srfBbTree = new verb.core.types.LazySurfaceBoundingBoxTree(surface);
+	var ints = verb.core.Intersect.boundingBoxTrees(crvBbTree,srfBbTree,tol);
 	return verb.core.ArrayExtensions.unique(ints.map(function(inter) {
 		var crvSeg = inter.item0;
 		var srfPart = inter.item1;
@@ -1930,8 +2121,10 @@ verb.core.Intersect.curveAndSurface = function(curve,surface,tol) {
 		var maxv = verb.core.ArrayExtensions.last(srfPart.knotsV);
 		var uv = [(minu + maxu) / 2.0,(minv + maxv) / 2.0];
 		return verb.core.Intersect.curveAndSurfaceWithEstimate(crvSeg,srfPart,[u].concat(uv),tol);
+	}).filter(function(x) {
+		return verb.core.Vec.distSquared(x.curvePoint,x.surfacePoint) < tol * tol;
 	}),function(a,b) {
-		return Math.abs(a.u - b.u) < tol;
+		return Math.abs(a.u - b.u) < 0.5 * tol;
 	});
 };
 verb.core.Intersect.curveAndSurfaceWithEstimate = function(curve,surface,start_params,tol) {
@@ -1942,9 +2135,18 @@ verb.core.Intersect.curveAndSurfaceWithEstimate = function(curve,surface,start_p
 		var p1_p2 = verb.core.Vec.sub(p1,p2);
 		return verb.core.Vec.dot(p1_p2,p1_p2);
 	};
-	var sol_obj = verb.core.Numeric.uncmin(objective,start_params,tol);
+	var grad = function(x1) {
+		var dc = verb.core.Eval.rationalCurveDerivatives(curve,x1[0],1);
+		var ds = verb.core.Eval.rationalSurfaceDerivatives(surface,x1[1],x1[2],1);
+		var r = verb.core.Vec.sub(ds[0][0],dc[0]);
+		var drdt = verb.core.Vec.mul(-1.0,dc[1]);
+		var drdu = ds[1][0];
+		var drdv = ds[0][1];
+		return [2.0 * verb.core.Vec.dot(drdt,r),2.0 * verb.core.Vec.dot(drdu,r),2.0 * verb.core.Vec.dot(drdv,r)];
+	};
+	var sol_obj = verb.core.Numeric.uncmin(objective,start_params,tol * tol,grad);
 	var $final = sol_obj.solution;
-	return new verb.core.types.CurveSurfaceIntersection($final[0],[$final[1],$final[2]]);
+	return new verb.core.types.CurveSurfaceIntersection($final[0],[$final[1],$final[2]],verb.core.Eval.rationalCurvePoint(curve,$final[0]),verb.core.Eval.rationalSurfacePoint(surface,$final[1],$final[2]));
 };
 verb.core.Intersect.polylineAndMesh = function(polyline,mesh,tol) {
 	var res = verb.core.Intersect.boundingBoxTrees(new verb.core.types.LazyPolylineBoundingBoxTree(polyline),new verb.core.types.LazyMeshBoundingBoxTree(mesh),tol);
@@ -1985,8 +2187,10 @@ verb.core.Intersect.curves = function(curve1,curve2,tolerance) {
 	var ints = verb.core.Intersect.boundingBoxTrees(new verb.core.types.LazyCurveBoundingBoxTree(curve1),new verb.core.types.LazyCurveBoundingBoxTree(curve2),0);
 	return verb.core.ArrayExtensions.unique(ints.map(function(x) {
 		return verb.core.Intersect.curvesWithEstimate(curve1,curve2,x.item0.knots[0],x.item1.knots[0],tolerance);
+	}).filter(function(x1) {
+		return verb.core.Vec.distSquared(x1.point0,x1.point1) < tolerance;
 	}),function(a,b) {
-		return Math.abs(a.u0 - b.u0) < tolerance;
+		return Math.abs(a.u0 - b.u0) < tolerance * 5;
 	});
 };
 verb.core.Intersect.curvesWithEstimate = function(curve0,curve1,u0,u1,tolerance) {
@@ -1996,7 +2200,15 @@ verb.core.Intersect.curvesWithEstimate = function(curve0,curve1,u0,u1,tolerance)
 		var p1_p2 = verb.core.Vec.sub(p1,p2);
 		return verb.core.Vec.dot(p1_p2,p1_p2);
 	};
-	var sol_obj = verb.core.Numeric.uncmin(objective,[u0,u1],tolerance);
+	var grad = function(x1) {
+		var dc0 = verb.core.Eval.rationalCurveDerivatives(curve0,x1[0],1);
+		var dc1 = verb.core.Eval.rationalCurveDerivatives(curve1,x1[1],1);
+		var r = verb.core.Vec.sub(dc0[0],dc1[0]);
+		var drdu = dc0[1];
+		var drdt = verb.core.Vec.mul(-1.0,dc1[1]);
+		return [2.0 * verb.core.Vec.dot(drdu,r),2.0 * verb.core.Vec.dot(drdt,r)];
+	};
+	var sol_obj = verb.core.Numeric.uncmin(objective,[u0,u1],tolerance * tolerance,grad);
 	var u11 = sol_obj.solution[0];
 	var u2 = sol_obj.solution[1];
 	var p11 = verb.core.Eval.rationalCurvePoint(curve0,u11);
@@ -4131,6 +4343,13 @@ verb.core.Trig.segmentClosestPoint = function(pt,segpt0,segpt1,u0,u1) {
 };
 verb.core.Vec = $hx_exports.core.Vec = function() { };
 verb.core.Vec.__name__ = ["verb","core","Vec"];
+verb.core.Vec.angleBetween = function(a,b) {
+	return Math.acos(verb.core.Vec.dot(a,b) / (verb.core.Vec.norm(a) * verb.core.Vec.norm(b)));
+};
+verb.core.Vec.angleBetweenNormalized2d = function(a,b) {
+	var perpDot = a[0] * b[1] - a[1] * b[0];
+	return Math.atan2(perpDot,verb.core.Vec.dot(a,b));
+};
 verb.core.Vec.domain = function(a) {
 	return a[a.length - 1] - a[0];
 };
@@ -4750,9 +4969,11 @@ verb.core.types.CurveLengthSample = $hx_exports.core.CurveLengthSample = functio
 	this.len = len;
 };
 verb.core.types.CurveLengthSample.__name__ = ["verb","core","types","CurveLengthSample"];
-verb.core.types.CurveSurfaceIntersection = $hx_exports.core.CurveSurfaceIntersection = function(u,uv) {
+verb.core.types.CurveSurfaceIntersection = $hx_exports.core.CurveSurfaceIntersection = function(u,uv,curvePoint,surfacePoint) {
 	this.u = u;
 	this.uv = uv;
+	this.curvePoint = curvePoint;
+	this.surfacePoint = surfacePoint;
 };
 verb.core.types.CurveSurfaceIntersection.__name__ = ["verb","core","types","CurveSurfaceIntersection"];
 verb.core.types.CurveTriPoint = $hx_exports.core.CurveTriPoint = function(u,point,uv) {
@@ -4771,7 +4992,7 @@ verb.core.types.Interval.__name__ = ["verb","core","types","Interval"];
 verb.core.types.LazyCurveBoundingBoxTree = function(curve,knotTol) {
 	this._boundingBox = null;
 	this._curve = curve;
-	if(knotTol == null) knotTol = verb.core.Vec.domain(this._curve.knots) / 1000;
+	if(knotTol == null) knotTol = verb.core.Vec.domain(this._curve.knots) / 64;
 	this._knotTol = knotTol;
 };
 verb.core.types.LazyCurveBoundingBoxTree.__name__ = ["verb","core","types","LazyCurveBoundingBoxTree"];
@@ -4781,7 +5002,7 @@ verb.core.types.LazyCurveBoundingBoxTree.prototype = {
 		var min = this._curve.knots[0];
 		var max = verb.core.ArrayExtensions.last(this._curve.knots);
 		var dom = max - min;
-		var crvs = verb.core.Modify.curveSplit(this._curve,(max + min) / 2.0);
+		var crvs = verb.core.Modify.curveSplit(this._curve,(max + min) / 2.0 + dom * 0.1 * Math.random());
 		return new verb.core.types.Pair(new verb.core.types.LazyCurveBoundingBoxTree(crvs[0],this._knotTol),new verb.core.types.LazyCurveBoundingBoxTree(crvs[1],this._knotTol));
 	}
 	,boundingBox: function() {
@@ -4872,8 +5093,8 @@ verb.core.types.LazySurfaceBoundingBoxTree = function(surface,splitV,knotTolU,kn
 	this._boundingBox = null;
 	this._surface = surface;
 	this._splitV = splitV;
-	if(knotTolU == null) knotTolU = verb.core.Vec.domain(surface.knotsU) / 1000;
-	if(knotTolV == null) knotTolV = verb.core.Vec.domain(surface.knotsV) / 1000;
+	if(knotTolU == null) knotTolU = verb.core.Vec.domain(surface.knotsU) / 16;
+	if(knotTolV == null) knotTolV = verb.core.Vec.domain(surface.knotsV) / 16;
 	this._knotTolU = knotTolU;
 	this._knotTolV = knotTolV;
 };
@@ -4891,7 +5112,7 @@ verb.core.types.LazySurfaceBoundingBoxTree.prototype = {
 			max = verb.core.ArrayExtensions.last(this._surface.knotsU);
 		}
 		var dom = max - min;
-		var pivot = (min + max) / 2.0;
+		var pivot = (min + max) / 2.0 + dom * 0.01 * Math.random();
 		var srfs = verb.core.Modify.surfaceSplit(this._surface,pivot,this._splitV);
 		return new verb.core.types.Pair(new verb.core.types.LazySurfaceBoundingBoxTree(srfs[0],!this._splitV,this._knotTolU,this._knotTolV),new verb.core.types.LazySurfaceBoundingBoxTree(srfs[1],!this._splitV,this._knotTolU,this._knotTolV));
 	}
@@ -5021,6 +5242,58 @@ verb.core.types.Ray = $hx_exports.core.Ray = function(origin,dir) {
 	this.dir = dir;
 };
 verb.core.types.Ray.__name__ = ["verb","core","types","Ray"];
+verb.core.types.SurfaceBoundingBoxTree = function(surface,splitV,knotTolU,knotTolV) {
+	if(splitV == null) splitV = false;
+	this._boundingBox = null;
+	this._surface = surface;
+	if(knotTolU == null) knotTolU = verb.core.Vec.domain(surface.knotsU) / 16;
+	if(knotTolV == null) knotTolV = verb.core.Vec.domain(surface.knotsV) / 16;
+	var divisible = false;
+	if(splitV) divisible = verb.core.Vec.domain(this._surface.knotsV) > knotTolV; else divisible = verb.core.Vec.domain(this._surface.knotsU) > knotTolU;
+	if(!divisible) return;
+	var min;
+	var max;
+	if(splitV) {
+		min = this._surface.knotsV[0];
+		max = verb.core.ArrayExtensions.last(this._surface.knotsV);
+	} else {
+		min = this._surface.knotsU[0];
+		max = verb.core.ArrayExtensions.last(this._surface.knotsU);
+	}
+	var dom = max - min;
+	var pivot = (min + max) / 2.0 + dom * 0.1 * Math.random();
+	var srfs = verb.core.Modify.surfaceSplit(this._surface,pivot,splitV);
+	this._children = new verb.core.types.Pair(new verb.core.types.SurfaceBoundingBoxTree(srfs[0],!splitV,knotTolU,knotTolV),new verb.core.types.SurfaceBoundingBoxTree(srfs[1],!splitV,knotTolU,knotTolV));
+};
+verb.core.types.SurfaceBoundingBoxTree.__name__ = ["verb","core","types","SurfaceBoundingBoxTree"];
+verb.core.types.SurfaceBoundingBoxTree.__interfaces__ = [verb.core.types.IBoundingBoxTree];
+verb.core.types.SurfaceBoundingBoxTree.prototype = {
+	split: function() {
+		return this._children;
+	}
+	,boundingBox: function() {
+		if(this._boundingBox == null) {
+			this._boundingBox = new verb.core.types.BoundingBox();
+			var _g = 0;
+			var _g1 = this._surface.controlPoints;
+			while(_g < _g1.length) {
+				var row = _g1[_g];
+				++_g;
+				this._boundingBox.addRange(verb.core.Eval.dehomogenize1d(row));
+			}
+		}
+		return this._boundingBox;
+	}
+	,'yield': function() {
+		return this._surface;
+	}
+	,indivisible: function(tolerance) {
+		return this._children == null;
+	}
+	,empty: function() {
+		return false;
+	}
+};
 verb.core.types.SurfacePoint = function(point,normal,uv,id,degen) {
 	if(degen == null) degen = false;
 	if(id == null) id = -1;
@@ -5126,7 +5399,7 @@ verb.exe.WorkerPool.prototype = {
 							_g._callbacks.remove(workId[0]);
 						}
 					} catch( error ) {
-						console.log(error);
+						haxe.Log.trace(error,{ fileName : "WorkerPool.hx", lineNumber : 77, className : "verb.exe.WorkerPool", methodName : "processQueue"});
 					}
 					_g.processQueue();
 				};
