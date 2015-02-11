@@ -13,7 +13,7 @@
 
 	threeSetup();
 
-
+    /*
     var a = [0,0,0];
     var b = [10,0,0];
     var c = [10,10,0];
@@ -28,8 +28,9 @@
 
     var srf2 = verb.geom.NurbsSurface.byCorners( a1, b1, c1, d1 );
 
+    */
 
-    /*
+
     var degree = 3
         , knots = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
         , pts = [ 	[ [0, 0, -10], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] , 	[40, 0, 0], [50, 0, 9] ],
@@ -40,13 +41,13 @@
                     [ [0, -50, 12], [10, -50, 0], 	[20, -50, 0], 	[30, -50, 0] , [50, -50, 0], [50, -50, 15]     ],     ];
     var srf1 =  new verb.geom.NurbsSurface.byKnotsControlPointsWeights( degree, degree, knots, knots, pts );
 
-    var p5 = [50,-50,3]
-        , p6 = [50,0,3]
-        , p7 = [0,0,3]
-        , p8 = [0,-50,3];
+    var p5 = [40,-50,3]
+        , p6 = [40,0,3]
+        , p7 = [-10,0,3]
+        , p8 = [-10,-50,3];
 
     var srf2 = verb.geom.NurbsSurface.byCorners( p5, p6, p7, p8 );
-    */
+
 
     var d1 = srf1.asNurbs();
     var d2 = srf2.asNurbs();

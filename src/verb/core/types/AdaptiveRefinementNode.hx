@@ -334,12 +334,12 @@ class AdaptiveRefinementNode {
         , ids = []
         , splitid = 0;
 
-// enumerate all uvs in counter clockwise direction
+        // enumerate all uvs in counter clockwise direction
         for (i in 0...4){
 
             var edgeCorners = this.getAllCorners(i);
 
-// this is the vertex that is split
+            // this is the vertex that is split
             if (edgeCorners.length == 2 ) splitid = i + 1;
 
             for (j in 0...edgeCorners.length) {
@@ -349,7 +349,7 @@ class AdaptiveRefinementNode {
 
         for (corner in uvs){
 
-// if the id is defined, we can just push it and continue
+            // if the id is defined, we can just push it and continue
             if (corner.id != -1){
                 ids.push(corner.id);
                 continue;
@@ -367,51 +367,43 @@ class AdaptiveRefinementNode {
 
         if (uvs.length == 4){
 
-// if the number of points is 4, we're just doing a
-// rectangle - just build the basic triangulated square
+            // if the number of points is 4, we're just doing a
+            // rectangle - just build the basic triangulated square
             mesh.faces.push( [ ids[0], ids[3], ids[1] ] );
             mesh.faces.push( [ ids[3], ids[2], ids[1] ] );
 
-// all done
+            // all done
             return mesh;
 
         } else if (uvs.length == 5){
 
-// use the splitcorner to triangulate
+            // use the splitcorner to triangulate
             var il = ids.length;
 
-// there will be 3 triangles
-            mesh.faces.push( [ ids[ splitid ],
-            ids[ (splitid + 1) % il ],
-            ids[ (splitid + 2) % il ] ] );
-
-            mesh.faces.push( [ ids[ (splitid + 4) % il ],
-            ids[ (splitid + 3) % il ],
-            ids[ splitid ] ] );
-
-            mesh.faces.push( [ ids[ splitid ],
-            ids[ (splitid + 2) % il ],
-            ids[ (splitid + 3) % il ] ]);
+            // there will be 3 triangles
+            mesh.faces.push( [ ids[ splitid ], ids[ (splitid + 2) % il ], ids[ (splitid + 1) % il ] ] );
+            mesh.faces.push( [ ids[ (splitid + 4) % il ],  ids[ (splitid + 3) % il ], ids[ splitid ] ] );
+            mesh.faces.push( [ ids[ splitid ], ids[ (splitid + 3) % il ],ids[ (splitid + 2) % il ] ]);
 
             return mesh;
 
         }
 
-// make point at center of face
+        // make point at center of face
         var center = this.center();
 
         mesh.uvs.push( center.uv );
         mesh.points.push( center.point );
         mesh.normals.push( center.normal );
 
-// get index
+        // get index
         var centerIndex = mesh.points.length - 1;
 
-// build triangle fan from center
+        // build triangle fan from center
         var i = 0;
         var j = uvs.length - 1;
         while (i < uvs.length){
-            mesh.faces.push( [	centerIndex, ids[j], ids[i]   ]);
+            mesh.faces.push( [	centerIndex, ids[i], ids[j]  ]);
             j = i++;
         }
 

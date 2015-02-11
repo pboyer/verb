@@ -12,6 +12,22 @@ function threeSetup(){
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize( window.innerWidth, window.innerHeight );
     document.body.appendChild( renderer.domElement );
+
+    var ambientLight = new THREE.AmbientLight( 0x111111 );
+    scene.add( ambientLight );
+
+    var lights = [];
+    lights[0] = new THREE.PointLight( 0xffffff, 1, 0 );
+    lights[1] = new THREE.PointLight( 0xffffff, 1, 0 );
+    lights[2] = new THREE.PointLight( 0xffffff, 1, 0 );
+
+    lights[0].position.set( 0, 200, 0 );
+    lights[1].position.set( 100, 200, 100 );
+    lights[2].position.set( -100, -200, -100 );
+
+    scene.add( lights[0] );
+    scene.add( lights[1] );
+    scene.add( lights[2] );
 }
 
 function threeRender(){
@@ -29,11 +45,19 @@ function addCurveToScene(geom, material){
 }
 
 function addMeshToScene(mesh, material, wireframe ){
-    material = material || new THREE.MeshNormalMaterial( { transparent: true, side: THREE.DoubleSide, opacity: 0.8, shading: THREE.SmoothShading, side: THREE.DoubleSide } );
+    material = material || new THREE.MeshPhongMaterial({
+                               specular: '#000000',
+                               color: '#8e8e8e',
+                               side: THREE.DoubleSide,
+                               ambient: '#888888',
+                               emissive: '#111111',
+                               shininess: 10
+                             });
+
     scene.add( new THREE.Mesh( mesh, material ) );
 
     if (wireframe){
-        var material2 = new THREE.MeshBasicMaterial( { color: 0x888888, side: THREE.DoubleSide, wireframe: true } );
+        var material2 = new THREE.MeshBasicMaterial( { color: 0x000000, side: THREE.DoubleSide, wireframe: true } );
         var mesh2 = new THREE.Mesh( mesh, material2 );
         scene.add( mesh2 );
     }
@@ -71,3 +95,4 @@ function addPointsToScene(pts){
 
     scene.add( cloud2 );
 }
+

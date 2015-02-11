@@ -4847,9 +4847,9 @@ verb.core.types.AdaptiveRefinementNode.prototype = {
 			return mesh;
 		} else if(uvs.length == 5) {
 			var il = ids.length;
-			mesh.faces.push([ids[splitid],ids[(splitid + 1) % il],ids[(splitid + 2) % il]]);
+			mesh.faces.push([ids[splitid],ids[(splitid + 2) % il],ids[(splitid + 1) % il]]);
 			mesh.faces.push([ids[(splitid + 4) % il],ids[(splitid + 3) % il],ids[splitid]]);
-			mesh.faces.push([ids[splitid],ids[(splitid + 2) % il],ids[(splitid + 3) % il]]);
+			mesh.faces.push([ids[splitid],ids[(splitid + 3) % il],ids[(splitid + 2) % il]]);
 			return mesh;
 		}
 		var center = this.center();
@@ -4860,7 +4860,7 @@ verb.core.types.AdaptiveRefinementNode.prototype = {
 		var i1 = 0;
 		var j1 = uvs.length - 1;
 		while(i1 < uvs.length) {
-			mesh.faces.push([centerIndex,ids[j1],ids[i1]]);
+			mesh.faces.push([centerIndex,ids[i1],ids[j1]]);
 			j1 = i1++;
 		}
 		return mesh;
