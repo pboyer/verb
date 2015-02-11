@@ -13,15 +13,15 @@ function threeSetup(){
     renderer.setSize( window.innerWidth, window.innerHeight );
     document.body.appendChild( renderer.domElement );
 
-    var ambientLight = new THREE.AmbientLight( 0x111111 );
+    var ambientLight = new THREE.AmbientLight( 0x888888 );
     scene.add( ambientLight );
 
     var lights = [];
-    lights[0] = new THREE.PointLight( 0xffffff, 1, 0 );
-    lights[1] = new THREE.PointLight( 0xffffff, 1, 0 );
-    lights[2] = new THREE.PointLight( 0xffffff, 1, 0 );
+    lights[0] = new THREE.PointLight( 0xececec, 0.25, 0 );
+    lights[1] = new THREE.PointLight( 0xececec, 0.25, 0 );
+    lights[2] = new THREE.PointLight( 0xececec, 0.25, 0 );
 
-    lights[0].position.set( 0, 200, 0 );
+    lights[0].position.set( 0, 100, 0 );
     lights[1].position.set( 100, 200, 100 );
     lights[2].position.set( -100, -200, -100 );
 
@@ -40,18 +40,18 @@ function threeRender(){
 }
 
 function addCurveToScene(geom, material){
-    material = material || new THREE.LineBasicMaterial({ linewidth: 3, color: 0xffffff});
+    material = material || new THREE.LineBasicMaterial({ linewidth: 2, color: 0xdcdcdc});
     scene.add( new THREE.Line( geom, material ) );
 }
 
 function addMeshToScene(mesh, material, wireframe ){
     material = material || new THREE.MeshPhongMaterial({
-                               specular: '#000000',
+                               specular: '#ffffff',
                                color: '#8e8e8e',
                                side: THREE.DoubleSide,
-                               ambient: '#888888',
+                               ambient: '#ffffff',
                                emissive: '#111111',
-                               shininess: 10
+                               shininess: 40
                              });
 
     scene.add( new THREE.Mesh( mesh, material ) );
@@ -90,7 +90,7 @@ function pointsAsGeometry(pts){
 function addPointsToScene(pts){
 
     var geom = asGeometry( asVector3(pts) );
-    var cloudMat2 = new THREE.PointCloudMaterial({ size: 0.5, color: 0xffffff });
+    var cloudMat2 = new THREE.PointCloudMaterial({ size: 6.5, sizeAttenuation: false, color: 0xffffff });
     var cloud2 = new THREE.PointCloud( geom, cloudMat2 );
 
     scene.add( cloud2 );
