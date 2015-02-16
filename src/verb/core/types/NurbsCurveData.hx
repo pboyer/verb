@@ -16,10 +16,14 @@ class NurbsCurveData {
     // array of nondecreasing knot values
     public var knots : Array<Float>;
 
-    public function new(degree, knots, controlPoints){
+    // is the surface cyclic in U
+    public var closed : Bool;
+
+    public function new(degree, knots, controlPoints, closed = false){
         this.degree = degree;
         this.controlPoints = controlPoints;
         this.knots = knots;
+        this.closed = closed;
     }
 }
 

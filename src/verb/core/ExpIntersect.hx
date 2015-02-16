@@ -2,6 +2,7 @@ package verb.core;
 
 // experimental surface intersection work
 
+import verb.core.types.SurfaceSurfaceIntersectionPoint;
 import verb.core.types.SurfaceBoundingBoxTree;
 import verb.core.types.Pair;
 import verb.core.types.MeshData.UV;
@@ -13,17 +14,259 @@ using verb.core.Vec;
 import verb.core.types.NurbsSurfaceData;
 import verb.core.types.NurbsCurveData;
 
+
+enum MarchStepState { OutOfBounds; InsideDomain; AtBoundary; }
+
+class MarchStep {
+
+    // the last step taken
+    public var step : Point;
+
+    // the uv from which the last step was taken on srf0
+    public var olduv0 : UV;
+
+    // the uv after the step was taken
+    public var uv0 : UV;
+
+    // the uv from which the last step was taken on srf0
+    public var olduv1 : UV;
+
+    // the uv after the step was taken
+    public var uv1 : UV;
+
+    // the point from which last step was taken
+    public var oldpoint : Point;
+
+    // the point after the step was taken
+    public var point : Point;
+
+    public var state : MarchStepState;
+
+    public function new( step, olduv0, olduv1, uv0, uv1, oldpoint, point, state ){
+        this.step = step;
+        this.olduv0 = olduv0;
+        this.olduv1 = olduv1;
+        this.uv0 = uv0;
+        this.uv1 = uv1;
+        this.oldpoint = oldpoint;
+        this.point = point;
+        this.state = state;
+    }
+
+    public static function outOfBounds(){
+        return new MarchStep( null, null, null, null, null, null, null, MarchStepState.OutOfBounds );
+    }
+
+    public static function init(pt : SurfaceSurfaceIntersectionPoint){
+        return new MarchStep( null, null, null, pt.uv0, pt.uv1, null, pt.point, MarchStepState.InsideDomain );
+    }
+}
+
 @:expose("core.ExpIntersect")
 class ExpIntersect {
 
-    public static function surfaces(surface0 : NurbsSurfaceData, surface1 : NurbsSurfaceData, tol : Float) : Array<Pair<UV,UV>> {
+    public static function outsideDomain( surface : NurbsSurfaceData, uv : UV) : Bool {
+        var u = uv[0];
+        var v = uv[1];
+
+        return u < surface.knotsU.first() || v < surface.knotsV.first() ||
+            u > surface.knotsU.last() || v > surface.knotsV.last();
+    }
+
+    public static function clampToDomain( surface : NurbsSurfaceData, uv : UV) : UV {
+        var u = uv[0];
+        var v = uv[1];
+
+        if (u < surface.knotsU.first()){
+            u = surface.knotsU.first();
+        }
+
+        if (u > surface.knotsU.last()){
+            u = surface.knotsU.last();
+        }
+
+        if (v < surface.knotsV.first()){
+            v = surface.knotsV.first();
+        }
+
+        if (v > surface.knotsV.last()){
+            u = surface.knotsV.last();
+        }
+
+        return [u,v];
+    }
+
+    public static function clampStep( surface : NurbsSurfaceData, uv : UV, step : UV ) : UV {
+        var u = uv[0];
+        var v = uv[1];
+
+        var nu = u + step[0];
+
+        if (nu > surface.knotsU.last() + Constants.EPSILON){
+            step = Vec.mul( (surface.knotsU.last() - u) / step[0], step  );
+        } else if ( nu < surface.knotsU.first() - Constants.EPSILON ){
+            step = Vec.mul( (surface.knotsU.first() - u) / step[0], step );
+        }
+
+        var nv = v + step[1];
+
+        if (nv > surface.knotsV.last() + Constants.EPSILON){
+            step = Vec.mul( (surface.knotsV.last() - v) / step[1], step );
+        } else if (nv < surface.knotsV.first() - Constants.EPSILON){
+            step = Vec.mul( (surface.knotsV.first() - v ) / step[1], step );
+        }
+
+        return step;
+    }
+
+    public static function march( surface0 : NurbsSurfaceData,
+                                                    surface1 : NurbsSurfaceData,
+                                                    prev : MarchStep,
+                                                    tol : Float ) {
+
+        var uv0 = prev.uv0;
+        var uv1 = prev.uv1;
+
+        var derivs0 = Eval.rationalSurfaceDerivatives( surface0, uv0[0], uv0[1], 1 );
+        var derivs1 = Eval.rationalSurfaceDerivatives( surface1, uv1[0], uv1[1], 1 );
+
+        // 1) get normal to both surfaces
+        var p = derivs0[0][0];
+        var q = derivs1[0][0];
+
+        var dfdu = derivs0[1][0];
+        var dfdv = derivs0[0][1];
+
+        var dgdu = derivs1[1][0];
+        var dgdv = derivs1[0][1];
+
+        var norm0 = dfdu.cross( dfdv );
+        var norm1 = dgdu.cross( dgdv );
+
+        // 2) the cross product is step direction
+        var unitStep = norm0.cross( norm1 ).normalized();
+
+        // 3) determine the new step length
+        var stepLength = INIT_STEP_LENGTH;
+
+        // if possible, build adaptive step
+        if ( prev.oldpoint != null ){
+
+            var denom = Math.acos( Vec.dot( prev.step.normalized(), unitStep ) );
+
+            // linear intersection curve
+            if ( Math.abs( denom ) < Constants.EPSILON){
+                stepLength = LINEAR_STEP_LENGTH;
+            } else {
+                var radiusOfCurvature = Vec.dist( prev.oldpoint, prev.point ) / Math.acos( Vec.dot( prev.step.normalized(), unitStep ) );
+                var theta = 2 * Math.acos( 1 - tol / radiusOfCurvature );
+
+                stepLength = radiusOfCurvature * Math.tan( theta );
+            }
+        }
+
+        // scale the step
+        var step = Vec.mul( stepLength, unitStep );
+
+        // project the step back to the surfaces
+        var x = prev.point.add(step);
+
+        var pdif = x.sub(p);
+        var qdif = x.sub(q);
+
+        var rw = dfdu.cross(norm0);
+        var rt = dfdv.cross(norm0);
+
+        var su = dgdu.cross(norm1);
+        var sv = dgdv.cross(norm1);
+
+        var dw = rt.dot(pdif) / rt.dot(dfdu);
+        var dt = rw.dot(pdif) / rw.dot(dfdv);
+
+        var du = sv.dot(qdif) / sv.dot(dgdu);
+        var dv = su.dot(qdif) / su.dot(dgdv);
+
+        var stepuv0 = [dw, dt];
+        var stepuv1 = [du, dv];
+
+        var state = MarchStepState.InsideDomain;
+
+        var newuv0 = uv0.add( stepuv0 );
+        var newuv1 = uv1.add( stepuv1 );
+
+        if ( outsideDomain( surface0, newuv0 ) ){
+            state = MarchStepState.AtBoundary;
+
+            var l = stepuv0.norm();
+            stepuv0 = clampStep( surface0, uv0, stepuv0 );
+            stepuv1 = Vec.mul( stepuv0.norm() / l, stepuv1 );
+        }
+
+        if ( outsideDomain( surface1, newuv1 ) ){
+            state = MarchStepState.AtBoundary;
+
+            var l = stepuv1.norm();
+            stepuv1 = clampStep( surface1, uv1, stepuv1 );
+            stepuv0 = Vec.mul( stepuv1.norm() / l, stepuv0 );
+        }
+
+        newuv0 = uv0.add( stepuv0 );
+        newuv1 = uv1.add( stepuv1 );
+
+        // TODO: if doesn't converge, make d smaller
+        var relaxed = Intersect.surfacesAtPointWithEstimate( surface0, surface1, newuv0, newuv1, tol );
+
+        return new MarchStep( step, prev.uv0, prev.uv1, relaxed.uv0, relaxed.uv1, prev.point, relaxed.point, state );
+    }
+
+    private static var INIT_STEP_LENGTH = 1e-3;
+    private static var LINEAR_STEP_LENGTH = 0.1;
+
+
+    public static function completeMarch(surface0 : NurbsSurfaceData,
+                                         surface1 : NurbsSurfaceData,
+                                         start : SurfaceSurfaceIntersectionPoint,
+                                         tol : Float ) : Array<SurfaceSurfaceIntersectionPoint> {
+
+        // take first step along curve
+        var step = march( surface0, surface1, MarchStep.init( start ), tol );
+
+        // if we're out of bounds, exit
+        if (step.state == MarchStepState.AtBoundary){
+            return null;
+        }
+
+        // march until you hit a boundary
+        var final = [];
+        final.push( start );
+
+        while (step.state != MarchStepState.AtBoundary) {
+            final.push( new SurfaceSurfaceIntersectionPoint( step.uv0, step.uv1, step.point, -1 ) );
+            step = march( surface0, surface1, step, tol );
+        }
+
+        final.push( new SurfaceSurfaceIntersectionPoint( step.uv0, step.uv1, step.point, -1 ) );
+
+        return final;
+    }
+
+    public static function surfaces(surface0 : NurbsSurfaceData, surface1 : NurbsSurfaceData, tol : Float) {
 
         var exactOuter = intersectBoundaryCurves( surface0, surface1, tol );
+
+        var final = [];
+
+        for (int in exactOuter){
+            var res = completeMarch( surface0, surface1, int, tol );
+            if (res != null) final.push( res );
+        }
+
+//        trace( exactOuter );
 
 //        var approxInner = approxInnerCriticalPts( surface0, surface1 );
 //        var refinedInner = refineInnerCriticalPts( surface0, surface1, approxInner, tol );
 
-        return exactOuter;
+        return final;
     }
 
     public static function refineInnerCriticalPts(surface0 : NurbsSurfaceData,
@@ -231,13 +474,10 @@ class ExpIntersect {
 
     public static function intersectBoundaryCurves(surface0 : NurbsSurfaceData,
                                                    surface1 : NurbsSurfaceData,
-                                                   tol : Float) : Array<Pair<UV,UV>> {
+                                                   tol : Float) : Array<SurfaceSurfaceIntersectionPoint> {
 
         var srf0bs = Make.surfaceBoundaryCurves( surface0 );
         var srf1bs = Make.surfaceBoundaryCurves( surface1 );
-
-//        var tree0 = new SurfaceBoundingBoxTree( surface0 );
-//        var tree1 = new SurfaceBoundingBoxTree( surface1 );
 
         var ints = [];
 
@@ -254,7 +494,8 @@ class ExpIntersect {
                     default: [ int.u, surface0.knotsV.last() ];
                 }
 
-                ints.push(new Pair<UV,UV>( uv, int.uv ) );
+                var dist = Vec.dist( int.curvePoint, int.surfacePoint );
+                ints.push(new SurfaceSurfaceIntersectionPoint( uv, int.uv, int.curvePoint, dist ) );
             }
         }
 
@@ -271,12 +512,13 @@ class ExpIntersect {
                     default: [ int.u, surface1.knotsV.last() ];
                 }
 
-                ints.push(new Pair<UV,UV>( int.uv, uv) );
+                var dist = Vec.dist( int.curvePoint, int.surfacePoint );
+                ints.push(new SurfaceSurfaceIntersectionPoint( int.uv, uv, int.curvePoint, dist ) );
             }
         }
 
         return ints.unique(function(a,b){
-            return Math.abs( a.item0[0] - b.item0[0] ) < tol && Math.abs( a.item0[1] - b.item0[1] ) < tol;
+            return Math.abs( a.uv0[0] - b.uv0[0] ) < tol && Math.abs( a.uv0[1] - b.uv0[1] ) < tol;
         });
     }
 

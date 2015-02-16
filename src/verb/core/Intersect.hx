@@ -80,18 +80,19 @@ class Intersect {
         var tess1 = Tess.rationalSurfaceAdaptive( surface0 );
         var tess2 = Tess.rationalSurfaceAdaptive( surface1 );
 
+        // 2) intersect the two meshes, yielding a list of polylines
         var resApprox = Intersect.meshes( tess1, tess2 );
 
-        // 2) refine the intersection points so that they lie on both surfaces
+        // 3) refine the intersection points so that they lie on both surfaces to tolerance
         var exactPls = resApprox.map(function(pl){
             return pl.map( function(inter : MeshIntersectionPoint){
                 return Intersect.surfacesAtPointWithEstimate( surface0, surface1, inter.uv0, inter.uv1, tol );
             });
         });
 
-        // 3) perform cubic interpolation
+        // 4) perform cubic interpolation
         return exactPls.map(function(x){
-            return Make.rationalInterpCurve( x.map(function(x){ return x.point; }), 3 );
+            return Make.rationalInterpCurve( x.map(function(y){ return y.point; }), 3 );
         });
     }
 
@@ -134,9 +135,9 @@ class Intersect {
             qd = Vec.dot( qn, q );
 
             // if tolerance is met, exit loop
-            dist = Vec.norm( Vec.sub(p, q) );
+            dist = Vec.distSquared(p, q);
 
-            if (dist < tol) {
+            if (dist < tol*tol) {
                 break;
             }
 

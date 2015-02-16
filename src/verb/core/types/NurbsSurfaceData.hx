@@ -21,11 +21,19 @@ class NurbsSurfaceData {
     // and where each control point is an array of length (dim)
     public var controlPoints : Array<Array<Point>>;
 
-    public function new(degreeU, degreeV, knotsU, knotsV, controlPoints){
+    // is the surface cyclic in U
+    public var closedU : Bool;
+
+    // is the surface cyclic in V
+    public var closedV : Bool;
+
+    public function new(degreeU, degreeV, knotsU, knotsV, controlPoints, closedU = false, closedV = false){
         this.degreeU = degreeU;
         this.degreeV = degreeV;
         this.knotsU = knotsU;
         this.knotsV = knotsV;
         this.controlPoints = controlPoints;
+        this.closedU = closedU;
+        this.closedV = closedV;
     }
 }

@@ -845,10 +845,9 @@ verb.core.Analyze.rationalCurveClosestPoint = function(curve,p) {
 	return verb.core.Eval.rationalCurvePoint(curve,verb.core.Analyze.rationalCurveClosestParam(curve,p));
 };
 verb.core.Analyze.rationalCurveClosestParam = function(curve,p) {
-	var tol = 1.0e-3;
 	var min = Math.POSITIVE_INFINITY;
 	var u = 0.0;
-	var pts = verb.core.Tess.rationalCurveAdaptiveSample(curve,tol,true);
+	var pts = verb.core.Tess.rationalCurveRegularSample(curve,curve.controlPoints.length * curve.degree,true);
 	var _g1 = 0;
 	var _g = pts.length - 1;
 	while(_g1 < _g) {
@@ -1672,11 +1671,138 @@ verb.core.Eval.knotSpanGivenN = function(n,degree,u,knots) {
 	}
 	return mid;
 };
+verb.core.MarchStepState = { __ename__ : true, __constructs__ : ["OutOfBounds","InsideDomain","AtBoundary"] };
+verb.core.MarchStepState.OutOfBounds = ["OutOfBounds",0];
+verb.core.MarchStepState.OutOfBounds.toString = $estr;
+verb.core.MarchStepState.OutOfBounds.__enum__ = verb.core.MarchStepState;
+verb.core.MarchStepState.InsideDomain = ["InsideDomain",1];
+verb.core.MarchStepState.InsideDomain.toString = $estr;
+verb.core.MarchStepState.InsideDomain.__enum__ = verb.core.MarchStepState;
+verb.core.MarchStepState.AtBoundary = ["AtBoundary",2];
+verb.core.MarchStepState.AtBoundary.toString = $estr;
+verb.core.MarchStepState.AtBoundary.__enum__ = verb.core.MarchStepState;
+verb.core.MarchStep = function(step,olduv0,olduv1,uv0,uv1,oldpoint,point,state) {
+	this.step = step;
+	this.olduv0 = olduv0;
+	this.olduv1 = olduv1;
+	this.uv0 = uv0;
+	this.uv1 = uv1;
+	this.oldpoint = oldpoint;
+	this.point = point;
+	this.state = state;
+};
+verb.core.MarchStep.__name__ = ["verb","core","MarchStep"];
+verb.core.MarchStep.outOfBounds = function() {
+	return new verb.core.MarchStep(null,null,null,null,null,null,null,verb.core.MarchStepState.OutOfBounds);
+};
+verb.core.MarchStep.init = function(pt) {
+	return new verb.core.MarchStep(null,null,null,pt.uv0,pt.uv1,null,pt.point,verb.core.MarchStepState.InsideDomain);
+};
 verb.core.ExpIntersect = $hx_exports.core.ExpIntersect = function() { };
 verb.core.ExpIntersect.__name__ = ["verb","core","ExpIntersect"];
+verb.core.ExpIntersect.outsideDomain = function(surface,uv) {
+	var u = uv[0];
+	var v = uv[1];
+	return u < surface.knotsU[0] || v < surface.knotsV[0] || u > verb.core.ArrayExtensions.last(surface.knotsU) || v > verb.core.ArrayExtensions.last(surface.knotsV);
+};
+verb.core.ExpIntersect.clampToDomain = function(surface,uv) {
+	var u = uv[0];
+	var v = uv[1];
+	if(u < surface.knotsU[0]) u = surface.knotsU[0];
+	if(u > verb.core.ArrayExtensions.last(surface.knotsU)) u = verb.core.ArrayExtensions.last(surface.knotsU);
+	if(v < surface.knotsV[0]) v = surface.knotsV[0];
+	if(v > verb.core.ArrayExtensions.last(surface.knotsV)) u = verb.core.ArrayExtensions.last(surface.knotsV);
+	return [u,v];
+};
+verb.core.ExpIntersect.clampStep = function(surface,uv,step) {
+	var u = uv[0];
+	var v = uv[1];
+	var nu = u + step[0];
+	if(nu > verb.core.ArrayExtensions.last(surface.knotsU) + 1e-10) step = verb.core.Vec.mul((verb.core.ArrayExtensions.last(surface.knotsU) - u) / step[0],step); else if(nu < surface.knotsU[0] - 1e-10) step = verb.core.Vec.mul((surface.knotsU[0] - u) / step[0],step);
+	var nv = v + step[1];
+	if(nv > verb.core.ArrayExtensions.last(surface.knotsV) + 1e-10) step = verb.core.Vec.mul((verb.core.ArrayExtensions.last(surface.knotsV) - v) / step[1],step); else if(nv < surface.knotsV[0] - 1e-10) step = verb.core.Vec.mul((surface.knotsV[0] - v) / step[1],step);
+	return step;
+};
+verb.core.ExpIntersect.march = function(surface0,surface1,prev,tol) {
+	var uv0 = prev.uv0;
+	var uv1 = prev.uv1;
+	var derivs0 = verb.core.Eval.rationalSurfaceDerivatives(surface0,uv0[0],uv0[1],1);
+	var derivs1 = verb.core.Eval.rationalSurfaceDerivatives(surface1,uv1[0],uv1[1],1);
+	var p = derivs0[0][0];
+	var q = derivs1[0][0];
+	var dfdu = derivs0[1][0];
+	var dfdv = derivs0[0][1];
+	var dgdu = derivs1[1][0];
+	var dgdv = derivs1[0][1];
+	var norm0 = verb.core.Vec.cross(dfdu,dfdv);
+	var norm1 = verb.core.Vec.cross(dgdu,dgdv);
+	var unitStep = verb.core.Vec.normalized(verb.core.Vec.cross(norm0,norm1));
+	var stepLength = verb.core.ExpIntersect.INIT_STEP_LENGTH;
+	if(prev.oldpoint != null) {
+		var denom = Math.acos(verb.core.Vec.dot(verb.core.Vec.normalized(prev.step),unitStep));
+		if(Math.abs(denom) < 1e-10) stepLength = verb.core.ExpIntersect.LINEAR_STEP_LENGTH; else {
+			var radiusOfCurvature = verb.core.Vec.dist(prev.oldpoint,prev.point) / Math.acos(verb.core.Vec.dot(verb.core.Vec.normalized(prev.step),unitStep));
+			var theta = 2 * Math.acos(1 - tol / radiusOfCurvature);
+			stepLength = radiusOfCurvature * Math.tan(theta);
+		}
+	}
+	var step = verb.core.Vec.mul(stepLength,unitStep);
+	var x = verb.core.Vec.add(prev.point,step);
+	var pdif = verb.core.Vec.sub(x,p);
+	var qdif = verb.core.Vec.sub(x,q);
+	var rw = verb.core.Vec.cross(dfdu,norm0);
+	var rt = verb.core.Vec.cross(dfdv,norm0);
+	var su = verb.core.Vec.cross(dgdu,norm1);
+	var sv = verb.core.Vec.cross(dgdv,norm1);
+	var dw = verb.core.Vec.dot(rt,pdif) / verb.core.Vec.dot(rt,dfdu);
+	var dt = verb.core.Vec.dot(rw,pdif) / verb.core.Vec.dot(rw,dfdv);
+	var du = verb.core.Vec.dot(sv,qdif) / verb.core.Vec.dot(sv,dgdu);
+	var dv = verb.core.Vec.dot(su,qdif) / verb.core.Vec.dot(su,dgdv);
+	var stepuv0 = [dw,dt];
+	var stepuv1 = [du,dv];
+	var state = verb.core.MarchStepState.InsideDomain;
+	var newuv0 = verb.core.Vec.add(uv0,stepuv0);
+	var newuv1 = verb.core.Vec.add(uv1,stepuv1);
+	if(verb.core.ExpIntersect.outsideDomain(surface0,newuv0)) {
+		state = verb.core.MarchStepState.AtBoundary;
+		var l = verb.core.Vec.norm(stepuv0);
+		stepuv0 = verb.core.ExpIntersect.clampStep(surface0,uv0,stepuv0);
+		stepuv1 = verb.core.Vec.mul(verb.core.Vec.norm(stepuv0) / l,stepuv1);
+	}
+	if(verb.core.ExpIntersect.outsideDomain(surface1,newuv1)) {
+		state = verb.core.MarchStepState.AtBoundary;
+		var l1 = verb.core.Vec.norm(stepuv1);
+		stepuv1 = verb.core.ExpIntersect.clampStep(surface1,uv1,stepuv1);
+		stepuv0 = verb.core.Vec.mul(verb.core.Vec.norm(stepuv1) / l1,stepuv0);
+	}
+	newuv0 = verb.core.Vec.add(uv0,stepuv0);
+	newuv1 = verb.core.Vec.add(uv1,stepuv1);
+	var relaxed = verb.core.Intersect.surfacesAtPointWithEstimate(surface0,surface1,newuv0,newuv1,tol);
+	return new verb.core.MarchStep(step,prev.uv0,prev.uv1,relaxed.uv0,relaxed.uv1,prev.point,relaxed.point,state);
+};
+verb.core.ExpIntersect.completeMarch = function(surface0,surface1,start,tol) {
+	var step = verb.core.ExpIntersect.march(surface0,surface1,verb.core.MarchStep.init(start),tol);
+	if(step.state == verb.core.MarchStepState.AtBoundary) return null;
+	var $final = [];
+	$final.push(start);
+	while(step.state != verb.core.MarchStepState.AtBoundary) {
+		$final.push(new verb.core.types.SurfaceSurfaceIntersectionPoint(step.uv0,step.uv1,step.point,-1));
+		step = verb.core.ExpIntersect.march(surface0,surface1,step,tol);
+	}
+	$final.push(new verb.core.types.SurfaceSurfaceIntersectionPoint(step.uv0,step.uv1,step.point,-1));
+	return $final;
+};
 verb.core.ExpIntersect.surfaces = function(surface0,surface1,tol) {
 	var exactOuter = verb.core.ExpIntersect.intersectBoundaryCurves(surface0,surface1,tol);
-	return exactOuter;
+	var $final = [];
+	var _g = 0;
+	while(_g < exactOuter.length) {
+		var $int = exactOuter[_g];
+		++_g;
+		var res = verb.core.ExpIntersect.completeMarch(surface0,surface1,$int,tol);
+		if(res != null) $final.push(res);
+	}
+	return $final;
 };
 verb.core.ExpIntersect.refineInnerCriticalPts = function(surface0,surface1,approx,tol) {
 	return approx.map(function(x) {
@@ -1704,11 +1830,11 @@ verb.core.ExpIntersect.verifyInnerCriticalPts = function(surface0,surface1,appro
 	return null;
 };
 verb.core.ExpIntersect.approxInnerCriticalPts = function(surface0,surface1) {
-	haxe.Log.trace("SURFACE INTERSECTION",{ fileName : "ExpIntersect.hx", lineNumber : 71, className : "verb.core.ExpIntersect", methodName : "approxInnerCriticalPts"});
+	haxe.Log.trace("SURFACE INTERSECTION",{ fileName : "ExpIntersect.hx", lineNumber : 314, className : "verb.core.ExpIntersect", methodName : "approxInnerCriticalPts"});
 	var div0 = new verb.core.types.LazySurfaceBoundingBoxTree(surface0,false,0.5,0.5);
 	var div1 = new verb.core.types.LazySurfaceBoundingBoxTree(surface1,false,0.5,0.5);
 	var res = verb.core.Intersect.boundingBoxTrees(div0,div1,0);
-	haxe.Log.trace(res.length,{ fileName : "ExpIntersect.hx", lineNumber : 78, className : "verb.core.ExpIntersect", methodName : "approxInnerCriticalPts", customParams : ["TOTAL INTERSECTING SUB-SURFACES"]});
+	haxe.Log.trace(res.length,{ fileName : "ExpIntersect.hx", lineNumber : 321, className : "verb.core.ExpIntersect", methodName : "approxInnerCriticalPts", customParams : ["TOTAL INTERSECTING SUB-SURFACES"]});
 	var numSamples = 5;
 	var criticalPts = [];
 	var _g = 0;
@@ -1875,7 +2001,8 @@ verb.core.ExpIntersect.intersectBoundaryCurves = function(surface0,surface1,tol)
 			default:
 				uv = [$int.u,verb.core.ArrayExtensions.last(surface0.knotsV)];
 			}
-			ints.push(new verb.core.types.Pair(uv,$int.uv));
+			var dist = verb.core.Vec.dist($int.curvePoint,$int.surfacePoint);
+			ints.push(new verb.core.types.SurfaceSurfaceIntersectionPoint(uv,$int.uv,$int.curvePoint,dist));
 		}
 	}
 	var _g11 = 0;
@@ -1902,11 +2029,12 @@ verb.core.ExpIntersect.intersectBoundaryCurves = function(surface0,surface1,tol)
 			default:
 				uv1 = [int1.u,verb.core.ArrayExtensions.last(surface1.knotsV)];
 			}
-			ints.push(new verb.core.types.Pair(int1.uv,uv1));
+			var dist1 = verb.core.Vec.dist(int1.curvePoint,int1.surfacePoint);
+			ints.push(new verb.core.types.SurfaceSurfaceIntersectionPoint(int1.uv,uv1,int1.curvePoint,dist1));
 		}
 	}
 	return verb.core.ArrayExtensions.unique(ints,function(a,b) {
-		return Math.abs(a.item0[0] - b.item0[0]) < tol && Math.abs(a.item0[1] - b.item0[1]) < tol;
+		return Math.abs(a.uv0[0] - b.uv0[0]) < tol && Math.abs(a.uv0[1] - b.uv0[1]) < tol;
 	});
 };
 verb.core.Intersect = $hx_exports.core.Intersect = function() { };
@@ -1943,8 +2071,8 @@ verb.core.Intersect.surfaces = function(surface0,surface1,tol) {
 		});
 	});
 	return exactPls.map(function(x) {
-		return verb.core.Make.rationalInterpCurve(x.map(function(x1) {
-			return x1.point;
+		return verb.core.Make.rationalInterpCurve(x.map(function(y) {
+			return y.point;
 		}),3);
 	});
 };
@@ -1977,8 +2105,8 @@ verb.core.Intersect.surfacesAtPointWithEstimate = function(surface0,surface1,uv1
 		qv = qds[0][1];
 		qn = verb.core.Vec.normalized(verb.core.Vec.cross(qu,qv));
 		qd = verb.core.Vec.dot(qn,q);
-		dist = verb.core.Vec.norm(verb.core.Vec.sub(p,q));
-		if(dist < tol) break;
+		dist = verb.core.Vec.distSquared(p,q);
+		if(dist < tol * tol) break;
 		var fn = verb.core.Vec.normalized(verb.core.Vec.cross(pn,qn));
 		var fd = verb.core.Vec.dot(fn,p);
 		var x = verb.core.Intersect.threePlanes(pn,pd,qn,qd,fn,fd);
@@ -5205,18 +5333,24 @@ verb.core.types.MeshIntersectionPoint = $hx_exports.core.MeshIntersectionPoint =
 	this.faceIndex1;
 };
 verb.core.types.MeshIntersectionPoint.__name__ = ["verb","core","types","MeshIntersectionPoint"];
-verb.core.types.NurbsCurveData = $hx_exports.core.NurbsCurveData = function(degree,knots,controlPoints) {
+verb.core.types.NurbsCurveData = $hx_exports.core.NurbsCurveData = function(degree,knots,controlPoints,closed) {
+	if(closed == null) closed = false;
 	this.degree = degree;
 	this.controlPoints = controlPoints;
 	this.knots = knots;
+	this.closed = closed;
 };
 verb.core.types.NurbsCurveData.__name__ = ["verb","core","types","NurbsCurveData"];
-verb.core.types.NurbsSurfaceData = $hx_exports.core.NurbsSurfaceData = function(degreeU,degreeV,knotsU,knotsV,controlPoints) {
+verb.core.types.NurbsSurfaceData = $hx_exports.core.NurbsSurfaceData = function(degreeU,degreeV,knotsU,knotsV,controlPoints,closedU,closedV) {
+	if(closedV == null) closedV = false;
+	if(closedU == null) closedU = false;
 	this.degreeU = degreeU;
 	this.degreeV = degreeV;
 	this.knotsU = knotsU;
 	this.knotsV = knotsV;
 	this.controlPoints = controlPoints;
+	this.closedU = closedU;
+	this.closedV = closedV;
 };
 verb.core.types.NurbsSurfaceData.__name__ = ["verb","core","types","NurbsSurfaceData"];
 verb.core.types.Pair = $hx_exports.core.Pair = function(item1,item2) {
@@ -6206,6 +6340,8 @@ verb.core.Analyze.Cvalues = [[],[],[1.0,1.0],[0.88888888888888888888888888888888
 verb.core.Binomial.memo = new haxe.ds.IntMap();
 verb.core.Constants.TOLERANCE = 1e-6;
 verb.core.Constants.EPSILON = 1e-10;
+verb.core.ExpIntersect.INIT_STEP_LENGTH = 1e-3;
+verb.core.ExpIntersect.LINEAR_STEP_LENGTH = 0.1;
 verb.core.types.BoundingBox.TOLERANCE = 1e-4;
 verb.exe.Dispatcher.THREADS = 1;
 verb.exe.Dispatcher._init = false;

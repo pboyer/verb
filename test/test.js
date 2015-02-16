@@ -7245,3 +7245,44 @@ describe("verb.core.ExpIntersect.surfaces",function(){
 */
 });
 
+
+describe("verb.core.ExpIntersect.clampStep",function(){
+
+    it('provides expected result for two planar surfaces', function(){
+
+        var s = new verb.core.NurbsSurfaceData( 1, 1, [0,1], [0,1], null );
+
+        var uv = [0.5,0.5];
+        var d = [1,0];
+        verb.core.ExpIntersect.clampStep(s, uv, d).should.eql([0.5,0]);
+
+        d = [-1,0];
+        verb.core.ExpIntersect.clampStep(s, uv, d).should.eql([-0.5,0]);
+
+        d = [0,1];
+        verb.core.ExpIntersect.clampStep(s, uv, d).should.eql([0,0.5]);
+
+        d = [0,-1];
+        verb.core.ExpIntersect.clampStep(s, uv, d).should.eql([0,-0.5]);
+
+        d = [1,2];
+        verb.core.ExpIntersect.clampStep(s, uv, d).should.eql([0.25,0.5]);
+
+        d = [-1,2];
+        verb.core.ExpIntersect.clampStep(s, uv, d).should.eql([-0.25,0.5]);
+
+        d = [2,1];
+        verb.core.ExpIntersect.clampStep(s, uv, d).should.eql([0.5,0.25]);
+
+        d = [-2,1];
+        verb.core.ExpIntersect.clampStep(s, uv, d).should.eql([-0.5,0.25]);
+
+        d = [-2,-1];
+        verb.core.ExpIntersect.clampStep(s, uv, d).should.eql([-0.5,-0.25]);
+
+        d = [2,-1];
+        verb.core.ExpIntersect.clampStep(s, uv, d).should.eql([0.5,-0.25]);
+
+    });
+
+});

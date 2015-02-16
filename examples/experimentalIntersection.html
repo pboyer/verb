@@ -13,7 +13,7 @@
 
 	threeSetup();
 
-    /*
+/*
     var a = [0,0,0];
     var b = [10,0,0];
     var c = [10,10,0];
@@ -28,7 +28,7 @@
 
     var srf2 = verb.geom.NurbsSurface.byCorners( a1, b1, c1, d1 );
 
-    */
+*/
 
 
     var degree = 3
@@ -41,13 +41,12 @@
                     [ [0, -50, 12], [10, -50, 0], 	[20, -50, 0], 	[30, -50, 0] , [50, -50, 0], [50, -50, 15]     ],     ];
     var srf1 =  new verb.geom.NurbsSurface.byKnotsControlPointsWeights( degree, degree, knots, knots, pts );
 
-    var p5 = [40,-50,3]
-        , p6 = [40,0,3]
-        , p7 = [-10,0,3]
+    var p5 = [50,-60,3]
+        , p6 = [50,10,3]
+        , p7 = [-10,10,3]
         , p8 = [-10,-50,3];
 
     var srf2 = verb.geom.NurbsSurface.byCorners( p5, p6, p7, p8 );
-
 
     var d1 = srf1.asNurbs();
     var d2 = srf2.asNurbs();
@@ -55,7 +54,6 @@
     var c2 = verb.core.Make.surfaceBoundaryCurves( d2 );
 
     var runs = 50;
-    // var bm = benchmark( function(){ return verb.core.Intersect.curveAndSurface( c1[3], d2, 1e-3 ) }, runs );
     var bm = benchmark( function(){ return verb.core.ExpIntersect.surfaces( d1, d2, 1e-3 ) }, runs );
 
     console.log( bm );
@@ -63,15 +61,9 @@
 
     var ints = bm.result;
 
-    var points = ints.map(function(x){
-        // return x.curvePoint;
-        return srf1.point( x.item0[0], x.item0[1] );
-    }).concat( ints.map(function(x){
-        // return x.surfacePoint;
-        return srf2.point( x.item1[0], x.item1[1] );
-    }));
-
-	addPointsToScene( points );
+    ints.forEach(function(x){
+        addPointsToScene( x.map(function(y){ return y.point; } ) );
+    });
 
 	addMeshToScene( srf1.toThreeGeometry() );
 	addMeshToScene( srf2.toThreeGeometry() );

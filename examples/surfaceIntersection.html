@@ -34,20 +34,20 @@
 
 	}
 
-	function exGlancingPlaneCylindricalSurface(){
+	function exPlaneCylindricalSurface(){
 
 		var axis = [0,0,1]
 			, xaxis = [1,0,0]
 			, base = [0,0,0]
-			, height = 5
-			, radius = 3;
+			, height = 50
+			, radius = 30;
 
 		srf1 = new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius );
 
-		var p5 	= [5,5,5]
-			, p6 = [-5,5,5]
-			, p7 = [-5,-5,0]
-			, p8 = [5,-5,0];
+		var p5 	= [50,50,50]
+			, p6 = [-50,50,50]
+			, p7 = [-50,-50,0]
+			, p8 = [50,-50,0];
 
 		srf2 = verb.geom.NurbsSurface.byCorners( p5, p6, p7, p8 );
 
@@ -73,20 +73,41 @@
 
 	}
 
-	exNurbsSurfacePlane();
-	// exTorusCylindricalSurface();
-	//exGlancingPlaneCylindricalSurface();
+	function exTorusCylindricalSurface2(){
+
+		// center, xaxis, yaxis, radius
+		var profile = new verb.geom.Circle( [5,0,0], [1,0,0], [0,0,1], 2 );
+
+		var base = [0,0,0];
+		var axis = [0,0,1];
+		var angle = 2 * Math.PI
+		srf1 = new verb.geom.RevolvedSurface( profile, base, axis, angle );
+
+		var axis = [-1,0,0]
+			, xaxis = [0,0,1]
+			, base = [8,0,1]
+			, height = 16
+			, radius = 2;
+
+		srf2 = new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius );
+
+	}
+
+	//exNurbsSurfacePlane();
+	//exPlaneCylindricalSurface();
+	//exTorusCylindricalSurface();
+	exTorusCylindricalSurface2();
 
 	addMeshToScene( srf1.toThreeGeometry()  );
 	addMeshToScene( srf2.toThreeGeometry()  );
 
 	var res;
-	var runs = 100;
+	var runs = 50;
 
 	var d1 = Date.now();
 
 	for (var i = 0 ; i < runs; i++){
-		res = verb.geom.Intersect.surfaces( srf1, srf2 );
+		res = verb.geom.Intersect.surfaces( srf1, srf2, 1e-6 );
 	}
 
 	var d2 = Date.now();

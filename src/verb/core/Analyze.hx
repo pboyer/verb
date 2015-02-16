@@ -296,11 +296,10 @@ class Analyze {
         //  4)  if |(u* - u)C'(u)| < e1, halt
         //
 
-        var tol = 1.0e-3;
         var min = Math.POSITIVE_INFINITY;
         var u = 0.0;
 
-        var pts = Tess.rationalCurveAdaptiveSample( curve, tol, true );
+        var pts = Tess.rationalCurveRegularSample( curve, curve.controlPoints.length * curve.degree, true );
 
         for ( i in 0...pts.length-1){
 
