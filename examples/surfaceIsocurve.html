@@ -11,7 +11,7 @@
 <body>
 <script>
 
-        verb.exe.WorkerPool.basePath = "../build/";
+        verb.exe.WorkerPool.basePath = "../build/js/";
 
 		threeSetup();
 
@@ -29,7 +29,7 @@
 		var Vec = verb.core.Vec;
 
        	Vec.span( 0, 1.0, 0.025 ).forEach(function(u){
-            srf.isocurveAsync( u ).then(function(x){
+            srf.isocurveAsync( u, true ).then(function(x){
                 addCurveToScene( x.toThreeGeometry() );
             });
         })

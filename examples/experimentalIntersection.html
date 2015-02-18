@@ -50,8 +50,10 @@
 
     var d1 = srf1.asNurbs();
     var d2 = srf2.asNurbs();
-    var c1 = verb.core.Make.surfaceBoundaryCurves( d1 );
-    var c2 = verb.core.Make.surfaceBoundaryCurves( d2 );
+
+    /*
+
+    // only supports edge curves
 
     var runs = 50;
     var bm = benchmark( function(){ return verb.core.ExpIntersect.surfaces( d1, d2, 1e-3 ) }, runs );
@@ -65,8 +67,48 @@
         addPointsToScene( x.map(function(y){ return y.point; } ) );
     });
 
+    */
+
+    var bbox = new verb.core.LazySurfaceBoundingBoxTree( d1, false, 0.25, 0.25 );
+    var surfs = verb.core.ExpIntersect.boundingBoxLeaves( bbox );
+
+    var mat1 = new THREE.MeshPhongMaterial({
+                               color: '#00ff00',
+                               side: THREE.DoubleSide
+                             });
+
+    var mat2 = new THREE.MeshPhongMaterial({
+                               color: '#ff0000',
+                               side: THREE.DoubleSide
+                             });
+
+    surfs.forEach(function(x, i){
+        var srf = new verb.geom.NurbsSurface( x );
+
+        srf.boundaries().forEach(function(y){
+            addCurveToScene( y.toThreeGeometry() );
+        });
+    });
+
+
+    var runs = 1;
+    var bm = benchmark( function(){ return verb.core.ExpIntersect.approxInnerCriticalPts( d1, d2 ) }, runs );
+
+    console.log( bm );
+    console.log( runs, " runs completed in ", bm.each, " ms each");
+
+    var ints = bm.result;
+
+    var pts = ints.map(function(x){
+        return verb.core.Eval.rationalSurfacePoint( d1, x.item0[0], x.item0[1] );
+    });
+
+    addPointsToScene( pts );
+
+/*
 	addMeshToScene( srf1.toThreeGeometry() );
 	addMeshToScene( srf2.toThreeGeometry() );
+*/
 
 	threeRender();
 

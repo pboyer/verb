@@ -31,7 +31,7 @@ module.exports = function(grunt) {
       },
       build: {
         files: {
-          'build/js/<%= pkg.name %>.min.js': ['build/<%= pkg.name %>.js']
+          'build/js/<%= pkg.name %>.min.js': ['build/js/<%= pkg.name %>.js']
         }
       }
     },

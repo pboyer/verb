@@ -3,6 +3,7 @@ package verb.core.types;
 using verb.core.ArrayExtensions;
 using verb.core.Vec;
 
+@:expose("core.LazySurfaceBoundingBoxTree")
 class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
 
     var _surface : NurbsSurfaceData;
@@ -28,7 +29,6 @@ class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
     }
 
     public function split() : Pair<IBoundingBoxTree<NurbsSurfaceData>, IBoundingBoxTree<NurbsSurfaceData>> {
-
         var min : Float;
         var max : Float;
 
@@ -41,7 +41,7 @@ class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
         }
 
         var dom = max - min;
-        var pivot = (min + max) / 2.0 + dom * 0.01 * Math.random();
+        var pivot = (min + max) / 2.0; // + dom * 0.01 * Math.random();
 
         var srfs = Modify.surfaceSplit( _surface, pivot, _splitV );
 
@@ -65,12 +65,7 @@ class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
     }
 
     public function indivisible( tolerance : Float ){
-
-        if (_splitV){
-            return _surface.knotsV.domain() < _knotTolV;
-        } else {
-            return _surface.knotsU.domain() < _knotTolU;
-        }
+        return _surface.knotsV.domain() < _knotTolV && _surface.knotsU.domain() < _knotTolU;
     }
 
     public function empty(){

@@ -13,7 +13,7 @@ function threeSetup(){
     renderer.setSize( window.innerWidth, window.innerHeight );
     document.body.appendChild( renderer.domElement );
 
-    var ambientLight = new THREE.AmbientLight( 0x888888 );
+    var ambientLight = new THREE.AmbientLight( 0xbbbbbb );
     scene.add( ambientLight );
 
     var lights = [];

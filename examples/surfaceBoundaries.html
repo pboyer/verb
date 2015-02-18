@@ -24,8 +24,6 @@
 
 		var srf = verb.geom.NurbsSurface.byKnotsControlPointsWeights( degree, degree, knots, knots, pts );
 
-		var Vec = verb.core.Vec;
-
        	srf.boundaries().map(function(x){
             addCurveToScene( x.toThreeGeometry() );
         });

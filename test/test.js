@@ -6690,101 +6690,6 @@ describe("verb.core.Intersect.meshes",function(){
 
 });
 
-describe("verb.core.Make.surfaceIsocurve",function(){
-
-	var degreeU = 3
-		, degreeV = 3
-		, knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
-		, knotsV =	[0, 0, 0, 0, 1, 1, 1, 1]
-		, controlPoints = [ 	[ [0, 0, 0], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] 		],
-								[ [0, -10, 0], 	[10, -10, 0], 	[20, -10, 0], 	[30, -10, 0] 	],
-								[ [0, -20, 0], 	[10, -20, 0], 	[20, -20, 0], 	[30, -20, 0] 	],
-								[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
-		, bezier = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
-
-	it('provides isocurves at expected location in u direction', function(){
-
-		for (var i = 0; i < 1.0; i += 0.1 ){
-
-			var res = verb.core.Make.surfaceIsocurve( bezier, i, false );
-
-			var cpts = res.controlPoints;
-
-			var pt0 = verb.core.Eval.surfacePoint( bezier, i, 0.0 );
-			var pt1 = verb.core.Eval.surfacePoint( bezier, i, 1.0 );
-
-			vecShouldBe( pt0, cpts[0] );
-			vecShouldBe( pt1, cpts[cpts.length-1] );
-
-		}
-
-	});
-
-	it('provides isocurves at expected location in v direction', function(){
-
-		for (var i = 0; i < 1.0; i += 0.1 ){
-
-			var res = verb.core.Make.surfaceIsocurve( bezier, i, true );
-
-			var cpts = res.controlPoints;
-
-			var pt0 = verb.core.Eval.surfacePoint( bezier, 0.0, i );
-			var pt1 = verb.core.Eval.surfacePoint( bezier, 1.0, i );
-
-			vecShouldBe( pt0, cpts[0] );
-			vecShouldBe( pt1, cpts[cpts.length-1] );
-
-		}
-
-	});
-
-});
-
-describe("verb.geom.NurbsSurface.isocurve",function(){
-	var degreeU = 3
-		, degreeV = 3
-		, knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
-		, knotsV =	[0, 0, 0, 0, 1, 1, 1, 1]
-		, controlPoints = [ 	[ [0, 0, 0], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] 		],
-								[ [0, -10, 0], 	[10, -10, 0], 	[20, -10, 0], 	[30, -10, 0] 	],
-								[ [0, -20, 0], 	[10, -20, 0], 	[20, -20, 0], 	[30, -20, 0] 	],
-								[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
-		, bezier = verb.geom.NurbsSurface.byKnotsControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints );
-
-	it('provides isocurves at expected location in u direction', function(){
-
-		var i = 0.5;
-		var res = bezier.isocurve( i, false );
-
-		var cpts = res.controlPoints();
-
-		var pt0 = bezier.point( i, 0.0 );
-		var pt1 = bezier.point( i, 1.0 );
-
-		vecShouldBe( pt0, cpts[0] );
-		vecShouldBe( pt1, cpts[cpts.length-1] );
-
-	});
-
-	it('provides isocurves at expected location in u direction async', function(done){
-
-		var i = 0.5;
-		bezier.isocurveAsync( i, false ).then(function(res){
-
-			var cpts = res.controlPoints();
-
-			var pt0 = bezier.point( i, 0.0 );
-			var pt1 = bezier.point( i, 1.0 );
-
-			vecShouldBe( pt0, cpts[0] );
-			vecShouldBe( pt1, cpts[cpts.length-1] );
-
-			done();
-
-		});
-	});
-});
-
 describe("verb.core.Modify.knotsReverse",function(){
  	it('can reverse basic knot array', function(){
 		verb.core.Modify.knotsReverse( [0,1,3,5] ).should.be.eql( [0,2,4,5] );
@@ -6976,41 +6881,6 @@ describe("verb.geom.SweptSurface",function(){
         vecShouldBe( srf.point( 0, 1 ), [2,1,1] );
 
     });
-});
-
-describe("verb.core.Make.surfaceBoundaryCurves",function(){
-
-    it('provides expected result for planar surface', function(){
-
-        var a = [0,0,0];
-        var b = [1,0,0];
-        var c = [1,1,0];
-        var d = [0,1,0];
-
-        var srf = verb.core.Make.fourPointSurface( a, b, c, d );
-
-        var crvs = verb.core.Make.surfaceBoundaryCurves( srf );
-
-        crvs[0].degree.should.be.equal( srf.degreeV );
-        crvs[1].degree.should.be.equal( srf.degreeV );
-        crvs[2].degree.should.be.equal( srf.degreeU );
-        crvs[3].degree.should.be.equal( srf.degreeU );
-
-        vecShouldBe( verb.core.Eval.dehomogenize( crvs[0].controlPoints[0] ), a );
-        vecShouldBe( verb.core.Eval.dehomogenize( crvs[0].controlPoints[3] ), d );
-
-        vecShouldBe( verb.core.Eval.dehomogenize( crvs[1].controlPoints[0] ), b );
-        vecShouldBe( verb.core.Eval.dehomogenize( crvs[1].controlPoints[3] ), c );
-
-        vecShouldBe( verb.core.Eval.dehomogenize( crvs[2].controlPoints[0] ), a );
-        vecShouldBe( verb.core.Eval.dehomogenize( crvs[2].controlPoints[3] ), b );
-
-        vecShouldBe( verb.core.Eval.dehomogenize( crvs[3].controlPoints[0] ), d );
-        vecShouldBe( verb.core.Eval.dehomogenize( crvs[3].controlPoints[3] ), c );
-
-
-    });
-
 });
 
 describe("verb.core.ExpIntersect.sampleSurfaceInteriorRegular",function(){
@@ -7282,6 +7152,134 @@ describe("verb.core.ExpIntersect.clampStep",function(){
 
         d = [2,-1];
         verb.core.ExpIntersect.clampStep(s, uv, d).should.eql([0.5,-0.25]);
+
+    });
+
+});
+
+
+describe("verb.core.Make.surfaceIsocurve",function(){
+
+	var degreeU = 3
+		, degreeV = 3
+		, knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
+		, knotsV =	[0, 0, 0, 0, 1, 1, 1, 1]
+		, controlPoints = [ 	[ [0, 0, 0], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] 		],
+								[ [0, -10, 0], 	[10, -10, 0], 	[20, -10, 0], 	[30, -10, 0] 	],
+								[ [0, -20, 0], 	[10, -20, 0], 	[20, -20, 0], 	[30, -20, 0] 	],
+								[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
+		, bezier = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
+
+
+    it('provides boundary isocurves at extremes of domain', function(){
+
+        var res = verb.core.Make.surfaceIsocurve( bezier, 0, false );
+
+        var cpts = res.controlPoints;
+
+        var pt0 = verb.core.Eval.surfacePoint( bezier, 0, 0.0 );
+        var pt1 = verb.core.Eval.surfacePoint( bezier, 0, 1.0 );
+
+        vecShouldBe( pt0, cpts[0] );
+        vecShouldBe( pt1, cpts[cpts.length-1] );
+
+    });
+
+	it('provides isocurves at expected location in v direction', function(){
+
+		for (var i = 0; i <= 1.0; i += 0.1 ){
+
+			var res = verb.core.Make.surfaceIsocurve( bezier, i, true );
+
+			var cpts = res.controlPoints;
+
+			var pt0 = verb.core.Eval.surfacePoint( bezier, 0.0, i );
+			var pt1 = verb.core.Eval.surfacePoint( bezier, 1.0, i );
+
+			vecShouldBe( pt0, cpts[0] );
+			vecShouldBe( pt1, cpts[cpts.length-1] );
+
+		}
+
+	});
+
+});
+
+describe("verb.geom.NurbsSurface.isocurve",function(){
+	var degreeU = 3
+		, degreeV = 3
+		, knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
+		, knotsV =	[0, 0, 0, 0, 1, 1, 1, 1]
+		, controlPoints = [ 	[ [0, 0, 0], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] 		],
+								[ [0, -10, 0], 	[10, -10, 0], 	[20, -10, 0], 	[30, -10, 0] 	],
+								[ [0, -20, 0], 	[10, -20, 0], 	[20, -20, 0], 	[30, -20, 0] 	],
+								[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
+		, bezier = verb.geom.NurbsSurface.byKnotsControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints );
+
+	it('provides isocurves at expected location in u direction', function(){
+
+		var i = 0.5;
+		var res = bezier.isocurve( i, false );
+
+		var cpts = res.controlPoints();
+
+		var pt0 = bezier.point( i, 0.0 );
+		var pt1 = bezier.point( i, 1.0 );
+
+		vecShouldBe( pt0, cpts[0] );
+		vecShouldBe( pt1, cpts[cpts.length-1] );
+
+	});
+
+	it('provides isocurves at expected location in u direction async', function(done){
+
+		var i = 0.5;
+		bezier.isocurveAsync( i, false ).then(function(res){
+
+			var cpts = res.controlPoints();
+
+			var pt0 = bezier.point( i, 0.0 );
+			var pt1 = bezier.point( i, 1.0 );
+
+			vecShouldBe( pt0, cpts[0] );
+			vecShouldBe( pt1, cpts[cpts.length-1] );
+
+			done();
+
+		});
+	});
+});
+
+describe("verb.core.Make.surfaceBoundaryCurves",function(){
+
+    it('provides expected result for planar surface', function(){
+
+        var a = [0,0,0];
+        var b = [1,0,0];
+        var c = [1,1,0];
+        var d = [0,1,0];
+
+        var srf = verb.core.Make.fourPointSurface( a, b, c, d );
+
+        var crvs = verb.core.Make.surfaceBoundaryCurves( srf );
+
+        crvs[0].degree.should.be.equal( srf.degreeV );
+        crvs[1].degree.should.be.equal( srf.degreeV );
+        crvs[2].degree.should.be.equal( srf.degreeU );
+        crvs[3].degree.should.be.equal( srf.degreeU );
+
+        vecShouldBe( verb.core.Eval.dehomogenize( crvs[0].controlPoints[0] ), a );
+        vecShouldBe( verb.core.Eval.dehomogenize( crvs[0].controlPoints[3] ), d );
+
+        vecShouldBe( verb.core.Eval.dehomogenize( crvs[1].controlPoints[0] ), b );
+        vecShouldBe( verb.core.Eval.dehomogenize( crvs[1].controlPoints[3] ), c );
+
+        vecShouldBe( verb.core.Eval.dehomogenize( crvs[2].controlPoints[0] ), a );
+        vecShouldBe( verb.core.Eval.dehomogenize( crvs[2].controlPoints[3] ), b );
+
+        vecShouldBe( verb.core.Eval.dehomogenize( crvs[3].controlPoints[0] ), d );
+        vecShouldBe( verb.core.Eval.dehomogenize( crvs[3].controlPoints[3] ), c );
+
 
     });
 

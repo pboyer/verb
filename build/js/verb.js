@@ -1841,6 +1841,7 @@ verb.core.ExpIntersect.surfaces = function(surface0,surface1,tol) {
 		var res = verb.core.ExpIntersect.completeMarch(surface0,surface1,$int,tol);
 		if(res != null) $final.push(res);
 	}
+	var approxInner = verb.core.ExpIntersect.approxInnerCriticalPts(surface0,surface1);
 	return $final;
 };
 verb.core.ExpIntersect.refineInnerCriticalPts = function(surface0,surface1,approx,tol) {
@@ -1868,12 +1869,16 @@ verb.core.ExpIntersect.refineCriticalPt = function(surface0,surface1,approx,tol)
 verb.core.ExpIntersect.verifyInnerCriticalPts = function(surface0,surface1,approx) {
 	return null;
 };
+verb.core.ExpIntersect.boundingBoxLeaves = function(division) {
+	if(division.indivisible(0)) return [division["yield"]()];
+	var halves = division.split();
+	return verb.core.ExpIntersect.boundingBoxLeaves(halves.item0).concat(verb.core.ExpIntersect.boundingBoxLeaves(halves.item1));
+};
 verb.core.ExpIntersect.approxInnerCriticalPts = function(surface0,surface1) {
-	haxe.Log.trace("SURFACE INTERSECTION",{ fileName : "ExpIntersect.hx", lineNumber : 314, className : "verb.core.ExpIntersect", methodName : "approxInnerCriticalPts"});
-	var div0 = new verb.core.types.LazySurfaceBoundingBoxTree(surface0,false,0.5,0.5);
-	var div1 = new verb.core.types.LazySurfaceBoundingBoxTree(surface1,false,0.5,0.5);
+	var div0 = new verb.core.types.LazySurfaceBoundingBoxTree(surface0,false,0.125,0.125);
+	var div1 = new verb.core.types.LazySurfaceBoundingBoxTree(surface1,false,0.125,0.125);
 	var res = verb.core.Intersect.boundingBoxTrees(div0,div1,0);
-	haxe.Log.trace(res.length,{ fileName : "ExpIntersect.hx", lineNumber : 321, className : "verb.core.ExpIntersect", methodName : "approxInnerCriticalPts", customParams : ["TOTAL INTERSECTING SUB-SURFACES"]});
+	haxe.Log.trace(res.length,{ fileName : "ExpIntersect.hx", lineNumber : 327, className : "verb.core.ExpIntersect", methodName : "approxInnerCriticalPts", customParams : ["TOTAL INTERSECTING SUB-SURFACES"]});
 	var numSamples = 5;
 	var criticalPts = [];
 	var _g = 0;
@@ -2795,9 +2800,9 @@ verb.core.Make.surfaceBoundaryCurves = function(surface) {
 verb.core.Make.surfaceIsocurve = function(surface,u,useV) {
 	if(useV == null) useV = false;
 	var knots;
-	if(useV) knots = surface.knotsU; else knots = surface.knotsV;
+	if(useV) knots = surface.knotsV; else knots = surface.knotsU;
 	var degree;
-	if(useV) degree = surface.degreeU; else degree = surface.degreeV;
+	if(useV) degree = surface.degreeV; else degree = surface.degreeU;
 	var knotMults = verb.core.Analyze.knotMultiplicities(knots);
 	var reqKnotIndex = -1;
 	var _g1 = 0;
@@ -2810,9 +2815,11 @@ verb.core.Make.surfaceIsocurve = function(surface,u,useV) {
 		}
 	}
 	var numKnotsToInsert = degree + 1;
-	if(reqKnotIndex > 0) numKnotsToInsert = numKnotsToInsert - knotMults[reqKnotIndex].mult;
-	var newSrf = verb.core.Modify.surfaceKnotRefine(surface,verb.core.Vec.rep(numKnotsToInsert,u),useV);
+	if(reqKnotIndex >= 0) numKnotsToInsert = numKnotsToInsert - knotMults[reqKnotIndex].mult;
+	var newSrf;
+	if(numKnotsToInsert > 0) newSrf = verb.core.Modify.surfaceKnotRefine(surface,verb.core.Vec.rep(numKnotsToInsert,u),useV); else newSrf = surface;
 	var span = verb.core.Eval.knotSpan(degree,u,knots);
+	if(Math.abs(u - knots[0]) < 1e-10) span = 0; else if(Math.abs(u - knots[knots.length - 1]) < 1e-10) span = (useV?newSrf.controlPoints[0].length:newSrf.controlPoints.length) - 1;
 	if(useV) return new verb.core.types.NurbsCurveData(newSrf.degreeU,newSrf.knotsU,(function($this) {
 		var $r;
 		var _g2 = [];
@@ -5255,7 +5262,7 @@ verb.core.types.LazyPolylineBoundingBoxTree.prototype = {
 		return this._interval.max - this._interval.min == 0;
 	}
 };
-verb.core.types.LazySurfaceBoundingBoxTree = function(surface,splitV,knotTolU,knotTolV) {
+verb.core.types.LazySurfaceBoundingBoxTree = $hx_exports.core.LazySurfaceBoundingBoxTree = function(surface,splitV,knotTolU,knotTolV) {
 	if(splitV == null) splitV = false;
 	this._boundingBox = null;
 	this._surface = surface;
@@ -5279,7 +5286,7 @@ verb.core.types.LazySurfaceBoundingBoxTree.prototype = {
 			max = verb.core.ArrayExtensions.last(this._surface.knotsU);
 		}
 		var dom = max - min;
-		var pivot = (min + max) / 2.0 + dom * 0.01 * Math.random();
+		var pivot = (min + max) / 2.0;
 		var srfs = verb.core.Modify.surfaceSplit(this._surface,pivot,this._splitV);
 		return new verb.core.types.Pair(new verb.core.types.LazySurfaceBoundingBoxTree(srfs[0],!this._splitV,this._knotTolU,this._knotTolV),new verb.core.types.LazySurfaceBoundingBoxTree(srfs[1],!this._splitV,this._knotTolU,this._knotTolV));
 	}
@@ -5300,7 +5307,7 @@ verb.core.types.LazySurfaceBoundingBoxTree.prototype = {
 		return this._surface;
 	}
 	,indivisible: function(tolerance) {
-		if(this._splitV) return verb.core.Vec.domain(this._surface.knotsV) < this._knotTolV; else return verb.core.Vec.domain(this._surface.knotsU) < this._knotTolU;
+		return verb.core.Vec.domain(this._surface.knotsV) < this._knotTolV && verb.core.Vec.domain(this._surface.knotsU) < this._knotTolU;
 	}
 	,empty: function() {
 		return false;

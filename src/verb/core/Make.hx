@@ -62,8 +62,8 @@ class Make {
 
     public static function surfaceIsocurve( surface : NurbsSurfaceData, u : Float, useV : Bool = false ) : NurbsCurveData {
 
-        var knots = useV ? surface.knotsU : surface.knotsV;
-        var degree = useV ? surface.degreeU : surface.degreeV;
+        var knots = useV ? surface.knotsV : surface.knotsU;
+        var degree = useV ? surface.degreeV : surface.degreeU;
 
         var knotMults = Analyze.knotMultiplicities( knots );
 
@@ -77,22 +77,27 @@ class Make {
         }
 
         var numKnotsToInsert = degree + 1;
-        if (reqKnotIndex > 0){
+        if (reqKnotIndex >= 0){
             numKnotsToInsert = numKnotsToInsert - knotMults[reqKnotIndex].mult;
         }
 
         // insert the knots
-        var newSrf = Modify.surfaceKnotRefine( surface, Vec.rep(numKnotsToInsert, u), useV );
+        var newSrf = numKnotsToInsert > 0 ? Modify.surfaceKnotRefine( surface, Vec.rep(numKnotsToInsert, u), useV ) : surface;
 
         // obtain the correct index of control points to extract
         var span = Eval.knotSpan( degree, u, knots );
+
+        if ( Math.abs( u - knots.first() ) < Constants.EPSILON  ){
+            span = 0;
+        } else if ( Math.abs( u - knots.last() ) < Constants.EPSILON ) {
+            span = ( if (useV) newSrf.controlPoints[0].length else newSrf.controlPoints.length ) - 1;
+        }
 
         if (useV){
             return new NurbsCurveData( newSrf.degreeU, newSrf.knotsU, [ for (row in newSrf.controlPoints) row[span] ]);
         }
 
         return new NurbsCurveData( newSrf.degreeV, newSrf.knotsV, newSrf.controlPoints[span] );
-
     }
 
     public static function loftedSurface( curves : Array<NurbsCurveData>, degreeV : Int = null ) : NurbsSurfaceData {

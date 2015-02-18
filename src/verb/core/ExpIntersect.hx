@@ -2,6 +2,7 @@ package verb.core;
 
 // experimental surface intersection work
 
+import verb.core.types.IBoundingBoxTree;
 import verb.core.types.SurfaceSurfaceIntersectionPoint;
 import verb.core.types.SurfaceBoundingBoxTree;
 import verb.core.types.Pair;
@@ -263,7 +264,7 @@ class ExpIntersect {
 
 //        trace( exactOuter );
 
-//        var approxInner = approxInnerCriticalPts( surface0, surface1 );
+        var approxInner = approxInnerCriticalPts( surface0, surface1 );
 //        var refinedInner = refineInnerCriticalPts( surface0, surface1, approxInner, tol );
 
         return final;
@@ -309,12 +310,17 @@ class ExpIntersect {
         return null;
     }
 
+    public static function boundingBoxLeaves<T>( division : IBoundingBoxTree<T> ) : Array<T> {
+        if ( division.indivisible(0) ) return [ division.yield() ];
+
+        var halves = division.split();
+        return boundingBoxLeaves( halves.item0 ).concat( boundingBoxLeaves( halves.item1 ) );
+    }
+
     public static function approxInnerCriticalPts(surface0 : NurbsSurfaceData, surface1 : NurbsSurfaceData) : Array<Pair<UV,UV>> {
 
-        trace("SURFACE INTERSECTION");
-
-        var div0 = new LazySurfaceBoundingBoxTree( surface0, false, 0.5, 0.5 );
-        var div1 = new LazySurfaceBoundingBoxTree( surface1, false, 0.5, 0.5 );
+        var div0 = new LazySurfaceBoundingBoxTree( surface0, false, 0.125, 0.125 );
+        var div1 = new LazySurfaceBoundingBoxTree( surface1, false, 0.125, 0.125 );
 
         var res = Intersect.boundingBoxTrees(div0, div1, 0);
 
