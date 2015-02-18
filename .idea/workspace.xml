@@ -5,16 +5,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="938890c0-f1ce-4fbd-8322-63610af7f5e6" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/Eval.hx" afterPath="$PROJECT_DIR$/src/verb/core/Eval.hx" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/ExpIntersect.hx" afterPath="$PROJECT_DIR$/src/verb/core/ExpIntersect.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/Gruntfile.js" afterPath="$PROJECT_DIR$/Gruntfile.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/types/LazySurfaceBoundingBoxTree.hx" afterPath="$PROJECT_DIR$/src/verb/core/types/LazySurfaceBoundingBoxTree.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/Make.hx" afterPath="$PROJECT_DIR$/src/verb/core/Make.hx" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/Trig.hx" afterPath="$PROJECT_DIR$/src/verb/core/Trig.hx" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/experimentalIntersection.html" afterPath="$PROJECT_DIR$/examples/experimentalIntersection.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/surfaceBoundaries.html" afterPath="$PROJECT_DIR$/examples/surfaceBoundaries.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/surfaceIntersection.html" afterPath="$PROJECT_DIR$/examples/surfaceIntersection.html" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/surfaceIsocurve.html" afterPath="$PROJECT_DIR$/examples/surfaceIsocurve.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/test.js" afterPath="$PROJECT_DIR$/test/test.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/js/threeBasic.js" afterPath="$PROJECT_DIR$/examples/js/threeBasic.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/js/verb.js" afterPath="$PROJECT_DIR$/build/js/verb.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/js/verbHaxe.js" afterPath="$PROJECT_DIR$/build/js/verbHaxe.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
@@ -42,21 +37,43 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="LazySurfaceBoundingBoxTree.hx" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/verb/core/types/LazySurfaceBoundingBoxTree.hx">
+      <file leaf-file-name="Intersect.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/core/Intersect.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="571" max-vertical-offset="1185">
-              <caret line="60" column="5" selection-start-line="60" selection-start-column="5" selection-end-line="60" selection-end-column="5" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="5440" max-vertical-offset="16320">
+              <caret line="392" column="27" selection-start-line="392" selection-start-column="27" selection-end-line="392" selection-end-column="27" />
+              <folding>
+                <element signature="e#1505#2195#0" expanded="false" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Eval.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/core/Eval.hx">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="13214" max-vertical-offset="15675">
+              <caret line="928" column="9" selection-start-line="928" selection-start-column="9" selection-end-line="928" selection-end-column="9" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name=".gitignore" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/.gitignore">
+      <file leaf-file-name="experimentalIntersection.html" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/examples/experimentalIntersection.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="300">
-              <caret line="0" column="0" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.33898306" vertical-offset="1210" max-vertical-offset="1800">
+              <caret line="94" column="11" selection-start-line="94" selection-start-column="11" selection-end-line="94" selection-end-column="11" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="loftedSurface.html" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/examples/loftedSurface.html">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="-12.541667" vertical-offset="44" max-vertical-offset="555">
+              <caret line="23" column="39" selection-start-line="23" selection-start-column="39" selection-end-line="23" selection-end-column="39" />
               <folding />
             </state>
           </provider>
@@ -65,52 +82,31 @@
       <file leaf-file-name="ExpIntersect.hx" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/verb/core/ExpIntersect.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="6990">
-              <caret line="21" column="0" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="3216" max-vertical-offset="8820">
+              <caret line="282" column="29" selection-start-line="282" selection-start-column="29" selection-end-line="282" selection-end-column="29" />
               <folding>
-                <element signature="e#2223#2663#0" expanded="false" />
-                <element signature="e#2757#3482#0" expanded="false" />
-                <element signature="e#3764#6802#0" expanded="false" />
+                <element signature="e#2321#2761#0" expanded="false" />
+                <element signature="e#2855#3580#0" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="experimentalIntersection.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/experimentalIntersection.html">
+      <file leaf-file-name="Trig.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/core/Trig.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-23.666666" vertical-offset="797" max-vertical-offset="1830">
-              <caret line="91" column="0" selection-start-line="91" selection-start-column="0" selection-end-line="91" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1890">
+              <caret line="10" column="0" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Mat.hx" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/verb/core/Mat.hx">
+      <file leaf-file-name="CurveSurfaceIntersection.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/core/types/CurveSurfaceIntersection.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="165" max-vertical-offset="2550">
-              <caret line="66" column="9" selection-start-line="66" selection-start-column="9" selection-end-line="66" selection-end-column="9" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="surfaceBoundaries.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/surfaceBoundaries.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-18.333334" vertical-offset="70" max-vertical-offset="660">
-              <caret line="34" column="13" selection-start-line="34" selection-start-column="13" selection-end-line="34" selection-end-column="13" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="surfaceIntersection.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/surfaceIntersection.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-15.083333" vertical-offset="1033" max-vertical-offset="1995">
-              <caret line="93" column="5" selection-start-line="93" selection-start-column="5" selection-end-line="93" selection-end-column="5" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="390">
+              <caret line="6" column="6" selection-start-line="6" selection-start-column="6" selection-end-line="6" selection-end-column="6" />
               <folding />
             </state>
           </provider>
@@ -129,18 +125,18 @@
       <file leaf-file-name="test.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/test/test.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="108574" max-vertical-offset="109380">
-              <caret line="7258" column="24" selection-start-line="7258" selection-start-column="24" selection-end-line="7258" selection-end-column="24" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="22582" max-vertical-offset="109380">
+              <caret line="1526" column="3" selection-start-line="1526" selection-start-column="3" selection-end-line="1526" selection-end-column="3" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="Make.hx" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Make.hx" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/verb/core/Make.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="2.296417" vertical-offset="0" max-vertical-offset="10725">
-              <caret line="94" column="0" selection-start-line="94" selection-start-column="0" selection-end-line="94" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="835" max-vertical-offset="10725">
+              <caret line="62" column="27" selection-start-line="62" selection-start-column="27" selection-end-line="62" selection-end-column="27" />
               <folding />
             </state>
           </provider>
@@ -154,7 +150,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/verb/core/Check.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/KdTree.hx" />
         <option value="$PROJECT_DIR$/build.hxml" />
         <option value="$PROJECT_DIR$/build/js/verbHaxe.js" />
@@ -180,7 +175,6 @@
         <option value="$PROJECT_DIR$/src/verb/geom/NurbsSurface.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/types/BoundingBox.hx" />
         <option value="$PROJECT_DIR$/examples/meshSlicing.html" />
-        <option value="$PROJECT_DIR$/src/verb/core/Trig.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Vec.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Modify.hx" />
         <option value="$PROJECT_DIR$/examples/curveIntersection.html" />
@@ -199,19 +193,21 @@
         <option value="$PROJECT_DIR$/examples/js/threeBasic.js" />
         <option value="$PROJECT_DIR$/examples/surfaceIsocurve.html" />
         <option value="$PROJECT_DIR$/Gruntfile.js" />
-        <option value="$PROJECT_DIR$/src/verb/core/ExpIntersect.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/types/LazySurfaceBoundingBoxTree.hx" />
         <option value="$PROJECT_DIR$/examples/surfaceBoundaries.html" />
-        <option value="$PROJECT_DIR$/test/test.js" />
-        <option value="$PROJECT_DIR$/examples/experimentalIntersection.html" />
         <option value="$PROJECT_DIR$/src/verb/core/Make.hx" />
+        <option value="$PROJECT_DIR$/src/verb/core/Eval.hx" />
+        <option value="$PROJECT_DIR$/test/test.js" />
+        <option value="$PROJECT_DIR$/src/verb/core/Trig.hx" />
+        <option value="$PROJECT_DIR$/src/verb/core/ExpIntersect.hx" />
+        <option value="$PROJECT_DIR$/examples/experimentalIntersection.html" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="110" />
+    <option name="x" value="42" />
     <option name="y" value="23" />
-    <option name="width" value="1237" />
+    <option name="width" value="1395" />
     <option name="height" value="873" />
   </component>
   <component name="ProjectInspectionProfilesVisibleTreeState">
@@ -351,24 +347,6 @@
             </PATH_ELEMENT>
             <PATH_ELEMENT>
               <option name="myItemId" value="examples" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-          </PATH>
-          <PATH>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="verb" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="verb" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="examples" />
-              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
-            </PATH_ELEMENT>
-            <PATH_ELEMENT>
-              <option name="myItemId" value="js" />
               <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
             </PATH_ELEMENT>
           </PATH>
@@ -578,7 +556,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="110" y="23" width="1237" height="873" extended-state="0" />
+    <frame x="42" y="23" width="1395" height="873" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -587,7 +565,7 @@
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.0" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.329602" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
@@ -598,7 +576,7 @@
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Application Servers" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.28536782" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.2530466" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
@@ -722,14 +700,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/examples/divideCurve.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-15.625" vertical-offset="0" max-vertical-offset="570">
-          <caret line="25" column="0" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/verb/core/ArrayExtensions.hx">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.024429968" vertical-offset="30" max-vertical-offset="2175">
@@ -750,14 +720,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="966" max-vertical-offset="3540">
           <caret line="78" column="27" selection-start-line="78" selection-start-column="27" selection-end-line="78" selection-end-column="27" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/core/Trig.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2220">
-          <caret line="4" column="12" selection-start-line="4" selection-start-column="12" selection-end-line="4" selection-end-column="12" />
           <folding />
         </state>
       </provider>
@@ -790,22 +752,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/core/types/CurveSurfaceIntersection.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.1465798" vertical-offset="0" max-vertical-offset="614">
-          <caret line="6" column="6" selection-start-line="6" selection-start-column="6" selection-end-line="6" selection-end-column="6" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/core/types/SurfaceSurfaceIntersectionPoint.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.31758958" vertical-offset="0" max-vertical-offset="614">
-          <caret line="13" column="23" selection-start-line="13" selection-start-column="23" selection-end-line="13" selection-end-column="48" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/verb/core/types/NurbsCurveData.hx">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="525">
@@ -830,29 +776,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/examples/loftedSurface.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-14.375" vertical-offset="0" max-vertical-offset="555">
-          <caret line="23" column="39" selection-start-line="23" selection-start-column="39" selection-end-line="23" selection-end-column="39" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/examples/meshIntersection.html">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-6.875" vertical-offset="2175" max-vertical-offset="3000">
           <caret line="156" column="21" selection-start-line="156" selection-start-column="21" selection-end-line="156" selection-end-column="21" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/core/Intersect.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1476" max-vertical-offset="16320">
-          <caret line="144" column="47" selection-start-line="144" selection-start-column="47" selection-end-line="144" selection-end-column="47" />
-          <folding>
-            <element signature="e#1505#2195#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -884,14 +812,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="3750" max-vertical-offset="5010">
           <caret line="283" column="30" selection-start-line="283" selection-start-column="20" selection-end-line="283" selection-end-column="30" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/core/Modify.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.0927835" vertical-offset="5097" max-vertical-offset="10020">
-          <caret line="335" column="27" selection-start-line="335" selection-start-column="27" selection-end-line="335" selection-end-column="27" />
           <folding />
         </state>
       </provider>
@@ -944,14 +864,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/core/Eval.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="13311" max-vertical-offset="15705">
-          <caret line="907" column="0" selection-start-line="907" selection-start-column="0" selection-end-line="907" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/verb/core/types/NurbsSurfaceData.hx">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="45" max-vertical-offset="675">
@@ -1000,26 +912,26 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/examples/experimentalIntersection.html">
+    <entry file="file://$PROJECT_DIR$/src/verb/core/Modify.hx">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-23.666666" vertical-offset="797" max-vertical-offset="1830">
-          <caret line="91" column="0" selection-start-line="91" selection-start-column="0" selection-end-line="91" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/test.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="108574" max-vertical-offset="109380">
-          <caret line="7258" column="24" selection-start-line="7258" selection-start-column="24" selection-end-line="7258" selection-end-column="24" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="5815" max-vertical-offset="10020">
+          <caret line="357" column="40" selection-start-line="357" selection-start-column="40" selection-end-line="357" selection-end-column="40" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/examples/surfaceIntersection.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-15.083333" vertical-offset="1033" max-vertical-offset="1995">
+        <state vertical-scroll-proportion="-3.2083333" vertical-offset="1318" max-vertical-offset="1995">
           <caret line="93" column="5" selection-start-line="93" selection-start-column="5" selection-end-line="93" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/divideCurve.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-13.166667" vertical-offset="59" max-vertical-offset="570">
+          <caret line="25" column="0" selection-start-line="25" selection-start-column="0" selection-end-line="25" selection-end-column="0" />
           <folding />
         </state>
       </provider>
@@ -1032,22 +944,87 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/core/ExpIntersect.hx">
+    <entry file="file://$PROJECT_DIR$/src/verb/core/types/SurfaceSurfaceIntersectionPoint.hx">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="6990">
-          <caret line="21" column="0" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
-          <folding>
-            <element signature="e#2223#2663#0" expanded="false" />
-            <element signature="e#2757#3482#0" expanded="false" />
-            <element signature="e#3764#6802#0" expanded="false" />
-          </folding>
+        <state vertical-scroll-proportion="0.3816047" vertical-offset="0" max-vertical-offset="511">
+          <caret line="13" column="25" selection-start-line="13" selection-start-column="25" selection-end-line="13" selection-end-column="46" />
+          <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/verb/core/Make.hx">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="2.296417" vertical-offset="0" max-vertical-offset="10725">
-          <caret line="94" column="0" selection-start-line="94" selection-start-column="0" selection-end-line="94" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="910" max-vertical-offset="10725">
+          <caret line="62" column="27" selection-start-line="62" selection-start-column="27" selection-end-line="62" selection-end-column="27" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/core/Intersect.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="5440" max-vertical-offset="16320">
+          <caret line="392" column="27" selection-start-line="392" selection-start-column="27" selection-end-line="392" selection-end-column="27" />
+          <folding>
+            <element signature="e#1505#2195#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/core/types/CurveSurfaceIntersection.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="390">
+          <caret line="6" column="6" selection-start-line="6" selection-start-column="6" selection-end-line="6" selection-end-column="6" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/core/Trig.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1890">
+          <caret line="10" column="0" selection-start-line="10" selection-start-column="0" selection-end-line="10" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/test.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="22582" max-vertical-offset="109380">
+          <caret line="1526" column="3" selection-start-line="1526" selection-start-column="3" selection-end-line="1526" selection-end-column="3" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/loftedSurface.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-12.541667" vertical-offset="44" max-vertical-offset="555">
+          <caret line="23" column="39" selection-start-line="23" selection-start-column="39" selection-end-line="23" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/core/Eval.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="13619" max-vertical-offset="15675">
+          <caret line="928" column="9" selection-start-line="928" selection-start-column="9" selection-end-line="928" selection-end-column="9" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/core/ExpIntersect.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="3216" max-vertical-offset="8820">
+          <caret line="282" column="29" selection-start-line="282" selection-start-column="29" selection-end-line="282" selection-end-column="29" />
+          <folding>
+            <element signature="e#2321#2761#0" expanded="false" />
+            <element signature="e#2855#3580#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/experimentalIntersection.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.33898306" vertical-offset="1210" max-vertical-offset="1800">
+          <caret line="94" column="11" selection-start-line="94" selection-start-column="11" selection-end-line="94" selection-end-column="11" />
           <folding />
         </state>
       </provider>

@@ -16,9 +16,11 @@ import verb.core.types.NurbsSurfaceData;
 import verb.core.types.NurbsCurveData;
 
 
-enum MarchStepState { OutOfBounds; InsideDomain; AtBoundary; }
+enum MarchStepState { OutOfBounds; InsideDomain; AtBoundary; CompleteLoop; }
 
 class MarchStep {
+
+    public var stepCount = 0;
 
     // the last step taken
     public var step : Point;
@@ -43,7 +45,7 @@ class MarchStep {
 
     public var state : MarchStepState;
 
-    public function new( step, olduv0, olduv1, uv0, uv1, oldpoint, point, state ){
+    public function new( step, olduv0, olduv1, uv0, uv1, oldpoint, point, state, stepCount ){
         this.step = step;
         this.olduv0 = olduv0;
         this.olduv1 = olduv1;
@@ -52,14 +54,15 @@ class MarchStep {
         this.oldpoint = oldpoint;
         this.point = point;
         this.state = state;
+        this.stepCount = stepCount;
     }
 
     public static function outOfBounds(){
-        return new MarchStep( null, null, null, null, null, null, null, MarchStepState.OutOfBounds );
+        return new MarchStep( null, null, null, null, null, null, null, MarchStepState.OutOfBounds, 0 );
     }
 
     public static function init(pt : SurfaceSurfaceIntersectionPoint){
-        return new MarchStep( null, null, null, pt.uv0, pt.uv1, null, pt.point, MarchStepState.InsideDomain );
+        return new MarchStep( null, null, null, pt.uv0, pt.uv1, null, pt.point, MarchStepState.InsideDomain, 0 );
     }
 }
 
@@ -120,10 +123,11 @@ class ExpIntersect {
         return step;
     }
 
-    public static function march( surface0 : NurbsSurfaceData,
-                                                    surface1 : NurbsSurfaceData,
-                                                    prev : MarchStep,
-                                                    tol : Float ) {
+    public static function march(   surface0 : NurbsSurfaceData,
+                                    surface1 : NurbsSurfaceData,
+                                    prev : MarchStep,
+                                    first : SurfaceSurfaceIntersectionPoint,
+                                    tol : Float ) {
 
         var uv0 = prev.uv0;
         var uv1 = prev.uv1;
@@ -156,11 +160,11 @@ class ExpIntersect {
             var denom = Math.acos( Vec.dot( prev.step.normalized(), unitStep ) );
 
             // linear intersection curve
-            if ( Math.abs( denom ) < Constants.EPSILON){
+            if ( Math.abs( denom ) < Constants.EPSILON ){
                 stepLength = LINEAR_STEP_LENGTH;
             } else {
                 var radiusOfCurvature = Vec.dist( prev.oldpoint, prev.point ) / Math.acos( Vec.dot( prev.step.normalized(), unitStep ) );
-                var theta = 2 * Math.acos( 1 - tol / radiusOfCurvature );
+                var theta = 2 * Math.acos( 1 - tol * 4 / radiusOfCurvature );
 
                 stepLength = radiusOfCurvature * Math.tan( theta );
             }
@@ -190,10 +194,10 @@ class ExpIntersect {
         var stepuv0 = [dw, dt];
         var stepuv1 = [du, dv];
 
-        var state = MarchStepState.InsideDomain;
-
         var newuv0 = uv0.add( stepuv0 );
         var newuv1 = uv1.add( stepuv1 );
+
+        var state = MarchStepState.InsideDomain;
 
         if ( outsideDomain( surface0, newuv0 ) ){
             state = MarchStepState.AtBoundary;
@@ -217,12 +221,16 @@ class ExpIntersect {
         // TODO: if doesn't converge, make d smaller
         var relaxed = Intersect.surfacesAtPointWithEstimate( surface0, surface1, newuv0, newuv1, tol );
 
-        return new MarchStep( step, prev.uv0, prev.uv1, relaxed.uv0, relaxed.uv1, prev.point, relaxed.point, state );
+        // have we made a loop?
+        if ( prev.stepCount > 5 && prev.olduv0 != null && Trig.distToSegment( prev.point, first.point, relaxed.point ) < 10 * tol ){
+            return new MarchStep( step, prev.uv0, prev.uv1, first.uv0, first.uv1, prev.point, first.point, MarchStepState.CompleteLoop, prev.stepCount+1 );
+        }
+
+        return new MarchStep( step, prev.uv0, prev.uv1, relaxed.uv0, relaxed.uv1, prev.point, relaxed.point, state, prev.stepCount+1 );
     }
 
     private static var INIT_STEP_LENGTH = 1e-3;
     private static var LINEAR_STEP_LENGTH = 0.1;
-
 
     public static function completeMarch(surface0 : NurbsSurfaceData,
                                          surface1 : NurbsSurfaceData,
@@ -230,7 +238,7 @@ class ExpIntersect {
                                          tol : Float ) : Array<SurfaceSurfaceIntersectionPoint> {
 
         // take first step along curve
-        var step = march( surface0, surface1, MarchStep.init( start ), tol );
+        var step = march( surface0, surface1, MarchStep.init( start ), start, tol );
 
         // if we're out of bounds, exit
         if (step.state == MarchStepState.AtBoundary){
@@ -241,9 +249,9 @@ class ExpIntersect {
         var final = [];
         final.push( start );
 
-        while (step.state != MarchStepState.AtBoundary) {
+        while ( step.state != MarchStepState.AtBoundary && step.state != MarchStepState.CompleteLoop ) {
             final.push( new SurfaceSurfaceIntersectionPoint( step.uv0, step.uv1, step.point, -1 ) );
-            step = march( surface0, surface1, step, tol );
+            step = march( surface0, surface1, step, start, tol );
         }
 
         final.push( new SurfaceSurfaceIntersectionPoint( step.uv0, step.uv1, step.point, -1 ) );
@@ -253,21 +261,37 @@ class ExpIntersect {
 
     public static function surfaces(surface0 : NurbsSurfaceData, surface1 : NurbsSurfaceData, tol : Float) {
 
-        var exactOuter = intersectBoundaryCurves( surface0, surface1, tol );
 
         var final = [];
 
-        for (int in exactOuter){
+        for (int in intersectBoundaryCurves( surface0, surface1, tol )){
             var res = completeMarch( surface0, surface1, int, tol );
             if (res != null) final.push( res );
         }
 
-//        trace( exactOuter );
-
         var approxInner = approxInnerCriticalPts( surface0, surface1 );
-//        var refinedInner = refineInnerCriticalPts( surface0, surface1, approxInner, tol );
+        var refinedInner = refineInnerCriticalPts( surface0, surface1, approxInner, tol );
 
-        return final;
+        // todo prevent duplicate points
+        var b = true;
+
+        for (pair in refinedInner){
+            var res = Intersect.curveAndSurface( Make.surfaceIsocurve( surface0, pair.item0[0], false ), surface1 );
+
+            if (res.length == 0 ) continue;
+
+            if (!b) continue;
+
+            b = false;
+
+            var int = new SurfaceSurfaceIntersectionPoint( [ pair.item0[0], res[0].u ], res[0].uv, res[0].curvePoint, -1 );
+
+            var res = completeMarch( surface0, surface1, int, tol );
+            if (res != null) final.push( res );
+        }
+
+        return [ for (pts in final) Make.rationalInterpCurve( pts.map(function(x){ return x.point; }) )];
+
     }
 
     public static function refineInnerCriticalPts(surface0 : NurbsSurfaceData,
@@ -319,20 +343,23 @@ class ExpIntersect {
 
     public static function approxInnerCriticalPts(surface0 : NurbsSurfaceData, surface1 : NurbsSurfaceData) : Array<Pair<UV,UV>> {
 
-        var div0 = new LazySurfaceBoundingBoxTree( surface0, false, 0.125, 0.125 );
-        var div1 = new LazySurfaceBoundingBoxTree( surface1, false, 0.125, 0.125 );
+        // TODO: adaptive division
+
+        var div0 = new LazySurfaceBoundingBoxTree( surface0, false, 0.6, 0.6 );
+        var div1 = new LazySurfaceBoundingBoxTree( surface1, false, 0.6, 0.6 );
 
         var res = Intersect.boundingBoxTrees(div0, div1, 0);
 
-        trace(res.length, "TOTAL INTERSECTING SUB-SURFACES");
+        trace( 'num surf pairs', res.length );
 
-        var numSamples = 5;
+        // TODO sampling density?
+        // faster closest point?
+        var numSamples = 4;
 
         var criticalPts = [];
 
         // for each surface pair, construct del phi 2d array
         for (srfpair in res){
-
             var a = approxSurfaceDelPhiField( srfpair.item0, srfpair.item1, numSamples, numSamples );
 
             var f = a.delphi;

@@ -1520,7 +1520,7 @@ describe("verb.core.Trig.distToSegment",function(){
 
 	it('works for simple case', function(){
 
-		verb.core.Trig.distToSegment([-10,0,0], [3,3,0], [2,0,0] ).should.be.equal( 3 );
+		verb.core.Trig.distToSegment([ -10,0,0], [3,3,0], [5,0,0] ).should.be.equal( 3 );
 
 	});
 

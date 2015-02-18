@@ -5,30 +5,8 @@ import verb.core.types.NurbsCurveData.Point;
 class Trig {
 
     public static function distToSegment(a : Point, b : Point, c : Point){
-
-        // check if ac is zero length
-        var acv = Vec.sub( c, a );
-        var acl = Vec.norm( acv );
-
-        // subtract b from a
-        var bma = Vec.sub(b, a);
-
-        if ( acl < Constants.TOLERANCE ){
-            return Vec.norm( bma );
-        }
-
-        // normalized ac
-        var ac = Vec.mul( 1 / acl, acv );
-
-        // project b - a to ac = p
-        var p = Vec.dot( bma, ac );
-
-        // multiply ac by d = acd
-        var acd = Vec.add( a, Vec.mul( p, ac ) );
-
-        // subtract acd from adp
-        return Vec.dist( acd, b );
-
+        var res = segmentClosestPoint( b, a, c, 0.0, 1.0 );
+        return Vec.dist( b, res.pt );
     }
 
     // Find the closest point on a ray

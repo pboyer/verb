@@ -27,9 +27,7 @@
     var d1 = [-5,10,10];
 
     var srf2 = verb.geom.NurbsSurface.byCorners( a1, b1, c1, d1 );
-
 */
-
 
     var degree = 3
         , knots = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
@@ -48,12 +46,9 @@
 
     var srf2 = verb.geom.NurbsSurface.byCorners( p5, p6, p7, p8 );
 
+
     var d1 = srf1.asNurbs();
     var d2 = srf2.asNurbs();
-
-    /*
-
-    // only supports edge curves
 
     var runs = 50;
     var bm = benchmark( function(){ return verb.core.ExpIntersect.surfaces( d1, d2, 1e-3 ) }, runs );
@@ -64,12 +59,22 @@
     var ints = bm.result;
 
     ints.forEach(function(x){
-        addPointsToScene( x.map(function(y){ return y.point; } ) );
+        addCurveToScene( (new verb.geom.NurbsCurve( x )).toThreeGeometry() );
     });
 
-    */
+	addMeshToScene( srf1.toThreeGeometry() );
+	addMeshToScene( srf2.toThreeGeometry() );
 
-    var bbox = new verb.core.LazySurfaceBoundingBoxTree( d1, false, 0.25, 0.25 );
+	threeRender();
+
+
+
+
+
+	/*
+
+
+    var bbox = new verb.core.LazySurfaceBoundingBoxTree( d2, false, 0.4, 0.4 );
     var surfs = verb.core.ExpIntersect.boundingBoxLeaves( bbox );
 
     var mat1 = new THREE.MeshPhongMaterial({
@@ -90,9 +95,8 @@
         });
     });
 
-
-    var runs = 1;
-    var bm = benchmark( function(){ return verb.core.ExpIntersect.approxInnerCriticalPts( d1, d2 ) }, runs );
+    var runs = 50;
+    var bm = benchmark( function(){ return verb.core.ExpIntersect.refineInnerCriticalPts( d1, d2, verb.core.ExpIntersect.approxInnerCriticalPts( d1, d2 ), 1e-3 ); }, runs );
 
     console.log( bm );
     console.log( runs, " runs completed in ", bm.each, " ms each");
@@ -103,14 +107,8 @@
         return verb.core.Eval.rationalSurfacePoint( d1, x.item0[0], x.item0[1] );
     });
 
-    addPointsToScene( pts );
+    */
 
-/*
-	addMeshToScene( srf1.toThreeGeometry() );
-	addMeshToScene( srf2.toThreeGeometry() );
-*/
-
-	threeRender();
 
 </script>
 </body>

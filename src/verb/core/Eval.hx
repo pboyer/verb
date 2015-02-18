@@ -900,10 +900,7 @@ class Eval {
 	
 	public static function knotSpan( degree : Int, u : Float, knots : Array<Float> ) : Int
 	{
-		var m = knots.length - 1
-			, n = m - degree - 1;
-
-		return knotSpanGivenN(n, degree, u, knots);
+		return knotSpanGivenN(knots.length - degree - 2, degree, u, knots);
 	}
 
 	// Find the span on the knot Array knots of the given parameter
@@ -921,12 +918,12 @@ class Eval {
 	
 	public static function knotSpanGivenN( n : Int, degree : Int, u : Float, knots : Array<Float> ) : Int
 	{
-		if ( u >= knots[n+1] )
+		if ( u > knots[n+1] - Constants.EPSILON )
 		{
 			return n;
 		}
 
-		if ( u < knots[degree] )
+		if ( u < knots[degree] + Constants.EPSILON )
 		{
 			return degree;
 		}
@@ -951,6 +948,7 @@ class Eval {
 		return mid;
 	}
 }
+
 /*
 //
 // Compute the gaussian curvature on a non-uniform, non-rational B spline surface
