@@ -6,13 +6,17 @@ import verb.geom.ICurve;
 
 class Edge {
 
-    public var l : Loop;
-    public var o : Edge;
-    public var pre : Edge;
-    public var nxt : Edge;
+    public var loop : Loop;
+    public var opp : Edge;
+    public var prev : Edge;
+    public var next : Edge;
     public var v : Vertex;
     public var crv : ICurve;
 
     public function new() {
+
     }
+
+
+
 }

@@ -40,9 +40,9 @@
     var srf1 =  new verb.geom.NurbsSurface.byKnotsControlPointsWeights( degree, degree, knots, knots, pts );
 
     var p5 = [50,-60,3]
-        , p6 = [50,10,3]
+        , p6 = [50,10,20]
         , p7 = [-10,10,3]
-        , p8 = [-10,-50,3];
+        , p8 = [-10,-50,-10];
 
     var srf2 = verb.geom.NurbsSurface.byCorners( p5, p6, p7, p8 );
 
@@ -50,7 +50,7 @@
     var d1 = srf1.asNurbs();
     var d2 = srf2.asNurbs();
 
-    var runs = 50;
+    var runs = 1;
     var bm = benchmark( function(){ return verb.core.ExpIntersect.surfaces( d1, d2, 1e-3 ) }, runs );
 
     console.log( bm );
@@ -66,10 +66,6 @@
 	addMeshToScene( srf2.toThreeGeometry() );
 
 	threeRender();
-
-
-
-
 
 	/*
 
@@ -113,3 +109,7 @@
 </script>
 </body>
 </html>
+
+
+
+

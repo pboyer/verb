@@ -12,7 +12,6 @@ import verb.core.types.NurbsCurveData;
 @:expose("core.Tess")
 class Tess {
 
-	//
 	// Sample a NURBS curve at equally spaced parametric intervals
 	//
 	// **params**
@@ -22,13 +21,11 @@ class Tess {
 	//
 	// **returns**
 	// + an array of points, prepended by the point param if required
-	//
 
 	public static function rationalCurveRegularSample( curve : NurbsCurveData, numSamples : Int, includeU : Bool ) : Array<Point> {
 		return rationalCurveRegularSampleRange( curve, curve.knots[0], curve.knots.last(), numSamples, includeU);
 	}
 
-	//
 	// Sample a range of a NURBS curve at equally spaced parametric intervals
 	//
 	// **params**
@@ -40,7 +37,6 @@ class Tess {
 	//
 	// **returns**
 	// + an dictionary of parameter - point pairs
-	//
 
 	public static function rationalCurveRegularSampleRange( curve : NurbsCurveData, start : Float, end : Float,
 																numSamples : Int, includeU  : Bool) : Array<Point>  {
@@ -69,7 +65,6 @@ class Tess {
 	}
 
 
-	//
 	// Sample a NURBS curve over its entire domain, corresponds to http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf
 	//
 	// **params**
@@ -79,7 +74,6 @@ class Tess {
 	//
 	// **returns**
 	// + an array of dim + 1 length where the first element is the param where it was sampled and the remaining the pt
-	//
 
 	public static function rationalCurveAdaptiveSample( curve : NurbsCurveData, tol : Float = 1e-6, includeU : Bool = false ) : Array<Point> {
 
@@ -97,7 +91,6 @@ class Tess {
 		return rationalCurveAdaptiveSampleRange( curve, curve.knots[0], curve.knots.last(), tol, includeU );
 	}
 
-	//
 	// Sample a NURBS curve at 3 points, facilitating adaptive sampling
 	//
 	// **params**
@@ -108,7 +101,6 @@ class Tess {
 	//
 	// **returns**
 	// + an array of dim + 1 length where the first element is the param where it was sampled and the remaining the pt
-	//
 
 	public static function rationalCurveAdaptiveSampleRange( curve : NurbsCurveData, start, end, tol, includeU ) : Array<Point>{
 
@@ -145,7 +137,6 @@ class Tess {
 		}
 	}
 
-	//
 	// Tessellate a NURBS surface on equal spaced intervals in the parametric domain
 	//
 	// **params**
@@ -155,7 +146,6 @@ class Tess {
 	//
 	// **returns**
 	// + MeshData object
-	//
 
 	public static function rationalSurfaceNaive( surface : NurbsSurfaceData, divs_u : Int, divs_v : Int ) : MeshData {
 

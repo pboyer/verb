@@ -350,8 +350,6 @@ class ExpIntersect {
 
         var res = Intersect.boundingBoxTrees(div0, div1, 0);
 
-        trace( 'num surf pairs', res.length );
-
         // TODO sampling density?
         // faster closest point?
         var numSamples = 4;

@@ -3,7 +3,7 @@ package verb.core.types;
 using verb.core.ArrayExtensions;
 
 class AdaptiveRefinementOptions {
-    public var normTol : Float = 8.5e-2;
+    public var normTol : Float = 2.5e-2;
     public var minDepth : Int = 0;
     public var maxDepth : Int = 10;
     public var refine : Bool = true;

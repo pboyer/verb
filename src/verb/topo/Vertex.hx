@@ -6,12 +6,12 @@ import verb.core.types.NurbsCurveData.Point;
 
 class Vertex {
 
-    public var id : Int;
-    public var p : Point;
+    public var point : Point;
     public var e : Edge;
-    public var pre : Vertex;
-    public var nxt : Vertex;
+    public var prev : Vertex;
+    public var next : Vertex;
 
-    public function new() {
+    public function new(point) {
+        this.point = point;
     }
 }
