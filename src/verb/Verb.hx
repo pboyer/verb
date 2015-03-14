@@ -1,5 +1,12 @@
 package verb;
 
+// topology
+import verb.topo.Solid;
+import verb.topo.Face;
+import verb.topo.Vertex;
+import verb.topo.Loop;
+import verb.topo.HalfEdge;
+
 // intersection
 import verb.core.ExpIntersect;
 import verb.geom.Intersect;

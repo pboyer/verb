@@ -18,11 +18,6 @@ class Euler {
     // h = hole
     // r = ring
 
-
-    public static function mev(){
-
-    }
-
     public static function kev(){
 
     }

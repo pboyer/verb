@@ -1,17 +1,16 @@
 package verb.topo;
 
-// TODO
-
+import verb.core.types.IDoublyLinkedList;
 import verb.core.types.NurbsCurveData.Point;
 
-class Vertex {
-
-    public var point : Point;
-    public var e : Edge;
-    public var prev : Vertex;
-    public var next : Vertex;
+@:expose("topo.Vertex")
+class Vertex implements IDoublyLinkedList<Vertex> {
+    public var pt : Point;
+    public var e : HalfEdge; // a vertex may be "owned" by many HalfEdge's - this is one of them
+    public var prv : Vertex;
+    public var nxt : Vertex;
 
     public function new(point) {
-        this.point = point;
+        this.pt = point;
     }
 }

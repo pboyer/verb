@@ -20,7 +20,7 @@ function last(a){
 	return a[a.length-1];
 }
 
-
+/*
 describe("verb.core.Eval.knotSpanGivenN",function(){
 
 	it('returns correct result', function(){
@@ -5122,7 +5122,7 @@ describe("verb.core.Eval.rational_surface_curvature ",function(){
 
 });
 
-*/
+
 
 describe("verb.geom.NurbsSurface.byKnotsControlPointsWeights",function(){
 
@@ -7087,32 +7087,32 @@ describe("verb.core.ExpIntersect.surfaces",function(){
         var ints = verb.core.ExpIntersect.surfaces( srf, srf1, 1e-3 );
 
     });
-/*
-    it('provides expected result for two nurbs surface and plane', function(){
 
-		var degree = 3
-			, knots = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
-			, pts = [ 	[ [0, 0, -10], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] , 	[40, 0, 0], [50, 0, 9] ],
-						[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] , [40, -10, 0], [50, -10, 0]	],
-						[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] , [40, -20, -2], [50, -20, 0] 	],
-						[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] , [40, -30, 0], [50, -30, 0]     ],
-						[ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , [40, -40, -20], [50, -40, 0]     ],
-						[ [0, -50, 12], [10, -50, 0], 	[20, -50, 0], 	[30, -50, 0] , [50, -50, 0], [50, -50, 15]     ],     ];
-		var srf1 =  new verb.geom.NurbsSurface.byKnotsControlPointsWeights( degree, degree, knots, knots, pts );
+//    it('provides expected result for two nurbs surface and plane', function(){
+//
+//		var degree = 3
+//			, knots = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
+//			, pts = [ 	[ [0, 0, -10], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] , 	[40, 0, 0], [50, 0, 9] ],
+//						[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] , [40, -10, 0], [50, -10, 0]	],
+//						[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] , [40, -20, -2], [50, -20, 0] 	],
+//						[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] , [40, -30, 0], [50, -30, 0]     ],
+//						[ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , [40, -40, -20], [50, -40, 0]     ],
+//						[ [0, -50, 12], [10, -50, 0], 	[20, -50, 0], 	[30, -50, 0] , [50, -50, 0], [50, -50, 15]     ],     ];
+//		var srf1 =  new verb.geom.NurbsSurface.byKnotsControlPointsWeights( degree, degree, knots, knots, pts );
+//
+//		var p5 = [50,-50,3]
+//			, p6 = [50,0,3]
+//			, p7 = [0,0,3]
+//			, p8 = [0,-50,5];
+//
+//		var srf2 = verb.geom.NurbsSurface.byCorners( p5, p6, p7, p8 );
+//
+//        var ints = verb.core.ExpIntersect.surfaces( srf1.asNurbs(), srf2.asNurbs(), 1e-4 );
+//
+//        console.log(ints);
+//
+//    });
 
-		var p5 = [50,-50,3]
-			, p6 = [50,0,3]
-			, p7 = [0,0,3]
-			, p8 = [0,-50,5];
-
-		var srf2 = verb.geom.NurbsSurface.byCorners( p5, p6, p7, p8 );
-
-        var ints = verb.core.ExpIntersect.surfaces( srf1.asNurbs(), srf2.asNurbs(), 1e-4 );
-
-        console.log(ints);
-
-    });
-*/
 });
 
 
@@ -7280,42 +7280,118 @@ describe("verb.core.Make.surfaceBoundaryCurves",function(){
         vecShouldBe( verb.core.Eval.dehomogenize( crvs[3].controlPoints[0] ), d );
         vecShouldBe( verb.core.Eval.dehomogenize( crvs[3].controlPoints[3] ), c );
 
-
     });
 
 });
+*/
 
-describe("verb.core.Make.surfaceBoundaryCurves",function(){
+describe("verb.topo.Solid.mvfs",function(){
+    it('provides correctly linked lists, correct number of elements', function(){
+        var s = verb.topo.Solid.mvfs( [0,0,0] );
 
-    it('provides expected result for planar surface', function(){
+        s.should.not.be.null;
 
-        var a = [0,0,0];
-        var b = [1,0,0];
-        var c = [1,1,0];
-        var d = [0,1,0];
+        var e0 = s.f.l.e;
+        e0.nxt.should.be.equal(e0);
 
-        var srf = verb.core.Make.fourPointSurface( a, b, c, d );
+        var l = s.loops();
+        var v = s.vertices();
+        var f = s.faces();
+        var he = s.halfEdges();
 
-        var crvs = verb.core.Make.surfaceBoundaryCurves( srf );
+        l.length.should.be.equal(1);
+        v.length.should.be.equal(1);
+        f.length.should.be.equal(1);
+        he.length.should.be.equal(1);
 
-        crvs[0].degree.should.be.equal( srf.degreeV );
-        crvs[1].degree.should.be.equal( srf.degreeV );
-        crvs[2].degree.should.be.equal( srf.degreeU );
-        crvs[3].degree.should.be.equal( srf.degreeU );
+        he[0].v.pt.should.eql([0,0,0]);
+        he[0].nxt.should.eql(he[0]);
+        he[0].prv.should.eql(he[0]);
 
-        vecShouldBe( verb.core.Eval.dehomogenize( crvs[0].controlPoints[0] ), a );
-        vecShouldBe( verb.core.Eval.dehomogenize( crvs[0].controlPoints[3] ), d );
+        f[0].nxt.should.eql(f[0]);
+        f[0].prv.should.eql(f[0]);
 
-        vecShouldBe( verb.core.Eval.dehomogenize( crvs[1].controlPoints[0] ), b );
-        vecShouldBe( verb.core.Eval.dehomogenize( crvs[1].controlPoints[3] ), c );
+        v[0].nxt.should.eql(v[0]);
+        v[0].prv.should.eql(v[0]);
 
-        vecShouldBe( verb.core.Eval.dehomogenize( crvs[2].controlPoints[0] ), a );
-        vecShouldBe( verb.core.Eval.dehomogenize( crvs[2].controlPoints[3] ), b );
+        l[0].nxt.should.eql(l[0]);
+        l[0].prv.should.eql(l[0]);
+    });
+});
 
-        vecShouldBe( verb.core.Eval.dehomogenize( crvs[3].controlPoints[0] ), d );
-        vecShouldBe( verb.core.Eval.dehomogenize( crvs[3].controlPoints[3] ), c );
+describe("verb.topo.Solid.lmev",function(){
+    it('adds 2 new HalfEdges, one new vertex on first call', function(){
+        var s = verb.topo.Solid.mvfs( [0,0,0] );
 
+        var e0 = s.f.l.e;
+        var v0 = s.f.l.e.v;
 
+        var nv = s.lmev( e0, e0, [1,0,0] );
+        nv.pt.should.eql([1,0,0]);
+
+        e0.v.should.be.equal( nv );
+        e0.nxt.v.should.be.equal( v0 );
+        e0.nxt.nxt.v.should.be.equal( e0.v );
+
+        var l = s.loops();
+        var v = s.vertices();
+        var f = s.faces();
+        var he = s.halfEdges();
+
+        l.length.should.be.equal(1);
+        v.length.should.be.equal(2);
+        f.length.should.be.equal(1);
+        he.length.should.be.equal(2);
     });
 
+    it('adds 2 new HalfEdges, one new vertex on second call', function(){
+        var s = verb.topo.Solid.mvfs( [0,0,0] );
+
+        var e0 = s.f.l.e;
+
+        var nv0 = s.lmev( e0, e0, [1,0,0] );
+        nv0.pt.should.eql([1,0,0]);
+
+        nv1 = s.lmev( nv0.e, nv0.e, [1,1,0] );
+        nv1.pt.should.eql( [1,1,0] );
+
+       // TODO: check the correctness of the 
+
+        var l = s.loops();
+        var v = s.vertices();
+        var f = s.faces();
+        var he = s.halfEdges();
+
+        l.length.should.be.equal(1);
+        v.length.should.be.equal(3);
+        f.length.should.be.equal(1);
+        he.length.should.be.equal(4);
+
+    });
 });
+//
+//describe("verb.topo.Solid.lmef",function(){
+//    it('adds 2 new HalfEdges, one new vertex on first call', function(){
+//        var s = verb.topo.Solid.mvfs( [0,0,0] );
+//
+//        var e0 = s.f.l.e;
+//
+//        var nv0 = s.lmev( e0, e0, [1,0,0] );
+//        nv1 = s.lmev( nv0.e, nv0.e, [1,1,0] );
+//
+//        s.lmef( e0, e0.nxt.nxt.nxt );
+//
+//        var l = s.loops();
+//        var v = s.vertices();
+//        var f = s.faces();
+//        var he = s.halfEdges();
+//
+//        console.log( f[0].loops()[0].halfEdges().length );
+//        console.log( f[1].loops()[0].halfEdges().length );
+//
+//        l.length.should.be.equal(2);
+//        v.length.should.be.equal(3);
+//        f.length.should.be.equal(2);
+//        he.length.should.be.equal(7);
+//    });
+//});

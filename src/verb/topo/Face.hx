@@ -1,29 +1,31 @@
 package verb.topo;
 
-// TODO
-
+import verb.core.types.DoublyLinkedListExtensions;
 import verb.geom.ISurface;
 
-class Face {
+using Lambda;
 
-    public var solid : Solid;
-    public var loop : Loop;
-    public var prev : Face;
-    public var next : Face;
+import verb.core.types.IDoublyLinkedList;
+using verb.core.types.DoublyLinkedListExtensions;
+
+@:expose("topo.Face")
+class Face implements IDoublyLinkedList<Face> {
+
+    public var s : Solid;
+    public var l : Loop;
+    public var prv : Face;
+    public var nxt : Face;
     public var srf : ISurface;
 
     public function new(solid) {
-        this.solid = solid;
+        this.s = solid;
     }
 
-    public function addLoop(vertex : Vertex = null){
-        var nl = new Loop(this, vertex);
+    public function loops() : Array<Loop> {
+        return l.iterate().array();
+    }
 
-        if (loop != null){
-            loop.pre = nl;
-            nl.nxt = loop;
-        }
-
-        return loop = nl;
+    public function addLoop() : Loop {
+        return l = l.push(new Loop(this));
     }
 }

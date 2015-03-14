@@ -38,6 +38,7 @@ if ( typeof window != 'object'){
 	};
 }
 (function ($hx_exports) { "use strict";
+$hx_exports.topo = $hx_exports.topo || {};
 $hx_exports.geom = $hx_exports.geom || {};
 $hx_exports.exe = $hx_exports.exe || {};
 $hx_exports.core = $hx_exports.core || {};
@@ -60,6 +61,15 @@ HxOverrides.iter = function(a) {
 };
 var Lambda = function() { };
 Lambda.__name__ = ["Lambda"];
+Lambda.array = function(it) {
+	var a = new Array();
+	var $it0 = $iterator(it)();
+	while( $it0.hasNext() ) {
+		var i = $it0.next();
+		a.push(i);
+	}
+	return a;
+};
 Lambda.fold = function(it,f,first) {
 	var $it0 = $iterator(it)();
 	while( $it0.hasNext() ) {
@@ -5082,8 +5092,50 @@ verb.core.types.CurveTriPoint = $hx_exports.core.CurveTriPoint = function(u,poin
 	this.uv = uv;
 };
 verb.core.types.CurveTriPoint.__name__ = ["verb","core","types","CurveTriPoint"];
+verb.core.types.DoublyLinkedListExtensions = function() { };
+verb.core.types.DoublyLinkedListExtensions.__name__ = ["verb","core","types","DoublyLinkedListExtensions"];
+verb.core.types.DoublyLinkedListExtensions.iterate = function(t) {
+	return new verb.core.types.DoublyLinkedListIterator(t);
+};
+verb.core.types.DoublyLinkedListExtensions.push = function(t,i) {
+	if(t == null) return verb.core.types.DoublyLinkedListExtensions.makeList(i);
+	t.prv.nxt = i;
+	i.prv = t.prv;
+	t.prv = i;
+	i.nxt = t;
+	return i;
+};
+verb.core.types.DoublyLinkedListExtensions.makeList = function(t) {
+	t.nxt = t;
+	t.prv = t;
+	return t;
+};
+verb.core.types.DoublyLinkedListIterator = function(t) {
+	this.t = t;
+	this.c = t;
+};
+verb.core.types.DoublyLinkedListIterator.__name__ = ["verb","core","types","DoublyLinkedListIterator"];
+verb.core.types.DoublyLinkedListIterator.prototype = {
+	iterator: function() {
+		return this;
+	}
+	,next: function() {
+		var cc = this.c;
+		if(this.c.nxt == this.t) this.c = null; else this.c = this.c.nxt;
+		return cc;
+	}
+	,hasNext: function() {
+		return this.c != null;
+	}
+};
+verb.core.types.Exception = function(message) {
+	this.message = message;
+};
+verb.core.types.Exception.__name__ = ["verb","core","types","Exception"];
 verb.core.types.IBoundingBoxTree = function() { };
 verb.core.types.IBoundingBoxTree.__name__ = ["verb","core","types","IBoundingBoxTree"];
+verb.core.types.IDoublyLinkedList = function() { };
+verb.core.types.IDoublyLinkedList.__name__ = ["verb","core","types","IDoublyLinkedList"];
 verb.core.types.Interval = $hx_exports.core.Interval = function(min,max) {
 	this.min = min;
 	this.max = max;
@@ -6051,6 +6103,130 @@ verb.geom.SweptSurface.prototype = $extend(verb.geom.NurbsSurface.prototype,{
 		return this._rail;
 	}
 });
+verb.topo = {};
+verb.topo.Face = $hx_exports.topo.Face = function(solid) {
+	this.s = solid;
+};
+verb.topo.Face.__name__ = ["verb","topo","Face"];
+verb.topo.Face.__interfaces__ = [verb.core.types.IDoublyLinkedList];
+verb.topo.Face.prototype = {
+	loops: function() {
+		return Lambda.array(verb.core.types.DoublyLinkedListExtensions.iterate(this.l));
+	}
+	,addLoop: function() {
+		return this.l = verb.core.types.DoublyLinkedListExtensions.push(this.l,new verb.topo.Loop(this));
+	}
+};
+verb.topo.HalfEdge = $hx_exports.topo.HalfEdge = function(loop,vertex) {
+	this.id = verb.topo.HalfEdge.guid++;
+	this.v = vertex;
+	this.v.e = this;
+	this.l = loop;
+};
+verb.topo.HalfEdge.__name__ = ["verb","topo","HalfEdge"];
+verb.topo.HalfEdge.__interfaces__ = [verb.core.types.IDoublyLinkedList];
+verb.topo.HalfEdge.prototype = {
+	mate: function(he) {
+		if(he == null) return this;
+		this.opp = he;
+		he.opp = this;
+		return this;
+	}
+};
+verb.topo.Loop = $hx_exports.topo.Loop = function(face) {
+	this.f = face;
+};
+verb.topo.Loop.__name__ = ["verb","topo","Loop"];
+verb.topo.Loop.__interfaces__ = [verb.core.types.IDoublyLinkedList];
+verb.topo.Loop.prototype = {
+	addHalfEdge: function(vertex,next,opp) {
+		if(vertex == null) throw new verb.core.types.Exception("vertex cannot be null!");
+		if(next != null && next.l != this) throw new verb.core.types.Exception("Next HalfEdge is not part of same Loop!");
+		if(next != null && next.opp == null && opp == null) {
+			vertex.e = next;
+			next.v = vertex;
+			return next;
+		}
+		if(next != null) this.e = next;
+		var he = new verb.topo.HalfEdge(this,vertex);
+		he.mate(opp);
+		return this.e = verb.core.types.DoublyLinkedListExtensions.push(this.e,he);
+	}
+	,points: function() {
+		return this.halfEdges().map(function(e) {
+			return e.v.pt;
+		});
+	}
+	,halfEdges: function() {
+		return Lambda.array(verb.core.types.DoublyLinkedListExtensions.iterate(this.e));
+	}
+};
+verb.topo.Solid = $hx_exports.topo.Solid = function() {
+};
+verb.topo.Solid.__name__ = ["verb","topo","Solid"];
+verb.topo.Solid.mvfs = function(pt) {
+	var s = new verb.topo.Solid();
+	var f = s.addFace();
+	var l = f.addLoop();
+	var h = l.addHalfEdge(s.addVertex(pt));
+	return s;
+};
+verb.topo.Solid.prototype = {
+	lmev: function(he0,he1,pt) {
+		var v = this.addVertex(pt);
+		var he = he0;
+		while(he != he1) {
+			he.v = v;
+			he = he.opp.nxt;
+		}
+		var ov = he0.v;
+		var nhe0 = he1.l.addHalfEdge(v,he1);
+		var nhe1 = he0.l.addHalfEdge(ov,he0 == he1?nhe0:he0,nhe0);
+		return v;
+	}
+	,lmef: function(he0,he1) {
+		var nf = this.addFace();
+		var nl = nf.addLoop();
+		var he = he0;
+		while(he != he1) {
+			he.l = nl;
+			he = he.nxt;
+		}
+		var nhe0 = he1.l.addHalfEdge(he0.v,he1);
+		var nhe1 = nl.addHalfEdge(he1.v,he0,nhe0);
+		return nf;
+	}
+	,addFace: function() {
+		return this.f = verb.core.types.DoublyLinkedListExtensions.push(this.f,new verb.topo.Face(this));
+	}
+	,addVertex: function(pt) {
+		return this.v = verb.core.types.DoublyLinkedListExtensions.push(this.v,new verb.topo.Vertex(pt));
+	}
+	,vertices: function() {
+		return Lambda.array(verb.core.types.DoublyLinkedListExtensions.iterate(this.v));
+	}
+	,faces: function() {
+		return Lambda.array(verb.core.types.DoublyLinkedListExtensions.iterate(this.f));
+	}
+	,loops: function() {
+		return Lambda.fold(this.faces(),function(f,acc) {
+			return acc.concat(f.loops());
+		},[]);
+	}
+	,halfEdges: function() {
+		return Lambda.fold(this.loops(),function(l,acc) {
+			return acc.concat(l.halfEdges());
+		},[]);
+	}
+	,print: function() {
+		return "Solid (" + this.vertices().length + " Vertices, " + this.faces().length + " Faces, " + this.loops().length + " Loops, " + this.halfEdges().length + " HalfEdges" + ")";
+	}
+};
+verb.topo.Vertex = $hx_exports.topo.Vertex = function(point) {
+	this.pt = point;
+};
+verb.topo.Vertex.__name__ = ["verb","topo","Vertex"];
+verb.topo.Vertex.__interfaces__ = [verb.core.types.IDoublyLinkedList];
 function $iterator(o) { if( o instanceof Array ) return function() { return HxOverrides.iter(o); }; return typeof(o.iterator) == 'function' ? $bind(o,o.iterator) : o.iterator; }
 var $_, $fid = 0;
 function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $fid++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; }
@@ -6319,5 +6495,6 @@ verb.exe.Dispatcher.THREADS = 1;
 verb.exe.Dispatcher._init = false;
 verb.exe.Work.uuid = 0;
 verb.exe.WorkerPool.basePath = "";
+verb.topo.HalfEdge.guid = 0;
 verb.Verb.main();
 })(typeof verb != "undefined" ? verb : exports);
