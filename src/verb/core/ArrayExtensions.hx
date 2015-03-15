@@ -2,6 +2,11 @@ package verb.core;
 
 class ArrayExtensions {
 
+    public static function alloc<T>( a : Array<T>, l : Int ){
+        while (a.length < l) {
+            a.push(null);
+        }
+    }
 
     // Obtain a reversed copy of an array
     //
