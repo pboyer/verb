@@ -42,11 +42,16 @@ class Loop implements IDoublyLinkedList<Loop> {
         return e = e.push( he );
     }
 
-    public function points() : Array<Point> {
-        return halfEdges().map(function(e){ return e.v.pt; });
-    }
-
     public function halfEdges() : Array<HalfEdge> {
         return e.iterate().array();
     }
+
+    public function vertices() : Array<Vertex> {
+        return halfEdges().map(function(e : HalfEdge){ return e.v; });
+    }
+
+    public function points() : Array<Point> {
+        return vertices().map(function(v : Vertex){ return v.pt; });
+    }
+
 }

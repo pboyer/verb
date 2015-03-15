@@ -7319,6 +7319,21 @@ describe("verb.topo.Solid.mvfs",function(){
     });
 });
 
+function triangularLamina(){
+    var s = verb.topo.Solid.mvfs( [0,0,0] );
+
+    var e0 = s.f.l.e;
+    var v0 = s.v;
+    var f0 = s.f;
+
+    var nv0 = s.lmev( e0, e0, [1,0,0] );
+    nv1 = s.lmev( nv0.e, nv0.e, [1,1,0] );
+
+    var nf = s.lmef( v0.e, v0.e.nxt.nxt );
+
+    return s;
+}
+
 describe("verb.topo.Solid.lmev",function(){
     it('adds 2 new HalfEdges, one new vertex on first call', function(){
         var s = verb.topo.Solid.mvfs( [0,0,0] );
@@ -7372,6 +7387,21 @@ describe("verb.topo.Solid.lmev",function(){
         he.length.should.be.equal(4);
 
     });
+
+    it('can extend edges from a triangular lamina', function(){
+        var s = triangularLamina();
+
+        var l = s.f.l;
+
+        // extend every vertex in the loop with an lmev
+        var nvs = l.halfEdges().map(function(e){
+            return s.lmev( e, e, verb.core.Vec.add( e.v.pt, [0,0,1]) );
+        });
+
+        l.halfEdges().length.should.be.equal(9);
+        s.f.nxt.l.halfEdges().length.should.be.equal(3);
+    });
+
 });
 
 describe("verb.topo.Solid.lmef",function(){
@@ -7435,5 +7465,57 @@ describe("verb.topo.Solid.lmef",function(){
         v.length.should.be.equal(4);
         f.length.should.be.equal(2);
         he.length.should.be.equal(8);
+    });
+
+    it('can be used to create a single new face, extending from a triangular lamina', function(){
+        var s = triangularLamina();
+
+        var l = s.f.l;
+
+        var nvs = l.halfEdges().map(function(e){
+            return s.lmev( e, e, verb.core.Vec.add( e.v.pt, [0,0,1]) );
+        });
+
+        var he0 = l.halfEdges()[1];
+        var he1 = he0.nxt.nxt.nxt;
+
+        var nf = s.lmef(he0, he1);
+
+        nf.l.halfEdges().length.should.equal( 4 );
+
+        var l = s.loops();
+        var v = s.vertices();
+        var f = s.faces();
+        var he = s.halfEdges();
+
+        l.length.should.be.equal(3);
+        v.length.should.be.equal(6);
+        f.length.should.be.equal(3);
+        he.length.should.be.equal(14);
+    });
+
+    it('can be used to close a lamina with extended edges into a prism', function(){
+        var s = triangularLamina();
+
+        var nvs = s.f.l.halfEdges().map(function(e){
+            return s.lmev( e, e, verb.core.Vec.add( e.v.pt, [0,0,1]) );
+        });
+
+        var nfs = nvs
+            .map(function(v){
+                // get the halfEdges
+                return v.e;
+            })
+            .map(function(e){
+                // form the new side faces
+                var nf = s.lmef(e, e.nxt.nxt.nxt);
+                nf.l.halfEdges().length.should.equal( 4 );
+                return nf;
+            });
+
+        s.vertices().length.should.be.equal(6);
+        s.faces().length.should.be.equal(5);
+        s.loops().length.should.be.equal(5);
+        s.halfEdges().length.should.be.equal(18);
     });
 });

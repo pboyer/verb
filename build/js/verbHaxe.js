@@ -6113,13 +6113,18 @@ verb.topo.Loop.prototype = {
 		he.mate(opp);
 		return this.e = verb.core.types.DoublyLinkedListExtensions.push(this.e,he);
 	}
-	,points: function() {
-		return this.halfEdges().map(function(e) {
-			return e.v.pt;
-		});
-	}
 	,halfEdges: function() {
 		return Lambda.array(verb.core.types.DoublyLinkedListExtensions.iterate(this.e));
+	}
+	,vertices: function() {
+		return this.halfEdges().map(function(e) {
+			return e.v;
+		});
+	}
+	,points: function() {
+		return this.vertices().map(function(v) {
+			return v.pt;
+		});
 	}
 };
 verb.topo.Solid = $hx_exports.topo.Solid = function() {

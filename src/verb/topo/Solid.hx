@@ -102,3 +102,17 @@ class Solid {
     }
 }
 
+// Key
+//
+// m = make
+// k = kill
+// s = split
+// j = join
+// v = vertex
+// e = edge
+// f = face
+// s = solid
+// h = hole
+// r = ring
+
+
