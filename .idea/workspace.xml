@@ -4,14 +4,7 @@
     <bookmark url="file://$PROJECT_DIR$/Gruntfile.js" description="      build: {&#10;        files: {&#10;          'build/&lt;..." line="8" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="938890c0-f1ce-4fbd-8322-63610af7f5e6" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/topo/Face.hx" afterPath="$PROJECT_DIR$/src/verb/topo/Face.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/topo/Tess2.hx" afterPath="$PROJECT_DIR$/src/verb/topo/Tess2.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/test.js" afterPath="$PROJECT_DIR$/test/test.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/js/verb.js" afterPath="$PROJECT_DIR$/build/js/verb.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/js/verbHaxe.js" afterPath="$PROJECT_DIR$/build/js/verbHaxe.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-    </list>
+    <list default="true" id="938890c0-f1ce-4fbd-8322-63610af7f5e6" name="Default" comment="" />
     <ignored path="verb.iws" />
     <ignored path=".idea/workspace.xml" />
     <ignored path="$PROJECT_DIR$/out/" />

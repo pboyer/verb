@@ -18,6 +18,7 @@
     "nurbs"
   ],
   "dependencies": {
+    "tess2": "^1.0.0"
   },
   "devDependencies": {
     "benchmark": "^1.0.0",
