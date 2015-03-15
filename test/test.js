@@ -20,7 +20,7 @@ function last(a){
 	return a[a.length-1];
 }
 
-/*
+
 describe("verb.core.Eval.knotSpanGivenN",function(){
 
 	it('returns correct result', function(){
@@ -4848,279 +4848,91 @@ describe("verb.geom.EllipseArc.tessellate",function(){
 
 });
 
-/*
-
-describe("SweepOneRail.constructor",function(){
-
-	it('can create an instance', function(){
-
-		var p1 = [0,0,0]
-			, p2 = [1,0,1]
-			, p3 = [2,0,-1]
-			, p4 = [3,0,0];
-
-		var rail = new verb.geom.BezierCurve( [p1, p2, p3, p4] )
-			, profile = new verb.geom.Line( [0,1,0], [0,-1,0]  );
-
-		var srf = new verb.geom.SweepOneRail( rail, profile );
-
-		should.exist(srf);
-
-	});
-
-});
-
-describe("SweepOneRail.point",function(){
-
-	it('evaluates correctly for middle of surface', function(){
-
-		var p1 = [0,0,0]
-			, p2 = [1,0,1]
-			, p3 = [2,0,-1]
-			, p4 = [3,0,0];
-
-		var rail = new verb.geom.BezierCurve( [p1, p2, p3, p4] )
-			, profile = new verb.geom.Line( [0,1,0], [0,-1,0]  )
-
-		var srf = new verb.geom.SweepOneRail( rail, profile );
-
-		should.exist(srf);
-
-		var p = srf.point(0.5,0.5);
-
-		should.exist(p);
-
-		p[0].should.be.greaterThan( 0 );
-		p[1].should.be.approximately(0, verb.core.Constants.EPSILON );
-		p[2].should.be.greaterThan(0, verb.core.Constants.EPSILON );
-
-	});
-
-});
-
-describe("SweepOneRail.derivatives",function(){
-
-	it('gives expected result for middle of surface', function(){
-
-		var p1 = [0,0,0]
-			, p2 = [1,0,1]
-			, p3 = [2,0,-1]
-			, p4 = [3,0,0];
-
-		var rail = new verb.geom.BezierCurve( [p1, p2, p3, p4] )
-			, profile = new verb.geom.Line( [0,1,0], [0,-1,0]  )
-
-		var srf = new verb.geom.SweepOneRail( rail, profile );
-
-		should.exist(srf);
-
-		var p = srf.derivatives(0.5, 0.5, 1);
-
-		p[0][0][0].should.be.greaterThan( 0 );
-		p[0][0][1].should.be.approximately(0, verb.core.Constants.EPSILON );
-		p[0][0][2].should.be.greaterThan(0, verb.core.Constants.EPSILON );
-
-		p[0][1][0].should.be.approximately(0, verb.core.Constants.EPSILON );
-		p[0][1][1].should.be.approximately(-2, verb.core.Constants.EPSILON );
-		p[0][1][2].should.be.approximately(0, verb.core.Constants.EPSILON );
-
-		p[0][0][0].should.be.greaterThan( 0 );
-		p[0][0][1].should.be.approximately(0, verb.core.Constants.EPSILON );
-		p[0][0][2].should.be.greaterThan( 0  );
-
-	});
-
-});
-
-
-describe("SweepOneRail.tessellate",function(){
-
-	it('gives mesh result', function(){
-
-		var p1 = [0,0,0]
-			, p2 = [1,0,1]
-			, p3 = [2,0,-1]
-			, p4 = [3,0,0];
-
-		var rail = new verb.geom.BezierCurve( [p1, p2, p3, p4] )
-			, profile = new verb.geom.Line( [0,1,0], [0,-1,0]  )
-
-		var srf = new verb.geom.SweepOneRail( rail, profile );
-
-		should.exist(srf);
-
-		var p = srf.tessellate();
-
-		p.uvs.length.should.be.greaterThan(10);
-		p.points.length.should.be.greaterThan(10);
-		p.faces.length.should.be.greaterThan(10);
-		p.normals.length.should.be.greaterThan(10);
-
-		p.points.map(function(e){ e.length.should.be.equal(3); });
-		p.uvs.map(function(e){ e.length.should.be.equal(2); });
-		p.faces.map(function(e){ e.length.should.be.equal(3); });
-		p.normals.map(function(e){ e.length.should.be.equal(3); });
-
-	});
-
-
-});
-
-describe("verb.intersectCurves",function(){
-
-	it('gives valid result for 2 planar degree 2 beziers', function(){
-
-		// build a bezier curve
-		var p1 = [0,0,0]
-			, p2 = [1,0,1]
-			, p3 = [2,0,1]
-			, p4 = [3,0,0];
-
-		var curve1 = new verb.geom.BezierCurve( [p1, p2, p3, p4] );
-
-		// build another
-		var c1 = [-5,0,3]
-			, c2 = [1,0,0]
-			, c3 = [2,0,0]
-			, c4 = [3,0,1];
-
-		var curve2 = new verb.geom.BezierCurve( [c1, c2, c3, c4] );
-
-		// make sync work
-		var res = verb.intersectCurves( curve1, curve2 );
-
-		res.length.should.be.equal(2);
-		res[0].length.should.be.equal(3);
-		res[1].length.should.be.equal(3);
-
-		res[0][0].should.be.approximately(0.23545561131691756, verb.core.Constants.TOLERANCE);
-		res[0][1].should.be.approximately(0.4756848757799639, verb.core.Constants.TOLERANCE);
-
-		res[1][0].should.be.approximately(0.7756197831105017, verb.core.Constants.TOLERANCE);
-		res[1][1].should.be.approximately(0.7908648647054176, verb.core.Constants.TOLERANCE);
-
-
-	});
-
-});
-
-
-describe("verb.intersectCurveSurface",function(){
-
-	it('gives valid result for planar surface and degree 2 bezier', function(){
-
-		var base = [0,0,0]
-			, uaxis = [1,0,0]
-			, vaxis = [0,1,0]
-			, ulength = 20
-			, vlength = 10;
-
-		var srf = new verb.geom.PlanarSurface( base, uaxis, vaxis, ulength, vlength );
-		var crv = new verb.geom.BezierCurve( [ [5.2,5.2,5], [5.4,4.8,0], [5.2,5.2,-5] ] );
-
-		var options = {
-			sampleTolerance: 1e-12,
-			tolerance: 1e-5,
-			uDivs: 10,
-			vDivs: 15
-		};
-
-		var res = verb.intersectCurveSurface( crv, srf, options );
-
-		res.length.should.be.equal( 1 );
-		res[0].p.should.be.approximately(0.5, verb.core.Constants.TOLERANCE);
-		res[0].uv[0].should.be.approximately(0.265, verb.core.Constants.TOLERANCE);
-		res[0].uv[1].should.be.approximately(0.5, verb.core.Constants.TOLERANCE);
-
-	});
-
-});
-
-
-describe("verb.core.Eval.rational_surface_curvature ",function(){
-
-	it('returns expected result for cylinder', function(){
-
-		var axis = [0,0,1]
-			, xaxis = [1,0,0]
-			, base = [0,0,0]
-			, height = 1
-			, radius = 1;
-
-		var srf = new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius );
-
-		var res = verb.core.Eval.rational_surface_curvature( srf.get('degreeU'),
-																													srf.get('knotsU'),
-																													srf.get('degreeV'),
-																													srf.get('knotsV'),
-																													srf.homogenize(),
-																													0.5, 0.5 );
-
-		res.point[0].should.be.approximately( -1, verb.core.Constants.TOLERANCE );
-		res.point[1].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-		res.point[2].should.be.approximately( 0.5, verb.core.Constants.TOLERANCE );
-
-		res.normal[0].should.be.approximately( 5.656854, verb.core.Constants.TOLERANCE );
-		res.normal[1].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-		res.normal[2].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-
-		res.mean.should.be.greaterThan( 0 );
-		res.gaussian.should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-
-		res.p1[0].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-		res.p1[1].should.be.approximately( -5.656854249, verb.core.Constants.TOLERANCE );
-		res.p1[2].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-
-		res.p2[0].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-		res.p2[1].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-		res.p2[2].should.be.approximately( -1, verb.core.Constants.TOLERANCE );
-
-		res.k1.should.be.approximately( 181.01933598, verb.core.Constants.TOLERANCE );
-		res.k2.should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-
-
-	});
-
-	it('returns expected result for sphere', function(){
-
-		var center = [0,0,0]
-			, radius = 1;
-
-		var srf = new verb.geom.SphericalSurface( center, radius );
-
-		var res = verb.core.Eval.rational_surface_curvature( srf.get('degreeU'),
-																													srf.get('knotsU'),
-																													srf.get('degreeV'),
-																													srf.get('knotsV'),
-																													srf.homogenize(),
-																													0.5, 0.9 );
-
-		// res.point[0].should.be.approximately( -1, verb.core.Constants.TOLERANCE );
-		// res.point[1].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-		// res.point[2].should.be.approximately( 0.5, verb.core.Constants.TOLERANCE );
-
-		// res.normal[0].should.be.approximately( -5.656854, verb.core.Constants.TOLERANCE );
-		// res.normal[1].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-		// res.normal[2].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-
-		// res.mean.should.be.lessThan( 0 );
-		// res.gaussian.should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-
-		// res.p1[0].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-		// res.p1[1].should.be.approximately( -5.656854249, verb.core.Constants.TOLERANCE );
-		// res.p1[2].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-
-		// res.p2[0].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-		// res.p2[1].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-		// res.p2[2].should.be.approximately( 1, verb.core.Constants.TOLERANCE );
-
-		// res.k1.should.be.approximately( -181.01933598, verb.core.Constants.TOLERANCE );
-		// res.k2.should.be.approximately( 0, verb.core.Constants.TOLERANCE );
-
-
-	});
-
-});
+//
+//describe("verb.core.Eval.rational_surface_curvature ",function(){
+//
+//	it('returns expected result for cylinder', function(){
+//
+//		var axis = [0,0,1]
+//			, xaxis = [1,0,0]
+//			, base = [0,0,0]
+//			, height = 1
+//			, radius = 1;
+//
+//		var srf = new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius );
+//
+//		var res = verb.core.Eval.rational_surface_curvature( srf.get('degreeU'),
+//																													srf.get('knotsU'),
+//																													srf.get('degreeV'),
+//																													srf.get('knotsV'),
+//																													srf.homogenize(),
+//																													0.5, 0.5 );
+//
+//		res.point[0].should.be.approximately( -1, verb.core.Constants.TOLERANCE );
+//		res.point[1].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+//		res.point[2].should.be.approximately( 0.5, verb.core.Constants.TOLERANCE );
+//
+//		res.normal[0].should.be.approximately( 5.656854, verb.core.Constants.TOLERANCE );
+//		res.normal[1].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+//		res.normal[2].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+//
+//		res.mean.should.be.greaterThan( 0 );
+//		res.gaussian.should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+//
+//		res.p1[0].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+//		res.p1[1].should.be.approximately( -5.656854249, verb.core.Constants.TOLERANCE );
+//		res.p1[2].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+//
+//		res.p2[0].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+//		res.p2[1].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+//		res.p2[2].should.be.approximately( -1, verb.core.Constants.TOLERANCE );
+//
+//		res.k1.should.be.approximately( 181.01933598, verb.core.Constants.TOLERANCE );
+//		res.k2.should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+//
+//
+//	});
+//
+//	it('returns expected result for sphere', function(){
+//
+//		var center = [0,0,0]
+//			, radius = 1;
+//
+//		var srf = new verb.geom.SphericalSurface( center, radius );
+//
+//		var res = verb.core.Eval.rational_surface_curvature( srf.get('degreeU'),
+//																													srf.get('knotsU'),
+//																													srf.get('degreeV'),
+//																													srf.get('knotsV'),
+//																													srf.homogenize(),
+//																													0.5, 0.9 );
+//
+//		// res.point[0].should.be.approximately( -1, verb.core.Constants.TOLERANCE );
+//		// res.point[1].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+//		// res.point[2].should.be.approximately( 0.5, verb.core.Constants.TOLERANCE );
+//
+//		// res.normal[0].should.be.approximately( -5.656854, verb.core.Constants.TOLERANCE );
+//		// res.normal[1].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+//		// res.normal[2].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+//
+//		// res.mean.should.be.lessThan( 0 );
+//		// res.gaussian.should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+//
+//		// res.p1[0].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+//		// res.p1[1].should.be.approximately( -5.656854249, verb.core.Constants.TOLERANCE );
+//		// res.p1[2].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+//
+//		// res.p2[0].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+//		// res.p2[1].should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+//		// res.p2[2].should.be.approximately( 1, verb.core.Constants.TOLERANCE );
+//
+//		// res.k1.should.be.approximately( -181.01933598, verb.core.Constants.TOLERANCE );
+//		// res.k2.should.be.approximately( 0, verb.core.Constants.TOLERANCE );
+//
+//
+//	});
+//
+//});
 
 
 
@@ -7283,7 +7095,7 @@ describe("verb.core.Make.surfaceBoundaryCurves",function(){
     });
 
 });
-*/
+
 
 describe("verb.topo.Solid.mvfs",function(){
     it('provides correctly linked lists, correct number of elements', function(){
@@ -7518,4 +7330,46 @@ describe("verb.topo.Solid.lmef",function(){
         s.loops().length.should.be.equal(5);
         s.halfEdges().length.should.be.equal(18);
     });
+
 });
+
+var Tess2 = require('tess2');
+
+describe("verb.topo.Tess2",function(){
+    it('has the same results as JS library for simple example', function(){
+
+        // has library
+        var ca = [0,0, 10,0, 5,10];
+        var cb = [0,2, 10,2, 10,6, 0,6];
+        var contours = [ca,cb];
+
+        var res0 = Tess2.tesselate({
+            contours: contours,
+            windingRule: Tess2.WINDING_ODD,
+            elementType: Tess2.POLYGONS,
+            polySize: 3,
+            vertexSize: 2
+        });
+
+        // haxe port
+        var opts2 = new verb.topo.Tess2Options();
+
+        opts2.contours = contours;
+        opts2.windingRule = verb.topo.Tess2.WINDING_ODD;
+        opts2.elementType = verb.topo.Tess2.POLYGONS;
+        opts2.polySize = 3;
+        opts2.vertexSize = 2;
+
+        var res1 = verb.topo.Tess2.tessellate(opts2);
+
+        res1.vertices.should.eql(res0.vertices);
+        res1.vertexIndices.should.eql(res0.vertexIndices);
+        res1.vertexCount.should.eql(res0.vertexCount);
+        res1.elements.should.eql(res0.elements);
+        res1.elementCount.should.eql(res0.elementCount);
+
+    });
+});
+
+
+

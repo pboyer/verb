@@ -38,6 +38,7 @@ package verb.topo;
 import verb.core.ArrayExtensions;
 using verb.core.ArrayExtensions;
 
+@:expose("topo.Tess2Options")
 class Tess2Options {
 
     public var windingRule = Tess2.WINDING_ODD;
@@ -53,6 +54,7 @@ class Tess2Options {
     }
 }
 
+@:expose("topo.Tess2Result")
 class Tess2Result {
     public var vertices : Array<Float>;
     public var vertexIndices : Array<Int>;

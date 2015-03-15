@@ -6073,24 +6073,24 @@ verb.topo.Face = $hx_exports.topo.Face = function(solid) {
 };
 verb.topo.Face.__name__ = ["verb","topo","Face"];
 verb.topo.Face.__interfaces__ = [verb.core.types.IDoublyLinkedList];
+verb.topo.Face.tessellate = function() {
+	var ca = [0,0,10,0,5,10];
+	var cb = [0,2,10,2,10,6,0,6];
+	var contours = [ca,cb];
+	var opts = new verb.topo.Tess2Options();
+	opts.contours = contours;
+	opts.windingRule = verb.topo.Tess2.WINDING_ODD;
+	opts.elementType = verb.topo.Tess2.POLYGONS;
+	opts.polySize = 3;
+	opts.vertexSize = 2;
+	return verb.topo.Tess2.tessellate(opts);
+};
 verb.topo.Face.prototype = {
 	loops: function() {
 		return Lambda.array(verb.core.types.DoublyLinkedListExtensions.iterate(this.l));
 	}
 	,addLoop: function() {
 		return this.l = verb.core.types.DoublyLinkedListExtensions.push(this.l,new verb.topo.Loop(this));
-	}
-	,tessellate: function() {
-		var ca = [0,0,10,0,5,10];
-		var cb = [0,2,10,2,10,6,0,6];
-		var contours = [ca,cb];
-		var opts = new verb.topo.Tess2Options();
-		opts.contours = contours;
-		opts.windingRule = verb.topo.Tess2.WINDING_ODD;
-		opts.elementType = verb.topo.Tess2.POLYGONS;
-		opts.polySize = 3;
-		opts.vertexSize = 2;
-		var res = verb.topo.Tess2.tessellate(opts);
 	}
 };
 verb.topo.HalfEdge = $hx_exports.topo.HalfEdge = function(loop,vertex) {
@@ -6208,7 +6208,7 @@ verb.topo.Solid.prototype = {
 		return "Solid (" + this.vertices().length + " Vertices, " + this.faces().length + " Faces, " + this.loops().length + " Loops, " + this.halfEdges().length + " HalfEdges" + ")";
 	}
 };
-verb.topo.Tess2Options = function() {
+verb.topo.Tess2Options = $hx_exports.topo.Tess2Options = function() {
 	this.contours = [];
 	this.debug = false;
 	this.normal = [0.0,0.0,1.0];
@@ -6218,7 +6218,7 @@ verb.topo.Tess2Options = function() {
 	this.windingRule = verb.topo.Tess2.WINDING_ODD;
 };
 verb.topo.Tess2Options.__name__ = ["verb","topo","Tess2Options"];
-verb.topo.Tess2Result = function(vertices,vertexIndices,vertexCount,elements,elementCount,mesh) {
+verb.topo.Tess2Result = $hx_exports.topo.Tess2Result = function(vertices,vertexIndices,vertexCount,elements,elementCount,mesh) {
 	this.vertices = vertices;
 	this.vertexIndices = vertexIndices;
 	this.vertexCount = vertexCount;

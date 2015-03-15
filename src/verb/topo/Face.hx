@@ -31,9 +31,7 @@ class Face implements IDoublyLinkedList<Face> {
         return l = l.push(new Loop(this));
     }
 
-    public function tessellate(){
-
-//        Tess2.tessellate();
+    public static function tessellate(){
 
         var ca = [0,0, 10,0, 5,10];
         var cb = [0,2, 10,2, 10,6, 0,6];
@@ -48,7 +46,7 @@ class Face implements IDoublyLinkedList<Face> {
         opts.vertexSize = 2;
 
         // Tesselate
-        var res = Tess2.tessellate(opts);
+        return Tess2.tessellate(opts);
 
     }
 

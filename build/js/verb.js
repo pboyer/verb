@@ -935,6 +935,9 @@ verb.core.Analyze.rationalBezierCurveArcLength = function(curve,u,gaussDegIncrea
 };
 verb.core.ArrayExtensions = function() { };
 verb.core.ArrayExtensions.__name__ = ["verb","core","ArrayExtensions"];
+verb.core.ArrayExtensions.alloc = function(a,l) {
+	while(a.length < l) a.push(null);
+};
 verb.core.ArrayExtensions.reversed = function(a) {
 	var ac = a.slice();
 	ac.reverse();
@@ -6109,6 +6112,18 @@ verb.topo.Face = $hx_exports.topo.Face = function(solid) {
 };
 verb.topo.Face.__name__ = ["verb","topo","Face"];
 verb.topo.Face.__interfaces__ = [verb.core.types.IDoublyLinkedList];
+verb.topo.Face.tessellate = function() {
+	var ca = [0,0,10,0,5,10];
+	var cb = [0,2,10,2,10,6,0,6];
+	var contours = [ca,cb];
+	var opts = new verb.topo.Tess2Options();
+	opts.contours = contours;
+	opts.windingRule = verb.topo.Tess2.WINDING_ODD;
+	opts.elementType = verb.topo.Tess2.POLYGONS;
+	opts.polySize = 3;
+	opts.vertexSize = 2;
+	return verb.topo.Tess2.tessellate(opts);
+};
 verb.topo.Face.prototype = {
 	loops: function() {
 		return Lambda.array(verb.core.types.DoublyLinkedListExtensions.iterate(this.l));
@@ -6230,6 +6245,1904 @@ verb.topo.Solid.prototype = {
 	}
 	,print: function() {
 		return "Solid (" + this.vertices().length + " Vertices, " + this.faces().length + " Faces, " + this.loops().length + " Loops, " + this.halfEdges().length + " HalfEdges" + ")";
+	}
+};
+verb.topo.Tess2Options = $hx_exports.topo.Tess2Options = function() {
+	this.contours = [];
+	this.debug = false;
+	this.normal = [0.0,0.0,1.0];
+	this.vertexSize = 2;
+	this.polySize = 3;
+	this.elementType = verb.topo.Tess2.POLYGONS;
+	this.windingRule = verb.topo.Tess2.WINDING_ODD;
+};
+verb.topo.Tess2Options.__name__ = ["verb","topo","Tess2Options"];
+verb.topo.Tess2Result = $hx_exports.topo.Tess2Result = function(vertices,vertexIndices,vertexCount,elements,elementCount,mesh) {
+	this.vertices = vertices;
+	this.vertexIndices = vertexIndices;
+	this.vertexCount = vertexCount;
+	this.elements = elements;
+	this.elementCount = elementCount;
+	this.mesh = mesh;
+};
+verb.topo.Tess2Result.__name__ = ["verb","topo","Tess2Result"];
+verb.topo.Tess2 = $hx_exports.topo.Tess2 = function() { };
+verb.topo.Tess2.__name__ = ["verb","topo","Tess2"];
+verb.topo.Tess2.tessellate = function(opts) {
+	var tess = new verb.topo.Tessellator();
+	var _g1 = 0;
+	var _g = opts.contours.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		tess.addContour(opts.vertexSize,opts.contours[i]);
+	}
+	tess.tessellate(opts.windingRule,opts.elementType,opts.polySize,opts.vertexSize,opts.normal);
+	return new verb.topo.Tess2Result(tess.vertices,tess.vertexIndices,tess.vertexCount,tess.elements,tess.elementCount,opts.debug?tess.mesh:null);
+};
+verb.topo.Tess2.assert = function(cond) {
+	if(!cond) throw "Assertion Failed!";
+};
+verb.topo.TESSvertex = function() {
+	this.next = null;
+	this.prev = null;
+	this.anEdge = null;
+	this.coords = [0,0,0];
+	this.s = 0.0;
+	this.t = 0.0;
+	this.pqHandle = 0;
+	this.n = 0;
+	this.idx = 0;
+};
+verb.topo.TESSvertex.__name__ = ["verb","topo","TESSvertex"];
+verb.topo.TESSface = function() {
+	this.next = null;
+	this.prev = null;
+	this.anEdge = null;
+	this.n = 0;
+	this.marked = false;
+	this.inside = false;
+};
+verb.topo.TESSface.__name__ = ["verb","topo","TESSface"];
+verb.topo.TESShalfEdge = function(side) {
+	this.next = null;
+	this.Sym = null;
+	this.Onext = null;
+	this.Lnext = null;
+	this.Org = null;
+	this.Lface = null;
+	this.activeRegion = null;
+	this.winding = 0;
+	this.side = side;
+};
+verb.topo.TESShalfEdge.__name__ = ["verb","topo","TESShalfEdge"];
+verb.topo.TESShalfEdge.prototype = {
+	getRface: function() {
+		return this.Sym.Lface;
+	}
+	,setRface: function(v) {
+		this.Sym.Lface = v;
+	}
+	,getDst: function() {
+		return this.Sym.Org;
+	}
+	,setDst: function(v) {
+		this.Sym.Org = v;
+	}
+	,getOprev: function() {
+		return this.Sym.Lnext;
+	}
+	,setOprev: function(v) {
+		this.Sym.Lnext = v;
+	}
+	,getLprev: function() {
+		return this.Onext.Sym;
+	}
+	,setLprev: function(v) {
+		this.Onext.Sym = v;
+	}
+	,getDprev: function() {
+		return this.Lnext.Sym;
+	}
+	,setDprev: function(v) {
+		this.Lnext.Sym = v;
+	}
+	,getRprev: function() {
+		return this.Sym.Onext;
+	}
+	,setRprev: function(v) {
+		this.Sym.Onext = v;
+	}
+	,getDnext: function() {
+		return this.Sym.Onext.Sym;
+	}
+	,setDnext: function(v) {
+		this.Sym.Onext.Sym = v;
+	}
+	,getRnext: function() {
+		return this.Sym.Lnext.Sym;
+	}
+	,setRnext: function(v) {
+		this.Sym.Lnext.Sym = v;
+	}
+};
+verb.topo.TESSmesh = function() {
+	var v = new verb.topo.TESSvertex();
+	var f = new verb.topo.TESSface();
+	var e = new verb.topo.TESShalfEdge(0);
+	var eSym = new verb.topo.TESShalfEdge(1);
+	v.next = v.prev = v;
+	v.anEdge = null;
+	f.next = f.prev = f;
+	f.anEdge = null;
+	f.marked = false;
+	f.inside = false;
+	e.next = e;
+	e.Sym = eSym;
+	e.Onext = null;
+	e.Lnext = null;
+	e.Org = null;
+	e.Lface = null;
+	e.winding = 0;
+	e.activeRegion = null;
+	eSym.next = eSym;
+	eSym.Sym = e;
+	eSym.Onext = null;
+	eSym.Lnext = null;
+	eSym.Org = null;
+	eSym.Lface = null;
+	eSym.winding = 0;
+	eSym.activeRegion = null;
+	this.vHead = v;
+	this.fHead = f;
+	this.eHead = e;
+	this.eHeadSym = eSym;
+};
+verb.topo.TESSmesh.__name__ = ["verb","topo","TESSmesh"];
+verb.topo.TESSmesh.prototype = {
+	makeEdge_: function(eNext) {
+		var e = new verb.topo.TESShalfEdge(0);
+		var eSym = new verb.topo.TESShalfEdge(1);
+		if(eNext.Sym.side < eNext.side) eNext = eNext.Sym;
+		var ePrev = eNext.Sym.next;
+		eSym.next = ePrev;
+		ePrev.Sym.next = e;
+		e.next = eNext;
+		eNext.Sym.next = eSym;
+		e.Sym = eSym;
+		e.Onext = e;
+		e.Lnext = eSym;
+		e.Org = null;
+		e.Lface = null;
+		e.winding = 0;
+		e.activeRegion = null;
+		eSym.Sym = e;
+		eSym.Onext = eSym;
+		eSym.Lnext = e;
+		eSym.Org = null;
+		eSym.Lface = null;
+		eSym.winding = 0;
+		eSym.activeRegion = null;
+		return e;
+	}
+	,splice_: function(a,b) {
+		var aOnext = a.Onext;
+		var bOnext = b.Onext;
+		aOnext.Sym.Lnext = b;
+		bOnext.Sym.Lnext = a;
+		a.Onext = bOnext;
+		b.Onext = aOnext;
+	}
+	,makeVertex_: function(newVertex,eOrig,vNext) {
+		var vNew = newVertex;
+		verb.topo.Tess2.assert(vNew != null);
+		var vPrev = vNext.prev;
+		vNew.prev = vPrev;
+		vPrev.next = vNew;
+		vNew.next = vNext;
+		vNext.prev = vNew;
+		vNew.anEdge = eOrig;
+		var e = eOrig;
+		do {
+			e.Org = vNew;
+			e = e.Onext;
+		} while(e != eOrig);
+	}
+	,makeFace_: function(newFace,eOrig,fNext) {
+		var fNew = newFace;
+		verb.topo.Tess2.assert(fNew != null);
+		var fPrev = fNext.prev;
+		fNew.prev = fPrev;
+		fPrev.next = fNew;
+		fNew.next = fNext;
+		fNext.prev = fNew;
+		fNew.anEdge = eOrig;
+		fNew.marked = false;
+		fNew.inside = fNext.inside;
+		var e = eOrig;
+		do {
+			e.Lface = fNew;
+			e = e.Lnext;
+		} while(e != eOrig);
+	}
+	,killEdge_: function(eDel) {
+		if(eDel.Sym.side < eDel.side) eDel = eDel.Sym;
+		var eNext = eDel.next;
+		var ePrev = eDel.Sym.next;
+		eNext.Sym.next = ePrev;
+		ePrev.Sym.next = eNext;
+	}
+	,killVertex_: function(vDel,newOrg) {
+		var eStart = vDel.anEdge;
+		var e = eStart;
+		do {
+			e.Org = newOrg;
+			e = e.Onext;
+		} while(e != eStart);
+		var vPrev = vDel.prev;
+		var vNext = vDel.next;
+		vNext.prev = vPrev;
+		vPrev.next = vNext;
+	}
+	,killFace_: function(fDel,newLface) {
+		var eStart = fDel.anEdge;
+		var e = eStart;
+		do {
+			e.Lface = newLface;
+			e = e.Lnext;
+		} while(e != eStart);
+		var fPrev = fDel.prev;
+		var fNext = fDel.next;
+		fNext.prev = fPrev;
+		fPrev.next = fNext;
+	}
+	,makeEdge: function() {
+		var newVertex1 = new verb.topo.TESSvertex();
+		var newVertex2 = new verb.topo.TESSvertex();
+		var newFace = new verb.topo.TESSface();
+		var e = this.makeEdge_(this.eHead);
+		this.makeVertex_(newVertex1,e,this.vHead);
+		this.makeVertex_(newVertex2,e.Sym,this.vHead);
+		this.makeFace_(newFace,e,this.fHead);
+		return e;
+	}
+	,splice: function(eOrg,eDst) {
+		var joiningLoops = false;
+		var joiningVertices = false;
+		if(eOrg == eDst) return;
+		if(eDst.Org != eOrg.Org) {
+			joiningVertices = true;
+			this.killVertex_(eDst.Org,eOrg.Org);
+		}
+		if(eDst.Lface != eOrg.Lface) {
+			joiningLoops = true;
+			this.killFace_(eDst.Lface,eOrg.Lface);
+		}
+		this.splice_(eDst,eOrg);
+		if(!joiningVertices) {
+			var newVertex = new verb.topo.TESSvertex();
+			this.makeVertex_(newVertex,eDst,eOrg.Org);
+			eOrg.Org.anEdge = eOrg;
+		}
+		if(!joiningLoops) {
+			var newFace = new verb.topo.TESSface();
+			this.makeFace_(newFace,eDst,eOrg.Lface);
+			eOrg.Lface.anEdge = eOrg;
+		}
+	}
+	,'delete': function(eDel) {
+		var eDelSym = eDel.Sym;
+		var joiningLoops = false;
+		if(eDel.Lface != eDel.getRface()) {
+			joiningLoops = true;
+			this.killFace_(eDel.Lface,eDel.getRface());
+		}
+		if(eDel.Onext == eDel) this.killVertex_(eDel.Org,null); else {
+			eDel.getRface().anEdge = eDel.getOprev();
+			eDel.Org.anEdge = eDel.Onext;
+			this.splice_(eDel,eDel.getOprev());
+			if(!joiningLoops) {
+				var newFace = new verb.topo.TESSface();
+				this.makeFace_(newFace,eDel,eDel.Lface);
+			}
+		}
+		if(eDelSym.Onext == eDelSym) {
+			this.killVertex_(eDelSym.Org,null);
+			this.killFace_(eDelSym.Lface,null);
+		} else {
+			eDel.Lface.anEdge = eDelSym.getOprev();
+			eDelSym.Org.anEdge = eDelSym.Onext;
+			this.splice_(eDelSym,eDelSym.getOprev());
+		}
+		this.killEdge_(eDel);
+	}
+	,addEdgeVertex: function(eOrg) {
+		var eNew = this.makeEdge_(eOrg);
+		var eNewSym = eNew.Sym;
+		this.splice_(eNew,eOrg.Lnext);
+		eNew.Org = eOrg.getDst();
+		var newVertex = new verb.topo.TESSvertex();
+		this.makeVertex_(newVertex,eNewSym,eNew.Org);
+		eNew.Lface = eNewSym.Lface = eOrg.Lface;
+		return eNew;
+	}
+	,splitEdge: function(eOrg) {
+		var tempHalfEdge = this.addEdgeVertex(eOrg);
+		var eNew = tempHalfEdge.Sym;
+		this.splice_(eOrg.Sym,eOrg.Sym.getOprev());
+		this.splice_(eOrg.Sym,eNew);
+		eOrg.setDst(eNew.Org);
+		eNew.getDst().anEdge = eNew.Sym;
+		eNew.setRface(eOrg.getRface());
+		eNew.winding = eOrg.winding;
+		eNew.Sym.winding = eOrg.Sym.winding;
+		return eNew;
+	}
+	,connect: function(eOrg,eDst) {
+		var joiningLoops = false;
+		var eNew = this.makeEdge_(eOrg);
+		var eNewSym = eNew.Sym;
+		if(eDst.Lface != eOrg.Lface) {
+			joiningLoops = true;
+			this.killFace_(eDst.Lface,eOrg.Lface);
+		}
+		this.splice_(eNew,eOrg.Lnext);
+		this.splice_(eNewSym,eDst);
+		eNew.Org = eOrg.getDst();
+		eNewSym.Org = eDst.Org;
+		eNew.Lface = eNewSym.Lface = eOrg.Lface;
+		eOrg.Lface.anEdge = eNewSym;
+		if(!joiningLoops) {
+			var newFace = new verb.topo.TESSface();
+			this.makeFace_(newFace,eNew,eOrg.Lface);
+		}
+		return eNew;
+	}
+	,zapFace: function(fZap) {
+		var eStart = fZap.anEdge;
+		var e;
+		var eNext;
+		var eSym;
+		var fPrev;
+		var fNext;
+		eNext = eStart.Lnext;
+		do {
+			e = eNext;
+			eNext = e.Lnext;
+			e.Lface = null;
+			if(e.getRface() == null) {
+				if(e.Onext == e) this.killVertex_(e.Org,null); else {
+					e.Org.anEdge = e.Onext;
+					this.splice_(e,e.getOprev());
+				}
+				eSym = e.Sym;
+				if(eSym.Onext == eSym) this.killVertex_(eSym.Org,null); else {
+					eSym.Org.anEdge = eSym.Onext;
+					this.splice_(eSym,eSym.getOprev());
+				}
+				this.killEdge_(e);
+			}
+		} while(e != eStart);
+		fPrev = fZap.prev;
+		fNext = fZap.next;
+		fNext.prev = fPrev;
+		fPrev.next = fNext;
+	}
+	,countFaceVerts_: function(f) {
+		var eCur = f.anEdge;
+		var n = 0;
+		do {
+			n++;
+			eCur = eCur.Lnext;
+		} while(eCur != f.anEdge);
+		return n;
+	}
+	,mergeConvexFaces: function(maxVertsPerFace) {
+		var eCur;
+		var eNext;
+		var eSym;
+		var vStart;
+		var curNv;
+		var symNv;
+		var f = this.fHead.next;
+		while(f != this.fHead) {
+			if(!f.inside) {
+				f = f.next;
+				continue;
+			}
+			eCur = f.anEdge;
+			vStart = eCur.Org;
+			while(true) {
+				eNext = eCur.Lnext;
+				eSym = eCur.Sym;
+				if(eSym != null && eSym.Lface != null && eSym.Lface.inside) {
+					curNv = this.countFaceVerts_(f);
+					symNv = this.countFaceVerts_(eSym.Lface);
+					if(curNv + symNv - 2 <= maxVertsPerFace) {
+						if(verb.topo.Geom.vertCCW(eCur.getLprev().Org,eCur.Org,eSym.Lnext.Lnext.Org) && verb.topo.Geom.vertCCW(eSym.getLprev().Org,eSym.Org,eCur.Lnext.Lnext.Org)) {
+							eNext = eSym.Lnext;
+							this["delete"](eSym);
+							eCur = null;
+							eSym = null;
+						}
+					}
+				}
+				if(eCur != null && eCur.Lnext.Org == vStart) break;
+				eCur = eNext;
+			}
+			f = f.next;
+		}
+		return true;
+	}
+	,check: function() {
+		var fHead = this.fHead;
+		var vHead = this.vHead;
+		var eHead = this.eHead;
+		var f;
+		var v;
+		var vPrev;
+		var e;
+		var ePrev;
+		var fPrev = fHead;
+		while((f = fPrev.next) != fHead) {
+			verb.topo.Tess2.assert(f.prev == fPrev);
+			e = f.anEdge;
+			do {
+				verb.topo.Tess2.assert(e.Sym != e);
+				verb.topo.Tess2.assert(e.Sym.Sym == e);
+				verb.topo.Tess2.assert(e.Lnext.Onext.Sym == e);
+				verb.topo.Tess2.assert(e.Onext.Sym.Lnext == e);
+				verb.topo.Tess2.assert(e.Lface == f);
+				e = e.Lnext;
+			} while(e != f.anEdge);
+			fPrev = f;
+		}
+		verb.topo.Tess2.assert(f.prev == fPrev && f.anEdge == null);
+		vPrev = vHead;
+		while((v = vPrev.next) != vHead) {
+			verb.topo.Tess2.assert(v.prev == vPrev);
+			e = v.anEdge;
+			do {
+				verb.topo.Tess2.assert(e.Sym != e);
+				verb.topo.Tess2.assert(e.Sym.Sym == e);
+				verb.topo.Tess2.assert(e.Lnext.Onext.Sym == e);
+				verb.topo.Tess2.assert(e.Onext.Sym.Lnext == e);
+				verb.topo.Tess2.assert(e.Org == v);
+				e = e.Onext;
+			} while(e != v.anEdge);
+			vPrev = v;
+		}
+		verb.topo.Tess2.assert(v.prev == vPrev && v.anEdge == null);
+		ePrev = eHead;
+		while((e = ePrev.next) != eHead) {
+			verb.topo.Tess2.assert(e.Sym.next == ePrev.Sym);
+			verb.topo.Tess2.assert(e.Sym != e);
+			verb.topo.Tess2.assert(e.Sym.Sym == e);
+			verb.topo.Tess2.assert(e.Org != null);
+			verb.topo.Tess2.assert(e.getDst() != null);
+			verb.topo.Tess2.assert(e.Lnext.Onext.Sym == e);
+			verb.topo.Tess2.assert(e.Onext.Sym.Lnext == e);
+			ePrev = e;
+		}
+		verb.topo.Tess2.assert(e.Sym.next == ePrev.Sym && e.Sym == this.eHeadSym && e.Sym.Sym == e && e.Org == null && e.getDst() == null && e.Lface == null && e.getRface() == null);
+	}
+};
+verb.topo.Geom = function() { };
+verb.topo.Geom.__name__ = ["verb","topo","Geom"];
+verb.topo.Geom.vertEq = function(u,v) {
+	return u.s == v.s && u.t == v.t;
+};
+verb.topo.Geom.vertLeq = function(u,v) {
+	return u.s < v.s || u.s == v.s && u.t <= v.t;
+};
+verb.topo.Geom.transLeq = function(u,v) {
+	return u.t < v.t || u.t == v.t && u.s <= v.s;
+};
+verb.topo.Geom.edgeGoesLeft = function(e) {
+	return verb.topo.Geom.vertLeq(e.getDst(),e.Org);
+};
+verb.topo.Geom.edgeGoesRight = function(e) {
+	return verb.topo.Geom.vertLeq(e.Org,e.getDst());
+};
+verb.topo.Geom.vertL1dist = function(u,v) {
+	return Math.abs(u.s - v.s) + Math.abs(u.t - v.t);
+};
+verb.topo.Geom.edgeEval = function(u,v,w) {
+	verb.topo.Tess2.assert(verb.topo.Geom.vertLeq(u,v) && verb.topo.Geom.vertLeq(v,w));
+	var gapL = v.s - u.s;
+	var gapR = w.s - v.s;
+	if(gapL + gapR > 0.0) {
+		if(gapL < gapR) return v.t - u.t + (u.t - w.t) * (gapL / (gapL + gapR)); else return v.t - w.t + (w.t - u.t) * (gapR / (gapL + gapR));
+	}
+	return 0.0;
+};
+verb.topo.Geom.edgeSign = function(u,v,w) {
+	verb.topo.Tess2.assert(verb.topo.Geom.vertLeq(u,v) && verb.topo.Geom.vertLeq(v,w));
+	var gapL = v.s - u.s;
+	var gapR = w.s - v.s;
+	if(gapL + gapR > 0.0) return (v.t - w.t) * gapL + (v.t - u.t) * gapR;
+	return 0.0;
+};
+verb.topo.Geom.transEval = function(u,v,w) {
+	verb.topo.Tess2.assert(verb.topo.Geom.transLeq(u,v) && verb.topo.Geom.transLeq(v,w));
+	var gapL = v.t - u.t;
+	var gapR = w.t - v.t;
+	if(gapL + gapR > 0.0) {
+		if(gapL < gapR) return v.s - u.s + (u.s - w.s) * (gapL / (gapL + gapR)); else return v.s - w.s + (w.s - u.s) * (gapR / (gapL + gapR));
+	}
+	return 0.0;
+};
+verb.topo.Geom.transSign = function(u,v,w) {
+	verb.topo.Tess2.assert(verb.topo.Geom.transLeq(u,v) && verb.topo.Geom.transLeq(v,w));
+	var gapL = v.t - u.t;
+	var gapR = w.t - v.t;
+	if(gapL + gapR > 0.0) return (v.s - w.s) * gapL + (v.s - u.s) * gapR;
+	return 0.0;
+};
+verb.topo.Geom.vertCCW = function(u,v,w) {
+	return u.s * (v.t - w.t) + v.s * (w.t - u.t) + w.s * (u.t - v.t) >= 0.0;
+};
+verb.topo.Geom.interpolate = function(a,x,b,y) {
+	var a1;
+	if(a < 0) a1 = 0; else a1 = a;
+	var b1;
+	if(b < 0) b1 = 0; else b1 = b;
+	if(a1 <= b1) {
+		if(b1 == 0) return (x + y) / 2; else return x + (y - x) * (a1 / (a1 + b1));
+	} else return y + (x - y) * (b1 / (a1 + b1));
+};
+verb.topo.Geom.intersect = function(o1,d1,o2,d2,v) {
+	var z1;
+	var z2;
+	var t;
+	if(!verb.topo.Geom.vertLeq(o1,d1)) {
+		t = o1;
+		o1 = d1;
+		d1 = t;
+	}
+	if(!verb.topo.Geom.vertLeq(o2,d2)) {
+		t = o2;
+		o2 = d2;
+		d2 = t;
+	}
+	if(!verb.topo.Geom.vertLeq(o1,o2)) {
+		t = o1;
+		o1 = o2;
+		o2 = t;
+		t = d1;
+		d1 = d2;
+		d2 = t;
+	}
+	if(!verb.topo.Geom.vertLeq(o2,d1)) v.s = (o2.s + d1.s) / 2; else if(verb.topo.Geom.vertLeq(d1,d2)) {
+		z1 = verb.topo.Geom.edgeEval(o1,o2,d1);
+		z2 = verb.topo.Geom.edgeEval(o2,d1,d2);
+		if(z1 + z2 < 0) {
+			z1 = -z1;
+			z2 = -z2;
+		}
+		v.s = verb.topo.Geom.interpolate(z1,o2.s,z2,d1.s);
+	} else {
+		z1 = verb.topo.Geom.edgeSign(o1,o2,d1);
+		z2 = -verb.topo.Geom.edgeSign(o1,d2,d1);
+		if(z1 + z2 < 0) {
+			z1 = -z1;
+			z2 = -z2;
+		}
+		v.s = verb.topo.Geom.interpolate(z1,o2.s,z2,d2.s);
+	}
+	if(!verb.topo.Geom.transLeq(o1,d1)) {
+		t = o1;
+		o1 = d1;
+		d1 = t;
+	}
+	if(!verb.topo.Geom.transLeq(o2,d2)) {
+		t = o2;
+		o2 = d2;
+		d2 = t;
+	}
+	if(!verb.topo.Geom.transLeq(o1,o2)) {
+		t = o1;
+		o1 = o2;
+		o2 = t;
+		t = d1;
+		d1 = d2;
+		d2 = t;
+	}
+	if(!verb.topo.Geom.transLeq(o2,d1)) v.t = (o2.t + d1.t) / 2; else if(verb.topo.Geom.transLeq(d1,d2)) {
+		z1 = verb.topo.Geom.transEval(o1,o2,d1);
+		z2 = verb.topo.Geom.transEval(o2,d1,d2);
+		if(z1 + z2 < 0) {
+			z1 = -z1;
+			z2 = -z2;
+		}
+		v.t = verb.topo.Geom.interpolate(z1,o2.t,z2,d1.t);
+	} else {
+		z1 = verb.topo.Geom.transSign(o1,o2,d1);
+		z2 = -verb.topo.Geom.transSign(o1,d2,d1);
+		if(z1 + z2 < 0) {
+			z1 = -z1;
+			z2 = -z2;
+		}
+		v.t = verb.topo.Geom.interpolate(z1,o2.t,z2,d2.t);
+	}
+};
+verb.topo.DictNode = function() {
+	this.key = null;
+	this.next = null;
+	this.prev = null;
+};
+verb.topo.DictNode.__name__ = ["verb","topo","DictNode"];
+verb.topo.Dict = function(frame,leq) {
+	this.head = new verb.topo.DictNode();
+	this.head.next = this.head;
+	this.head.prev = this.head;
+	this.frame = frame;
+	this.leq = leq;
+};
+verb.topo.Dict.__name__ = ["verb","topo","Dict"];
+verb.topo.Dict.prototype = {
+	min: function() {
+		return this.head.next;
+	}
+	,max: function() {
+		return this.head.prev;
+	}
+	,insert: function(k) {
+		return this.insertBefore(this.head,k);
+	}
+	,search: function(key) {
+		var node = this.head;
+		do node = node.next; while(node.key != null && !this.leq(this.frame,key,node.key));
+		return node;
+	}
+	,insertBefore: function(node,key) {
+		do node = node.prev; while(node.key != null && !this.leq(this.frame,node.key,key));
+		var newNode = new verb.topo.DictNode();
+		newNode.key = key;
+		newNode.next = node.next;
+		node.next.prev = newNode;
+		newNode.prev = node;
+		node.next = newNode;
+		return newNode;
+	}
+	,'delete': function(node) {
+		node.next.prev = node.prev;
+		node.prev.next = node.next;
+	}
+};
+verb.topo.PQnode = function() {
+	this.handle = null;
+};
+verb.topo.PQnode.__name__ = ["verb","topo","PQnode"];
+verb.topo.PQhandleElem = function() {
+	this.key = null;
+	this.node = null;
+};
+verb.topo.PQhandleElem.__name__ = ["verb","topo","PQhandleElem"];
+verb.topo.PriorityQ = function(size,leq) {
+	this.size = 0;
+	this.max = size;
+	this.nodes = [];
+	verb.core.ArrayExtensions.alloc(this.nodes,size + 1);
+	var _g1 = 0;
+	var _g = this.nodes.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		this.nodes[i] = new verb.topo.PQnode();
+	}
+	this.handles = [];
+	verb.core.ArrayExtensions.alloc(this.handles,size + 1);
+	var _g11 = 0;
+	var _g2 = this.handles.length;
+	while(_g11 < _g2) {
+		var i1 = _g11++;
+		this.handles[i1] = new verb.topo.PQhandleElem();
+	}
+	this.initialized = false;
+	this.freeList = 0;
+	this.leq = leq;
+	this.nodes[1].handle = 1;
+	this.handles[1].key = null;
+};
+verb.topo.PriorityQ.__name__ = ["verb","topo","PriorityQ"];
+verb.topo.PriorityQ.prototype = {
+	floatDown_: function(curr) {
+		var n = this.nodes;
+		var h = this.handles;
+		var hCurr;
+		var hChild;
+		var child;
+		hCurr = n[curr].handle;
+		while(true) {
+			child = curr << 1;
+			if(child < this.size && this.leq(h[n[child + 1].handle].key,h[n[child].handle].key)) ++child;
+			verb.topo.Tess2.assert(child <= this.max);
+			hChild = n[child].handle;
+			if(child > this.size || this.leq(h[hCurr].key,h[hChild].key)) {
+				n[curr].handle = hCurr;
+				h[hCurr].node = curr;
+				break;
+			}
+			n[curr].handle = hChild;
+			h[hChild].node = curr;
+			curr = child;
+		}
+	}
+	,floatUp_: function(curr) {
+		var n = this.nodes;
+		var h = this.handles;
+		var hCurr;
+		var hParent;
+		var parent;
+		hCurr = n[curr].handle;
+		while(true) {
+			parent = curr >> 1;
+			hParent = n[parent].handle;
+			if(parent == 0 || this.leq(h[hParent].key,h[hCurr].key)) {
+				n[curr].handle = hCurr;
+				h[hCurr].node = curr;
+				break;
+			}
+			n[curr].handle = hParent;
+			h[hParent].node = curr;
+			curr = parent;
+		}
+	}
+	,init: function() {
+		var i = this.size;
+		while(i >= 1) {
+			this.floatDown_(i);
+			--i;
+		}
+		this.initialized = true;
+	}
+	,min: function() {
+		return this.handles[this.nodes[1].handle].key;
+	}
+	,isEmpty: function() {
+		this.size == 0;
+	}
+	,insert: function(keyNew) {
+		var curr;
+		var free;
+		curr = ++this.size;
+		if(curr * 2 > this.max) {
+			this.max *= 2;
+			var s;
+			s = this.nodes.length;
+			verb.core.ArrayExtensions.alloc(this.nodes,this.max + 1);
+			var _g1 = 0;
+			var _g = this.nodes.length;
+			while(_g1 < _g) {
+				var i = _g1++;
+				this.nodes[i] = new verb.topo.PQnode();
+			}
+			s = this.handles.length;
+			verb.core.ArrayExtensions.alloc(this.handles,this.max + 1);
+			var _g11 = s;
+			var _g2 = this.handles.length;
+			while(_g11 < _g2) {
+				var i1 = _g11++;
+				this.handles[i1] = new verb.topo.PQhandleElem();
+			}
+		}
+		if(this.freeList == 0) free = curr; else {
+			free = this.freeList;
+			this.freeList = this.handles[free].node;
+		}
+		this.nodes[curr].handle = free;
+		this.handles[free].node = curr;
+		this.handles[free].key = keyNew;
+		if(this.initialized) this.floatUp_(curr);
+		return free;
+	}
+	,extractMin: function() {
+		var n = this.nodes;
+		var h = this.handles;
+		var hMin = n[1].handle;
+		var min = h[hMin].key;
+		if(this.size > 0) {
+			n[1].handle = n[this.size].handle;
+			h[n[1].handle].node = 1;
+			h[hMin].key = null;
+			h[hMin].node = this.freeList;
+			this.freeList = hMin;
+			--this.size;
+			if(this.size > 0) this.floatDown_(1);
+		}
+		return min;
+	}
+	,'delete': function(hCurr) {
+		var n = this.nodes;
+		var h = this.handles;
+		var curr;
+		verb.topo.Tess2.assert(hCurr >= 1 && hCurr <= this.max && h[hCurr].key != null);
+		curr = h[hCurr].node;
+		n[curr].handle = n[this.size].handle;
+		h[n[curr].handle].node = curr;
+		--this.size;
+		if(curr <= this.size) {
+			if(curr <= 1 || this.leq(h[n[curr >> 1].handle].key,h[n[curr].handle].key)) this.floatDown_(curr); else this.floatUp_(curr);
+		}
+		h[hCurr].key = null;
+		h[hCurr].node = this.freeList;
+		this.freeList = hCurr;
+	}
+};
+verb.topo.ActiveRegion = function() {
+	this.eUp = null;
+	this.nodeUp = null;
+	this.windingNumber = 0;
+	this.inside = false;
+	this.sentinel = false;
+	this.dirty = false;
+	this.fixUpperEdge = false;
+};
+verb.topo.ActiveRegion.__name__ = ["verb","topo","ActiveRegion"];
+verb.topo.Sweep = function() { };
+verb.topo.Sweep.__name__ = ["verb","topo","Sweep"];
+verb.topo.Sweep.regionBelow = function(r) {
+	return r.nodeUp.prev.key;
+};
+verb.topo.Sweep.regionAbove = function(r) {
+	return r.nodeUp.next.key;
+};
+verb.topo.Sweep.debugEvent = function(tess) {
+};
+verb.topo.Sweep.addWinding = function(eDst,eSrc) {
+	eDst.winding += eSrc.winding;
+	eDst.Sym.winding += eSrc.Sym.winding;
+};
+verb.topo.Sweep.edgeLeq = function(tess,reg1,reg2) {
+	var ev = tess.event;
+	var t1;
+	var t2;
+	var e1 = reg1.eUp;
+	var e2 = reg2.eUp;
+	if(e1.getDst() == ev) {
+		if(e2.getDst() == ev) {
+			if(verb.topo.Geom.vertLeq(e1.Org,e2.Org)) return verb.topo.Geom.edgeSign(e2.getDst(),e1.Org,e2.Org) <= 0;
+			return verb.topo.Geom.edgeSign(e1.getDst(),e2.Org,e1.Org) >= 0;
+		}
+		return verb.topo.Geom.edgeSign(e2.getDst(),ev,e2.Org) <= 0;
+	}
+	if(e2.getDst() == ev) return verb.topo.Geom.edgeSign(e1.getDst(),ev,e1.Org) >= 0;
+	var t11 = verb.topo.Geom.edgeEval(e1.getDst(),ev,e1.Org);
+	var t21 = verb.topo.Geom.edgeEval(e2.getDst(),ev,e2.Org);
+	return t11 >= t21;
+};
+verb.topo.Sweep.deleteRegion = function(tess,reg) {
+	if(reg.fixUpperEdge) verb.topo.Tess2.assert(reg.eUp.winding == 0);
+	reg.eUp.activeRegion = null;
+	tess.dict["delete"](reg.nodeUp);
+};
+verb.topo.Sweep.fixUpperEdge = function(tess,reg,newEdge) {
+	verb.topo.Tess2.assert(reg.fixUpperEdge);
+	tess.mesh["delete"](reg.eUp);
+	reg.fixUpperEdge = false;
+	reg.eUp = newEdge;
+	newEdge.activeRegion = reg;
+};
+verb.topo.Sweep.topLeftRegion = function(tess,reg) {
+	var org = reg.eUp.Org;
+	var e;
+	do reg = verb.topo.Sweep.regionAbove(reg); while(reg.eUp.Org == org);
+	if(reg.fixUpperEdge) {
+		e = tess.mesh.connect(verb.topo.Sweep.regionBelow(reg).eUp.Sym,reg.eUp.Lnext);
+		if(e == null) return null;
+		verb.topo.Sweep.fixUpperEdge(tess,reg,e);
+		reg = verb.topo.Sweep.regionAbove(reg);
+	}
+	return reg;
+};
+verb.topo.Sweep.topRightRegion = function(reg) {
+	var dst = reg.eUp.getDst();
+	var reg1 = null;
+	do reg1 = verb.topo.Sweep.regionAbove(reg1); while(reg1.eUp.getDst() == dst);
+	return reg1;
+};
+verb.topo.Sweep.addRegionBelow = function(tess,regAbove,eNewUp) {
+	var regNew = new verb.topo.ActiveRegion();
+	regNew.eUp = eNewUp;
+	regNew.nodeUp = tess.dict.insertBefore(regAbove.nodeUp,regNew);
+	regNew.fixUpperEdge = false;
+	regNew.sentinel = false;
+	regNew.dirty = false;
+	eNewUp.activeRegion = regNew;
+	return regNew;
+};
+verb.topo.Sweep.isWindingInside = function(tess,n) {
+	var _g = tess.windingRule;
+	switch(_g) {
+	case verb.topo.Tess2.WINDING_ODD:
+		return (n & 1) != 0;
+	case verb.topo.Tess2.WINDING_NONZERO:
+		return n != 0;
+	case verb.topo.Tess2.WINDING_POSITIVE:
+		return n > 0;
+	case verb.topo.Tess2.WINDING_NEGATIVE:
+		return n < 0;
+	case verb.topo.Tess2.WINDING_ABS_GEQ_TWO:
+		return n >= 2 || n <= -2;
+	}
+	verb.topo.Tess2.assert(false);
+	return false;
+};
+verb.topo.Sweep.computeWinding = function(tess,reg) {
+	reg.windingNumber = verb.topo.Sweep.regionAbove(reg).windingNumber + reg.eUp.winding;
+	reg.inside = verb.topo.Sweep.isWindingInside(tess,reg.windingNumber);
+};
+verb.topo.Sweep.finishRegion = function(tess,reg) {
+	var e = reg.eUp;
+	var f = e.Lface;
+	f.inside = reg.inside;
+	f.anEdge = e;
+	verb.topo.Sweep.deleteRegion(tess,reg);
+};
+verb.topo.Sweep.finishLeftRegions = function(tess,regFirst,regLast) {
+	var e;
+	var ePrev;
+	var reg = null;
+	var regPrev = regFirst;
+	var ePrev1 = regFirst.eUp;
+	while(regPrev != regLast) {
+		regPrev.fixUpperEdge = false;
+		reg = verb.topo.Sweep.regionBelow(regPrev);
+		e = reg.eUp;
+		if(e.Org != ePrev1.Org) {
+			if(!reg.fixUpperEdge) {
+				verb.topo.Sweep.finishRegion(tess,regPrev);
+				break;
+			}
+			e = tess.mesh.connect(ePrev1.getLprev(),e.Sym);
+			verb.topo.Sweep.fixUpperEdge(tess,reg,e);
+		}
+		if(ePrev1.Onext != e) {
+			tess.mesh.splice(e.getOprev(),e);
+			tess.mesh.splice(ePrev1,e);
+		}
+		verb.topo.Sweep.finishRegion(tess,regPrev);
+		ePrev1 = reg.eUp;
+		regPrev = reg;
+	}
+	return ePrev1;
+};
+verb.topo.Sweep.addRightEdges = function(tess,regUp,eFirst,eLast,eTopLeft,cleanUp) {
+	var reg;
+	var regPrev;
+	var e;
+	var ePrev;
+	var firstTime = true;
+	e = eFirst;
+	do {
+		verb.topo.Tess2.assert(verb.topo.Geom.vertLeq(e.Org,e.getDst()));
+		verb.topo.Sweep.addRegionBelow(tess,regUp,e.Sym);
+		e = e.Onext;
+	} while(e != eLast);
+	if(eTopLeft == null) eTopLeft = verb.topo.Sweep.regionBelow(regUp).eUp.getRprev();
+	regPrev = regUp;
+	ePrev = eTopLeft;
+	while(true) {
+		reg = verb.topo.Sweep.regionBelow(regPrev);
+		e = reg.eUp.Sym;
+		if(e.Org != ePrev.Org) break;
+		if(e.Onext != ePrev) {
+			tess.mesh.splice(e.getOprev(),e);
+			tess.mesh.splice(ePrev.getOprev(),e);
+		}
+		reg.windingNumber = regPrev.windingNumber - e.winding;
+		reg.inside = verb.topo.Sweep.isWindingInside(tess,reg.windingNumber);
+		regPrev.dirty = true;
+		if(!firstTime && verb.topo.Sweep.checkForRightSplice(tess,regPrev)) {
+			verb.topo.Sweep.addWinding(e,ePrev);
+			verb.topo.Sweep.deleteRegion(tess,regPrev);
+			tess.mesh["delete"](ePrev);
+		}
+		firstTime = false;
+		regPrev = reg;
+		ePrev = e;
+	}
+	regPrev.dirty = true;
+	verb.topo.Tess2.assert(regPrev.windingNumber - e.winding == reg.windingNumber);
+	if(cleanUp) verb.topo.Sweep.walkDirtyRegions(tess,regPrev);
+};
+verb.topo.Sweep.spliceMergeVertices = function(tess,e1,e2) {
+	tess.mesh.splice(e1,e2);
+};
+verb.topo.Sweep.vertexWeights = function(isect,org,dst) {
+	var t1 = verb.topo.Geom.vertL1dist(org,isect);
+	var t2 = verb.topo.Geom.vertL1dist(dst,isect);
+	var w0 = 0.5 * t2 / (t1 + t2);
+	var w1 = 0.5 * t1 / (t1 + t2);
+	isect.coords[0] += w0 * org.coords[0] + w1 * dst.coords[0];
+	isect.coords[1] += w0 * org.coords[1] + w1 * dst.coords[1];
+	isect.coords[2] += w0 * org.coords[2] + w1 * dst.coords[2];
+};
+verb.topo.Sweep.getIntersectData = function(tess,isect,orgUp,dstUp,orgLo,dstLo) {
+	isect.coords[0] = isect.coords[1] = isect.coords[2] = 0;
+	isect.idx = -1;
+	verb.topo.Sweep.vertexWeights(isect,orgUp,dstUp);
+	verb.topo.Sweep.vertexWeights(isect,orgLo,dstLo);
+};
+verb.topo.Sweep.checkForRightSplice = function(tess,regUp) {
+	var regLo = verb.topo.Sweep.regionBelow(regUp);
+	var eUp = regUp.eUp;
+	var eLo = regLo.eUp;
+	if(verb.topo.Geom.vertLeq(eUp.Org,eLo.Org)) {
+		if(verb.topo.Geom.edgeSign(eLo.getDst(),eUp.Org,eLo.Org) > 0) return false;
+		if(!verb.topo.Geom.vertEq(eUp.Org,eLo.Org)) {
+			tess.mesh.splitEdge(eLo.Sym);
+			tess.mesh.splice(eUp,eLo.getOprev());
+			regUp.dirty = regLo.dirty = true;
+		} else if(eUp.Org != eLo.Org) {
+			tess.pq["delete"](eUp.Org.pqHandle);
+			verb.topo.Sweep.spliceMergeVertices(tess,eLo.getOprev(),eUp);
+		}
+	} else {
+		if(verb.topo.Geom.edgeSign(eUp.getDst(),eLo.Org,eUp.Org) < 0) return false;
+		verb.topo.Sweep.regionAbove(regUp).dirty = regUp.dirty = true;
+		tess.mesh.splitEdge(eUp.Sym);
+		tess.mesh.splice(eLo.getOprev(),eUp);
+	}
+	return true;
+};
+verb.topo.Sweep.checkForLeftSplice = function(tess,regUp) {
+	var regLo = verb.topo.Sweep.regionBelow(regUp);
+	var eUp = regUp.eUp;
+	var eLo = regLo.eUp;
+	var e;
+	verb.topo.Tess2.assert(!verb.topo.Geom.vertEq(eUp.getDst(),eLo.getDst()));
+	if(verb.topo.Geom.vertLeq(eUp.getDst(),eLo.getDst())) {
+		if(verb.topo.Geom.edgeSign(eUp.getDst(),eLo.getDst(),eUp.Org) < 0) return false;
+		verb.topo.Sweep.regionAbove(regUp).dirty = regUp.dirty = true;
+		e = tess.mesh.splitEdge(eUp);
+		tess.mesh.splice(eLo.Sym,e);
+		e.Lface.inside = regUp.inside;
+	} else {
+		if(verb.topo.Geom.edgeSign(eLo.getDst(),eUp.getDst(),eLo.Org) > 0) return false;
+		regUp.dirty = regLo.dirty = true;
+		e = tess.mesh.splitEdge(eLo);
+		tess.mesh.splice(eUp.Lnext,eLo.Sym);
+		e.getRface().inside = regUp.inside;
+	}
+	return true;
+};
+verb.topo.Sweep.checkForIntersect = function(tess,regUp) {
+	var regLo = verb.topo.Sweep.regionBelow(regUp);
+	var eUp = regUp.eUp;
+	var eLo = regLo.eUp;
+	var orgUp = eUp.Org;
+	var orgLo = eLo.Org;
+	var dstUp = eUp.getDst();
+	var dstLo = eLo.getDst();
+	var tMinUp;
+	var tMaxLo;
+	var isect = new verb.topo.TESSvertex();
+	var orgMin;
+	var e;
+	verb.topo.Tess2.assert(!verb.topo.Geom.vertEq(dstLo,dstUp));
+	verb.topo.Tess2.assert(verb.topo.Geom.edgeSign(dstUp,tess.event,orgUp) <= 0);
+	verb.topo.Tess2.assert(verb.topo.Geom.edgeSign(dstLo,tess.event,orgLo) >= 0);
+	verb.topo.Tess2.assert(orgUp != tess.event && orgLo != tess.event);
+	verb.topo.Tess2.assert(!regUp.fixUpperEdge && !regLo.fixUpperEdge);
+	if(orgUp == orgLo) return false;
+	tMinUp = Math.min(orgUp.t,dstUp.t);
+	tMaxLo = Math.max(orgLo.t,dstLo.t);
+	if(tMinUp > tMaxLo) return false;
+	if(verb.topo.Geom.vertLeq(orgUp,orgLo)) {
+		if(verb.topo.Geom.edgeSign(dstLo,orgUp,orgLo) > 0) return false;
+	} else if(verb.topo.Geom.edgeSign(dstUp,orgLo,orgUp) < 0) return false;
+	verb.topo.Sweep.debugEvent(tess);
+	verb.topo.Geom.intersect(dstUp,orgUp,dstLo,orgLo,isect);
+	verb.topo.Tess2.assert(Math.min(orgUp.t,dstUp.t) <= isect.t);
+	verb.topo.Tess2.assert(isect.t <= Math.max(orgLo.t,dstLo.t));
+	verb.topo.Tess2.assert(Math.min(dstLo.s,dstUp.s) <= isect.s);
+	verb.topo.Tess2.assert(isect.s <= Math.max(orgLo.s,orgUp.s));
+	if(verb.topo.Geom.vertLeq(isect,tess.event)) {
+		isect.s = tess.event.s;
+		isect.t = tess.event.t;
+	}
+	if(verb.topo.Geom.vertLeq(orgUp,orgLo)) orgMin = orgUp; else orgMin = orgLo;
+	if(verb.topo.Geom.vertLeq(orgMin,isect)) {
+		isect.s = orgMin.s;
+		isect.t = orgMin.t;
+	}
+	if(verb.topo.Geom.vertEq(isect,orgUp) || verb.topo.Geom.vertEq(isect,orgLo)) {
+		verb.topo.Sweep.checkForRightSplice(tess,regUp);
+		return false;
+	}
+	if(!verb.topo.Geom.vertEq(dstUp,tess.event) && verb.topo.Geom.edgeSign(dstUp,tess.event,isect) >= 0 || !verb.topo.Geom.vertEq(dstLo,tess.event) && verb.topo.Geom.edgeSign(dstLo,tess.event,isect) <= 0) {
+		if(dstLo == tess.event) {
+			tess.mesh.splitEdge(eUp.Sym);
+			tess.mesh.splice(eLo.Sym,eUp);
+			regUp = verb.topo.Sweep.topLeftRegion(tess,regUp);
+			eUp = verb.topo.Sweep.regionBelow(regUp).eUp;
+			verb.topo.Sweep.finishLeftRegions(tess,verb.topo.Sweep.regionBelow(regUp),regLo);
+			verb.topo.Sweep.addRightEdges(tess,regUp,eUp.getOprev(),eUp,eUp,true);
+			return true;
+		}
+		if(dstUp == tess.event) {
+			tess.mesh.splitEdge(eLo.Sym);
+			tess.mesh.splice(eUp.Lnext,eLo.getOprev());
+			regLo = regUp;
+			regUp = verb.topo.Sweep.topRightRegion(regUp);
+			e = verb.topo.Sweep.regionBelow(regUp).eUp.getRprev();
+			regLo.eUp = eLo.getOprev();
+			eLo = verb.topo.Sweep.finishLeftRegions(tess,regLo,null);
+			verb.topo.Sweep.addRightEdges(tess,regUp,eLo.Onext,eUp.getRprev(),e,true);
+			return true;
+		}
+		if(verb.topo.Geom.edgeSign(dstUp,tess.event,isect) >= 0) {
+			verb.topo.Sweep.regionAbove(regUp).dirty = regUp.dirty = true;
+			tess.mesh.splitEdge(eUp.Sym);
+			eUp.Org.s = tess.event.s;
+			eUp.Org.t = tess.event.t;
+		}
+		if(verb.topo.Geom.edgeSign(dstLo,tess.event,isect) <= 0) {
+			regUp.dirty = regLo.dirty = true;
+			tess.mesh.splitEdge(eLo.Sym);
+			eLo.Org.s = tess.event.s;
+			eLo.Org.t = tess.event.t;
+		}
+		return false;
+	}
+	tess.mesh.splitEdge(eUp.Sym);
+	tess.mesh.splitEdge(eLo.Sym);
+	tess.mesh.splice(eLo.getOprev(),eUp);
+	eUp.Org.s = isect.s;
+	eUp.Org.t = isect.t;
+	eUp.Org.pqHandle = tess.pq.insert(eUp.Org);
+	verb.topo.Sweep.getIntersectData(tess,eUp.Org,orgUp,dstUp,orgLo,dstLo);
+	verb.topo.Sweep.regionAbove(regUp).dirty = regUp.dirty = regLo.dirty = true;
+	return false;
+};
+verb.topo.Sweep.walkDirtyRegions = function(tess,regUp) {
+	var regLo = verb.topo.Sweep.regionBelow(regUp);
+	var eUp;
+	var eLo;
+	while(true) {
+		while(regLo.dirty) {
+			regUp = regLo;
+			regLo = verb.topo.Sweep.regionBelow(regLo);
+		}
+		if(!regUp.dirty) {
+			regLo = regUp;
+			regUp = verb.topo.Sweep.regionAbove(regUp);
+			if(regUp == null || !regUp.dirty) return;
+		}
+		regUp.dirty = false;
+		eUp = regUp.eUp;
+		eLo = regLo.eUp;
+		if(eUp.getDst() != eLo.getDst()) {
+			if(verb.topo.Sweep.checkForLeftSplice(tess,regUp)) {
+				if(regLo.fixUpperEdge) {
+					verb.topo.Sweep.deleteRegion(tess,regLo);
+					tess.mesh["delete"](eLo);
+					regLo = verb.topo.Sweep.regionBelow(regUp);
+					eLo = regLo.eUp;
+				} else if(regUp.fixUpperEdge) {
+					verb.topo.Sweep.deleteRegion(tess,regUp);
+					tess.mesh["delete"](eUp);
+					regUp = verb.topo.Sweep.regionAbove(regLo);
+					eUp = regUp.eUp;
+				}
+			}
+		}
+		if(eUp.Org != eLo.Org) {
+			if(eUp.getDst() != eLo.getDst() && !regUp.fixUpperEdge && !regLo.fixUpperEdge && (eUp.getDst() == tess.event || eLo.getDst() == tess.event)) {
+				if(verb.topo.Sweep.checkForIntersect(tess,regUp)) return;
+			} else verb.topo.Sweep.checkForRightSplice(tess,regUp);
+		}
+		if(eUp.Org == eLo.Org && eUp.getDst() == eLo.getDst()) {
+			verb.topo.Sweep.addWinding(eLo,eUp);
+			verb.topo.Sweep.deleteRegion(tess,regUp);
+			tess.mesh["delete"](eUp);
+			regUp = verb.topo.Sweep.regionAbove(regLo);
+		}
+	}
+};
+verb.topo.Sweep.connectRightVertex = function(tess,regUp,eBottomLeft) {
+	var eNew;
+	var eTopLeft = eBottomLeft.Onext;
+	var regLo = verb.topo.Sweep.regionBelow(regUp);
+	var eUp = regUp.eUp;
+	var eLo = regLo.eUp;
+	var degenerate = false;
+	if(eUp.getDst() != eLo.getDst()) verb.topo.Sweep.checkForIntersect(tess,regUp);
+	if(verb.topo.Geom.vertEq(eUp.Org,tess.event)) {
+		tess.mesh.splice(eTopLeft.getOprev(),eUp);
+		regUp = verb.topo.Sweep.topLeftRegion(tess,regUp);
+		eTopLeft = verb.topo.Sweep.regionBelow(regUp).eUp;
+		verb.topo.Sweep.finishLeftRegions(tess,verb.topo.Sweep.regionBelow(regUp),regLo);
+		degenerate = true;
+	}
+	if(verb.topo.Geom.vertEq(eLo.Org,tess.event)) {
+		tess.mesh.splice(eBottomLeft,eLo.getOprev());
+		eBottomLeft = verb.topo.Sweep.finishLeftRegions(tess,regLo,null);
+		degenerate = true;
+	}
+	if(degenerate) {
+		verb.topo.Sweep.addRightEdges(tess,regUp,eBottomLeft.Onext,eTopLeft,eTopLeft,true);
+		return;
+	}
+	if(verb.topo.Geom.vertLeq(eLo.Org,eUp.Org)) eNew = eLo.getOprev(); else eNew = eUp;
+	eNew = tess.mesh.connect(eBottomLeft.getLprev(),eNew);
+	verb.topo.Sweep.addRightEdges(tess,regUp,eNew,eNew.Onext,eNew.Onext,false);
+	eNew.Sym.activeRegion.fixUpperEdge = true;
+	verb.topo.Sweep.walkDirtyRegions(tess,regUp);
+};
+verb.topo.Sweep.connectLeftDegenerate = function(tess,regUp,vEvent) {
+	var e;
+	var eTopLeft;
+	var eTopRight;
+	var eLast;
+	var reg;
+	e = regUp.eUp;
+	if(verb.topo.Geom.vertEq(e.Org,vEvent)) {
+		verb.topo.Tess2.assert(false);
+		verb.topo.Sweep.spliceMergeVertices(tess,e,vEvent.anEdge);
+		return;
+	}
+	if(!verb.topo.Geom.vertEq(e.getDst(),vEvent)) {
+		tess.mesh.splitEdge(e.Sym);
+		if(regUp.fixUpperEdge) {
+			tess.mesh["delete"](e.Onext);
+			regUp.fixUpperEdge = false;
+		}
+		tess.mesh.splice(vEvent.anEdge,e);
+		verb.topo.Sweep.sweepEvent(tess,vEvent);
+		return;
+	}
+	verb.topo.Tess2.assert(false);
+	regUp = verb.topo.Sweep.topRightRegion(regUp);
+	reg = verb.topo.Sweep.regionBelow(regUp);
+	eTopRight = reg.eUp.Sym;
+	eTopLeft = eLast = eTopRight.Onext;
+	if(reg.fixUpperEdge) {
+		verb.topo.Tess2.assert(eTopLeft != eTopRight);
+		verb.topo.Sweep.deleteRegion(tess,reg);
+		tess.mesh["delete"](eTopRight);
+		eTopRight = eTopLeft.getOprev();
+	}
+	tess.mesh.splice(vEvent.anEdge,eTopRight);
+	if(!verb.topo.Geom.edgeGoesLeft(eTopLeft)) eTopLeft = null;
+	verb.topo.Sweep.addRightEdges(tess,regUp,eTopRight.Onext,eLast,eTopLeft,true);
+};
+verb.topo.Sweep.connectLeftVertex = function(tess,vEvent) {
+	var regUp;
+	var regLo;
+	var reg;
+	var eUp;
+	var eLo;
+	var eNew;
+	var tmp = new verb.topo.ActiveRegion();
+	tmp.eUp = vEvent.anEdge.Sym;
+	regUp = tess.dict.search(tmp).key;
+	regLo = verb.topo.Sweep.regionBelow(regUp);
+	if(regLo == null) return;
+	eUp = regUp.eUp;
+	eLo = regLo.eUp;
+	if(verb.topo.Geom.edgeSign(eUp.getDst(),vEvent,eUp.Org) == 0.0) {
+		verb.topo.Sweep.connectLeftDegenerate(tess,regUp,vEvent);
+		return;
+	}
+	if(verb.topo.Geom.vertLeq(eLo.getDst(),eUp.getDst())) reg = regUp; else reg = regLo;
+	if(regUp.inside || reg.fixUpperEdge) {
+		if(reg == regUp) eNew = tess.mesh.connect(vEvent.anEdge.Sym,eUp.Lnext); else {
+			var tempHalfEdge = tess.mesh.connect(eLo.getDnext(),vEvent.anEdge);
+			eNew = tempHalfEdge.Sym;
+		}
+		if(reg.fixUpperEdge) verb.topo.Sweep.fixUpperEdge(tess,reg,eNew); else verb.topo.Sweep.computeWinding(tess,verb.topo.Sweep.addRegionBelow(tess,regUp,eNew));
+		verb.topo.Sweep.sweepEvent(tess,vEvent);
+	} else verb.topo.Sweep.addRightEdges(tess,regUp,vEvent.anEdge,vEvent.anEdge,null,true);
+};
+verb.topo.Sweep.sweepEvent = function(tess,vEvent) {
+	tess.event = vEvent;
+	verb.topo.Sweep.debugEvent(tess);
+	var e = vEvent.anEdge;
+	while(e.activeRegion == null) {
+		e = e.Onext;
+		if(e == vEvent.anEdge) {
+			verb.topo.Sweep.connectLeftVertex(tess,vEvent);
+			return;
+		}
+	}
+	var regUp = verb.topo.Sweep.topLeftRegion(tess,e.activeRegion);
+	verb.topo.Tess2.assert(regUp != null);
+	var reg = verb.topo.Sweep.regionBelow(regUp);
+	var eTopLeft = reg.eUp;
+	var eBottomLeft = verb.topo.Sweep.finishLeftRegions(tess,reg,null);
+	if(eBottomLeft.Onext == eTopLeft) verb.topo.Sweep.connectRightVertex(tess,regUp,eBottomLeft); else verb.topo.Sweep.addRightEdges(tess,regUp,eBottomLeft.Onext,eTopLeft,eTopLeft,true);
+};
+verb.topo.Sweep.addSentinel = function(tess,smin,smax,t) {
+	var reg = new verb.topo.ActiveRegion();
+	var e = tess.mesh.makeEdge();
+	e.Org.s = smax;
+	e.Org.t = t;
+	e.getDst().s = smin;
+	e.getDst().t = t;
+	tess.event = e.getDst();
+	reg.eUp = e;
+	reg.windingNumber = 0;
+	reg.inside = false;
+	reg.fixUpperEdge = false;
+	reg.sentinel = true;
+	reg.dirty = false;
+	reg.nodeUp = tess.dict.insert(reg);
+};
+verb.topo.Sweep.initEdgeDict = function(tess) {
+	tess.dict = new verb.topo.Dict(tess,verb.topo.Sweep.edgeLeq);
+	var w = tess.bmax[0] - tess.bmin[0];
+	var h = tess.bmax[1] - tess.bmin[1];
+	var smin = tess.bmin[0] - w;
+	var smax = tess.bmax[0] + w;
+	var tmin = tess.bmin[1] - h;
+	var tmax = tess.bmax[1] + h;
+	verb.topo.Sweep.addSentinel(tess,smin,smax,tmin);
+	verb.topo.Sweep.addSentinel(tess,smin,smax,tmax);
+};
+verb.topo.Sweep.doneEdgeDict = function(tess) {
+	var reg;
+	var fixedEdges = 0;
+	while((reg = tess.dict.min().key) != null) {
+		if(!reg.sentinel) {
+			verb.topo.Tess2.assert(reg.fixUpperEdge);
+			verb.topo.Tess2.assert(++fixedEdges == 1);
+		}
+		verb.topo.Tess2.assert(reg.windingNumber == 0);
+		verb.topo.Sweep.deleteRegion(tess,reg);
+	}
+};
+verb.topo.Sweep.removeDegenerateEdges = function(tess) {
+	var eNext;
+	var eLnext;
+	var eHead = tess.mesh.eHead;
+	var e = eHead.next;
+	while(e != eHead) {
+		eNext = e.next;
+		eLnext = e.Lnext;
+		if(verb.topo.Geom.vertEq(e.Org,e.getDst()) && e.Lnext.Lnext != e) {
+			verb.topo.Sweep.spliceMergeVertices(tess,eLnext,e);
+			tess.mesh["delete"](e);
+			e = eLnext;
+			eLnext = e.Lnext;
+		}
+		if(eLnext.Lnext == e) {
+			if(eLnext != e) {
+				if(eLnext == eNext || eLnext == eNext.Sym) eNext = eNext.next;
+				tess.mesh["delete"](eLnext);
+			}
+			if(e == eNext || e == eNext.Sym) eNext = eNext.next;
+			tess.mesh["delete"](e);
+		}
+		e = eNext;
+	}
+};
+verb.topo.Sweep.initPriorityQ = function(tess) {
+	var pq;
+	var vHead;
+	var vertexCount = 0;
+	vHead = tess.mesh.vHead;
+	var v = vHead.next;
+	while(v != vHead) {
+		vertexCount++;
+		v = v.next;
+	}
+	vertexCount += 8;
+	pq = tess.pq = new verb.topo.PriorityQ(vertexCount,verb.topo.Geom.vertLeq);
+	vHead = tess.mesh.vHead;
+	v = vHead.next;
+	while(v != vHead) {
+		v.pqHandle = pq.insert(v);
+		v = v.next;
+	}
+	if(v != vHead) return false;
+	pq.init();
+	return true;
+};
+verb.topo.Sweep.donePriorityQ = function(tess) {
+	tess.pq = null;
+};
+verb.topo.Sweep.removeDegenerateFaces = function(tess,mesh) {
+	var fNext;
+	var e;
+	var f = mesh.fHead.next;
+	while(f != mesh.fHead) {
+		fNext = f.next;
+		e = f.anEdge;
+		verb.topo.Tess2.assert(e.Lnext != e);
+		if(e.Lnext.Lnext == e) {
+			verb.topo.Sweep.addWinding(e.Onext,e);
+			tess.mesh["delete"](e);
+		}
+		f = fNext;
+	}
+	return true;
+};
+verb.topo.Sweep.computeInterior = function(tess) {
+	var v;
+	var vNext;
+	verb.topo.Sweep.removeDegenerateEdges(tess);
+	if(!verb.topo.Sweep.initPriorityQ(tess)) return false;
+	verb.topo.Sweep.initEdgeDict(tess);
+	while((v = tess.pq.extractMin()) != null) {
+		while(true) {
+			vNext = tess.pq.min();
+			if(vNext == null || !verb.topo.Geom.vertEq(vNext,v)) break;
+			vNext = tess.pq.extractMin();
+			verb.topo.Sweep.spliceMergeVertices(tess,v.anEdge,vNext.anEdge);
+		}
+		verb.topo.Sweep.sweepEvent(tess,v);
+	}
+	tess.event = tess.dict.min().key.eUp.Org;
+	verb.topo.Sweep.debugEvent(tess);
+	verb.topo.Sweep.doneEdgeDict(tess);
+	verb.topo.Sweep.donePriorityQ(tess);
+	if(!verb.topo.Sweep.removeDegenerateFaces(tess,tess.mesh)) return false;
+	tess.mesh.check();
+	return true;
+};
+verb.topo.Tessellator = function() {
+	this.mesh = null;
+	this.normal = [0.0,0.0,0.0];
+	this.sUnit = [0.0,0.0,0.0];
+	this.tUnit = [0.0,0.0,0.0];
+	this.bmin = [0.0,0.0];
+	this.bmax = [0.0,0.0];
+	this.windingRule = verb.topo.Tess2.WINDING_ODD;
+	this.dict = null;
+	this.pq = null;
+	this.event = null;
+	this.vertexIndexCounter = 0;
+	this.vertices = [];
+	this.vertexIndices = [];
+	this.vertexCount = 0;
+	this.elements = [];
+	this.elementCount = 0;
+};
+verb.topo.Tessellator.__name__ = ["verb","topo","Tessellator"];
+verb.topo.Tessellator.prototype = {
+	dot_: function(u,v) {
+		return u[0] * v[0] + u[1] * v[1] + u[2] * v[2];
+	}
+	,normalize_: function(v) {
+		var len = v[0] * v[0] + v[1] * v[1] + v[2] * v[2];
+		verb.topo.Tess2.assert(len > 0.0);
+		len = Math.sqrt(len);
+		v[0] /= len;
+		v[1] /= len;
+		v[2] /= len;
+	}
+	,longAxis_: function(v) {
+		var i = 0;
+		if(Math.abs(v[1]) > Math.abs(v[0])) i = 1;
+		if(Math.abs(v[2]) > Math.abs(v[i])) i = 2;
+		return i;
+	}
+	,computeNormal_: function(norm) {
+		var v;
+		var v1;
+		var v2;
+		var c;
+		var tLen2;
+		var maxLen2;
+		var maxVal = [0.0,0.0,0.0];
+		var minVal = [0.0,0.0,0.0];
+		var d1 = [0.0,0.0,0.0];
+		var d2_0 = 0.0;
+		var d2_1 = 0.0;
+		var d2_2 = 0.0;
+		var tNorm_0 = 0.0;
+		var tNorm_1 = 0.0;
+		var tNorm_2 = 0.0;
+		var maxVert = [null,null,null];
+		var minVert = [null,null,null];
+		var vHead = this.mesh.vHead;
+		v = vHead.next;
+		var _g = 0;
+		while(_g < 3) {
+			var i = _g++;
+			c = v.coords[i];
+			minVal[i] = c;
+			minVert[i] = v;
+			maxVal[i] = c;
+			maxVert[i] = v;
+		}
+		v = vHead.next;
+		while(v != vHead) {
+			var _g1 = 0;
+			while(_g1 < 3) {
+				var i1 = _g1++;
+				c = v.coords[i1];
+				if(c < minVal[i1]) {
+					minVal[i1] = c;
+					minVert[i1] = v;
+				}
+				if(c > maxVal[i1]) {
+					maxVal[i1] = c;
+					maxVert[i1] = v;
+				}
+			}
+			v = v.next;
+		}
+		var i2 = 0;
+		if(maxVal[1] - minVal[1] > maxVal[0] - minVal[0]) i2 = 1;
+		if(maxVal[2] - minVal[2] > maxVal[i2] - minVal[i2]) i2 = 2;
+		if(minVal[i2] >= maxVal[i2]) {
+			norm[0] = 0.0;
+			norm[1] = 0.0;
+			norm[2] = 1.0;
+			return;
+		}
+		maxLen2 = 0.0;
+		v1 = minVert[i2];
+		v2 = maxVert[i2];
+		d1[0] = v1.coords[0] - v2.coords[0];
+		d1[1] = v1.coords[1] - v2.coords[1];
+		d1[2] = v1.coords[2] - v2.coords[2];
+		v = vHead.next;
+		while(v != vHead) {
+			d2_0 = v.coords[0] - v2.coords[0];
+			d2_1 = v.coords[1] - v2.coords[1];
+			d2_2 = v.coords[2] - v2.coords[2];
+			tNorm_0 = d1[1] * d2_2 - d1[2] * d2_1;
+			tNorm_1 = d1[2] * d2_0 - d1[0] * d2_2;
+			tNorm_2 = d1[0] * d2_1 - d1[1] * d2_0;
+			tLen2 = tNorm_0 * tNorm_0 + tNorm_1 * tNorm_1 + tNorm_2 * tNorm_2;
+			if(tLen2 > maxLen2) {
+				maxLen2 = tLen2;
+				norm[0] = tNorm_0;
+				norm[1] = tNorm_1;
+				norm[2] = tNorm_2;
+			}
+			v = v.next;
+		}
+		if(maxLen2 <= 0) {
+			norm[0] = norm[1] = norm[2] = 0;
+			norm[this.longAxis_(d1)] = 1;
+		}
+	}
+	,checkOrientation_: function() {
+		var area;
+		var f;
+		var fHead = this.mesh.fHead;
+		var v;
+		var vHead = this.mesh.vHead;
+		var e;
+		area = 0.0;
+		f = fHead.next;
+		while(f != fHead) {
+			e = f.anEdge;
+			if(e.winding <= 0) continue;
+			do {
+				area += (e.Org.s - e.getDst().s) * (e.Org.t + e.getDst().t);
+				e = e.Lnext;
+			} while(e != f.anEdge);
+			f = f.next;
+		}
+		if(area < 0) {
+			v = vHead.next;
+			while(v != vHead) {
+				v.t = -v.t;
+				v = v.next;
+			}
+			this.tUnit[0] = -this.tUnit[0];
+			this.tUnit[1] = -this.tUnit[1];
+			this.tUnit[2] = -this.tUnit[2];
+		}
+	}
+	,projectPolygon_: function() {
+		var v;
+		var vHead = this.mesh.vHead;
+		var norm = [0.0,0.0,0.0];
+		var sUnit;
+		var tUnit;
+		var i;
+		var first;
+		var computedNormal = false;
+		norm[0] = this.normal[0];
+		norm[1] = this.normal[1];
+		norm[2] = this.normal[2];
+		if(norm[0] == 0.0 && norm[1] == 0.0 && norm[2] == 0.0) {
+			this.computeNormal_(norm);
+			computedNormal = true;
+		}
+		sUnit = this.sUnit;
+		tUnit = this.tUnit;
+		i = this.longAxis_(norm);
+		sUnit[i] = 0;
+		sUnit[(i + 1) % 3] = 1.0;
+		sUnit[(i + 2) % 3] = 0.0;
+		tUnit[i] = 0;
+		tUnit[(i + 1) % 3] = 0.0;
+		if(norm[i] > 0) tUnit[(i + 2) % 3] = 1.0; else tUnit[(i + 2) % 3] = -1.0;
+		v = vHead.next;
+		while(v != vHead) {
+			v.s = this.dot_(v.coords,sUnit);
+			v.t = this.dot_(v.coords,tUnit);
+			v = v.next;
+		}
+		if(computedNormal) this.checkOrientation_();
+		first = true;
+		v = vHead.next;
+		while(v != vHead) {
+			if(first) {
+				this.bmin[0] = this.bmax[0] = v.s;
+				this.bmin[1] = this.bmax[1] = v.t;
+				first = false;
+			} else {
+				if(v.s < this.bmin[0]) this.bmin[0] = v.s;
+				if(v.s > this.bmax[0]) this.bmax[0] = v.s;
+				if(v.t < this.bmin[1]) this.bmin[1] = v.t;
+				if(v.t > this.bmax[1]) this.bmax[1] = v.t;
+			}
+			v = v.next;
+		}
+	}
+	,addWinding_: function(eDst,eSrc) {
+		eDst.winding += eSrc.winding;
+		eDst.Sym.winding += eSrc.Sym.winding;
+	}
+	,tessellateMonoRegion_: function(mesh,face) {
+		var up;
+		var lo;
+		up = face.anEdge;
+		verb.topo.Tess2.assert(up.Lnext != up && up.Lnext.Lnext != up);
+		while(verb.topo.Geom.vertLeq(up.getDst(),up.Org)) up = up.getLprev();
+		while(verb.topo.Geom.vertLeq(up.Org,up.getDst())) up = up.Lnext;
+		lo = up.getLprev();
+		while(up.Lnext != lo) if(verb.topo.Geom.vertLeq(up.getDst(),lo.Org)) {
+			while(lo.Lnext != up && (verb.topo.Geom.edgeGoesLeft(lo.Lnext) || verb.topo.Geom.edgeSign(lo.Org,lo.getDst(),lo.Lnext.getDst()) <= 0.0)) {
+				var tempHalfEdge = mesh.connect(lo.Lnext,lo);
+				lo = tempHalfEdge.Sym;
+			}
+			lo = lo.getLprev();
+		} else {
+			while(lo.Lnext != up && (verb.topo.Geom.edgeGoesRight(up.getLprev()) || verb.topo.Geom.edgeSign(up.getDst(),up.Org,up.getLprev().Org) >= 0.0)) {
+				var tempHalfEdge1 = mesh.connect(up,up.getLprev());
+				up = tempHalfEdge1.Sym;
+			}
+			up = up.Lnext;
+		}
+		verb.topo.Tess2.assert(lo.Lnext != up);
+		while(lo.Lnext.Lnext != up) {
+			var tempHalfEdge2 = mesh.connect(lo.Lnext,lo);
+			lo = tempHalfEdge2.Sym;
+		}
+		return true;
+	}
+	,tessellateInterior_: function(mesh) {
+		var next;
+		var f = mesh.fHead.next;
+		while(f != mesh.fHead) {
+			next = f.next;
+			if(f.inside) {
+				if(!this.tessellateMonoRegion_(mesh,f)) return false;
+			}
+			f = next;
+		}
+		return true;
+	}
+	,discardExterior_: function(mesh) {
+		var next;
+		var f = mesh.fHead.next;
+		while(f != mesh.fHead) {
+			next = f.next;
+			if(!f.inside) mesh.zapFace(f);
+			f = next;
+		}
+	}
+	,setWindingNumber_: function(mesh,value,keepOnlyBoundary) {
+		var e;
+		var eNext;
+		var e1 = mesh.eHead.next;
+		while(e1 != mesh.eHead) {
+			eNext = e1.next;
+			if(e1.getRface().inside != e1.Lface.inside) if(e1.Lface.inside) e1.winding = value; else e1.winding = -value; else if(!keepOnlyBoundary) e1.winding = 0; else mesh["delete"](e1);
+			e1 = eNext;
+		}
+	}
+	,getNeighbourFace_: function(edge) {
+		if(edge.getRface() == null) return -1;
+		if(!edge.getRface().inside) return -1;
+		return edge.getRface().n;
+	}
+	,outputPolymesh_: function(mesh,elementType,polySize,vertexSize) {
+		var v;
+		var f;
+		var edge;
+		var maxFaceCount = 0;
+		var maxVertexCount = 0;
+		var faceVerts;
+		var i;
+		var elements = 0;
+		var vert;
+		if(polySize > 3) mesh.mergeConvexFaces(polySize);
+		v = mesh.vHead.next;
+		while(v != mesh.vHead) {
+			v.n = -1;
+			v = v.next;
+		}
+		f = mesh.fHead.next;
+		while(f != mesh.fHead) {
+			f.n = -1;
+			if(!f.inside) {
+				f = f.next;
+				continue;
+			}
+			edge = f.anEdge;
+			faceVerts = 0;
+			do {
+				v = edge.Org;
+				if(v.n == -1) {
+					v.n = maxVertexCount;
+					maxVertexCount++;
+				}
+				faceVerts++;
+				edge = edge.Lnext;
+			} while(edge != f.anEdge);
+			verb.topo.Tess2.assert(faceVerts <= polySize);
+			f.n = maxFaceCount;
+			++maxFaceCount;
+			f = f.next;
+		}
+		this.elementCount = maxFaceCount;
+		if(elementType == verb.topo.Tess2.CONNECTED_POLYGONS) maxFaceCount *= 2;
+		this.elements = [];
+		verb.core.ArrayExtensions.alloc(this.elements,maxFaceCount * polySize);
+		this.vertexCount = maxVertexCount;
+		this.vertices = [];
+		verb.core.ArrayExtensions.alloc(this.vertices,maxVertexCount * vertexSize);
+		this.vertexIndices = [];
+		verb.core.ArrayExtensions.alloc(this.vertexIndices,maxVertexCount);
+		v = mesh.vHead.next;
+		while(v != mesh.vHead) {
+			if(v.n != -1) {
+				var idx = v.n * vertexSize;
+				this.vertices[idx] = v.coords[0];
+				this.vertices[idx + 1] = v.coords[1];
+				if(vertexSize > 2) this.vertices[idx + 2] = v.coords[2];
+				this.vertexIndices[v.n] = v.idx;
+			}
+			v = v.next;
+		}
+		var nel = 0;
+		f = mesh.fHead.next;
+		while(f != mesh.fHead) {
+			if(!f.inside) {
+				f = f.next;
+				continue;
+			}
+			edge = f.anEdge;
+			faceVerts = 0;
+			do {
+				v = edge.Org;
+				this.elements[nel++] = v.n;
+				faceVerts++;
+				edge = edge.Lnext;
+			} while(edge != f.anEdge);
+			var _g = faceVerts;
+			while(_g < polySize) {
+				var i1 = _g++;
+				this.elements[nel++] = -1;
+			}
+			if(elementType == verb.topo.Tess2.CONNECTED_POLYGONS) {
+				edge = f.anEdge;
+				do {
+					this.elements[nel++] = this.getNeighbourFace_(edge);
+					edge = edge.Lnext;
+				} while(edge != f.anEdge);
+				var _g1 = faceVerts;
+				while(_g1 < polySize) {
+					var i2 = _g1++;
+					this.elements[nel++] = -1;
+				}
+			}
+			f = f.next;
+		}
+	}
+	,outputContours_: function(mesh,vertexSize) {
+		var f;
+		var edge;
+		var start;
+		var verts;
+		var elements;
+		var vertInds;
+		var startVert = 0;
+		var vertCount = 0;
+		this.vertexCount = 0;
+		this.elementCount = 0;
+		f = mesh.fHead.next;
+		while(f != mesh.fHead) {
+			if(!f.inside) {
+				f = f.next;
+				continue;
+			}
+			start = edge = f.anEdge;
+			do {
+				this.vertexCount++;
+				edge = edge.Lnext;
+			} while(edge != start);
+			this.elementCount++;
+			f = f.next;
+		}
+		this.elements = [];
+		verb.core.ArrayExtensions.alloc(this.elements,this.elementCount * 2);
+		this.vertices = [];
+		verb.core.ArrayExtensions.alloc(this.vertices,this.vertexCount * vertexSize);
+		this.vertexIndices = [];
+		verb.core.ArrayExtensions.alloc(this.vertexIndices,this.vertexCount);
+		var nv = 0;
+		var nvi = 0;
+		var nel = 0;
+		startVert = 0;
+		f = mesh.fHead.next;
+		while(f != mesh.fHead) {
+			if(!f.inside) {
+				f = f.next;
+				continue;
+			}
+			vertCount = 0;
+			start = edge = f.anEdge;
+			do {
+				this.vertices[nv++] = edge.Org.coords[0];
+				this.vertices[nv++] = edge.Org.coords[1];
+				if(vertexSize > 2) this.vertices[nv++] = edge.Org.coords[2];
+				this.vertexIndices[nvi++] = edge.Org.idx;
+				vertCount++;
+				edge = edge.Lnext;
+			} while(edge != start);
+			this.elements[nel++] = startVert;
+			this.elements[nel++] = vertCount;
+			startVert += vertCount;
+			f = f.next;
+		}
+	}
+	,addContour: function(size,vertices) {
+		var e;
+		var i;
+		if(this.mesh == null) this.mesh = new verb.topo.TESSmesh();
+		if(size < 2) size = 2;
+		if(size > 3) size = 3;
+		e = null;
+		i = 0;
+		while(i < vertices.length) {
+			if(e == null) {
+				e = this.mesh.makeEdge();
+				this.mesh.splice(e,e.Sym);
+			} else {
+				this.mesh.splitEdge(e);
+				e = e.Lnext;
+			}
+			e.Org.coords[0] = vertices[i];
+			e.Org.coords[1] = vertices[i + 1];
+			if(size > 2) e.Org.coords[2] = vertices[i + 2]; else e.Org.coords[2] = 0.0;
+			e.Org.idx = this.vertexIndexCounter++;
+			e.winding = 1;
+			e.Sym.winding = -1;
+			i += size;
+		}
+	}
+	,tessellate: function(windingRule,elementType,polySize,vertexSize,normal) {
+		this.vertices = [];
+		this.elements = [];
+		this.vertexIndices = [];
+		this.vertexIndexCounter = 0;
+		if(normal != null) {
+			this.normal[0] = normal[0];
+			this.normal[1] = normal[1];
+			this.normal[2] = normal[2];
+		}
+		this.windingRule = windingRule;
+		if(vertexSize < 2) vertexSize = 2;
+		if(vertexSize > 3) vertexSize = 3;
+		if(this.mesh == null) return false;
+		this.projectPolygon_();
+		verb.topo.Sweep.computeInterior(this);
+		var mesh = this.mesh;
+		if(elementType == verb.topo.Tess2.BOUNDARY_CONTOURS) this.setWindingNumber_(mesh,1,true); else this.tessellateInterior_(mesh);
+		mesh.check();
+		if(elementType == verb.topo.Tess2.BOUNDARY_CONTOURS) this.outputContours_(mesh,vertexSize); else this.outputPolymesh_(mesh,elementType,polySize,vertexSize);
+		return true;
 	}
 };
 verb.topo.Vertex = $hx_exports.topo.Vertex = function(point) {
@@ -6506,5 +8419,13 @@ verb.exe.Dispatcher._init = false;
 verb.exe.Work.uuid = 0;
 verb.exe.WorkerPool.basePath = "";
 verb.topo.HalfEdge.guid = 0;
+verb.topo.Tess2.WINDING_ODD = 0;
+verb.topo.Tess2.WINDING_NONZERO = 1;
+verb.topo.Tess2.WINDING_POSITIVE = 2;
+verb.topo.Tess2.WINDING_NEGATIVE = 3;
+verb.topo.Tess2.WINDING_ABS_GEQ_TWO = 4;
+verb.topo.Tess2.POLYGONS = 0;
+verb.topo.Tess2.CONNECTED_POLYGONS = 1;
+verb.topo.Tess2.BOUNDARY_CONTOURS = 2;
 verb.Verb.main();
 })(typeof verb != "undefined" ? verb : exports);
