@@ -56,8 +56,14 @@ class Solid {
             he = he.nxt;
         }
 
-        var nhe0 = he1.l.addHalfEdge( he0.v, he1 );
-        var nhe1 = nl.addHalfEdge( he1.v, he0, nhe0 );
+        var nhe0 = nl.addHalfEdge( he1.v, he0 );
+        var nhe1 = he1.l.addHalfEdge( he0.v, he1, nhe0 );
+
+        nhe0.prv.nxt = nhe1;
+        nhe1.prv.nxt = nhe0;
+        var temp = nhe0.prv;
+        nhe0.prv = nhe1.prv;
+        nhe1.prv = temp;
 
         return nf;
     }

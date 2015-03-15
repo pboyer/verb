@@ -7348,6 +7348,7 @@ describe("verb.topo.Solid.lmev",function(){
         var s = verb.topo.Solid.mvfs( [0,0,0] );
 
         var e0 = s.f.l.e;
+        var v0 = s.f.l.e.v;
 
         var nv0 = s.lmev( e0, e0, [1,0,0] );
         nv0.pt.should.eql([1,0,0]);
@@ -7355,7 +7356,10 @@ describe("verb.topo.Solid.lmev",function(){
         nv1 = s.lmev( nv0.e, nv0.e, [1,1,0] );
         nv1.pt.should.eql( [1,1,0] );
 
-       // TODO: check the correctness of the 
+        e0.v.should.be.equal( nv0 );
+        e0.nxt.v.should.be.equal( v0 );
+        e0.nxt.nxt.v.should.be.equal( nv0 );
+        e0.nxt.nxt.nxt.v.should.be.equal( nv1 );
 
         var l = s.loops();
         var v = s.vertices();
@@ -7369,29 +7373,67 @@ describe("verb.topo.Solid.lmev",function(){
 
     });
 });
-//
-//describe("verb.topo.Solid.lmef",function(){
-//    it('adds 2 new HalfEdges, one new vertex on first call', function(){
-//        var s = verb.topo.Solid.mvfs( [0,0,0] );
-//
-//        var e0 = s.f.l.e;
-//
-//        var nv0 = s.lmev( e0, e0, [1,0,0] );
-//        nv1 = s.lmev( nv0.e, nv0.e, [1,1,0] );
-//
-//        s.lmef( e0, e0.nxt.nxt.nxt );
-//
-//        var l = s.loops();
-//        var v = s.vertices();
-//        var f = s.faces();
-//        var he = s.halfEdges();
-//
-//        console.log( f[0].loops()[0].halfEdges().length );
-//        console.log( f[1].loops()[0].halfEdges().length );
-//
-//        l.length.should.be.equal(2);
-//        v.length.should.be.equal(3);
-//        f.length.should.be.equal(2);
-//        he.length.should.be.equal(7);
-//    });
-//});
+
+describe("verb.topo.Solid.lmef",function(){
+    it('can close a single triangular loop into a lamina', function(){
+        var s = verb.topo.Solid.mvfs( [0,0,0] );
+
+        var e0 = s.f.l.e;
+        var v0 = s.v;
+        var f0 = s.f;
+
+        var nv0 = s.lmev( e0, e0, [1,0,0] );
+        nv1 = s.lmev( nv0.e, nv0.e, [1,1,0] );
+
+        var nf = s.lmef( v0.e, v0.e.nxt.nxt );
+
+        e0.should.equal( e0.nxt.nxt.nxt );
+        e0.opp.should.not.equal( e0 );
+        e0.opp.should.equal( e0.opp.nxt.nxt.nxt );
+
+        var l = s.loops();
+        var v = s.vertices();
+        var f = s.faces();
+        var he = s.halfEdges();
+
+        f[0].loops()[0].halfEdges().length.should.be.equal( 3 );
+        f[1].loops()[0].halfEdges().length.should.be.equal( 3 );
+
+        l.length.should.be.equal(2);
+        v.length.should.be.equal(3);
+        f.length.should.be.equal(2);
+        he.length.should.be.equal(6);
+    });
+
+    it('can close a single rectangular loop into a lamina', function(){
+        var s = verb.topo.Solid.mvfs( [0,0,0] );
+
+        var e0 = s.f.l.e;
+        var v0 = s.v;
+        var f0 = s.f;
+
+        var nv0 = s.lmev( e0, e0, [1,0,0] );
+        nv1 = s.lmev( nv0.e, nv0.e, [1,1,0] );
+        s.lmev( nv1.e, nv1.e, [0,1,0] );
+
+        var nf = s.lmef( v0.e, v0.e.nxt.nxt.nxt );
+
+        e0.should.equal( e0.nxt.nxt.nxt.nxt );
+        e0.opp.should.not.equal( e0 );
+        e0.opp.l.should.not.equal( e0.l );
+        e0.opp.should.equal( e0.opp.nxt.nxt.nxt.nxt );
+
+        var l = s.loops();
+        var v = s.vertices();
+        var f = s.faces();
+        var he = s.halfEdges();
+
+        f[0].loops()[0].halfEdges().length.should.be.equal( 4 );
+        f[1].loops()[0].halfEdges().length.should.be.equal( 4 );
+
+        l.length.should.be.equal(2);
+        v.length.should.be.equal(4);
+        f.length.should.be.equal(2);
+        he.length.should.be.equal(8);
+    });
+});
