@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="../build/js/verb.js"></script>
+    <script src="js/three.min.js"></script>
+    <script src="js/verbToThreeConversion.js"></script>
+    <script src="js/OrbitControls.js"></script>
+    <script src="js/threeBasic.js"></script>
+    <style> body {  margin: 0; } </style>
+</head>
+<body>
+<script>
+
+    // WARNING: this api is highly unstable
+
+    function triangularLamina(){
+        var s = verb.topo.Solid.mvfs( [0,0,0] );
+
+        var e0 = s.f.l.e;
+        var v0 = s.v;
+        var f0 = s.f;
+
+        var nv0 = s.lmev( e0, e0, [10,0,0] );
+        nv1 = s.lmev( nv0.e, nv0.e, [10,10,0] );
+
+        var nf = s.lmef( v0.e, v0.e.nxt.nxt );
+
+        return s;
+    }
+
+	threeSetup();
+
+    var s = triangularLamina();
+
+    var nvs = s.f.l.halfEdges().map(function(e){
+        return s.lmev( e, e, verb.core.Vec.add( e.v.pt, [0,0,10]) );
+    });
+
+    var nfs = nvs
+        .map(function(v){
+            // get the halfEdges
+            return v.e;
+        })
+        .map(function(e){
+            // form the new side faces
+            return s.lmef(e, e.nxt.nxt.nxt);
+        });
+
+    s.faces().forEach(function(x){
+        addMeshToScene( x.toThreeGeometry() );
+    });
+
+    // addMeshToScene( s.f.toThreeGeometry(), null, true );
+
+	threeRender();
+
+</script>
+
+</body>
+
+</html>

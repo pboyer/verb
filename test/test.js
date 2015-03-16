@@ -7097,6 +7097,7 @@ describe("verb.core.Make.surfaceBoundaryCurves",function(){
 });
 
 
+
 describe("verb.topo.Solid.mvfs",function(){
     it('provides correctly linked lists, correct number of elements', function(){
         var s = verb.topo.Solid.mvfs( [0,0,0] );
@@ -7329,8 +7330,15 @@ describe("verb.topo.Solid.lmef",function(){
         s.faces().length.should.be.equal(5);
         s.loops().length.should.be.equal(5);
         s.halfEdges().length.should.be.equal(18);
-    });
 
+//        var tess = s.f.nxt.nxt.tessellate();
+//        console.log(s.f.nxt.nxt.nxt.nxt.nxt.tessellate());
+//        console.log(s.f.nxt.nxt.nxt.nxt.tessellate());
+//        console.log(s.f.nxt.nxt.nxt.tessellate());
+//        console.log(s.f.nxt.tessellate());
+//        console.log(s.f.tessellate());
+
+    });
 });
 
 var Tess2 = require('tess2');
@@ -7367,7 +7375,6 @@ describe("verb.topo.Tess2",function(){
         res1.vertexCount.should.eql(res0.vertexCount);
         res1.elements.should.eql(res0.elements);
         res1.elementCount.should.eql(res0.elementCount);
-
     });
 });
 

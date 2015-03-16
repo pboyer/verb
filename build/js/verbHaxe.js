@@ -6073,24 +6073,35 @@ verb.topo.Face = $hx_exports.topo.Face = function(solid) {
 };
 verb.topo.Face.__name__ = ["verb","topo","Face"];
 verb.topo.Face.__interfaces__ = [verb.core.types.IDoublyLinkedList];
-verb.topo.Face.tessellate = function() {
-	var ca = [0,0,10,0,5,10];
-	var cb = [0,2,10,2,10,6,0,6];
-	var contours = [ca,cb];
-	var opts = new verb.topo.Tess2Options();
-	opts.contours = contours;
-	opts.windingRule = verb.topo.Tess2.WINDING_ODD;
-	opts.elementType = verb.topo.Tess2.POLYGONS;
-	opts.polySize = 3;
-	opts.vertexSize = 2;
-	return verb.topo.Tess2.tessellate(opts);
-};
 verb.topo.Face.prototype = {
 	loops: function() {
 		return Lambda.array(verb.core.types.DoublyLinkedListExtensions.iterate(this.l));
 	}
 	,addLoop: function() {
 		return this.l = verb.core.types.DoublyLinkedListExtensions.push(this.l,new verb.topo.Loop(this));
+	}
+	,tessellate: function() {
+		var opts = new verb.topo.Tess2Options();
+		opts.contours = this.contours();
+		opts.windingRule = verb.topo.Tess2.WINDING_ODD;
+		opts.elementType = verb.topo.Tess2.POLYGONS;
+		opts.polySize = 3;
+		opts.normal = this.normal();
+		opts.vertexSize = 3;
+		return verb.topo.Tess2.tessellate(opts);
+	}
+	,contours: function() {
+		return this.loops().map(function(x) {
+			return x.coords();
+		});
+	}
+	,normal: function() {
+		var v0 = this.l.e.v.pt;
+		var v1 = this.l.e.nxt.v.pt;
+		var v2 = this.l.e.nxt.nxt.v.pt;
+		var v01 = verb.core.Vec.sub(v0,v1);
+		var v21 = verb.core.Vec.sub(v2,v1);
+		return verb.core.Vec.normalized(verb.core.Vec.cross(v01,v21));
 	}
 };
 verb.topo.HalfEdge = $hx_exports.topo.HalfEdge = function(loop,vertex) {
@@ -6135,6 +6146,11 @@ verb.topo.Loop.prototype = {
 		return this.halfEdges().map(function(e) {
 			return e.v;
 		});
+	}
+	,coords: function() {
+		return Lambda.fold(this.vertices(),function(v,a) {
+			return a.concat(v.pt);
+		},[]);
 	}
 	,points: function() {
 		return this.vertices().map(function(v) {

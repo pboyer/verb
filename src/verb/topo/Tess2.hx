@@ -47,7 +47,7 @@ class Tess2Options {
     public var vertexSize : Int = 2;
     public var normal : Array<Float> = [0.0,0.0,1.0];
     public var debug : Bool = false;
-    public var contours : Array<Array<Int>> = [];
+    public var contours : Array<Array<Float>> = [];
 
     public function new(){
 
@@ -3537,7 +3537,7 @@ class Tessellator {
         }
     }
 
-    public function addContour( size : Int, vertices : Array<Int> )
+    public function addContour( size : Int, vertices : Array<Float> )
     {
         var e;
         var i;

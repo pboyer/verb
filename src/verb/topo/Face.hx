@@ -10,6 +10,9 @@ using verb.core.types.DoublyLinkedListExtensions;
 
 import verb.topo.Tess2;
 
+import verb.core.Vec;
+using verb.core.Vec;
+
 @:expose("topo.Face")
 class Face implements IDoublyLinkedList<Face> {
 
@@ -31,23 +34,32 @@ class Face implements IDoublyLinkedList<Face> {
         return l = l.push(new Loop(this));
     }
 
-    public static function tessellate(){
-
-        var ca = [0,0, 10,0, 5,10];
-        var cb = [0,2, 10,2, 10,6, 0,6];
-        var contours = [ca,cb];
-
+    public function tessellate(){
         var opts = new Tess2Options();
 
-        opts.contours = contours;
-        opts.windingRule = Tess2.WINDING_ODD;
+        opts.contours = contours();
+        opts.windingRule = Tess2.WINDING_ODD; // TODO: is this what I want?
         opts.elementType = Tess2.POLYGONS;
         opts.polySize = 3;
-        opts.vertexSize = 2;
+        opts.normal = normal();
+        opts.vertexSize = 3;
 
-        // Tesselate
         return Tess2.tessellate(opts);
-
     }
 
+    private function contours() : Array<Array<Float>> {
+        return loops().map(function(x : Loop){ return x.coords(); });
+    }
+
+    public function normal() : Array<Float> {
+        // TODO: specify face eq
+        var v0 = l.e.v.pt;
+        var v1 = l.e.nxt.v.pt;
+        var v2 = l.e.nxt.nxt.v.pt;
+
+        var v01 = v0.sub(v1);
+        var v21 = v2.sub(v1);
+
+        return v01.cross(v21).normalized();
+    }
 }

@@ -3,6 +3,7 @@ package verb.topo;
 import verb.core.types.NurbsCurveData.Point;
 import verb.core.types.Exception;
 import verb.core.types.DoublyLinkedListExtensions;
+
 using Lambda;
 
 import verb.core.types.IDoublyLinkedList;
@@ -50,8 +51,11 @@ class Loop implements IDoublyLinkedList<Loop> {
         return halfEdges().map(function(e : HalfEdge){ return e.v; });
     }
 
+    public function coords() : Array<Float> {
+        return vertices().fold(function(v : Vertex, a : Array<Float>){ return a.concat(v.pt); }, []);
+    }
+
     public function points() : Array<Point> {
         return vertices().map(function(v : Vertex){ return v.pt; });
     }
-
 }
