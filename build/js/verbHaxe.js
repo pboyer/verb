@@ -6082,18 +6082,15 @@ verb.topo.Face.prototype = {
 	}
 	,tessellate: function() {
 		var opts = new verb.topo.Tess2Options();
-		opts.contours = this.contours();
+		opts.contours = this.loops().map(function(x) {
+			return x.coords();
+		});
 		opts.windingRule = verb.topo.Tess2.WINDING_ODD;
 		opts.elementType = verb.topo.Tess2.POLYGONS;
 		opts.polySize = 3;
 		opts.normal = this.normal();
 		opts.vertexSize = 3;
 		return verb.topo.Tess2.tessellate(opts);
-	}
-	,contours: function() {
-		return this.loops().map(function(x) {
-			return x.coords();
-		});
 	}
 	,normal: function() {
 		var v0 = this.l.e.v.pt;
@@ -6138,6 +6135,17 @@ verb.topo.Loop.prototype = {
 		var he = new verb.topo.HalfEdge(this,vertex);
 		he.mate(opp);
 		return this.e = verb.core.types.DoublyLinkedListExtensions.push(this.e,he);
+	}
+	,delHalfEdge: function(he) {
+		if(he == null) throw new verb.core.types.Exception("argument cannot be null!");
+		if(he.l != this) throw new verb.core.types.Exception("HalfEdge is not part of this loop!");
+		if(he.nxt == he) {
+			he.opp = null;
+			return;
+		}
+		he.prv.nxt = he.nxt;
+		he.nxt.prv = he.prv;
+		this.e = he.nxt;
 	}
 	,halfEdges: function() {
 		return Lambda.array(verb.core.types.DoublyLinkedListExtensions.iterate(this.e));
@@ -6197,6 +6205,40 @@ verb.topo.Solid.prototype = {
 		nhe0.prv = nhe1.prv;
 		nhe1.prv = temp;
 		return nf;
+	}
+	,lkemr: function(he0) {
+		var he1 = he0.opp;
+		var nl = he0.l.f.addLoop();
+		var hea = he0.nxt;
+		var heb = he1.nxt;
+		heb.v.e = heb;
+		hea.v.e = hea;
+		he0.prv.nxt = he1.nxt;
+		he1.nxt.prv = he0.prv;
+		he1.nxt = he0;
+		he0.prv = he1;
+		var che = he0;
+		do che.l = nl; while((che = che.nxt) != heb);
+		nl.delHalfEdge(he0);
+		nl.delHalfEdge(he1);
+		return nl;
+	}
+	,lkvfs: function(face) {
+	}
+	,lkev: function(he) {
+		var che = he.nxt;
+		do che.v = he.v; while((che.opp.nxt = che) != he.nxt);
+		var oe = he.opp;
+		he.l.delHalfEdge(he);
+		oe.l.delHalfEdge(oe);
+	}
+	,lkef: function(he) {
+		var kl = he.l;
+		var kf = he.l.f;
+		var oe = he.opp;
+		var ol = oe.l;
+		var che = he;
+		do che.l = ol; while((che = he.nxt) != he);
 	}
 	,addFace: function() {
 		return this.f = verb.core.types.DoublyLinkedListExtensions.push(this.f,new verb.topo.Face(this));

@@ -69,31 +69,87 @@ class Solid {
     }
 
     // lkemr
-    public function lkemr(he0 : HalfEdge) : Void {
+    public function lkemr(he0 : HalfEdge) : Loop {
 
-        // result is -1 half edges and +1 loop (?)
-
+        // result is -1 (sometimes -2) half edges and +1 loop
         var he1 = he0.opp;
-        var ol = he0.l;
-        var nl = ol.f.addLoop();
+        var nl = he0.l.f.addLoop();
+
+        var hea = he0.nxt;
+        var heb = he1.nxt;
+
+        // ensure vertex edge pointers are pointing at valid edges
+        heb.v.e = heb;
+        hea.v.e = hea;
 
         // split the original loop
         he0.prv.nxt = he1.nxt;
         he1.nxt.prv = he0.prv;
 
-        // move second edge and all of its predecessors to the new loop
-        var che = he1;
+        // the two edges now loop around in nl
+        he1.nxt = he0;
+        he0.prv = he1;
+
+        // move he0, he1 and edges in between to nl
+        var che = he0;
         do {
             che.l = nl;
-        } while( (che = che.prv) != he0);
+        } while( (che = che.nxt) != heb);
 
-        ol.delHalfEdge( he0 );
-        nl.delHalfEdge( he1 );
+        // delete the half-edges from the new loop
+        nl.delHalfEdge( he0 );
+        nl.delHalfEdge( he1 ); // properly handles the length-1 loop case
+
+        return nl;
     }
 
-    // lkvfs
-    // lkev
-    // lkef
+
+    public function lkvfs(face : Face) : Void {
+        // remove an face with a single vertex
+    }
+
+    public function lkev(he : HalfEdge) : Void {
+        // unlike kev which splits a vertex in two, this should join two adj vertices together
+
+        // loop around the second vertex, assigning the start vertex
+        var che = he.nxt;
+        do {
+            che.v = he.v;
+        } while ( ( che.opp.nxt = che) != he.nxt);
+
+        // remove the two half edges
+        var oe = he.opp;
+        he.l.delHalfEdge(he);
+        oe.l.delHalfEdge(oe);
+
+        // TODO!
+
+    }
+
+    public function lkef(he : HalfEdge) : Void {
+        // unlike kef, which splits a face - this should join two faces together
+
+        // what if the face has internal rings?
+
+        // the face to remove
+        var kl = he.l;
+        var kf = he.l.f;
+
+        var oe = he.opp;
+        var ol = oe.l;
+
+        // assign the edges to the other loop
+        var che = he;
+        do {
+            che.l = ol;
+        } while ( (che = he.nxt) != he);
+
+        // remove the two halfEdges and properly fix predecessors
+        // TODO!
+
+        // remove the face
+
+    }
 
     public function addFace() : Face {
         return f = f.push( new Face(this) );
