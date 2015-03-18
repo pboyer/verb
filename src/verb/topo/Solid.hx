@@ -68,6 +68,33 @@ class Solid {
         return nf;
     }
 
+    // lkemr
+    public function lkemr(he0 : HalfEdge) : Void {
+
+        // result is -1 half edges and +1 loop (?)
+
+        var he1 = he0.opp;
+        var ol = he0.l;
+        var nl = ol.f.addLoop();
+
+        // split the original loop
+        he0.prv.nxt = he1.nxt;
+        he1.nxt.prv = he0.prv;
+
+        // move second edge and all of its predecessors to the new loop
+        var che = he1;
+        do {
+            che.l = nl;
+        } while( (che = che.prv) != he0);
+
+        ol.delHalfEdge( he0 );
+        nl.delHalfEdge( he1 );
+    }
+
+    // lkvfs
+    // lkev
+    // lkef
+
     public function addFace() : Face {
         return f = f.push( new Face(this) );
     }
@@ -114,5 +141,3 @@ class Solid {
 // s = solid
 // h = hole
 // r = ring
-
-

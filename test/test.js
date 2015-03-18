@@ -7331,13 +7331,6 @@ describe("verb.topo.Solid.lmef",function(){
         s.loops().length.should.be.equal(5);
         s.halfEdges().length.should.be.equal(18);
 
-//        var tess = s.f.nxt.nxt.tessellate();
-//        console.log(s.f.nxt.nxt.nxt.nxt.nxt.tessellate());
-//        console.log(s.f.nxt.nxt.nxt.nxt.tessellate());
-//        console.log(s.f.nxt.nxt.nxt.tessellate());
-//        console.log(s.f.nxt.tessellate());
-//        console.log(s.f.tessellate());
-
     });
 });
 

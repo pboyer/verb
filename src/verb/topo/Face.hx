@@ -37,7 +37,7 @@ class Face implements IDoublyLinkedList<Face> {
     public function tessellate(){
         var opts = new Tess2Options();
 
-        opts.contours = contours();
+        opts.contours = loops().map(function(x : Loop){ return x.coords(); });
         opts.windingRule = Tess2.WINDING_ODD; // TODO: is this what I want?
         opts.elementType = Tess2.POLYGONS;
         opts.polySize = 3;
@@ -45,10 +45,6 @@ class Face implements IDoublyLinkedList<Face> {
         opts.vertexSize = 3;
 
         return Tess2.tessellate(opts);
-    }
-
-    private function contours() : Array<Array<Float>> {
-        return loops().map(function(x : Loop){ return x.coords(); });
     }
 
     public function normal() : Array<Float> {

@@ -43,6 +43,27 @@ class Loop implements IDoublyLinkedList<Loop> {
         return e = e.push( he );
     }
 
+    public function delHalfEdge( he : HalfEdge ) : Void {
+        if ( he == null) {
+            throw new Exception("argument cannot be null!");
+        }
+
+        if ( he.l != this) {
+            throw new Exception("HalfEdge is not part of this loop!");
+        }
+
+        // the base case - a half-edge cycle
+        if (he.nxt == he){
+            he.opp = null;
+            return;
+        }
+
+        he.prv.nxt = he.nxt;
+        he.nxt.prv = he.prv;
+
+        this.e = he.nxt;
+    }
+
     public function halfEdges() : Array<HalfEdge> {
         return e.iterate().array();
     }
