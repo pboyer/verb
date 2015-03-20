@@ -6239,6 +6239,15 @@ verb.topo.Solid.prototype = {
 		var ol = oe.l;
 		var che = he;
 		do che.l = ol; while((che = he.nxt) != he);
+		var ha = he.prv;
+		var hb = he.nxt;
+		var hc = oe.prv;
+		var hd = oe.nxt;
+		ha.nxt = hd;
+		hd.prv = ha;
+		hc.nxt = hb;
+		hb.prv = hc;
+		if(ol.e == oe) ol.e = hc;
 	}
 	,addFace: function() {
 		return this.f = verb.core.types.DoublyLinkedListExtensions.push(this.f,new verb.topo.Face(this));

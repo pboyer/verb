@@ -108,8 +108,12 @@ class Solid {
         // remove an face with a single vertex
     }
 
+
+    // unlike lkev which splits a vertex in two, this should
+    // join two adj vertices together
+
+    // TODO: test
     public function lkev(he : HalfEdge) : Void {
-        // unlike kev which splits a vertex in two, this should join two adj vertices together
 
         // loop around the second vertex, assigning the start vertex
         var che = he.nxt;
@@ -122,33 +126,48 @@ class Solid {
         he.l.delHalfEdge(he);
         oe.l.delHalfEdge(oe);
 
-        // TODO!
-
     }
 
+    // unlike kef, which splits a face - this should join two faces together
+
+    // TODO: test
     public function lkef(he : HalfEdge) : Void {
-        // unlike kef, which splits a face - this should join two faces together
 
         // what if the face has internal rings?
+        // what if the two faces are equal?
 
         // the face to remove
         var kl = he.l;
-        var kf = he.l.f;
+        var kf = he.l.f; // what about internal loops?
 
+        // the opposite edge and loop
         var oe = he.opp;
         var ol = oe.l;
 
-        // assign the edges to the other loop
+        // assign the edges of the given edge to the opposite loop
         var che = he;
         do {
             che.l = ol;
         } while ( (che = he.nxt) != he);
 
-        // remove the two halfEdges and properly fix predecessors
-        // TODO!
+        // store the edges adjacent edges
+        var ha = he.prv;
+        var hb = he.nxt;
 
-        // remove the face
+        var hc = oe.prv;
+        var hd = oe.nxt;
 
+        // properly set before & after of leftover adjacent edges
+        ha.nxt = hd;
+        hd.prv = ha;
+
+        hc.nxt = hb;
+        hb.prv = hc;
+
+        // assign the edge correctly
+        if (ol.e == oe){
+            ol.e = hc;
+        }
     }
 
     public function addFace() : Face {

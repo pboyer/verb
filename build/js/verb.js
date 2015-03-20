@@ -6247,15 +6247,46 @@ verb.topo.Solid.prototype = {
 	}
 	,lkemr: function(he0) {
 		var he1 = he0.opp;
-		var ol = he0.l;
-		var nl = ol.f.addLoop();
+		var nl = he0.l.f.addLoop();
+		var hea = he0.nxt;
+		var heb = he1.nxt;
+		heb.v.e = heb;
+		hea.v.e = hea;
 		he0.prv.nxt = he1.nxt;
 		he1.nxt.prv = he0.prv;
-		var che = he1;
-		do che.l = nl; while((che = che.prv) != he0);
-		ol.delHalfEdge(he0);
+		he1.nxt = he0;
+		he0.prv = he1;
+		var che = he0;
+		do che.l = nl; while((che = che.nxt) != heb);
+		nl.delHalfEdge(he0);
 		nl.delHalfEdge(he1);
 		return nl;
+	}
+	,lkvfs: function(face) {
+	}
+	,lkev: function(he) {
+		var che = he.nxt;
+		do che.v = he.v; while((che.opp.nxt = che) != he.nxt);
+		var oe = he.opp;
+		he.l.delHalfEdge(he);
+		oe.l.delHalfEdge(oe);
+	}
+	,lkef: function(he) {
+		var kl = he.l;
+		var kf = he.l.f;
+		var oe = he.opp;
+		var ol = oe.l;
+		var che = he;
+		do che.l = ol; while((che = he.nxt) != he);
+		var ha = he.prv;
+		var hb = he.nxt;
+		var hc = oe.prv;
+		var hd = oe.nxt;
+		ha.nxt = hd;
+		hd.prv = ha;
+		hc.nxt = hb;
+		hb.prv = hc;
+		if(ol.e == oe) ol.e = hc;
 	}
 	,addFace: function() {
 		return this.f = verb.core.types.DoublyLinkedListExtensions.push(this.f,new verb.topo.Face(this));
