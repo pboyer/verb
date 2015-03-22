@@ -9,7 +9,7 @@ class DoublyLinkedListExtensions {
 
     public static function push<T:(IDoublyLinkedList<T>)>( t : T, i : T ) : T {
         if (t == null) {
-            return makeList(i);
+            return make(i);
         }
 
         t.prv.nxt = i;
@@ -20,7 +20,19 @@ class DoublyLinkedListExtensions {
         return i;
     }
 
-    public static function makeList<T:(IDoublyLinkedList<T>)>( t : T ) : T {
+    public static function kill<T:(IDoublyLinkedList<T>)>( t : T, i : T ) : T {
+
+        if (t.nxt == t){ // a loop
+            return null;
+        }
+
+        i.prv.nxt = i.nxt;
+        i.nxt.prv = i.prv;
+
+        return t;
+    }
+
+    public static function make<T:(IDoublyLinkedList<T>)>( t : T ) : T {
         t.nxt = t;
         t.prv = t;
 

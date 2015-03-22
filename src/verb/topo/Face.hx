@@ -1,5 +1,7 @@
 package verb.topo;
 
+import haxe.ds.IntMap;
+
 import verb.core.types.DoublyLinkedListExtensions;
 import verb.geom.ISurface;
 
@@ -14,13 +16,14 @@ import verb.core.Vec;
 using verb.core.Vec;
 
 @:expose("topo.Face")
-class Face implements IDoublyLinkedList<Face> {
+class Face implements IDoublyLinkedList<Face> extends Topo {
 
     public var s : Solid;
+    public var ol : Loop; // outer loop
     public var l : Loop;
     public var prv : Face;
     public var nxt : Face;
-    public var srf : ISurface;
+//    public var srf : ISurface; // TODO: all faces now planar
 
     public function new(solid) {
         this.s = solid;
@@ -30,8 +33,48 @@ class Face implements IDoublyLinkedList<Face> {
         return l.iterate().array();
     }
 
+    // TODO: test
+    public function rings() : Array<Loop> {
+        var a = [];
+        for (il in l.iterate()){
+            if (il == ol) continue;
+            a.push(il);
+        }
+        return a;
+    }
+
     public function addLoop() : Loop {
-        return l = l.push(new Loop(this));
+        var nl = new Loop(this);
+        if (ol == null) ol = nl; // the first loop is the outer loop
+        return l = l.push(nl);
+    }
+
+    // TODO: test
+    public function neighbors() : Array<Face> {
+        var memo = new IntMap<Face>();
+        memo.set(id, this); // do not include self
+
+        var a = [];
+
+        var he = halfEdges();
+        for (e in he){
+            if (e.opp == null) continue;
+
+            var f = e.opp.l.f;
+            if (memo.exists(f.id)) continue;
+
+            memo.set(f.id, f);
+            a.push(f);
+        }
+
+        return a;
+    }
+
+    // TODO: test
+    public function halfEdges() : Array<HalfEdge>{
+        return loops().fold(function(l : Loop, a : Array<HalfEdge>){
+            return a.concat( l.halfEdges() );
+        }, []);
     }
 
     public function tessellate(){

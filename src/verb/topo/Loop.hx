@@ -10,7 +10,7 @@ import verb.core.types.IDoublyLinkedList;
 using verb.core.types.DoublyLinkedListExtensions;
 
 @:expose("topo.Loop")
-class Loop implements IDoublyLinkedList<Loop> {
+class Loop implements IDoublyLinkedList<Loop> extends Topo {
     public var f : Face;
     public var e : HalfEdge;
     public var prv : Loop;
@@ -20,11 +20,23 @@ class Loop implements IDoublyLinkedList<Loop> {
         this.f = face;
     }
 
-    public function addHalfEdge(vertex : Vertex, next : HalfEdge = null, opp : HalfEdge = null ) : HalfEdge {
-        if (vertex == null) {
-            throw new Exception("vertex cannot be null!");
-        }
+    public function halfEdges() : Array<HalfEdge> {
+        return e.iterate().array();
+    }
 
+    public function vertices() : Array<Vertex> {
+        return halfEdges().map(function(e : HalfEdge){ return e.v; });
+    }
+
+    public function coords() : Array<Float> {
+        return vertices().fold(function(v : Vertex, a : Array<Float>){ return a.concat(v.pt); }, []);
+    }
+
+    public function points() : Array<Point> {
+        return vertices().map(function(v : Vertex){ return v.pt; });
+    }
+
+    public function addHalfEdge(vertex : Vertex, next : HalfEdge = null, opp : HalfEdge = null ) : HalfEdge {
         if (next != null && next.l != this){
             throw new Exception("Next HalfEdge is not part of same Loop!");
         }
@@ -43,40 +55,19 @@ class Loop implements IDoublyLinkedList<Loop> {
         return e = e.push( he );
     }
 
-    public function delHalfEdge( he : HalfEdge ) : Void {
-        if ( he == null) {
-            throw new Exception("argument cannot be null!");
-        }
-
+    public function delHalfEdge( he : HalfEdge ) : Loop {
         if ( he.l != this) {
-            throw new Exception("HalfEdge is not part of this loop!");
+            throw new Exception("HalfEdge is not part of this Loop!");
         }
 
         // the base case - a half-edge cycle
         if (he.nxt == he){
             he.opp = null;
-            return;
+            this.e = he;
+            return this;
         }
 
-        he.prv.nxt = he.nxt;
-        he.nxt.prv = he.prv;
-
-        this.e = he.nxt;
-    }
-
-    public function halfEdges() : Array<HalfEdge> {
-        return e.iterate().array();
-    }
-
-    public function vertices() : Array<Vertex> {
-        return halfEdges().map(function(e : HalfEdge){ return e.v; });
-    }
-
-    public function coords() : Array<Float> {
-        return vertices().fold(function(v : Vertex, a : Array<Float>){ return a.concat(v.pt); }, []);
-    }
-
-    public function points() : Array<Point> {
-        return vertices().map(function(v : Vertex){ return v.pt; });
+        this.e = e.kill(he);
+        return this;
     }
 }

@@ -21,6 +21,8 @@ function last(a){
 }
 
 
+
+
 describe("verb.core.Eval.knotSpanGivenN",function(){
 
 	it('returns correct result', function(){
@@ -7132,6 +7134,45 @@ describe("verb.topo.Solid.mvfs",function(){
     });
 });
 
+var Tess2 = require('tess2');
+
+describe("verb.topo.Tess2",function(){
+    it('has the same results as JS library for simple example', function(){
+
+        // has library
+        var ca = [0,0, 10,0, 5,10];
+        var cb = [0,2, 10,2, 10,6, 0,6];
+        var contours = [ca,cb];
+
+        var res0 = Tess2.tesselate({
+            contours: contours,
+            windingRule: Tess2.WINDING_ODD,
+            elementType: Tess2.POLYGONS,
+            polySize: 3,
+            vertexSize: 2
+        });
+
+        // haxe port
+        var opts2 = new verb.topo.Tess2Options();
+
+        opts2.contours = contours;
+        opts2.windingRule = verb.topo.Tess2.WINDING_ODD;
+        opts2.elementType = verb.topo.Tess2.POLYGONS;
+        opts2.polySize = 3;
+        opts2.vertexSize = 2;
+
+        var res1 = verb.topo.Tess2.tessellate(opts2);
+
+        res1.vertices.should.eql(res0.vertices);
+        res1.vertexIndices.should.eql(res0.vertexIndices);
+        res1.vertexCount.should.eql(res0.vertexCount);
+        res1.elements.should.eql(res0.elements);
+        res1.elementCount.should.eql(res0.elementCount);
+    });
+});
+
+
+
 function triangularLamina(){
     var s = verb.topo.Solid.mvfs( [0,0,0] );
 
@@ -7143,6 +7184,26 @@ function triangularLamina(){
     nv1 = s.lmev( nv0.e, nv0.e, [1,1,0] );
 
     var nf = s.lmef( v0.e, v0.e.nxt.nxt );
+
+    return s;
+}
+
+function triangularPrism(){
+    var s = triangularLamina();
+
+    var nvs = s.f.l.halfEdges().map(function(e){
+        return s.lmev( e, e, verb.core.Vec.add( e.v.pt, [0,0,1]) );
+    });
+
+    var nfs = nvs
+        .map(function(v){
+            return v.e;
+        })
+        .map(function(e){
+            var nf = s.lmef(e, e.nxt.nxt.nxt);
+            nf.l.halfEdges().length.should.equal( 4 );
+            return nf;
+        });
 
     return s;
 }
@@ -7204,6 +7265,13 @@ describe("verb.topo.Solid.lmev",function(){
     it('can extend edges from a triangular lamina', function(){
         var s = triangularLamina();
 
+        var vs = s.vertices();
+
+        // each vertex has 2 neighbors originally
+        vs.forEach(function(x){
+            x.neighbors().length.should.be.equal(2);
+        });
+
         var l = s.f.l;
 
         // extend every vertex in the loop with an lmev
@@ -7213,8 +7281,12 @@ describe("verb.topo.Solid.lmev",function(){
 
         l.halfEdges().length.should.be.equal(9);
         s.f.nxt.l.halfEdges().length.should.be.equal(3);
-    });
 
+        // each of the original vertices has 3 neighbors afterwards
+        vs.forEach(function(x){
+            x.neighbors().length.should.be.equal(3);
+        });
+    });
 });
 
 describe("verb.topo.Solid.lmef",function(){
@@ -7246,6 +7318,19 @@ describe("verb.topo.Solid.lmef",function(){
         v.length.should.be.equal(3);
         f.length.should.be.equal(2);
         he.length.should.be.equal(6);
+
+        v.forEach(function(x){
+            x.neighbors().length.should.be.equal(2);
+        });
+
+        l.forEach(function(x){
+            x.vertices().length.should.be.equal(3);
+        });
+
+        l.forEach(function(x){
+            x.f.should.not.be.null;
+        });
+
     });
 
     it('can close a single rectangular loop into a lamina', function(){
@@ -7305,6 +7390,21 @@ describe("verb.topo.Solid.lmef",function(){
         v.length.should.be.equal(6);
         f.length.should.be.equal(3);
         he.length.should.be.equal(14);
+
+        // each vertex has >=1 neighbors
+        v.forEach(function(x){
+            x.neighbors().length.should.be.greaterThan(0);
+        });
+
+        // each loop has >=3 vertices
+        l.forEach(function(x){
+            x.vertices().length.should.be.greaterThan(2);
+        });
+
+        // each loop is non-null
+        f.forEach(function(x){
+            x.l.should.not.be.null;
+        });
     });
 
     it('can be used to close a lamina with extended edges into a prism', function(){
@@ -7326,50 +7426,71 @@ describe("verb.topo.Solid.lmef",function(){
                 return nf;
             });
 
-        s.vertices().length.should.be.equal(6);
-        s.faces().length.should.be.equal(5);
-        s.loops().length.should.be.equal(5);
-        s.halfEdges().length.should.be.equal(18);
+        var l = s.loops();
+        var v = s.vertices();
+        var f = s.faces();
+        var he = s.halfEdges();
 
-    });
-});
+        v.length.should.be.equal(6);
+        f.length.should.be.equal(5);
+        l.length.should.be.equal(5);
+        he.length.should.be.equal(18);
 
-var Tess2 = require('tess2');
-
-describe("verb.topo.Tess2",function(){
-    it('has the same results as JS library for simple example', function(){
-
-        // has library
-        var ca = [0,0, 10,0, 5,10];
-        var cb = [0,2, 10,2, 10,6, 0,6];
-        var contours = [ca,cb];
-
-        var res0 = Tess2.tesselate({
-            contours: contours,
-            windingRule: Tess2.WINDING_ODD,
-            elementType: Tess2.POLYGONS,
-            polySize: 3,
-            vertexSize: 2
+        // each vertex has 3 neighbors
+        v.forEach(function(x){
+            x.neighbors().length.should.be.equal(3);
         });
 
-        // haxe port
-        var opts2 = new verb.topo.Tess2Options();
+        // each loop has >=3 vertices
+        l.forEach(function(x){
+            x.vertices().length.should.be.greaterThan(2);
+        });
 
-        opts2.contours = contours;
-        opts2.windingRule = verb.topo.Tess2.WINDING_ODD;
-        opts2.elementType = verb.topo.Tess2.POLYGONS;
-        opts2.polySize = 3;
-        opts2.vertexSize = 2;
-
-        var res1 = verb.topo.Tess2.tessellate(opts2);
-
-        res1.vertices.should.eql(res0.vertices);
-        res1.vertexIndices.should.eql(res0.vertexIndices);
-        res1.vertexCount.should.eql(res0.vertexCount);
-        res1.elements.should.eql(res0.elements);
-        res1.elementCount.should.eql(res0.elementCount);
+        // each loop is non-null
+        f.forEach(function(x){
+            x.l.should.not.be.null;
+        });
     });
 });
+
+describe("verb.topo.Solid.lkemr",function(){
+    it('can be used to insert an empty ring into a face', function(){
+        var s = triangularPrism();
+
+        // get the top face
+        var tfl = s.faces().filter(function(x){
+            return verb.core.Vec.dot( x.normal(), [0,0,1] ) > 0;
+        });
+
+        tfl.length.should.be.equal( 1 );
+
+        var tf = tfl[0];
+
+        // insert new vertex and two new half-edges into face
+        var nv = s.lmev( tf.l.e, tf.l.e, [0.1,0.1,1] );
+
+        // now the face has 5 edges
+        nv.e.l.halfEdges().length.should.be.equal(5);
+
+        // remove the edges connecting this vertex to the outer face, making this into a new ring (i.e. inner loop)
+        var nl = s.lkemr(nv.e.prv);
+
+        nl.halfEdges().length.should.be.equal(1);
+        nl.f.loops().length.should.be.equal(2);
+        nl.f.neighbors().length.should.be.equal(3);
+
+        nv.e.l.halfEdges().length.should.be.equal(1);
+        nv.neighbors().length.should.be.equal(0);
+
+        var fl = nl.f.loops();
+        var ol = fl[0] != nl ? fl[0] : fl[1];
+
+        ol.halfEdges().length.should.be.equal(3);
+        nl.f.rings().length.should.be.equal(1);
+    });
+});
+
+
 
 
 

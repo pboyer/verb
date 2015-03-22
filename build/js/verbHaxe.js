@@ -5062,14 +5062,20 @@ verb.core.types.DoublyLinkedListExtensions.iterate = function(t) {
 	return new verb.core.types.DoublyLinkedListIterator(t);
 };
 verb.core.types.DoublyLinkedListExtensions.push = function(t,i) {
-	if(t == null) return verb.core.types.DoublyLinkedListExtensions.makeList(i);
+	if(t == null) return verb.core.types.DoublyLinkedListExtensions.make(i);
 	t.prv.nxt = i;
 	i.prv = t.prv;
 	t.prv = i;
 	i.nxt = t;
 	return i;
 };
-verb.core.types.DoublyLinkedListExtensions.makeList = function(t) {
+verb.core.types.DoublyLinkedListExtensions.kill = function(t,i) {
+	if(t.nxt == t) return null;
+	i.prv.nxt = i.nxt;
+	i.nxt.prv = i.prv;
+	return t;
+};
+verb.core.types.DoublyLinkedListExtensions.make = function(t) {
 	t.nxt = t;
 	t.prv = t;
 	return t;
@@ -6068,17 +6074,57 @@ verb.geom.SweptSurface.prototype = $extend(verb.geom.NurbsSurface.prototype,{
 	}
 });
 verb.topo = {};
+verb.topo.Topo = function() {
+	this.id = verb.topo.Topo.counter++;
+};
+verb.topo.Topo.__name__ = ["verb","topo","Topo"];
 verb.topo.Face = $hx_exports.topo.Face = function(solid) {
+	verb.topo.Topo.call(this);
 	this.s = solid;
 };
 verb.topo.Face.__name__ = ["verb","topo","Face"];
 verb.topo.Face.__interfaces__ = [verb.core.types.IDoublyLinkedList];
-verb.topo.Face.prototype = {
+verb.topo.Face.__super__ = verb.topo.Topo;
+verb.topo.Face.prototype = $extend(verb.topo.Topo.prototype,{
 	loops: function() {
 		return Lambda.array(verb.core.types.DoublyLinkedListExtensions.iterate(this.l));
 	}
+	,rings: function() {
+		var a = [];
+		var $it0 = $iterator(verb.core.types.DoublyLinkedListExtensions.iterate(this.l))();
+		while( $it0.hasNext() ) {
+			var il = $it0.next();
+			if(il == this.ol) continue;
+			a.push(il);
+		}
+		return a;
+	}
 	,addLoop: function() {
-		return this.l = verb.core.types.DoublyLinkedListExtensions.push(this.l,new verb.topo.Loop(this));
+		var nl = new verb.topo.Loop(this);
+		if(this.ol == null) this.ol = nl;
+		return this.l = verb.core.types.DoublyLinkedListExtensions.push(this.l,nl);
+	}
+	,neighbors: function() {
+		var memo = new haxe.ds.IntMap();
+		memo.set(this.id,this);
+		var a = [];
+		var he = this.halfEdges();
+		var _g = 0;
+		while(_g < he.length) {
+			var e = he[_g];
+			++_g;
+			if(e.opp == null) continue;
+			var f = e.opp.l.f;
+			if(memo.exists(f.id)) continue;
+			memo.set(f.id,f);
+			a.push(f);
+		}
+		return a;
+	}
+	,halfEdges: function() {
+		return Lambda.fold(this.loops(),function(l,a) {
+			return a.concat(l.halfEdges());
+		},[]);
 	}
 	,tessellate: function() {
 		var opts = new verb.topo.Tess2Options();
@@ -6100,54 +6146,33 @@ verb.topo.Face.prototype = {
 		var v21 = verb.core.Vec.sub(v2,v1);
 		return verb.core.Vec.normalized(verb.core.Vec.cross(v01,v21));
 	}
-};
+});
 verb.topo.HalfEdge = $hx_exports.topo.HalfEdge = function(loop,vertex) {
-	this.id = verb.topo.HalfEdge.guid++;
+	verb.topo.Topo.call(this);
 	this.v = vertex;
 	this.v.e = this;
 	this.l = loop;
 };
 verb.topo.HalfEdge.__name__ = ["verb","topo","HalfEdge"];
 verb.topo.HalfEdge.__interfaces__ = [verb.core.types.IDoublyLinkedList];
-verb.topo.HalfEdge.prototype = {
+verb.topo.HalfEdge.__super__ = verb.topo.Topo;
+verb.topo.HalfEdge.prototype = $extend(verb.topo.Topo.prototype,{
 	mate: function(he) {
 		if(he == null) return this;
 		this.opp = he;
 		he.opp = this;
 		return this;
 	}
-};
+});
 verb.topo.Loop = $hx_exports.topo.Loop = function(face) {
+	verb.topo.Topo.call(this);
 	this.f = face;
 };
 verb.topo.Loop.__name__ = ["verb","topo","Loop"];
 verb.topo.Loop.__interfaces__ = [verb.core.types.IDoublyLinkedList];
-verb.topo.Loop.prototype = {
-	addHalfEdge: function(vertex,next,opp) {
-		if(vertex == null) throw new verb.core.types.Exception("vertex cannot be null!");
-		if(next != null && next.l != this) throw new verb.core.types.Exception("Next HalfEdge is not part of same Loop!");
-		if(next != null && next.opp == null && opp == null) {
-			vertex.e = next;
-			next.v = vertex;
-			return next;
-		}
-		if(next != null) this.e = next;
-		var he = new verb.topo.HalfEdge(this,vertex);
-		he.mate(opp);
-		return this.e = verb.core.types.DoublyLinkedListExtensions.push(this.e,he);
-	}
-	,delHalfEdge: function(he) {
-		if(he == null) throw new verb.core.types.Exception("argument cannot be null!");
-		if(he.l != this) throw new verb.core.types.Exception("HalfEdge is not part of this loop!");
-		if(he.nxt == he) {
-			he.opp = null;
-			return;
-		}
-		he.prv.nxt = he.nxt;
-		he.nxt.prv = he.prv;
-		this.e = he.nxt;
-	}
-	,halfEdges: function() {
+verb.topo.Loop.__super__ = verb.topo.Topo;
+verb.topo.Loop.prototype = $extend(verb.topo.Topo.prototype,{
+	halfEdges: function() {
 		return Lambda.array(verb.core.types.DoublyLinkedListExtensions.iterate(this.e));
 	}
 	,vertices: function() {
@@ -6165,8 +6190,31 @@ verb.topo.Loop.prototype = {
 			return v.pt;
 		});
 	}
-};
+	,addHalfEdge: function(vertex,next,opp) {
+		if(next != null && next.l != this) throw new verb.core.types.Exception("Next HalfEdge is not part of same Loop!");
+		if(next != null && next.opp == null && opp == null) {
+			vertex.e = next;
+			next.v = vertex;
+			return next;
+		}
+		if(next != null) this.e = next;
+		var he = new verb.topo.HalfEdge(this,vertex);
+		he.mate(opp);
+		return this.e = verb.core.types.DoublyLinkedListExtensions.push(this.e,he);
+	}
+	,delHalfEdge: function(he) {
+		if(he.l != this) throw new verb.core.types.Exception("HalfEdge is not part of this Loop!");
+		if(he.nxt == he) {
+			he.opp = null;
+			this.e = he;
+			return this;
+		}
+		this.e = verb.core.types.DoublyLinkedListExtensions.kill(this.e,he);
+		return this;
+	}
+});
 verb.topo.Solid = $hx_exports.topo.Solid = function() {
+	verb.topo.Topo.call(this);
 };
 verb.topo.Solid.__name__ = ["verb","topo","Solid"];
 verb.topo.Solid.mvfs = function(pt) {
@@ -6176,7 +6224,8 @@ verb.topo.Solid.mvfs = function(pt) {
 	var h = l.addHalfEdge(s.addVertex(pt));
 	return s;
 };
-verb.topo.Solid.prototype = {
+verb.topo.Solid.__super__ = verb.topo.Topo;
+verb.topo.Solid.prototype = $extend(verb.topo.Topo.prototype,{
 	lmev: function(he0,he1,pt) {
 		var v = this.addVertex(pt);
 		var he = he0;
@@ -6190,40 +6239,52 @@ verb.topo.Solid.prototype = {
 		return v;
 	}
 	,lmef: function(he0,he1) {
+		if(he0.l != he1.l) throw new verb.core.types.Exception("Both HalfEdge's must be part of the same loop!");
 		var nf = this.addFace();
 		var nl = nf.addLoop();
+		var ol = he1.l;
 		var he = he0;
 		while(he != he1) {
 			he.l = nl;
 			he = he.nxt;
 		}
+		he1.prv.nxt = he0;
+		he0.prv.nxt = he1;
+		var t = he1.prv;
+		he1.prv = he0.prv;
+		he0.prv = t;
 		var nhe0 = nl.addHalfEdge(he1.v,he0);
-		var nhe1 = he1.l.addHalfEdge(he0.v,he1,nhe0);
-		nhe0.prv.nxt = nhe1;
-		nhe1.prv.nxt = nhe0;
-		var temp = nhe0.prv;
-		nhe0.prv = nhe1.prv;
-		nhe1.prv = temp;
+		var nhe1 = ol.addHalfEdge(he0.v,he1,nhe0);
 		return nf;
 	}
 	,lkemr: function(he0) {
 		var he1 = he0.opp;
-		var nl = he0.l.f.addLoop();
+		var ol = he0.l;
+		var nl = ol.f.addLoop();
 		var hea = he0.nxt;
 		var heb = he1.nxt;
 		heb.v.e = heb;
 		hea.v.e = hea;
 		he0.prv.nxt = he1.nxt;
 		he1.nxt.prv = he0.prv;
+		ol.e = he1.nxt;
 		he1.nxt = he0;
 		he0.prv = he1;
 		var che = he0;
-		do che.l = nl; while((che = che.nxt) != heb);
+		do {
+			che.l = nl;
+			che = che.nxt;
+		} while(che != he0);
+		nl.e = he1;
 		nl.delHalfEdge(he0);
 		nl.delHalfEdge(he1);
 		return nl;
 	}
-	,lkvfs: function(face) {
+	,lkvfs: function(he) {
+		var v = he.v;
+		this.delVertex(v);
+		this.delFace(he.l.f);
+		return this;
 	}
 	,lkev: function(he) {
 		var che = he.nxt;
@@ -6231,6 +6292,7 @@ verb.topo.Solid.prototype = {
 		var oe = he.opp;
 		he.l.delHalfEdge(he);
 		oe.l.delHalfEdge(oe);
+		return this;
 	}
 	,lkef: function(he) {
 		var kl = he.l;
@@ -6248,12 +6310,23 @@ verb.topo.Solid.prototype = {
 		hc.nxt = hb;
 		hb.prv = hc;
 		if(ol.e == oe) ol.e = hc;
+		return this;
 	}
 	,addFace: function() {
 		return this.f = verb.core.types.DoublyLinkedListExtensions.push(this.f,new verb.topo.Face(this));
 	}
+	,delFace: function(i) {
+		if(i.s != this) throw new verb.core.types.Exception("Face is not part of this Solid!");
+		this.f = verb.core.types.DoublyLinkedListExtensions.kill(this.f,i);
+		return this;
+	}
 	,addVertex: function(pt) {
 		return this.v = verb.core.types.DoublyLinkedListExtensions.push(this.v,new verb.topo.Vertex(pt));
+	}
+	,delVertex: function(i) {
+		if(i.e.l.f.s != this) throw new verb.core.types.Exception("Face is not part of this Solid!");
+		this.v = verb.core.types.DoublyLinkedListExtensions.kill(this.v,i);
+		return this;
 	}
 	,vertices: function() {
 		return Lambda.array(verb.core.types.DoublyLinkedListExtensions.iterate(this.v));
@@ -6274,7 +6347,7 @@ verb.topo.Solid.prototype = {
 	,print: function() {
 		return "Solid (" + this.vertices().length + " Vertices, " + this.faces().length + " Faces, " + this.loops().length + " Loops, " + this.halfEdges().length + " HalfEdges" + ")";
 	}
-};
+});
 verb.topo.Tess2Options = $hx_exports.topo.Tess2Options = function() {
 	this.contours = [];
 	this.debug = false;
@@ -8174,10 +8247,40 @@ verb.topo.Tessellator.prototype = {
 	}
 };
 verb.topo.Vertex = $hx_exports.topo.Vertex = function(point) {
+	verb.topo.Topo.call(this);
 	this.pt = point;
 };
 verb.topo.Vertex.__name__ = ["verb","topo","Vertex"];
 verb.topo.Vertex.__interfaces__ = [verb.core.types.IDoublyLinkedList];
+verb.topo.Vertex.__super__ = verb.topo.Topo;
+verb.topo.Vertex.prototype = $extend(verb.topo.Topo.prototype,{
+	neighbors: function() {
+		var memo = new haxe.ds.IntMap();
+		memo.set(this.id,this);
+		var a = [];
+		var ce = this.e;
+		var _g = 0;
+		var _g1 = this.halfEdges();
+		while(_g < _g1.length) {
+			var e = _g1[_g];
+			++_g;
+			var v = e.nxt.v;
+			if(memo.exists(v.id)) continue;
+			a.push(v);
+		}
+		return a;
+	}
+	,halfEdges: function() {
+		var a = [];
+		var ce = this.e;
+		do {
+			a.push(ce);
+			if(this.e.opp == null) break;
+			ce = ce.opp.nxt;
+		} while(ce != this.e);
+		return a;
+	}
+});
 function $iterator(o) { if( o instanceof Array ) return function() { return HxOverrides.iter(o); }; return typeof(o.iterator) == 'function' ? $bind(o,o.iterator) : o.iterator; }
 var $_, $fid = 0;
 function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $fid++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; }
@@ -8446,7 +8549,7 @@ verb.exe.Dispatcher.THREADS = 1;
 verb.exe.Dispatcher._init = false;
 verb.exe.Work.uuid = 0;
 verb.exe.WorkerPool.basePath = "";
-verb.topo.HalfEdge.guid = 0;
+verb.topo.Topo.counter = 0;
 verb.topo.Tess2.WINDING_ODD = 0;
 verb.topo.Tess2.WINDING_NONZERO = 1;
 verb.topo.Tess2.WINDING_POSITIVE = 2;
