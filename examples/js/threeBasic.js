@@ -44,6 +44,10 @@ function addCurveToScene(geom, material){
     scene.add( new THREE.Line( geom, material ) );
 }
 
+function addLineToScene(pts, mat){
+    addCurveToScene(asGeometry(asVector3(pts)), mat);
+}
+
 function addMeshToScene(mesh, material, wireframe ){
     material = material || new THREE.MeshNormalMaterial( { side: THREE.DoubleSide, wireframe: false, shading: THREE.SmoothShading, transparent: true, opacity: 0.4 } )
 

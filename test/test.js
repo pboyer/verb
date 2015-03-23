@@ -7451,6 +7451,34 @@ describe("verb.topo.Solid.lmef",function(){
             x.l.should.not.be.null;
         });
     });
+
+    it('can split a quad face of a solid into two triangles', function(){
+
+        var s = triangularPrism();
+
+        var tfl = s.faces().filter(function(x){
+            return verb.core.Vec.dot( x.normal(), [0,-1,0] ) > 0;
+        });
+
+        tfl.length.should.be.equal( 1 );
+
+        var of = tfl[0];
+        var nf = s.lmef( of.ol.e, of.ol.e.nxt.nxt );
+
+        of.ol.vertices().length.should.be.equal(3);
+        nf.ol.vertices().length.should.be.equal(3);
+
+        var l = s.loops();
+        var v = s.vertices();
+        var f = s.faces();
+        var he = s.halfEdges();
+
+        l.length.should.be.equal(6);
+        v.length.should.be.equal(6);
+        f.length.should.be.equal(6);
+        he.length.should.be.equal(20);
+
+    });
 });
 
 describe("verb.topo.Solid.lkemr",function(){
@@ -7492,7 +7520,6 @@ describe("verb.topo.Solid.lkemr",function(){
 
 describe("verb.topo.Solid.lkev",function(){
     it('can be used to reduce a single edge back to the base', function(){
-
         // 2 vertex, 2 half edge topo
         var s = verb.topo.Solid.mvfs([0,0,0]);
         var e = s.f.l.e;
@@ -7514,6 +7541,29 @@ describe("verb.topo.Solid.lkev",function(){
         f[0].neighbors().length.should.be.equal(0);
         l[0].halfEdges().length.should.be.equal(1);
         he[0].nxt.should.be.equal(he[0]); // loop
+
+        s.edges().length.should.be.equal(0);
+    });
+});
+
+describe("verb.topo.Solid.lkef",function(){
+    it('can rejoin a face on a quad face of a solid', function(){
+
+        var s = triangularPrism();
+
+        var tf = s.faces().filter(function(x){
+            return verb.core.Vec.dot( x.normal(), [0,-1,0] ) > 0;
+        })[0];
+
+        var oe = tf.ol.e;
+        var f = s.lmef( oe, oe.nxt.nxt );
+
+        s.faces().length.should.be.equal( 6 );
+
+        s.lkef( oe.prv );
+
+        console.log(s.print())
+
     });
 });
 

@@ -5112,6 +5112,9 @@ verb.core.types.DoublyLinkedListExtensions.kill = function(t,i) {
 	if(t.nxt == t) return null;
 	i.prv.nxt = i.nxt;
 	i.nxt.prv = i.prv;
+	if(t == i) t = t.nxt;
+	i.nxt = null;
+	i.prv = null;
 	return t;
 };
 verb.core.types.DoublyLinkedListExtensions.make = function(t) {
@@ -6246,8 +6249,10 @@ verb.topo.Loop.prototype = $extend(verb.topo.Topo.prototype,{
 		if(he.nxt == he) {
 			he.opp = null;
 			this.e = he;
+			he.v.e = he;
 			return this;
 		}
+		if(he.opp.nxt != null) he.v.e = he.opp.nxt;
 		this.e = verb.core.types.DoublyLinkedListExtensions.kill(this.e,he);
 		return this;
 	}
@@ -6336,12 +6341,14 @@ verb.topo.Solid.prototype = $extend(verb.topo.Topo.prototype,{
 		return this.delVertex(kv);
 	}
 	,lkef: function(he) {
+		if(he.opp == null) throw new verb.core.types.Exception("Cannot kill base case!");
+		if(he.opp.l.f == he.l.f) throw new verb.core.types.Exception("Edge does not traverse two distinct faces!");
 		var kl = he.l;
 		var kf = he.l.f;
 		var oe = he.opp;
 		var ol = oe.l;
 		var che = he;
-		do che.l = ol; while((che = he.nxt) != he);
+		do che.l = ol; while((che = che.nxt) != he);
 		var ha = he.prv;
 		var hb = he.nxt;
 		var hc = oe.prv;
@@ -6350,7 +6357,10 @@ verb.topo.Solid.prototype = $extend(verb.topo.Topo.prototype,{
 		hd.prv = ha;
 		hc.nxt = hb;
 		hb.prv = hc;
+		he.v.e = hd;
+		oe.v.e = hb;
 		if(ol.e == oe) ol.e = hc;
+		this.delFace(kf);
 		return this;
 	}
 	,addFace: function() {
@@ -6384,6 +6394,21 @@ verb.topo.Solid.prototype = $extend(verb.topo.Topo.prototype,{
 		return Lambda.fold(this.loops(),function(l,acc) {
 			return acc.concat(l.halfEdges());
 		},[]);
+	}
+	,edges: function() {
+		var m = new haxe.ds.IntMap();
+		var a = [];
+		var _g = 0;
+		var _g1 = this.halfEdges();
+		while(_g < _g1.length) {
+			var e = _g1[_g];
+			++_g;
+			if(e.opp == null || m.exists(e.id) || m.exists(e.opp.id)) continue;
+			m.set(e.id,e);
+			m.set(e.opp.id,e.opp);
+			a.push(new verb.core.types.Pair(e,e.opp));
+		}
+		return a;
 	}
 	,print: function() {
 		return "Solid (" + this.vertices().length + " Vertices, " + this.faces().length + " Faces, " + this.loops().length + " Loops, " + this.halfEdges().length + " HalfEdges" + ")";

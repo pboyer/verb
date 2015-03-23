@@ -9,7 +9,7 @@
     verb.geom.NurbsSurface.prototype.toThreeGeometry = function(){
         return tessellateSurface( this );
     }
-//
+
 //    verb.topo.Solid.prototype.toThreeGeometry = function(){
 //
 //        var f = this.faces().map(function(x){

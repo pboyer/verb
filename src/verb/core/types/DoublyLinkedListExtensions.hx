@@ -29,6 +29,11 @@ class DoublyLinkedListExtensions {
         i.prv.nxt = i.nxt;
         i.nxt.prv = i.prv;
 
+        if (t == i) t = t.nxt;
+
+        i.nxt = null;
+        i.prv = null;
+
         return t;
     }
 

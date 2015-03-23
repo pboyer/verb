@@ -1,5 +1,6 @@
 package verb.topo;
 
+import haxe.ds.IntMap;
 import verb.core.types.Exception;
 import verb.core.types.DoublyLinkedListExtensions;
 using Lambda;
@@ -138,13 +139,12 @@ class Solid extends Topo {
 
     // unlike lkev which splits a vertex in two, this should
     // join two adj vertices together
-    // TODO: test
     public function lkev(he : HalfEdge) : Solid {
         if (he.nxt == he){
             throw new Exception("Cannot lkev the base case!");
         }
 
-        var kv = he.nxt.v;
+        var kv = he.nxt.v;  // in lkev, he.v's vertex needs to be set correctly
 
         // loop around the second vertex, assigning the start vertex
         var che = he.nxt;
@@ -167,11 +167,20 @@ class Solid extends Topo {
         // what if the face has internal rings?
         // what if the two faces are equal?
 
-        // the face to remove
-        var kl = he.l;
-        var kf = he.l.f; // what about internal loops?
+        if (he.opp == null){
+            throw new Exception("Cannot kill base case!");
+        }
 
-        // the opposite edge and loop
+        if (he.opp.l.f == he.l.f){
+            throw new Exception("Edge does not traverse two distinct faces!");
+        }
+
+        var kl = he.l; // what about internal loops?
+
+        // the face to remove
+        var kf = he.l.f;
+
+        // the opposite edge and loop that we will maintain
         var oe = he.opp;
         var ol = oe.l;
 
@@ -179,36 +188,43 @@ class Solid extends Topo {
         var che = he;
         do {
             che.l = ol;
-        } while ( (che = he.nxt) != he);
+        } while ( (che = che.nxt) != he);
 
-        // store the edges adjacent edges
+        // store the adjacent edges
         var ha = he.prv;
         var hb = he.nxt;
 
         var hc = oe.prv;
         var hd = oe.nxt;
 
-        // properly set before & after of leftover adjacent edges
+        // properly set adjacent edges
         ha.nxt = hd;
         hd.prv = ha;
 
         hc.nxt = hb;
         hb.prv = hc;
 
+        // set the vertex parents correctly
+        he.v.e = hd;
+        oe.v.e = hb;
+
         // assign the edge correctly
         if (ol.e == oe){
             ol.e = hc;
         }
 
+        // delete the old face from the solid
+        this.delFace( kf );
+
         return this;
     }
 
-    public function addFace() : Face {
+    private function addFace() : Face {
         return f = f.push( new Face(this) );
     }
 
     // TODO: test
-    public function delFace( i : Face ) : Solid {
+    private function delFace( i : Face ) : Solid {
         if ( i.s != this) {
             throw new Exception("Face is not part of this Solid!");
         }
@@ -217,12 +233,12 @@ class Solid extends Topo {
         return this;
     }
 
-    public function addVertex( pt ) : Vertex {
+    private function addVertex( pt ) : Vertex {
         return v = v.push( new Vertex( pt ) );
     }
 
     // TODO: test
-    public function delVertex( i : Vertex ) : Solid {
+    private function delVertex( i : Vertex ) : Solid {
         if ( i.e.l.f.s != this) {
             throw new Exception("Face is not part of this Solid!");
         }
@@ -245,6 +261,20 @@ class Solid extends Topo {
 
     public function halfEdges() : Array<HalfEdge> {
         return loops().fold(function(l : Loop, acc : Array<HalfEdge>){ return acc.concat( l.halfEdges() ); }, []);
+    }
+
+    public function edges() : Array<Pair<HalfEdge, HalfEdge>> {
+        var m = new IntMap<HalfEdge>();
+
+        var a = [];
+        for (e in halfEdges()){
+            if (e.opp == null || m.exists(e.id) || m.exists(e.opp.id)) continue;
+            m.set( e.id, e );
+            m.set( e.opp.id, e.opp );
+            a.push( new Pair(e, e.opp) );
+        }
+
+        return a;
     }
 
     public function print(){

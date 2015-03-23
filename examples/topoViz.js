@@ -36,20 +36,15 @@ $(function(){ // on dom ready
 
     var s = triangularPrism();
 
-    var tfl = s.faces().filter(function(x){
-        return verb.core.Vec.dot( x.normal(), [0,0,1] ) > 0;
-    });
 
-    var tf = tfl[0];
+    var tf = s.faces().filter(function(x){
+        return verb.core.Vec.dot( x.normal(), [0,-1,0] ) > 0;
+    })[0];
 
-    var nv = s.lmev( tf.l.e, tf.l.e, [0.1,0.1,1] );
+    var oe = tf.ol.e;
+    var f = s.lmef( oe, oe.nxt.nxt );
 
-    var nl = s.lkemr( nv.e.prv );
-
-    console.log(nl.halfEdges());
-
-    console.log(nl.f.ol.halfEdges());
-
+    s.lkef( oe.prv );
 
     var faces = s.faces();
     var vertices = s.vertices();
@@ -57,14 +52,10 @@ $(function(){ // on dom ready
     var eles = vertices;
 
     var graphEdges = eles.reduce(function(a, f){
-
-        var n = f.neighbors();
-
         return a.concat(
-            n.map(function(fo){
+             f.neighbors().map(function(fo){
                 return { data: { source: f.id.toString(), target: fo.id.toString() } };
-            })
-        );
+            }));
     }, []);
 
     var graphNodes = eles.map(function(x){

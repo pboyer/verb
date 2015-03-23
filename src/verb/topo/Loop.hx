@@ -64,7 +64,13 @@ class Loop implements IDoublyLinkedList<Loop> extends Topo {
         if (he.nxt == he){
             he.opp = null;
             this.e = he;
+            he.v.e = he;
             return this;
+        }
+
+        // reassign parent edge for vertex
+        if (he.opp.nxt != null){
+            he.v.e = he.opp.nxt;
         }
 
         this.e = e.kill(he);
