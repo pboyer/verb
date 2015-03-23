@@ -6287,12 +6287,14 @@ verb.topo.Solid.prototype = $extend(verb.topo.Topo.prototype,{
 		return this;
 	}
 	,lkev: function(he) {
+		if(he.nxt == he) throw new verb.core.types.Exception("Cannot lkev the base case!");
+		var kv = he.nxt.v;
 		var che = he.nxt;
 		do che.v = he.v; while((che.opp.nxt = che) != he.nxt);
 		var oe = he.opp;
 		he.l.delHalfEdge(he);
 		oe.l.delHalfEdge(oe);
-		return this;
+		return this.delVertex(kv);
 	}
 	,lkef: function(he) {
 		var kl = he.l;
@@ -8275,7 +8277,7 @@ verb.topo.Vertex.prototype = $extend(verb.topo.Topo.prototype,{
 		var ce = this.e;
 		do {
 			a.push(ce);
-			if(this.e.opp == null) break;
+			if(ce.opp == null) break;
 			ce = ce.opp.nxt;
 		} while(ce != this.e);
 		return a;

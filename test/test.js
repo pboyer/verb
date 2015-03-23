@@ -21,7 +21,7 @@ function last(a){
 }
 
 
-
+/*
 
 describe("verb.core.Eval.knotSpanGivenN",function(){
 
@@ -7171,7 +7171,7 @@ describe("verb.topo.Tess2",function(){
     });
 });
 
-
+*/
 
 function triangularLamina(){
     var s = verb.topo.Solid.mvfs( [0,0,0] );
@@ -7490,6 +7490,32 @@ describe("verb.topo.Solid.lkemr",function(){
     });
 });
 
+describe("verb.topo.Solid.lkev",function(){
+    it('can be used to reduce a single edge back to the base', function(){
+
+        // 2 vertex, 2 half edge topo
+        var s = verb.topo.Solid.mvfs([0,0,0]);
+        var e = s.f.l.e;
+        var v = s.lmev( e, e, [0,0,1] );
+
+        s.lkev( e );
+
+        var l = s.loops();
+        var v = s.vertices();
+        var f = s.faces();
+        var he = s.halfEdges();
+
+        v.length.should.be.equal(1);
+        f.length.should.be.equal(1);
+        l.length.should.be.equal(1);
+        he.length.should.be.equal(1);
+
+        v[0].neighbors().length.should.be.equal(0);
+        f[0].neighbors().length.should.be.equal(0);
+        l[0].halfEdges().length.should.be.equal(1);
+        he[0].nxt.should.be.equal(he[0]); // loop
+    });
+});
 
 
 

@@ -138,9 +138,13 @@ class Solid extends Topo {
 
     // unlike lkev which splits a vertex in two, this should
     // join two adj vertices together
-
     // TODO: test
     public function lkev(he : HalfEdge) : Solid {
+        if (he.nxt == he){
+            throw new Exception("Cannot lkev the base case!");
+        }
+
+        var kv = he.nxt.v;
 
         // loop around the second vertex, assigning the start vertex
         var che = he.nxt;
@@ -148,16 +152,15 @@ class Solid extends Topo {
             che.v = he.v;
         } while ( ( che.opp.nxt = che) != he.nxt);
 
-        // remove the two half edges
+        // remove the two half edges from their parent loops
         var oe = he.opp;
         he.l.delHalfEdge(he);
         oe.l.delHalfEdge(oe);
 
-        return this;
+        return this.delVertex( kv );
     }
 
     // unlike kef, which splits a face - this should join two faces together
-
     // TODO: test
     public function lkef(he : HalfEdge) : Solid {
 

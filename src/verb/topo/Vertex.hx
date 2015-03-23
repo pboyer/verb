@@ -37,11 +37,10 @@ class Vertex implements IDoublyLinkedList<Vertex> extends Topo {
         var ce = e;
         do {
             a.push(ce);
-            if (e.opp == null) break; // the solid base case
+            if (ce.opp == null) break; // the solid base case
             ce = ce.opp.nxt;
         } while (ce != e);
 
         return a;
     }
-
 }
