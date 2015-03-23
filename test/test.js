@@ -7562,7 +7562,30 @@ describe("verb.topo.Solid.lkef",function(){
 
         s.lkef( oe.prv );
 
-        console.log(s.print())
+        var l = s.loops();
+        var v = s.vertices();
+        var f = s.faces();
+        var he = s.halfEdges();
+
+        v.length.should.be.equal(6);
+        f.length.should.be.equal(5);
+        l.length.should.be.equal(5);
+        he.length.should.be.equal(18);
+
+        // each vertex has 3 neighbors
+        v.forEach(function(x){
+            x.neighbors().length.should.be.equal(3);
+        });
+
+        // each loop has >=3 vertices
+        l.forEach(function(x){
+            x.vertices().length.should.be.greaterThan(2);
+        });
+
+        // each loop is non-null
+        f.forEach(function(x){
+            x.l.should.not.be.null;
+        });
 
     });
 });

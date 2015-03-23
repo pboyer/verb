@@ -5,16 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="938890c0-f1ce-4fbd-8322-63610af7f5e6" name="Default" comment="">
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/core/types/DoublyLinkedListExtensions.hx" afterPath="$PROJECT_DIR$/src/verb/core/types/DoublyLinkedListExtensions.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/topo/Loop.hx" afterPath="$PROJECT_DIR$/src/verb/topo/Loop.hx" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/topo/Solid.hx" afterPath="$PROJECT_DIR$/src/verb/topo/Solid.hx" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/eulerOperators.html" afterPath="$PROJECT_DIR$/examples/eulerOperators.html" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/test.js" afterPath="$PROJECT_DIR$/test/test.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/js/threeBasic.js" afterPath="$PROJECT_DIR$/examples/js/threeBasic.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/topoViz.js" afterPath="$PROJECT_DIR$/examples/topoViz.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/js/verb.js" afterPath="$PROJECT_DIR$/build/js/verb.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/js/verbHaxe.js" afterPath="$PROJECT_DIR$/build/js/verbHaxe.js" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/js/verbToThreeConversion.js" afterPath="$PROJECT_DIR$/examples/js/verbToThreeConversion.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="verb.iws" />
@@ -40,11 +32,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="Solid.hx" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Solid.hx" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/verb/topo/Solid.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-0.029985007" vertical-offset="1385" max-vertical-offset="2295">
-              <caret line="213" column="9" selection-start-line="213" selection-start-column="9" selection-end-line="213" selection-end-column="9" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="375" max-vertical-offset="1215">
+              <caret line="161" column="0" selection-start-line="161" selection-start-column="0" selection-end-line="161" selection-end-column="0" />
               <folding>
                 <element signature="e#526#689#0" expanded="false" />
                 <element signature="e#793#1126#0" expanded="false" />
@@ -52,14 +44,17 @@
                 <element signature="e#1946#2944#0" expanded="false" />
                 <element signature="e#3013#3359#0" expanded="false" />
                 <element signature="e#3508#4067#0" expanded="false" />
-                <element signature="e#5507#5559#0" expanded="false" />
-                <element signature="e#5834#5888#0" expanded="false" />
-                <element signature="e#6174#6217#0" expanded="false" />
-                <element signature="e#6261#6304#0" expanded="false" />
-                <element signature="e#6348#6462#0" expanded="false" />
-                <element signature="e#6514#6636#0" expanded="false" />
-                <element signature="e#6700#7020#0" expanded="false" />
-                <element signature="e#7049#7276#0" expanded="false" />
+                <element signature="e#4194#5449#0" expanded="false" />
+                <element signature="e#5489#5541#0" expanded="false" />
+                <element signature="e#5592#5750#0" expanded="false" />
+                <element signature="e#5798#5852#0" expanded="false" />
+                <element signature="e#5907#6071#0" expanded="false" />
+                <element signature="e#6120#6163#0" expanded="false" />
+                <element signature="e#6207#6250#0" expanded="false" />
+                <element signature="e#6294#6408#0" expanded="false" />
+                <element signature="e#6460#6582#0" expanded="false" />
+                <element signature="e#6646#6966#0" expanded="false" />
+                <element signature="e#6995#7222#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -115,13 +110,13 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="test.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="test.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/test/test.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="112343" max-vertical-offset="113025">
-              <caret line="7564" column="29" selection-start-line="7564" selection-start-column="29" selection-end-line="7564" selection-end-column="29" />
+            <state vertical-scroll-proportion="0.16791604" vertical-offset="112688" max-vertical-offset="113370">
+              <caret line="7563" column="0" selection-start-line="7563" selection-start-column="0" selection-end-line="7563" selection-end-column="0" />
               <folding>
-                <element signature="e#0#221057#0" expanded="false" />
+                <element signature="e#0#221682#0" expanded="false" />
               </folding>
             </state>
           </provider>
@@ -210,12 +205,12 @@
         <option value="$PROJECT_DIR$/examples/js/verbToThreeConversion.js" />
         <option value="$PROJECT_DIR$/examples/js/threeBasic.js" />
         <option value="$PROJECT_DIR$/src/verb/core/types/DoublyLinkedListExtensions.hx" />
-        <option value="$PROJECT_DIR$/src/verb/topo/Solid.hx" />
         <option value="$PROJECT_DIR$/src/verb/topo/Loop.hx" />
         <option value="$PROJECT_DIR$/src/verb/topo/Vertex.hx" />
-        <option value="$PROJECT_DIR$/test/test.js" />
         <option value="$PROJECT_DIR$/examples/topoViz.js" />
         <option value="$PROJECT_DIR$/examples/eulerOperators.html" />
+        <option value="$PROJECT_DIR$/src/verb/topo/Solid.hx" />
+        <option value="$PROJECT_DIR$/test/test.js" />
       </list>
     </option>
   </component>
@@ -959,14 +954,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/topo/Loop.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1275">
-          <caret line="67" column="24" selection-start-line="67" selection-start-column="24" selection-end-line="67" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/verb/topo/Topo.hx">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="165">
@@ -980,16 +967,6 @@
         <state vertical-scroll-proportion="0.0" vertical-offset="75" max-vertical-offset="780">
           <caret line="31" column="5" selection-start-line="31" selection-start-column="5" selection-end-line="31" selection-end-column="5" />
           <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/test.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="112343" max-vertical-offset="113025">
-          <caret line="7564" column="29" selection-start-line="7564" selection-start-column="29" selection-end-line="7564" selection-end-column="29" />
-          <folding>
-            <element signature="e#0#221057#0" expanded="false" />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -1019,8 +996,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/verb/topo/Solid.hx">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.029985007" vertical-offset="1385" max-vertical-offset="2295">
-          <caret line="213" column="9" selection-start-line="213" selection-start-column="9" selection-end-line="213" selection-end-column="9" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="375" max-vertical-offset="1215">
+          <caret line="161" column="0" selection-start-line="161" selection-start-column="0" selection-end-line="161" selection-end-column="0" />
           <folding>
             <element signature="e#526#689#0" expanded="false" />
             <element signature="e#793#1126#0" expanded="false" />
@@ -1028,14 +1005,35 @@
             <element signature="e#1946#2944#0" expanded="false" />
             <element signature="e#3013#3359#0" expanded="false" />
             <element signature="e#3508#4067#0" expanded="false" />
-            <element signature="e#5507#5559#0" expanded="false" />
-            <element signature="e#5834#5888#0" expanded="false" />
-            <element signature="e#6174#6217#0" expanded="false" />
-            <element signature="e#6261#6304#0" expanded="false" />
-            <element signature="e#6348#6462#0" expanded="false" />
-            <element signature="e#6514#6636#0" expanded="false" />
-            <element signature="e#6700#7020#0" expanded="false" />
-            <element signature="e#7049#7276#0" expanded="false" />
+            <element signature="e#4194#5449#0" expanded="false" />
+            <element signature="e#5489#5541#0" expanded="false" />
+            <element signature="e#5592#5750#0" expanded="false" />
+            <element signature="e#5798#5852#0" expanded="false" />
+            <element signature="e#5907#6071#0" expanded="false" />
+            <element signature="e#6120#6163#0" expanded="false" />
+            <element signature="e#6207#6250#0" expanded="false" />
+            <element signature="e#6294#6408#0" expanded="false" />
+            <element signature="e#6460#6582#0" expanded="false" />
+            <element signature="e#6646#6966#0" expanded="false" />
+            <element signature="e#6995#7222#0" expanded="false" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/topo/Loop.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1275">
+          <caret line="67" column="24" selection-start-line="67" selection-start-column="24" selection-end-line="67" selection-end-column="24" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/test.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.16791604" vertical-offset="112688" max-vertical-offset="113370">
+          <caret line="7563" column="0" selection-start-line="7563" selection-start-column="0" selection-end-line="7563" selection-end-column="0" />
+          <folding>
+            <element signature="e#0#221682#0" expanded="false" />
           </folding>
         </state>
       </provider>

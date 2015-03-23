@@ -161,7 +161,6 @@ class Solid extends Topo {
     }
 
     // unlike kef, which splits a face - this should join two faces together
-    // TODO: test
     public function lkef(he : HalfEdge) : Solid {
 
         // what if the face has internal rings?
@@ -223,7 +222,6 @@ class Solid extends Topo {
         return f = f.push( new Face(this) );
     }
 
-    // TODO: test
     private function delFace( i : Face ) : Solid {
         if ( i.s != this) {
             throw new Exception("Face is not part of this Solid!");
@@ -237,7 +235,6 @@ class Solid extends Topo {
         return v = v.push( new Vertex( pt ) );
     }
 
-    // TODO: test
     private function delVertex( i : Vertex ) : Solid {
         if ( i.e.l.f.s != this) {
             throw new Exception("Face is not part of this Solid!");
