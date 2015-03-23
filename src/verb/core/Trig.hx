@@ -20,13 +20,11 @@ class Trig {
     // + pt
 
     public static function rayClosestPoint( pt, o, r ) {
-
         var o2pt = Vec.sub(pt,o)
         , do2ptr = Vec.dot(o2pt, r)
         , proj = Vec.add(o, Vec.mul(do2ptr, r));
 
         return proj;
-
     }
 
     // Find the distance of a point to a ray
@@ -40,14 +38,12 @@ class Trig {
     // + the distance
 
     public static function distToRay( pt, o, r ) {
-
         var d = rayClosestPoint( pt, o, r );
         var dif = Vec.sub( d, pt );
 
         return Vec.norm( dif );
 
     }
-
 
     // Determine if three points form a straight line within a given tolerance for their 2 * squared area
     //

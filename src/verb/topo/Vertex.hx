@@ -1,5 +1,6 @@
 package verb.topo;
 
+import verb.core.types.Ray;
 import haxe.ds.IntMap;
 import verb.core.types.IDoublyLinkedList;
 import verb.core.types.NurbsCurveData.Point;

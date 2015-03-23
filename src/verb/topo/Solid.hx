@@ -1,9 +1,15 @@
 package verb.topo;
 
+import verb.core.Intersect;
+import verb.core.Vec;
+import verb.core.Trig;
+import verb.core.types.Ray;
 import haxe.ds.IntMap;
 import verb.core.types.Exception;
 import verb.core.types.DoublyLinkedListExtensions;
 using Lambda;
+
+using verb.core.Vec;
 
 import verb.core.types.Pair;
 import verb.core.types.NurbsCurveData.Point;
@@ -160,7 +166,7 @@ class Solid extends Topo {
         return this.delVertex( kv );
     }
 
-    // unlike kef, which splits a face - this should join two faces together
+    // unlike kef, which splits a face - this lkef joins two faces together
     public function lkef(he : HalfEdge) : Solid {
 
         // what if the face has internal rings?
@@ -182,6 +188,7 @@ class Solid extends Topo {
         // the opposite edge and loop that we will maintain
         var oe = he.opp;
         var ol = oe.l;
+        var of = oe.l.f;
 
         // assign the edges of the given edge to the opposite loop
         var che = he;
@@ -210,6 +217,12 @@ class Solid extends Topo {
         // assign the edge correctly
         if (ol.e == oe){
             ol.e = hc;
+        }
+
+        // move kf's internal rings to of
+        for (l in kf.rings()){
+            l.f = of;
+            of.l.push( l );
         }
 
         // delete the old face from the solid
@@ -274,6 +287,52 @@ class Solid extends Topo {
         return a;
     }
 
+    public function raycast(ray : Ray, tol : Float = 0.001) : RayCastResult {
+
+        var s0 = ray.origin;
+        var s1 = Vec.add( ray.origin, Vec.mul(1.0e6, ray.dir) );
+
+        var d = Math.POSITIVE_INFINITY;
+        var ct = RayCastResultKind.None;
+        var ce : HalfEdge = null;
+        var cv : Vertex = null;
+        var cf : Face = null;
+
+        for (e in edges()){
+            var r = Intersect.segments( e.item0.v.pt, e.item0.nxt.v.pt, s0, s1, tol );
+            if (r == null) continue;
+
+            var cd = Vec.distSquared(r.point1, ray.origin);
+            if (r.u1 > 0.0 && cd < d ){
+                ct = RayCastResultKind.HalfEdge;
+                d = cd;
+            }
+        }
+
+        for (v in vertices()){
+            var r = Trig.rayClosestPoint( v.pt, ray.origin, ray.dir );
+            if (Vec.distSquared(r, v.pt) > tol) continue;
+
+            var cd = Vec.distSquared(r, ray.origin);
+            if (cd < d && ray.dir.dot(Vec.sub( r, ray.origin )) > 0.0){
+                ct = RayCastResultKind.Vertex;
+                d = cd;
+            }
+        }
+
+        for (f in faces()){
+
+        }
+
+        return {
+            distance: d,
+            kind : ct,
+            edge : ce,
+            face : cf,
+            vertex : cv
+        };
+    }
+
     public function print(){
         return "Solid (" +
             vertices().length + " Vertices, " +
@@ -283,6 +342,19 @@ class Solid extends Topo {
         ")";
     }
 }
+
+enum RayCastResultKind {
+    None; HalfEdge; Vertex;  // Face;
+}
+
+typedef RayCastResult = {
+    distance : Float,
+    kind : RayCastResultKind,
+    edge : HalfEdge,
+    face : Face,
+    vertex : Vertex
+}
+
 
 // Key
 //
