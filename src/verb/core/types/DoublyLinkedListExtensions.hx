@@ -3,7 +3,7 @@ package verb.core.types;
 using Lambda;
 
 class DoublyLinkedListExtensions {
-    public static function iterate<T:(IDoublyLinkedList<T>)>( t : T ) : Iterable<T> {
+    public static function iter<T:(IDoublyLinkedList<T>)>( t : T ) : Iterable<T> {
         return new DoublyLinkedListIterator(t);
     }
 

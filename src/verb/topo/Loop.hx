@@ -21,7 +21,7 @@ class Loop implements IDoublyLinkedList<Loop> extends Topo {
     }
 
     public function halfEdges() : Array<HalfEdge> {
-        return e.iterate().array();
+        return e.iter().array();
     }
 
     public function vertices() : Array<Vertex> {

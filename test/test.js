@@ -21,8 +21,6 @@ function last(a){
 }
 
 
-/*
-
 describe("verb.core.Eval.knotSpanGivenN",function(){
 
 	it('returns correct result', function(){
@@ -7171,7 +7169,6 @@ describe("verb.topo.Tess2",function(){
     });
 });
 
-*/
 
 function triangularLamina(){
     var s = verb.topo.Solid.mvfs( [0,0,0] );

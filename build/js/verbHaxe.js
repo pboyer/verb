@@ -5058,7 +5058,7 @@ verb.core.types.CurveTriPoint = $hx_exports.core.CurveTriPoint = function(u,poin
 verb.core.types.CurveTriPoint.__name__ = ["verb","core","types","CurveTriPoint"];
 verb.core.types.DoublyLinkedListExtensions = function() { };
 verb.core.types.DoublyLinkedListExtensions.__name__ = ["verb","core","types","DoublyLinkedListExtensions"];
-verb.core.types.DoublyLinkedListExtensions.iterate = function(t) {
+verb.core.types.DoublyLinkedListExtensions.iter = function(t) {
 	return new verb.core.types.DoublyLinkedListIterator(t);
 };
 verb.core.types.DoublyLinkedListExtensions.push = function(t,i) {
@@ -6090,11 +6090,11 @@ verb.topo.Face.__interfaces__ = [verb.core.types.IDoublyLinkedList];
 verb.topo.Face.__super__ = verb.topo.Topo;
 verb.topo.Face.prototype = $extend(verb.topo.Topo.prototype,{
 	loops: function() {
-		return Lambda.array(verb.core.types.DoublyLinkedListExtensions.iterate(this.l));
+		return Lambda.array(verb.core.types.DoublyLinkedListExtensions.iter(this.l));
 	}
 	,rings: function() {
 		var a = [];
-		var $it0 = $iterator(verb.core.types.DoublyLinkedListExtensions.iterate(this.l))();
+		var $it0 = $iterator(verb.core.types.DoublyLinkedListExtensions.iter(this.l))();
 		while( $it0.hasNext() ) {
 			var il = $it0.next();
 			if(il == this.ol) continue;
@@ -6102,10 +6102,14 @@ verb.topo.Face.prototype = $extend(verb.topo.Topo.prototype,{
 		}
 		return a;
 	}
-	,addLoop: function() {
-		var nl = new verb.topo.Loop(this);
+	,addLoop: function(nl) {
+		if(nl == null) nl = new verb.topo.Loop(this);
 		if(this.ol == null) this.ol = nl;
 		return this.l = verb.core.types.DoublyLinkedListExtensions.push(this.l,nl);
+	}
+	,delLoop: function(kl) {
+		if(kl == this.ol) throw new verb.core.types.Exception("Cannot delete outer loop!");
+		this.l = verb.core.types.DoublyLinkedListExtensions.kill(this.l,kl);
 	}
 	,neighbors: function() {
 		var memo = new haxe.ds.IntMap();
@@ -6176,7 +6180,7 @@ verb.topo.Loop.__interfaces__ = [verb.core.types.IDoublyLinkedList];
 verb.topo.Loop.__super__ = verb.topo.Topo;
 verb.topo.Loop.prototype = $extend(verb.topo.Topo.prototype,{
 	halfEdges: function() {
-		return Lambda.array(verb.core.types.DoublyLinkedListExtensions.iterate(this.e));
+		return Lambda.array(verb.core.types.DoublyLinkedListExtensions.iter(this.e));
 	}
 	,vertices: function() {
 		return this.halfEdges().map(function(e) {
@@ -6333,6 +6337,45 @@ verb.topo.Solid.prototype = $extend(verb.topo.Topo.prototype,{
 		this.delFace(kf);
 		return this;
 	}
+	,lmekr: function(he0,he1) {
+		if(he0.l == he1.l) throw new verb.core.types.Exception("HalfEdges are not from different loops!");
+		if(he0.l.f == he1.l.f) throw new verb.core.types.Exception("HalfEdges must be part of the same face!");
+		var l0 = he0.l;
+		var $it0 = $iterator(verb.core.types.DoublyLinkedListExtensions.iter(he1))();
+		while( $it0.hasNext() ) {
+			var he = $it0.next();
+			he.l = l0;
+		}
+		var ne0 = new verb.topo.HalfEdge(l0,he0.v);
+		var ne1 = new verb.topo.HalfEdge(l0,he1.v);
+		ne0.mate(ne1);
+		he0.prv.nxt = ne0;
+		he1.prv.nxt = ne1;
+		ne0.prv = he0.prv;
+		ne1.prv = he1.prv;
+		he1.prv = ne0;
+		he0.prv = ne1;
+		ne0.nxt = he1;
+		ne1.nxt = he0;
+		return ne0;
+	}
+	,lkfmrh: function(he0,he1) {
+		var of = he0.l.f;
+		var tf = he1.l.f;
+		if(he0.l != of.ol || he0.l.nxt != he0.l) throw new verb.core.types.Exception("First edge must be from outer loop of face with no interior rings!");
+		he0.l.f = tf;
+		verb.core.types.DoublyLinkedListExtensions.push(tf.l,he0.l);
+		this.delFace(he0.l.f);
+		return he0.l;
+	}
+	,lmfkrh: function(he) {
+		var ol = he.l;
+		var of = ol.f;
+		of.delLoop(ol);
+		var nf = this.addFace();
+		nf.addLoop(ol);
+		return nf;
+	}
 	,addFace: function() {
 		return this.f = verb.core.types.DoublyLinkedListExtensions.push(this.f,new verb.topo.Face(this));
 	}
@@ -6350,10 +6393,10 @@ verb.topo.Solid.prototype = $extend(verb.topo.Topo.prototype,{
 		return this;
 	}
 	,vertices: function() {
-		return Lambda.array(verb.core.types.DoublyLinkedListExtensions.iterate(this.v));
+		return Lambda.array(verb.core.types.DoublyLinkedListExtensions.iter(this.v));
 	}
 	,faces: function() {
-		return Lambda.array(verb.core.types.DoublyLinkedListExtensions.iterate(this.f));
+		return Lambda.array(verb.core.types.DoublyLinkedListExtensions.iter(this.f));
 	}
 	,loops: function() {
 		return Lambda.fold(this.faces(),function(f,acc) {

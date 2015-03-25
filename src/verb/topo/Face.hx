@@ -1,5 +1,6 @@
 package verb.topo;
 
+import verb.core.types.Exception;
 import haxe.ds.IntMap;
 
 import verb.core.types.DoublyLinkedListExtensions;
@@ -30,23 +31,32 @@ class Face implements IDoublyLinkedList<Face> extends Topo {
     }
 
     public function loops() : Array<Loop> {
-        return l.iterate().array();
+        return l.iter().array();
     }
 
     // TODO: test
     public function rings() : Array<Loop> {
         var a = [];
-        for (il in l.iterate()){
+        for (il in l.iter()){
             if (il == ol) continue;
             a.push(il);
         }
         return a;
     }
 
-    public function addLoop() : Loop {
-        var nl = new Loop(this);
+    public function addLoop(nl : Loop = null) : Loop {
+        if (nl == null) {
+            nl = new Loop(this);
+        }
         if (ol == null) ol = nl; // the first loop is the outer loop
         return l = l.push(nl);
+    }
+
+    public function delLoop(kl : Loop) : Void {
+        if (kl == ol) {
+            throw new Exception("Cannot delete outer loop!"); // this may be overly conservative
+        }
+        l = l.kill(kl);
     }
 
     // TODO: test

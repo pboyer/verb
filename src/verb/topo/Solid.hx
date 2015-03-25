@@ -1,5 +1,6 @@
 package verb.topo;
 
+import verb.topo.Tess2.PriorityQ;
 import verb.core.Intersect;
 import verb.core.Vec;
 import verb.core.Trig;
@@ -231,6 +232,94 @@ class Solid extends Topo {
         return this;
     }
 
+    // TODO: test
+    // inverse of lkemr
+    // introduces a new edge between two loops, forming a single loop
+    public function lmekr(he0: HalfEdge, he1 : HalfEdge) : HalfEdge {
+
+        // check if the two edges aren't already part of the same loop
+        if (he0.l == he1.l){
+            throw new Exception("HalfEdges are not from different loops!");
+        }
+
+        if (he0.l.f == he1.l.f){
+            throw new Exception("HalfEdges must be part of the same face!");
+        }
+
+        // we keep the first loop arg
+        var l0 = he0.l;
+
+        // for all the edges in loop1, set loop0 as parent
+        for (he in he1.iter()){ he.l = l0; }
+
+        // create two new half edges in loop0
+        var ne0 = new HalfEdge(l0, he0.v);
+        var ne1 = new HalfEdge(l0, he1.v);
+        ne0.mate(ne1);
+
+        // using the two new half edges, rejoin the loop
+        he0.prv.nxt = ne0;
+        he1.prv.nxt = ne1;
+
+        ne0.prv = he0.prv;
+        ne1.prv = he1.prv;
+
+        he1.prv = ne0;
+        he0.prv = ne1;
+
+        ne0.nxt = he1;
+        ne1.nxt = he0;
+
+        return ne0;
+    }
+
+    // TODO: test
+    // kill face make ring hole
+    // we kill the face by making it a ring inside of the face
+    public function lkfmrh(he0 : HalfEdge, he1 : HalfEdge){
+
+        // the face to remove
+        var of = he0.l.f;
+
+        // the target face
+        var tf = he1.l.f;
+
+        // what to do if the face has rings in it? don't allow it?
+        if (he0.l != of.ol || he0.l.nxt != he0.l){
+            throw new Exception("First edge must be from outer loop of face with no interior rings!");
+        }
+
+        // move the original loop to new edge as an interior ring
+        he0.l.f = tf;
+        tf.l.push( he0.l );
+
+        delFace( he0.l.f );
+
+        return he0.l;
+    }
+
+    // TODO: test
+    // create a face by extracting a ring from a face
+    public function lmfkrh( he : HalfEdge ){
+
+        // the original loop (ring)
+        var ol = he.l;
+
+        // its parent face
+        var of = ol.f;
+
+        // remove the original ring from its parent face
+        of.delLoop( ol );
+
+        // the new face
+        var nf = this.addFace();
+
+        // insert the old loop into its parent
+        nf.addLoop(ol);
+
+        return nf;
+    }
+
     private function addFace() : Face {
         return f = f.push( new Face(this) );
     }
@@ -258,11 +347,11 @@ class Solid extends Topo {
     }
 
     public function vertices() : Array<Vertex> {
-        return v.iterate().array();
+        return v.iter().array();
     }
 
     public function faces() : Array<Face> {
-        return f.iterate().array();
+        return f.iter().array();
     }
 
     public function loops() : Array<Loop> {
@@ -287,6 +376,7 @@ class Solid extends Topo {
         return a;
     }
 
+    // TODO : slow as shit, doesn't belong here either
     public function raycast(ray : Ray, tol : Float = 0.001) : RayCastResult {
 
         var s0 = ray.origin;
