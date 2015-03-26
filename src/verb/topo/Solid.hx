@@ -283,26 +283,20 @@ class Solid extends Topo {
     // TODO: test
     // kill face make ring hole
     // we kill the face by making it a ring inside of the face
-    public function lkfmrh(he0 : HalfEdge, he1 : HalfEdge){
+    public function lkfmrh(kf : Face, tf : Face) : Loop {
 
-        // the face to remove
-        var of = he0.l.f;
-
-        // the target face
-        var tf = he1.l.f;
-
-        // what to do if the face has rings in it? don't allow it?
-        if (he0.l != of.ol || he0.l.nxt != he0.l){
-            throw new Exception("First edge must be from outer loop of face with no interior rings!");
+        // what to do if the face has rings in it?
+        if (kf.rings().length > 0){
+            throw new Exception("Cannot insert a face with rings as a ring of another face!");
         }
 
+        delFace( kf );
+
         // move the original loop to new edge as an interior ring
-        he0.l.f = tf;
-        tf.l.push( he0.l );
+        kf.ol.f = tf;
+        tf.l.push( kf.ol );
 
-        delFace( he0.l.f );
-
-        return he0.l;
+        return kf.ol;
     }
 
     // TODO: test

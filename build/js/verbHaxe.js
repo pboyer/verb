@@ -6140,7 +6140,7 @@ verb.topo.Face.prototype = $extend(verb.topo.Topo.prototype,{
 		}).filter(function(x1) {
 			return x1.length > 3;
 		});
-		opts.windingRule = verb.topo.Tess2.WINDING_ODD;
+		opts.windingRule = verb.topo.Tess2.WINDING_POSITIVE;
 		opts.elementType = verb.topo.Tess2.POLYGONS;
 		opts.polySize = 3;
 		opts.normal = this.normal();
@@ -6157,7 +6157,7 @@ verb.topo.Face.prototype = $extend(verb.topo.Topo.prototype,{
 			var v2 = ei.nxt.nxt.v.pt;
 			var v01 = verb.core.Vec.sub(v0,v1);
 			var v21 = verb.core.Vec.sub(v2,v1);
-			var cv = verb.core.Vec.cross(v01,v21);
+			var cv = verb.core.Vec.cross(v21,v01);
 			if(verb.core.Vec.normSquared(cv) > 1e-10) x = verb.core.Vec.add(x,cv);
 		}
 		return verb.core.Vec.normalized(x);
@@ -6372,14 +6372,12 @@ verb.topo.Solid.prototype = $extend(verb.topo.Topo.prototype,{
 		e1.nxt = he0;
 		return e0;
 	}
-	,lkfmrh: function(he0,he1) {
-		var of = he0.l.f;
-		var tf = he1.l.f;
-		if(he0.l != of.ol || he0.l.nxt != he0.l) throw new verb.core.types.Exception("First edge must be from outer loop of face with no interior rings!");
-		he0.l.f = tf;
-		verb.core.types.DoublyLinkedListExtensions.push(tf.l,he0.l);
-		this.delFace(he0.l.f);
-		return he0.l;
+	,lkfmrh: function(kf,tf) {
+		if(kf.rings().length > 0) throw new verb.core.types.Exception("Cannot insert a face with rings as a ring of another face!");
+		this.delFace(kf);
+		kf.ol.f = tf;
+		verb.core.types.DoublyLinkedListExtensions.push(tf.l,kf.ol);
+		return kf.ol;
 	}
 	,lmfkrh: function(he) {
 		var ol = he.l;

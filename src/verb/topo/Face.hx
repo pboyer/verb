@@ -94,7 +94,7 @@ class Face implements IDoublyLinkedList<Face> extends Topo {
 
         opts.contours = loops().map(function(x : Loop){ return x.coords(); })
                                .filter(function(x : Array<Float>){ return x.length > 3; });
-        opts.windingRule = Tess2.WINDING_ODD; // TODO: is this what I want?
+        opts.windingRule = Tess2.WINDING_POSITIVE;
         opts.elementType = Tess2.POLYGONS;
         opts.polySize = 3;
         opts.normal = normal();
@@ -105,7 +105,6 @@ class Face implements IDoublyLinkedList<Face> extends Topo {
 
     public function normal() : Array<Float> {
 
-        // TODO: need legit face eq
         var x = [0.0,0.0,0.0];
 
         for (ei in ol.e.iter()){
@@ -116,7 +115,7 @@ class Face implements IDoublyLinkedList<Face> extends Topo {
             var v01 = v0.sub(v1);
             var v21 = v2.sub(v1);
 
-            var cv : Array<Float>  = v01.cross(v21);
+            var cv : Array<Float> = v21.cross(v01);
 
             if (cv.normSquared() > verb.core.Constants.EPSILON){
                 x = x.add(cv);

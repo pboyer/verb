@@ -7637,6 +7637,7 @@ describe("verb.topo.Solid.lkfmrh",function(){
         })[0];
 
         var tf = tfl[0];
+
         var e0 = tf.l.e.prv;
 
         var nv = s.lmev( tf.l.e, tf.l.e, [2,1,0] );
@@ -7672,7 +7673,7 @@ describe("verb.topo.Solid.lkfmrh",function(){
         var of = s.faces();
 
         // insert nf into the top face as a ring
-        s.lkfmrh( nf.l.e, bf.l.e );
+        s.lkfmrh( nf, bf );
 
         s.edges().length.should.be.equal( oe.length );
         s.halfEdges().length.should.be.equal( ohe.length );

@@ -36,7 +36,6 @@ $(function(){ // on dom ready
 
     var s = triangularPrism();
 
-
     var tf = s.faces().filter(function(x){
         return verb.core.Vec.dot( x.normal(), [0,-1,0] ) > 0;
     })[0];
