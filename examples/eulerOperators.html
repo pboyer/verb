@@ -28,32 +28,38 @@
         return s;
     }
 
-	threeSetup(true);
+    function triangularPrism(){
+        var s = triangularLamina();
 
-    var s = triangularLamina();
-
-    var nvs = s.f.l.halfEdges().map(function(e){
-        return s.lmev( e, e, verb.core.Vec.add( e.v.pt, [0,0,10]) );
-    });
-
-    var nfs = nvs
-        .map(function(v){
-            // get the halfEdges
-            return v.e;
-        })
-        .map(function(e){
-            // form the new side faces
-            return s.lmef(e, e.nxt.nxt.nxt);
+        var nvs = s.f.l.halfEdges().map(function(e){
+            return s.lmev( e, e, verb.core.Vec.add( e.v.pt, [0,0,10]) );
         });
 
-    var tf = s.faces().filter(function(x){
-        return verb.core.Vec.dot( x.normal(), [0,-1,0] ) > 0;
-    })[0];
+        var nfs = nvs
+            .map(function(v){
+                return v.e;
+            })
+            .map(function(e){
+                var nf = s.lmef(e, e.nxt.nxt.nxt);
+                return nf;
+            });
 
-    var oe = tf.ol.e;
-    var f = s.lmef( oe, oe.nxt.nxt );
+        return s;
+    }
 
-    s.lkef( oe.prv );
+	threeSetup(true);
+
+    var s = triangularPrism();
+
+    var tfl = s.faces().filter(function(x){
+        return verb.core.Vec.dot( x.normal(), [0,0,1] ) > 0;
+    });
+
+    var tf = tfl[0];
+
+    console.log( tf.l.e.v.pt );
+    var nv = s.lmev( tf.l.e, tf.l.e, [2,1,0] );
+    //var nl = s.lkemr(nv.e.prv); // now there's a hanging vertex in the face
 
     s.faces().forEach(function(x){
         addMeshToScene( x.toThreeGeometry(), new THREE.MeshNormalMaterial( { side: THREE.DoubleSide, wireframe: false, shading: THREE.SmoothShading, transparent: false, opacity: 0.4 } ));

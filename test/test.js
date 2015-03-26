@@ -19,7 +19,7 @@ function vecShouldBe( expected, test, tol ){
 function last(a){
 	return a[a.length-1];
 }
-
+/*
 
 describe("verb.core.Eval.knotSpanGivenN",function(){
 
@@ -7167,8 +7167,10 @@ describe("verb.topo.Tess2",function(){
         res1.elements.should.eql(res0.elements);
         res1.elementCount.should.eql(res0.elementCount);
     });
+
 });
 
+*/
 
 function triangularLamina(){
     var s = verb.topo.Solid.mvfs( [0,0,0] );
@@ -7587,6 +7589,28 @@ describe("verb.topo.Solid.lkef",function(){
     });
 });
 
+describe("verb.topo.Solid.lmekr",function(){
+    it('can be used to undo a single lkemr', function(){
+        var s = triangularPrism();
 
+        var tfl = s.faces().filter(function(x){
+            return verb.core.Vec.dot( x.normal(), [0,0,1] ) > 0;
+        });
+
+        var tf = tfl[0];
+        var nv = s.lmev( tf.l.e, tf.l.e, [0.1,0.1,1] );
+        var nl = s.lkemr(nv.e.prv); // now there's a hanging vertex in the face
+
+        console.log( tf.l.e.v.pt );
+        console.log( nl.e.v.pt );
+
+
+        var r = s.lmekr( tf.l.e, nl.e );
+
+
+
+
+    });
+});
 
 

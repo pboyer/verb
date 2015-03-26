@@ -1,5 +1,7 @@
 package verb.topo;
 
+import verb.core.Constants;
+import verb.core.types.NurbsCurveData.Point;
 import verb.core.types.Exception;
 import haxe.ds.IntMap;
 
@@ -90,7 +92,8 @@ class Face implements IDoublyLinkedList<Face> extends Topo {
     public function tessellate(){
         var opts = new Tess2Options();
 
-        opts.contours = loops().map(function(x : Loop){ return x.coords(); });
+        opts.contours = loops().map(function(x : Loop){ return x.coords(); })
+                               .filter(function(x : Array<Float>){ return x.length > 3; });
         opts.windingRule = Tess2.WINDING_ODD; // TODO: is this what I want?
         opts.elementType = Tess2.POLYGONS;
         opts.polySize = 3;
@@ -101,14 +104,25 @@ class Face implements IDoublyLinkedList<Face> extends Topo {
     }
 
     public function normal() : Array<Float> {
-        // TODO: specify face eq
-        var v0 = l.e.v.pt;
-        var v1 = l.e.nxt.v.pt;
-        var v2 = l.e.nxt.nxt.v.pt;
 
-        var v01 = v0.sub(v1);
-        var v21 = v2.sub(v1);
+        // TODO: need legit face eq
+        var x = [0.0,0.0,0.0];
 
-        return v01.cross(v21).normalized();
+        for (ei in ol.e.iter()){
+            var v0 : Array<Float> = ei.v.pt;
+            var v1 : Array<Float> = ei.nxt.v.pt;
+            var v2 : Array<Float> = ei.nxt.nxt.v.pt;
+
+            var v01 = v0.sub(v1);
+            var v21 = v2.sub(v1);
+
+            var cv : Array<Float>  = v01.cross(v21);
+
+            if (cv.normSquared() > verb.core.Constants.EPSILON){
+                x = x.add(cv);
+            }
+        }
+
+        return x.normalized();
     }
 }

@@ -6176,6 +6176,8 @@ verb.topo.Face.prototype = $extend(verb.topo.Topo.prototype,{
 		var opts = new verb.topo.Tess2Options();
 		opts.contours = this.loops().map(function(x) {
 			return x.coords();
+		}).filter(function(x1) {
+			return x1.length > 3;
 		});
 		opts.windingRule = verb.topo.Tess2.WINDING_ODD;
 		opts.elementType = verb.topo.Tess2.POLYGONS;
@@ -6185,12 +6187,19 @@ verb.topo.Face.prototype = $extend(verb.topo.Topo.prototype,{
 		return verb.topo.Tess2.tessellate(opts);
 	}
 	,normal: function() {
-		var v0 = this.l.e.v.pt;
-		var v1 = this.l.e.nxt.v.pt;
-		var v2 = this.l.e.nxt.nxt.v.pt;
-		var v01 = verb.core.Vec.sub(v0,v1);
-		var v21 = verb.core.Vec.sub(v2,v1);
-		return verb.core.Vec.normalized(verb.core.Vec.cross(v01,v21));
+		var x = [0.0,0.0,0.0];
+		var $it0 = $iterator(verb.core.types.DoublyLinkedListExtensions.iter(this.ol.e))();
+		while( $it0.hasNext() ) {
+			var ei = $it0.next();
+			var v0 = ei.v.pt;
+			var v1 = ei.nxt.v.pt;
+			var v2 = ei.nxt.nxt.v.pt;
+			var v01 = verb.core.Vec.sub(v0,v1);
+			var v21 = verb.core.Vec.sub(v2,v1);
+			var cv = verb.core.Vec.cross(v01,v21);
+			if(verb.core.Vec.normSquared(cv) > 1e-10) x = verb.core.Vec.add(x,cv);
+		}
+		return verb.core.Vec.normalized(x);
 	}
 });
 verb.topo.HalfEdge = $hx_exports.topo.HalfEdge = function(loop,vertex) {
