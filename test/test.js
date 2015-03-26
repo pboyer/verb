@@ -7590,7 +7590,7 @@ describe("verb.topo.Solid.lkef",function(){
 });
 
 describe("verb.topo.Solid.lmekr",function(){
-    it('can be used to undo a single lkemr', function(){
+    it('can be used to undo a single lkemr to a lone vertex', function(){
         var s = triangularPrism();
 
         var tfl = s.faces().filter(function(x){
@@ -7598,18 +7598,28 @@ describe("verb.topo.Solid.lmekr",function(){
         });
 
         var tf = tfl[0];
+
+        var e0 = tf.l.e.prv;
+
         var nv = s.lmev( tf.l.e, tf.l.e, [0.1,0.1,1] );
         var nl = s.lkemr(nv.e.prv); // now there's a hanging vertex in the face
 
-        console.log( tf.l.e.v.pt );
-        console.log( nl.e.v.pt );
+        var ohe = s.halfEdges();
+        var oe = s.edges();
+        var ol = s.loops();
 
+        var ne = s.lmekr( e0.nxt, nl.e );
 
-        var r = s.lmekr( tf.l.e, nl.e );
+        s.edges().length.should.be.equal( oe.length + 1 );
 
+        // the solid should have one more edge
+        s.halfEdges().length.should.be.equal( ohe.length + 1 );
 
+        // one less loop
+        s.loops().length.should.be.equal( ol.length - 1 );
 
-
+        // the face should have a single loop
+        ne.l.halfEdges().length.should.equal( 5 );
     });
 });
 

@@ -5,8 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="938890c0-f1ce-4fbd-8322-63610af7f5e6" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/src/verb/topo/RayCast.hx" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/topo/Solid.hx" afterPath="$PROJECT_DIR$/src/verb/topo/Solid.hx" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/examples/eulerOperators.html" afterPath="$PROJECT_DIR$/examples/eulerOperators.html" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/test.js" afterPath="$PROJECT_DIR$/test/test.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/js/verb.js" afterPath="$PROJECT_DIR$/build/js/verb.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/js/verbHaxe.js" afterPath="$PROJECT_DIR$/build/js/verbHaxe.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
@@ -34,59 +35,58 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="Solid.hx" pinned="false" current-in-tab="true">
+      <file leaf-file-name="Solid.hx" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/verb/topo/Solid.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="1.9818182" vertical-offset="885" max-vertical-offset="2820">
-              <caret line="388" column="0" selection-start-line="388" selection-start-column="0" selection-end-line="388" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="660" max-vertical-offset="2895">
+              <caret line="252" column="37" selection-start-line="252" selection-start-column="37" selection-end-line="252" selection-end-column="37" />
               <folding>
                 <element signature="e#683#846#0" expanded="false" />
                 <element signature="e#950#1283#0" expanded="false" />
                 <element signature="e#1371#2025#0" expanded="false" />
+                <element signature="e#2103#3101#0" expanded="false" />
                 <element signature="e#3170#3516#0" expanded="false" />
                 <element signature="e#3665#4224#0" expanded="false" />
                 <element signature="e#4350#5764#0" expanded="false" />
-                <element signature="e#7040#7559#0" expanded="false" />
-                <element signature="e#7676#8028#0" expanded="false" />
-                <element signature="e#8068#8120#0" expanded="false" />
-                <element signature="e#8171#8329#0" expanded="false" />
-                <element signature="e#8377#8431#0" expanded="false" />
-                <element signature="e#8486#8650#0" expanded="false" />
-                <element signature="e#8699#8739#0" expanded="false" />
-                <element signature="e#8783#8823#0" expanded="false" />
-                <element signature="e#8867#8981#0" expanded="false" />
-                <element signature="e#9033#9155#0" expanded="false" />
-                <element signature="e#9219#9539#0" expanded="false" />
+                <element signature="e#8334#8386#0" expanded="false" />
+                <element signature="e#8437#8595#0" expanded="false" />
+                <element signature="e#8643#8697#0" expanded="false" />
+                <element signature="e#8752#8916#0" expanded="false" />
+                <element signature="e#8965#9005#0" expanded="false" />
+                <element signature="e#9049#9089#0" expanded="false" />
+                <element signature="e#9133#9247#0" expanded="false" />
+                <element signature="e#9299#9421#0" expanded="false" />
+                <element signature="e#9485#9805#0" expanded="false" />
               </folding>
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="RayCast.hx" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/verb/topo/RayCast.hx">
+      <file leaf-file-name="Verb.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/Verb.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="135" max-vertical-offset="1155">
-              <caret line="38" column="0" selection-start-line="38" selection-start-column="0" selection-end-line="38" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="45" max-vertical-offset="870">
+              <caret line="21" column="0" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="topoViz.html" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/topoViz.html">
+      <file leaf-file-name="Tess2.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/topo/Tess2.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-9.375" vertical-offset="0" max-vertical-offset="705">
-              <caret line="15" column="14" selection-start-line="15" selection-start-column="14" selection-end-line="15" selection-end-column="14" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="480" max-vertical-offset="55140">
+              <caret line="61" column="37" selection-start-line="61" selection-start-column="37" selection-end-line="61" selection-end-column="37" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="topoViz.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/topoViz.js">
+      <file leaf-file-name="Vertex.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/topo/Vertex.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="240" max-vertical-offset="1905">
-              <caret line="34" column="5" selection-start-line="34" selection-start-column="5" selection-end-line="34" selection-end-column="5" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="795">
+              <caret line="30" column="0" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -95,48 +95,18 @@
       <file leaf-file-name="Face.hx" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/verb/topo/Face.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="1170" max-vertical-offset="2010">
-              <caret line="110" column="32" selection-start-line="110" selection-start-column="32" selection-end-line="110" selection-end-column="32" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="235" max-vertical-offset="2010">
+              <caret line="36" column="5" selection-start-line="36" selection-start-column="5" selection-end-line="36" selection-end-column="5" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="test.js" pinned="false" current-in-tab="false">
+      <file leaf-file-name="test.js" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/test/test.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="113445" max-vertical-offset="114330">
-              <caret line="7599" column="24" selection-start-line="7599" selection-start-column="24" selection-end-line="7599" selection-end-column="24" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Vec.hx" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/verb/core/Vec.hx">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="970" max-vertical-offset="3540">
-              <caret line="85" column="0" selection-start-line="85" selection-start-column="0" selection-end-line="85" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="threeBasic.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/js/threeBasic.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="495" max-vertical-offset="2295">
-              <caret line="51" column="0" selection-start-line="51" selection-start-column="0" selection-end-line="51" selection-end-column="0" />
-              <folding />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="verbToThreeConversion.js" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/examples/js/verbToThreeConversion.js">
-          <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="60" max-vertical-offset="1425">
-              <caret line="26" column="0" selection-start-line="26" selection-start-column="0" selection-end-line="26" selection-end-column="0" />
+            <state vertical-scroll-proportion="0.58181816" vertical-offset="113655" max-vertical-offset="114480">
+              <caret line="7609" column="0" selection-start-line="7609" selection-start-column="0" selection-end-line="7609" selection-end-column="0" />
               <folding />
             </state>
           </provider>
@@ -145,8 +115,38 @@
       <file leaf-file-name="eulerOperators.html" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/examples/eulerOperators.html">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-17.75" vertical-offset="474" max-vertical-offset="1275">
-              <caret line="60" column="4" selection-start-line="60" selection-start-column="4" selection-end-line="60" selection-end-column="4" />
+            <state vertical-scroll-proportion="-16.25" vertical-offset="450" max-vertical-offset="1365">
+              <caret line="56" column="0" selection-start-line="56" selection-start-column="0" selection-end-line="56" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="HalfEdge.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/topo/HalfEdge.hx">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="540">
+              <caret line="12" column="28" selection-start-line="12" selection-start-column="28" selection-end-line="12" selection-end-column="28" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Topo.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/topo/Topo.hx">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="165">
+              <caret line="3" column="36" selection-start-line="3" selection-start-column="36" selection-end-line="3" selection-end-column="36" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="Loop.hx" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/verb/topo/Loop.hx">
+          <provider selected="true" editor-type-id="text-editor">
+            <state vertical-scroll-proportion="0.0" vertical-offset="450" max-vertical-offset="1275">
+              <caret line="45" column="28" selection-start-line="45" selection-start-column="28" selection-end-line="45" selection-end-column="28" />
               <folding />
             </state>
           </provider>
@@ -203,14 +203,14 @@
         <option value="$PROJECT_DIR$/src/verb/core/Trig.hx" />
         <option value="$PROJECT_DIR$/examples/js/three.min.js" />
         <option value="$PROJECT_DIR$/examples/js/threeBasic.js" />
-        <option value="$PROJECT_DIR$/test/test.js" />
         <option value="$PROJECT_DIR$/examples/topoViz.js" />
-        <option value="$PROJECT_DIR$/examples/eulerOperators.html" />
         <option value="$PROJECT_DIR$/src/verb/core/Vec.hx" />
         <option value="$PROJECT_DIR$/src/verb/topo/Face.hx" />
         <option value="$PROJECT_DIR$/examples/js/verbToThreeConversion.js" />
-        <option value="$PROJECT_DIR$/src/verb/topo/Solid.hx" />
         <option value="$PROJECT_DIR$/src/verb/topo/RayCast.hx" />
+        <option value="$PROJECT_DIR$/examples/eulerOperators.html" />
+        <option value="$PROJECT_DIR$/src/verb/topo/Solid.hx" />
+        <option value="$PROJECT_DIR$/test/test.js" />
       </list>
     </option>
   </component>
@@ -904,66 +904,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/topo/HalfEdge.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="540">
-          <caret line="12" column="28" selection-start-line="12" selection-start-column="28" selection-end-line="12" selection-end-column="28" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/Verb.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="870">
-          <caret line="21" column="0" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/topo/Tess2.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="480" max-vertical-offset="55140">
-          <caret line="61" column="37" selection-start-line="61" selection-start-column="37" selection-end-line="61" selection-end-column="37" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/topo/Topo.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="165">
-          <caret line="3" column="36" selection-start-line="3" selection-start-column="36" selection-end-line="3" selection-end-column="36" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/topo/Vertex.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="795">
-          <caret line="32" column="5" selection-start-line="32" selection-start-column="5" selection-end-line="32" selection-end-column="5" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/topo/Loop.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1275">
-          <caret line="17" column="0" selection-start-line="17" selection-start-column="0" selection-end-line="17" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/examples/topoViz.html">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="-9.375" vertical-offset="0" max-vertical-offset="705">
           <caret line="15" column="14" selection-start-line="15" selection-start-column="14" selection-end-line="15" selection-end-column="14" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/examples/eulerOperators.html">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-17.75" vertical-offset="474" max-vertical-offset="1275">
-          <caret line="60" column="4" selection-start-line="60" selection-start-column="4" selection-end-line="60" selection-end-column="4" />
           <folding />
         </state>
       </provider>
@@ -980,22 +924,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="970" max-vertical-offset="3540">
           <caret line="85" column="0" selection-start-line="85" selection-start-column="0" selection-end-line="85" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test/test.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="113445" max-vertical-offset="114330">
-          <caret line="7599" column="24" selection-start-line="7599" selection-start-column="24" selection-end-line="7599" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/verb/topo/Face.hx">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="1170" max-vertical-offset="2010">
-          <caret line="110" column="32" selection-start-line="110" selection-start-column="32" selection-end-line="110" selection-end-column="32" />
           <folding />
         </state>
       </provider>
@@ -1024,29 +952,100 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/topo/Tess2.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="480" max-vertical-offset="55140">
+          <caret line="61" column="37" selection-start-line="61" selection-start-column="37" selection-end-line="61" selection-end-column="37" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/Verb.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="870">
+          <caret line="21" column="0" selection-start-line="21" selection-start-column="0" selection-end-line="21" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/examples/eulerOperators.html">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="-16.25" vertical-offset="450" max-vertical-offset="1365">
+          <caret line="56" column="0" selection-start-line="56" selection-start-column="0" selection-end-line="56" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/topo/Topo.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="165">
+          <caret line="3" column="36" selection-start-line="3" selection-start-column="36" selection-end-line="3" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/topo/Vertex.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="795">
+          <caret line="30" column="0" selection-start-line="30" selection-start-column="0" selection-end-line="30" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/topo/Loop.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="450" max-vertical-offset="1275">
+          <caret line="45" column="28" selection-start-line="45" selection-start-column="28" selection-end-line="45" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/topo/HalfEdge.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="540">
+          <caret line="12" column="28" selection-start-line="12" selection-start-column="28" selection-end-line="12" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/verb/topo/Face.hx">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="235" max-vertical-offset="2010">
+          <caret line="36" column="5" selection-start-line="36" selection-start-column="5" selection-end-line="36" selection-end-column="5" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/verb/topo/Solid.hx">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="1.9818182" vertical-offset="885" max-vertical-offset="2820">
-          <caret line="388" column="0" selection-start-line="388" selection-start-column="0" selection-end-line="388" selection-end-column="0" />
+        <state vertical-scroll-proportion="0.0" vertical-offset="660" max-vertical-offset="2895">
+          <caret line="252" column="37" selection-start-line="252" selection-start-column="37" selection-end-line="252" selection-end-column="37" />
           <folding>
             <element signature="e#683#846#0" expanded="false" />
             <element signature="e#950#1283#0" expanded="false" />
             <element signature="e#1371#2025#0" expanded="false" />
+            <element signature="e#2103#3101#0" expanded="false" />
             <element signature="e#3170#3516#0" expanded="false" />
             <element signature="e#3665#4224#0" expanded="false" />
             <element signature="e#4350#5764#0" expanded="false" />
-            <element signature="e#7040#7559#0" expanded="false" />
-            <element signature="e#7676#8028#0" expanded="false" />
-            <element signature="e#8068#8120#0" expanded="false" />
-            <element signature="e#8171#8329#0" expanded="false" />
-            <element signature="e#8377#8431#0" expanded="false" />
-            <element signature="e#8486#8650#0" expanded="false" />
-            <element signature="e#8699#8739#0" expanded="false" />
-            <element signature="e#8783#8823#0" expanded="false" />
-            <element signature="e#8867#8981#0" expanded="false" />
-            <element signature="e#9033#9155#0" expanded="false" />
-            <element signature="e#9219#9539#0" expanded="false" />
+            <element signature="e#8334#8386#0" expanded="false" />
+            <element signature="e#8437#8595#0" expanded="false" />
+            <element signature="e#8643#8697#0" expanded="false" />
+            <element signature="e#8752#8916#0" expanded="false" />
+            <element signature="e#8965#9005#0" expanded="false" />
+            <element signature="e#9049#9089#0" expanded="false" />
+            <element signature="e#9133#9247#0" expanded="false" />
+            <element signature="e#9299#9421#0" expanded="false" />
+            <element signature="e#9485#9805#0" expanded="false" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/test/test.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.58181816" vertical-offset="113655" max-vertical-offset="114480">
+          <caret line="7609" column="0" selection-start-line="7609" selection-start-column="0" selection-end-line="7609" selection-end-column="0" />
+          <folding />
         </state>
       </provider>
     </entry>

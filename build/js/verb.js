@@ -6387,25 +6387,29 @@ verb.topo.Solid.prototype = $extend(verb.topo.Topo.prototype,{
 	}
 	,lmekr: function(he0,he1) {
 		if(he0.l == he1.l) throw new verb.core.types.Exception("HalfEdges are not from different loops!");
-		if(he0.l.f == he1.l.f) throw new verb.core.types.Exception("HalfEdges must be part of the same face!");
+		if(he0.l.f != he1.l.f) throw new verb.core.types.Exception("HalfEdges must be part of the same face!");
+		var kl = he1.l;
+		kl.f.delLoop(kl);
 		var l0 = he0.l;
 		var $it0 = $iterator(verb.core.types.DoublyLinkedListExtensions.iter(he1))();
 		while( $it0.hasNext() ) {
 			var he = $it0.next();
 			he.l = l0;
 		}
-		var ne0 = new verb.topo.HalfEdge(l0,he0.v);
-		var ne1 = new verb.topo.HalfEdge(l0,he1.v);
-		ne0.mate(ne1);
-		he0.prv.nxt = ne0;
-		he1.prv.nxt = ne1;
-		ne0.prv = he0.prv;
-		ne1.prv = he1.prv;
-		he1.prv = ne0;
-		he0.prv = ne1;
-		ne0.nxt = he1;
-		ne1.nxt = he0;
-		return ne0;
+		var e0;
+		if(he0.nxt == he0) e0 = he0; else e0 = new verb.topo.HalfEdge(l0,he0.v);
+		var e1;
+		if(he1.nxt == he1) e1 = he1; else e1 = new verb.topo.HalfEdge(l0,he1.v);
+		e0.mate(e1);
+		he0.prv.nxt = e0;
+		he1.prv.nxt = e1;
+		e0.prv = he0.prv;
+		e1.prv = he1.prv;
+		he1.prv = e0;
+		he0.prv = e1;
+		e0.nxt = he1;
+		e1.nxt = he0;
+		return e0;
 	}
 	,lkfmrh: function(he0,he1) {
 		var of = he0.l.f;

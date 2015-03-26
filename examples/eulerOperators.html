@@ -57,9 +57,15 @@
 
     var tf = tfl[0];
 
-    console.log( tf.l.e.v.pt );
+    var e0 = tf.l.e.prv;
+
     var nv = s.lmev( tf.l.e, tf.l.e, [2,1,0] );
-    //var nl = s.lkemr(nv.e.prv); // now there's a hanging vertex in the face
+    var nl = s.lkemr(nv.e.prv); // now there's a hanging vertex in the face
+
+    var oe = s.halfEdges();
+    var ol = s.loops();
+
+    var ne = s.lmekr( e0.nxt, nl.e );
 
     s.faces().forEach(function(x){
         addMeshToScene( x.toThreeGeometry(), new THREE.MeshNormalMaterial( { side: THREE.DoubleSide, wireframe: false, shading: THREE.SmoothShading, transparent: false, opacity: 0.4 } ));

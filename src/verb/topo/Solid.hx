@@ -232,7 +232,7 @@ class Solid extends Topo {
         return this;
     }
 
-    // TODO: test
+    // TODO: test with two rings with non-single length, with first argument as length1
     // inverse of lkemr
     // introduces a new edge between two loops, forming a single loop
     public function lmekr(he0: HalfEdge, he1 : HalfEdge) : HalfEdge {
@@ -242,35 +242,42 @@ class Solid extends Topo {
             throw new Exception("HalfEdges are not from different loops!");
         }
 
-        if (he0.l.f == he1.l.f){
+        if (he0.l.f != he1.l.f){
             throw new Exception("HalfEdges must be part of the same face!");
         }
+
+        // remove the second loop
+        var kl : Loop = he1.l;
+        kl.f.delLoop( kl );
 
         // we keep the first loop arg
         var l0 = he0.l;
 
         // for all the edges in loop1, set loop0 as parent
-        for (he in he1.iter()){ he.l = l0; }
+        for (he in he1.iter()){
+            he.l = l0;
+        }
 
-        // create two new half edges in loop0
-        var ne0 = new HalfEdge(l0, he0.v);
-        var ne1 = new HalfEdge(l0, he1.v);
-        ne0.mate(ne1);
+        // create two new half edges in loop0, accounting for base case
+        var e0 : HalfEdge = he0.nxt == he0 ? he0 : new HalfEdge(l0, he0.v);
+        var e1 : HalfEdge = he1.nxt == he1 ? he1 : new HalfEdge(l0, he1.v);
+
+        e0.mate(e1);
 
         // using the two new half edges, rejoin the loop
-        he0.prv.nxt = ne0;
-        he1.prv.nxt = ne1;
+        he0.prv.nxt = e0;
+        he1.prv.nxt = e1;
 
-        ne0.prv = he0.prv;
-        ne1.prv = he1.prv;
+        e0.prv = he0.prv;
+        e1.prv = he1.prv;
 
-        he1.prv = ne0;
-        he0.prv = ne1;
+        he1.prv = e0;
+        he0.prv = e1;
 
-        ne0.nxt = he1;
-        ne1.nxt = he0;
+        e0.nxt = he1;
+        e1.nxt = he0;
 
-        return ne0;
+        return e0;
     }
 
     // TODO: test
