@@ -6471,63 +6471,10 @@ verb.topo.Solid.prototype = $extend(verb.topo.Topo.prototype,{
 		}
 		return a;
 	}
-	,raycast: function(ray,tol) {
-		if(tol == null) tol = 0.001;
-		var s0 = ray.origin;
-		var s1 = verb.core.Vec.add(ray.origin,verb.core.Vec.mul(1.0e6,ray.dir));
-		var d = Math.POSITIVE_INFINITY;
-		var ct = verb.topo.RayCastResultKind.None;
-		var ce = null;
-		var cv = null;
-		var cf = null;
-		var _g = 0;
-		var _g1 = this.edges();
-		while(_g < _g1.length) {
-			var e = _g1[_g];
-			++_g;
-			var r = verb.core.Intersect.segments(e.item0.v.pt,e.item0.nxt.v.pt,s0,s1,tol);
-			if(r == null) continue;
-			var cd = verb.core.Vec.distSquared(r.point1,ray.origin);
-			if(r.u1 > 0.0 && cd < d) {
-				ct = verb.topo.RayCastResultKind.HalfEdge;
-				d = cd;
-			}
-		}
-		var _g2 = 0;
-		var _g11 = this.vertices();
-		while(_g2 < _g11.length) {
-			var v = _g11[_g2];
-			++_g2;
-			var r1 = verb.core.Trig.rayClosestPoint(v.pt,ray.origin,ray.dir);
-			if(verb.core.Vec.distSquared(r1,v.pt) > tol) continue;
-			var cd1 = verb.core.Vec.distSquared(r1,ray.origin);
-			if(cd1 < d && verb.core.Vec.dot(ray.dir,verb.core.Vec.sub(r1,ray.origin)) > 0.0) {
-				ct = verb.topo.RayCastResultKind.Vertex;
-				d = cd1;
-			}
-		}
-		var _g3 = 0;
-		var _g12 = this.faces();
-		while(_g3 < _g12.length) {
-			var f = _g12[_g3];
-			++_g3;
-		}
-		return { distance : d, kind : ct, edge : ce, face : cf, vertex : cv};
-	}
 	,print: function() {
 		return "Solid (" + this.vertices().length + " Vertices, " + this.faces().length + " Faces, " + this.loops().length + " Loops, " + this.halfEdges().length + " HalfEdges" + ")";
 	}
 });
-verb.topo.RayCastResultKind = { __constructs__ : ["None","HalfEdge","Vertex"] };
-verb.topo.RayCastResultKind.None = ["None",0];
-verb.topo.RayCastResultKind.None.toString = $estr;
-verb.topo.RayCastResultKind.None.__enum__ = verb.topo.RayCastResultKind;
-verb.topo.RayCastResultKind.HalfEdge = ["HalfEdge",1];
-verb.topo.RayCastResultKind.HalfEdge.toString = $estr;
-verb.topo.RayCastResultKind.HalfEdge.__enum__ = verb.topo.RayCastResultKind;
-verb.topo.RayCastResultKind.Vertex = ["Vertex",2];
-verb.topo.RayCastResultKind.Vertex.toString = $estr;
-verb.topo.RayCastResultKind.Vertex.__enum__ = verb.topo.RayCastResultKind;
 verb.topo.Tess2Options = $hx_exports.topo.Tess2Options = function() {
 	this.contours = [];
 	this.debug = false;

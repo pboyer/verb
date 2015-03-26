@@ -376,53 +376,6 @@ class Solid extends Topo {
         return a;
     }
 
-    // TODO : slow as shit, doesn't belong here either
-    public function raycast(ray : Ray, tol : Float = 0.001) : RayCastResult {
-
-        var s0 = ray.origin;
-        var s1 = Vec.add( ray.origin, Vec.mul(1.0e6, ray.dir) );
-
-        var d = Math.POSITIVE_INFINITY;
-        var ct = RayCastResultKind.None;
-        var ce : HalfEdge = null;
-        var cv : Vertex = null;
-        var cf : Face = null;
-
-        for (e in edges()){
-            var r = Intersect.segments( e.item0.v.pt, e.item0.nxt.v.pt, s0, s1, tol );
-            if (r == null) continue;
-
-            var cd = Vec.distSquared(r.point1, ray.origin);
-            if (r.u1 > 0.0 && cd < d ){
-                ct = RayCastResultKind.HalfEdge;
-                d = cd;
-            }
-        }
-
-        for (v in vertices()){
-            var r = Trig.rayClosestPoint( v.pt, ray.origin, ray.dir );
-            if (Vec.distSquared(r, v.pt) > tol) continue;
-
-            var cd = Vec.distSquared(r, ray.origin);
-            if (cd < d && ray.dir.dot(Vec.sub( r, ray.origin )) > 0.0){
-                ct = RayCastResultKind.Vertex;
-                d = cd;
-            }
-        }
-
-        for (f in faces()){
-
-        }
-
-        return {
-            distance: d,
-            kind : ct,
-            edge : ce,
-            face : cf,
-            vertex : cv
-        };
-    }
-
     public function print(){
         return "Solid (" +
             vertices().length + " Vertices, " +
@@ -433,17 +386,7 @@ class Solid extends Topo {
     }
 }
 
-enum RayCastResultKind {
-    None; HalfEdge; Vertex;  // Face;
-}
 
-typedef RayCastResult = {
-    distance : Float,
-    kind : RayCastResultKind,
-    edge : HalfEdge,
-    face : Face,
-    vertex : Vertex
-}
 
 
 // Key
