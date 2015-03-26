@@ -7179,8 +7179,8 @@ function triangularLamina(){
     var v0 = s.v;
     var f0 = s.f;
 
-    var nv0 = s.lmev( e0, e0, [1,0,0] );
-    nv1 = s.lmev( nv0.e, nv0.e, [1,1,0] );
+    var nv0 = s.lmev( e0, e0, [10,0,0] );
+    nv1 = s.lmev( nv0.e, nv0.e, [10,10,0] );
 
     var nf = s.lmef( v0.e, v0.e.nxt.nxt );
 
@@ -7191,7 +7191,7 @@ function triangularPrism(){
     var s = triangularLamina();
 
     var nvs = s.f.l.halfEdges().map(function(e){
-        return s.lmev( e, e, verb.core.Vec.add( e.v.pt, [0,0,1]) );
+        return s.lmev( e, e, verb.core.Vec.add( e.v.pt, [0,0,10]) );
     });
 
     var nfs = nvs
@@ -7620,6 +7620,69 @@ describe("verb.topo.Solid.lmekr",function(){
 
         // the face should have a single loop
         ne.l.halfEdges().length.should.equal( 5 );
+    });
+});
+
+describe("verb.topo.Solid.lkfmrh",function(){
+    it('can be used to form a new hole', function(){
+
+        var s = triangularPrism();
+
+        var tfl = s.faces().filter(function(x){
+            return verb.core.Vec.dot( x.normal(), [0,0,1] ) > 0;
+        });
+
+        var bf = s.faces().filter(function(x){
+            return verb.core.Vec.dot( x.normal(), [0,0,-1] ) > 0;
+        })[0];
+
+        var tf = tfl[0];
+        var e0 = tf.l.e.prv;
+
+        var nv = s.lmev( tf.l.e, tf.l.e, [2,1,0] );
+        var nl = s.lkemr(nv.e.prv);
+
+        var v0 = nl.e.v;
+
+        // make new face inside of this one
+        var nv1 = s.lmev( nl.e, nl.e, [9,1,0] );
+        var nv2 = s.lmev( nv1.e, nv1.e, [9,8,0] );
+        var nf = s.lmef( v0.e, v0.e.nxt.nxt );
+
+        // on each vertex of the outer loop of the new face, do an mev
+        var nvs = nf.l.halfEdges().map(function(e){
+            return s.lmev( e, e, verb.core.Vec.add( e.v.pt, [0,0,10]) ); // this extends up to the top face
+        });
+
+        // now iterate around, introducing new faces on every side, now we're extruding the interior face
+        var nfs = nvs
+            .map(function(v){
+                return v.e;
+            })
+            .map(function(e){
+                var nf = s.lmef(e, e.nxt.nxt.nxt);
+                nf.l.halfEdges().length.should.equal( 4 );
+                return nf;
+            });
+
+        // before apply lkfmrh
+        var ohe = s.halfEdges();
+        var oe = s.edges();
+        var ol = s.loops();
+        var of = s.faces();
+
+        // insert nf into the top face as a ring
+        s.lkfmrh( nf.l.e, bf.l.e );
+
+        s.edges().length.should.be.equal( oe.length );
+        s.halfEdges().length.should.be.equal( ohe.length );
+        s.loops().length.should.be.equal( ol.length );
+
+        // the face should now have an inner ring
+        bf.loops().length.should.equal( 2 );
+
+        // one less face!
+        s.faces().length.should.equal( of.length - 1 );
     });
 });
 
