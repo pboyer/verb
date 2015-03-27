@@ -19,7 +19,7 @@ function vecShouldBe( expected, test, tol ){
 function last(a){
 	return a[a.length-1];
 }
-/*
+
 
 describe("verb.core.Eval.knotSpanGivenN",function(){
 
@@ -7170,8 +7170,6 @@ describe("verb.topo.Tess2",function(){
 
 });
 
-*/
-
 function triangularLamina(){
     var s = verb.topo.Solid.mvfs( [0,0,0] );
 
@@ -7200,7 +7198,6 @@ function triangularPrism(){
         })
         .map(function(e){
             var nf = s.lmef(e, e.nxt.nxt.nxt);
-            nf.l.halfEdges().length.should.equal( 4 );
             return nf;
         });
 
@@ -7684,6 +7681,75 @@ describe("verb.topo.Solid.lkfmrh",function(){
 
         // one less face!
         s.faces().length.should.equal( of.length - 1 );
+    });
+});
+
+
+function hollowPrism(){
+
+    var s = triangularPrism();
+
+    var tfl = s.faces().filter(function(x){
+        return verb.core.Vec.dot( x.normal(), [0,0,1] ) > 0;
+    });
+
+    var bf = s.faces().filter(function(x){
+        return verb.core.Vec.dot( x.normal(), [0,0,-1] ) > 0;
+    })[0];
+
+    var tf = tfl[0];
+    var e0 = tf.l.e.prv;
+
+    var nv = s.lmev( tf.l.e, tf.l.e, [2,1,10] );
+    var nl = s.lkemr(nv.e.prv);
+
+    var v0 = nl.e.v;
+
+    // make new face inside of this one
+    var nv1 = s.lmev( nl.e, nl.e, [9,1,10] );
+    var nv2 = s.lmev( nv1.e, nv1.e, [9,8,10] );
+    var nf = s.lmef( v0.e, v0.e.nxt.nxt );
+
+    // on each vertex of the outer loop of the new face, do an mev
+    var nvs = nf.l.halfEdges().map(function(e){
+        return s.lmev( e, e, verb.core.Vec.add( e.v.pt, [0,0,-10]) ); // this extends up to the top face
+    });
+
+    // now iterate around, introducing new faces on every side, now we're extruding the interior face
+    var nfs = nvs
+        .map(function(v){
+            return v.e;
+        })
+        .map(function(e){
+            return s.lmef(e, e.nxt.nxt.nxt);
+        });
+
+    s.lkfmrh( nf, bf );
+
+    return s;
+}
+
+describe("verb.topo.Analyze.volume",function(){
+    it('computes correct volume for triangular prism', function(){
+        var s = triangularPrism();
+        verb.topo.Analyze.volume( s ).should.equal( 500 );
+    });
+
+    it('computes correct volume for hollow prism', function(){
+        var s = hollowPrism();
+        verb.topo.Analyze.volume( s ).should.equal( 500 - 245 );
+    });
+});
+
+describe("verb.topo.Analyze.area",function(){
+    it('computes correct area for triangular prism', function(){
+        var s = triangularPrism();
+        verb.topo.Analyze.area( s ).should.equal( 200 + 100 + 10 * 10 * Math.sqrt(2) );
+    });
+
+    it('computes correct volume for hollow prism', function(){
+        var s = hollowPrism();
+        verb.topo.Analyze.area( s ).should.equal( 200 + (100 - 49) + 10 * 10 * Math.sqrt(2) + 10*7*Math.sqrt(2) + 2*7*10  );
     });
 });
 

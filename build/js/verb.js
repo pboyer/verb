@@ -6116,6 +6116,57 @@ verb.geom.SweptSurface.prototype = $extend(verb.geom.NurbsSurface.prototype,{
 	}
 });
 verb.topo = {};
+verb.topo.Analyze = $hx_exports.topo.Analyze = function() { };
+verb.topo.Analyze.__name__ = ["verb","topo","Analyze"];
+verb.topo.Analyze.volume = function(s,o) {
+	if(o == null) o = [0.0,0.0,0.0];
+	var v = 0.0;
+	var $it0 = $iterator(verb.core.types.DoublyLinkedListExtensions.iter(s.f))();
+	while( $it0.hasNext() ) {
+		var f = $it0.next();
+		var $it1 = $iterator(verb.core.types.DoublyLinkedListExtensions.iter(f.l))();
+		while( $it1.hasNext() ) {
+			var l = $it1.next();
+			var se = l.e;
+			var ce = se.nxt;
+			do {
+				v += verb.topo.Analyze.tetravol(se.v.pt,ce.v.pt,ce.nxt.v.pt,o);
+				ce = ce.nxt;
+			} while(ce.nxt != se);
+		}
+	}
+	return v / 6.0;
+};
+verb.topo.Analyze.tetravol = function(a,b,c,d) {
+	return verb.core.Vec.dot(verb.core.Vec.sub(a,d),verb.core.Vec.cross(verb.core.Vec.sub(b,d),verb.core.Vec.sub(c,d)));
+};
+verb.topo.Analyze.area = function(s) {
+	return Lambda.fold(verb.core.types.DoublyLinkedListExtensions.iter(s.f),function(f,a) {
+		return a + verb.topo.Analyze.faceArea(f);
+	},0.0);
+};
+verb.topo.Analyze.faceArea = function(f) {
+	var n = f.normal();
+	return Lambda.fold(verb.core.types.DoublyLinkedListExtensions.iter(f.l),function(l,a) {
+		return a + verb.topo.Analyze.loopArea(l,n);
+	},0.0);
+};
+verb.topo.Analyze.loopArea = function(l,n) {
+	var e = l.e;
+	if(e == e.nxt || e == e.nxt.nxt) return 0.0;
+	var v = 0.0;
+	if(n == null) n = l.f.normal();
+	var se = l.e;
+	var o = l.e.v.pt;
+	var ce = se.nxt;
+	do {
+		var a = ce.v.pt;
+		var b = ce.nxt.v.pt;
+		v += verb.core.Vec.dot(n,verb.core.Vec.cross(verb.core.Vec.sub(a,o),verb.core.Vec.sub(b,o)));
+		ce = ce.nxt;
+	} while(ce.nxt != se);
+	return v / 2;
+};
 verb.topo.Topo = function() {
 	this.id = verb.topo.Topo.counter++;
 };
@@ -6418,8 +6469,7 @@ verb.topo.Solid.prototype = $extend(verb.topo.Topo.prototype,{
 		verb.core.types.DoublyLinkedListExtensions.push(tf.l,kf.ol);
 		return kf.ol;
 	}
-	,lmfkrh: function(he) {
-		var ol = he.l;
+	,lmfkrh: function(ol) {
 		var of = ol.f;
 		of.delLoop(ol);
 		var nf = this.addFace();

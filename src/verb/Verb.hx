@@ -1,6 +1,7 @@
 package verb;
 
 // topology
+import verb.topo.Analyze;
 import verb.topo.Solid;
 import verb.topo.Face;
 import verb.topo.Vertex;

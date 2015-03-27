@@ -47,51 +47,53 @@
         return s;
     }
 
-	threeSetup(true);
+    function hollowPrism(){
 
-    var s = triangularPrism();
+        var s = triangularPrism();
 
-    var tfl = s.faces().filter(function(x){
-        return verb.core.Vec.dot( x.normal(), [0,0,1] ) > 0;
-    });
-
-    var bf = s.faces().filter(function(x){
-        return verb.core.Vec.dot( x.normal(), [0,0,-1] ) > 0;
-    })[0];
-
-    var tf = tfl[0];
-    var e0 = tf.l.e.prv;
-
-    console.log(tf.normal());
-
-    console.log("hi", tf.l.e.v.pt);
-
-    var nv = s.lmev( tf.l.e, tf.l.e, [2,1,10] );
-    var nl = s.lkemr(nv.e.prv);
-
-    var v0 = nl.e.v;
-
-    // make new face inside of this one
-    var nv1 = s.lmev( nl.e, nl.e, [9,1,10] );
-    var nv2 = s.lmev( nv1.e, nv1.e, [9,8,10] );
-    var nf = s.lmef( v0.e, v0.e.nxt.nxt );
-
-    // on each vertex of the outer loop of the new face, do an mev
-    var nvs = nf.l.halfEdges().map(function(e){
-        return s.lmev( e, e, verb.core.Vec.add( e.v.pt, [0,0,-10]) ); // this extends up to the top face
-    });
-
-    // now iterate around, introducing new faces on every side, now we're extruding the interior face
-    var nfs = nvs
-        .map(function(v){
-            return v.e;
-        })
-        .map(function(e){
-            return s.lmef(e, e.nxt.nxt.nxt);
+        var tfl = s.faces().filter(function(x){
+            return verb.core.Vec.dot( x.normal(), [0,0,1] ) > 0;
         });
 
-    // inert nf into the top face
-    s.lkfmrh( nf, bf );
+        var bf = s.faces().filter(function(x){
+            return verb.core.Vec.dot( x.normal(), [0,0,-1] ) > 0;
+        })[0];
+
+        var tf = tfl[0];
+        var e0 = tf.l.e.prv;
+
+        var nv = s.lmev( tf.l.e, tf.l.e, [2,1,10] );
+        var nl = s.lkemr(nv.e.prv);
+
+        var v0 = nl.e.v;
+
+        // make new face inside of this one
+        var nv1 = s.lmev( nl.e, nl.e, [9,1,10] );
+        var nv2 = s.lmev( nv1.e, nv1.e, [9,8,10] );
+        var nf = s.lmef( v0.e, v0.e.nxt.nxt );
+
+        // on each vertex of the outer loop of the new face, do an mev
+        var nvs = nf.l.halfEdges().map(function(e){
+            return s.lmev( e, e, verb.core.Vec.add( e.v.pt, [0,0,-10]) ); // this extends up to the top face
+        });
+
+        // now iterate around, introducing new faces on every side, now we're extruding the interior face
+        var nfs = nvs
+            .map(function(v){
+                return v.e;
+            })
+            .map(function(e){
+                return s.lmef(e, e.nxt.nxt.nxt);
+            });
+
+        s.lkfmrh( nf, bf );
+
+        return s;
+    }
+
+	threeSetup(true);
+
+    var s = hollowPrism();
 
     s.faces().forEach(function(x){
         addMeshToScene( x.toThreeGeometry(),

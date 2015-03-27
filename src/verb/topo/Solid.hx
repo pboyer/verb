@@ -280,7 +280,6 @@ class Solid extends Topo {
         return e0;
     }
 
-    // TODO: test
     // kill face make ring hole
     // we kill the face by making it a ring inside of the face
     public function lkfmrh(kf : Face, tf : Face) : Loop {
@@ -292,7 +291,6 @@ class Solid extends Topo {
 
         delFace( kf );
 
-        // move the original loop to new edge as an interior ring
         kf.ol.f = tf;
         tf.l.push( kf.ol );
 
@@ -301,21 +299,15 @@ class Solid extends Topo {
 
     // TODO: test
     // create a face by extracting a ring from a face
-    public function lmfkrh( he : HalfEdge ){
+    public function lmfkrh( ol : Loop ){
 
-        // the original loop (ring)
-        var ol = he.l;
-
-        // its parent face
         var of = ol.f;
 
         // remove the original ring from its parent face
         of.delLoop( ol );
 
-        // the new face
+        // and add to a new face
         var nf = this.addFace();
-
-        // insert the old loop into its parent
         nf.addLoop(ol);
 
         return nf;
@@ -386,8 +378,6 @@ class Solid extends Topo {
         ")";
     }
 }
-
-
 
 
 // Key
