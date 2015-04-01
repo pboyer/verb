@@ -2,6 +2,10 @@ package verb;
 
 // topology
 import verb.topo.Analyze;
+import verb.topo.Make;
+import verb.topo.Slice;
+
+
 import verb.topo.Solid;
 import verb.topo.Face;
 import verb.topo.Vertex;

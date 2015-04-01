@@ -38,16 +38,21 @@ class Solid extends Topo {
 
     // make edge vertex
     public function lmev(he0 : HalfEdge, he1 : HalfEdge, pt : Point) : Vertex {
+
+        // TODO: should the two half edges be from different loops unless duplicate?
+
+        // create a new vertex
         var v = this.addVertex( pt );
 
-        var he = he0;
+        // store the original vertex we'll be "splitting"
+        var ov = he0.v;
 
+        var he = he0;
         while ( he != he1 ) {
             he.v = v;
             he = he.opp.nxt;
         }
 
-        var ov = he0.v;
         var nhe0 = he1.l.addHalfEdge( v, he1 );
         var nhe1 = he0.l.addHalfEdge( ov, if (he0 == he1) nhe0 else he0, nhe0 );
 

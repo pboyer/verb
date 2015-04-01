@@ -23,6 +23,9 @@
         var nv0 = s.lmev( e0, e0, [10,0,0] );
         nv1 = s.lmev( nv0.e, nv0.e, [10,10,0] );
 
+        console.log(v0.e.v.pt);
+        console.log(v0.e.nxt.nxt.v.pt);
+
         var nf = s.lmef( v0.e, v0.e.nxt.nxt );
 
         return s;
@@ -93,7 +96,30 @@
 
 	threeSetup(true);
 
-    var s = hollowPrism();
+    var pts = [];
+
+    var s = 32;
+    var w = 2 * Math.PI / s;
+    var r = 10;
+
+    for (var i = 0 ; i < s; i++){
+        pts.push( [ r * Math.cos( i*w ),  r * Math.sin( i*w ), 0 ] );
+    }
+
+   pts = [[0,0,0], [10,0,0], [10,10,0], [20,10,0], [20,20,0], [0,20,0] ]
+
+    var s = verb.topo.Make.extrusion( pts, [-5,5,10] );    // hollowPrism();
+
+    console.log( "volume", verb.topo.Analyze.volume( s ) );
+    console.log( "area", verb.topo.Analyze.area( s ) );
+
+    var p = { n : [0,0,1], o : [0,0,5] };
+
+    // addPointsToScene( verb.topo.Slice.intersectionPoints( s, p ) );
+
+    verb.topo.Slice.slice( s, p );
+
+
 
     s.faces().forEach(function(x){
         addMeshToScene( x.toThreeGeometry(),

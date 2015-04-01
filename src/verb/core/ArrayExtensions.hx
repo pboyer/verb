@@ -3,6 +3,7 @@ package verb.core;
 class ArrayExtensions {
 
     public static function alloc<T>( a : Array<T>, l : Int ){
+        if (l < 0) return;
         while (a.length < l) {
             a.push(null);
         }

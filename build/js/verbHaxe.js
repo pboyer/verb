@@ -93,6 +93,21 @@ haxe.ds.IntMap.prototype = {
 		delete(this.h[key]);
 		return true;
 	}
+	,keys: function() {
+		var a = [];
+		for( var key in this.h ) {
+		if(this.h.hasOwnProperty(key)) a.push(key | 0);
+		}
+		return HxOverrides.iter(a);
+	}
+	,iterator: function() {
+		return { ref : this.h, it : this.keys(), hasNext : function() {
+			return this.it.hasNext();
+		}, next : function() {
+			var i = this.it.next();
+			return this.ref[i];
+		}};
+	}
 };
 haxe.ds.Option = { __constructs__ : ["Some","None"] };
 haxe.ds.Option.Some = function(v) { var $x = ["Some",0,v]; $x.__enum__ = haxe.ds.Option; $x.toString = $estr; return $x; };
@@ -897,6 +912,7 @@ verb.core.Analyze.rationalBezierCurveArcLength = function(curve,u,gaussDegIncrea
 verb.core.ArrayExtensions = function() { };
 verb.core.ArrayExtensions.__name__ = ["verb","core","ArrayExtensions"];
 verb.core.ArrayExtensions.alloc = function(a,l) {
+	if(l < 0) return;
 	while(a.length < l) a.push(null);
 };
 verb.core.ArrayExtensions.reversed = function(a) {
@@ -2492,10 +2508,12 @@ verb.core.Intersect.segmentWithTriangle = function(p0,p1,points,tri) {
 	return new verb.core.types.TriSegmentIntersection(pt,s,t,r);
 };
 verb.core.Intersect.segmentAndPlane = function(p0,p1,v0,n) {
-	var denom = verb.core.Vec.dot(n,verb.core.Vec.sub(p0,p1));
+	var denom = verb.core.Vec.dot(n,verb.core.Vec.sub(p1,p0));
 	if(Math.abs(denom) < 1e-10) return null;
 	var numer = verb.core.Vec.dot(n,verb.core.Vec.sub(v0,p0));
-	return { p : numer / denom};
+	var p = 1.0 - numer / denom;
+	if(p > 1.0000000001 || p < -1e-10) return null;
+	return { p : p};
 };
 verb.core.KdPoint = $hx_exports.core.KdPoint = function(point,obj) {
 	this.point = point;
@@ -6282,6 +6300,158 @@ verb.topo.Loop.prototype = $extend(verb.topo.Topo.prototype,{
 		return this;
 	}
 });
+verb.topo.Make = $hx_exports.topo.Make = function() { };
+verb.topo.Make.__name__ = ["verb","topo","Make"];
+verb.topo.Make.lamina = function(profile) {
+	var s = verb.topo.Solid.mvfs(profile[0]);
+	var p0 = profile[0];
+	var e = s.f.l.e;
+	var ce = s.f.l.e;
+	var _g = 0;
+	while(_g < profile.length) {
+		var pt = profile[_g];
+		++_g;
+		if(pt == p0) continue;
+		var nv = s.lmev(ce,ce,pt);
+		ce = nv.e;
+	}
+	s.lmef(e.nxt,ce);
+	return s;
+};
+verb.topo.Make.extrusion = function(profile,dir) {
+	if(profile.length < 3) throw new verb.core.types.Exception("More than three points are required to define a polygon!");
+	var s = verb.topo.Make.lamina(profile);
+	var nvs = s.f.l.halfEdges().map(function(e) {
+		return s.lmev(e,e,verb.core.Vec.add(e.v.pt,dir));
+	});
+	nvs.map(function(v) {
+		return v.e;
+	}).map(function(e1) {
+		var nf = s.lmef(e1,e1.nxt.nxt.nxt);
+		return nf;
+	});
+	return s;
+};
+verb.topo.VertexClass = { __constructs__ : ["On","Above","Below"] };
+verb.topo.VertexClass.On = ["On",0];
+verb.topo.VertexClass.On.toString = $estr;
+verb.topo.VertexClass.On.__enum__ = verb.topo.VertexClass;
+verb.topo.VertexClass.Above = ["Above",1];
+verb.topo.VertexClass.Above.toString = $estr;
+verb.topo.VertexClass.Above.__enum__ = verb.topo.VertexClass;
+verb.topo.VertexClass.Below = ["Below",2];
+verb.topo.VertexClass.Below.toString = $estr;
+verb.topo.VertexClass.Below.__enum__ = verb.topo.VertexClass;
+verb.topo.Slice = $hx_exports.topo.Slice = function() { };
+verb.topo.Slice.__name__ = ["verb","topo","Slice"];
+verb.topo.Slice.slice = function(s,p) {
+	var r = verb.topo.Slice.intersect(s,p);
+	var vs = new haxe.ds.IntMap();
+	var _g = 0;
+	while(_g < r.length) {
+		var ir = r[_g];
+		++_g;
+		if(verb.topo.Slice.isCrossingEdge(ir.item1)) {
+			var nhe = verb.topo.Slice.splitEdge(ir.item0,ir.item1);
+			vs.set(nhe.v.id,nhe.v);
+		} else {
+			var v = ir.item0.v;
+			if(!vs.exists(v.id)) vs.set(v.id,v);
+		}
+	}
+	var ecs = new Array();
+	var $it0 = vs.iterator();
+	while( $it0.hasNext() ) {
+		var v1 = $it0.next();
+		var _g1 = 0;
+		var _g11 = v1.halfEdges();
+		while(_g1 < _g11.length) {
+			var e = _g11[_g1];
+			++_g1;
+			ecs.push({ edge : e, cl : verb.topo.Slice.classify(e,p)});
+			if(verb.topo.Slice.wideSector(e)) ecs.push({ edge : e, cl : verb.topo.Slice.classifyBisector(e)});
+		}
+	}
+	var el = ecs.length;
+	var _g2 = 0;
+	while(_g2 < el) {
+		var i = _g2++;
+		var ep = ecs[i];
+		if(ep.cl == verb.topo.VertexClass.On) {
+			var nc = verb.topo.Slice.reclassifyCoplanarSector(ep.edge,p);
+			ecs[i].cl = nc;
+			ecs[i + 1 % el].cl = nc;
+		}
+	}
+	var el1 = ecs.length;
+	var _g3 = 0;
+	while(_g3 < el1) {
+		var i1 = _g3++;
+		var ep1 = ecs[i1];
+		if(ep1.cl == verb.topo.VertexClass.On) {
+			var prv = ecs[i1 - 1 % el1].cl;
+			var nxt = ecs[i1 + 1 % el1].cl;
+			if(prv == verb.topo.VertexClass.Above && nxt == verb.topo.VertexClass.Above) ep1.cl = verb.topo.VertexClass.Below; else if(prv == verb.topo.VertexClass.Below && nxt == verb.topo.VertexClass.Above) ep1.cl = verb.topo.VertexClass.Below; else if(prv == verb.topo.VertexClass.Above && nxt == verb.topo.VertexClass.Below) ep1.cl = verb.topo.VertexClass.Below; else if(prv == verb.topo.VertexClass.Below && nxt == verb.topo.VertexClass.Below) ep1.cl = verb.topo.VertexClass.Above; else throw new verb.core.types.Exception("Double On edge encountered!");
+		}
+	}
+	return null;
+};
+verb.topo.Slice.wideSector = function(e) {
+	return false;
+};
+verb.topo.Slice.classifyBisector = function(e) {
+	return verb.topo.VertexClass.On;
+};
+verb.topo.Slice.reclassifyCoplanarSector = function(e,p) {
+	var n = e.l.f.normal();
+	var c = verb.core.Vec.cross(n,p.n);
+	if(verb.core.Vec.dot(c,c) > 1.0000000000000001e-20) return verb.topo.VertexClass.On;
+	return null;
+};
+verb.topo.Slice.classify = function(e,p) {
+	var pt = e.nxt.v.pt;
+	var s = verb.core.Vec.dot(verb.core.Vec.sub(pt,p.o),p.n);
+	if(Math.abs(s) < 1e-10) return verb.topo.VertexClass.On;
+	if(s > 0.0) return verb.topo.VertexClass.Above; else return verb.topo.VertexClass.Below;
+};
+verb.topo.Slice.intersect = function(s,p) {
+	var $is = [];
+	var _g = 0;
+	var _g1 = s.edges();
+	while(_g < _g1.length) {
+		var e = _g1[_g];
+		++_g;
+		var he = e.item0;
+		var r = verb.core.Intersect.segmentAndPlane(he.v.pt,he.nxt.v.pt,p.o,p.n);
+		if(r == null) continue;
+		$is.push(new verb.core.types.Pair(he,r.p));
+	}
+	return $is;
+};
+verb.topo.Slice.splitEdge = function(e,p) {
+	var s = e.l.f.s;
+	var pt0 = verb.topo.Slice.pointOnHalfEdge(e,p);
+	var pt1 = pt0.slice();
+	var nv = s.lmev(e,e.opp.nxt,pt0);
+	return nv.e;
+};
+verb.topo.Slice.isCrossingEdge = function(p) {
+	return p < 0.9999999999 || p > 1e-10;
+};
+verb.topo.Slice.pointOnHalfEdge = function(e,p) {
+	return verb.core.Vec.lerp(p,e.v.pt,e.nxt.v.pt);
+};
+verb.topo.Slice.intersectionPoints = function(s,p) {
+	var _g = [];
+	var _g1 = 0;
+	var _g2 = verb.topo.Slice.intersect(s,p);
+	while(_g1 < _g2.length) {
+		var i = _g2[_g1];
+		++_g1;
+		_g.push(verb.topo.Slice.pointOnHalfEdge(i.item0,i.item1));
+	}
+	return _g;
+};
 verb.topo.Solid = $hx_exports.topo.Solid = function() {
 	verb.topo.Topo.call(this);
 };
@@ -6297,12 +6467,12 @@ verb.topo.Solid.__super__ = verb.topo.Topo;
 verb.topo.Solid.prototype = $extend(verb.topo.Topo.prototype,{
 	lmev: function(he0,he1,pt) {
 		var v = this.addVertex(pt);
+		var ov = he0.v;
 		var he = he0;
 		while(he != he1) {
 			he.v = v;
 			he = he.opp.nxt;
 		}
-		var ov = he0.v;
 		var nhe0 = he1.l.addHalfEdge(v,he1);
 		var nhe1 = he0.l.addHalfEdge(ov,he0 == he1?nhe0:he0,nhe0);
 		return v;
@@ -7251,7 +7421,7 @@ verb.topo.PriorityQ.prototype = {
 			var s;
 			s = this.nodes.length;
 			verb.core.ArrayExtensions.alloc(this.nodes,this.max + 1);
-			var _g1 = 0;
+			var _g1 = s;
 			var _g = this.nodes.length;
 			while(_g1 < _g) {
 				var i = _g1++;

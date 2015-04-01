@@ -1365,6 +1365,34 @@ class PriorityQ {
         this.handles[1].key = null;
     }
 
+//    floatDown_: function( curr )
+//    {
+//    var n = this.nodes;
+//    var h = this.handles;
+//    var hCurr, hChild;
+//    var child;
+//
+//    hCurr = n[curr].handle;
+//    for( ;; ) {
+//    child = curr << 1;
+//    if( child < this.size && this.leq( h[n[child+1].handle].key, h[n[child].handle].key )) {
+//    ++child;
+//    }
+//
+//    assert(child <= this.max);
+//
+//    hChild = n[child].handle;
+//    if( child > this.size || this.leq( h[hCurr].key, h[hChild].key )) {
+//    n[curr].handle = hCurr;
+//    h[hCurr].node = curr;
+//    break;
+//    }
+//    n[curr].handle = hChild;
+//    h[hChild].node = curr;
+//    curr = child;
+//    }
+//    },
+
     public function floatDown_( curr : Int ) : Void
     {
         var n = this.nodes;
@@ -1450,7 +1478,7 @@ class PriorityQ {
             var s;
             s = this.nodes.length;
             this.nodes.alloc(  this.max+1 );
-            for (i in 0...this.nodes.length)
+            for (i in s...this.nodes.length)
             // for (var i = s; i < this.nodes.length; i++)
             {
                 this.nodes[i] = new PQnode();

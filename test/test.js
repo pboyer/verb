@@ -20,6 +20,7 @@ function last(a){
 	return a[a.length-1];
 }
 
+/*
 
 describe("verb.core.Eval.knotSpanGivenN",function(){
 
@@ -7170,6 +7171,8 @@ describe("verb.topo.Tess2",function(){
 
 });
 
+*/
+
 function triangularLamina(){
     var s = verb.topo.Solid.mvfs( [0,0,0] );
 
@@ -7204,86 +7207,6 @@ function triangularPrism(){
     return s;
 }
 
-describe("verb.topo.Solid.lmev",function(){
-    it('adds 2 new HalfEdges, one new vertex on first call', function(){
-        var s = verb.topo.Solid.mvfs( [0,0,0] );
-
-        var e0 = s.f.l.e;
-        var v0 = s.f.l.e.v;
-
-        var nv = s.lmev( e0, e0, [1,0,0] );
-        nv.pt.should.eql([1,0,0]);
-
-        e0.v.should.be.equal( nv );
-        e0.nxt.v.should.be.equal( v0 );
-        e0.nxt.nxt.v.should.be.equal( e0.v );
-
-        var l = s.loops();
-        var v = s.vertices();
-        var f = s.faces();
-        var he = s.halfEdges();
-
-        l.length.should.be.equal(1);
-        v.length.should.be.equal(2);
-        f.length.should.be.equal(1);
-        he.length.should.be.equal(2);
-    });
-
-    it('adds 2 new HalfEdges, one new vertex on second call', function(){
-        var s = verb.topo.Solid.mvfs( [0,0,0] );
-
-        var e0 = s.f.l.e;
-        var v0 = s.f.l.e.v;
-
-        var nv0 = s.lmev( e0, e0, [1,0,0] );
-        nv0.pt.should.eql([1,0,0]);
-
-        nv1 = s.lmev( nv0.e, nv0.e, [1,1,0] );
-        nv1.pt.should.eql( [1,1,0] );
-
-        e0.v.should.be.equal( nv0 );
-        e0.nxt.v.should.be.equal( v0 );
-        e0.nxt.nxt.v.should.be.equal( nv0 );
-        e0.nxt.nxt.nxt.v.should.be.equal( nv1 );
-
-        var l = s.loops();
-        var v = s.vertices();
-        var f = s.faces();
-        var he = s.halfEdges();
-
-        l.length.should.be.equal(1);
-        v.length.should.be.equal(3);
-        f.length.should.be.equal(1);
-        he.length.should.be.equal(4);
-
-    });
-
-    it('can extend edges from a triangular lamina', function(){
-        var s = triangularLamina();
-
-        var vs = s.vertices();
-
-        // each vertex has 2 neighbors originally
-        vs.forEach(function(x){
-            x.neighbors().length.should.be.equal(2);
-        });
-
-        var l = s.f.l;
-
-        // extend every vertex in the loop with an lmev
-        var nvs = l.halfEdges().map(function(e){
-            return s.lmev( e, e, verb.core.Vec.add( e.v.pt, [0,0,1]) );
-        });
-
-        l.halfEdges().length.should.be.equal(9);
-        s.f.nxt.l.halfEdges().length.should.be.equal(3);
-
-        // each of the original vertices has 3 neighbors afterwards
-        vs.forEach(function(x){
-            x.neighbors().length.should.be.equal(3);
-        });
-    });
-});
 
 describe("verb.topo.Solid.lmef",function(){
     it('can close a single triangular loop into a lamina', function(){
@@ -7754,3 +7677,138 @@ describe("verb.topo.Analyze.area",function(){
 });
 
 
+
+describe("verb.topo.Solid.lmev",function(){
+    it('adds 2 new HalfEdges, one new vertex on first call', function(){
+        var s = verb.topo.Solid.mvfs( [0,0,0] );
+
+        var e0 = s.f.l.e;
+        var v0 = s.f.l.e.v;
+
+        var nv = s.lmev( e0, e0, [1,0,0] );
+        nv.pt.should.eql([1,0,0]);
+
+        e0.v.should.be.equal( nv );
+        e0.nxt.v.should.be.equal( v0 );
+        e0.nxt.nxt.v.should.be.equal( e0.v );
+
+        var l = s.loops();
+        var v = s.vertices();
+        var f = s.faces();
+        var he = s.halfEdges();
+
+        l.length.should.be.equal(1);
+        v.length.should.be.equal(2);
+        f.length.should.be.equal(1);
+        he.length.should.be.equal(2);
+    });
+
+    it('adds 2 new HalfEdges, one new vertex on second call', function(){
+        var s = verb.topo.Solid.mvfs( [0,0,0] );
+
+        var e0 = s.f.l.e;
+        var v0 = s.f.l.e.v;
+
+        var nv0 = s.lmev( e0, e0, [1,0,0] );
+        nv0.pt.should.eql([1,0,0]);
+
+        nv1 = s.lmev( nv0.e, nv0.e, [1,1,0] );
+        nv1.pt.should.eql( [1,1,0] );
+
+        e0.v.should.be.equal( nv0 );
+        e0.nxt.v.should.be.equal( v0 );
+        e0.nxt.nxt.v.should.be.equal( nv0 );
+        e0.nxt.nxt.nxt.v.should.be.equal( nv1 );
+
+        var l = s.loops();
+        var v = s.vertices();
+        var f = s.faces();
+        var he = s.halfEdges();
+
+        l.length.should.be.equal(1);
+        v.length.should.be.equal(3);
+        f.length.should.be.equal(1);
+        he.length.should.be.equal(4);
+
+    });
+
+    it('can extend edges from a triangular lamina', function(){
+        var s = triangularLamina();
+
+        var vs = s.vertices();
+
+        // each vertex has 2 neighbors originally
+        vs.forEach(function(x){
+            x.neighbors().length.should.be.equal(2);
+        });
+
+        var l = s.f.l;
+
+        // extend every vertex in the loop with an lmev
+        var nvs = l.halfEdges().map(function(e){
+            return s.lmev( e, e, verb.core.Vec.add( e.v.pt, [0,0,1]) );
+        });
+
+        l.halfEdges().length.should.be.equal(9);
+        s.f.nxt.l.halfEdges().length.should.be.equal(3);
+
+        // each of the original vertices has 3 neighbors afterwards
+        vs.forEach(function(x){
+            x.neighbors().length.should.be.equal(3);
+        });
+    });
+
+    it('can be used to split an edge of a prism', function(){
+
+        var pts = [[0,0,0], [10,0,0], [10,10,0] ];
+        var s = verb.topo.Make.extrusion( pts, [0,0,10] );
+
+        // get the top face
+        var tf = s.faces().filter(function(x){
+            return verb.core.Vec.dot( x.normal(), [0,0,1] ) > 0;
+        })[0];
+
+        // pick a vertex from the top face
+        var v = tf.ol.e.v;
+
+        // get an edge going from top to bottom
+        var e = v.halfEdges()
+            .filter(function(e){
+                var dif = verb.core.Vec.sub( e.v.pt, e.nxt.v.pt );
+                return Math.abs( dif[0] ) < 1e-3 && Math.abs( dif[1] ) < 1e-3;
+            })[0];
+
+        console.log( e.v.pt, e.nxt.v.pt )
+
+        s.lmev( e, e.opp.nxt, [10,0,5] );
+
+
+//        console.log(v.pt);
+
+
+
+
+
+//        var vs = s.vertices();
+//
+//        // each vertex has 2 neighbors originally
+//        vs.forEach(function(x){
+//            x.neighbors().length.should.be.equal(2);
+//        });
+//
+//        var l = s.f.l;
+//
+//        // extend every vertex in the loop with an lmev
+//        var nvs = l.halfEdges().map(function(e){
+//            return s.lmev( e, e, verb.core.Vec.add( e.v.pt, [0,0,1]) );
+//        });
+//
+//        l.halfEdges().length.should.be.equal(9);
+//        s.f.nxt.l.halfEdges().length.should.be.equal(3);
+//
+//        // each of the original vertices has 3 neighbors afterwards
+//        vs.forEach(function(x){
+//            x.neighbors().length.should.be.equal(3);
+//        });
+    });
+});

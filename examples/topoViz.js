@@ -34,16 +34,8 @@ $(function(){ // on dom ready
         return s;
     }
 
-    var s = triangularPrism();
-
-    var tf = s.faces().filter(function(x){
-        return verb.core.Vec.dot( x.normal(), [0,-1,0] ) > 0;
-    })[0];
-
-    var oe = tf.ol.e;
-    var f = s.lmef( oe, oe.nxt.nxt );
-
-    s.lkef( oe.prv );
+    var pts = [[0,0,0], [10,0,0], [10,10,0], [20,10,0], [20,20,0], [0,20,0] ]
+    var s = verb.topo.Make.extrusion( pts, [-5,5,10] );    // hollowPrism();
 
     var faces = s.faces();
     var vertices = s.vertices();
