@@ -94,6 +94,25 @@
         return s;
     }
 
+    function drawSolid(s){
+
+        s.faces().forEach(function(x){
+            addMeshToScene( x.toThreeGeometry(),
+                new THREE.MeshNormalMaterial(
+                    { side: THREE.FrontSide, wireframe: false, shading: THREE.SmoothShading, transparent: true, opacity: 0.95 } ));
+        });
+
+        s.halfEdges().forEach(function(x){
+            addLineToScene( [x.v.pt,x.nxt.v.pt] );
+        });
+
+        s.vertices().forEach(function(x){
+            addPointsToScene( [x.pt] );
+        });
+
+    }
+
+
 	threeSetup(true);
 
     var pts = [];
@@ -106,9 +125,10 @@
         pts.push( [ r * Math.cos( i*w ),  r * Math.sin( i*w ), 0 ] );
     }
 
-   pts = [[0,0,0], [10,0,0], [10,10,0], [20,10,0], [20,20,0], [0,20,0] ]
+    var pts = [[0,0,0], [10,0,0], [10,10,0] , [20,10,0], [20,20,0], [0,20,0] ]
 
-    var s = verb.topo.Make.extrusion( pts, [-5,5,10] );    // hollowPrism();
+    var s = verb.topo.Make.extrusion( pts, [0,0,10] );    // hollowPrism();
+
 
     console.log( "volume", verb.topo.Analyze.volume( s ) );
     console.log( "area", verb.topo.Analyze.area( s ) );
@@ -117,23 +137,13 @@
 
     // addPointsToScene( verb.topo.Slice.intersectionPoints( s, p ) );
 
-    verb.topo.Slice.slice( s, p );
+    var r = verb.topo.Split.split( s, p );
 
+    drawSolid( r.item0 );
+    drawSolid( r.item1 );
 
-
-    s.faces().forEach(function(x){
-        addMeshToScene( x.toThreeGeometry(),
-            new THREE.MeshNormalMaterial(
-                { side: THREE.FrontSide, wireframe: false, shading: THREE.SmoothShading, transparent: true, opacity: 0.95 } ));
-    });
-
-    s.edges().forEach(function(x){
-        addLineToScene( [x.item0.v.pt,x.item1.v.pt] );
-    });
-
-    s.vertices().forEach(function(x){
-        addPointsToScene( [x.pt] );
-    });
+    console.log( "volume", verb.topo.Analyze.volume( s ) );
+    console.log( "area", verb.topo.Analyze.area( s ) );
 
 	threeRender();
 

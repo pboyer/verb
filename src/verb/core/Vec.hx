@@ -14,6 +14,23 @@ class Vec {
         return Math.acos( dot(a, b) / ( norm(a) * norm(b) )  );
     }
 
+    public static function signedAngleBetween(a : Array<Float>, b : Array<Float>, n : Array<Float>) : Float{
+        var nab = Vec.cross(a,b);
+
+        var al = Vec.norm(a);
+        var bl = Vec.norm(b);
+        var abl = al * bl;
+        var adb = Vec.dot(a,b);
+
+        var sina = Vec.norm(nab) / abl;
+        var cosa = adb / abl;
+
+        var w = Math.atan2( sina, cosa );
+        var s = Vec.dot(n, nab);
+
+        return s > 0.0 ? w : 2 * Math.PI - w;
+    }
+
     public static function angleBetweenNormalized2d(a : Array<Float>, b : Array<Float>) : Float {
         var perpDot = a[0] * b[1]-a[1] * b[0];
         return Math.atan2(perpDot, dot(a, b));

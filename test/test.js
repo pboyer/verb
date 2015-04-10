@@ -7812,3 +7812,29 @@ describe("verb.topo.Solid.lmev",function(){
 //        });
     });
 });
+
+
+describe("verb.core.Vec.signedAngleBetween",function(){
+    it('computes correct area for triangular prism', function(){
+        verb.core.Vec.signedAngleBetween( [1,0,0], [0,1,0], [0,0,1] ).should.be.approximately( Math.PI / 2, verb.core.Constants.EPSILON );
+        verb.core.Vec.signedAngleBetween( [1,0,0], [-1,0,0], [0,0,1] ).should.be.approximately( Math.PI, verb.core.Constants.EPSILON );
+        verb.core.Vec.signedAngleBetween( [1,0,0], [0,-1,0], [0,0,1] ).should.be.approximately( 3 * Math.PI / 2, verb.core.Constants.EPSILON );
+    });
+});
+
+describe("verb.topo.Split.split",function(){
+    it('can split simple l shaped extrusion', function(){
+        var pts = [[0,0,0], [10,0,0], [10,10,0], [20,10,0], [20,20,0], [0,20,0] ]
+        var s = verb.topo.Make.extrusion( pts, [0,0,10] );    // hollowPrism();
+
+        var p = { n : [0,0,1], o : [0,0,5] };
+        verb.topo.Split.split( s, p );
+
+        s.vertices().forEach(function(x){
+            console.log(x.e != null);
+        })
+
+    });
+});
+
+

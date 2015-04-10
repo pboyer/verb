@@ -3,7 +3,7 @@ package verb;
 // topology
 import verb.topo.Analyze;
 import verb.topo.Make;
-import verb.topo.Slice;
+import verb.topo.Split;
 
 
 import verb.topo.Solid;

@@ -22,6 +22,8 @@ class DoublyLinkedListExtensions {
 
     public static function kill<T:(IDoublyLinkedList<T>)>( t : T, i : T ) : T {
 
+        if (t == null) return null;
+
         if (t.nxt == t){ // a loop
             return null;
         }

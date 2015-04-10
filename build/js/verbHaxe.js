@@ -13,6 +13,18 @@ function $extend(from, fields) {
 }
 var HxOverrides = function() { };
 HxOverrides.__name__ = ["HxOverrides"];
+HxOverrides.indexOf = function(a,obj,i) {
+	var len = a.length;
+	if(i < 0) {
+		i += len;
+		if(i < 0) i = 0;
+	}
+	while(i < len) {
+		if(a[i] === obj) return i;
+		i++;
+	}
+	return -1;
+};
 HxOverrides.iter = function(a) {
 	return { cur : 0, arr : a, hasNext : function() {
 		return this.cur < this.arr.length;
@@ -72,6 +84,11 @@ Type.getClassName = function(c) {
 	return a.join(".");
 };
 var haxe = {};
+haxe.Log = function() { };
+haxe.Log.__name__ = ["haxe","Log"];
+haxe.Log.trace = function(v,infos) {
+	js.Boot.__trace(v,infos);
+};
 haxe.ds = {};
 haxe.ds.IntMap = function() {
 	this.h = { };
@@ -109,11 +126,100 @@ haxe.ds.IntMap.prototype = {
 		}};
 	}
 };
-haxe.ds.Option = { __constructs__ : ["Some","None"] };
+haxe.ds.Option = { __ename__ : true, __constructs__ : ["Some","None"] };
 haxe.ds.Option.Some = function(v) { var $x = ["Some",0,v]; $x.__enum__ = haxe.ds.Option; $x.toString = $estr; return $x; };
 haxe.ds.Option.None = ["None",1];
 haxe.ds.Option.None.toString = $estr;
 haxe.ds.Option.None.__enum__ = haxe.ds.Option;
+var js = {};
+js.Boot = function() { };
+js.Boot.__name__ = ["js","Boot"];
+js.Boot.__unhtml = function(s) {
+	return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
+};
+js.Boot.__trace = function(v,i) {
+	var msg;
+	if(i != null) msg = i.fileName + ":" + i.lineNumber + ": "; else msg = "";
+	msg += js.Boot.__string_rec(v,"");
+	if(i != null && i.customParams != null) {
+		var _g = 0;
+		var _g1 = i.customParams;
+		while(_g < _g1.length) {
+			var v1 = _g1[_g];
+			++_g;
+			msg += "," + js.Boot.__string_rec(v1,"");
+		}
+	}
+	var d;
+	if(typeof(document) != "undefined" && (d = document.getElementById("haxe:trace")) != null) d.innerHTML += js.Boot.__unhtml(msg) + "<br/>"; else if(typeof console != "undefined" && console.log != null) console.log(msg);
+};
+js.Boot.__string_rec = function(o,s) {
+	if(o == null) return "null";
+	if(s.length >= 5) return "<...>";
+	var t = typeof(o);
+	if(t == "function" && (o.__name__ || o.__ename__)) t = "object";
+	switch(t) {
+	case "object":
+		if(o instanceof Array) {
+			if(o.__enum__) {
+				if(o.length == 2) return o[0];
+				var str = o[0] + "(";
+				s += "\t";
+				var _g1 = 2;
+				var _g = o.length;
+				while(_g1 < _g) {
+					var i = _g1++;
+					if(i != 2) str += "," + js.Boot.__string_rec(o[i],s); else str += js.Boot.__string_rec(o[i],s);
+				}
+				return str + ")";
+			}
+			var l = o.length;
+			var i1;
+			var str1 = "[";
+			s += "\t";
+			var _g2 = 0;
+			while(_g2 < l) {
+				var i2 = _g2++;
+				str1 += (i2 > 0?",":"") + js.Boot.__string_rec(o[i2],s);
+			}
+			str1 += "]";
+			return str1;
+		}
+		var tostr;
+		try {
+			tostr = o.toString;
+		} catch( e ) {
+			return "???";
+		}
+		if(tostr != null && tostr != Object.toString) {
+			var s2 = o.toString();
+			if(s2 != "[object Object]") return s2;
+		}
+		var k = null;
+		var str2 = "{\n";
+		s += "\t";
+		var hasp = o.hasOwnProperty != null;
+		for( var k in o ) {
+		if(hasp && !o.hasOwnProperty(k)) {
+			continue;
+		}
+		if(k == "prototype" || k == "__class__" || k == "__super__" || k == "__interfaces__" || k == "__properties__") {
+			continue;
+		}
+		if(str2.length != 2) str2 += ", \n";
+		str2 += s + k + " : " + js.Boot.__string_rec(o[k],s);
+		}
+		s = s.substring(1);
+		str2 += "\n" + s + "}";
+		return str2;
+	case "function":
+		return "<function>";
+	case "string":
+		return o;
+	default:
+		return String(o);
+	}
+};
 var promhx = {};
 promhx.base = {};
 promhx.base.AsyncBase = function(d) {
@@ -645,14 +751,14 @@ promhx.base.EventLoop.continueOnNextLoop = function() {
 	if(promhx.base.EventLoop.nextLoop != null) promhx.base.EventLoop.nextLoop(promhx.base.EventLoop.f); else setImmediate(promhx.base.EventLoop.f);
 };
 promhx.error = {};
-promhx.error.PromiseError = { __constructs__ : ["AlreadyResolved","DownstreamNotFullfilled"] };
+promhx.error.PromiseError = { __ename__ : true, __constructs__ : ["AlreadyResolved","DownstreamNotFullfilled"] };
 promhx.error.PromiseError.AlreadyResolved = function(message) { var $x = ["AlreadyResolved",0,message]; $x.__enum__ = promhx.error.PromiseError; $x.toString = $estr; return $x; };
 promhx.error.PromiseError.DownstreamNotFullfilled = function(message) { var $x = ["DownstreamNotFullfilled",1,message]; $x.__enum__ = promhx.error.PromiseError; $x.toString = $estr; return $x; };
 var verb = {};
 verb.Verb = function() { };
 verb.Verb.__name__ = ["verb","Verb"];
 verb.Verb.main = function() {
-	console.log("verb 0.2.0");
+	haxe.Log.trace("verb 0.2.0",{ fileName : "Verb.hx", lineNumber : 56, className : "verb.Verb", methodName : "main"});
 };
 verb.core = {};
 verb.core.KnotMultiplicity = $hx_exports.core.KnotMultiplicity = function(knot,mult) {
@@ -1604,7 +1710,7 @@ verb.core.Eval.knotSpanGivenN = function(n,degree,u,knots) {
 	}
 	return mid;
 };
-verb.core.MarchStepState = { __constructs__ : ["OutOfBounds","InsideDomain","AtBoundary","CompleteLoop"] };
+verb.core.MarchStepState = { __ename__ : true, __constructs__ : ["OutOfBounds","InsideDomain","AtBoundary","CompleteLoop"] };
 verb.core.MarchStepState.OutOfBounds = ["OutOfBounds",0];
 verb.core.MarchStepState.OutOfBounds.toString = $estr;
 verb.core.MarchStepState.OutOfBounds.__enum__ = verb.core.MarchStepState;
@@ -2511,7 +2617,7 @@ verb.core.Intersect.segmentAndPlane = function(p0,p1,v0,n) {
 	var denom = verb.core.Vec.dot(n,verb.core.Vec.sub(p1,p0));
 	if(Math.abs(denom) < 1e-10) return null;
 	var numer = verb.core.Vec.dot(n,verb.core.Vec.sub(v0,p0));
-	var p = 1.0 - numer / denom;
+	var p = numer / denom;
 	if(p > 1.0000000001 || p < -1e-10) return null;
 	return { p : p};
 };
@@ -4438,6 +4544,18 @@ verb.core.Vec.__name__ = ["verb","core","Vec"];
 verb.core.Vec.angleBetween = function(a,b) {
 	return Math.acos(verb.core.Vec.dot(a,b) / (verb.core.Vec.norm(a) * verb.core.Vec.norm(b)));
 };
+verb.core.Vec.signedAngleBetween = function(a,b,n) {
+	var nab = verb.core.Vec.cross(a,b);
+	var al = verb.core.Vec.norm(a);
+	var bl = verb.core.Vec.norm(b);
+	var abl = al * bl;
+	var adb = verb.core.Vec.dot(a,b);
+	var sina = verb.core.Vec.norm(nab) / abl;
+	var cosa = adb / abl;
+	var w = Math.atan2(sina,cosa);
+	var s = verb.core.Vec.dot(n,nab);
+	if(s > 0.0) return w; else return 2 * Math.PI - w;
+};
 verb.core.Vec.angleBetweenNormalized2d = function(a,b) {
 	var perpDot = a[0] * b[1] - a[1] * b[0];
 	return Math.atan2(perpDot,verb.core.Vec.dot(a,b));
@@ -5088,6 +5206,7 @@ verb.core.types.DoublyLinkedListExtensions.push = function(t,i) {
 	return i;
 };
 verb.core.types.DoublyLinkedListExtensions.kill = function(t,i) {
+	if(t == null) return null;
 	if(t.nxt == t) return null;
 	i.prv.nxt = i.nxt;
 	i.nxt.prv = i.prv;
@@ -5548,7 +5667,7 @@ verb.exe.WorkerPool.prototype = {
 							_g._callbacks.remove(workId[0]);
 						}
 					} catch( error ) {
-						console.log(error);
+						haxe.Log.trace(error,{ fileName : "WorkerPool.hx", lineNumber : 77, className : "verb.exe.WorkerPool", methodName : "processQueue"});
 					}
 					_g.processQueue();
 				};
@@ -6332,126 +6451,6 @@ verb.topo.Make.extrusion = function(profile,dir) {
 	});
 	return s;
 };
-verb.topo.VertexClass = { __constructs__ : ["On","Above","Below"] };
-verb.topo.VertexClass.On = ["On",0];
-verb.topo.VertexClass.On.toString = $estr;
-verb.topo.VertexClass.On.__enum__ = verb.topo.VertexClass;
-verb.topo.VertexClass.Above = ["Above",1];
-verb.topo.VertexClass.Above.toString = $estr;
-verb.topo.VertexClass.Above.__enum__ = verb.topo.VertexClass;
-verb.topo.VertexClass.Below = ["Below",2];
-verb.topo.VertexClass.Below.toString = $estr;
-verb.topo.VertexClass.Below.__enum__ = verb.topo.VertexClass;
-verb.topo.Slice = $hx_exports.topo.Slice = function() { };
-verb.topo.Slice.__name__ = ["verb","topo","Slice"];
-verb.topo.Slice.slice = function(s,p) {
-	var r = verb.topo.Slice.intersect(s,p);
-	var vs = new haxe.ds.IntMap();
-	var _g = 0;
-	while(_g < r.length) {
-		var ir = r[_g];
-		++_g;
-		if(verb.topo.Slice.isCrossingEdge(ir.item1)) {
-			var nhe = verb.topo.Slice.splitEdge(ir.item0,ir.item1);
-			vs.set(nhe.v.id,nhe.v);
-		} else {
-			var v = ir.item0.v;
-			if(!vs.exists(v.id)) vs.set(v.id,v);
-		}
-	}
-	var ecs = new Array();
-	var $it0 = vs.iterator();
-	while( $it0.hasNext() ) {
-		var v1 = $it0.next();
-		var _g1 = 0;
-		var _g11 = v1.halfEdges();
-		while(_g1 < _g11.length) {
-			var e = _g11[_g1];
-			++_g1;
-			ecs.push({ edge : e, cl : verb.topo.Slice.classify(e,p)});
-			if(verb.topo.Slice.wideSector(e)) ecs.push({ edge : e, cl : verb.topo.Slice.classifyBisector(e)});
-		}
-	}
-	var el = ecs.length;
-	var _g2 = 0;
-	while(_g2 < el) {
-		var i = _g2++;
-		var ep = ecs[i];
-		if(ep.cl == verb.topo.VertexClass.On) {
-			var nc = verb.topo.Slice.reclassifyCoplanarSector(ep.edge,p);
-			ecs[i].cl = nc;
-			ecs[i + 1 % el].cl = nc;
-		}
-	}
-	var el1 = ecs.length;
-	var _g3 = 0;
-	while(_g3 < el1) {
-		var i1 = _g3++;
-		var ep1 = ecs[i1];
-		if(ep1.cl == verb.topo.VertexClass.On) {
-			var prv = ecs[i1 - 1 % el1].cl;
-			var nxt = ecs[i1 + 1 % el1].cl;
-			if(prv == verb.topo.VertexClass.Above && nxt == verb.topo.VertexClass.Above) ep1.cl = verb.topo.VertexClass.Below; else if(prv == verb.topo.VertexClass.Below && nxt == verb.topo.VertexClass.Above) ep1.cl = verb.topo.VertexClass.Below; else if(prv == verb.topo.VertexClass.Above && nxt == verb.topo.VertexClass.Below) ep1.cl = verb.topo.VertexClass.Below; else if(prv == verb.topo.VertexClass.Below && nxt == verb.topo.VertexClass.Below) ep1.cl = verb.topo.VertexClass.Above; else throw new verb.core.types.Exception("Double On edge encountered!");
-		}
-	}
-	return null;
-};
-verb.topo.Slice.wideSector = function(e) {
-	return false;
-};
-verb.topo.Slice.classifyBisector = function(e) {
-	return verb.topo.VertexClass.On;
-};
-verb.topo.Slice.reclassifyCoplanarSector = function(e,p) {
-	var n = e.l.f.normal();
-	var c = verb.core.Vec.cross(n,p.n);
-	if(verb.core.Vec.dot(c,c) > 1.0000000000000001e-20) return verb.topo.VertexClass.On;
-	return null;
-};
-verb.topo.Slice.classify = function(e,p) {
-	var pt = e.nxt.v.pt;
-	var s = verb.core.Vec.dot(verb.core.Vec.sub(pt,p.o),p.n);
-	if(Math.abs(s) < 1e-10) return verb.topo.VertexClass.On;
-	if(s > 0.0) return verb.topo.VertexClass.Above; else return verb.topo.VertexClass.Below;
-};
-verb.topo.Slice.intersect = function(s,p) {
-	var $is = [];
-	var _g = 0;
-	var _g1 = s.edges();
-	while(_g < _g1.length) {
-		var e = _g1[_g];
-		++_g;
-		var he = e.item0;
-		var r = verb.core.Intersect.segmentAndPlane(he.v.pt,he.nxt.v.pt,p.o,p.n);
-		if(r == null) continue;
-		$is.push(new verb.core.types.Pair(he,r.p));
-	}
-	return $is;
-};
-verb.topo.Slice.splitEdge = function(e,p) {
-	var s = e.l.f.s;
-	var pt0 = verb.topo.Slice.pointOnHalfEdge(e,p);
-	var pt1 = pt0.slice();
-	var nv = s.lmev(e,e.opp.nxt,pt0);
-	return nv.e;
-};
-verb.topo.Slice.isCrossingEdge = function(p) {
-	return p < 0.9999999999 || p > 1e-10;
-};
-verb.topo.Slice.pointOnHalfEdge = function(e,p) {
-	return verb.core.Vec.lerp(p,e.v.pt,e.nxt.v.pt);
-};
-verb.topo.Slice.intersectionPoints = function(s,p) {
-	var _g = [];
-	var _g1 = 0;
-	var _g2 = verb.topo.Slice.intersect(s,p);
-	while(_g1 < _g2.length) {
-		var i = _g2[_g1];
-		++_g1;
-		_g.push(verb.topo.Slice.pointOnHalfEdge(i.item0,i.item1));
-	}
-	return _g;
-};
 verb.topo.Solid = $hx_exports.topo.Solid = function() {
 	verb.topo.Topo.call(this);
 };
@@ -6605,6 +6604,7 @@ verb.topo.Solid.prototype = $extend(verb.topo.Topo.prototype,{
 		of.delLoop(ol);
 		var nf = this.addFace();
 		nf.addLoop(ol);
+		ol.f = nf;
 		return nf;
 	}
 	,addFace: function() {
@@ -6658,6 +6658,290 @@ verb.topo.Solid.prototype = $extend(verb.topo.Topo.prototype,{
 		return "Solid (" + this.vertices().length + " Vertices, " + this.faces().length + " Faces, " + this.loops().length + " Loops, " + this.halfEdges().length + " HalfEdges" + ")";
 	}
 });
+verb.topo.VertexClass = { __ename__ : true, __constructs__ : ["On","Above","Below"] };
+verb.topo.VertexClass.On = ["On",0];
+verb.topo.VertexClass.On.toString = $estr;
+verb.topo.VertexClass.On.__enum__ = verb.topo.VertexClass;
+verb.topo.VertexClass.Above = ["Above",1];
+verb.topo.VertexClass.Above.toString = $estr;
+verb.topo.VertexClass.Above.__enum__ = verb.topo.VertexClass;
+verb.topo.VertexClass.Below = ["Below",2];
+verb.topo.VertexClass.Below.toString = $estr;
+verb.topo.VertexClass.Below.__enum__ = verb.topo.VertexClass;
+verb.topo.Split = $hx_exports.topo.Split = function() { };
+verb.topo.Split.__name__ = ["verb","topo","Split"];
+verb.topo.Split.split = function(s,p) {
+	var r = verb.topo.Split.intersect(s,p);
+	var vs = new haxe.ds.IntMap();
+	var _g = 0;
+	while(_g < r.length) {
+		var ir = r[_g];
+		++_g;
+		var v;
+		if(verb.topo.Split.isCrossingEdge(ir.item1)) v = verb.topo.Split.splitEdge(ir.item0,ir.item1).v; else v = ir.item0.v;
+		if(!vs.exists(v.id)) vs.set(v.id,v);
+	}
+	var nulledges = new Array();
+	var $it0 = vs.iterator();
+	while( $it0.hasNext() ) {
+		var v1 = $it0.next();
+		var ecs = new Array();
+		var _g1 = 0;
+		var _g11 = v1.halfEdges();
+		while(_g1 < _g11.length) {
+			var e = _g11[_g1];
+			++_g1;
+			ecs.push({ edge : e, cl : verb.topo.Split.classify(e,p)});
+			if(verb.topo.Split.wideSector(e)) ecs.push({ edge : e, cl : verb.topo.Split.classifyBisector(e,p)});
+		}
+		var el = ecs.length;
+		var _g2 = 0;
+		while(_g2 < el) {
+			var i = _g2++;
+			var ep = ecs[i];
+			if(ep.cl == verb.topo.VertexClass.On) {
+				var nc = verb.topo.Split.reclassifyCoplanarSector(ep.edge,p);
+				ecs[i].cl = nc;
+				ecs[(i + 1) % el].cl = nc;
+			}
+		}
+		var _g3 = 0;
+		while(_g3 < el) {
+			var i1 = _g3++;
+			var ep1 = ecs[i1];
+			if(ep1.cl == verb.topo.VertexClass.On) {
+				var a;
+				if(i1 == 0) a = el; else a = i1 - 1;
+				var b = (i1 + 1) % el;
+				var prv = ecs[a].cl;
+				var nxt = ecs[b].cl;
+				if(prv == verb.topo.VertexClass.Above && nxt == verb.topo.VertexClass.Above) ep1.cl = verb.topo.VertexClass.Below; else if(prv == verb.topo.VertexClass.Below && nxt == verb.topo.VertexClass.Above) ep1.cl = verb.topo.VertexClass.Below; else if(prv == verb.topo.VertexClass.Above && nxt == verb.topo.VertexClass.Below) ep1.cl = verb.topo.VertexClass.Below; else if(prv == verb.topo.VertexClass.Below && nxt == verb.topo.VertexClass.Below) ep1.cl = verb.topo.VertexClass.Above; else {
+					haxe.Log.trace(prv,{ fileName : "Split.hx", lineNumber : 106, className : "verb.topo.Split", methodName : "split", customParams : [nxt,a,b]});
+					throw new verb.core.types.Exception("Double On edge encountered!");
+				}
+			}
+		}
+		var i2 = verb.topo.Split.nextAbove(ecs,0);
+		if(i2 == -1) break;
+		var start = ecs[i2].edge;
+		var head = start;
+		var tail = start;
+		while(true) {
+			while(ecs[i2].cl == verb.topo.VertexClass.Above) {
+				tail = ecs[i2].edge;
+				i2 = (i2 + 1) % el;
+			}
+			s.lmev(head,tail.opp.nxt,head.v.pt.slice());
+			var ne = head.prv;
+			nulledges.push(ne);
+			i2 = verb.topo.Split.nextAbove(ecs,i2);
+			if(i2 == -1) break;
+			head = ecs[i2].edge;
+			if(head == start) break;
+		}
+	}
+	verb.topo.Split.sortNullEdges(nulledges);
+	var h0;
+	var h1;
+	var i3 = 0;
+	var looseends = [];
+	var afaces = [];
+	while(i3 < nulledges.length) {
+		var ne1 = nulledges[i3++];
+		if((h0 = verb.topo.Split.canJoin(ne1,looseends)) != null) {
+			verb.topo.Split.join(h0,ne1);
+			if(!verb.topo.Split.isLoose(h0.opp,looseends)) verb.topo.Split.cut(h0,afaces);
+		}
+		if((h1 = verb.topo.Split.canJoin(ne1.opp,looseends)) != null) {
+			verb.topo.Split.join(h1,ne1.opp);
+			if(!verb.topo.Split.isLoose(h1.opp,looseends)) verb.topo.Split.cut(h1,afaces);
+		}
+		if(h0 != null && h1 != null) verb.topo.Split.cut(ne1,afaces);
+	}
+	var bfaces = [];
+	var _g12 = 0;
+	var _g4 = afaces.length;
+	while(_g12 < _g4) {
+		var i4 = _g12++;
+		var f = afaces[i4];
+		bfaces.push(s.lmfkrh(f.l));
+	}
+	var a1 = new verb.topo.Solid();
+	var b1 = new verb.topo.Solid();
+	var _g13 = 0;
+	var _g5 = afaces.length;
+	while(_g13 < _g5) {
+		var i5 = _g13++;
+		verb.topo.Split.moveFace(afaces[i5],a1);
+		verb.topo.Split.moveFace(bfaces[i5],b1);
+	}
+	verb.topo.Split.cleanup(a1,s);
+	verb.topo.Split.cleanup(b1,s);
+	return new verb.core.types.Pair(a1,b1);
+};
+verb.topo.Split.moveFace = function(f,s) {
+	if(f.s == s) return;
+	f.s.f = verb.core.types.DoublyLinkedListExtensions.kill(f.s.f,f);
+	s.f = verb.core.types.DoublyLinkedListExtensions.push(s.f,f);
+	f.s = s;
+	var _g = 0;
+	var _g1 = f.neighbors();
+	while(_g < _g1.length) {
+		var nf = _g1[_g];
+		++_g;
+		verb.topo.Split.moveFace(nf,s);
+	}
+};
+verb.topo.Split.cleanup = function(s,ks) {
+	var memo = new haxe.ds.IntMap();
+	var $it0 = $iterator(verb.core.types.DoublyLinkedListExtensions.iter(s.f))();
+	while( $it0.hasNext() ) {
+		var f = $it0.next();
+		var $it1 = $iterator(verb.core.types.DoublyLinkedListExtensions.iter(f.l))();
+		while( $it1.hasNext() ) {
+			var l = $it1.next();
+			var _g = 0;
+			var _g1 = l.vertices();
+			while(_g < _g1.length) {
+				var v = _g1[_g];
+				++_g;
+				if(!memo.exists(v.id)) {
+					memo.set(v.id,v);
+					ks.v = verb.core.types.DoublyLinkedListExtensions.kill(ks.v,v);
+					s.v = verb.core.types.DoublyLinkedListExtensions.push(s.v,v);
+				}
+			}
+		}
+	}
+};
+verb.topo.Split.canJoin = function(e,looseends) {
+	var _g1 = 0;
+	var _g = looseends.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		if(verb.topo.Split.neighbor(e,looseends[i])) {
+			var r = looseends[i];
+			looseends.splice(i,1);
+			return r;
+		}
+	}
+	looseends.push(e);
+	return null;
+};
+verb.topo.Split.neighbor = function(e0,e1) {
+	return e0.l.f == e1.l.f;
+};
+verb.topo.Split.isLoose = function(e,le) {
+	return HxOverrides.indexOf(le,e,0) != -1;
+};
+verb.topo.Split.join = function(e0,e1) {
+	var of = e0.l.f;
+	var nf = null;
+	var s = e0.l.f.s;
+	if(e0.l == e1.l) {
+		if(e0.prv.prv != e1) nf = s.lmef(e0,e1.nxt);
+	} else s.lmekr(e0,e1.nxt);
+	if(e0.nxt.nxt != e1) {
+		s.lmef(e1,e0.nxt);
+		if(nf != null && of.l.nxt != of.l) {
+		}
+	}
+};
+verb.topo.Split.cut = function(e,faces) {
+	if(e.l == e.opp.l) {
+		faces.push(e.l.f);
+		e.l.f.s.lkemr(e);
+	} else e.l.f.s.lkef(e);
+};
+verb.topo.Split.sortNullEdges = function(es) {
+	es.sort(function(a,b) {
+		var ap = a.v.pt;
+		var bp = b.v.pt;
+		if(ap[0] < bp[0]) return -1; else if(ap[0] > bp[0]) return 1; else if(ap[1] < bp[1]) return -1; else if(ap[1] > bp[1]) return 1; else if(ap[2] < bp[2]) return -1; else if(ap[2] > bp[2]) return 1;
+		return 0;
+	});
+};
+verb.topo.Split.nextAbove = function(ecs,start) {
+	var i = start;
+	var head = null;
+	while(i < ecs.length) {
+		if(ecs[i].cl == verb.topo.VertexClass.Above) {
+			head = ecs[i];
+			break;
+		}
+		i++;
+	}
+	if(head != null) return i; else return -1;
+};
+verb.topo.Split.wideSector = function(e) {
+	var n = e.l.f.normal();
+	var a = verb.core.Vec.normalized(verb.core.Vec.sub(e.nxt.v.pt,e.v.pt));
+	var b = verb.core.Vec.normalized(verb.core.Vec.sub(e.prv.v.pt,e.v.pt));
+	return verb.core.Vec.signedAngleBetween(a,b,n) > Math.PI;
+};
+verb.topo.Split.classifyBisector = function(e,p) {
+	return verb.topo.Split.classifyPoint(verb.core.Vec.mul(0.5,verb.core.Vec.add(e.nxt.v.pt,e.prv.v.pt)),p);
+};
+verb.topo.Split.reclassifyCoplanarSector = function(e,p) {
+	var n = e.l.f.normal();
+	var n1 = e.opp.l.f.normal();
+	var ndc = verb.core.Vec.dot(n,p.n);
+	var ndc1 = verb.core.Vec.dot(n1,p.n);
+	if(Math.abs(ndc - 1.0) < 1.0000000000000001e-20 || Math.abs(ndc1 - 1.0) < 1.0000000000000001e-20) return verb.topo.VertexClass.Below;
+	if(Math.abs(ndc + 1.0) < 1.0000000000000001e-20 || Math.abs(ndc1 + 1.0) < 1.0000000000000001e-20) return verb.topo.VertexClass.Above;
+	return verb.topo.VertexClass.On;
+};
+verb.topo.Split.classify = function(e,p) {
+	var c = verb.topo.Split.classifyPoint(e.nxt.v.pt,p);
+	return c;
+};
+verb.topo.Split.classifyPoint = function(pt,p) {
+	var s = verb.core.Vec.dot(verb.core.Vec.sub(pt,p.o),p.n);
+	if(Math.abs(s) < 1e-10) return verb.topo.VertexClass.On;
+	if(s > 0.0) return verb.topo.VertexClass.Above; else return verb.topo.VertexClass.Below;
+};
+verb.topo.Split.intersect = function(s,p) {
+	var $is = [];
+	var _g = 0;
+	var _g1 = s.edges();
+	while(_g < _g1.length) {
+		var e = _g1[_g];
+		++_g;
+		var he = e.item0;
+		var r = verb.core.Intersect.segmentAndPlane(he.v.pt,he.nxt.v.pt,p.o,p.n);
+		if(r == null) continue;
+		if(r.p > 0.9999999999) {
+			r.p = 0.0;
+			he = he.nxt;
+		}
+		$is.push(new verb.core.types.Pair(he,r.p));
+	}
+	return $is;
+};
+verb.topo.Split.splitEdge = function(e,p) {
+	var s = e.l.f.s;
+	var pt0 = verb.topo.Split.pointOnHalfEdge(e,p);
+	var pt1 = pt0.slice();
+	var nv = s.lmev(e,e.opp.nxt,pt1);
+	return nv.e;
+};
+verb.topo.Split.isCrossingEdge = function(p) {
+	return p < 0.9999999999 && p > 1e-10;
+};
+verb.topo.Split.pointOnHalfEdge = function(e,p) {
+	return verb.core.Vec.lerp(p,e.v.pt,e.nxt.v.pt);
+};
+verb.topo.Split.intersectionPoints = function(s,p) {
+	var _g = [];
+	var _g1 = 0;
+	var _g2 = verb.topo.Split.intersect(s,p);
+	while(_g1 < _g2.length) {
+		var i = _g2[_g1];
+		++_g1;
+		_g.push(verb.topo.Split.pointOnHalfEdge(i.item0,i.item1));
+	}
+	return _g;
+};
 verb.topo.Tess2Options = $hx_exports.topo.Tess2Options = function() {
 	this.contours = [];
 	this.debug = false;
@@ -8594,6 +8878,9 @@ verb.topo.Vertex.prototype = $extend(verb.topo.Topo.prototype,{
 function $iterator(o) { if( o instanceof Array ) return function() { return HxOverrides.iter(o); }; return typeof(o.iterator) == 'function' ? $bind(o,o.iterator) : o.iterator; }
 var $_, $fid = 0;
 function $bind(o,m) { if( m == null ) return null; if( m.__id__ == null ) m.__id__ = $fid++; var f; if( o.hx__closures__ == null ) o.hx__closures__ = {}; else f = o.hx__closures__[m.__id__]; if( f == null ) { f = function(){ return f.method.apply(f.scope, arguments); }; f.scope = o; f.method = m; o.hx__closures__[m.__id__] = f; } return f; }
+if(Array.prototype.indexOf) HxOverrides.indexOf = function(a,o,i) {
+	return Array.prototype.indexOf.call(a,o,i);
+};
 Math.NaN = Number.NaN;
 Math.NEGATIVE_INFINITY = Number.NEGATIVE_INFINITY;
 Math.POSITIVE_INFINITY = Number.POSITIVE_INFINITY;

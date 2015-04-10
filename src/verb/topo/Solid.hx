@@ -7,7 +7,7 @@ import verb.core.Trig;
 import verb.core.types.Ray;
 import haxe.ds.IntMap;
 import verb.core.types.Exception;
-import verb.core.types.DoublyLinkedListExtensions;
+
 using Lambda;
 
 using verb.core.Vec;
@@ -16,6 +16,7 @@ import verb.core.types.Pair;
 import verb.core.types.NurbsCurveData.Point;
 
 import verb.core.types.IDoublyLinkedList;
+import verb.core.types.DoublyLinkedListExtensions;
 using verb.core.types.DoublyLinkedListExtensions;
 
 @:expose("topo.Solid")
@@ -305,15 +306,16 @@ class Solid extends Topo {
     // TODO: test
     // create a face by extracting a ring from a face
     public function lmfkrh( ol : Loop ){
-
         var of = ol.f;
 
         // remove the original ring from its parent face
         of.delLoop( ol );
 
         // and add to a new face
-        var nf = this.addFace();
+        var nf = this.addFace();  // what are this faces new neighbors?
         nf.addLoop(ol);
+
+        ol.f = nf;
 
         return nf;
     }

@@ -1089,6 +1089,7 @@ class Intersect {
 
     public static function segmentAndPlane( p0 : Point, p1 : Point, v0 : Point, n : Point ) {
 
+        // the length of the segment
         var denom = Vec.dot( n, Vec.sub(p1,p0) );
 
         // parallel case
@@ -1098,9 +1099,9 @@ class Intersect {
 
         var numer = Vec.dot( n, Vec.sub(v0, p0) );
 
-        var p = 1.0 - (numer / denom);
+        var p = numer / denom;
 
-        if (p > 1.0 + Constants.EPSILON || p < 0.0 - Constants.EPSILON ) return null;
+        if (p > 1.0 + Constants.EPSILON || p < -Constants.EPSILON ) return null;
 
         return { p: p };
 

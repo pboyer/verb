@@ -1,46 +1,17 @@
 $(function(){ // on dom ready
 
-    function triangularLamina(){
-        var s = verb.topo.Solid.mvfs( [0,0,0] );
+    var pts = [[0,0,0], [10,0,0], [10,10,0] ] //, [20,10,0], [20,20,0], [0,20,0] ]
+    var s = verb.topo.Make.extrusion( pts, [0,0,10] );    // hollowPrism();
 
-        var e0 = s.f.l.e;
-        var v0 = s.v;
-        var f0 = s.f;
+    var p = { n : [0,0,1], o : [0,0,5] };
+    var r = verb.topo.Split.split( s, p );
 
-        var nv0 = s.lmev( e0, e0, [10,0,0] );
-        nv1 = s.lmev( nv0.e, nv0.e, [10,10,0] );
-
-        var nf = s.lmef( v0.e, v0.e.nxt.nxt );
-
-        return s;
-    }
-
-    function triangularPrism(){
-        var s = triangularLamina();
-
-        var nvs = s.f.l.halfEdges().map(function(e){
-            return s.lmev( e, e, verb.core.Vec.add( e.v.pt, [0,0,1]) );
-        });
-
-        var nfs = nvs
-            .map(function(v){
-                return v.e;
-            })
-            .map(function(e){
-                var nf = s.lmef(e, e.nxt.nxt.nxt);
-                return nf;
-            });
-
-        return s;
-    }
-
-    var pts = [[0,0,0], [10,0,0], [10,10,0], [20,10,0], [20,20,0], [0,20,0] ]
-    var s = verb.topo.Make.extrusion( pts, [-5,5,10] );    // hollowPrism();
+//    s = r.item1;
 
     var faces = s.faces();
-    var vertices = s.vertices();
+//    var vertices = s.vertices();
 
-    var eles = vertices;
+    var eles = faces;
 
     var graphEdges = eles.reduce(function(a, f){
         return a.concat(
@@ -50,6 +21,14 @@ $(function(){ // on dom ready
     }, []);
 
     var graphNodes = eles.map(function(x){
+
+//        var pos = verb.core.Vec.sub( x.l.e.v.pt, [5,15,-2]);
+//
+//        var r = 3 * pos[2];
+//
+//        var xp = x.pt[0] + r * pos[0];
+//        var yp = x.pt[1] + r * pos[1];
+
         return { data: { id: x.id.toString(), name: 'Ele' + x.id.toString() } };
     });
 
@@ -82,8 +61,7 @@ $(function(){ // on dom ready
       },
 
       layout: {
-        name: 'grid',
-        padding: 10
+        name: 'grid'
       },
 
       // on graph initial layout done (could be async depending on layout...)
@@ -94,19 +72,6 @@ $(function(){ // on dom ready
 
         cy.elements().unselectify();
 
-        cy.on('tap', 'node', function(e){
-          var node = e.cyTarget;
-          var neighborhood = node.neighborhood().add(node);
-
-          cy.elements().addClass('faded');
-          neighborhood.removeClass('faded');
-        });
-
-        cy.on('tap', function(e){
-          if( e.cyTarget === cy ){
-            cy.elements().removeClass('faded');
-          }
-        });
       }
     });
 
