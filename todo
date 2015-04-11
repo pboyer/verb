@@ -1,3 +1,9 @@
+Split
+
+    Segment plane intersection is WRONG!
+    Infinite loop on coplanar face with no intersection
+    Holes are not recognized
+
 SweptSurface
 More efficient representation for surface tessellation, don't use 2d arrays
 More exact srf-srf intersection

@@ -6716,7 +6716,7 @@ verb.topo.Split.split = function(s,p) {
 				var prv = ecs[a].cl;
 				var nxt = ecs[b].cl;
 				if(prv == verb.topo.VertexClass.Above && nxt == verb.topo.VertexClass.Above) ep1.cl = verb.topo.VertexClass.Below; else if(prv == verb.topo.VertexClass.Below && nxt == verb.topo.VertexClass.Above) ep1.cl = verb.topo.VertexClass.Below; else if(prv == verb.topo.VertexClass.Above && nxt == verb.topo.VertexClass.Below) ep1.cl = verb.topo.VertexClass.Below; else if(prv == verb.topo.VertexClass.Below && nxt == verb.topo.VertexClass.Below) ep1.cl = verb.topo.VertexClass.Above; else {
-					haxe.Log.trace(prv,{ fileName : "Split.hx", lineNumber : 106, className : "verb.topo.Split", methodName : "split", customParams : [nxt,a,b]});
+					haxe.Log.trace(prv,{ fileName : "Split.hx", lineNumber : 105, className : "verb.topo.Split", methodName : "split", customParams : [nxt,a,b]});
 					throw new verb.core.types.Exception("Double On edge encountered!");
 				}
 			}
@@ -6743,11 +6743,12 @@ verb.topo.Split.split = function(s,p) {
 	verb.topo.Split.sortNullEdges(nulledges);
 	var h0;
 	var h1;
-	var i3 = 0;
 	var looseends = [];
 	var afaces = [];
-	while(i3 < nulledges.length) {
-		var ne1 = nulledges[i3++];
+	var _g4 = 0;
+	while(_g4 < nulledges.length) {
+		var ne1 = nulledges[_g4];
+		++_g4;
 		if((h0 = verb.topo.Split.canJoin(ne1,looseends)) != null) {
 			verb.topo.Split.join(h0,ne1);
 			if(!verb.topo.Split.isLoose(h0.opp,looseends)) verb.topo.Split.cut(h0,afaces);
@@ -6758,22 +6759,28 @@ verb.topo.Split.split = function(s,p) {
 		}
 		if(h0 != null && h1 != null) verb.topo.Split.cut(ne1,afaces);
 	}
-	var bfaces = [];
+	var bfaces;
+	var _g5 = [];
 	var _g12 = 0;
-	var _g4 = afaces.length;
-	while(_g12 < _g4) {
-		var i4 = _g12++;
-		var f = afaces[i4];
-		bfaces.push(s.lmfkrh(f.l));
+	while(_g12 < afaces.length) {
+		var f = afaces[_g12];
+		++_g12;
+		_g5.push(s.lmfkrh(f.l));
 	}
+	bfaces = _g5;
 	var a1 = new verb.topo.Solid();
 	var b1 = new verb.topo.Solid();
 	var _g13 = 0;
-	var _g5 = afaces.length;
-	while(_g13 < _g5) {
-		var i5 = _g13++;
-		verb.topo.Split.moveFace(afaces[i5],a1);
-		verb.topo.Split.moveFace(bfaces[i5],b1);
+	while(_g13 < afaces.length) {
+		var f1 = afaces[_g13];
+		++_g13;
+		verb.topo.Split.moveFace(f1,a1);
+	}
+	var _g14 = 0;
+	while(_g14 < bfaces.length) {
+		var f2 = bfaces[_g14];
+		++_g14;
+		verb.topo.Split.moveFace(f2,b1);
 	}
 	verb.topo.Split.cleanup(a1,s);
 	verb.topo.Split.cleanup(b1,s);
@@ -6843,8 +6850,7 @@ verb.topo.Split.join = function(e0,e1) {
 	} else s.lmekr(e0,e1.nxt);
 	if(e0.nxt.nxt != e1) {
 		s.lmef(e1,e0.nxt);
-		if(nf != null && of.l.nxt != of.l) {
-		}
+		if(nf != null && of.l.nxt != of.l) haxe.Log.trace("PANIC!",{ fileName : "Split.hx", lineNumber : 254, className : "verb.topo.Split", methodName : "join"});
 	}
 };
 verb.topo.Split.cut = function(e,faces) {
@@ -6929,7 +6935,7 @@ verb.topo.Split.isCrossingEdge = function(p) {
 	return p < 0.9999999999 && p > 1e-10;
 };
 verb.topo.Split.pointOnHalfEdge = function(e,p) {
-	return verb.core.Vec.lerp(p,e.v.pt,e.nxt.v.pt);
+	return verb.core.Vec.lerp(p,e.nxt.v.pt,e.v.pt);
 };
 verb.topo.Split.intersectionPoints = function(s,p) {
 	var _g = [];

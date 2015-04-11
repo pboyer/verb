@@ -7837,4 +7837,12 @@ describe("verb.topo.Split.split",function(){
     });
 });
 
-
+describe("verb.core.Intersect.segmentAndPlane",function(){
+	it('works for simple cases', function(){
+		verb.core.Intersect.segmentAndPlane( [0,0,0], [0,0,1], [0,0,0.5], [0,0,1] ).p.should.be.approximately( 0.5, 1e-6 );
+		verb.core.Intersect.segmentAndPlane( [0,0,0], [0,0,1], [0,0,0.1], [0,0,1] ).p.should.be.approximately( 0.1, 1e-6 );
+		verb.core.Intersect.segmentAndPlane( [0,0,0], [0,0,1], [0,0,0.9], [0,0,1] ).p.should.be.approximately( 0.9, 1e-6 );
+		verb.core.Intersect.segmentAndPlane( [0,0,0], [0,1,0], [0,0.5,0], [0,1,0] ).p.should.be.approximately( 0.5, 1e-6 );
+		verb.core.Intersect.segmentAndPlane( [0,0,0], [0,1,0], [0,0.1,0], [0,1,0] ).p.should.be.approximately( 0.1, 1e-6 );
+	});
+});

@@ -13,7 +13,6 @@ import verb.core.Intersect;
 import verb.core.types.DoublyLinkedListExtensions;
 using verb.core.types.DoublyLinkedListExtensions;
 
-
 typedef Plane = {
     n : Array<Float>,
     o : Array<Float>
@@ -153,12 +152,9 @@ class Split {
         var h0 : HalfEdge;
         var h1 : HalfEdge;
 
-        var i = 0;
         var looseends = [];
         var afaces = [];
-        while( i < nulledges.length ){
-            var ne : HalfEdge = nulledges[i++];
-
+        for (ne in nulledges){
             if ( (h0 = canJoin( ne, looseends )) != null ){
                 join( h0, ne );
                 if (!isLoose(h0.opp, looseends)) cut(h0, afaces);
@@ -173,26 +169,19 @@ class Split {
         }
 
         // close the two solids
-        var bfaces = [];
-        for ( i in 0...afaces.length ){
-            var f : Face = afaces[i];
-            bfaces.push( s.lmfkrh( f.l ) ); // this produces an incorrect face topology
-        }
+        var bfaces = [for (f in afaces) s.lmfkrh(f.l)];
 
         // classify the top and bottom of the solid
         var a : Solid = new Solid();
         var b : Solid = new Solid();
 
-        for (i in 0...afaces.length){
-            moveFace( afaces[i], a );
-            moveFace( bfaces[i], b );
-        }
+        for (f in afaces) moveFace( f, a );
+        for (f in bfaces) moveFace( f, b );
 
         cleanup(a, s);
         cleanup(b, s);
 
         return new Pair(a,b);
-
     }
 
     private static function moveFace( f : Face, s : Solid ) : Void {
@@ -207,11 +196,10 @@ class Split {
         }
     }
 
+    // move vertices of ks to s by traversing the faces of s
     private static function cleanup( s : Solid, ks : Solid ) : Void {
-
         var memo = new IntMap<Vertex>();
 
-        // TODO: use iterators
         for (f in s.f.iter()){
             for (l in f.l.iter()){
                 for (v in l.vertices()){
@@ -246,6 +234,7 @@ class Split {
         return le.indexOf(e) != -1;
     }
 
+    // join a new null edge into the expanding slice polygon
     private static function join( e0 : HalfEdge, e1 : HalfEdge ) {
         var of = e0.l.f;
         var nf : Face = null;
@@ -262,15 +251,16 @@ class Split {
         if (e0.nxt.nxt != e1){
             s.lmef( e1, e0.nxt );
             if (nf != null && of.l.nxt != of.l){
+                trace('PANIC!');
                 // TODO - move internal rings to the new face as appropriate
                 // s.laringmv(of, nf);
             }
         }
     }
 
-    // remove away a null edge
+    // remove a null edge
     private static function cut( e : HalfEdge, faces : Array<Face> ) {
-        if (e.l == e.opp.l){ // the case when removing the edge creates a ring
+        if (e.l == e.opp.l){
             faces.push(e.l.f);
             e.l.f.s.lkemr( e );
         } else {
@@ -278,11 +268,13 @@ class Split {
         }
     }
 
+
     private static function sortNullEdges( es : Array<HalfEdge> ){
         es.sort(function(a : HalfEdge, b : HalfEdge){
             var ap = a.v.pt;
             var bp = b.v.pt;
 
+            // lexicographical sort
             if (ap[0] < bp[0]) {
                 return -1;
             } else if (ap[0] > bp[0]) {
@@ -314,7 +306,6 @@ class Split {
         return head != null ? i : -1;
     }
 
-    // TODO: TEST
     public static function wideSector ( e : HalfEdge ) : Bool {
         var n = e.l.f.normal();
 
@@ -324,12 +315,10 @@ class Split {
         return a.signedAngleBetween(b, n) > Math.PI;
     }
 
-    // TODO
     private static function classifyBisector( e : HalfEdge, p : Plane ) : VertexClass {
         return classifyPoint( Vec.mul( 0.5, e.nxt.v.pt.add(e.prv.v.pt) ), p);
     }
 
-    // TODO
     private static function reclassifyCoplanarSector( e : HalfEdge, p : Plane ) : VertexClass {
 
         var n = e.l.f.normal(); // TODO: cache me
@@ -401,7 +390,7 @@ class Split {
     }
 
     private static function pointOnHalfEdge( e : HalfEdge, p : Float ) : Point {
-        return Vec.lerp( p, e.v.pt, e.nxt.v.pt );
+        return Vec.lerp( p, e.nxt.v.pt, e.v.pt );
     }
 
     public static function intersectionPoints( s : Solid, p : Plane ) : Array<Point> {
