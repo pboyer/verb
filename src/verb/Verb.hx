@@ -4,7 +4,7 @@ package verb;
 import verb.topo.Analyze;
 import verb.topo.Make;
 import verb.topo.Split;
-
+import verb.topo.Boolean;
 
 import verb.topo.Solid;
 import verb.topo.Face;

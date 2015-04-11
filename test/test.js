@@ -7173,6 +7173,16 @@ describe("verb.topo.Tess2",function(){
 
 */
 
+describe("verb.core.Intersect.segmentAndPlane",function(){
+	it('works for simple cases', function(){
+		verb.core.Intersect.segmentAndPlane( [0,0,0], [0,0,1], [0,0,0.5], [0,0,1] ).p.should.be.approximately( 0.5, verb.core.Constants.EPSILON );
+		verb.core.Intersect.segmentAndPlane( [0,0,0], [0,0,1], [0,0,0.1], [0,0,1] ).p.should.be.approximately( 0.1, verb.core.Constants.EPSILON );
+		verb.core.Intersect.segmentAndPlane( [0,0,0], [0,0,1], [0,0,0.9], [0,0,1] ).p.should.be.approximately( 0.9, verb.core.Constants.EPSILON );
+		verb.core.Intersect.segmentAndPlane( [0,0,0], [0,1,0], [0,0.5,0], [0,1,0] ).p.should.be.approximately( 0.5, verb.core.Constants.EPSILON );
+		verb.core.Intersect.segmentAndPlane( [0,0,0], [0,1,0], [0,0.1,0], [0,1,0] ).p.should.be.approximately( 0.1, verb.core.Constants.EPSILON );
+	});
+});
+
 function triangularLamina(){
     var s = verb.topo.Solid.mvfs( [0,0,0] );
 
@@ -7823,26 +7833,38 @@ describe("verb.core.Vec.signedAngleBetween",function(){
 });
 
 describe("verb.topo.Split.split",function(){
-    it('can split simple l shaped extrusion', function(){
-        var pts = [[0,0,0], [10,0,0], [10,10,0], [20,10,0], [20,20,0], [0,20,0] ]
-        var s = verb.topo.Make.extrusion( pts, [0,0,10] );    // hollowPrism();
+    it('can split a cube in half', function(){
+        var pts = [[0,0,0], [10,0,0], [10,10,0], [0,10,0] ];
+        var s = verb.topo.Make.extrusion( pts, [0,0,10] );
 
         var p = { n : [0,0,1], o : [0,0,5] };
-        verb.topo.Split.split( s, p );
+        var res = verb.topo.Split.split( s, p );
 
-        s.vertices().forEach(function(x){
-            console.log(x.e != null);
-        })
+        verb.topo.Analyze.volume(res.item0).should.be.approximately( 500, verb.core.Constants.EPSILON );
+        verb.topo.Analyze.volume(res.item1).should.be.approximately( 500, verb.core.Constants.EPSILON );
+    });
 
+    it('can split a cube in quarters', function(){
+        var pts = [[0,0,0], [10,0,0], [10,10,0], [0,10,0] ];
+        var s = verb.topo.Make.extrusion( pts, [0,0,10] );
+
+        var p = { n : [0,0,1], o : [0,0,2.5] };
+        var res = verb.topo.Split.split( s, p );
+
+        verb.topo.Analyze.volume(res.item0).should.be.approximately( 750, verb.core.Constants.EPSILON );
+        verb.topo.Analyze.volume(res.item1).should.be.approximately( 250, verb.core.Constants.EPSILON );
+    });
+
+    it('can split an l-shaped solid', function(){
+        var pts = [[0,0,0], [10,0,0], [10,10,0] , [20,10,0], [20,20,0], [0,20,0] ];
+        var s = verb.topo.Make.extrusion( pts, [0,0,10] );
+        var v = verb.topo.Analyze.volume( s );
+
+        var p = { n : [0,0,1], o : [0,0,5] };
+        var res = verb.topo.Split.split( s, p );
+
+        verb.topo.Analyze.volume(res.item0).should.be.approximately( v/2, verb.core.Constants.EPSILON );
+        verb.topo.Analyze.volume(res.item1).should.be.approximately( v/2, verb.core.Constants.EPSILON );
     });
 });
 
-describe("verb.core.Intersect.segmentAndPlane",function(){
-	it('works for simple cases', function(){
-		verb.core.Intersect.segmentAndPlane( [0,0,0], [0,0,1], [0,0,0.5], [0,0,1] ).p.should.be.approximately( 0.5, 1e-6 );
-		verb.core.Intersect.segmentAndPlane( [0,0,0], [0,0,1], [0,0,0.1], [0,0,1] ).p.should.be.approximately( 0.1, 1e-6 );
-		verb.core.Intersect.segmentAndPlane( [0,0,0], [0,0,1], [0,0,0.9], [0,0,1] ).p.should.be.approximately( 0.9, 1e-6 );
-		verb.core.Intersect.segmentAndPlane( [0,0,0], [0,1,0], [0,0.5,0], [0,1,0] ).p.should.be.approximately( 0.5, 1e-6 );
-		verb.core.Intersect.segmentAndPlane( [0,0,0], [0,1,0], [0,0.1,0], [0,1,0] ).p.should.be.approximately( 0.1, 1e-6 );
-	});
-});

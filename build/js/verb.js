@@ -6304,6 +6304,65 @@ verb.topo.Analyze.loopArea = function(l,n) {
 	} while(ce.nxt != se);
 	return v / 2;
 };
+verb.topo.VertexFaceClass = { __ename__ : true, __constructs__ : ["Above","Below"] };
+verb.topo.VertexFaceClass.Above = ["Above",0];
+verb.topo.VertexFaceClass.Above.toString = $estr;
+verb.topo.VertexFaceClass.Above.__enum__ = verb.topo.VertexFaceClass;
+verb.topo.VertexFaceClass.Below = ["Below",1];
+verb.topo.VertexFaceClass.Below.toString = $estr;
+verb.topo.VertexFaceClass.Below.__enum__ = verb.topo.VertexFaceClass;
+verb.topo.VertexVertexClass = { __ename__ : true, __constructs__ : ["Above","Below"] };
+verb.topo.VertexVertexClass.Above = ["Above",0];
+verb.topo.VertexVertexClass.Above.toString = $estr;
+verb.topo.VertexVertexClass.Above.__enum__ = verb.topo.VertexVertexClass;
+verb.topo.VertexVertexClass.Below = ["Below",1];
+verb.topo.VertexVertexClass.Below.toString = $estr;
+verb.topo.VertexVertexClass.Below.__enum__ = verb.topo.VertexVertexClass;
+verb.topo.Boolean = $hx_exports.topo.Boolean = function() { };
+verb.topo.Boolean.__name__ = ["verb","topo","Boolean"];
+verb.topo.Boolean.prototype = {
+	union: function(a,b) {
+		var s = this.split(a,b);
+		var cfa = this.vertexFaceClassify(s.coplanarVerticesA);
+		var cfb = this.vertexFaceClassify(s.coplanarVerticesB);
+		var cc = this.vertexVertexClassification(s.coincidentVertices);
+	}
+	,vertexFaceClassify: function(a) {
+		return null;
+	}
+	,vertexVertexClassification: function(a) {
+		return null;
+	}
+	,split: function(a,b) {
+		var va = this.splitEdges(a,b);
+		var vva = this.splitEdgesByVertices(a,b);
+		var vvb = this.splitEdgesByVertices(b,a);
+		var cov = this.getCoincidentVertices(a,b,va.concat(vva).concat(vvb));
+		var vfa = this.splitEdgesWithFaces(a,b);
+		var vfb = this.splitEdgesWithFaces(b,a);
+		var cpva = this.getCoplanarVertices(a,b,vfa);
+		var cpvb = this.getCoplanarVertices(b,a,vfb);
+		return { coincidentVertices : cov, coplanarVerticesA : cpva, coplanarVerticesB : cpvb};
+	}
+	,isPointInFace: function(pt,f) {
+		return false;
+	}
+	,splitEdges: function(a,b) {
+		return null;
+	}
+	,splitEdgesByVertices: function(a,b) {
+		return null;
+	}
+	,getCoincidentVertices: function(a,b,v) {
+		return null;
+	}
+	,splitEdgesWithFaces: function(a,b) {
+		return null;
+	}
+	,getCoplanarVertices: function(a,b,v) {
+		return null;
+	}
+};
 verb.topo.Topo = function() {
 	this.id = verb.topo.Topo.counter++;
 };
@@ -6823,7 +6882,7 @@ verb.topo.Split.split = function(s,p) {
 	}
 	verb.topo.Split.cleanup(a1,s);
 	verb.topo.Split.cleanup(b1,s);
-	return new verb.core.types.Pair(a1,b1);
+	return new verb.core.types.Pair(b1,a1);
 };
 verb.topo.Split.moveFace = function(f,s) {
 	if(f.s == s) return;

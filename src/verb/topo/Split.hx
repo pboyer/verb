@@ -181,7 +181,7 @@ class Split {
         cleanup(a, s);
         cleanup(b, s);
 
-        return new Pair(a,b);
+        return new Pair(b,a);
     }
 
     private static function moveFace( f : Face, s : Solid ) : Void {
