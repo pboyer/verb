@@ -7768,59 +7768,6 @@ describe("verb.topo.Solid.lmev",function(){
         });
     });
 
-    it('can be used to split an edge of a prism', function(){
-
-        var pts = [[0,0,0], [10,0,0], [10,10,0] ];
-        var s = verb.topo.Make.extrusion( pts, [0,0,10] );
-
-        // get the top face
-        var tf = s.faces().filter(function(x){
-            return verb.core.Vec.dot( x.normal(), [0,0,1] ) > 0;
-        })[0];
-
-        // pick a vertex from the top face
-        var v = tf.ol.e.v;
-
-        // get an edge going from top to bottom
-        var e = v.halfEdges()
-            .filter(function(e){
-                var dif = verb.core.Vec.sub( e.v.pt, e.nxt.v.pt );
-                return Math.abs( dif[0] ) < 1e-3 && Math.abs( dif[1] ) < 1e-3;
-            })[0];
-
-        console.log( e.v.pt, e.nxt.v.pt )
-
-        s.lmev( e, e.opp.nxt, [10,0,5] );
-
-
-//        console.log(v.pt);
-
-
-
-
-
-//        var vs = s.vertices();
-//
-//        // each vertex has 2 neighbors originally
-//        vs.forEach(function(x){
-//            x.neighbors().length.should.be.equal(2);
-//        });
-//
-//        var l = s.f.l;
-//
-//        // extend every vertex in the loop with an lmev
-//        var nvs = l.halfEdges().map(function(e){
-//            return s.lmev( e, e, verb.core.Vec.add( e.v.pt, [0,0,1]) );
-//        });
-//
-//        l.halfEdges().length.should.be.equal(9);
-//        s.f.nxt.l.halfEdges().length.should.be.equal(3);
-//
-//        // each of the original vertices has 3 neighbors afterwards
-//        vs.forEach(function(x){
-//            x.neighbors().length.should.be.equal(3);
-//        });
-    });
 });
 
 
@@ -7833,26 +7780,53 @@ describe("verb.core.Vec.signedAngleBetween",function(){
 });
 
 describe("verb.topo.Split.split",function(){
-    it('can split a cube in half', function(){
+    function cube(){
         var pts = [[0,0,0], [10,0,0], [10,10,0], [0,10,0] ];
-        var s = verb.topo.Make.extrusion( pts, [0,0,10] );
+        return verb.topo.Make.extrusion( pts, [0,0,10] );
+    }
 
+    it('can split a cube in half', function(){
         var p = { n : [0,0,1], o : [0,0,5] };
-        var res = verb.topo.Split.split( s, p );
+        var res = verb.topo.Split.split( cube(), p );
 
         verb.topo.Analyze.volume(res.item0).should.be.approximately( 500, verb.core.Constants.EPSILON );
         verb.topo.Analyze.volume(res.item1).should.be.approximately( 500, verb.core.Constants.EPSILON );
     });
 
     it('can split a cube in quarters', function(){
-        var pts = [[0,0,0], [10,0,0], [10,10,0], [0,10,0] ];
-        var s = verb.topo.Make.extrusion( pts, [0,0,10] );
-
         var p = { n : [0,0,1], o : [0,0,2.5] };
-        var res = verb.topo.Split.split( s, p );
+        var res = verb.topo.Split.split( cube(), p );
 
         verb.topo.Analyze.volume(res.item0).should.be.approximately( 750, verb.core.Constants.EPSILON );
         verb.topo.Analyze.volume(res.item1).should.be.approximately( 250, verb.core.Constants.EPSILON );
+    });
+
+    it('does not split when plane is coplanar with bottom face of cube', function(){
+        var res = verb.topo.Split.split( cube(), { n : [0,0,1], o : [0,0,0] } );
+        should.equal(null, res);
+    });
+
+    it('does not split when plane is coplanar with top face of cube', function(){
+        var res = verb.topo.Split.split( cube(), { n : [0,0,1], o : [0,0,10] } );
+        should.equal(null, res);
+    });
+
+    it('does not split when plane is coplanar with side face of cube', function(){
+        var res = verb.topo.Split.split( cube(), { n : [1,0,0], o : [10,0,0] } );
+        should.equal(null, res);
+    });
+
+    it('does not split when plane is non-intersecting', function(){
+        var res = verb.topo.Split.split( cube(), { n : [1,0,0], o : [20,0,0] } );
+        should.equal(null, res);
+    });
+
+    it('can split cube through the center', function(){
+        var n = [ 1 / Math.sqrt(3), 1 / Math.sqrt(3), 1 / Math.sqrt(3) ];
+        var res = verb.topo.Split.split( cube(), { n : n, o : [5,5,5] } );
+
+        verb.topo.Analyze.volume(res.item0).should.be.approximately( 500, verb.core.Constants.EPSILON );
+        verb.topo.Analyze.volume(res.item1).should.be.approximately( 500, verb.core.Constants.EPSILON );
     });
 
     it('can split an l-shaped solid', function(){

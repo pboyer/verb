@@ -1,5 +1,8 @@
 package verb.topo;
 
+import verb.topo.Split.VertexClass;
+import verb.topo.Split.VertexClass;
+import verb.topo.Split.VertexClass;
 import verb.topo.Split.SectorClass;
 import verb.core.types.Exception;
 import haxe.ds.IntMap;
@@ -49,6 +52,7 @@ class Split {
         }
 
         var nulledges = new Array<HalfEdge>();
+        var crossing = false;
 
         for (v in vs.iterator()){
 
@@ -102,17 +106,22 @@ class Split {
                     } else if ( prv == VertexClass.Below && nxt == VertexClass.Below ) {
                         ep.cl = VertexClass.Above;
                     } else {
-                        trace(prv, nxt, a, b);
                         throw new Exception("Double On edge encountered!");
                     }
                 }
             }
 
             // find the first in ABOVE seq
-            var i = nextAbove( ecs, 0 );
+            var i = nextOfClass( VertexClass.Above, ecs, 0 );
 
-            // there's no above edge in the seq, continue
+            // there's no above edge in the seq (all below), continue
             if (i == -1) break;
+
+            // if all of the edges are of the same type, just continue
+            if (nextOfClass( VertexClass.Below, ecs, 0 ) == -1) break;
+
+            // if we've reached this point, at least one vertex is crossing
+            crossing = true;
 
             var start = ecs[i].edge;
             var head = start;
@@ -131,7 +140,7 @@ class Split {
                 nulledges.push( ne );
 
                 // find the next start sequence and assign to head
-                i = nextAbove( ecs, i );
+                i = nextOfClass( VertexClass.Above, ecs, i );
 
                 // there is no other above edge, we're done with this vertex
                 if (i == -1) break;
@@ -141,6 +150,11 @@ class Split {
                 // we've come back to the beginning (should never happen)
                 if (head == start) break;
             }
+        }
+
+        // there are no crossing edges, this might happen if the plane is coplanar with a face
+        if (!crossing){
+            return null;
         }
 
         // now we have all of the null edges inserted and need to separate the solid
@@ -268,7 +282,6 @@ class Split {
         }
     }
 
-
     private static function sortNullEdges( es : Array<HalfEdge> ){
         es.sort(function(a : HalfEdge, b : HalfEdge){
             var ap = a.v.pt;
@@ -293,11 +306,11 @@ class Split {
         });
     }
 
-    private static function nextAbove( ecs : Array<SectorClass>, start : Int ) : Int {
+    private static function nextOfClass( cl : VertexClass, ecs : Array<SectorClass>, start : Int ) : Int {
         var i = start;
         var head : SectorClass = null;
         while (i < ecs.length){
-            if (ecs[i].cl == VertexClass.Above) {
+            if ( ecs[i].cl == cl ) {
                 head = ecs[i];
                 break;
             }

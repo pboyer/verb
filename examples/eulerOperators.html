@@ -124,21 +124,20 @@
         pts.push( [ r * Math.cos( i*w ),  r * Math.sin( i*w ), 0 ] );
     }
 
-    var pts = [[0,0,0], [10,0,0], [10,10,0] , [20,10,0], [20,20,0], [0,20,0] ]
+    var pts = [[0,0,0], [10,0,0], [10,10,0], [0,10,0] ];
 
     var s = verb.topo.Make.extrusion( pts, [0,0,10] );
 
     console.log( "volume", verb.topo.Analyze.volume( s ) );
     console.log( "area", verb.topo.Analyze.area( s ) );
 
-    var p = { n : [0,1,0], o : [0,5,0] }; // this crashes!
-
-    // addPointsToScene( verb.topo.Slice.intersectionPoints( s, p ) );
+    var n = [ 1 / Math.sqrt(3), 1 / Math.sqrt(3), 1 / Math.sqrt(3) ];
+    var p = { n : n, o : [5,5,5] };
 
     var r = verb.topo.Split.split( s, p );
 
     drawSolid( r.item0 );
-    drawSolid( r.item1 );
+    // drawSolid( r.item1 );
 
 	threeRender();
 

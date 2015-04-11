@@ -84,11 +84,6 @@ Type.getClassName = function(c) {
 	return a.join(".");
 };
 var haxe = {};
-haxe.Log = function() { };
-haxe.Log.__name__ = ["haxe","Log"];
-haxe.Log.trace = function(v,infos) {
-	js.Boot.__trace(v,infos);
-};
 haxe.ds = {};
 haxe.ds.IntMap = function() {
 	this.h = { };
@@ -126,100 +121,11 @@ haxe.ds.IntMap.prototype = {
 		}};
 	}
 };
-haxe.ds.Option = { __ename__ : true, __constructs__ : ["Some","None"] };
+haxe.ds.Option = { __constructs__ : ["Some","None"] };
 haxe.ds.Option.Some = function(v) { var $x = ["Some",0,v]; $x.__enum__ = haxe.ds.Option; $x.toString = $estr; return $x; };
 haxe.ds.Option.None = ["None",1];
 haxe.ds.Option.None.toString = $estr;
 haxe.ds.Option.None.__enum__ = haxe.ds.Option;
-var js = {};
-js.Boot = function() { };
-js.Boot.__name__ = ["js","Boot"];
-js.Boot.__unhtml = function(s) {
-	return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
-};
-js.Boot.__trace = function(v,i) {
-	var msg;
-	if(i != null) msg = i.fileName + ":" + i.lineNumber + ": "; else msg = "";
-	msg += js.Boot.__string_rec(v,"");
-	if(i != null && i.customParams != null) {
-		var _g = 0;
-		var _g1 = i.customParams;
-		while(_g < _g1.length) {
-			var v1 = _g1[_g];
-			++_g;
-			msg += "," + js.Boot.__string_rec(v1,"");
-		}
-	}
-	var d;
-	if(typeof(document) != "undefined" && (d = document.getElementById("haxe:trace")) != null) d.innerHTML += js.Boot.__unhtml(msg) + "<br/>"; else if(typeof console != "undefined" && console.log != null) console.log(msg);
-};
-js.Boot.__string_rec = function(o,s) {
-	if(o == null) return "null";
-	if(s.length >= 5) return "<...>";
-	var t = typeof(o);
-	if(t == "function" && (o.__name__ || o.__ename__)) t = "object";
-	switch(t) {
-	case "object":
-		if(o instanceof Array) {
-			if(o.__enum__) {
-				if(o.length == 2) return o[0];
-				var str = o[0] + "(";
-				s += "\t";
-				var _g1 = 2;
-				var _g = o.length;
-				while(_g1 < _g) {
-					var i = _g1++;
-					if(i != 2) str += "," + js.Boot.__string_rec(o[i],s); else str += js.Boot.__string_rec(o[i],s);
-				}
-				return str + ")";
-			}
-			var l = o.length;
-			var i1;
-			var str1 = "[";
-			s += "\t";
-			var _g2 = 0;
-			while(_g2 < l) {
-				var i2 = _g2++;
-				str1 += (i2 > 0?",":"") + js.Boot.__string_rec(o[i2],s);
-			}
-			str1 += "]";
-			return str1;
-		}
-		var tostr;
-		try {
-			tostr = o.toString;
-		} catch( e ) {
-			return "???";
-		}
-		if(tostr != null && tostr != Object.toString) {
-			var s2 = o.toString();
-			if(s2 != "[object Object]") return s2;
-		}
-		var k = null;
-		var str2 = "{\n";
-		s += "\t";
-		var hasp = o.hasOwnProperty != null;
-		for( var k in o ) {
-		if(hasp && !o.hasOwnProperty(k)) {
-			continue;
-		}
-		if(k == "prototype" || k == "__class__" || k == "__super__" || k == "__interfaces__" || k == "__properties__") {
-			continue;
-		}
-		if(str2.length != 2) str2 += ", \n";
-		str2 += s + k + " : " + js.Boot.__string_rec(o[k],s);
-		}
-		s = s.substring(1);
-		str2 += "\n" + s + "}";
-		return str2;
-	case "function":
-		return "<function>";
-	case "string":
-		return o;
-	default:
-		return String(o);
-	}
-};
 var promhx = {};
 promhx.base = {};
 promhx.base.AsyncBase = function(d) {
@@ -751,14 +657,14 @@ promhx.base.EventLoop.continueOnNextLoop = function() {
 	if(promhx.base.EventLoop.nextLoop != null) promhx.base.EventLoop.nextLoop(promhx.base.EventLoop.f); else setImmediate(promhx.base.EventLoop.f);
 };
 promhx.error = {};
-promhx.error.PromiseError = { __ename__ : true, __constructs__ : ["AlreadyResolved","DownstreamNotFullfilled"] };
+promhx.error.PromiseError = { __constructs__ : ["AlreadyResolved","DownstreamNotFullfilled"] };
 promhx.error.PromiseError.AlreadyResolved = function(message) { var $x = ["AlreadyResolved",0,message]; $x.__enum__ = promhx.error.PromiseError; $x.toString = $estr; return $x; };
 promhx.error.PromiseError.DownstreamNotFullfilled = function(message) { var $x = ["DownstreamNotFullfilled",1,message]; $x.__enum__ = promhx.error.PromiseError; $x.toString = $estr; return $x; };
 var verb = {};
 verb.Verb = function() { };
 verb.Verb.__name__ = ["verb","Verb"];
 verb.Verb.main = function() {
-	haxe.Log.trace("verb 0.2.0",{ fileName : "Verb.hx", lineNumber : 56, className : "verb.Verb", methodName : "main"});
+	console.log("verb 0.2.0");
 };
 verb.core = {};
 verb.core.KnotMultiplicity = $hx_exports.core.KnotMultiplicity = function(knot,mult) {
@@ -1710,7 +1616,7 @@ verb.core.Eval.knotSpanGivenN = function(n,degree,u,knots) {
 	}
 	return mid;
 };
-verb.core.MarchStepState = { __ename__ : true, __constructs__ : ["OutOfBounds","InsideDomain","AtBoundary","CompleteLoop"] };
+verb.core.MarchStepState = { __constructs__ : ["OutOfBounds","InsideDomain","AtBoundary","CompleteLoop"] };
 verb.core.MarchStepState.OutOfBounds = ["OutOfBounds",0];
 verb.core.MarchStepState.OutOfBounds.toString = $estr;
 verb.core.MarchStepState.OutOfBounds.__enum__ = verb.core.MarchStepState;
@@ -5667,7 +5573,7 @@ verb.exe.WorkerPool.prototype = {
 							_g._callbacks.remove(workId[0]);
 						}
 					} catch( error ) {
-						haxe.Log.trace(error,{ fileName : "WorkerPool.hx", lineNumber : 77, className : "verb.exe.WorkerPool", methodName : "processQueue"});
+						console.log(error);
 					}
 					_g.processQueue();
 				};
@@ -6265,14 +6171,14 @@ verb.topo.Analyze.loopArea = function(l,n) {
 	} while(ce.nxt != se);
 	return v / 2;
 };
-verb.topo.VertexFaceClass = { __ename__ : true, __constructs__ : ["Above","Below"] };
+verb.topo.VertexFaceClass = { __constructs__ : ["Above","Below"] };
 verb.topo.VertexFaceClass.Above = ["Above",0];
 verb.topo.VertexFaceClass.Above.toString = $estr;
 verb.topo.VertexFaceClass.Above.__enum__ = verb.topo.VertexFaceClass;
 verb.topo.VertexFaceClass.Below = ["Below",1];
 verb.topo.VertexFaceClass.Below.toString = $estr;
 verb.topo.VertexFaceClass.Below.__enum__ = verb.topo.VertexFaceClass;
-verb.topo.VertexVertexClass = { __ename__ : true, __constructs__ : ["Above","Below"] };
+verb.topo.VertexVertexClass = { __constructs__ : ["Above","Below"] };
 verb.topo.VertexVertexClass.Above = ["Above",0];
 verb.topo.VertexVertexClass.Above.toString = $estr;
 verb.topo.VertexVertexClass.Above.__enum__ = verb.topo.VertexVertexClass;
@@ -6717,7 +6623,7 @@ verb.topo.Solid.prototype = $extend(verb.topo.Topo.prototype,{
 		return "Solid (" + this.vertices().length + " Vertices, " + this.faces().length + " Faces, " + this.loops().length + " Loops, " + this.halfEdges().length + " HalfEdges" + ")";
 	}
 });
-verb.topo.VertexClass = { __ename__ : true, __constructs__ : ["On","Above","Below"] };
+verb.topo.VertexClass = { __constructs__ : ["On","Above","Below"] };
 verb.topo.VertexClass.On = ["On",0];
 verb.topo.VertexClass.On.toString = $estr;
 verb.topo.VertexClass.On.__enum__ = verb.topo.VertexClass;
@@ -6741,6 +6647,7 @@ verb.topo.Split.split = function(s,p) {
 		if(!vs.exists(v.id)) vs.set(v.id,v);
 	}
 	var nulledges = new Array();
+	var crossing = false;
 	var $it0 = vs.iterator();
 	while( $it0.hasNext() ) {
 		var v1 = $it0.next();
@@ -6774,14 +6681,13 @@ verb.topo.Split.split = function(s,p) {
 				var b = (i1 + 1) % el;
 				var prv = ecs[a].cl;
 				var nxt = ecs[b].cl;
-				if(prv == verb.topo.VertexClass.Above && nxt == verb.topo.VertexClass.Above) ep1.cl = verb.topo.VertexClass.Below; else if(prv == verb.topo.VertexClass.Below && nxt == verb.topo.VertexClass.Above) ep1.cl = verb.topo.VertexClass.Below; else if(prv == verb.topo.VertexClass.Above && nxt == verb.topo.VertexClass.Below) ep1.cl = verb.topo.VertexClass.Below; else if(prv == verb.topo.VertexClass.Below && nxt == verb.topo.VertexClass.Below) ep1.cl = verb.topo.VertexClass.Above; else {
-					haxe.Log.trace(prv,{ fileName : "Split.hx", lineNumber : 105, className : "verb.topo.Split", methodName : "split", customParams : [nxt,a,b]});
-					throw new verb.core.types.Exception("Double On edge encountered!");
-				}
+				if(prv == verb.topo.VertexClass.Above && nxt == verb.topo.VertexClass.Above) ep1.cl = verb.topo.VertexClass.Below; else if(prv == verb.topo.VertexClass.Below && nxt == verb.topo.VertexClass.Above) ep1.cl = verb.topo.VertexClass.Below; else if(prv == verb.topo.VertexClass.Above && nxt == verb.topo.VertexClass.Below) ep1.cl = verb.topo.VertexClass.Below; else if(prv == verb.topo.VertexClass.Below && nxt == verb.topo.VertexClass.Below) ep1.cl = verb.topo.VertexClass.Above; else throw new verb.core.types.Exception("Double On edge encountered!");
 			}
 		}
-		var i2 = verb.topo.Split.nextAbove(ecs,0);
+		var i2 = verb.topo.Split.nextOfClass(verb.topo.VertexClass.Above,ecs,0);
 		if(i2 == -1) break;
+		if(verb.topo.Split.nextOfClass(verb.topo.VertexClass.Below,ecs,0) == -1) break;
+		crossing = true;
 		var start = ecs[i2].edge;
 		var head = start;
 		var tail = start;
@@ -6793,12 +6699,13 @@ verb.topo.Split.split = function(s,p) {
 			s.lmev(head,tail.opp.nxt,head.v.pt.slice());
 			var ne = head.prv;
 			nulledges.push(ne);
-			i2 = verb.topo.Split.nextAbove(ecs,i2);
+			i2 = verb.topo.Split.nextOfClass(verb.topo.VertexClass.Above,ecs,i2);
 			if(i2 == -1) break;
 			head = ecs[i2].edge;
 			if(head == start) break;
 		}
 	}
+	if(!crossing) return null;
 	verb.topo.Split.sortNullEdges(nulledges);
 	var h0;
 	var h1;
@@ -6909,7 +6816,7 @@ verb.topo.Split.join = function(e0,e1) {
 	} else s.lmekr(e0,e1.nxt);
 	if(e0.nxt.nxt != e1) {
 		s.lmef(e1,e0.nxt);
-		if(nf != null && of.l.nxt != of.l) haxe.Log.trace("PANIC!",{ fileName : "Split.hx", lineNumber : 254, className : "verb.topo.Split", methodName : "join"});
+		if(nf != null && of.l.nxt != of.l) console.log("PANIC!");
 	}
 };
 verb.topo.Split.cut = function(e,faces) {
@@ -6926,11 +6833,11 @@ verb.topo.Split.sortNullEdges = function(es) {
 		return 0;
 	});
 };
-verb.topo.Split.nextAbove = function(ecs,start) {
+verb.topo.Split.nextOfClass = function(cl,ecs,start) {
 	var i = start;
 	var head = null;
 	while(i < ecs.length) {
-		if(ecs[i].cl == verb.topo.VertexClass.Above) {
+		if(ecs[i].cl == cl) {
 			head = ecs[i];
 			break;
 		}
