@@ -4451,6 +4451,9 @@ verb.core.Tess.rationalSurfaceAdaptive = function(surface,options) {
 };
 verb.core.Trig = $hx_exports.core.Trig = function() { };
 verb.core.Trig.__name__ = ["verb","core","Trig"];
+verb.core.Trig.isPointInPlane = function(pt,p,tol) {
+	return Math.abs(verb.core.Vec.dot(verb.core.Vec.sub(pt,p.o),p.n)) < tol;
+};
 verb.core.Trig.distToSegment = function(a,b,c) {
 	var res = verb.core.Trig.segmentClosestPoint(b,a,c,0.0,1.0);
 	return verb.core.Vec.dist(b,res.pt);
@@ -4488,6 +4491,19 @@ verb.core.Vec = $hx_exports.core.Vec = function() { };
 verb.core.Vec.__name__ = ["verb","core","Vec"];
 verb.core.Vec.angleBetween = function(a,b) {
 	return Math.acos(verb.core.Vec.dot(a,b) / (verb.core.Vec.norm(a) * verb.core.Vec.norm(b)));
+};
+verb.core.Vec.signedAngleBetween2 = function(a,b,n) {
+	var nab = verb.core.Vec.cross(a,b);
+	var al = verb.core.Vec.norm(a);
+	var bl = verb.core.Vec.norm(b);
+	var abl = al * bl;
+	var adb = verb.core.Vec.dot(a,b);
+	var sina = verb.core.Vec.norm(nab) / abl;
+	var cosa = adb / abl;
+	var w = Math.atan2(sina,cosa);
+	var s = verb.core.Vec.dot(n,nab);
+	if(Math.abs(s) < 1e-10) return w;
+	if(s > 0) return w; else return -w;
 };
 verb.core.Vec.signedAngleBetween = function(a,b,n) {
 	var nab = verb.core.Vec.cross(a,b);
@@ -6226,47 +6242,97 @@ verb.topo.VertexVertexClass.Below.toString = $estr;
 verb.topo.VertexVertexClass.Below.__enum__ = verb.topo.VertexVertexClass;
 verb.topo.Boolean = $hx_exports.topo.Boolean = function() { };
 verb.topo.Boolean.__name__ = ["verb","topo","Boolean"];
+verb.topo.Boolean.vertexFaceClassify = function(a) {
+	return null;
+};
+verb.topo.Boolean.vertexVertexClassification = function(a) {
+	return null;
+};
+verb.topo.Boolean.split = function(a,b,tol) {
+	var va = verb.topo.Boolean.splitAllEdges(a,b,tol);
+	var vva = verb.topo.Boolean.splitEdgesByVertices(a,b);
+	var vvb = verb.topo.Boolean.splitEdgesByVertices(b,a);
+	var cov = verb.topo.Boolean.getCoincidentVertices(a,b,va.concat(vva).concat(vvb));
+	var vfa = verb.topo.Boolean.splitEdgesWithFaces(a,b);
+	var vfb = verb.topo.Boolean.splitEdgesWithFaces(b,a);
+	var cpva = verb.topo.Boolean.getCoplanarVertices(a,b,vfa);
+	var cpvb = verb.topo.Boolean.getCoplanarVertices(b,a,vfb);
+	return { coincidentVertices : cov, coplanarVerticesA : cpva, coplanarVerticesB : cpvb};
+};
+verb.topo.Boolean.splitAllEdges = function(a,b,tol) {
+	var c = new Array();
+	var _g = 0;
+	var _g1 = a.edges();
+	while(_g < _g1.length) {
+		var e0 = _g1[_g];
+		++_g;
+		var _g2 = 0;
+		var _g3 = b.edges();
+		while(_g2 < _g3.length) {
+			var e1 = _g3[_g2];
+			++_g2;
+			var a1 = verb.topo.Boolean.splitEdges(e0.item0,e1.item0,tol);
+			if(a1 == null) continue;
+			c.push(a1);
+		}
+	}
+	return c;
+};
+verb.topo.Boolean.splitEdges = function(a,b,tol) {
+	var i = verb.core.Intersect.segments(a.v.pt,a.nxt.v.pt,b.v.pt,b.nxt.v.pt,tol);
+	if(i == null) return null;
+	if(i.u0 > 0.9999999999 || i.u0 < 1e-10 || i.u1 > 0.9999999999 || i.u1 < 1e-10) return null;
+	return new verb.core.types.Pair(verb.topo.Boolean.splitEdge(a,i.point0),verb.topo.Boolean.splitEdge(b,i.point1));
+};
+verb.topo.Boolean.splitEdge = function(e,pt) {
+	var s = e.l.f.s;
+	return s.lmev(e,e.opp.nxt,pt);
+};
+verb.topo.Boolean.isPointInFace = function(pt,f,tol) {
+	var n = f.normal();
+	var o = f.l.e.v.pt;
+	if(!verb.core.Trig.isPointInPlane(pt,{ n : n, o : o},tol)) return false;
+	var iol = verb.topo.Boolean.isPointInPolygon(pt,f.ol.points(),n);
+	if(!iol) return iol;
+	var _g = 0;
+	var _g1 = f.rings();
+	while(_g < _g1.length) {
+		var il = _g1[_g];
+		++_g;
+		if(verb.topo.Boolean.isPointInPolygon(pt,il.points(),n)) return false;
+	}
+	return true;
+};
+verb.topo.Boolean.isPointInPolygon = function(pt,pts,n) {
+	var ptsl = pts.length;
+	var a = 0.0;
+	var _g = 0;
+	while(_g < ptsl) {
+		var i = _g++;
+		var v0 = verb.core.Vec.sub(pts[i],pt);
+		var v1 = verb.core.Vec.sub(pts[(i + 1) % ptsl],pt);
+		a += verb.core.Vec.signedAngleBetween2(v0,v1,n);
+	}
+	return Math.abs(a) > Math.PI;
+};
+verb.topo.Boolean.splitEdgesByVertices = function(a,b) {
+	return null;
+};
+verb.topo.Boolean.getCoincidentVertices = function(a,b,v) {
+	return null;
+};
+verb.topo.Boolean.splitEdgesWithFaces = function(a,b) {
+	return null;
+};
+verb.topo.Boolean.getCoplanarVertices = function(a,b,v) {
+	return null;
+};
 verb.topo.Boolean.prototype = {
-	union: function(a,b) {
-		var s = this.split(a,b);
-		var cfa = this.vertexFaceClassify(s.coplanarVerticesA);
-		var cfb = this.vertexFaceClassify(s.coplanarVerticesB);
-		var cc = this.vertexVertexClassification(s.coincidentVertices);
-	}
-	,vertexFaceClassify: function(a) {
-		return null;
-	}
-	,vertexVertexClassification: function(a) {
-		return null;
-	}
-	,split: function(a,b) {
-		var va = this.splitEdges(a,b);
-		var vva = this.splitEdgesByVertices(a,b);
-		var vvb = this.splitEdgesByVertices(b,a);
-		var cov = this.getCoincidentVertices(a,b,va.concat(vva).concat(vvb));
-		var vfa = this.splitEdgesWithFaces(a,b);
-		var vfb = this.splitEdgesWithFaces(b,a);
-		var cpva = this.getCoplanarVertices(a,b,vfa);
-		var cpvb = this.getCoplanarVertices(b,a,vfb);
-		return { coincidentVertices : cov, coplanarVerticesA : cpva, coplanarVerticesB : cpvb};
-	}
-	,isPointInFace: function(pt,f) {
-		return false;
-	}
-	,splitEdges: function(a,b) {
-		return null;
-	}
-	,splitEdgesByVertices: function(a,b) {
-		return null;
-	}
-	,getCoincidentVertices: function(a,b,v) {
-		return null;
-	}
-	,splitEdgesWithFaces: function(a,b) {
-		return null;
-	}
-	,getCoplanarVertices: function(a,b,v) {
-		return null;
+	union: function(a,b,tol) {
+		var s = verb.topo.Boolean.split(a,b,tol);
+		var cfa = verb.topo.Boolean.vertexFaceClassify(s.coplanarVerticesA);
+		var cfb = verb.topo.Boolean.vertexFaceClassify(s.coplanarVerticesB);
+		var cc = verb.topo.Boolean.vertexVertexClassification(s.coincidentVertices);
 	}
 };
 verb.topo.Topo = function() {

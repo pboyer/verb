@@ -7842,3 +7842,35 @@ describe("verb.topo.Split.split",function(){
     });
 });
 
+describe("verb.core.Trig.isPointInPlane",function(){
+    it('works for a few basic cases', function(){
+        verb.core.Trig.isPointInPlane( [0,0,0], { n : [1,0,0], o : [0,0,0] }, verb.core.Constants.EPSILON  ).should.be.equal( true );
+        verb.core.Trig.isPointInPlane( [0,0,1], { n : [1,0,0], o : [0,0,0] }, verb.core.Constants.EPSILON  ).should.be.equal( true );
+        verb.core.Trig.isPointInPlane( [1,0,1], { n : [1,0,0], o : [0,0,0] }, verb.core.Constants.EPSILON  ).should.be.equal( false );
+    });
+});
+
+describe("verb.topo.Boolean.isPointInPolygon",function(){
+    it('works for a few basic cases', function(){
+        var tri = [ [0,0,0], [1,0,0], [1,1,0] ];
+        var rect = [ [0,0,0], [1,0,0], [1,1,0], [0,1,0] ];
+        var rectin = [ [0,0,0], [0.5,0.2,0], [1,0,0], [1,1,0], [0,1,0], [0.5,0.5,0] ];
+        var l = [ [0,0,0], [1,0,0], [1,1,0], [2,1,0], [2,2,0], [0,2,0] ];
+
+        verb.topo.Boolean.isPointInPolygon( [0.5,0.5,0], tri, [0,0,1]  ).should.be.equal( true );
+        verb.topo.Boolean.isPointInPolygon( [0.5,0.5,0], rect, [0,0,1] ).should.be.equal( true );
+        verb.topo.Boolean.isPointInPolygon( [0.1,0.3,0], rect, [0,0,1]  ).should.be.equal( true );
+        verb.topo.Boolean.isPointInPolygon( [0.9,0.1,0], rect, [0,0,1]  ).should.be.equal( true );
+
+        verb.topo.Boolean.isPointInPolygon( [2,0.5,0], rect, [0,0,1]  ).should.be.equal( false );
+        verb.topo.Boolean.isPointInPolygon( [-2,0.5,0], rect, [0,0,1]  ).should.be.equal( false );
+        verb.topo.Boolean.isPointInPolygon( [2,2,0], rect, [0,0,1]  ).should.be.equal( false );
+        verb.topo.Boolean.isPointInPolygon( [-2,-2,0], rect, [0,0,1]  ).should.be.equal( false );
+
+        verb.topo.Boolean.isPointInPolygon( [0,0.5,0], rectin, [0,0,1]  ).should.be.equal( false );
+        verb.topo.Boolean.isPointInPolygon( [0.5,0.9,0], rectin, [0,0,1]  ).should.be.equal( true );
+
+        verb.topo.Boolean.isPointInPolygon( [2,0,0], l, [0,0,1]  ).should.be.equal( false );
+        verb.topo.Boolean.isPointInPolygon( [0.5,0.9,0], l, [0,0,1]  ).should.be.equal( true );
+    });
+});

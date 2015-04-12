@@ -1,8 +1,17 @@
 package verb.core;
 
+import verb.core.Vec;
+using verb.core.Vec;
+
+import verb.topo.Split.Plane;
 import verb.core.types.NurbsCurveData.Point;
+
 @:expose("core.Trig")
 class Trig {
+
+    public static function isPointInPlane( pt : Point, p : Plane, tol : Float ) : Bool{
+        return Math.abs( pt.sub( p.o ).dot( p.n ) ) < tol;
+    }
 
     public static function distToSegment(a : Point, b : Point, c : Point){
         var res = segmentClosestPoint( b, a, c, 0.0, 1.0 );
