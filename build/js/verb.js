@@ -6226,6 +6226,16 @@ verb.topo.Analyze.loopArea = function(l,n) {
 	} while(ce.nxt != se);
 	return v / 2;
 };
+verb.topo.BooleanOp = { __constructs__ : ["Union","Intersect","Subtract"] };
+verb.topo.BooleanOp.Union = ["Union",0];
+verb.topo.BooleanOp.Union.toString = $estr;
+verb.topo.BooleanOp.Union.__enum__ = verb.topo.BooleanOp;
+verb.topo.BooleanOp.Intersect = ["Intersect",1];
+verb.topo.BooleanOp.Intersect.toString = $estr;
+verb.topo.BooleanOp.Intersect.__enum__ = verb.topo.BooleanOp;
+verb.topo.BooleanOp.Subtract = ["Subtract",2];
+verb.topo.BooleanOp.Subtract.toString = $estr;
+verb.topo.BooleanOp.Subtract.__enum__ = verb.topo.BooleanOp;
 verb.topo.VertexFaceClass = { __constructs__ : ["Above","Below"] };
 verb.topo.VertexFaceClass.Above = ["Above",0];
 verb.topo.VertexFaceClass.Above.toString = $estr;
@@ -6250,14 +6260,11 @@ verb.topo.Boolean.vertexVertexClassification = function(a) {
 };
 verb.topo.Boolean.split = function(a,b,tol) {
 	var va = verb.topo.Boolean.splitAllEdges(a,b,tol);
-	var vva = verb.topo.Boolean.splitEdgesByVertices(a,b);
-	var vvb = verb.topo.Boolean.splitEdgesByVertices(b,a);
-	var cov = verb.topo.Boolean.getCoincidentVertices(a,b,va.concat(vva).concat(vvb));
-	var vfa = verb.topo.Boolean.splitEdgesWithFaces(a,b);
-	var vfb = verb.topo.Boolean.splitEdgesWithFaces(b,a);
-	var cpva = verb.topo.Boolean.getCoplanarVertices(a,b,vfa);
-	var cpvb = verb.topo.Boolean.getCoplanarVertices(b,a,vfb);
-	return { coincidentVertices : cov, coplanarVerticesA : cpva, coplanarVerticesB : cpvb};
+	var vva = verb.topo.Boolean.splitEdgesByVertices(a,b,tol);
+	var vvb = verb.topo.Boolean.splitEdgesByVertices(b,a,tol);
+	var vfa = verb.topo.Boolean.splitEdgesWithFaces(a,b,tol);
+	var vfb = verb.topo.Boolean.splitEdgesWithFaces(b,a,tol);
+	return { coincidentVertices : verb.topo.Boolean.getCoincidentVertices(a,b,va.concat(vva).concat(vvb),tol), coplanarVerticesOfA : verb.topo.Boolean.getCoplanarVertices(a,b,vfa,tol), coplanarVerticesOfB : verb.topo.Boolean.getCoplanarVertices(b,a,vfb,tol)};
 };
 verb.topo.Boolean.splitAllEdges = function(a,b,tol) {
 	var c = new Array();
@@ -6283,6 +6290,13 @@ verb.topo.Boolean.splitEdges = function(a,b,tol) {
 	if(i == null) return null;
 	if(i.u0 > 0.9999999999 || i.u0 < 1e-10 || i.u1 > 0.9999999999 || i.u1 < 1e-10) return null;
 	return new verb.core.types.Pair(verb.topo.Boolean.splitEdge(a,i.point0),verb.topo.Boolean.splitEdge(b,i.point1));
+};
+verb.topo.Boolean.splitEdgeByVertex = function(e,v,tol) {
+	var i = verb.core.Trig.segmentClosestPoint(v.pt,e.v.pt,e.nxt.v.pt,0.0,1.0);
+	var d = verb.core.Vec.distSquared(v.pt,i.pt);
+	if(d > tol * tol) return null;
+	if(i.u > 0.9999999999 || i.u < 1e-10) return null;
+	return verb.topo.Boolean.splitEdge(e,i.pt);
 };
 verb.topo.Boolean.splitEdge = function(e,pt) {
 	var s = e.l.f.s;
@@ -6315,23 +6329,98 @@ verb.topo.Boolean.isPointInPolygon = function(pt,pts,n) {
 	}
 	return Math.abs(a) > Math.PI;
 };
-verb.topo.Boolean.splitEdgesByVertices = function(a,b) {
-	return null;
+verb.topo.Boolean.splitEdgesByVertices = function(a,b,tol) {
+	var c = new Array();
+	var _g = 0;
+	var _g1 = a.edges();
+	while(_g < _g1.length) {
+		var e = _g1[_g];
+		++_g;
+		var $it0 = $iterator(verb.core.types.DoublyLinkedListExtensions.iter(b.v))();
+		while( $it0.hasNext() ) {
+			var v = $it0.next();
+			var a1 = verb.topo.Boolean.splitEdgeByVertex(e.item0,v,tol);
+			if(a1 == null) continue;
+			c.push(new verb.core.types.Pair(a1,v));
+		}
+	}
+	return c;
 };
-verb.topo.Boolean.getCoincidentVertices = function(a,b,v) {
-	return null;
+verb.topo.Boolean.getCoincidentVertices = function(a,b,v,tol) {
+	var m = new haxe.ds.IntMap();
+	var _g = 0;
+	while(_g < v.length) {
+		var p = v[_g];
+		++_g;
+		m.set(p.item0.id,p.item0);
+		m.set(p.item1.id,p.item1);
+	}
+	var tol2 = tol * tol;
+	var $it0 = $iterator(verb.core.types.DoublyLinkedListExtensions.iter(a.v))();
+	while( $it0.hasNext() ) {
+		var v0 = $it0.next();
+		if(m.exists(v0.id)) continue;
+		var $it1 = $iterator(verb.core.types.DoublyLinkedListExtensions.iter(b.v))();
+		while( $it1.hasNext() ) {
+			var v1 = $it1.next();
+			if(m.exists(v1.id)) continue;
+			if(verb.core.Vec.distSquared(v0.pt,v1.pt) < tol2) v.push(new verb.core.types.Pair(v0,v1));
+		}
+	}
+	return v;
 };
-verb.topo.Boolean.splitEdgesWithFaces = function(a,b) {
-	return null;
+verb.topo.Boolean.splitEdgesWithFaces = function(a,b,tol) {
+	var v = new Array();
+	var _g = 0;
+	var _g1 = a.edges();
+	while(_g < _g1.length) {
+		var e = _g1[_g];
+		++_g;
+		var $it0 = $iterator(verb.core.types.DoublyLinkedListExtensions.iter(b.f))();
+		while( $it0.hasNext() ) {
+			var f = $it0.next();
+			var r = verb.topo.Boolean.splitEdgeWithFace(e.item0,f,tol);
+			if(r == null) continue;
+			v.push(new verb.core.types.Pair(r,f));
+		}
+	}
+	return v;
 };
-verb.topo.Boolean.getCoplanarVertices = function(a,b,v) {
-	return null;
+verb.topo.Boolean.splitEdgeWithFace = function(he,f,tol) {
+	var n = f.normal();
+	var o = f.ol.e.v.pt;
+	var r = verb.core.Intersect.segmentAndPlane(he.v.pt,he.nxt.v.pt,o,n);
+	if(r == null) return null;
+	if(r.p > 0.9999999999 || r.p < 1e-10) return null;
+	var pt = verb.core.Vec.lerp(r.p,he.nxt.v.pt,he.v.pt);
+	if(!verb.topo.Boolean.isPointInFace(pt,f,tol)) return null;
+	return verb.topo.Boolean.splitEdge(he,pt);
+};
+verb.topo.Boolean.getCoplanarVertices = function(a,b,ar,tol) {
+	var m = new haxe.ds.IntMap();
+	var _g = 0;
+	while(_g < ar.length) {
+		var p = ar[_g];
+		++_g;
+		m.set(p.item0.id,p.item0);
+	}
+	var $it0 = $iterator(verb.core.types.DoublyLinkedListExtensions.iter(a.v))();
+	while( $it0.hasNext() ) {
+		var v = $it0.next();
+		if(m.exists(v.id)) continue;
+		var $it1 = $iterator(verb.core.types.DoublyLinkedListExtensions.iter(b.f))();
+		while( $it1.hasNext() ) {
+			var f = $it1.next();
+			if(verb.topo.Boolean.isPointInFace(v.pt,f,tol)) ar.push(new verb.core.types.Pair(v,f));
+		}
+	}
+	return ar;
 };
 verb.topo.Boolean.prototype = {
 	union: function(a,b,tol) {
 		var s = verb.topo.Boolean.split(a,b,tol);
-		var cfa = verb.topo.Boolean.vertexFaceClassify(s.coplanarVerticesA);
-		var cfb = verb.topo.Boolean.vertexFaceClassify(s.coplanarVerticesB);
+		var cfa = verb.topo.Boolean.vertexFaceClassify(s.coplanarVerticesOfA);
+		var cfb = verb.topo.Boolean.vertexFaceClassify(s.coplanarVerticesOfB);
 		var cc = verb.topo.Boolean.vertexVertexClassification(s.coincidentVertices);
 	}
 };
@@ -6756,57 +6845,26 @@ verb.topo.Split.split = function(s,p) {
 	var $it0 = vs.iterator();
 	while( $it0.hasNext() ) {
 		var v1 = $it0.next();
-		var ecs = new Array();
-		var _g1 = 0;
-		var _g11 = v1.halfEdges();
-		while(_g1 < _g11.length) {
-			var e = _g11[_g1];
-			++_g1;
-			ecs.push({ edge : e, cl : verb.topo.Split.classify(e,p)});
-			if(verb.topo.Split.wideSector(e)) ecs.push({ edge : e, cl : verb.topo.Split.classifyBisector(e,p)});
-		}
-		var el = ecs.length;
-		var _g2 = 0;
-		while(_g2 < el) {
-			var i = _g2++;
-			var ep = ecs[i];
-			if(ep.cl == verb.topo.VertexClass.On) {
-				var nc = verb.topo.Split.reclassifyCoplanarSector(ep.edge,p);
-				ecs[i].cl = nc;
-				ecs[(i + 1) % el].cl = nc;
-			}
-		}
-		var _g3 = 0;
-		while(_g3 < el) {
-			var i1 = _g3++;
-			var ep1 = ecs[i1];
-			if(ep1.cl == verb.topo.VertexClass.On) {
-				var a;
-				if(i1 == 0) a = el; else a = i1 - 1;
-				var b = (i1 + 1) % el;
-				var prv = ecs[a].cl;
-				var nxt = ecs[b].cl;
-				if(prv == verb.topo.VertexClass.Above && nxt == verb.topo.VertexClass.Above) ep1.cl = verb.topo.VertexClass.Below; else if(prv == verb.topo.VertexClass.Below && nxt == verb.topo.VertexClass.Above) ep1.cl = verb.topo.VertexClass.Below; else if(prv == verb.topo.VertexClass.Above && nxt == verb.topo.VertexClass.Below) ep1.cl = verb.topo.VertexClass.Below; else if(prv == verb.topo.VertexClass.Below && nxt == verb.topo.VertexClass.Below) ep1.cl = verb.topo.VertexClass.Above; else throw new verb.core.types.Exception("Double On edge encountered!");
-			}
-		}
-		var i2 = verb.topo.Split.nextOfClass(verb.topo.VertexClass.Above,ecs,0);
-		if(i2 == -1) break;
+		var ecs = verb.topo.Split.vertexClassify(v1,p);
+		var i = verb.topo.Split.nextOfClass(verb.topo.VertexClass.Above,ecs,0);
+		if(i == -1) break;
 		if(verb.topo.Split.nextOfClass(verb.topo.VertexClass.Below,ecs,0) == -1) break;
 		crossing = true;
-		var start = ecs[i2].edge;
+		var start = ecs[i].edge;
 		var head = start;
 		var tail = start;
+		var el = ecs.length;
 		while(true) {
-			while(ecs[i2].cl == verb.topo.VertexClass.Above) {
-				tail = ecs[i2].edge;
-				i2 = (i2 + 1) % el;
+			while(ecs[i].cl == verb.topo.VertexClass.Above) {
+				tail = ecs[i].edge;
+				i = (i + 1) % el;
 			}
 			s.lmev(head,tail.opp.nxt,head.v.pt.slice());
 			var ne = head.prv;
 			nulledges.push(ne);
-			i2 = verb.topo.Split.nextOfClass(verb.topo.VertexClass.Above,ecs,i2);
-			if(i2 == -1) break;
-			head = ecs[i2].edge;
+			i = verb.topo.Split.nextOfClass(verb.topo.VertexClass.Above,ecs,i);
+			if(i == -1) break;
+			head = ecs[i].edge;
 			if(head == start) break;
 		}
 	}
@@ -6816,10 +6874,10 @@ verb.topo.Split.split = function(s,p) {
 	var h1;
 	var looseends = [];
 	var afaces = [];
-	var _g4 = 0;
-	while(_g4 < nulledges.length) {
-		var ne1 = nulledges[_g4];
-		++_g4;
+	var _g1 = 0;
+	while(_g1 < nulledges.length) {
+		var ne1 = nulledges[_g1];
+		++_g1;
 		if((h0 = verb.topo.Split.canJoin(ne1,looseends)) != null) {
 			verb.topo.Split.join(h0,ne1);
 			if(!verb.topo.Split.isLoose(h0.opp,looseends)) verb.topo.Split.cut(h0,afaces);
@@ -6831,31 +6889,67 @@ verb.topo.Split.split = function(s,p) {
 		if(h0 != null && h1 != null) verb.topo.Split.cut(ne1,afaces);
 	}
 	var bfaces;
-	var _g5 = [];
+	var _g2 = [];
+	var _g11 = 0;
+	while(_g11 < afaces.length) {
+		var f = afaces[_g11];
+		++_g11;
+		_g2.push(s.lmfkrh(f.l));
+	}
+	bfaces = _g2;
+	var a = new verb.topo.Solid();
+	var b = new verb.topo.Solid();
 	var _g12 = 0;
 	while(_g12 < afaces.length) {
-		var f = afaces[_g12];
+		var f1 = afaces[_g12];
 		++_g12;
-		_g5.push(s.lmfkrh(f.l));
+		verb.topo.Split.moveFace(f1,a);
 	}
-	bfaces = _g5;
-	var a1 = new verb.topo.Solid();
-	var b1 = new verb.topo.Solid();
 	var _g13 = 0;
-	while(_g13 < afaces.length) {
-		var f1 = afaces[_g13];
+	while(_g13 < bfaces.length) {
+		var f2 = bfaces[_g13];
 		++_g13;
-		verb.topo.Split.moveFace(f1,a1);
+		verb.topo.Split.moveFace(f2,b);
 	}
-	var _g14 = 0;
-	while(_g14 < bfaces.length) {
-		var f2 = bfaces[_g14];
-		++_g14;
-		verb.topo.Split.moveFace(f2,b1);
+	verb.topo.Split.cleanup(a,s);
+	verb.topo.Split.cleanup(b,s);
+	return new verb.core.types.Pair(b,a);
+};
+verb.topo.Split.vertexClassify = function(v,p) {
+	var ecs = new Array();
+	var _g = 0;
+	var _g1 = v.halfEdges();
+	while(_g < _g1.length) {
+		var e = _g1[_g];
+		++_g;
+		ecs.push({ edge : e, cl : verb.topo.Split.classify(e,p)});
+		if(verb.topo.Split.wideSector(e)) ecs.push({ edge : e, cl : verb.topo.Split.classifyBisector(e,p)});
 	}
-	verb.topo.Split.cleanup(a1,s);
-	verb.topo.Split.cleanup(b1,s);
-	return new verb.core.types.Pair(b1,a1);
+	var el = ecs.length;
+	var _g2 = 0;
+	while(_g2 < el) {
+		var i = _g2++;
+		var ep = ecs[i];
+		if(ep.cl == verb.topo.VertexClass.On) {
+			var nc = verb.topo.Split.reclassifyCoplanarSector(ep.edge,p);
+			ecs[i].cl = nc;
+			ecs[(i + 1) % el].cl = nc;
+		}
+	}
+	var _g3 = 0;
+	while(_g3 < el) {
+		var i1 = _g3++;
+		var ep1 = ecs[i1];
+		if(ep1.cl == verb.topo.VertexClass.On) {
+			var a;
+			if(i1 == 0) a = el; else a = i1 - 1;
+			var b = (i1 + 1) % el;
+			var prv = ecs[a].cl;
+			var nxt = ecs[b].cl;
+			if(prv == verb.topo.VertexClass.Above && nxt == verb.topo.VertexClass.Above) ep1.cl = verb.topo.VertexClass.Below; else if(prv == verb.topo.VertexClass.Below && nxt == verb.topo.VertexClass.Above) ep1.cl = verb.topo.VertexClass.Below; else if(prv == verb.topo.VertexClass.Above && nxt == verb.topo.VertexClass.Below) ep1.cl = verb.topo.VertexClass.Below; else if(prv == verb.topo.VertexClass.Below && nxt == verb.topo.VertexClass.Below) ep1.cl = verb.topo.VertexClass.Above; else throw new verb.core.types.Exception("Double On edge encountered!");
+		}
+	}
+	return ecs;
 };
 verb.topo.Split.moveFace = function(f,s) {
 	if(f.s == s) return;

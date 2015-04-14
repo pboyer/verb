@@ -1,5 +1,6 @@
 package verb.topo;
 
+import verb.core.types.Exception;
 import haxe.ds.IntMap;
 import verb.core.Trig;
 import verb.topo.Split.Plane;
@@ -17,12 +18,29 @@ using verb.core.types.DoublyLinkedListExtensions;
 
 typedef BooleanSplitResult = {
     coincidentVertices : Array<Pair<Vertex,Vertex>>,
-    coplanarVerticesA : Array<Pair<Vertex,Face>>,
-    coplanarVerticesB : Array<Pair<Vertex,Face>>
+    coplanarVerticesOfA : Array<Pair<Vertex,Face>>,
+    coplanarVerticesOfB : Array<Pair<Vertex,Face>>
 }
 
-enum VertexFaceClass { Above; Below; }
-enum VertexVertexClass { Above; Below; }
+@:enum
+abstract BoolSectorClass(Int) {
+    var AonBp = 0;
+    var AonBm = 1;
+    var BonAp = 2;
+    var BonAm = 3;
+
+    var AoutB = 4;
+    var AinB = 5;
+    var BoutA = 6;
+    var BinA = 7;
+}
+
+@:enum
+abstract BoolOp(Int) {
+    var Union = 0;
+    var Subtract = 1;
+    var Intersect = 2;
+}
 
 @:expose("topo.Boolean")
 class Boolean {
@@ -30,18 +48,126 @@ class Boolean {
     public function union( a : Solid, b : Solid, tol : Float ){
 
         var s = split( a, b, tol );
-        var cfa = vertexFaceClassify( s.coplanarVerticesA );
-        var cfb = vertexFaceClassify( s.coplanarVerticesB );
-        var cc = vertexVertexClassification( s.coincidentVertices );
+        var cfa = classifyAllVertexFace( s.coplanarVerticesOfA, BoolOp.Union );
+        var cfb = classifyAllVertexFace( s.coplanarVerticesOfB, BoolOp.Union );
+        var cc = classifyAllVertexVertex( s.coincidentVertices, BoolOp.Union );
+//      var parts = connect( cfa, cfb, cc );  // reconnect the two solids
+//      categorize( parts, BoolOp.Union );  // from the various resultant parts  BinA, AinB, BoutA, etc, reconnect
 
     }
 
-    public static function vertexFaceClassify( a : Array<Pair<Vertex,Face>> ) : Array<VertexFaceClass> {
+    public static function planeFromFace( f : Face ){
+        return { o : f.l.e.v.pt, n : f.normal() };
+    }
+
+    public static function classifyAllVertexFace( vfa : Array<Pair<Vertex,Face>>, op : BoolOp ) : Array<Array<BoolSectorClass>> {
+//        return [ for (vf in vfa) classifyVertexFace( vf.item0, vf.item1, op ) ];
+
         return null;
     }
 
-    public static function vertexVertexClassification( a : Array<Pair<Vertex,Vertex>> ) : Array<VertexVertexClass>{
+
+    public static function classifyVertexFace( v : Vertex, f : Face, op : BoolOp, verticesFromA : Bool ){
+
+        var onPlus = BoolSectorClass.AonBp;
+        var onMinus = BoolSectorClass.AonBm;
+
+        if (!verticesFromA){
+            onPlus = BoolSectorClass.BonAp;
+            onMinus = BoolSectorClass.BonAm;
+        }
+
+        var p = planeFromFace( f );
+        var ecs = new Array<SectorClass>();
+
+        // 1. classify vertex edges based on opposite vertex's signed distance from the cutting plane
+        for (e in v.halfEdges()){
+            ecs.push({ edge: e, cl : classify(e, p) });
+
+            // for each edge, we also need to check the sector width - i.e. the angle
+            // bisector between two adjacent edges. If more than 180, we bisect the edge
+            if ( Split.wideSector(e) ){
+                ecs.push({ edge: e, cl : Split.classifyBisector(e, p) });
+            }
+        }
+
+        // 2. now, for each "on" edge, we need to determine its face - is this face aligned with the plane normal?
+        // if so,
+        //      if aligned with plane normal (dot(fn, sp) > 0), BELOW, along with the next edge
+        //      else ABOVE
+        var el = ecs.length;
+        for (i in 0...el){
+            var ep = ecs[i];
+            if (ep.cl == VertexClass.On){
+                var nc = reclassifyCoplanarSector(ep.edge, p);
+                ecs[i].cl = nc;
+                ecs[(i+1) % el].cl = nc;
+            }
+        }
+
+        // 3. now, go through all of the edges, search for ON edges, reclassify them based on rules on pg 245
+        for (i in 0...el){
+            var ep = ecs[i];
+            if (ep.cl == VertexClass.On){
+                var a = i == 0 ? el : i-1;
+                var b = (i+1) % el;
+
+                var prv = ecs[a].cl;
+                var nxt = ecs[b].cl;
+
+                // TODO: this could be simplified but let's keep for debugging purposes
+                if ( prv == VertexClass.Above && nxt == VertexClass.Above ){
+                    ep.cl = VertexClass.Below;
+                } else if ( prv == VertexClass.Below && nxt == VertexClass.Above ) {
+                    ep.cl = VertexClass.Below;
+                } else if ( prv == VertexClass.Above && nxt == VertexClass.Below ) {
+                    ep.cl = VertexClass.Below;
+                } else if ( prv == VertexClass.Below && nxt == VertexClass.Below ) {
+                    ep.cl = VertexClass.Above;
+                } else {
+                    throw new Exception("Double On edge encountered!");
+                }
+            }
+        }
+
+        return ecs;
+    }
+
+    private static function reclassifyCoplanarSector( e : HalfEdge, p : Plane ) : VertexClass {
+
+        var n = e.l.f.normal(); // TODO: cache me
+        var n1 = e.opp.l.f.normal(); // TODO: cache me
+
+        var ndc = n.dot(p.n);
+        var ndc1 = n1.dot(p.n);
+
+        var eps2 = Constants.EPSILON * Constants.EPSILON;
+
+        if ( Math.abs(ndc - 1.0) < eps2 || Math.abs(ndc1 - 1.0) < eps2 ) {
+            return VertexClass.Below;
+        }
+
+        if ( Math.abs(ndc + 1.0) < eps2 || Math.abs(ndc1 + 1.0) < eps2 ) {
+            return VertexClass.Above;
+        }
+
+        return VertexClass.On;
+    }
+
+    public static function classifyAllVertexVertex( a : Array<Pair<Vertex,Vertex>>, op : BoolOp ){
+        // in essence, this involves classifying the surrounding intersecting sectors of the vertices
         return null;
+    }
+
+    private static var boolOnSectorMap =
+    [
+        [ BoolSectorClass.AoutB, BoolSectorClass.AinB, BoolSectorClass.BinA, BoolSectorClass.BinA ],
+        [ BoolSectorClass.AinB, BoolSectorClass.AoutB, BoolSectorClass.BoutA, BoolSectorClass.BoutA ],
+        [ BoolSectorClass.AinB, BoolSectorClass.AoutB, BoolSectorClass.BoutA, BoolSectorClass.BoutA ]
+    ];
+
+    public static function reclassifyOnSector( c : BoolSectorClass, op : BoolOp ) : BoolSectorClass {
+        return boolOnSectorMap[ op ][ c ];
     }
 
     public static function split( a : Solid, b : Solid, tol : Float ) : BooleanSplitResult {
@@ -49,18 +175,17 @@ class Boolean {
         var va = splitAllEdges( a, b, tol );
         var vva = splitEdgesByVertices( a, b, tol );
         var vvb = splitEdgesByVertices( b, a, tol );
-        var cov = getCoincidentVertices( a, b, va.concat(vva).concat(vvb), tol );
         var vfa = splitEdgesWithFaces( a, b, tol );
         var vfb = splitEdgesWithFaces( b, a, tol );
-        var cpva = getCoplanarVertices( a, b, vfa, tol );
-        var cpvb = getCoplanarVertices( b, a, vfb, tol );
 
         return {
-            coincidentVertices : cov,
-            coplanarVerticesA : cpva,
-            coplanarVerticesB : cpvb
+            coincidentVertices : getCoincidentVertices( a, b, va.concat(vva).concat(vvb), tol ),
+            coplanarVerticesOfA : getCoplanarVertices( a, b, vfa, tol ),
+            coplanarVerticesOfB : getCoplanarVertices( b, a, vfb, tol )
         };
     }
+
+
 
     // find the intersecting edges of the two solids and split them
     public static function splitAllEdges( a : Solid, b : Solid, tol : Float ) : Array<Pair<Vertex,Vertex>> {
@@ -99,9 +224,10 @@ class Boolean {
     private static function splitEdgeByVertex( e : HalfEdge, v : Vertex, tol : Float ) : Vertex {
 
         var i = Trig.segmentClosestPoint( v.pt, e.v.pt, e.nxt.v.pt, 0.0, 1.0 );
+        var d = v.pt.distSquared( i.pt );
 
         // too far
-        if (v.pt.dist( i.pt ) < tol) {
+        if ( d > tol*tol ) {
             return null;
         }
 
@@ -182,8 +308,10 @@ class Boolean {
         var tol2 = tol * tol;
 
         for ( v0 in a.v.iter() ){
+
             if (m.exists(v0.id)) continue;
             for ( v1 in b.v.iter() ){
+
                 if (m.exists(v1.id)) continue;
 
                 if (v0.pt.distSquared(v1.pt) < tol2){
@@ -200,7 +328,7 @@ class Boolean {
         var v = new Array<Pair<Vertex, Face>>();
 
         for (e in a.edges()){
-            for (f in a.f.iter()){
+            for (f in b.f.iter()){
                 var r = splitEdgeWithFace( e.item0, f, tol );
                 if (r == null) continue;
                 v.push( new Pair(r, f) );
@@ -217,7 +345,9 @@ class Boolean {
         var r = verb.core.Intersect.segmentAndPlane(he.v.pt, he.nxt.v.pt, o, n );
 
         // no intersection
-        if (r == null) return null;
+        if (r == null) {
+            return null;
+        }
 
         // on vertex
         if ( r.p > 1.0 - Constants.EPSILON || r.p < Constants.EPSILON ){

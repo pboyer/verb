@@ -58,58 +58,7 @@ class Split {
 
             // now we need to classify the edges emanating
             // from our coplanar vertices
-            var ecs : Array<SectorClass> = new Array<SectorClass>();
-
-            // 1. classify vertex edges based on opposite vertex's signed distance from the cutting plane
-            for (e in v.halfEdges()){
-                ecs.push({ edge: e, cl : classify(e, p) });
-
-                // for each edge, we also need to check the sector width - i.e. the angle
-                // bisector between two adjacent edges. If more than 180, we bisect the edge
-                if ( wideSector(e) ){
-                    ecs.push({ edge: e, cl : classifyBisector(e, p) });
-                }
-            }
-
-            // 2. now, for each "on" edge, we need to determine its face - is this face aligned with the plane normal?
-            // if so,
-            //      if aligned with plane normal (dot(fn, sp) > 0), BELOW, along with the next edge
-            //      else ABOVE
-            var el = ecs.length;
-            for (i in 0...el){
-                var ep = ecs[i];
-                if (ep.cl == VertexClass.On){
-                    var nc = reclassifyCoplanarSector(ep.edge, p);
-                    ecs[i].cl = nc;
-                    ecs[(i+1) % el].cl = nc;
-                }
-            }
-
-            // 3. now, go through all of the edges, search for ON edges, reclassify them based on rules on pg 245
-            for (i in 0...el){
-                var ep = ecs[i];
-                if (ep.cl == VertexClass.On){
-
-                    var a = i == 0 ? el : i-1;
-                    var b = (i+1) % el;
-
-                    var prv = ecs[a].cl;
-                    var nxt = ecs[b].cl;
-
-                    // TODO: this could be simplified but let's keep for debugging purposes
-                    if ( prv == VertexClass.Above && nxt == VertexClass.Above ){
-                        ep.cl = VertexClass.Below;
-                    } else if ( prv == VertexClass.Below && nxt == VertexClass.Above ) {
-                        ep.cl = VertexClass.Below;
-                    } else if ( prv == VertexClass.Above && nxt == VertexClass.Below ) {
-                        ep.cl = VertexClass.Below;
-                    } else if ( prv == VertexClass.Below && nxt == VertexClass.Below ) {
-                        ep.cl = VertexClass.Above;
-                    } else {
-                        throw new Exception("Double On edge encountered!");
-                    }
-                }
-            }
+            var ecs : Array<SectorClass> = classifyVertex( v, p );
 
             // find the first in ABOVE seq
             var i = nextOfClass( VertexClass.Above, ecs, 0 );
@@ -126,6 +75,7 @@ class Split {
             var start = ecs[i].edge;
             var head = start;
             var tail = start;
+            var el = ecs.length;
 
             while(true){
 
@@ -135,6 +85,7 @@ class Split {
                     i = (i + 1) % el;
                 }
 
+                // insert a null edge
                 s.lmev( head, tail.opp.nxt, head.v.pt.copy() );
                 var ne = head.prv;
                 nulledges.push( ne );
@@ -196,6 +147,64 @@ class Split {
         cleanup(b, s);
 
         return new Pair(b,a);
+    }
+
+    public static function classifyVertex( v : Vertex, p : Plane ) :  Array<SectorClass> {
+
+        var ecs = new Array<SectorClass>();
+
+        // 1. classify vertex edges based on opposite vertex's signed distance from the cutting plane
+        for (e in v.halfEdges()){
+            ecs.push({ edge: e, cl : classify(e, p) });
+
+            // for each edge, we also need to check the sector width - i.e. the angle
+            // bisector between two adjacent edges. If more than 180, we bisect the edge
+            if ( wideSector(e) ){
+                ecs.push({ edge: e, cl : classifyBisector(e, p) });
+            }
+        }
+
+        // 2. now, for each "on" edge, we need to determine its face - is this face aligned with the plane normal?
+        // if so,
+        //      if aligned with plane normal (dot(fn, sp) > 0), BELOW, along with the next edge
+        //      else ABOVE
+        var el = ecs.length;
+        for (i in 0...el){
+            var ep = ecs[i];
+            if (ep.cl == VertexClass.On){
+                var nc = reclassifyCoplanarSector(ep.edge, p);
+                ecs[i].cl = nc;
+                ecs[(i+1) % el].cl = nc;
+            }
+        }
+
+        // 3. now, go through all of the edges, search for ON edges, reclassify them based on rules on pg 245
+        for (i in 0...el){
+            var ep = ecs[i];
+            if (ep.cl == VertexClass.On){
+
+                var a = i == 0 ? el : i-1;
+                var b = (i+1) % el;
+
+                var prv = ecs[a].cl;
+                var nxt = ecs[b].cl;
+
+                // TODO: this could be simplified but let's keep for debugging purposes
+                if ( prv == VertexClass.Above && nxt == VertexClass.Above ){
+                    ep.cl = VertexClass.Below;
+                } else if ( prv == VertexClass.Below && nxt == VertexClass.Above ) {
+                    ep.cl = VertexClass.Below;
+                } else if ( prv == VertexClass.Above && nxt == VertexClass.Below ) {
+                    ep.cl = VertexClass.Below;
+                } else if ( prv == VertexClass.Below && nxt == VertexClass.Below ) {
+                    ep.cl = VertexClass.Above;
+                } else {
+                    throw new Exception("Double On edge encountered!");
+                }
+            }
+        }
+
+        return ecs;
     }
 
     private static function moveFace( f : Face, s : Solid ) : Void {
@@ -340,12 +349,13 @@ class Split {
         var ndc = n.dot(p.n);
         var ndc1 = n1.dot(p.n);
 
-        if ( Math.abs(ndc - 1.0) < Constants.EPSILON * Constants.EPSILON ||
-                Math.abs(ndc1 - 1.0) < Constants.EPSILON * Constants.EPSILON ) {
+        var eps2 = Constants.EPSILON * Constants.EPSILON;
+
+        if ( Math.abs(ndc - 1.0) < eps2 || Math.abs(ndc1 - 1.0) < eps2 ) {
             return VertexClass.Below;
         }
 
-        if ( Math.abs(ndc + 1.0) < Constants.EPSILON * Constants.EPSILON || Math.abs(ndc1 + 1.0) < Constants.EPSILON * Constants.EPSILON ) {
+        if ( Math.abs(ndc + 1.0) < eps2 || Math.abs(ndc1 + 1.0) < eps2 ) {
             return VertexClass.Above;
         }
 

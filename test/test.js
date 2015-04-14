@@ -20,8 +20,6 @@ function last(a){
 	return a[a.length-1];
 }
 
-/*
-
 describe("verb.core.Eval.knotSpanGivenN",function(){
 
 	it('returns correct result', function(){
@@ -7171,7 +7169,6 @@ describe("verb.topo.Tess2",function(){
 
 });
 
-*/
 
 describe("verb.core.Intersect.segmentAndPlane",function(){
 	it('works for simple cases', function(){
