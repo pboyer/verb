@@ -68,7 +68,7 @@ class Boolean {
 
 
     public static function classifyVertexFace( v : Vertex, f : Face, op : BoolOp, verticesFromA : Bool ){
-
+/*
         var onPlus = BoolSectorClass.AonBp;
         var onMinus = BoolSectorClass.AonBm;
 
@@ -131,27 +131,29 @@ class Boolean {
         }
 
         return ecs;
+
+        */
     }
 
-    private static function reclassifyCoplanarSector( e : HalfEdge, p : Plane ) : VertexClass {
+    private static function reclassifyCoplanarSector( e : HalfEdge, p : Plane ) {
 
-        var n = e.l.f.normal(); // TODO: cache me
-        var n1 = e.opp.l.f.normal(); // TODO: cache me
-
-        var ndc = n.dot(p.n);
-        var ndc1 = n1.dot(p.n);
-
-        var eps2 = Constants.EPSILON * Constants.EPSILON;
-
-        if ( Math.abs(ndc - 1.0) < eps2 || Math.abs(ndc1 - 1.0) < eps2 ) {
-            return VertexClass.Below;
-        }
-
-        if ( Math.abs(ndc + 1.0) < eps2 || Math.abs(ndc1 + 1.0) < eps2 ) {
-            return VertexClass.Above;
-        }
-
-        return VertexClass.On;
+//        var n = e.l.f.normal(); // TODO: cache me
+//        var n1 = e.opp.l.f.normal(); // TODO: cache me
+//
+//        var ndc = n.dot(p.n);
+//        var ndc1 = n1.dot(p.n);
+//
+//        var eps2 = Constants.EPSILON * Constants.EPSILON;
+//
+//        if ( Math.abs(ndc - 1.0) < eps2 || Math.abs(ndc1 - 1.0) < eps2 ) {
+//            return VertexClass.Below;
+//        }
+//
+//        if ( Math.abs(ndc + 1.0) < eps2 || Math.abs(ndc1 + 1.0) < eps2 ) {
+//            return VertexClass.Above;
+//        }
+//
+//        return VertexClass.On;
     }
 
     public static function classifyAllVertexVertex( a : Array<Pair<Vertex,Vertex>>, op : BoolOp ){
@@ -159,16 +161,16 @@ class Boolean {
         return null;
     }
 
-    private static var boolOnSectorMap =
-    [
-        [ BoolSectorClass.AoutB, BoolSectorClass.AinB, BoolSectorClass.BinA, BoolSectorClass.BinA ],
-        [ BoolSectorClass.AinB, BoolSectorClass.AoutB, BoolSectorClass.BoutA, BoolSectorClass.BoutA ],
-        [ BoolSectorClass.AinB, BoolSectorClass.AoutB, BoolSectorClass.BoutA, BoolSectorClass.BoutA ]
-    ];
-
-    public static function reclassifyOnSector( c : BoolSectorClass, op : BoolOp ) : BoolSectorClass {
-        return boolOnSectorMap[ op ][ c ];
-    }
+//    private static var boolOnSectorMap =
+//    [
+//        [ BoolSectorClass.AoutB, BoolSectorClass.AinB, BoolSectorClass.BinA, BoolSectorClass.BinA ],
+//        [ BoolSectorClass.AinB, BoolSectorClass.AoutB, BoolSectorClass.BoutA, BoolSectorClass.BoutA ],
+//        [ BoolSectorClass.AinB, BoolSectorClass.AoutB, BoolSectorClass.BoutA, BoolSectorClass.BoutA ]
+//    ];
+//
+//    public static function reclassifyOnSector( c : BoolSectorClass, op : BoolOp ) : BoolSectorClass {
+//        return boolOnSectorMap[ op ][ c ];
+//    }
 
     public static function split( a : Solid, b : Solid, tol : Float ) : BooleanSplitResult {
 
