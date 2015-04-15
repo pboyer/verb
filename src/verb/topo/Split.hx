@@ -1,9 +1,9 @@
 package verb.topo;
 
-import verb.topo.Split.VertexClass;
-import verb.topo.Split.VertexClass;
-import verb.topo.Split.VertexClass;
-import verb.topo.Split.SectorClass;
+import verb.topo.Split.PlanePosition;
+import verb.topo.Split.PlanePosition;
+import verb.topo.Split.PlanePosition;
+import verb.topo.Split.EdgePlanePosition;
 import verb.core.types.Exception;
 import haxe.ds.IntMap;
 import verb.core.Constants;
@@ -21,12 +21,12 @@ typedef Plane = {
     o : Array<Float>
 }
 
-typedef SectorClass = {
+typedef EdgePlanePosition = {
     edge : HalfEdge,
-    cl : VertexClass
+    pos : PlanePosition
 }
 
-enum VertexClass { On; Above; Below; }
+enum PlanePosition { On; Above; Below; }
 
 @:expose("topo.Split")
 class Split {
@@ -58,16 +58,16 @@ class Split {
 
             // now we need to classify the edges emanating
             // from our coplanar vertices
-            var ecs : Array<SectorClass> = classifyVertex( v, p );
+            var ecs : Array<EdgePlanePosition> = classifyVertex( v, p );
 
             // find the first in ABOVE seq
-            var i = nextOfClass( VertexClass.Above, ecs, 0 );
+            var i = nextOfClass( PlanePosition.Above, ecs, 0 );
 
             // there's no above edge in the seq (all below), continue
             if (i == -1) break;
 
             // if all of the edges are of the same type, just continue
-            if (nextOfClass( VertexClass.Below, ecs, 0 ) == -1) break;
+            if (nextOfClass( PlanePosition.Below, ecs, 0 ) == -1) break;
 
             // if we've reached this point, at least one vertex is crossing
             crossing = true;
@@ -80,7 +80,7 @@ class Split {
             while(true){
 
                 // find the end of the ABOVE sequence
-                while (ecs[i].cl == VertexClass.Above){
+                while (ecs[i].pos == PlanePosition.Above){
                     tail = ecs[i].edge;
                     i = (i + 1) % el;
                 }
@@ -91,7 +91,7 @@ class Split {
                 nulledges.push( ne );
 
                 // find the next start sequence and assign to head
-                i = nextOfClass( VertexClass.Above, ecs, i );
+                i = nextOfClass( PlanePosition.Above, ecs, i );
 
                 // there is no other above edge, we're done with this vertex
                 if (i == -1) break;
@@ -149,18 +149,18 @@ class Split {
         return new Pair(b,a);
     }
 
-    public static function classifyVertex( v : Vertex, p : Plane ) :  Array<SectorClass> {
+    public static function classifyVertex( v : Vertex, p : Plane ) :  Array<EdgePlanePosition> {
 
-        var ecs = new Array<SectorClass>();
+        var ecs = new Array<EdgePlanePosition>();
 
         // 1. classify vertex edges based on opposite vertex's signed distance from the cutting plane
         for (e in v.halfEdges()){
-            ecs.push({ edge: e, cl : classify(e, p) });
+            ecs.push({ edge: e, pos : classify(e, p) });
 
             // for each edge, we also need to check the sector width - i.e. the angle
             // bisector between two adjacent edges. If more than 180, we bisect the edge
             if ( wideSector(e) ){
-                ecs.push({ edge: e, cl : classifyBisector(e, p) });
+                ecs.push({ edge: e, pos : classifyBisector(e, p) });
             }
         }
 
@@ -171,33 +171,33 @@ class Split {
         var el = ecs.length;
         for (i in 0...el){
             var ep = ecs[i];
-            if (ep.cl == VertexClass.On){
+            if (ep.pos == PlanePosition.On){
                 var nc = reclassifyCoplanarSector(ep.edge, p);
-                ecs[i].cl = nc;
-                ecs[(i+1) % el].cl = nc;
+                ecs[i].pos = nc;
+                ecs[(i+1) % el].pos = nc;
             }
         }
 
         // 3. now, go through all of the edges, search for ON edges, reclassify them based on rules on pg 245
         for (i in 0...el){
             var ep = ecs[i];
-            if (ep.cl == VertexClass.On){
+            if (ep.pos == PlanePosition.On){
 
                 var a = i == 0 ? el : i-1;
                 var b = (i+1) % el;
 
-                var prv = ecs[a].cl;
-                var nxt = ecs[b].cl;
+                var prv = ecs[a].pos;
+                var nxt = ecs[b].pos;
 
                 // TODO: this could be simplified but let's keep for debugging purposes
-                if ( prv == VertexClass.Above && nxt == VertexClass.Above ){
-                    ep.cl = VertexClass.Below;
-                } else if ( prv == VertexClass.Below && nxt == VertexClass.Above ) {
-                    ep.cl = VertexClass.Below;
-                } else if ( prv == VertexClass.Above && nxt == VertexClass.Below ) {
-                    ep.cl = VertexClass.Below;
-                } else if ( prv == VertexClass.Below && nxt == VertexClass.Below ) {
-                    ep.cl = VertexClass.Above;
+                if ( prv == PlanePosition.Above && nxt == PlanePosition.Above ){
+                    ep.pos = PlanePosition.Below;
+                } else if ( prv == PlanePosition.Below && nxt == PlanePosition.Above ) {
+                    ep.pos = PlanePosition.Below;
+                } else if ( prv == PlanePosition.Above && nxt == PlanePosition.Below ) {
+                    ep.pos = PlanePosition.Below;
+                } else if ( prv == PlanePosition.Below && nxt == PlanePosition.Below ) {
+                    ep.pos = PlanePosition.Above;
                 } else {
                     throw new Exception("Double On edge encountered!");
                 }
@@ -315,11 +315,11 @@ class Split {
         });
     }
 
-    private static function nextOfClass( cl : VertexClass, ecs : Array<SectorClass>, start : Int ) : Int {
+    private static function nextOfClass( cl : PlanePosition, ecs : Array<EdgePlanePosition>, start : Int ) : Int {
         var i = start;
-        var head : SectorClass = null;
+        var head : EdgePlanePosition = null;
         while (i < ecs.length){
-            if ( ecs[i].cl == cl ) {
+            if ( ecs[i].pos == cl ) {
                 head = ecs[i];
                 break;
             }
@@ -337,11 +337,11 @@ class Split {
         return a.signedAngleBetween(b, n) > Math.PI;
     }
 
-    private static function classifyBisector( e : HalfEdge, p : Plane ) : VertexClass {
+    public static function classifyBisector( e : HalfEdge, p : Plane ) : PlanePosition {
         return classifyPoint( Vec.mul( 0.5, e.nxt.v.pt.add(e.prv.v.pt) ), p);
     }
 
-    private static function reclassifyCoplanarSector( e : HalfEdge, p : Plane ) : VertexClass {
+    private static function reclassifyCoplanarSector( e : HalfEdge, p : Plane ) : PlanePosition {
 
         var n = e.l.f.normal(); // TODO: cache me
         var n1 = e.opp.l.f.normal(); // TODO: cache me
@@ -352,27 +352,25 @@ class Split {
         var eps2 = Constants.EPSILON * Constants.EPSILON;
 
         if ( Math.abs(ndc - 1.0) < eps2 || Math.abs(ndc1 - 1.0) < eps2 ) {
-            return VertexClass.Below;
+            return PlanePosition.Below;
         }
 
         if ( Math.abs(ndc + 1.0) < eps2 || Math.abs(ndc1 + 1.0) < eps2 ) {
-            return VertexClass.Above;
+            return PlanePosition.Above;
         }
 
-        return VertexClass.On;
+        return PlanePosition.On;
     }
 
-    private static function classify(e : HalfEdge, p : Plane) : VertexClass {
-        var c = classifyPoint( e.nxt.v.pt, p );
-//        trace(c);
-        return c;
+    public static function classify(e : HalfEdge, p : Plane) : PlanePosition {
+        return classifyPoint( e.nxt.v.pt, p );
     }
 
-    private static function classifyPoint(pt : Array<Float>, p : Plane) : VertexClass {
+    private static function classifyPoint(pt : Array<Float>, p : Plane) : PlanePosition {
         var s = pt.sub( p.o ).dot( p.n );
 
-        if (Math.abs(s) < Constants.EPSILON) return VertexClass.On;
-        if (s > 0.0) return VertexClass.Above else return VertexClass.Below;
+        if (Math.abs(s) < Constants.EPSILON) return PlanePosition.On;
+        if (s > 0.0) return PlanePosition.Above else return PlanePosition.Below;
     }
 
     private static function intersect( s : Solid, p : Plane ) : Array<Pair<HalfEdge,Float>> {

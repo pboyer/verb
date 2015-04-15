@@ -6226,25 +6226,108 @@ verb.topo.Analyze.loopArea = function(l,n) {
 	} while(ce.nxt != se);
 	return v / 2;
 };
-verb.topo._Boolean = {};
-verb.topo._Boolean.BoolSectorClass_Impl_ = function() { };
-verb.topo._Boolean.BoolSectorClass_Impl_.__name__ = ["verb","topo","_Boolean","BoolSectorClass_Impl_"];
-verb.topo._Boolean.BoolOp_Impl_ = function() { };
-verb.topo._Boolean.BoolOp_Impl_.__name__ = ["verb","topo","_Boolean","BoolOp_Impl_"];
+verb.topo.FacePosition = { __constructs__ : ["On","AonBp","AonBm","BonAp","BonAm","AoutB","AinB","BoutA","BinA"] };
+verb.topo.FacePosition.On = ["On",0];
+verb.topo.FacePosition.On.toString = $estr;
+verb.topo.FacePosition.On.__enum__ = verb.topo.FacePosition;
+verb.topo.FacePosition.AonBp = ["AonBp",1];
+verb.topo.FacePosition.AonBp.toString = $estr;
+verb.topo.FacePosition.AonBp.__enum__ = verb.topo.FacePosition;
+verb.topo.FacePosition.AonBm = ["AonBm",2];
+verb.topo.FacePosition.AonBm.toString = $estr;
+verb.topo.FacePosition.AonBm.__enum__ = verb.topo.FacePosition;
+verb.topo.FacePosition.BonAp = ["BonAp",3];
+verb.topo.FacePosition.BonAp.toString = $estr;
+verb.topo.FacePosition.BonAp.__enum__ = verb.topo.FacePosition;
+verb.topo.FacePosition.BonAm = ["BonAm",4];
+verb.topo.FacePosition.BonAm.toString = $estr;
+verb.topo.FacePosition.BonAm.__enum__ = verb.topo.FacePosition;
+verb.topo.FacePosition.AoutB = ["AoutB",5];
+verb.topo.FacePosition.AoutB.toString = $estr;
+verb.topo.FacePosition.AoutB.__enum__ = verb.topo.FacePosition;
+verb.topo.FacePosition.AinB = ["AinB",6];
+verb.topo.FacePosition.AinB.toString = $estr;
+verb.topo.FacePosition.AinB.__enum__ = verb.topo.FacePosition;
+verb.topo.FacePosition.BoutA = ["BoutA",7];
+verb.topo.FacePosition.BoutA.toString = $estr;
+verb.topo.FacePosition.BoutA.__enum__ = verb.topo.FacePosition;
+verb.topo.FacePosition.BinA = ["BinA",8];
+verb.topo.FacePosition.BinA.toString = $estr;
+verb.topo.FacePosition.BinA.__enum__ = verb.topo.FacePosition;
+verb.topo.BoolOp = { __constructs__ : ["Union","Subtract","Intersect"] };
+verb.topo.BoolOp.Union = ["Union",0];
+verb.topo.BoolOp.Union.toString = $estr;
+verb.topo.BoolOp.Union.__enum__ = verb.topo.BoolOp;
+verb.topo.BoolOp.Subtract = ["Subtract",1];
+verb.topo.BoolOp.Subtract.toString = $estr;
+verb.topo.BoolOp.Subtract.__enum__ = verb.topo.BoolOp;
+verb.topo.BoolOp.Intersect = ["Intersect",2];
+verb.topo.BoolOp.Intersect.toString = $estr;
+verb.topo.BoolOp.Intersect.__enum__ = verb.topo.BoolOp;
 verb.topo.Boolean = $hx_exports.topo.Boolean = function() { };
 verb.topo.Boolean.__name__ = ["verb","topo","Boolean"];
+verb.topo.Boolean.classifyAllVertexVertex = function(a,op) {
+	return null;
+};
+verb.topo.Boolean.classifyAllVertexFace = function(a,op,isA) {
+	var _g = [];
+	var _g1 = 0;
+	while(_g1 < a.length) {
+		var vf = a[_g1];
+		++_g1;
+		_g.push(verb.topo.Boolean.classifyVertexFace(vf.item0,vf.item1,op,isA));
+	}
+	return _g;
+};
+verb.topo.Boolean.classifyVertexFace = function(v,f,op,isA) {
+	var p = verb.topo.Boolean.planeFromFace(f);
+	var ecs = new Array();
+	var _g = 0;
+	var _g1 = v.halfEdges();
+	while(_g < _g1.length) {
+		var e = _g1[_g];
+		++_g;
+		ecs.push({ edge : e, pos : verb.topo.Boolean.asFacePosition(verb.topo.Split.classify(e,p),isA)});
+		if(verb.topo.Split.wideSector(e)) ecs.push({ edge : e, pos : verb.topo.Boolean.asFacePosition(verb.topo.Split.classifyBisector(e,p),isA)});
+	}
+	var el = ecs.length;
+	var _g2 = 0;
+	while(_g2 < el) {
+		var i = _g2++;
+		var ep = ecs[i];
+		if(ep.pos == verb.topo.FacePosition.On) {
+			var nc = verb.topo.Boolean.reclassifyCoplanarEdge(ep.edge,p,isA);
+			ecs[i].pos = nc;
+			ecs[(i + 1) % el].pos = nc;
+		}
+	}
+	var _g3 = 0;
+	while(_g3 < el) {
+		var i1 = _g3++;
+		var ep1 = ecs[i1];
+		var ei = ep1.pos[1];
+		if(ei > 0 && ei < 5) ep1.pos = verb.topo.Boolean.reclassifyOnSector(ep1.pos,op);
+	}
+	return ecs;
+};
 verb.topo.Boolean.planeFromFace = function(f) {
 	return { o : f.l.e.v.pt, n : f.normal()};
 };
-verb.topo.Boolean.classifyAllVertexFace = function(vfa,op) {
-	return null;
+verb.topo.Boolean.reclassifyCoplanarEdge = function(e,p,isA) {
+	var n = e.l.f.normal();
+	var ndc = verb.core.Vec.dot(n,p.n);
+	var eps2 = 1.0000000000000001e-20;
+	if(Math.abs(ndc - 1.0) < eps2) if(isA) return verb.topo.FacePosition.AonBp; else return verb.topo.FacePosition.BonAp;
+	if(Math.abs(ndc + 1.0) < eps2) if(isA) return verb.topo.FacePosition.AonBm; else return verb.topo.FacePosition.BonAm;
+	throw new verb.core.types.Exception("Cannot categorize on edge!");
+	return verb.topo.FacePosition.On;
 };
-verb.topo.Boolean.classifyVertexFace = function(v,f,op,verticesFromA) {
+verb.topo.Boolean.asFacePosition = function(pos,isA) {
+	if(pos == verb.topo.PlanePosition.Above) if(isA) return verb.topo.FacePosition.AoutB; else return verb.topo.FacePosition.BoutA; else if(pos == verb.topo.PlanePosition.Below) if(isA) return verb.topo.FacePosition.AinB; else return verb.topo.FacePosition.BinA;
+	return verb.topo.FacePosition.On;
 };
-verb.topo.Boolean.reclassifyCoplanarSector = function(e,p) {
-};
-verb.topo.Boolean.classifyAllVertexVertex = function(a,op) {
-	return null;
+verb.topo.Boolean.reclassifyOnSector = function(c,op) {
+	return verb.topo.Boolean.boolOnSectorMap[op[1]][c[1]];
 };
 verb.topo.Boolean.split = function(a,b,tol) {
 	var va = verb.topo.Boolean.splitAllEdges(a,b,tol);
@@ -6407,9 +6490,9 @@ verb.topo.Boolean.getCoplanarVertices = function(a,b,ar,tol) {
 verb.topo.Boolean.prototype = {
 	union: function(a,b,tol) {
 		var s = verb.topo.Boolean.split(a,b,tol);
-		var cfa = verb.topo.Boolean.classifyAllVertexFace(s.coplanarVerticesOfA,0);
-		var cfb = verb.topo.Boolean.classifyAllVertexFace(s.coplanarVerticesOfB,0);
-		var cc = verb.topo.Boolean.classifyAllVertexVertex(s.coincidentVertices,0);
+		var cfa = verb.topo.Boolean.classifyAllVertexFace(s.coplanarVerticesOfA,verb.topo.BoolOp.Union,true);
+		var cfb = verb.topo.Boolean.classifyAllVertexFace(s.coplanarVerticesOfB,verb.topo.BoolOp.Union,false);
+		var cc = verb.topo.Boolean.classifyAllVertexVertex(s.coincidentVertices,verb.topo.BoolOp.Union);
 	}
 };
 verb.topo.Topo = function() {
@@ -6805,16 +6888,16 @@ verb.topo.Solid.prototype = $extend(verb.topo.Topo.prototype,{
 		return "Solid (" + this.vertices().length + " Vertices, " + this.faces().length + " Faces, " + this.loops().length + " Loops, " + this.halfEdges().length + " HalfEdges" + ")";
 	}
 });
-verb.topo.VertexClass = { __constructs__ : ["On","Above","Below"] };
-verb.topo.VertexClass.On = ["On",0];
-verb.topo.VertexClass.On.toString = $estr;
-verb.topo.VertexClass.On.__enum__ = verb.topo.VertexClass;
-verb.topo.VertexClass.Above = ["Above",1];
-verb.topo.VertexClass.Above.toString = $estr;
-verb.topo.VertexClass.Above.__enum__ = verb.topo.VertexClass;
-verb.topo.VertexClass.Below = ["Below",2];
-verb.topo.VertexClass.Below.toString = $estr;
-verb.topo.VertexClass.Below.__enum__ = verb.topo.VertexClass;
+verb.topo.PlanePosition = { __constructs__ : ["On","Above","Below"] };
+verb.topo.PlanePosition.On = ["On",0];
+verb.topo.PlanePosition.On.toString = $estr;
+verb.topo.PlanePosition.On.__enum__ = verb.topo.PlanePosition;
+verb.topo.PlanePosition.Above = ["Above",1];
+verb.topo.PlanePosition.Above.toString = $estr;
+verb.topo.PlanePosition.Above.__enum__ = verb.topo.PlanePosition;
+verb.topo.PlanePosition.Below = ["Below",2];
+verb.topo.PlanePosition.Below.toString = $estr;
+verb.topo.PlanePosition.Below.__enum__ = verb.topo.PlanePosition;
 verb.topo.Split = $hx_exports.topo.Split = function() { };
 verb.topo.Split.__name__ = ["verb","topo","Split"];
 verb.topo.Split.split = function(s,p) {
@@ -6834,23 +6917,23 @@ verb.topo.Split.split = function(s,p) {
 	while( $it0.hasNext() ) {
 		var v1 = $it0.next();
 		var ecs = verb.topo.Split.classifyVertex(v1,p);
-		var i = verb.topo.Split.nextOfClass(verb.topo.VertexClass.Above,ecs,0);
+		var i = verb.topo.Split.nextOfClass(verb.topo.PlanePosition.Above,ecs,0);
 		if(i == -1) break;
-		if(verb.topo.Split.nextOfClass(verb.topo.VertexClass.Below,ecs,0) == -1) break;
+		if(verb.topo.Split.nextOfClass(verb.topo.PlanePosition.Below,ecs,0) == -1) break;
 		crossing = true;
 		var start = ecs[i].edge;
 		var head = start;
 		var tail = start;
 		var el = ecs.length;
 		while(true) {
-			while(ecs[i].cl == verb.topo.VertexClass.Above) {
+			while(ecs[i].pos == verb.topo.PlanePosition.Above) {
 				tail = ecs[i].edge;
 				i = (i + 1) % el;
 			}
 			s.lmev(head,tail.opp.nxt,head.v.pt.slice());
 			var ne = head.prv;
 			nulledges.push(ne);
-			i = verb.topo.Split.nextOfClass(verb.topo.VertexClass.Above,ecs,i);
+			i = verb.topo.Split.nextOfClass(verb.topo.PlanePosition.Above,ecs,i);
 			if(i == -1) break;
 			head = ecs[i].edge;
 			if(head == start) break;
@@ -6910,31 +6993,31 @@ verb.topo.Split.classifyVertex = function(v,p) {
 	while(_g < _g1.length) {
 		var e = _g1[_g];
 		++_g;
-		ecs.push({ edge : e, cl : verb.topo.Split.classify(e,p)});
-		if(verb.topo.Split.wideSector(e)) ecs.push({ edge : e, cl : verb.topo.Split.classifyBisector(e,p)});
+		ecs.push({ edge : e, pos : verb.topo.Split.classify(e,p)});
+		if(verb.topo.Split.wideSector(e)) ecs.push({ edge : e, pos : verb.topo.Split.classifyBisector(e,p)});
 	}
 	var el = ecs.length;
 	var _g2 = 0;
 	while(_g2 < el) {
 		var i = _g2++;
 		var ep = ecs[i];
-		if(ep.cl == verb.topo.VertexClass.On) {
+		if(ep.pos == verb.topo.PlanePosition.On) {
 			var nc = verb.topo.Split.reclassifyCoplanarSector(ep.edge,p);
-			ecs[i].cl = nc;
-			ecs[(i + 1) % el].cl = nc;
+			ecs[i].pos = nc;
+			ecs[(i + 1) % el].pos = nc;
 		}
 	}
 	var _g3 = 0;
 	while(_g3 < el) {
 		var i1 = _g3++;
 		var ep1 = ecs[i1];
-		if(ep1.cl == verb.topo.VertexClass.On) {
+		if(ep1.pos == verb.topo.PlanePosition.On) {
 			var a;
 			if(i1 == 0) a = el; else a = i1 - 1;
 			var b = (i1 + 1) % el;
-			var prv = ecs[a].cl;
-			var nxt = ecs[b].cl;
-			if(prv == verb.topo.VertexClass.Above && nxt == verb.topo.VertexClass.Above) ep1.cl = verb.topo.VertexClass.Below; else if(prv == verb.topo.VertexClass.Below && nxt == verb.topo.VertexClass.Above) ep1.cl = verb.topo.VertexClass.Below; else if(prv == verb.topo.VertexClass.Above && nxt == verb.topo.VertexClass.Below) ep1.cl = verb.topo.VertexClass.Below; else if(prv == verb.topo.VertexClass.Below && nxt == verb.topo.VertexClass.Below) ep1.cl = verb.topo.VertexClass.Above; else throw new verb.core.types.Exception("Double On edge encountered!");
+			var prv = ecs[a].pos;
+			var nxt = ecs[b].pos;
+			if(prv == verb.topo.PlanePosition.Above && nxt == verb.topo.PlanePosition.Above) ep1.pos = verb.topo.PlanePosition.Below; else if(prv == verb.topo.PlanePosition.Below && nxt == verb.topo.PlanePosition.Above) ep1.pos = verb.topo.PlanePosition.Below; else if(prv == verb.topo.PlanePosition.Above && nxt == verb.topo.PlanePosition.Below) ep1.pos = verb.topo.PlanePosition.Below; else if(prv == verb.topo.PlanePosition.Below && nxt == verb.topo.PlanePosition.Below) ep1.pos = verb.topo.PlanePosition.Above; else throw new verb.core.types.Exception("Double On edge encountered!");
 		}
 	}
 	return ecs;
@@ -7024,7 +7107,7 @@ verb.topo.Split.nextOfClass = function(cl,ecs,start) {
 	var i = start;
 	var head = null;
 	while(i < ecs.length) {
-		if(ecs[i].cl == cl) {
+		if(ecs[i].pos == cl) {
 			head = ecs[i];
 			break;
 		}
@@ -7047,18 +7130,17 @@ verb.topo.Split.reclassifyCoplanarSector = function(e,p) {
 	var ndc = verb.core.Vec.dot(n,p.n);
 	var ndc1 = verb.core.Vec.dot(n1,p.n);
 	var eps2 = 1.0000000000000001e-20;
-	if(Math.abs(ndc - 1.0) < eps2 || Math.abs(ndc1 - 1.0) < eps2) return verb.topo.VertexClass.Below;
-	if(Math.abs(ndc + 1.0) < eps2 || Math.abs(ndc1 + 1.0) < eps2) return verb.topo.VertexClass.Above;
-	return verb.topo.VertexClass.On;
+	if(Math.abs(ndc - 1.0) < eps2 || Math.abs(ndc1 - 1.0) < eps2) return verb.topo.PlanePosition.Below;
+	if(Math.abs(ndc + 1.0) < eps2 || Math.abs(ndc1 + 1.0) < eps2) return verb.topo.PlanePosition.Above;
+	return verb.topo.PlanePosition.On;
 };
 verb.topo.Split.classify = function(e,p) {
-	var c = verb.topo.Split.classifyPoint(e.nxt.v.pt,p);
-	return c;
+	return verb.topo.Split.classifyPoint(e.nxt.v.pt,p);
 };
 verb.topo.Split.classifyPoint = function(pt,p) {
 	var s = verb.core.Vec.dot(verb.core.Vec.sub(pt,p.o),p.n);
-	if(Math.abs(s) < 1e-10) return verb.topo.VertexClass.On;
-	if(s > 0.0) return verb.topo.VertexClass.Above; else return verb.topo.VertexClass.Below;
+	if(Math.abs(s) < 1e-10) return verb.topo.PlanePosition.On;
+	if(s > 0.0) return verb.topo.PlanePosition.Above; else return verb.topo.PlanePosition.Below;
 };
 verb.topo.Split.intersect = function(s,p) {
 	var $is = [];
@@ -9306,17 +9388,7 @@ verb.exe.Dispatcher.THREADS = 1;
 verb.exe.Dispatcher._init = false;
 verb.exe.Work.uuid = 0;
 verb.exe.WorkerPool.basePath = "";
-verb.topo._Boolean.BoolSectorClass_Impl_.AonBp = 0;
-verb.topo._Boolean.BoolSectorClass_Impl_.AonBm = 1;
-verb.topo._Boolean.BoolSectorClass_Impl_.BonAp = 2;
-verb.topo._Boolean.BoolSectorClass_Impl_.BonAm = 3;
-verb.topo._Boolean.BoolSectorClass_Impl_.AoutB = 4;
-verb.topo._Boolean.BoolSectorClass_Impl_.AinB = 5;
-verb.topo._Boolean.BoolSectorClass_Impl_.BoutA = 6;
-verb.topo._Boolean.BoolSectorClass_Impl_.BinA = 7;
-verb.topo._Boolean.BoolOp_Impl_.Union = 0;
-verb.topo._Boolean.BoolOp_Impl_.Subtract = 1;
-verb.topo._Boolean.BoolOp_Impl_.Intersect = 2;
+verb.topo.Boolean.boolOnSectorMap = [[verb.topo.FacePosition.AoutB,verb.topo.FacePosition.AinB,verb.topo.FacePosition.BinA,verb.topo.FacePosition.BinA],[verb.topo.FacePosition.AinB,verb.topo.FacePosition.AoutB,verb.topo.FacePosition.BoutA,verb.topo.FacePosition.BoutA],[verb.topo.FacePosition.AinB,verb.topo.FacePosition.AoutB,verb.topo.FacePosition.BoutA,verb.topo.FacePosition.BoutA]];
 verb.topo.Topo.counter = 0;
 verb.topo.Tess2.WINDING_ODD = 0;
 verb.topo.Tess2.WINDING_NONZERO = 1;
