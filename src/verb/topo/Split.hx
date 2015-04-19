@@ -183,7 +183,7 @@ class Split {
             var ep = ecs[i];
             if (ep.pos == PlanePosition.On){
 
-                var a = i == 0 ? el : i-1;
+                var a = i == 0 ? el-1 : i-1;
                 var b = (i+1) % el;
 
                 var prv = ecs[a].pos;

@@ -52,12 +52,24 @@ enum BoolOp {
 @:expose("topo.Boolean")
 class Boolean {
 
-    public function union( a : Solid, b : Solid, tol : Float ){
+    public static function union( a : Solid, b : Solid, tol : Float ){
 
         var s = split( a, b, tol );
         var cfa = classifyAllVertexFace( s.coplanarVerticesOfA, BoolOp.Union, true );
+
+//        for (a in cfa){
+//            trace('===');
+//            for (w in a){
+//                trace(w.pos);
+//            }
+//        }
+
         var cfb = classifyAllVertexFace( s.coplanarVerticesOfB, BoolOp.Union, false );
+
+        // now all edges coplanar vertices have their outgoing edges completely classified
+
         var cc = classifyAllVertexVertex( s.coincidentVertices, BoolOp.Union );
+
 //      var parts = connect( cfa, cfb, cc );  // reconnect the two solids
 //      categorize( parts, BoolOp.Union );  // from the various resultant parts  BinA, AinB, BoutA, etc, reconnect
 
@@ -101,7 +113,7 @@ class Boolean {
             }
         }
 
-        // 3. now, go through all of the edges, search for ON edges, reclassify them based on the kind of op
+        // reclassify faces that are on
         for (i in 0...el){
             var ep = ecs[i];
             var ei = Type.enumIndex( ep.pos );
@@ -110,7 +122,49 @@ class Boolean {
             }
         }
 
+        // it's possible that an edge was on, but its neighbors were not, indicating that its parent face is not coplanar
+        // here, we reclassify based on neighbor edges
+        for (i in 0...el){
+            var ep = ecs[i];
+            if (ep.pos == FacePosition.On){
+
+                var a = i == 0 ? el-1 : i-1;
+                var b = (i+1) % el;
+
+                var prv = ecs[a].pos;
+                var nxt = ecs[b].pos;
+
+                if ( isAbove( prv ) && isAbove( nxt ) ){
+                    ep.pos = below( isA );
+                } else if ( isBelow( prv ) && isAbove( nxt ) ) {
+                    ep.pos = below( isA );
+                } else if ( isAbove( prv ) && isBelow( nxt ) ) {
+                    ep.pos = below( isA );
+                } else if ( isBelow( prv ) && isBelow( nxt ) ) {
+                    ep.pos = above( isA );
+                } else {
+                    throw new Exception("Double On edge encountered!");
+                }
+            }
+        }
+
         return ecs;
+    }
+
+    public static function above( isA : Bool ) : FacePosition {
+        return isA ? FacePosition.AoutB : FacePosition.BoutA;
+    }
+
+    public static function below( isA : Bool ) : FacePosition {
+        return isA ? FacePosition.AinB : FacePosition.BinA;
+    }
+
+    public static function isAbove( pos : FacePosition ) : Bool {
+        return pos == FacePosition.AoutB || pos == FacePosition.BoutA;
+    }
+
+    public static function isBelow( pos : FacePosition ) : Bool {
+        return pos == FacePosition.AinB || pos == FacePosition.BinA;
     }
 
     public static function planeFromFace( f : Face ){
@@ -120,7 +174,6 @@ class Boolean {
     private static function reclassifyCoplanarEdge( e : HalfEdge, p : Plane, isA : Bool ) : FacePosition {
 
         var n = e.l.f.normal(); // TODO: cache me
-
         var ndc = n.dot(p.n);
 
         var eps2 = Constants.EPSILON * Constants.EPSILON;
@@ -133,8 +186,6 @@ class Boolean {
         if ( Math.abs(ndc + 1.0) < eps2 ) {
             return isA ? FacePosition.AonBm : FacePosition.BonAm;
         }
-
-        throw new Exception("Cannot categorize on edge!");  // TODO we need more positional information about the face
 
         return FacePosition.On;
     }

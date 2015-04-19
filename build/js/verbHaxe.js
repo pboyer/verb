@@ -3178,6 +3178,46 @@ verb.core.Mat.mul = function(a,b) {
 	}
 	return _g;
 };
+verb.core.Mat.mult = function(x,y) {
+	var p;
+	var q;
+	var r;
+	var ret;
+	var foo;
+	var bar;
+	var woo;
+	var i0;
+	var k0;
+	var p0;
+	var r0;
+	p = x.length;
+	q = y.length;
+	r = y[0].length;
+	ret = new Array();
+	var i = p - 1;
+	var j = 0;
+	var k = 0;
+	while(i >= 0) {
+		foo = new Array();
+		bar = x[i];
+		k = r - 1;
+		while(k >= 0) {
+			woo = bar[q - 1] * y[q - 1][k];
+			j = q - 2;
+			while(j >= 1) {
+				i0 = j - 1;
+				woo += bar[j] * y[j][k] + bar[i0] * y[i0][k];
+				j -= 2;
+			}
+			if(j == 0) woo += bar[0] * y[0][k];
+			foo[k] = woo;
+			k--;
+		}
+		ret[i] = foo;
+		i--;
+	}
+	return ret;
+};
 verb.core.Mat.add = function(a,b) {
 	var _g = [];
 	var _g2 = 0;
@@ -6227,6 +6267,12 @@ verb.topo.BoolOp.Intersect.toString = $estr;
 verb.topo.BoolOp.Intersect.__enum__ = verb.topo.BoolOp;
 verb.topo.Boolean = $hx_exports.topo.Boolean = function() { };
 verb.topo.Boolean.__name__ = ["verb","topo","Boolean"];
+verb.topo.Boolean.union = function(a,b,tol) {
+	var s = verb.topo.Boolean.split(a,b,tol);
+	var cfa = verb.topo.Boolean.classifyAllVertexFace(s.coplanarVerticesOfA,verb.topo.BoolOp.Union,true);
+	var cfb = verb.topo.Boolean.classifyAllVertexFace(s.coplanarVerticesOfB,verb.topo.BoolOp.Union,false);
+	var cc = verb.topo.Boolean.classifyAllVertexVertex(s.coincidentVertices,verb.topo.BoolOp.Union);
+};
 verb.topo.Boolean.classifyAllVertexVertex = function(a,op) {
 	return null;
 };
@@ -6269,7 +6315,32 @@ verb.topo.Boolean.classifyVertexFace = function(v,f,op,isA) {
 		var ei = ep1.pos[1];
 		if(ei > 0 && ei < 5) ep1.pos = verb.topo.Boolean.reclassifyOnSector(ep1.pos,op);
 	}
+	var _g4 = 0;
+	while(_g4 < el) {
+		var i2 = _g4++;
+		var ep2 = ecs[i2];
+		if(ep2.pos == verb.topo.FacePosition.On) {
+			var a;
+			if(i2 == 0) a = el - 1; else a = i2 - 1;
+			var b = (i2 + 1) % el;
+			var prv = ecs[a].pos;
+			var nxt = ecs[b].pos;
+			if(verb.topo.Boolean.isAbove(prv) && verb.topo.Boolean.isAbove(nxt)) ep2.pos = verb.topo.Boolean.below(isA); else if(verb.topo.Boolean.isBelow(prv) && verb.topo.Boolean.isAbove(nxt)) ep2.pos = verb.topo.Boolean.below(isA); else if(verb.topo.Boolean.isAbove(prv) && verb.topo.Boolean.isBelow(nxt)) ep2.pos = verb.topo.Boolean.below(isA); else if(verb.topo.Boolean.isBelow(prv) && verb.topo.Boolean.isBelow(nxt)) ep2.pos = verb.topo.Boolean.above(isA); else throw new verb.core.types.Exception("Double On edge encountered!");
+		}
+	}
 	return ecs;
+};
+verb.topo.Boolean.above = function(isA) {
+	if(isA) return verb.topo.FacePosition.AoutB; else return verb.topo.FacePosition.BoutA;
+};
+verb.topo.Boolean.below = function(isA) {
+	if(isA) return verb.topo.FacePosition.AinB; else return verb.topo.FacePosition.BinA;
+};
+verb.topo.Boolean.isAbove = function(pos) {
+	return pos == verb.topo.FacePosition.AoutB || pos == verb.topo.FacePosition.BoutA;
+};
+verb.topo.Boolean.isBelow = function(pos) {
+	return pos == verb.topo.FacePosition.AinB || pos == verb.topo.FacePosition.BinA;
 };
 verb.topo.Boolean.planeFromFace = function(f) {
 	return { o : f.l.e.v.pt, n : f.normal()};
@@ -6280,7 +6351,6 @@ verb.topo.Boolean.reclassifyCoplanarEdge = function(e,p,isA) {
 	var eps2 = 1.0000000000000001e-20;
 	if(Math.abs(ndc - 1.0) < eps2) if(isA) return verb.topo.FacePosition.AonBp; else return verb.topo.FacePosition.BonAp;
 	if(Math.abs(ndc + 1.0) < eps2) if(isA) return verb.topo.FacePosition.AonBm; else return verb.topo.FacePosition.BonAm;
-	throw new verb.core.types.Exception("Cannot categorize on edge!");
 	return verb.topo.FacePosition.On;
 };
 verb.topo.Boolean.asFacePosition = function(pos,isA) {
@@ -6447,14 +6517,6 @@ verb.topo.Boolean.getCoplanarVertices = function(a,b,ar,tol) {
 		}
 	}
 	return ar;
-};
-verb.topo.Boolean.prototype = {
-	union: function(a,b,tol) {
-		var s = verb.topo.Boolean.split(a,b,tol);
-		var cfa = verb.topo.Boolean.classifyAllVertexFace(s.coplanarVerticesOfA,verb.topo.BoolOp.Union,true);
-		var cfb = verb.topo.Boolean.classifyAllVertexFace(s.coplanarVerticesOfB,verb.topo.BoolOp.Union,false);
-		var cc = verb.topo.Boolean.classifyAllVertexVertex(s.coincidentVertices,verb.topo.BoolOp.Union);
-	}
 };
 verb.topo.Topo = function() {
 	this.id = verb.topo.Topo.counter++;
@@ -6974,7 +7036,7 @@ verb.topo.Split.classifyVertex = function(v,p) {
 		var ep1 = ecs[i1];
 		if(ep1.pos == verb.topo.PlanePosition.On) {
 			var a;
-			if(i1 == 0) a = el; else a = i1 - 1;
+			if(i1 == 0) a = el - 1; else a = i1 - 1;
 			var b = (i1 + 1) % el;
 			var prv = ecs[a].pos;
 			var nxt = ecs[b].pos;

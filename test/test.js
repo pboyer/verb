@@ -7847,6 +7847,7 @@ describe("verb.core.Trig.isPointInPlane",function(){
     });
 });
 
+
 describe("verb.topo.Boolean.isPointInPolygon",function(){
     it('works for a few basic cases', function(){
         var tri = [ [0,0,0], [1,0,0], [1,1,0] ];
@@ -7869,5 +7870,29 @@ describe("verb.topo.Boolean.isPointInPolygon",function(){
 
         verb.topo.Boolean.isPointInPolygon( [2,0,0], l, [0,0,1]  ).should.be.equal( false );
         verb.topo.Boolean.isPointInPolygon( [0.5,0.9,0], l, [0,0,1]  ).should.be.equal( true );
+    });
+});
+
+describe("verb.topo.Boolean.isPointInPolygon",function(){
+    it('works for a few basic cases', function(){
+        var ptsa = [[0,0,0], [10,0,0], [10,10,0], [0,10,0] ];
+        var a = verb.topo.Make.extrusion( ptsa, [0,0,10] );
+
+        var ptsb = [[5,5,-5], [15,5,-5], [15,15,-5], [5,15,-5] ];
+        var b = verb.topo.Make.extrusion( ptsb, [0,0,10] );
+
+        var res = verb.topo.Boolean.union( a, b, 1e-6 );
+
+        // TODO test that classifyVertexFace returns 3 inside, outside pairs
+
+    });
+});
+
+describe("verb.core.Mat.mult",function(){
+    it('works for a few basic cases', function(){
+        var mat = [[1,2], [2,3]];
+
+        verb.core.Mat.mult( verb.core.Mat.identity(2), mat ).should.eql( mat );
+        verb.core.Mat.mult( mat, verb.core.Mat.identity(2) ).should.eql( mat );
     });
 });

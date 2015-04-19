@@ -21,6 +21,42 @@ class Mat {
         return [ for (i in 0...b.length) Vec.mul(a, b[i]) ];
     }
 
+    public static function mult(x : Matrix, y : Matrix) : Matrix {
+        // based on the numeric.js routine - numeric.dotMMsmall
+
+        var p,q,r,ret,foo,bar,woo,i0,k0,p0,r0;
+
+        p = x.length; q = y.length; r = y[0].length;
+        ret = new Matrix();
+
+        var i = p-1;
+        var j = 0;
+        var k = 0;
+
+        while (i>=0){
+            foo = new Vector();
+            bar = x[i];
+
+            k = r-1;
+            while( k >= 0 ){
+                woo = bar[q-1]*y[q-1][k];
+
+                j = q-2;
+                while ( j >= 1 ){
+                    i0 = j-1;
+                    woo += bar[j]*y[j][k] + bar[i0]*y[i0][k];
+                    j -= 2;
+                }
+                if(j==0) { woo += bar[0]*y[0][k]; }
+                foo[k] = woo;
+                k--;
+            }
+            ret[i] = foo;
+            i--;
+        }
+        return ret;
+    }
+
     public static function add(a : Matrix, b : Matrix ) : Matrix {
         return [ for (i in 0...a.length) Vec.add(a[i], b[i]) ];
     }
