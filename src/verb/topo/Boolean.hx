@@ -5,6 +5,7 @@ import haxe.ds.IntMap;
 import verb.core.Trig;
 import verb.topo.Split.Plane;
 import verb.core.Vec;
+import verb.core.Mat;
 using verb.core.Vec;
 
 import verb.core.Constants;
@@ -49,6 +50,29 @@ enum BoolOp {
     Intersect;
 }
 
+class SectorPair {
+    public var SectorA : SectorVectors;
+    public var SectorB : SectorVectors;
+    public var s1a : Int; // -1, 0, 1
+    public var s2a : Int;
+    public var s1b : Int;
+    public var s2b : Int;
+    public var intersect : Bool = true;
+    public function new() {}
+}
+
+class SectorVectors {
+    public var edge : HalfEdge;
+    public var ref1 : Array<Float>;
+    public var ref2 : Array<Float>;
+    public var ref12 : Array<Float>;
+
+    public function new() {}
+    public function updateNormal(){
+        this.ref12 = ref1.cross(ref2);
+    }
+}
+
 @:expose("topo.Boolean")
 class Boolean {
 
@@ -64,20 +88,124 @@ class Boolean {
 //            }
 //        }
 
+        // TODO: insert vertices on coplanar faces and add cfb, cfa to coincident vertices?
+
         var cfb = classifyAllVertexFace( s.coplanarVerticesOfB, BoolOp.Union, false );
 
         // now all edges coplanar vertices have their outgoing edges completely classified
 
-        var cc = classifyAllVertexVertex( s.coincidentVertices, BoolOp.Union );
+        var cc = classifyAllVertexVertex( s.coincidentVertices, BoolOp.Union, tol );
 
 //      var parts = connect( cfa, cfb, cc );  // reconnect the two solids
 //      categorize( parts, BoolOp.Union );  // from the various resultant parts  BinA, AinB, BoutA, etc, reconnect
 
     }
 
-    public static function classifyAllVertexVertex( a : Array<Pair<Vertex,Vertex>>, op : BoolOp ){
-        // in essence, this involves classifying the surrounding intersecting sectors of the vertices
-        return null;
+
+
+
+    public static function classifyAllVertexVertex( a : Array<Pair<Vertex,Vertex>>, op : BoolOp, tol : Float ){
+        var cps = [for (vv in a) classifyVertexVertex( vv.item0, vv.item1, tol )];
+
+        // reclassify on sectors
+
+        // reclassify on edges
+
+        return cps;
+    }
+
+    public static function classifyVertexVertex( a : Vertex, b : Vertex, tol : Float ) : Array<SectorPair> {
+
+        var res = new Array<SectorPair>();
+
+        // preprocess the sectors with extra geometric info
+        var svsa = preprocessVertexSectors( a );
+        var svsb = preprocessVertexSectors( b );
+
+        // for each sector pair
+        for (sva in svsa){
+            for (svb in svsb){
+
+                // if intersects, classify sector edges
+                if ( sectorsIntersect( sva, svb ) ){
+
+                    var sp = new SectorPair();
+                    res.push( sp );
+
+                    sp.SectorA = sva;
+                    sp.SectorB = svb;
+
+                    var na = sva.edge.l.f.normal();
+                    var nb = svb.edge.l.f.normal();
+
+                    sp.s1a = comp( nb.dot( sva.ref1 ), 0.0, tol );
+                    sp.s2a = comp( nb.dot( sva.ref2 ), 0.0, tol );
+                    sp.s1b = comp( na.dot( svb.ref1 ), 0.0, tol );
+                    sp.s2b = comp( na.dot( svb.ref1 ), 0.0, tol );
+
+                }
+            }
+        }
+
+        return res;
+    }
+
+    public static function sectorsIntersect( a : SectorVectors, b : SectorVectors ) : Bool {
+
+        return false;
+
+    }
+
+    public static function comp(a : Float, b : Float, tol : Float ) : Int {
+        if ( Math.abs(a - b) < tol ){
+            return 0;
+        }
+
+        return ( a > b ) ? 1 : -1;
+    }
+
+    public static function preprocessVertexSectors( v : Vertex, tol : Float = 1.0e-3 ) : Array<SectorVectors> {
+
+        var svs = new Array<SectorVectors>();
+
+        for (e in v.halfEdges()){
+
+            var sv = new SectorVectors();
+            svs.push(sv);
+
+            sv.edge = e;
+            sv.ref1 = e.prv.v.pt.sub( e.v.pt );
+            sv.ref2 = e.nxt.v.pt.sub( e.v.pt );
+            sv.updateNormal();
+
+            // are the two edges coincident? or is the angle between them > 180?
+            if (sv.ref12.norm() < tol || e.l.f.normal().dot( sv.ref12 ) > 0.0 ){
+
+                // bisect the sector!
+                var bisector : Array<Float>;
+
+                if ( sv.ref12.norm() < tol ){
+                    // TODO not sure how to handle this case
+                    throw new Exception("Coincident consecutive edges encountered!");
+//                    bisector = inside( e );
+                } else {
+                    bisector = sv.ref1.add( sv.ref2 ).neg();
+                }
+
+                var sv2 = new SectorVectors();
+                svs.push( sv2 );
+
+                sv2.edge = e;
+                sv2.ref2 = sv.ref2.copy();
+                sv2.ref1 = bisector;
+                sv.ref2 = bisector;
+
+                sv.updateNormal();
+                sv2.updateNormal();
+            }
+        }
+
+        return svs;
     }
 
     public static function classifyAllVertexFace( a : Array<Pair<Vertex,Face>>, op : BoolOp, isA : Bool ) : Array<Array<EdgeFacePosition>> {

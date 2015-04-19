@@ -6265,16 +6265,101 @@ verb.topo.BoolOp.Subtract.__enum__ = verb.topo.BoolOp;
 verb.topo.BoolOp.Intersect = ["Intersect",2];
 verb.topo.BoolOp.Intersect.toString = $estr;
 verb.topo.BoolOp.Intersect.__enum__ = verb.topo.BoolOp;
+verb.topo.SectorPair = function() {
+	this.intersect = true;
+};
+verb.topo.SectorPair.__name__ = ["verb","topo","SectorPair"];
+verb.topo.SectorVectors = function() {
+};
+verb.topo.SectorVectors.__name__ = ["verb","topo","SectorVectors"];
+verb.topo.SectorVectors.prototype = {
+	updateNormal: function() {
+		this.ref12 = verb.core.Vec.cross(this.ref1,this.ref2);
+	}
+};
 verb.topo.Boolean = $hx_exports.topo.Boolean = function() { };
 verb.topo.Boolean.__name__ = ["verb","topo","Boolean"];
 verb.topo.Boolean.union = function(a,b,tol) {
 	var s = verb.topo.Boolean.split(a,b,tol);
 	var cfa = verb.topo.Boolean.classifyAllVertexFace(s.coplanarVerticesOfA,verb.topo.BoolOp.Union,true);
 	var cfb = verb.topo.Boolean.classifyAllVertexFace(s.coplanarVerticesOfB,verb.topo.BoolOp.Union,false);
-	var cc = verb.topo.Boolean.classifyAllVertexVertex(s.coincidentVertices,verb.topo.BoolOp.Union);
+	var cc = verb.topo.Boolean.classifyAllVertexVertex(s.coincidentVertices,verb.topo.BoolOp.Union,tol);
 };
-verb.topo.Boolean.classifyAllVertexVertex = function(a,op) {
-	return null;
+verb.topo.Boolean.classifyAllVertexVertex = function(a,op,tol) {
+	var cps;
+	var _g = [];
+	var _g1 = 0;
+	while(_g1 < a.length) {
+		var vv = a[_g1];
+		++_g1;
+		_g.push(verb.topo.Boolean.classifyVertexVertex(vv.item0,vv.item1,tol));
+	}
+	cps = _g;
+	return cps;
+};
+verb.topo.Boolean.classifyVertexVertex = function(a,b,tol) {
+	var res = new Array();
+	var svsa = verb.topo.Boolean.preprocessVertexSectors(a);
+	var svsb = verb.topo.Boolean.preprocessVertexSectors(b);
+	var _g = 0;
+	while(_g < svsa.length) {
+		var sva = svsa[_g];
+		++_g;
+		var _g1 = 0;
+		while(_g1 < svsb.length) {
+			var svb = svsb[_g1];
+			++_g1;
+			if(verb.topo.Boolean.sectorsIntersect(sva,svb)) {
+				var sp = new verb.topo.SectorPair();
+				res.push(sp);
+				sp.SectorA = sva;
+				sp.SectorB = svb;
+				var na = sva.edge.l.f.normal();
+				var nb = svb.edge.l.f.normal();
+				sp.s1a = verb.topo.Boolean.comp(verb.core.Vec.dot(nb,sva.ref1),0.0,tol);
+				sp.s2a = verb.topo.Boolean.comp(verb.core.Vec.dot(nb,sva.ref2),0.0,tol);
+				sp.s1b = verb.topo.Boolean.comp(verb.core.Vec.dot(na,svb.ref1),0.0,tol);
+				sp.s2b = verb.topo.Boolean.comp(verb.core.Vec.dot(na,svb.ref1),0.0,tol);
+			}
+		}
+	}
+	return res;
+};
+verb.topo.Boolean.sectorsIntersect = function(a,b) {
+	return false;
+};
+verb.topo.Boolean.comp = function(a,b,tol) {
+	if(Math.abs(a - b) < tol) return 0;
+	if(a > b) return 1; else return -1;
+};
+verb.topo.Boolean.preprocessVertexSectors = function(v,tol) {
+	if(tol == null) tol = 1.0e-3;
+	var svs = new Array();
+	var _g = 0;
+	var _g1 = v.halfEdges();
+	while(_g < _g1.length) {
+		var e = _g1[_g];
+		++_g;
+		var sv = new verb.topo.SectorVectors();
+		svs.push(sv);
+		sv.edge = e;
+		sv.ref1 = verb.core.Vec.sub(e.prv.v.pt,e.v.pt);
+		sv.ref2 = verb.core.Vec.sub(e.nxt.v.pt,e.v.pt);
+		sv.updateNormal();
+		if(verb.core.Vec.norm(sv.ref12) < tol || verb.core.Vec.dot(e.l.f.normal(),sv.ref12) > 0.0) {
+			var bisector;
+			if(verb.core.Vec.norm(sv.ref12) < tol) throw new verb.core.types.Exception("Coincident consecutive edges encountered!"); else bisector = verb.core.Vec.neg(verb.core.Vec.add(sv.ref1,sv.ref2));
+			var sv2 = new verb.topo.SectorVectors();
+			svs.push(sv2);
+			sv2.edge = e;
+			sv2.ref2 = sv.ref2.slice();
+			sv2.ref1 = bisector;
+			sv.ref2 = bisector;
+			sv.updateNormal();
+			sv2.updateNormal();
+		}
+	}
+	return svs;
 };
 verb.topo.Boolean.classifyAllVertexFace = function(a,op,isA) {
 	var _g = [];
