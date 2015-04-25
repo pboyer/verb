@@ -50,24 +50,43 @@ enum BoolOp {
     Intersect;
 }
 
-class SectorPair {
-    public var SectorA : SectorVectors;
-    public var SectorB : SectorVectors;
-    public var s1a : Int; // -1, 0, 1
-    public var s2a : Int;
-    public var s1b : Int;
-    public var s2b : Int;
+class SectorIntersection {
+    public var SectorA : SectorDescription;
+    public var SectorB : SectorDescription;
+
+    // -1, 0, 1
+    public var s1a : Int; // whether edge a of sector 1 is in, on, or out
+    public var s2a : Int; // whether edge a of sector 2 is in, on, or out
+    public var s1b : Int; // whether edge b of sector 1 is in, on, or out
+    public var s2b : Int; // whether edge b of sector 2 is in, on, or out
+
     public var intersect : Bool = true;
     public function new() {}
 }
 
-class SectorVectors {
+class SectorDescription {
     public var edge : HalfEdge;
     public var ref1 : Array<Float>;
     public var ref2 : Array<Float>;
     public var ref12 : Array<Float>;
+    public var i : Int;
+    public var list : Array<SectorDescription>;
 
-    public function new() {}
+    public function new( i : Int, list : Array<SectorDescription> ) {
+        this.i = i;
+        this.list = list;
+    }
+
+    public function nxt() {
+        var j = (this.i + 1) % this.list.length;
+        return this.list[j];
+    }
+
+    public function prv() {
+        var j = this.i == 0 ? this.list.length - 1 : i - 1;
+        return this.list[j];
+    }
+
     public function updateNormal(){
         this.ref12 = ref1.cross(ref2);
     }
@@ -76,137 +95,120 @@ class SectorVectors {
 @:expose("topo.Boolean")
 class Boolean {
 
+    public static var IN = 1;
+    public static var ON = 0;
+    public static var OUT = -1;
+
     public static function union( a : Solid, b : Solid, tol : Float ){
 
-        var s = split( a, b, tol );
-        var cfa = classifyAllVertexFace( s.coplanarVerticesOfA, BoolOp.Union, true );
+        var op = BoolOp.Union;
 
-//        for (a in cfa){
-//            trace('===');
-//            for (w in a){
-//                trace(w.pos);
-//            }
-//        }
+        var s = splitGeometry( a, b, tol );
 
-        // TODO: insert vertices on coplanar faces and add cfb, cfa to coincident vertices?
+        var nea : Array<HalfEdge> = new Array<HalfEdge>();
+        var neb : Array<HalfEdge> = new Array<HalfEdge>();
 
-        var cfb = classifyAllVertexFace( s.coplanarVerticesOfB, BoolOp.Union, false );
+        var cfa = classifyAllVertexFace( s.coplanarVerticesOfA, op, true );
+        var cfb = classifyAllVertexFace( s.coplanarVerticesOfB, op, false );
 
-        // now all edges coplanar vertices have their outgoing edges completely classified
+        // TODO: implement faceVertexEvent and use here to ensure correct null edges are inserted
 
-        var cc = classifyAllVertexVertex( s.coincidentVertices, BoolOp.Union, tol );
+        for (vv in s.coincidentVertices){
+            vertexVertexEvent( vv.item0, vv.item1, op, nea, neb );
+        }
 
-//      var parts = connect( cfa, cfb, cc );  // reconnect the two solids
-//      categorize( parts, BoolOp.Union );  // from the various resultant parts  BinA, AinB, BoutA, etc, reconnect
+//      connect( cfa, cfb, ccs );  // form the cut lines
+//      performOp( parts, BoolOp.Union );  // from the various resultant parts  BinA, AinB, BoutA, etc, reconnect
 
     }
 
 
+    // todo - what do we need in order to insert the correct null edges for this event?
+    public static function vertexFaceEvent( v : Vertex, f : Face, op : BoolOp, isA : Bool,
+                                            nea : Array<HalfEdge>, neb : Array<HalfEdge>  ) : Pair<Array<EdgeFacePosition>, HalfEdge> {
 
+        var cl = classifyVertexFace( v, f, op, isA );
 
-    public static function classifyAllVertexVertex( a : Array<Pair<Vertex,Vertex>>, op : BoolOp, tol : Float ){
-        var cps = [for (vv in a) classifyVertexVertex( vv.item0, vv.item1, tol )];
+        return null;
 
-        // reclassify on sectors
-
-        // reclassify on edges
-
-        return cps;
     }
 
-    public static function classifyVertexVertex( a : Vertex, b : Vertex, tol : Float ) : Array<SectorPair> {
+    public static function insertNullEdgeIntoFace( point : Point, f : Face ) : HalfEdge {
 
-        var res = new Array<SectorPair>();
+        var nv = f.s.lmev( f.ol.e, f.ol.e, point );
+        var nl = f.s.lkemr(nv.e.prv);
 
-        // preprocess the sectors with extra geometric info
-        var svsa = preprocessVertexSectors( a );
-        var svsb = preprocessVertexSectors( b );
+        return nv.e;
+    }
 
-        // for each sector pair
-        for (sva in svsa){
-            for (svb in svsb){
+    public static function vertexVertexEvent( a : Vertex, b : Vertex, op : BoolOp,
+                                                     nea : Array<HalfEdge>, neb : Array<HalfEdge> ){
 
-                // if intersects, classify sector edges
-                if ( sectorsIntersect( sva, svb ) ){
+        var sps = classifyVertexVertex( a, b );
+        reclassifyCoplanarSectorPairs( sps, op );
+        reclassifyCoplanarSectorEdge( sps, op );
+        insertNullEdges( sps, nea, neb );
+        return sps;
+    }
 
-                    var sp = new SectorPair();
-                    res.push( sp );
+    public static function insertNullEdges( ar : Array<SectorIntersection>,
+                                                    nea : Array<HalfEdge>, neb : Array<HalfEdge> ) : Void {
 
-                    sp.SectorA = sva;
-                    sp.SectorB = svb;
+        // the result is a collection of null edges
+        var i = 0;
+        var arl = ar.length;
+        while (true){
 
-                    var na = sva.edge.l.f.normal();
-                    var nb = svb.edge.l.f.normal();
+            while (!ar[i].intersect)
+                if (++i == arl) return;
 
-                    sp.s1a = comp( nb.dot( sva.ref1 ), 0.0, tol );
-                    sp.s2a = comp( nb.dot( sva.ref2 ), 0.0, tol );
-                    sp.s1b = comp( na.dot( svb.ref1 ), 0.0, tol );
-                    sp.s2b = comp( na.dot( svb.ref1 ), 0.0, tol );
+            var ha1 : HalfEdge = null;
+            var ha2 : HalfEdge = null;
 
-                }
+            var hb1 : HalfEdge = null;
+            var hb2 : HalfEdge = null;
+
+            if (ar[i].s1a == OUT){ ha1 = ar[i].SectorA.edge; } else { ha2 = ar[i].SectorA.edge; }
+            if (ar[i].s1b == IN){ hb1 = ar[i++].SectorB.edge; } else { hb2 = ar[i++].SectorB.edge; }
+
+            while (!ar[i].intersect)
+                if (++i == arl) return;
+
+            if (ar[i].s1a == OUT){ ha1 = ar[i].SectorA.edge; } else { ha2 = ar[i].SectorA.edge; }
+            if (ar[i].s1b == IN){ hb1 = ar[i++].SectorB.edge; } else { hb2 = ar[i++].SectorB.edge; }
+
+            if (ha1 == ha2){
+                insertNullEdge(ha1, ha1, 0, nea, neb );
+                insertNullEdge(hb1, hb2, 1, nea, neb );
+            } else if (hb1 == hb2){
+                insertNullEdge(hb1, hb1, 1, nea, neb );
+                insertNullEdge(ha2, ha1, 0, nea, neb );
+            } else {
+                insertNullEdge(ha2, ha1, 0, nea, neb );
+                insertNullEdge(hb1, hb2, 1, nea, neb );
             }
+
+            if (i == arl) return;
         }
-
-        return res;
     }
 
-    public static function sectorsIntersect( a : SectorVectors, b : SectorVectors ) : Bool {
-
-        return false;
-
-    }
-
-    public static function comp(a : Float, b : Float, tol : Float ) : Int {
-        if ( Math.abs(a - b) < tol ){
-            return 0;
+    public static function insertNullEdge(t : HalfEdge, f : HalfEdge, type : Int, nea : Array<HalfEdge>, neb : Array<HalfEdge> ){
+        t.l.f.s.lmev(f, t, f.v.pt.copy());
+        if (type == 0){
+            nea.push( f.prv );
+        } else {
+            neb.push( f.prv );
         }
-
-        return ( a > b ) ? 1 : -1;
     }
 
-    public static function preprocessVertexSectors( v : Vertex, tol : Float = 1.0e-3 ) : Array<SectorVectors> {
+    public static function connect( cfa, cfb, cc ){
 
-        var svs = new Array<SectorVectors>();
+        trace(cfa.length, cfb.length, cc.length );
 
-        for (e in v.halfEdges()){
+        //
 
-            var sv = new SectorVectors();
-            svs.push(sv);
-
-            sv.edge = e;
-            sv.ref1 = e.prv.v.pt.sub( e.v.pt );
-            sv.ref2 = e.nxt.v.pt.sub( e.v.pt );
-            sv.updateNormal();
-
-            // are the two edges coincident? or is the angle between them > 180?
-            if (sv.ref12.norm() < tol || e.l.f.normal().dot( sv.ref12 ) > 0.0 ){
-
-                // bisect the sector!
-                var bisector : Array<Float>;
-
-                if ( sv.ref12.norm() < tol ){
-                    // TODO not sure how to handle this case
-                    throw new Exception("Coincident consecutive edges encountered!");
-//                    bisector = inside( e );
-                } else {
-                    bisector = sv.ref1.add( sv.ref2 ).neg();
-                }
-
-                var sv2 = new SectorVectors();
-                svs.push( sv2 );
-
-                sv2.edge = e;
-                sv2.ref2 = sv.ref2.copy();
-                sv2.ref1 = bisector;
-                sv.ref2 = bisector;
-
-                sv.updateNormal();
-                sv2.updateNormal();
-            }
-        }
-
-        return svs;
     }
+
 
     public static function classifyAllVertexFace( a : Array<Pair<Vertex,Face>>, op : BoolOp, isA : Bool ) : Array<Array<EdgeFacePosition>> {
         return [for (vf in a) classifyVertexFace( vf.item0, vf.item1, op, isA )];
@@ -279,6 +281,205 @@ class Boolean {
         return ecs;
     }
 
+    public static function reclassifyCoplanarSectorEdge( sps : Array<SectorIntersection>, op : BoolOp ){
+
+        for (sp in sps){
+
+            if ( !(sp.s1a == 0 || sp.s1b == 0 || sp.s2a == 0 || sp.s2b == 0) ) continue;
+
+            throw new Exception("Coplanar sector edge classification not yet implemented!");
+
+            // TODO: 2 varieties
+                // edges lying within a sector face
+                    // look at neighbor sectors of the edge
+                        // both in -> in
+                        // both out -> out
+                        // in-out -> not an intersection?
+            // edges aligned with an edge from the other solid
+                //
+
+        }
+
+    }
+
+    public static function reclassifyCoplanarSectorPairs( sps : Array<SectorIntersection>, op : BoolOp ) : Void {
+
+        for (sp in sps){
+
+            if (!( sp.s1a == 0 && sp.s1b == 0 && sp.s2a == 0 && sp.s2b == 0 ) ) continue;
+
+            // do reclassification
+            var sa = sp.SectorA;
+            var sb = sp.SectorB;
+
+            var psa = sa.prv();
+            var nsa = sa.nxt();
+
+            var psb = sb.prv();
+            var nsb = sb.nxt();
+
+            var ha = sa.edge;
+            var hb = sb.edge;
+
+            var newsa : Int = 0;
+            var newsb : Int = 0;
+
+            var aligned = ha.l.f.normal().sub( hb.l.f.normal() ).norm() < Constants.EPSILON;
+
+            if (aligned){
+                newsa = (op == BoolOp.Union) ? -1 : 1;
+                newsb = (op == BoolOp.Union) ? 1 : -1;
+            } else {
+                newsa = (op == BoolOp.Union) ? 1 : -1;
+                newsb = (op == BoolOp.Union) ? 1 : -1;
+            }
+
+            for (sp2 in sps){
+                if ( sp2.SectorA == psa  && sp2.SectorB == sb && sp2.s1a != 0 ){
+                    sp2.s2a = newsa;
+                }
+
+                if ( sp2.SectorA == nsa  && sp2.SectorB == sb && sp2.s2a != 0){
+                    sp2.s1a = newsa;
+                }
+
+                if ( sp2.SectorA == sa  && sp2.SectorB == psb && sp2.s1b != 0){
+                    sp2.s2b = newsb;
+                }
+
+                if ( sp2.s1a == sp2.s2a  && sp2.s1a != 0 ){
+                    sp2.intersect = false;
+                }
+
+                if ( sp2.s1b == sp2.s2b  && sp2.s1b != 0 ){
+                    sp2.intersect = false;
+                }
+            }
+
+            sp.s1a = sp.s2a = newsa;
+            sp.s1b = sp.s2b = newsb;
+            sp.intersect = false;
+        }
+
+    }
+
+    public static function classifyVertexVertex( a : Vertex, b : Vertex ) : Array<SectorIntersection> {
+
+        var res = new Array<SectorIntersection>();
+
+        // preprocess the sectors with extra geometric info
+        var svsa = preprocessVertexSectors( a );
+        var svsb = preprocessVertexSectors( b );
+
+        // for each sector pair
+        for (sva in svsa){
+            for (svb in svsb){
+
+                // if the pair intersects, classify the pair
+                if ( sectorsIntersect( sva, svb ) ){
+
+                    var sp = new SectorIntersection();
+                    res.push( sp );
+
+                    sp.SectorA = sva;
+                    sp.SectorB = svb;
+
+                    var na = sva.edge.l.f.normal();
+                    var nb = svb.edge.l.f.normal();
+
+                    sp.s1a = comp( nb.dot( sva.ref1 ), 0.0, Constants.EPSILON );
+                    sp.s2a = comp( nb.dot( sva.ref2 ), 0.0, Constants.EPSILON );
+                    sp.s1b = comp( na.dot( svb.ref1 ), 0.0, Constants.EPSILON );
+                    sp.s2b = comp( na.dot( svb.ref2 ), 0.0, Constants.EPSILON );
+                }
+            }
+        }
+
+        return res;
+    }
+
+    public static function sectorsIntersect( a : SectorDescription, b : SectorDescription ) : Bool {
+
+        var na = a.edge.l.f.normal();
+        var nb = b.edge.l.f.normal();
+
+        var int = na.cross(nb);
+
+        if (int.norm() < Constants.EPSILON){
+            return sectorsOverlap( a, b );
+        }
+
+        if ( withinSector( int, a ) && withinSector( int, b ) ){
+            return true;
+        }
+
+        int = int.neg();
+        return withinSector( int, a ) && withinSector( int, b );
+    }
+
+    public static function sectorsOverlap( a : SectorDescription, b : SectorDescription ) : Bool {
+        throw new Exception("sectorsOverlap not implemented!");
+        return false;
+    }
+
+    public static function withinSector( vec : Array<Float>, sv : SectorDescription ) : Bool {
+        // TODO: not sure how robust this is
+        return vec.positiveAngleBetween( sv.ref1, sv.ref12 ) < sv.ref1.positiveAngleBetween( sv.ref2, sv.ref12 );
+    }
+
+    public static function comp(a : Float, b : Float, tol : Float ) : Int {
+        if ( Math.abs(a - b) < tol ){
+            return 0;
+        }
+        return ( a > b ) ? 1 : -1;
+    }
+
+    public static function preprocessVertexSectors( v : Vertex, tol : Float = 1.0e-3 ) : Array<SectorDescription> {
+
+        var svs = new Array<SectorDescription>();
+
+        var i = 0;
+
+        for (e in v.halfEdges()){
+
+            var sv = new SectorDescription(i++, svs);
+            svs.push(sv);
+
+            sv.edge = e;
+            sv.ref1 = e.prv.v.pt.sub( e.v.pt );
+            sv.ref2 = e.nxt.v.pt.sub( e.v.pt );
+            sv.updateNormal();
+
+            // are the two edges coincident? or is the angle between them > 180?
+            if (sv.ref12.norm() < tol || e.l.f.normal().dot( sv.ref12 ) > 0.0 ){
+
+                // bisect the sector!
+                var bisector : Array<Float>;
+
+                if ( sv.ref12.norm() < tol ){
+                    // TODO not sure how to handle this case
+                    throw new Exception("Coincident consecutive edges encountered!");
+//                    bisector = inside( e );
+                } else {
+                    bisector = sv.ref1.add( sv.ref2 ).neg();
+                }
+
+                var sv2 = new SectorDescription(i++, svs);
+                svs.push( sv2 );
+
+                sv2.edge = e;
+                sv2.ref2 = sv.ref2.copy();
+                sv2.ref1 = bisector;
+                sv.ref2 = bisector;
+
+                sv.updateNormal();
+                sv2.updateNormal();
+            }
+        }
+
+        return svs;
+    }
+
     public static function above( isA : Bool ) : FacePosition {
         return isA ? FacePosition.AoutB : FacePosition.BoutA;
     }
@@ -339,7 +540,7 @@ class Boolean {
         return boolOnSectorMap[ Type.enumIndex(op) ][ Type.enumIndex(c) ];
     }
 
-    public static function split( a : Solid, b : Solid, tol : Float ) : BooleanSplitResult {
+    public static function splitGeometry( a : Solid, b : Solid, tol : Float ) : BooleanSplitResult {
 
         var va = splitAllEdges( a, b, tol );
         var vva = splitEdgesByVertices( a, b, tol );
@@ -439,7 +640,7 @@ class Boolean {
             var v0 = pts[i].sub( pt );
             var v1 = pts[(i+1) % ptsl].sub( pt );
 
-            a += Vec.signedAngleBetween2( v0, v1, n );
+            a += Vec.positiveAngleBetween( v0, v1, n );
         }
 
         return Math.abs(a) > Math.PI;

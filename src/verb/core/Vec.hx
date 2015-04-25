@@ -14,7 +14,7 @@ class Vec {
         return Math.acos( dot(a, b) / ( norm(a) * norm(b) )  );
     }
 
-    public static function signedAngleBetween2(a : Array<Float>, b : Array<Float>, n : Array<Float>) : Float{
+    public static function positiveAngleBetween(a : Array<Float>, b : Array<Float>, n : Array<Float>) : Float{
         var nab = Vec.cross(a,b);
 
         var al = Vec.norm(a);

@@ -123,6 +123,11 @@ Type.getClassName = function(c) {
 	return a.join(".");
 };
 var haxe = {};
+haxe.Log = function() { };
+haxe.Log.__name__ = ["haxe","Log"];
+haxe.Log.trace = function(v,infos) {
+	js.Boot.__trace(v,infos);
+};
 haxe.ds = {};
 haxe.ds.IntMap = function() {
 	this.h = { };
@@ -160,11 +165,100 @@ haxe.ds.IntMap.prototype = {
 		}};
 	}
 };
-haxe.ds.Option = { __constructs__ : ["Some","None"] };
+haxe.ds.Option = { __ename__ : true, __constructs__ : ["Some","None"] };
 haxe.ds.Option.Some = function(v) { var $x = ["Some",0,v]; $x.__enum__ = haxe.ds.Option; $x.toString = $estr; return $x; };
 haxe.ds.Option.None = ["None",1];
 haxe.ds.Option.None.toString = $estr;
 haxe.ds.Option.None.__enum__ = haxe.ds.Option;
+var js = {};
+js.Boot = function() { };
+js.Boot.__name__ = ["js","Boot"];
+js.Boot.__unhtml = function(s) {
+	return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
+};
+js.Boot.__trace = function(v,i) {
+	var msg;
+	if(i != null) msg = i.fileName + ":" + i.lineNumber + ": "; else msg = "";
+	msg += js.Boot.__string_rec(v,"");
+	if(i != null && i.customParams != null) {
+		var _g = 0;
+		var _g1 = i.customParams;
+		while(_g < _g1.length) {
+			var v1 = _g1[_g];
+			++_g;
+			msg += "," + js.Boot.__string_rec(v1,"");
+		}
+	}
+	var d;
+	if(typeof(document) != "undefined" && (d = document.getElementById("haxe:trace")) != null) d.innerHTML += js.Boot.__unhtml(msg) + "<br/>"; else if(typeof console != "undefined" && console.log != null) console.log(msg);
+};
+js.Boot.__string_rec = function(o,s) {
+	if(o == null) return "null";
+	if(s.length >= 5) return "<...>";
+	var t = typeof(o);
+	if(t == "function" && (o.__name__ || o.__ename__)) t = "object";
+	switch(t) {
+	case "object":
+		if(o instanceof Array) {
+			if(o.__enum__) {
+				if(o.length == 2) return o[0];
+				var str = o[0] + "(";
+				s += "\t";
+				var _g1 = 2;
+				var _g = o.length;
+				while(_g1 < _g) {
+					var i = _g1++;
+					if(i != 2) str += "," + js.Boot.__string_rec(o[i],s); else str += js.Boot.__string_rec(o[i],s);
+				}
+				return str + ")";
+			}
+			var l = o.length;
+			var i1;
+			var str1 = "[";
+			s += "\t";
+			var _g2 = 0;
+			while(_g2 < l) {
+				var i2 = _g2++;
+				str1 += (i2 > 0?",":"") + js.Boot.__string_rec(o[i2],s);
+			}
+			str1 += "]";
+			return str1;
+		}
+		var tostr;
+		try {
+			tostr = o.toString;
+		} catch( e ) {
+			return "???";
+		}
+		if(tostr != null && tostr != Object.toString) {
+			var s2 = o.toString();
+			if(s2 != "[object Object]") return s2;
+		}
+		var k = null;
+		var str2 = "{\n";
+		s += "\t";
+		var hasp = o.hasOwnProperty != null;
+		for( var k in o ) {
+		if(hasp && !o.hasOwnProperty(k)) {
+			continue;
+		}
+		if(k == "prototype" || k == "__class__" || k == "__super__" || k == "__interfaces__" || k == "__properties__") {
+			continue;
+		}
+		if(str2.length != 2) str2 += ", \n";
+		str2 += s + k + " : " + js.Boot.__string_rec(o[k],s);
+		}
+		s = s.substring(1);
+		str2 += "\n" + s + "}";
+		return str2;
+	case "function":
+		return "<function>";
+	case "string":
+		return o;
+	default:
+		return String(o);
+	}
+};
 var promhx = {};
 promhx.base = {};
 promhx.base.AsyncBase = function(d) {
@@ -696,14 +790,14 @@ promhx.base.EventLoop.continueOnNextLoop = function() {
 	if(promhx.base.EventLoop.nextLoop != null) promhx.base.EventLoop.nextLoop(promhx.base.EventLoop.f); else setImmediate(promhx.base.EventLoop.f);
 };
 promhx.error = {};
-promhx.error.PromiseError = { __constructs__ : ["AlreadyResolved","DownstreamNotFullfilled"] };
+promhx.error.PromiseError = { __ename__ : true, __constructs__ : ["AlreadyResolved","DownstreamNotFullfilled"] };
 promhx.error.PromiseError.AlreadyResolved = function(message) { var $x = ["AlreadyResolved",0,message]; $x.__enum__ = promhx.error.PromiseError; $x.toString = $estr; return $x; };
 promhx.error.PromiseError.DownstreamNotFullfilled = function(message) { var $x = ["DownstreamNotFullfilled",1,message]; $x.__enum__ = promhx.error.PromiseError; $x.toString = $estr; return $x; };
 var verb = {};
 verb.Verb = function() { };
 verb.Verb.__name__ = ["verb","Verb"];
 verb.Verb.main = function() {
-	console.log("verb 0.2.0");
+	haxe.Log.trace("verb 0.2.0",{ fileName : "Verb.hx", lineNumber : 56, className : "verb.Verb", methodName : "main"});
 };
 verb.core = {};
 verb.core.KnotMultiplicity = $hx_exports.core.KnotMultiplicity = function(knot,mult) {
@@ -1655,7 +1749,7 @@ verb.core.Eval.knotSpanGivenN = function(n,degree,u,knots) {
 	}
 	return mid;
 };
-verb.core.MarchStepState = { __constructs__ : ["OutOfBounds","InsideDomain","AtBoundary","CompleteLoop"] };
+verb.core.MarchStepState = { __ename__ : true, __constructs__ : ["OutOfBounds","InsideDomain","AtBoundary","CompleteLoop"] };
 verb.core.MarchStepState.OutOfBounds = ["OutOfBounds",0];
 verb.core.MarchStepState.OutOfBounds.toString = $estr;
 verb.core.MarchStepState.OutOfBounds.__enum__ = verb.core.MarchStepState;
@@ -4532,7 +4626,7 @@ verb.core.Vec.__name__ = ["verb","core","Vec"];
 verb.core.Vec.angleBetween = function(a,b) {
 	return Math.acos(verb.core.Vec.dot(a,b) / (verb.core.Vec.norm(a) * verb.core.Vec.norm(b)));
 };
-verb.core.Vec.signedAngleBetween2 = function(a,b,n) {
+verb.core.Vec.positiveAngleBetween = function(a,b,n) {
 	var nab = verb.core.Vec.cross(a,b);
 	var al = verb.core.Vec.norm(a);
 	var bl = verb.core.Vec.norm(b);
@@ -5668,7 +5762,7 @@ verb.exe.WorkerPool.prototype = {
 							_g._callbacks.remove(workId[0]);
 						}
 					} catch( error ) {
-						console.log(error);
+						haxe.Log.trace(error,{ fileName : "WorkerPool.hx", lineNumber : 77, className : "verb.exe.WorkerPool", methodName : "processQueue"});
 					}
 					_g.processQueue();
 				};
@@ -6266,7 +6360,7 @@ verb.topo.Analyze.loopArea = function(l,n) {
 	} while(ce.nxt != se);
 	return v / 2;
 };
-verb.topo.FacePosition = { __constructs__ : ["On","AonBp","AonBm","BonAp","BonAm","AoutB","AinB","BoutA","BinA"] };
+verb.topo.FacePosition = { __ename__ : true, __constructs__ : ["On","AonBp","AonBm","BonAp","BonAm","AoutB","AinB","BoutA","BinA"] };
 verb.topo.FacePosition.On = ["On",0];
 verb.topo.FacePosition.On.toString = $estr;
 verb.topo.FacePosition.On.__enum__ = verb.topo.FacePosition;
@@ -6294,7 +6388,7 @@ verb.topo.FacePosition.BoutA.__enum__ = verb.topo.FacePosition;
 verb.topo.FacePosition.BinA = ["BinA",8];
 verb.topo.FacePosition.BinA.toString = $estr;
 verb.topo.FacePosition.BinA.__enum__ = verb.topo.FacePosition;
-verb.topo.BoolOp = { __constructs__ : ["Union","Subtract","Intersect"] };
+verb.topo.BoolOp = { __ename__ : true, __constructs__ : ["Union","Subtract","Intersect"] };
 verb.topo.BoolOp.Union = ["Union",0];
 verb.topo.BoolOp.Union.toString = $estr;
 verb.topo.BoolOp.Union.__enum__ = verb.topo.BoolOp;
@@ -6304,16 +6398,95 @@ verb.topo.BoolOp.Subtract.__enum__ = verb.topo.BoolOp;
 verb.topo.BoolOp.Intersect = ["Intersect",2];
 verb.topo.BoolOp.Intersect.toString = $estr;
 verb.topo.BoolOp.Intersect.__enum__ = verb.topo.BoolOp;
+verb.topo.SectorIntersection = function() {
+	this.intersect = true;
+};
+verb.topo.SectorIntersection.__name__ = ["verb","topo","SectorIntersection"];
+verb.topo.SectorDescription = function(i,list) {
+	this.i = i;
+	this.list = list;
+};
+verb.topo.SectorDescription.__name__ = ["verb","topo","SectorDescription"];
+verb.topo.SectorDescription.prototype = {
+	nxt: function() {
+		var j = (this.i + 1) % this.list.length;
+		return this.list[j];
+	}
+	,prv: function() {
+		var j;
+		if(this.i == 0) j = this.list.length - 1; else j = this.i - 1;
+		return this.list[j];
+	}
+	,updateNormal: function() {
+		this.ref12 = verb.core.Vec.cross(this.ref1,this.ref2);
+	}
+};
 verb.topo.Boolean = $hx_exports.topo.Boolean = function() { };
 verb.topo.Boolean.__name__ = ["verb","topo","Boolean"];
 verb.topo.Boolean.union = function(a,b,tol) {
-	var s = verb.topo.Boolean.split(a,b,tol);
-	var cfa = verb.topo.Boolean.classifyAllVertexFace(s.coplanarVerticesOfA,verb.topo.BoolOp.Union,true);
-	var cfb = verb.topo.Boolean.classifyAllVertexFace(s.coplanarVerticesOfB,verb.topo.BoolOp.Union,false);
-	var cc = verb.topo.Boolean.classifyAllVertexVertex(s.coincidentVertices,verb.topo.BoolOp.Union);
+	var op = verb.topo.BoolOp.Union;
+	var s = verb.topo.Boolean.splitGeometry(a,b,tol);
+	var nea = new Array();
+	var neb = new Array();
+	var cfa = verb.topo.Boolean.classifyAllVertexFace(s.coplanarVerticesOfA,op,true);
+	var cfb = verb.topo.Boolean.classifyAllVertexFace(s.coplanarVerticesOfB,op,false);
+	var _g = 0;
+	var _g1 = s.coincidentVertices;
+	while(_g < _g1.length) {
+		var vv = _g1[_g];
+		++_g;
+		verb.topo.Boolean.vertexVertexEvent(vv.item0,vv.item1,op,nea,neb);
+	}
 };
-verb.topo.Boolean.classifyAllVertexVertex = function(a,op) {
+verb.topo.Boolean.vertexFaceEvent = function(v,f,op,isA,nea,neb) {
+	var cl = verb.topo.Boolean.classifyVertexFace(v,f,op,isA);
 	return null;
+};
+verb.topo.Boolean.insertNullEdgeIntoFace = function(point,f) {
+	var nv = f.s.lmev(f.ol.e,f.ol.e,point);
+	var nl = f.s.lkemr(nv.e.prv);
+	return nv.e;
+};
+verb.topo.Boolean.vertexVertexEvent = function(a,b,op,nea,neb) {
+	var sps = verb.topo.Boolean.classifyVertexVertex(a,b);
+	verb.topo.Boolean.reclassifyCoplanarSectorPairs(sps,op);
+	verb.topo.Boolean.reclassifyCoplanarSectorEdge(sps,op);
+	verb.topo.Boolean.insertNullEdges(sps,nea,neb);
+	return sps;
+};
+verb.topo.Boolean.insertNullEdges = function(ar,nea,neb) {
+	var i = 0;
+	var arl = ar.length;
+	while(true) {
+		while(!ar[i].intersect) if(++i == arl) return;
+		var ha1 = null;
+		var ha2 = null;
+		var hb1 = null;
+		var hb2 = null;
+		if(ar[i].s1a == verb.topo.Boolean.OUT) ha1 = ar[i].SectorA.edge; else ha2 = ar[i].SectorA.edge;
+		if(ar[i].s1b == verb.topo.Boolean.IN) hb1 = ar[i++].SectorB.edge; else hb2 = ar[i++].SectorB.edge;
+		while(!ar[i].intersect) if(++i == arl) return;
+		if(ar[i].s1a == verb.topo.Boolean.OUT) ha1 = ar[i].SectorA.edge; else ha2 = ar[i].SectorA.edge;
+		if(ar[i].s1b == verb.topo.Boolean.IN) hb1 = ar[i++].SectorB.edge; else hb2 = ar[i++].SectorB.edge;
+		if(ha1 == ha2) {
+			verb.topo.Boolean.insertNullEdge(ha1,ha1,0,nea,neb);
+			verb.topo.Boolean.insertNullEdge(hb1,hb2,1,nea,neb);
+		} else if(hb1 == hb2) {
+			verb.topo.Boolean.insertNullEdge(hb1,hb1,1,nea,neb);
+			verb.topo.Boolean.insertNullEdge(ha2,ha1,0,nea,neb);
+		} else {
+			verb.topo.Boolean.insertNullEdge(ha2,ha1,0,nea,neb);
+			verb.topo.Boolean.insertNullEdge(hb1,hb2,1,nea,neb);
+		}
+		if(i == arl) return;
+	}
+};
+verb.topo.Boolean.insertNullEdge = function(t,f,type,nea,neb) {
+	t.l.f.s.lmev(f,t,f.v.pt.slice());
+	if(type == 0) nea.push(f.prv); else neb.push(f.prv);
+};
+verb.topo.Boolean.connect = function(cfa,cfb,cc) {
+	haxe.Log.trace(cfa.length,{ fileName : "Boolean.hx", lineNumber : 206, className : "verb.topo.Boolean", methodName : "connect", customParams : [cfb.length,cc.length]});
 };
 verb.topo.Boolean.classifyAllVertexFace = function(a,op,isA) {
 	var _g = [];
@@ -6369,6 +6542,132 @@ verb.topo.Boolean.classifyVertexFace = function(v,f,op,isA) {
 	}
 	return ecs;
 };
+verb.topo.Boolean.reclassifyCoplanarSectorEdge = function(sps,op) {
+	var _g = 0;
+	while(_g < sps.length) {
+		var sp = sps[_g];
+		++_g;
+		if(!(sp.s1a == 0 || sp.s1b == 0 || sp.s2a == 0 || sp.s2b == 0)) continue;
+		throw new verb.core.types.Exception("Coplanar sector edge classification not yet implemented!");
+	}
+};
+verb.topo.Boolean.reclassifyCoplanarSectorPairs = function(sps,op) {
+	var _g = 0;
+	while(_g < sps.length) {
+		var sp = sps[_g];
+		++_g;
+		if(!(sp.s1a == 0 && sp.s1b == 0 && sp.s2a == 0 && sp.s2b == 0)) continue;
+		var sa = sp.SectorA;
+		var sb = sp.SectorB;
+		var psa = sa.prv();
+		var nsa = sa.nxt();
+		var psb = sb.prv();
+		var nsb = sb.nxt();
+		var ha = sa.edge;
+		var hb = sb.edge;
+		var newsa = 0;
+		var newsb = 0;
+		var aligned = verb.core.Vec.norm(verb.core.Vec.sub(ha.l.f.normal(),hb.l.f.normal())) < 1e-10;
+		if(aligned) {
+			if(op == verb.topo.BoolOp.Union) newsa = -1; else newsa = 1;
+			if(op == verb.topo.BoolOp.Union) newsb = 1; else newsb = -1;
+		} else {
+			if(op == verb.topo.BoolOp.Union) newsa = 1; else newsa = -1;
+			if(op == verb.topo.BoolOp.Union) newsb = 1; else newsb = -1;
+		}
+		var _g1 = 0;
+		while(_g1 < sps.length) {
+			var sp2 = sps[_g1];
+			++_g1;
+			if(sp2.SectorA == psa && sp2.SectorB == sb && sp2.s1a != 0) sp2.s2a = newsa;
+			if(sp2.SectorA == nsa && sp2.SectorB == sb && sp2.s2a != 0) sp2.s1a = newsa;
+			if(sp2.SectorA == sa && sp2.SectorB == psb && sp2.s1b != 0) sp2.s2b = newsb;
+			if(sp2.s1a == sp2.s2a && sp2.s1a != 0) sp2.intersect = false;
+			if(sp2.s1b == sp2.s2b && sp2.s1b != 0) sp2.intersect = false;
+		}
+		sp.s1a = sp.s2a = newsa;
+		sp.s1b = sp.s2b = newsb;
+		sp.intersect = false;
+	}
+};
+verb.topo.Boolean.classifyVertexVertex = function(a,b) {
+	var res = new Array();
+	var svsa = verb.topo.Boolean.preprocessVertexSectors(a);
+	var svsb = verb.topo.Boolean.preprocessVertexSectors(b);
+	var _g = 0;
+	while(_g < svsa.length) {
+		var sva = svsa[_g];
+		++_g;
+		var _g1 = 0;
+		while(_g1 < svsb.length) {
+			var svb = svsb[_g1];
+			++_g1;
+			if(verb.topo.Boolean.sectorsIntersect(sva,svb)) {
+				var sp = new verb.topo.SectorIntersection();
+				res.push(sp);
+				sp.SectorA = sva;
+				sp.SectorB = svb;
+				var na = sva.edge.l.f.normal();
+				var nb = svb.edge.l.f.normal();
+				sp.s1a = verb.topo.Boolean.comp(verb.core.Vec.dot(nb,sva.ref1),0.0,1e-10);
+				sp.s2a = verb.topo.Boolean.comp(verb.core.Vec.dot(nb,sva.ref2),0.0,1e-10);
+				sp.s1b = verb.topo.Boolean.comp(verb.core.Vec.dot(na,svb.ref1),0.0,1e-10);
+				sp.s2b = verb.topo.Boolean.comp(verb.core.Vec.dot(na,svb.ref2),0.0,1e-10);
+			}
+		}
+	}
+	return res;
+};
+verb.topo.Boolean.sectorsIntersect = function(a,b) {
+	var na = a.edge.l.f.normal();
+	var nb = b.edge.l.f.normal();
+	var $int = verb.core.Vec.cross(na,nb);
+	if(verb.core.Vec.norm($int) < 1e-10) return verb.topo.Boolean.sectorsOverlap(a,b);
+	if(verb.topo.Boolean.withinSector($int,a) && verb.topo.Boolean.withinSector($int,b)) return true;
+	$int = verb.core.Vec.neg($int);
+	return verb.topo.Boolean.withinSector($int,a) && verb.topo.Boolean.withinSector($int,b);
+};
+verb.topo.Boolean.sectorsOverlap = function(a,b) {
+	throw new verb.core.types.Exception("sectorsOverlap not implemented!");
+	return false;
+};
+verb.topo.Boolean.withinSector = function(vec,sv) {
+	return verb.core.Vec.positiveAngleBetween(vec,sv.ref1,sv.ref12) < verb.core.Vec.positiveAngleBetween(sv.ref1,sv.ref2,sv.ref12);
+};
+verb.topo.Boolean.comp = function(a,b,tol) {
+	if(Math.abs(a - b) < tol) return 0;
+	if(a > b) return 1; else return -1;
+};
+verb.topo.Boolean.preprocessVertexSectors = function(v,tol) {
+	if(tol == null) tol = 1.0e-3;
+	var svs = new Array();
+	var i = 0;
+	var _g = 0;
+	var _g1 = v.halfEdges();
+	while(_g < _g1.length) {
+		var e = _g1[_g];
+		++_g;
+		var sv = new verb.topo.SectorDescription(i++,svs);
+		svs.push(sv);
+		sv.edge = e;
+		sv.ref1 = verb.core.Vec.sub(e.prv.v.pt,e.v.pt);
+		sv.ref2 = verb.core.Vec.sub(e.nxt.v.pt,e.v.pt);
+		sv.updateNormal();
+		if(verb.core.Vec.norm(sv.ref12) < tol || verb.core.Vec.dot(e.l.f.normal(),sv.ref12) > 0.0) {
+			var bisector;
+			if(verb.core.Vec.norm(sv.ref12) < tol) throw new verb.core.types.Exception("Coincident consecutive edges encountered!"); else bisector = verb.core.Vec.neg(verb.core.Vec.add(sv.ref1,sv.ref2));
+			var sv2 = new verb.topo.SectorDescription(i++,svs);
+			svs.push(sv2);
+			sv2.edge = e;
+			sv2.ref2 = sv.ref2.slice();
+			sv2.ref1 = bisector;
+			sv.ref2 = bisector;
+			sv.updateNormal();
+			sv2.updateNormal();
+		}
+	}
+	return svs;
+};
 verb.topo.Boolean.above = function(isA) {
 	if(isA) return verb.topo.FacePosition.AoutB; else return verb.topo.FacePosition.BoutA;
 };
@@ -6399,7 +6698,7 @@ verb.topo.Boolean.asFacePosition = function(pos,isA) {
 verb.topo.Boolean.reclassifyOnSector = function(c,op) {
 	return verb.topo.Boolean.boolOnSectorMap[op[1]][c[1]];
 };
-verb.topo.Boolean.split = function(a,b,tol) {
+verb.topo.Boolean.splitGeometry = function(a,b,tol) {
 	var va = verb.topo.Boolean.splitAllEdges(a,b,tol);
 	var vva = verb.topo.Boolean.splitEdgesByVertices(a,b,tol);
 	var vvb = verb.topo.Boolean.splitEdgesByVertices(b,a,tol);
@@ -6466,7 +6765,7 @@ verb.topo.Boolean.isPointInPolygon = function(pt,pts,n) {
 		var i = _g++;
 		var v0 = verb.core.Vec.sub(pts[i],pt);
 		var v1 = verb.core.Vec.sub(pts[(i + 1) % ptsl],pt);
-		a += verb.core.Vec.signedAngleBetween2(v0,v1,n);
+		a += verb.core.Vec.positiveAngleBetween(v0,v1,n);
 	}
 	return Math.abs(a) > Math.PI;
 };
@@ -6950,7 +7249,7 @@ verb.topo.Solid.prototype = $extend(verb.topo.Topo.prototype,{
 		return "Solid (" + this.vertices().length + " Vertices, " + this.faces().length + " Faces, " + this.loops().length + " Loops, " + this.halfEdges().length + " HalfEdges" + ")";
 	}
 });
-verb.topo.PlanePosition = { __constructs__ : ["On","Above","Below"] };
+verb.topo.PlanePosition = { __ename__ : true, __constructs__ : ["On","Above","Below"] };
 verb.topo.PlanePosition.On = ["On",0];
 verb.topo.PlanePosition.On.toString = $estr;
 verb.topo.PlanePosition.On.__enum__ = verb.topo.PlanePosition;
@@ -7148,7 +7447,7 @@ verb.topo.Split.join = function(e0,e1) {
 	} else s.lmekr(e0,e1.nxt);
 	if(e0.nxt.nxt != e1) {
 		s.lmef(e1,e0.nxt);
-		if(nf != null && of.l.nxt != of.l) console.log("PANIC!");
+		if(nf != null && of.l.nxt != of.l) haxe.Log.trace("PANIC!",{ fileName : "Split.hx", lineNumber : 277, className : "verb.topo.Split", methodName : "join"});
 	}
 };
 verb.topo.Split.cut = function(e,faces) {
@@ -9450,6 +9749,9 @@ verb.exe.Dispatcher.THREADS = 1;
 verb.exe.Dispatcher._init = false;
 verb.exe.Work.uuid = 0;
 verb.exe.WorkerPool.basePath = "";
+verb.topo.Boolean.IN = 1;
+verb.topo.Boolean.ON = 0;
+verb.topo.Boolean.OUT = -1;
 verb.topo.Boolean.boolOnSectorMap = [[verb.topo.FacePosition.AoutB,verb.topo.FacePosition.AinB,verb.topo.FacePosition.BinA,verb.topo.FacePosition.BinA],[verb.topo.FacePosition.AinB,verb.topo.FacePosition.AoutB,verb.topo.FacePosition.BoutA,verb.topo.FacePosition.BoutA],[verb.topo.FacePosition.AinB,verb.topo.FacePosition.AoutB,verb.topo.FacePosition.BoutA,verb.topo.FacePosition.BoutA]];
 verb.topo.Topo.counter = 0;
 verb.topo.Tess2.WINDING_ODD = 0;

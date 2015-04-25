@@ -20,6 +20,8 @@ function last(a){
 	return a[a.length-1];
 }
 
+/*
+
 describe("verb.core.Eval.knotSpanGivenN",function(){
 
 	it('returns correct result', function(){
@@ -7848,6 +7850,8 @@ describe("verb.core.Trig.isPointInPlane",function(){
 });
 
 
+*/
+
 describe("verb.topo.Boolean.isPointInPolygon",function(){
     it('works for a few basic cases', function(){
         var tri = [ [0,0,0], [1,0,0], [1,1,0] ];
@@ -7873,8 +7877,17 @@ describe("verb.topo.Boolean.isPointInPolygon",function(){
     });
 });
 
-describe("verb.topo.Boolean.isPointInPolygon",function(){
+describe("verb.core.Mat.mult",function(){
     it('works for a few basic cases', function(){
+        var mat = [[1,2], [2,3]];
+
+        verb.core.Mat.mult( verb.core.Mat.identity(2), mat ).should.eql( mat );
+        verb.core.Mat.mult( mat, verb.core.Mat.identity(2) ).should.eql( mat );
+    });
+});
+
+describe("verb.topo.Boolean.union",function(){
+    it('testing', function(){
         var ptsa = [[0,0,0], [10,0,0], [10,10,0], [0,10,0] ];
         var a = verb.topo.Make.extrusion( ptsa, [0,0,10] );
 
@@ -7885,14 +7898,8 @@ describe("verb.topo.Boolean.isPointInPolygon",function(){
 
         // TODO test that classifyVertexFace returns 3 inside, outside pairs
 
-    });
-});
 
-describe("verb.core.Mat.mult",function(){
-    it('works for a few basic cases', function(){
-        var mat = [[1,2], [2,3]];
 
-        verb.core.Mat.mult( verb.core.Mat.identity(2), mat ).should.eql( mat );
-        verb.core.Mat.mult( mat, verb.core.Mat.identity(2) ).should.eql( mat );
+
     });
 });
