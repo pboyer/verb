@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="938890c0-f1ce-4fbd-8322-63610af7f5e6" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/verb/topo/Split.hx" afterPath="$PROJECT_DIR$/src/verb/topo/Split.hx" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/test/test.js" afterPath="$PROJECT_DIR$/test/test.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/js/verb.js" afterPath="$PROJECT_DIR$/build/js/verb.js" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/build/js/verbHaxe.js" afterPath="$PROJECT_DIR$/build/js/verbHaxe.js" />
     </list>
@@ -68,8 +69,8 @@
       <file leaf-file-name="Split.hx" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/verb/topo/Split.hx">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="-0.42525774" vertical-offset="4635" max-vertical-offset="6240">
-              <caret line="287" column="0" selection-start-line="287" selection-start-column="0" selection-end-line="287" selection-end-column="0" />
+            <state vertical-scroll-proportion="3.822165" vertical-offset="469" max-vertical-offset="6435">
+              <caret line="229" column="34" selection-start-line="229" selection-start-column="34" selection-end-line="229" selection-end-column="34" />
               <folding />
             </state>
           </provider>
@@ -98,8 +99,8 @@
       <file leaf-file-name="test.js" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/test/test.js">
           <provider selected="true" editor-type-id="text-editor">
-            <state vertical-scroll-proportion="0.0" vertical-offset="116329" max-vertical-offset="118695">
-              <caret line="7778" column="3" selection-start-line="7778" selection-start-column="3" selection-end-line="7778" selection-end-column="3" />
+            <state vertical-scroll-proportion="0.0" vertical-offset="116569" max-vertical-offset="118695">
+              <caret line="7830" column="7" selection-start-line="7830" selection-start-column="7" selection-end-line="7830" selection-end-column="7" />
               <folding />
             </state>
           </provider>
@@ -161,9 +162,9 @@
         <option value="$PROJECT_DIR$/examples/boolean.js" />
         <option value="$PROJECT_DIR$/src/verb/core/Mat.hx" />
         <option value="$PROJECT_DIR$/src/verb/core/Vec.hx" />
-        <option value="$PROJECT_DIR$/test/test.js" />
         <option value="$PROJECT_DIR$/src/verb/topo/Boolean.hx" />
         <option value="$PROJECT_DIR$/src/verb/topo/Split.hx" />
+        <option value="$PROJECT_DIR$/test/test.js" />
       </list>
     </option>
   </component>
@@ -952,14 +953,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/test/test.js">
-      <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="0.0" vertical-offset="116329" max-vertical-offset="118695">
-          <caret line="7778" column="3" selection-start-line="7778" selection-start-column="3" selection-end-line="7778" selection-end-column="3" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/verb/topo/Boolean.hx">
       <provider selected="true" editor-type-id="text-editor">
         <state vertical-scroll-proportion="0.0" vertical-offset="1482" max-vertical-offset="11475">
@@ -968,10 +961,18 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/test/test.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state vertical-scroll-proportion="0.0" vertical-offset="116569" max-vertical-offset="118695">
+          <caret line="7830" column="7" selection-start-line="7830" selection-start-column="7" selection-end-line="7830" selection-end-column="7" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/verb/topo/Split.hx">
       <provider selected="true" editor-type-id="text-editor">
-        <state vertical-scroll-proportion="-0.42525774" vertical-offset="4635" max-vertical-offset="6240">
-          <caret line="287" column="0" selection-start-line="287" selection-start-column="0" selection-end-line="287" selection-end-column="0" />
+        <state vertical-scroll-proportion="3.822165" vertical-offset="469" max-vertical-offset="6435">
+          <caret line="229" column="34" selection-start-line="229" selection-start-column="34" selection-end-line="229" selection-end-column="34" />
           <folding />
         </state>
       </provider>

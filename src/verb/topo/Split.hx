@@ -31,17 +31,21 @@ enum PlanePosition { On; Above; Below; }
 @:expose("topo.Split")
 class Split {
 
-    public static function split( s : Solid, p : Plane ) : Pair<Solid,Solid> {
+    public static function solidByPlane( s : Solid, p : Plane ) : Pair<Solid,Solid> {
 
-        // intersect
+    // 1.  intersect
+
         var r = intersect(s, p);
 
-        // identify crossing edges and coplanar vertices
+    // 2. reduce problem coplanar vertices
+
         var vs = [for (ir in r)
             if ( isCrossingEdge(ir.item1) )
                 splitEdge(ir.item0, ir.item1).v
             else ir.item0.v
         ];
+
+    // 3. classify outgoing vertex edges and insert corresponding null edges
 
         var nulledges = [];
         for (v in vs){
@@ -50,23 +54,32 @@ class Split {
 
         if (nulledges.length == 0) return null;
 
+    // 4. connect the null edges
+
         var afaces = [];
         connectNullEdges( nulledges, afaces );
 
-        // close the two solids
-        var bfaces = [for (f in afaces) s.lmfkrh(f.l)];
+    // 5. close the resultant solids
 
-        // classify the top and bottom of the solid
         var a = new Solid();
         var b = new Solid();
+
+        close( afaces, a, b );
+
+        return new Pair(b,a);
+    }
+
+    public static function close( afaces : Array<Face>, a : Solid, b : Solid ){
+
+        var s = afaces[0].s;
+
+        var bfaces = [for (f in afaces) s.lmfkrh(f.l)];
 
         for (f in afaces) moveFace( f, a );
         for (f in bfaces) moveFace( f, b );
 
         cleanup(a, s);
         cleanup(b, s);
-
-        return new Pair(b,a);
     }
 
     public static function connectNullEdges( nulledges : Array<HalfEdge>, afaces : Array<Face>  ) : Void {

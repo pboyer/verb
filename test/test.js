@@ -7780,7 +7780,7 @@ describe("verb.core.Vec.signedAngleBetween",function(){
 
 */
 
-describe("verb.topo.Split.split",function(){
+describe("verb.topo.Split.solidByPlane",function(){
     function cube(){
         var pts = [[0,0,0], [10,0,0], [10,10,0], [0,10,0] ];
         return verb.topo.Make.extrusion( pts, [0,0,10] );
@@ -7788,7 +7788,7 @@ describe("verb.topo.Split.split",function(){
 
     it('can split a cube in half', function(){
         var p = { n : [0,0,1], o : [0,0,5] };
-        var res = verb.topo.Split.split( cube(), p );
+        var res = verb.topo.Split.solidByPlane( cube(), p );
 
         verb.topo.Analyze.volume(res.item0).should.be.approximately( 500, verb.core.Constants.EPSILON );
         verb.topo.Analyze.volume(res.item1).should.be.approximately( 500, verb.core.Constants.EPSILON );
@@ -7796,35 +7796,35 @@ describe("verb.topo.Split.split",function(){
 
     it('can split a cube in quarters', function(){
         var p = { n : [0,0,1], o : [0,0,2.5] };
-        var res = verb.topo.Split.split( cube(), p );
+        var res = verb.topo.Split.solidByPlane( cube(), p );
 
         verb.topo.Analyze.volume(res.item0).should.be.approximately( 750, verb.core.Constants.EPSILON );
         verb.topo.Analyze.volume(res.item1).should.be.approximately( 250, verb.core.Constants.EPSILON );
     });
 
     it('does not split when plane is coplanar with bottom face of cube', function(){
-        var res = verb.topo.Split.split( cube(), { n : [0,0,1], o : [0,0,0] } );
+        var res = verb.topo.Split.solidByPlane( cube(), { n : [0,0,1], o : [0,0,0] } );
         should.equal(null, res);
     });
 
     it('does not split when plane is coplanar with top face of cube', function(){
-        var res = verb.topo.Split.split( cube(), { n : [0,0,1], o : [0,0,10] } );
+        var res = verb.topo.Split.solidByPlane( cube(), { n : [0,0,1], o : [0,0,10] } );
         should.equal(null, res);
     });
 
     it('does not split when plane is coplanar with side face of cube', function(){
-        var res = verb.topo.Split.split( cube(), { n : [1,0,0], o : [10,0,0] } );
+        var res = verb.topo.Split.solidByPlane( cube(), { n : [1,0,0], o : [10,0,0] } );
         should.equal(null, res);
     });
 
     it('does not split when plane is non-intersecting', function(){
-        var res = verb.topo.Split.split( cube(), { n : [1,0,0], o : [20,0,0] } );
+        var res = verb.topo.Split.solidByPlane( cube(), { n : [1,0,0], o : [20,0,0] } );
         should.equal(null, res);
     });
 
     it('can split cube through the center', function(){
         var n = [ 1 / Math.sqrt(3), 1 / Math.sqrt(3), 1 / Math.sqrt(3) ];
-        var res = verb.topo.Split.split( cube(), { n : n, o : [5,5,5] } );
+        var res = verb.topo.Split.solidByPlane( cube(), { n : n, o : [5,5,5] } );
 
         verb.topo.Analyze.volume(res.item0).should.be.approximately( 500, verb.core.Constants.EPSILON );
         verb.topo.Analyze.volume(res.item1).should.be.approximately( 500, verb.core.Constants.EPSILON );
@@ -7836,7 +7836,7 @@ describe("verb.topo.Split.split",function(){
         var v = verb.topo.Analyze.volume( s );
 
         var p = { n : [0,0,1], o : [0,0,5] };
-        var res = verb.topo.Split.split( s, p );
+        var res = verb.topo.Split.solidByPlane( s, p );
 
         verb.topo.Analyze.volume(res.item0).should.be.approximately( v/2, verb.core.Constants.EPSILON );
         verb.topo.Analyze.volume(res.item1).should.be.approximately( v/2, verb.core.Constants.EPSILON );

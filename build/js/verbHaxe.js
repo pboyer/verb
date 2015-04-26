@@ -7207,7 +7207,7 @@ verb.topo.PlanePosition.Below.toString = $estr;
 verb.topo.PlanePosition.Below.__enum__ = verb.topo.PlanePosition;
 verb.topo.Split = $hx_exports.topo.Split = function() { };
 verb.topo.Split.__name__ = ["verb","topo","Split"];
-verb.topo.Split.split = function(s,p) {
+verb.topo.Split.solidByPlane = function(s,p) {
 	var r = verb.topo.Split.intersect(s,p);
 	var vs;
 	var _g = [];
@@ -7228,32 +7228,36 @@ verb.topo.Split.split = function(s,p) {
 	if(nulledges.length == 0) return null;
 	var afaces = [];
 	verb.topo.Split.connectNullEdges(nulledges,afaces);
-	var bfaces;
-	var _g12 = [];
-	var _g2 = 0;
-	while(_g2 < afaces.length) {
-		var f = afaces[_g2];
-		++_g2;
-		_g12.push(s.lmfkrh(f.l));
-	}
-	bfaces = _g12;
 	var a = new verb.topo.Solid();
 	var b = new verb.topo.Solid();
-	var _g21 = 0;
-	while(_g21 < afaces.length) {
-		var f1 = afaces[_g21];
-		++_g21;
+	verb.topo.Split.close(afaces,a,b);
+	return new verb.core.types.Pair(b,a);
+};
+verb.topo.Split.close = function(afaces,a,b) {
+	var s = afaces[0].s;
+	var bfaces;
+	var _g = [];
+	var _g1 = 0;
+	while(_g1 < afaces.length) {
+		var f = afaces[_g1];
+		++_g1;
+		_g.push(s.lmfkrh(f.l));
+	}
+	bfaces = _g;
+	var _g11 = 0;
+	while(_g11 < afaces.length) {
+		var f1 = afaces[_g11];
+		++_g11;
 		verb.topo.Split.moveFace(f1,a);
 	}
-	var _g22 = 0;
-	while(_g22 < bfaces.length) {
-		var f2 = bfaces[_g22];
-		++_g22;
+	var _g12 = 0;
+	while(_g12 < bfaces.length) {
+		var f2 = bfaces[_g12];
+		++_g12;
 		verb.topo.Split.moveFace(f2,b);
 	}
 	verb.topo.Split.cleanup(a,s);
 	verb.topo.Split.cleanup(b,s);
-	return new verb.core.types.Pair(b,a);
 };
 verb.topo.Split.connectNullEdges = function(nulledges,afaces) {
 	verb.topo.Split.lexicographicalSort(nulledges);
@@ -7398,7 +7402,7 @@ verb.topo.Split.join = function(e0,e1) {
 	} else s.lmekr(e0,e1.nxt);
 	if(e0.nxt.nxt != e1) {
 		s.lmef(e1,e0.nxt);
-		if(nf != null && of.l.nxt != of.l) haxe.Log.trace("PANIC!",{ fileName : "Split.hx", lineNumber : 267, className : "verb.topo.Split", methodName : "join"});
+		if(nf != null && of.l.nxt != of.l) haxe.Log.trace("PANIC!",{ fileName : "Split.hx", lineNumber : 280, className : "verb.topo.Split", methodName : "join"});
 	}
 };
 verb.topo.Split.cut = function(e,faces) {
