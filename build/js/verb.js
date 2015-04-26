@@ -7248,32 +7248,61 @@ verb.topo.Split = $hx_exports.topo.Split = function() { };
 verb.topo.Split.__name__ = ["verb","topo","Split"];
 verb.topo.Split.split = function(s,p) {
 	var r = verb.topo.Split.intersect(s,p);
-	var vs = new Array();
-	var _g = 0;
-	while(_g < r.length) {
-		var ir = r[_g];
-		++_g;
-		var v;
-		if(verb.topo.Split.isCrossingEdge(ir.item1)) v = verb.topo.Split.splitEdge(ir.item0,ir.item1).v; else v = ir.item0.v;
-		vs.push(v);
-	}
-	var nulledges = new Array();
+	var vs;
+	var _g = [];
 	var _g1 = 0;
-	while(_g1 < vs.length) {
-		var v1 = vs[_g1];
+	while(_g1 < r.length) {
+		var ir = r[_g1];
 		++_g1;
-		nulledges = nulledges.concat(verb.topo.Split.insertNullEdges(v1,verb.topo.Split.classifyVertex(v1,p)));
+		_g.push(verb.topo.Split.isCrossingEdge(ir.item1)?verb.topo.Split.splitEdge(ir.item0,ir.item1).v:ir.item0.v);
+	}
+	vs = _g;
+	var nulledges = [];
+	var _g11 = 0;
+	while(_g11 < vs.length) {
+		var v = vs[_g11];
+		++_g11;
+		verb.topo.Split.insertNullEdges(v,verb.topo.Split.classifyVertex(v,p),nulledges);
 	}
 	if(nulledges.length == 0) return null;
+	var afaces = [];
+	verb.topo.Split.connectNullEdges(nulledges,afaces);
+	var bfaces;
+	var _g12 = [];
+	var _g2 = 0;
+	while(_g2 < afaces.length) {
+		var f = afaces[_g2];
+		++_g2;
+		_g12.push(s.lmfkrh(f.l));
+	}
+	bfaces = _g12;
+	var a = new verb.topo.Solid();
+	var b = new verb.topo.Solid();
+	var _g21 = 0;
+	while(_g21 < afaces.length) {
+		var f1 = afaces[_g21];
+		++_g21;
+		verb.topo.Split.moveFace(f1,a);
+	}
+	var _g22 = 0;
+	while(_g22 < bfaces.length) {
+		var f2 = bfaces[_g22];
+		++_g22;
+		verb.topo.Split.moveFace(f2,b);
+	}
+	verb.topo.Split.cleanup(a,s);
+	verb.topo.Split.cleanup(b,s);
+	return new verb.core.types.Pair(b,a);
+};
+verb.topo.Split.connectNullEdges = function(nulledges,afaces) {
 	verb.topo.Split.lexicographicalSort(nulledges);
 	var h0;
 	var h1;
 	var looseends = [];
-	var afaces = [];
-	var _g2 = 0;
-	while(_g2 < nulledges.length) {
-		var ne = nulledges[_g2];
-		++_g2;
+	var _g = 0;
+	while(_g < nulledges.length) {
+		var ne = nulledges[_g];
+		++_g;
 		if((h0 = verb.topo.Split.canJoin(ne,looseends)) != null) {
 			verb.topo.Split.join(h0,ne);
 			if(!verb.topo.Split.isLoose(h0.opp,looseends)) verb.topo.Split.cut(h0,afaces);
@@ -7284,39 +7313,12 @@ verb.topo.Split.split = function(s,p) {
 		}
 		if(h0 != null && h1 != null) verb.topo.Split.cut(ne,afaces);
 	}
-	var bfaces;
-	var _g3 = [];
-	var _g11 = 0;
-	while(_g11 < afaces.length) {
-		var f = afaces[_g11];
-		++_g11;
-		_g3.push(s.lmfkrh(f.l));
-	}
-	bfaces = _g3;
-	var a = new verb.topo.Solid();
-	var b = new verb.topo.Solid();
-	var _g12 = 0;
-	while(_g12 < afaces.length) {
-		var f1 = afaces[_g12];
-		++_g12;
-		verb.topo.Split.moveFace(f1,a);
-	}
-	var _g13 = 0;
-	while(_g13 < bfaces.length) {
-		var f2 = bfaces[_g13];
-		++_g13;
-		verb.topo.Split.moveFace(f2,b);
-	}
-	verb.topo.Split.cleanup(a,s);
-	verb.topo.Split.cleanup(b,s);
-	return new verb.core.types.Pair(b,a);
 };
-verb.topo.Split.insertNullEdges = function(v,ecs) {
-	var nulledges = new Array();
+verb.topo.Split.insertNullEdges = function(v,ecs,nulledges) {
 	var s = v.e.l.f.s;
 	var i = verb.topo.Split.nextOfClass(verb.topo.PlanePosition.Above,ecs,0);
-	if(i == -1) return nulledges;
-	if(verb.topo.Split.nextOfClass(verb.topo.PlanePosition.Below,ecs,0) == -1) return nulledges;
+	if(i == -1) return;
+	if(verb.topo.Split.nextOfClass(verb.topo.PlanePosition.Below,ecs,0) == -1) return;
 	var start = ecs[i].edge;
 	var head = start;
 	var tail = start;
@@ -7334,7 +7336,6 @@ verb.topo.Split.insertNullEdges = function(v,ecs) {
 		head = ecs[i].edge;
 		if(head == start) break;
 	}
-	return nulledges;
 };
 verb.topo.Split.classifyVertex = function(v,p) {
 	var ecs = new Array();
@@ -7436,7 +7437,7 @@ verb.topo.Split.join = function(e0,e1) {
 	} else s.lmekr(e0,e1.nxt);
 	if(e0.nxt.nxt != e1) {
 		s.lmef(e1,e0.nxt);
-		if(nf != null && of.l.nxt != of.l) haxe.Log.trace("PANIC!",{ fileName : "Split.hx", lineNumber : 274, className : "verb.topo.Split", methodName : "join"});
+		if(nf != null && of.l.nxt != of.l) haxe.Log.trace("PANIC!",{ fileName : "Split.hx", lineNumber : 267, className : "verb.topo.Split", methodName : "join"});
 	}
 };
 verb.topo.Split.cut = function(e,faces) {

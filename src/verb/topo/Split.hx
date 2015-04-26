@@ -37,27 +37,39 @@ class Split {
         var r = intersect(s, p);
 
         // identify crossing edges and coplanar vertices
-        var vs = new Array<Vertex>();
-        for (ir in r){
-            var v : Vertex;
-            if ( isCrossingEdge(ir.item1) ){
-                v = splitEdge(ir.item0, ir.item1).v;
-            } else {
-                v = ir.item0.v;
-            }
+        var vs = [for (ir in r)
+            if ( isCrossingEdge(ir.item1) )
+                splitEdge(ir.item0, ir.item1).v
+            else ir.item0.v
+        ];
 
-            vs.push( v );
-        }
-
-        var nulledges = new Array<HalfEdge>();
-
-        // insert nulledges
+        var nulledges = [];
         for (v in vs){
-            nulledges = nulledges.concat(insertNullEdges( v, classifyVertex( v, p )));
+            insertNullEdges( v, classifyVertex( v, p ), nulledges );
         }
 
-        // there are no crossing edges, this might happen if the plane is coplanar with a face
         if (nulledges.length == 0) return null;
+
+        var afaces = [];
+        connectNullEdges( nulledges, afaces );
+
+        // close the two solids
+        var bfaces = [for (f in afaces) s.lmfkrh(f.l)];
+
+        // classify the top and bottom of the solid
+        var a = new Solid();
+        var b = new Solid();
+
+        for (f in afaces) moveFace( f, a );
+        for (f in bfaces) moveFace( f, b );
+
+        cleanup(a, s);
+        cleanup(b, s);
+
+        return new Pair(b,a);
+    }
+
+    public static function connectNullEdges( nulledges : Array<HalfEdge>, afaces : Array<Face>  ) : Void {
 
         // now we have all of the null edges inserted and need to separate the solid
         // into two pieces
@@ -67,7 +79,7 @@ class Split {
         var h1 : HalfEdge;
 
         var looseends = [];
-        var afaces = [];
+
         for (ne in nulledges){
             if ( (h0 = canJoin( ne, looseends )) != null ){
                 join( h0, ne );
@@ -82,35 +94,20 @@ class Split {
             if (h0 != null && h1 != null) cut(ne, afaces);
         }
 
-        // close the two solids
-        var bfaces = [for (f in afaces) s.lmfkrh(f.l)];
-
-        // classify the top and bottom of the solid
-        var a : Solid = new Solid();
-        var b : Solid = new Solid();
-
-        for (f in afaces) moveFace( f, a );
-        for (f in bfaces) moveFace( f, b );
-
-        cleanup(a, s);
-        cleanup(b, s);
-
-        return new Pair(b,a);
     }
 
-    public static function insertNullEdges( v : Vertex, ecs : Array<EdgePlanePosition> ) : Array<HalfEdge> {
+    public static function insertNullEdges( v : Vertex, ecs : Array<EdgePlanePosition>, nulledges : Array<HalfEdge> ) : Void {
 
-        var nulledges = new Array<HalfEdge>();
         var s = v.e.l.f.s;
 
         // find the first in ABOVE seq
         var i = nextOfClass( PlanePosition.Above, ecs, 0 );
 
         // there's no above edge in the seq (all below), continue
-        if (i == -1) return nulledges;
+        if (i == -1) return;
 
         // if all of the edges are of the same type, just continue
-        if (nextOfClass( PlanePosition.Below, ecs, 0 ) == -1) return nulledges;
+        if (nextOfClass( PlanePosition.Below, ecs, 0 ) == -1) return;
 
         var start = ecs[i].edge;
         var head = start;
@@ -141,9 +138,6 @@ class Split {
             // we've come back to the beginning (should never happen)
             if (head == start) break;
         }
-
-        return nulledges;
-
     }
 
     public static function classifyVertex( v : Vertex, p : Plane ) :  Array<EdgePlanePosition> {
@@ -186,7 +180,6 @@ class Split {
                 var prv = ecs[a].pos;
                 var nxt = ecs[b].pos;
 
-                // TODO: this could be simplified but let's keep for debugging purposes
                 if ( prv == PlanePosition.Above && nxt == PlanePosition.Above ){
                     ep.pos = PlanePosition.Below;
                 } else if ( prv == PlanePosition.Below && nxt == PlanePosition.Above ) {
@@ -293,20 +286,18 @@ class Split {
             var ap = a.v.pt;
             var bp = b.v.pt;
 
-            // lexicographical sort
-            if (ap[0] < bp[0]) {
+            if (ap[0] < bp[0])
                 return -1;
-            } else if (ap[0] > bp[0]) {
+            else if (ap[0] > bp[0])
                 return 1;
-            } else if (ap[1] < bp[1]) {
+            else if (ap[1] < bp[1])
                 return -1;
-            } else if (ap[1] > bp[1]) {
+            else if (ap[1] > bp[1])
                 return 1;
-            } else if (ap[2] < bp[2]) {
+            else if (ap[2] < bp[2])
                 return -1;
-            } else if (ap[2] > bp[2]) {
+            else if (ap[2] > bp[2])
                 return 1;
-            }
 
             return 0;
         });
