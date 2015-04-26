@@ -7778,6 +7778,8 @@ describe("verb.core.Vec.signedAngleBetween",function(){
     });
 });
 
+*/
+
 describe("verb.topo.Split.split",function(){
     function cube(){
         var pts = [[0,0,0], [10,0,0], [10,10,0], [0,10,0] ];
@@ -7850,7 +7852,7 @@ describe("verb.core.Trig.isPointInPlane",function(){
 });
 
 
-*/
+
 
 describe("verb.topo.Boolean.isPointInPolygon",function(){
     it('works for a few basic cases', function(){

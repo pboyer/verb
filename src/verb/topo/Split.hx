@@ -37,7 +37,7 @@ class Split {
         var r = intersect(s, p);
 
         // identify crossing edges and coplanar vertices
-        var vs : IntMap<Vertex> = new IntMap<Vertex>();
+        var vs = new Array<Vertex>();
         for (ir in r){
             var v : Vertex;
             if ( isCrossingEdge(ir.item1) ){
@@ -46,73 +46,22 @@ class Split {
                 v = ir.item0.v;
             }
 
-            if (!vs.exists(v.id)){
-                vs.set(v.id, v);
-            }
+            vs.push( v );
         }
 
         var nulledges = new Array<HalfEdge>();
-        var crossing = false;
 
-        for (v in vs.iterator()){
-
-            // now we need to classify the edges emanating
-            // from our coplanar vertices
-            var ecs : Array<EdgePlanePosition> = classifyVertex( v, p );
-
-            // find the first in ABOVE seq
-            var i = nextOfClass( PlanePosition.Above, ecs, 0 );
-
-            // there's no above edge in the seq (all below), continue
-            if (i == -1) break;
-
-            // if all of the edges are of the same type, just continue
-            if (nextOfClass( PlanePosition.Below, ecs, 0 ) == -1) break;
-
-            // if we've reached this point, at least one vertex is crossing
-            crossing = true;
-
-            var start = ecs[i].edge;
-            var head = start;
-            var tail = start;
-            var el = ecs.length;
-
-            while(true){
-
-                // find the end of the ABOVE sequence
-                while (ecs[i].pos == PlanePosition.Above){
-                    tail = ecs[i].edge;
-                    i = (i + 1) % el;
-                }
-
-                // insert a null edge
-                s.lmev( head, tail.opp.nxt, head.v.pt.copy() );
-                var ne = head.prv;
-                nulledges.push( ne );
-
-                // find the next start sequence and assign to head
-                i = nextOfClass( PlanePosition.Above, ecs, i );
-
-                // there is no other above edge, we're done with this vertex
-                if (i == -1) break;
-
-                head = ecs[i].edge;
-
-                // we've come back to the beginning (should never happen)
-                if (head == start) break;
-            }
+        // insert nulledges
+        for (v in vs){
+            nulledges = nulledges.concat(insertNullEdges( v, classifyVertex( v, p )));
         }
 
         // there are no crossing edges, this might happen if the plane is coplanar with a face
-        if (!crossing){
-            return null;
-        }
+        if (nulledges.length == 0) return null;
 
         // now we have all of the null edges inserted and need to separate the solid
         // into two pieces
-
-        // lexicographical sort of the null edges
-        sortNullEdges( nulledges );
+        lexicographicalSort( nulledges );
 
         var h0 : HalfEdge;
         var h1 : HalfEdge;
@@ -147,6 +96,54 @@ class Split {
         cleanup(b, s);
 
         return new Pair(b,a);
+    }
+
+    public static function insertNullEdges( v : Vertex, ecs : Array<EdgePlanePosition> ) : Array<HalfEdge> {
+
+        var nulledges = new Array<HalfEdge>();
+        var s = v.e.l.f.s;
+
+        // find the first in ABOVE seq
+        var i = nextOfClass( PlanePosition.Above, ecs, 0 );
+
+        // there's no above edge in the seq (all below), continue
+        if (i == -1) return nulledges;
+
+        // if all of the edges are of the same type, just continue
+        if (nextOfClass( PlanePosition.Below, ecs, 0 ) == -1) return nulledges;
+
+        var start = ecs[i].edge;
+        var head = start;
+        var tail = start;
+        var el = ecs.length;
+
+        while(true){
+
+            // find the end of the ABOVE sequence
+            while (ecs[i].pos == PlanePosition.Above){
+                tail = ecs[i].edge;
+                i = (i + 1) % el;
+            }
+
+            // insert a null edge
+            s.lmev( head, tail.opp.nxt, head.v.pt.copy() );
+            var ne = head.prv;
+            nulledges.push( ne );
+
+            // find the next start sequence and assign to head
+            i = nextOfClass( PlanePosition.Above, ecs, i );
+
+            // there is no other above edge, we're done with this vertex
+            if (i == -1) break;
+
+            head = ecs[i].edge;
+
+            // we've come back to the beginning (should never happen)
+            if (head == start) break;
+        }
+
+        return nulledges;
+
     }
 
     public static function classifyVertex( v : Vertex, p : Plane ) :  Array<EdgePlanePosition> {
@@ -291,7 +288,7 @@ class Split {
         }
     }
 
-    private static function sortNullEdges( es : Array<HalfEdge> ){
+    private static function lexicographicalSort( es : Array<HalfEdge> ){
         es.sort(function(a : HalfEdge, b : HalfEdge){
             var ap = a.v.pt;
             var bp = b.v.pt;

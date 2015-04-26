@@ -103,10 +103,10 @@ class Boolean {
 
         var op = BoolOp.Union;
 
-        var s = splitGeometry( a, b, tol );
+        var s = intersect( a, b, tol );
 
-        var nea : Array<HalfEdge> = new Array<HalfEdge>();
-        var neb : Array<HalfEdge> = new Array<HalfEdge>();
+        var nea = new Array<HalfEdge>();
+        var neb = new Array<HalfEdge>();
 
         var cfa = classifyAllVertexFace( s.coplanarVerticesOfA, op, true );
         var cfb = classifyAllVertexFace( s.coplanarVerticesOfB, op, false );
@@ -121,7 +121,6 @@ class Boolean {
 //      performOp( parts, BoolOp.Union );  // from the various resultant parts  BinA, AinB, BoutA, etc, reconnect
 
     }
-
 
     // todo - what do we need in order to insert the correct null edges for this event?
     public static function vertexFaceEvent( v : Vertex, f : Face, op : BoolOp, isA : Bool,
@@ -540,7 +539,7 @@ class Boolean {
         return boolOnSectorMap[ Type.enumIndex(op) ][ Type.enumIndex(c) ];
     }
 
-    public static function splitGeometry( a : Solid, b : Solid, tol : Float ) : BooleanSplitResult {
+    public static function intersect( a : Solid, b : Solid, tol : Float ) : BooleanSplitResult {
 
         var va = splitAllEdges( a, b, tol );
         var vva = splitEdgesByVertices( a, b, tol );
