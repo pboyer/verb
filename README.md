@@ -32,7 +32,7 @@ Build compiled as javascript:
 
 	grunt build
 
-Run all unit tests (>260 in total):
+Run all unit tests:
 
 	grunt test
 
