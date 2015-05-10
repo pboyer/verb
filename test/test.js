@@ -7913,8 +7913,6 @@ function cube(){
     return verb.topo.Make.extrusion( ptsa, [0,0,10] );
 }
 
-
-
 describe("verb.topo.Boolean.insertNullEdgeIntoFace",function(){
     it('testing', function(){
 
@@ -7924,9 +7922,20 @@ describe("verb.topo.Boolean.insertNullEdgeIntoFace",function(){
 
         var centroid = verb.core.Vec.div( verb.core.Vec.addAll( f.l.points() ), f.l.points().length );
 
+        // insertNullEdgeIntoFace( point : Point, f : Face, nes : Array<HalfEdge> )
 
+        var nes = [];
+        verb.topo.Boolean.insertNullEdgeIntoFace( centroid, f, nes );
 
+        f.ol.halfEdges().forEach(function(e){
+            console.log( e.nxt.id );
+            console.log( e.prv.id );
+        });
 
+        f.l.halfEdges().forEach(function(e){
+            console.log( e.nxt.id );
+            console.log( e.prv.id );
+        });
 
     });
 });
