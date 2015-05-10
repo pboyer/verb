@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/pboyer/verb.svg?branch=master)](https://travis-ci.org/pboyer/verb)
+[![Build Status](https://travis-ci.org/pboyer/verb.svg?branch=master)](https://travis-ci.org/pboyer/verb) [![Coverage Status](https://coveralls.io/repos/pboyer/verb/badge.svg)](https://coveralls.io/r/pboyer/verb)
 
 #verb
 ###A CAD Library
