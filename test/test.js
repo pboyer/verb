@@ -20,6 +20,7 @@ function last(a){
 	return a[a.length-1];
 }
 
+/*
 
 describe("verb.core.Eval.knotSpanGivenN",function(){
 
@@ -7904,6 +7905,8 @@ describe("verb.core.Mat.mult",function(){
         verb.core.Mat.mult( mat, verb.core.Mat.identity(2) ).should.eql( mat );
     });
 });
+
+*/
 
 function cube(){
     var ptsa = [[0,0,0], [10,0,0], [10,10,0], [0,10,0] ];
