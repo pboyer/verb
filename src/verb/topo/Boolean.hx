@@ -103,57 +103,132 @@ class Boolean {
 
         var op = BoolOp.Union;
 
-        var s = intersect( a, b, tol );
+        var sg = intersect( a, b, tol );
 
         var nea = new Array<HalfEdge>();
         var neb = new Array<HalfEdge>();
 
-        var cfa = classifyAllVertexFace( s.coplanarVerticesOfA, op, true );
-        var cfb = classifyAllVertexFace( s.coplanarVerticesOfB, op, false );
+        processVertexFaceEvents( sg.coplanarVerticesOfA, op, true, nea, neb );
+//        processVertexFaceEvents( sg.coplanarVerticesOfB, op, false, nea, neb );
 
-        // TODO: implement faceVertexEvent and use here to ensure correct null edges are inserted
+//        processVertexVertexEvents( sg.coincidentVertices, op, nea, neb );
 
-        for (vv in s.coincidentVertices){
-            vertexVertexEvent( vv.item0, vv.item1, op, nea, neb );
+//      connectNullEdges( nea, neb );
+//      close( parts, op );  // from the various resultant parts  BinA, AinB, BoutA, etc, reconnect
+
+    }
+
+    public static function connectNullEdges( cfa, cfb, cc ){
+
+        trace(cfa.length, cfb.length, cc.length );
+    }
+
+    public static function processVertexFaceEvents( vfs : Array<Pair<Vertex,Face>>, op : BoolOp, isA : Bool,
+                                                    nea : Array<HalfEdge>, neb : Array<HalfEdge> ) : Void {
+
+        for (vf in vfs){
+            processVertexFaceEvent( vf.item0, vf.item1, op, isA, nea, neb );
+        }
+    }
+
+    public static function processVertexFaceEvent( v : Vertex, f : Face, op : BoolOp, isA : Bool,
+                                                   nea : Array<HalfEdge>, neb : Array<HalfEdge>  ) : Void {
+
+
+        insertVertexFaceEventNullEdges( v, f, classifyVertexFace( v, f, op, isA ), isA, isA ? nea : neb );
+
+        // this results in invalid an edge with an invalid nxt field
+        insertNullEdgeIntoFace( v.pt.copy(), f, isA ? neb : nea );
+    }
+
+    public static function insertVertexFaceEventNullEdges( v : Vertex, f : Face, efs : Array<EdgeFacePosition>,
+                                                           isA : Bool, nulledges : Array<HalfEdge>  ) : Void {
+
+        var s = v.e.l.f.s;
+        var i = nextOfClass( above(isA), efs, 0 );
+
+        // there's no above edge in the seq (all below), continue
+        if (i == -1) return;
+
+        // if all of the edges are of the same type, just continue
+        if (nextOfClass( below(isA), efs, 0 ) == -1) return;
+
+        var start = efs[i].edge;
+        var head = start;
+        var tail = start;
+        var el = efs.length;
+
+        while(true){
+
+            // find the end of the ABOVE sequence
+            while (efs[i].pos == above(isA)){
+                tail = efs[i].edge;
+                i = (i + 1) % el;
+            }
+
+            // insert a null edge
+            s.lmev( head, tail.opp.nxt, head.v.pt.copy() );
+            nulledges.push( head.prv );
+
+            // find the next start sequence and assign to head
+            i = nextOfClass( above(isA), efs, i );
+
+            // there is no other above edge, we're done with this vertex
+            if (i == -1) break;
+
+            head = efs[i].edge;
+
+            // we've come back to the beginning (should never happen)
+            if (head == start) break;
         }
 
-//      connect( cfa, cfb, ccs );  // form the cut lines
-//      performOp( parts, BoolOp.Union );  // from the various resultant parts  BinA, AinB, BoutA, etc, reconnect
-
     }
 
-    // todo - what do we need in order to insert the correct null edges for this event?
-    public static function vertexFaceEvent( v : Vertex, f : Face, op : BoolOp, isA : Bool,
-                                            nea : Array<HalfEdge>, neb : Array<HalfEdge>  ) : Pair<Array<EdgeFacePosition>, HalfEdge> {
+    private static function nextOfClass( cl : FacePosition, ecs : Array<EdgeFacePosition>, start : Int ) : Int {
 
-        var cl = classifyVertexFace( v, f, op, isA );
-
-        return null;
-
+        var i = start;
+        var head : EdgeFacePosition = null;
+        while (i < ecs.length){
+            if ( ecs[i].pos == cl ) {
+                head = ecs[i];
+                break;
+            }
+            i++;
+        }
+        return head != null ? i : -1;
     }
 
-    public static function insertNullEdgeIntoFace( point : Point, f : Face ) : HalfEdge {
+
+    public static function insertNullEdgeIntoFace( point : Point, f : Face, nes : Array<HalfEdge> ) : Void {
 
         var nv = f.s.lmev( f.ol.e, f.ol.e, point );
         var nl = f.s.lkemr(nv.e.prv);
 
-        return nv.e;
+//        trace(nv.e.nxt != null, nv.)
+
+        nes.push( nv.e );
     }
 
-    public static function vertexVertexEvent( a : Vertex, b : Vertex, op : BoolOp,
-                                                     nea : Array<HalfEdge>, neb : Array<HalfEdge> ){
+    public static function processVertexVertexEvents( vvs : Array<Pair<Vertex,Vertex>>, op : BoolOp,
+                                                      nea : Array<HalfEdge>, neb : Array<HalfEdge> ) : Void {
+
+        for (vv in vvs){
+            processVertexVertexEvent( vv.item0, vv.item1, op, nea, neb );
+        }
+    }
+
+    public static function processVertexVertexEvent( a : Vertex, b : Vertex, op : BoolOp,
+                                                     nea : Array<HalfEdge>, neb : Array<HalfEdge> ) : Void {
 
         var sps = classifyVertexVertex( a, b );
         reclassifyCoplanarSectorPairs( sps, op );
         reclassifyCoplanarSectorEdge( sps, op );
-        insertNullEdges( sps, nea, neb );
-        return sps;
+        insertVertexVertexEventNullEdges( sps, nea, neb );
     }
 
-    public static function insertNullEdges( ar : Array<SectorIntersection>,
-                                                    nea : Array<HalfEdge>, neb : Array<HalfEdge> ) : Void {
+    public static function insertVertexVertexEventNullEdges( ar : Array<SectorIntersection>,
+                                                             nea : Array<HalfEdge>, neb : Array<HalfEdge> ) : Void {
 
-        // the result is a collection of null edges
         var i = 0;
         var arl = ar.length;
         while (true){
@@ -200,16 +275,8 @@ class Boolean {
         }
     }
 
-    public static function connect( cfa, cfb, cc ){
 
-        trace(cfa.length, cfb.length, cc.length );
-
-        //
-
-    }
-
-
-    public static function classifyAllVertexFace( a : Array<Pair<Vertex,Face>>, op : BoolOp, isA : Bool ) : Array<Array<EdgeFacePosition>> {
+    public static function classifyVertexFaceEvents( a : Array<Pair<Vertex,Face>>, op : BoolOp, isA : Bool ) : Array<Array<EdgeFacePosition>> {
         return [for (vf in a) classifyVertexFace( vf.item0, vf.item1, op, isA )];
     }
 

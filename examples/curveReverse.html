@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="../build/js/verb.js"></script>
+    <script src="js/three.min.js"></script>
+    <script src="js/verbToThreeConversion.js"></script>
+    <script src="js/OrbitControls.js"></script>
+    <script src="js/threeBasic.js"></script>
+    <style> body {  margin: 0; } </style>
+</head>
+<body>
+<script>
+	threeSetup();
+
+    var c = new verb.geom.Arc([0,0,0], [1,0,0], [0,1,0], 20, 0, Math.PI/ 2 );
+    var cr = c.reverse(); // returns a reversed copy
+    var crr = cr.reverse(); // returns the original
+
+    // all curves will be coincident. comment out these lines in order to see the individual curves.
+	addCurveToScene( c.toThreeGeometry(), new THREE.LineBasicMaterial({ color: 0xff0000}) );
+	addCurveToScene( cr.toThreeGeometry(), new THREE.LineBasicMaterial({ color: 0x00ff00}) );
+	addCurveToScene( crr.toThreeGeometry(), new THREE.LineBasicMaterial({ color: 0x0000ff}) );
+
+	threeRender();
+</script>
+
+</body>
+
+</html>

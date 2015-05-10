@@ -136,6 +136,15 @@ class Vec {
         return a.fold(function(x,a){ return a + x; }, 0);
     }
 
+    public static function addAll(a : Iterable<Array<Float>>) : Array<Float> {
+        var i = a.iterator();
+        if (!i.hasNext()) return null;
+
+        var f = i.next().length;
+
+        return a.fold(function(x,a){ return add(a,x); }, rep(f, 0.0));
+    }
+
     public static function norm(a : Iterable<Float> ) : Float {
         var norm2 = normSquared(a);
         return norm2 != 0.0 ? Math.sqrt( norm2 ) : norm2;

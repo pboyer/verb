@@ -37,7 +37,7 @@ class Split {
 
         var r = intersect(s, p);
 
-    // 2. reduce problem coplanar vertices
+    // 2. reduce to coplanar vertices
 
         var vs = [for (ir in r)
             if ( isCrossingEdge(ir.item1) )
@@ -45,7 +45,7 @@ class Split {
             else ir.item0.v
         ];
 
-    // 3. classify outgoing vertex edges and insert corresponding null edges
+    // 3. classify outgoing vertex edges and insert required null edges
 
         var nulledges = [];
         for (v in vs){
@@ -54,7 +54,7 @@ class Split {
 
         if (nulledges.length == 0) return null;
 
-    // 4. connect the null edges
+    // 4. connect the null edges, forming cross-section polygons
 
         var afaces = [];
         connectNullEdges( nulledges, afaces );
@@ -137,8 +137,7 @@ class Split {
 
             // insert a null edge
             s.lmev( head, tail.opp.nxt, head.v.pt.copy() );
-            var ne = head.prv;
-            nulledges.push( ne );
+            nulledges.push( head.prv );
 
             // find the next start sequence and assign to head
             i = nextOfClass( PlanePosition.Above, ecs, i );

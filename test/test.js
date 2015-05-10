@@ -20,7 +20,6 @@ function last(a){
 	return a[a.length-1];
 }
 
-/*
 
 describe("verb.core.Eval.knotSpanGivenN",function(){
 
@@ -6597,6 +6596,25 @@ describe("verb.geom.NurbsCurve.reverse",function(){
 		sameCurve( c.asNurbs(), crr.asNurbs() );
 	});
 
+	it('is correct for 90 degree arc', function(){
+        var c = new verb.geom.Arc([0,0,0], [1,0,0], [0,1,0], 5, 0, Math.PI/ 2 );
+        var cr = c.reverse(); // returns a reversed copy
+        var crr = cr.reverse(); // returns the original
+
+        var cp0 = c.point( 0 );
+        var cp1 = cr.point( 1.0 );
+
+        vecShouldBe( cp0, cp1, verb.core.Constants.EPSILON );
+
+        var cp2 = c.point( 1.0 );
+        var cp3 = cr.point( 0 );
+
+        vecShouldBe( cp2, cp3, verb.core.Constants.EPSILON );
+
+        sameCurve( c.asNurbs(), crr.asNurbs() );
+
+	});
+
 });
 
 describe("verb.geom.NurbsSurface.reverse",function(){
@@ -7778,7 +7796,6 @@ describe("verb.core.Vec.signedAngleBetween",function(){
     });
 });
 
-*/
 
 describe("verb.topo.Split.solidByPlane",function(){
     function cube(){
@@ -7888,10 +7905,33 @@ describe("verb.core.Mat.mult",function(){
     });
 });
 
+function cube(){
+    var ptsa = [[0,0,0], [10,0,0], [10,10,0], [0,10,0] ];
+    return verb.topo.Make.extrusion( ptsa, [0,0,10] );
+}
+
+
+
+describe("verb.topo.Boolean.insertNullEdgeIntoFace",function(){
+    it('testing', function(){
+
+        var c = cube();
+
+        var f = c.faces()[0];
+
+        var centroid = verb.core.Vec.div( verb.core.Vec.addAll( f.l.points() ), f.l.points().length );
+
+
+
+
+
+    });
+});
+
+
 describe("verb.topo.Boolean.union",function(){
     it('testing', function(){
-        var ptsa = [[0,0,0], [10,0,0], [10,10,0], [0,10,0] ];
-        var a = verb.topo.Make.extrusion( ptsa, [0,0,10] );
+        var a = cube();
 
         var ptsb = [[5,5,-5], [15,5,-5], [15,15,-5], [5,15,-5] ];
         var b = verb.topo.Make.extrusion( ptsb, [0,0,10] );

@@ -4676,6 +4676,14 @@ verb.core.Vec.sum = function(a) {
 		return a1 + x;
 	},0);
 };
+verb.core.Vec.addAll = function(a) {
+	var i = $iterator(a)();
+	if(!i.hasNext()) return null;
+	var f = i.next().length;
+	return Lambda.fold(a,function(x,a1) {
+		return verb.core.Vec.add(a1,x);
+	},verb.core.Vec.rep(f,0.0));
+};
 verb.core.Vec.norm = function(a) {
 	var norm2 = verb.core.Vec.normSquared(a);
 	if(norm2 != 0.0) return Math.sqrt(norm2); else return norm2;
@@ -6371,36 +6379,80 @@ verb.topo.Boolean = $hx_exports.topo.Boolean = function() { };
 verb.topo.Boolean.__name__ = ["verb","topo","Boolean"];
 verb.topo.Boolean.union = function(a,b,tol) {
 	var op = verb.topo.BoolOp.Union;
-	var s = verb.topo.Boolean.intersect(a,b,tol);
+	var sg = verb.topo.Boolean.intersect(a,b,tol);
 	var nea = new Array();
 	var neb = new Array();
-	var cfa = verb.topo.Boolean.classifyAllVertexFace(s.coplanarVerticesOfA,op,true);
-	var cfb = verb.topo.Boolean.classifyAllVertexFace(s.coplanarVerticesOfB,op,false);
+	verb.topo.Boolean.processVertexFaceEvents(sg.coplanarVerticesOfA,op,true,nea,neb);
+};
+verb.topo.Boolean.connectNullEdges = function(cfa,cfb,cc) {
+	haxe.Log.trace(cfa.length,{ fileName : "Boolean.hx", lineNumber : 123, className : "verb.topo.Boolean", methodName : "connectNullEdges", customParams : [cfb.length,cc.length]});
+};
+verb.topo.Boolean.processVertexFaceEvents = function(vfs,op,isA,nea,neb) {
 	var _g = 0;
-	var _g1 = s.coincidentVertices;
-	while(_g < _g1.length) {
-		var vv = _g1[_g];
+	while(_g < vfs.length) {
+		var vf = vfs[_g];
 		++_g;
-		verb.topo.Boolean.vertexVertexEvent(vv.item0,vv.item1,op,nea,neb);
+		verb.topo.Boolean.processVertexFaceEvent(vf.item0,vf.item1,op,isA,nea,neb);
 	}
 };
-verb.topo.Boolean.vertexFaceEvent = function(v,f,op,isA,nea,neb) {
-	var cl = verb.topo.Boolean.classifyVertexFace(v,f,op,isA);
-	return null;
+verb.topo.Boolean.processVertexFaceEvent = function(v,f,op,isA,nea,neb) {
+	verb.topo.Boolean.insertVertexFaceEventNullEdges(v,f,verb.topo.Boolean.classifyVertexFace(v,f,op,isA),isA,isA?nea:neb);
+	verb.topo.Boolean.insertNullEdgeIntoFace(v.pt.slice(),f,isA?neb:nea);
 };
-verb.topo.Boolean.insertNullEdgeIntoFace = function(point,f) {
+verb.topo.Boolean.insertVertexFaceEventNullEdges = function(v,f,efs,isA,nulledges) {
+	var s = v.e.l.f.s;
+	var i = verb.topo.Boolean.nextOfClass(verb.topo.Boolean.above(isA),efs,0);
+	if(i == -1) return;
+	if(verb.topo.Boolean.nextOfClass(verb.topo.Boolean.below(isA),efs,0) == -1) return;
+	var start = efs[i].edge;
+	var head = start;
+	var tail = start;
+	var el = efs.length;
+	while(true) {
+		while(efs[i].pos == verb.topo.Boolean.above(isA)) {
+			tail = efs[i].edge;
+			i = (i + 1) % el;
+		}
+		s.lmev(head,tail.opp.nxt,head.v.pt.slice());
+		nulledges.push(head.prv);
+		i = verb.topo.Boolean.nextOfClass(verb.topo.Boolean.above(isA),efs,i);
+		if(i == -1) break;
+		head = efs[i].edge;
+		if(head == start) break;
+	}
+};
+verb.topo.Boolean.nextOfClass = function(cl,ecs,start) {
+	var i = start;
+	var head = null;
+	while(i < ecs.length) {
+		if(ecs[i].pos == cl) {
+			head = ecs[i];
+			break;
+		}
+		i++;
+	}
+	if(head != null) return i; else return -1;
+};
+verb.topo.Boolean.insertNullEdgeIntoFace = function(point,f,nes) {
 	var nv = f.s.lmev(f.ol.e,f.ol.e,point);
 	var nl = f.s.lkemr(nv.e.prv);
-	return nv.e;
+	nes.push(nv.e);
 };
-verb.topo.Boolean.vertexVertexEvent = function(a,b,op,nea,neb) {
+verb.topo.Boolean.processVertexVertexEvents = function(vvs,op,nea,neb) {
+	var _g = 0;
+	while(_g < vvs.length) {
+		var vv = vvs[_g];
+		++_g;
+		verb.topo.Boolean.processVertexVertexEvent(vv.item0,vv.item1,op,nea,neb);
+	}
+};
+verb.topo.Boolean.processVertexVertexEvent = function(a,b,op,nea,neb) {
 	var sps = verb.topo.Boolean.classifyVertexVertex(a,b);
 	verb.topo.Boolean.reclassifyCoplanarSectorPairs(sps,op);
 	verb.topo.Boolean.reclassifyCoplanarSectorEdge(sps,op);
-	verb.topo.Boolean.insertNullEdges(sps,nea,neb);
-	return sps;
+	verb.topo.Boolean.insertVertexVertexEventNullEdges(sps,nea,neb);
 };
-verb.topo.Boolean.insertNullEdges = function(ar,nea,neb) {
+verb.topo.Boolean.insertVertexVertexEventNullEdges = function(ar,nea,neb) {
 	var i = 0;
 	var arl = ar.length;
 	while(true) {
@@ -6431,10 +6483,7 @@ verb.topo.Boolean.insertNullEdge = function(t,f,type,nea,neb) {
 	t.l.f.s.lmev(f,t,f.v.pt.slice());
 	if(type == 0) nea.push(f.prv); else neb.push(f.prv);
 };
-verb.topo.Boolean.connect = function(cfa,cfb,cc) {
-	haxe.Log.trace(cfa.length,{ fileName : "Boolean.hx", lineNumber : 205, className : "verb.topo.Boolean", methodName : "connect", customParams : [cfb.length,cc.length]});
-};
-verb.topo.Boolean.classifyAllVertexFace = function(a,op,isA) {
+verb.topo.Boolean.classifyVertexFaceEvents = function(a,op,isA) {
 	var _g = [];
 	var _g1 = 0;
 	while(_g1 < a.length) {
@@ -7294,8 +7343,7 @@ verb.topo.Split.insertNullEdges = function(v,ecs,nulledges) {
 			i = (i + 1) % el;
 		}
 		s.lmev(head,tail.opp.nxt,head.v.pt.slice());
-		var ne = head.prv;
-		nulledges.push(ne);
+		nulledges.push(head.prv);
 		i = verb.topo.Split.nextOfClass(verb.topo.PlanePosition.Above,ecs,i);
 		if(i == -1) break;
 		head = ecs[i].edge;
@@ -7402,7 +7450,7 @@ verb.topo.Split.join = function(e0,e1) {
 	} else s.lmekr(e0,e1.nxt);
 	if(e0.nxt.nxt != e1) {
 		s.lmef(e1,e0.nxt);
-		if(nf != null && of.l.nxt != of.l) haxe.Log.trace("PANIC!",{ fileName : "Split.hx", lineNumber : 280, className : "verb.topo.Split", methodName : "join"});
+		if(nf != null && of.l.nxt != of.l) haxe.Log.trace("PANIC!",{ fileName : "Split.hx", lineNumber : 279, className : "verb.topo.Split", methodName : "join"});
 	}
 };
 verb.topo.Split.cut = function(e,faces) {
