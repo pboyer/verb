@@ -17,22 +17,20 @@
     "cad",
     "nurbs"
   ],
-  "dependencies": {
-    "tess2": "^1.0.0"
-  },
   "devDependencies": {
     "benchmark": "^1.0.0",
-    "grunt": "0.4.2",
+    "grunt": "0.4.5",
     "grunt-benchmark": "^0.3.0",
-    "grunt-contrib-concat": "0.1.2",
-    "grunt-contrib-uglify": "0.1.1",
-    "grunt-docco": "0.3.0",
-    "grunt-haxe": "^0.1.12",
-    "grunt-mocha-test": "^0.12.2",
+    "grunt-contrib-concat": "0.5.1",
+    "grunt-contrib-uglify": "0.9.1",
+    "grunt-docco": "0.3.3",
+    "grunt-haxe": "^0.1.13",
+    "grunt-mocha-test": "^0.12.7",
     "grunt-text-replace": "^0.4.0",
-    "mocha": "^2.0.1",
-    "should": "2.1.0",
-    "webworker-threads": "*"
+    "mocha": "^2.2.4",
+    "should": "6.0.1",
+    "webworker-threads": "*",
+    "tess2": "^1.0.0"
   },
   "license": "MIT"
 }
