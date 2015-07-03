@@ -22,9 +22,9 @@ function last(a){
 
 describe("verb.topo.Solid.mvfs",function(){
     it('provides correctly linked lists, correct number of elements', function(){
-        var s = verb.topo.Solid.mvfs( [0,0,0] );
+	var s = verb.topo.Solid.mvfs( [0,0,0] );
 
-        s.should.not.be.null;
+	s.should.not.be.null;
 
         var e0 = s.f.l.e;
         e0.nxt.should.be.equal(e0);
@@ -783,8 +783,6 @@ function cube(){
     return verb.topo.Make.extrusion( ptsa, [0,0,10] );
 }
 
-
-
 describe("verb.topo.Boolean.insertNullEdgeIntoFace",function(){
     it('testing', function(){
 
@@ -794,9 +792,20 @@ describe("verb.topo.Boolean.insertNullEdgeIntoFace",function(){
 
         var centroid = verb.core.Vec.div( verb.core.Vec.addAll( f.l.points() ), f.l.points().length );
 
+        // insertNullEdgeIntoFace( point : Point, f : Face, nes : Array<HalfEdge> )
 
+        var nes = [];
+        verb.topo.Boolean.insertNullEdgeIntoFace( centroid, f, nes );
 
+        f.ol.halfEdges().forEach(function(e){
+            should.notEqual(null, e.nxt);
+            should.notEqual(null, e.prv);
+        });
 
+        f.l.halfEdges().forEach(function(e){
+            should.notEqual(null, e.nxt);
+            should.notEqual(null, e.prv);
+        });
 
     });
 });
@@ -813,8 +822,6 @@ describe("verb.topo.Boolean.union",function(){
 
         // TODO test that classifyVertexFace returns 3 inside, outside pairs
 
-
-
-
     });
-}); 
+});
+
