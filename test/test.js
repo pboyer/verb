@@ -7928,13 +7928,13 @@ describe("verb.topo.Boolean.insertNullEdgeIntoFace",function(){
         verb.topo.Boolean.insertNullEdgeIntoFace( centroid, f, nes );
 
         f.ol.halfEdges().forEach(function(e){
-            console.log( e.nxt.id );
-            console.log( e.prv.id );
+            should.notEqual(null, e.nxt);
+            should.notEqual(null, e.prv);
         });
 
         f.l.halfEdges().forEach(function(e){
-            console.log( e.nxt.id );
-            console.log( e.prv.id );
+            should.notEqual(null, e.nxt);
+            should.notEqual(null, e.prv);
         });
 
     });
@@ -7951,9 +7951,6 @@ describe("verb.topo.Boolean.union",function(){
         var res = verb.topo.Boolean.union( a, b, 1e-6 );
 
         // TODO test that classifyVertexFace returns 3 inside, outside pairs
-
-
-
 
     });
 });

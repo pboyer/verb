@@ -6419,26 +6419,95 @@ verb.topo.Boolean.__name__ = ["verb","topo","Boolean"];
 verb.topo.Boolean.union = function(a,b,tol) {
 	var op = verb.topo.BoolOp.Union;
 	var sg = verb.topo.Boolean.intersect(a,b,tol);
+	var clvfa = verb.topo.Boolean.classifyAllVertexFaceEvents(sg.coplanarVerticesOfA,op,true);
+	var clvfb = verb.topo.Boolean.classifyAllVertexFaceEvents(sg.coplanarVerticesOfB,op,false);
+	var clvv = verb.topo.Boolean.classifyAllVertexVertexEvents(sg.coincidentVertices,op);
 	var nea = new Array();
 	var neb = new Array();
-	verb.topo.Boolean.processVertexFaceEvents(sg.coplanarVerticesOfA,op,true,nea,neb);
+	verb.topo.Boolean.insertAllVertexFaceEventNullEdges(sg.coplanarVerticesOfA,clvfa,op,true,nea,neb);
+	verb.topo.Boolean.insertAllVertexFaceEventNullEdges(sg.coplanarVerticesOfB,clvfb,op,false,nea,neb);
+	verb.topo.Boolean.insertAllVertexVertexEventNullEdges(clvv,nea,neb);
+	var afaces = [];
+	var bfaces = [];
+	verb.topo.Boolean.connect(nea,neb,afaces,bfaces);
 };
-verb.topo.Boolean.connectNullEdges = function(cfa,cfb,cc) {
-	haxe.Log.trace(cfa.length,{ fileName : "Boolean.hx", lineNumber : 123, className : "verb.topo.Boolean", methodName : "connectNullEdges", customParams : [cfb.length,cc.length]});
-};
-verb.topo.Boolean.processVertexFaceEvents = function(vfs,op,isA,nea,neb) {
-	var _g = 0;
-	while(_g < vfs.length) {
-		var vf = vfs[_g];
-		++_g;
-		verb.topo.Boolean.processVertexFaceEvent(vf.item0,vf.item1,op,isA,nea,neb);
+verb.topo.Boolean.connect = function(nesa,nesb,afaces,bfaces) {
+	verb.topo.Split.lexicographicalSort(nesa);
+	verb.topo.Split.lexicographicalSort(nesb);
+	var h0;
+	var h1;
+	var looseendsa = [];
+	var looseendsb = [];
+	var _g1 = 0;
+	var _g = nesa.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		var nea = nesa[i];
+		var neb = nesb[i];
+		haxe.Log.trace("edges at:",{ fileName : "Boolean.hx", lineNumber : 164, className : "verb.topo.Boolean", methodName : "connect", customParams : [nea.v.pt,neb.v.pt]});
+		haxe.Log.trace("edges at:",{ fileName : "Boolean.hx", lineNumber : 165, className : "verb.topo.Boolean", methodName : "connect", customParams : [nea.opp.id,neb.opp.id]});
+		if((h0 = verb.topo.Boolean.canJoin(nea,neb.opp,looseendsa,looseendsb)) != null) {
+			haxe.Log.trace("joining 1!",{ fileName : "Boolean.hx", lineNumber : 169, className : "verb.topo.Boolean", methodName : "connect"});
+			var h0a = h0.item0;
+			var h0b = h0.item1;
+			haxe.Log.trace("connecting:",{ fileName : "Boolean.hx", lineNumber : 174, className : "verb.topo.Boolean", methodName : "connect", customParams : [h0a.id,nea.id]});
+			verb.topo.Split.join(h0a,nea);
+			if(!verb.topo.Split.isLoose(h0a.opp,looseendsa)) verb.topo.Split.cut(h0a,afaces);
+			verb.topo.Split.join(h0b,neb.opp);
+			if(!verb.topo.Split.isLoose(h0b.opp,looseendsb)) verb.topo.Split.cut(h0b,bfaces);
+		}
+		if((h1 = verb.topo.Boolean.canJoin(nea.opp,neb,looseendsa,looseendsb)) != null) {
+			haxe.Log.trace("joining 2!",{ fileName : "Boolean.hx", lineNumber : 190, className : "verb.topo.Boolean", methodName : "connect"});
+			var h1a = h1.item0;
+			var h1b = h1.item1;
+			haxe.Log.trace("connecting:",{ fileName : "Boolean.hx", lineNumber : 195, className : "verb.topo.Boolean", methodName : "connect", customParams : [h1a.id,h1b.id,neb.id,nea.opp.id]});
+			verb.topo.Split.join(h1a,nea.opp);
+			if(!verb.topo.Split.isLoose(h1a.opp,looseendsa)) verb.topo.Split.cut(h1a,afaces);
+			haxe.Log.trace("alright",{ fileName : "Boolean.hx", lineNumber : 202, className : "verb.topo.Boolean", methodName : "connect"});
+			verb.topo.Split.join(h1b,neb);
+			if(!verb.topo.Split.isLoose(h1b.opp,looseendsb)) verb.topo.Split.cut(h1b,bfaces);
+		}
+		if(h0 != null && h1 != null) {
+			haxe.Log.trace("cutting",{ fileName : "Boolean.hx", lineNumber : 210, className : "verb.topo.Boolean", methodName : "connect"});
+			verb.topo.Split.cut(nea,afaces);
+			verb.topo.Split.cut(neb,bfaces);
+		}
 	}
 };
-verb.topo.Boolean.processVertexFaceEvent = function(v,f,op,isA,nea,neb) {
-	verb.topo.Boolean.insertVertexFaceEventNullEdges(v,f,verb.topo.Boolean.classifyVertexFace(v,f,op,isA),isA,isA?nea:neb);
+verb.topo.Boolean.canJoin = function(hea,heb,looseendsa,looseendsb) {
+	if(hea != null && heb != null) {
+		var _g1 = 0;
+		var _g = looseendsa.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			var n0 = verb.topo.Split.neighbor(hea,looseendsa[i]);
+			var n1 = verb.topo.Split.neighbor(heb,looseendsb[i]);
+			if(n0 && n1) {
+				var ra = looseendsa[i];
+				var rb = looseendsb[i];
+				looseendsa.splice(i,1);
+				looseendsb.splice(i,1);
+				return new verb.core.types.Pair(ra,rb);
+			}
+		}
+	}
+	if(hea != null) looseendsa.push(hea);
+	if(heb != null) looseendsb.push(heb);
+	return null;
+};
+verb.topo.Boolean.insertAllVertexFaceEventNullEdges = function(vfs,efs,op,isA,nea,neb) {
+	var _g1 = 0;
+	var _g = vfs.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		verb.topo.Boolean.insertVertexFaceEventNullEdges(vfs[i].item0,vfs[i].item1,efs[i],op,isA,nea,neb);
+	}
+};
+verb.topo.Boolean.insertVertexFaceEventNullEdges = function(v,f,efs,op,isA,nea,neb) {
+	verb.topo.Boolean.insertVertexFaceEventNullEdgesCore(v,f,efs,isA,isA?nea:neb);
 	verb.topo.Boolean.insertNullEdgeIntoFace(v.pt.slice(),f,isA?neb:nea);
 };
-verb.topo.Boolean.insertVertexFaceEventNullEdges = function(v,f,efs,isA,nulledges) {
+verb.topo.Boolean.insertVertexFaceEventNullEdgesCore = function(v,f,efs,isA,nulledges) {
 	var s = v.e.l.f.s;
 	var i = verb.topo.Boolean.nextOfClass(verb.topo.Boolean.above(isA),efs,0);
 	if(i == -1) return;
@@ -6477,19 +6546,29 @@ verb.topo.Boolean.insertNullEdgeIntoFace = function(point,f,nes) {
 	var nl = f.s.lkemr(nv.e.prv);
 	nes.push(nv.e);
 };
-verb.topo.Boolean.processVertexVertexEvents = function(vvs,op,nea,neb) {
+verb.topo.Boolean.insertAllVertexVertexEventNullEdges = function(sps,nea,neb) {
 	var _g = 0;
-	while(_g < vvs.length) {
-		var vv = vvs[_g];
+	while(_g < sps.length) {
+		var sp = sps[_g];
 		++_g;
-		verb.topo.Boolean.processVertexVertexEvent(vv.item0,vv.item1,op,nea,neb);
+		verb.topo.Boolean.insertVertexVertexEventNullEdges(sp,nea,neb);
 	}
 };
-verb.topo.Boolean.processVertexVertexEvent = function(a,b,op,nea,neb) {
-	var sps = verb.topo.Boolean.classifyVertexVertex(a,b);
+verb.topo.Boolean.classifyAllVertexVertexEvents = function(vvs,op) {
+	var _g = [];
+	var _g1 = 0;
+	while(_g1 < vvs.length) {
+		var vv = vvs[_g1];
+		++_g1;
+		_g.push(verb.topo.Boolean.classifyVertexVertexEvent(vv.item0,vv.item1,op));
+	}
+	return _g;
+};
+verb.topo.Boolean.classifyVertexVertexEvent = function(a,b,op) {
+	var sps = verb.topo.Boolean.classifyVertexVertexCore(a,b);
 	verb.topo.Boolean.reclassifyCoplanarSectorPairs(sps,op);
 	verb.topo.Boolean.reclassifyCoplanarSectorEdge(sps,op);
-	verb.topo.Boolean.insertVertexVertexEventNullEdges(sps,nea,neb);
+	return sps;
 };
 verb.topo.Boolean.insertVertexVertexEventNullEdges = function(ar,nea,neb) {
 	var i = 0;
@@ -6522,17 +6601,17 @@ verb.topo.Boolean.insertNullEdge = function(t,f,type,nea,neb) {
 	t.l.f.s.lmev(f,t,f.v.pt.slice());
 	if(type == 0) nea.push(f.prv); else neb.push(f.prv);
 };
-verb.topo.Boolean.classifyVertexFaceEvents = function(a,op,isA) {
+verb.topo.Boolean.classifyAllVertexFaceEvents = function(a,op,isA) {
 	var _g = [];
 	var _g1 = 0;
 	while(_g1 < a.length) {
 		var vf = a[_g1];
 		++_g1;
-		_g.push(verb.topo.Boolean.classifyVertexFace(vf.item0,vf.item1,op,isA));
+		_g.push(verb.topo.Boolean.classifyVertexFaceEvent(vf.item0,vf.item1,op,isA));
 	}
 	return _g;
 };
-verb.topo.Boolean.classifyVertexFace = function(v,f,op,isA) {
+verb.topo.Boolean.classifyVertexFaceEvent = function(v,f,op,isA) {
 	var p = verb.topo.Boolean.planeFromFace(f);
 	var ecs = new Array();
 	var _g = 0;
@@ -6624,7 +6703,7 @@ verb.topo.Boolean.reclassifyCoplanarSectorPairs = function(sps,op) {
 		sp.intersect = false;
 	}
 };
-verb.topo.Boolean.classifyVertexVertex = function(a,b) {
+verb.topo.Boolean.classifyVertexVertexCore = function(a,b) {
 	var res = new Array();
 	var svsa = verb.topo.Boolean.preprocessVertexSectors(a);
 	var svsb = verb.topo.Boolean.preprocessVertexSectors(b);
@@ -7315,7 +7394,7 @@ verb.topo.Split.solidByPlane = function(s,p) {
 	}
 	if(nulledges.length == 0) return null;
 	var afaces = [];
-	verb.topo.Split.connectNullEdges(nulledges,afaces);
+	verb.topo.Split.connect(nulledges,afaces);
 	var a = new verb.topo.Solid();
 	var b = new verb.topo.Solid();
 	verb.topo.Split.close(afaces,a,b);
@@ -7347,7 +7426,7 @@ verb.topo.Split.close = function(afaces,a,b) {
 	verb.topo.Split.cleanup(a,s);
 	verb.topo.Split.cleanup(b,s);
 };
-verb.topo.Split.connectNullEdges = function(nulledges,afaces) {
+verb.topo.Split.connect = function(nulledges,afaces) {
 	verb.topo.Split.lexicographicalSort(nulledges);
 	var h0;
 	var h1;
@@ -7489,7 +7568,7 @@ verb.topo.Split.join = function(e0,e1) {
 	} else s.lmekr(e0,e1.nxt);
 	if(e0.nxt.nxt != e1) {
 		s.lmef(e1,e0.nxt);
-		if(nf != null && of.l.nxt != of.l) haxe.Log.trace("PANIC!",{ fileName : "Split.hx", lineNumber : 279, className : "verb.topo.Split", methodName : "join"});
+		if(nf != null && of.l.nxt != of.l) haxe.Log.trace("PANIC!",{ fileName : "Split.hx", lineNumber : 280, className : "verb.topo.Split", methodName : "join"});
 	}
 };
 verb.topo.Split.cut = function(e,faces) {

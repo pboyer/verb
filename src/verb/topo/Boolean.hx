@@ -103,45 +103,173 @@ class Boolean {
 
         var op = BoolOp.Union;
 
+    // 1. Perform geometric intersection of the two solids, and insert vertices where appropriate
+
         var sg = intersect( a, b, tol );
+
+    // 2. Classify the various intersection events
+
+        var clvfa = classifyAllVertexFaceEvents( sg.coplanarVerticesOfA, op, true );
+        var clvfb = classifyAllVertexFaceEvents( sg.coplanarVerticesOfB, op, false );
+
+        var clvv = classifyAllVertexVertexEvents( sg.coincidentVertices, op );
+
+    // 3. Insert null edges into the solids.  We will separate the two solids through these edges.
 
         var nea = new Array<HalfEdge>();
         var neb = new Array<HalfEdge>();
 
-        processVertexFaceEvents( sg.coplanarVerticesOfA, op, true, nea, neb );
-//        processVertexFaceEvents( sg.coplanarVerticesOfB, op, false, nea, neb );
+        insertAllVertexFaceEventNullEdges( sg.coplanarVerticesOfA, clvfa, op, true, nea, neb );
+        insertAllVertexFaceEventNullEdges( sg.coplanarVerticesOfB, clvfb, op, false, nea, neb );
 
-//        processVertexVertexEvents( sg.coincidentVertices, op, nea, neb );
+        insertAllVertexVertexEventNullEdges( clvv, nea, neb );
 
-//      connectNullEdges( nea, neb );
+    // 4. Connect the null edges into a sequences of edges, forming new faces
+
+        var afaces = [];
+        var bfaces = [];
+
+        connect( nea, neb, afaces, bfaces );
+
+    // 5.
+
 //      close( parts, op );  // from the various resultant parts  BinA, AinB, BoutA, etc, reconnect
 
     }
 
-    public static function connectNullEdges( cfa, cfb, cc ){
+    public static function connect( nesa : Array<HalfEdge>,
+                                    nesb : Array<HalfEdge>,
+                                    afaces : Array<Face>,
+                                    bfaces : Array<Face> ) : Void {
+//    Split.connect(nesa, afaces);
+//    Split.connect(nesb, bfaces);
 
-        trace(cfa.length, cfb.length, cc.length );
-    }
 
-    public static function processVertexFaceEvents( vfs : Array<Pair<Vertex,Face>>, op : BoolOp, isA : Bool,
-                                                    nea : Array<HalfEdge>, neb : Array<HalfEdge> ) : Void {
+        Split.lexicographicalSort( nesa );
+        Split.lexicographicalSort( nesb );
 
-        for (vf in vfs){
-            processVertexFaceEvent( vf.item0, vf.item1, op, isA, nea, neb );
+        var h0 : Pair<HalfEdge, HalfEdge>;
+        var h1 : Pair<HalfEdge, HalfEdge>;
+
+        var looseendsa = [];
+        var looseendsb = [];
+
+        // for every pair, one of the edges will be naked!
+
+        for (i in 0...nesa.length){
+
+            var nea = nesa[i];
+            var neb = nesb[i];
+
+            trace("edges at:", nea.v.pt, neb.v.pt); // definitely these edges are paired correctly!
+            trace("edges at:", nea.opp.id, neb.opp.id); // definitely these edges are paired correctly!
+
+            if ( (h0 = canJoin( nea, neb.opp, looseendsa, looseendsb )) != null){
+
+                trace("joining 1!");
+
+                var h0a = h0.item0;
+                var h0b = h0.item1;
+
+                trace("connecting:", h0a.id, nea.id);
+
+                Split.join( h0a, nea );
+
+                if (!Split.isLoose(h0a.opp, looseendsa)) {
+                    Split.cut(h0a, afaces);
+                }
+
+                Split.join( h0b, neb.opp );
+                if (!Split.isLoose(h0b.opp, looseendsb)) {
+                    Split.cut(h0b, bfaces);
+                }
+            }
+
+            if ( (h1 = canJoin( nea.opp, neb, looseendsa, looseendsb )) != null){
+
+                trace("joining 2!");
+
+                var h1a = h1.item0;
+                var h1b = h1.item1;
+
+                trace("connecting:", h1a.id, h1b.id, neb.id, nea.opp.id);
+
+                Split.join( h1a, nea.opp );
+                if (!Split.isLoose(h1a.opp, /*ok*/looseendsa)) {
+                    Split.cut(h1a, afaces);
+                }
+
+                trace('alright');
+                Split.join( h1b, neb );
+                if (!Split.isLoose(h1b.opp, /*ok*/looseendsb)) {
+                    Split.cut(h1b, bfaces);
+                }
+            }
+
+            if (h0 != null && h1 != null) {
+                trace('cutting');
+
+                Split.cut(nea, afaces);
+                Split.cut(neb, bfaces);
+            }
         }
     }
 
-    public static function processVertexFaceEvent( v : Vertex, f : Face, op : BoolOp, isA : Bool,
-                                                   nea : Array<HalfEdge>, neb : Array<HalfEdge>  ) : Void {
+    public static function canJoin(hea : HalfEdge,
+                                   heb : HalfEdge,
+                                   looseendsa : Array<HalfEdge>,
+                                   looseendsb : Array<HalfEdge>) : Pair<HalfEdge, HalfEdge> {
 
+        if (hea != null && heb != null){
+            for (i in 0...looseendsa.length){
 
-        insertVertexFaceEventNullEdges( v, f, classifyVertexFace( v, f, op, isA ), isA, isA ? nea : neb );
+                var n0 = Split.neighbor(hea, looseendsa[i]);
+                var n1 = Split.neighbor(heb, looseendsb[i]);
+
+                if (n0 && n1){
+                    var ra = looseendsa[i];
+                    var rb = looseendsb[i];
+                    looseendsa.splice(i, 1);
+                    looseendsb.splice(i, 1);
+
+                    return new Pair(ra, rb);
+                }
+            }
+        }
+
+        if (hea != null){
+            looseendsa.push(hea);
+        }
+
+        if (heb != null){
+            looseendsb.push(heb);
+        }
+
+        return null;
+    }
+
+    public static function insertAllVertexFaceEventNullEdges( vfs : Array<Pair<Vertex,Face>>,
+                                                              efs : Array<Array<EdgeFacePosition>>,
+                                                              op : BoolOp,
+                                                              isA : Bool,
+                                                              nea : Array<HalfEdge>,
+                                                              neb : Array<HalfEdge> ) : Void {
+
+        for (i in 0...vfs.length){
+            insertVertexFaceEventNullEdges( vfs[i].item0, vfs[i].item1, efs[i], op, isA, nea, neb );
+        }
+    }
+
+    public static function insertVertexFaceEventNullEdges( v : Vertex, f : Face, efs : Array<EdgeFacePosition>, op : BoolOp,
+                                                           isA : Bool, nea : Array<HalfEdge>, neb : Array<HalfEdge>  ) : Void {
+
+        insertVertexFaceEventNullEdgesCore( v, f, efs, isA, isA ? nea : neb );
 
         // this results in invalid an edge with an invalid nxt field
         insertNullEdgeIntoFace( v.pt.copy(), f, isA ? neb : nea );
     }
 
-    public static function insertVertexFaceEventNullEdges( v : Vertex, f : Face, efs : Array<EdgeFacePosition>,
+    public static function insertVertexFaceEventNullEdgesCore( v : Vertex, f : Face, efs : Array<EdgeFacePosition>,
                                                            isA : Bool, nulledges : Array<HalfEdge>  ) : Void {
 
         var s = v.e.l.f.s;
@@ -204,30 +332,32 @@ class Boolean {
         var nv = f.s.lmev( f.ol.e, f.ol.e, point );
         var nl = f.s.lkemr(nv.e.prv);
 
-//        trace(nv.e.nxt != null, nv.)
-
         nes.push( nv.e );
     }
 
-    public static function processVertexVertexEvents( vvs : Array<Pair<Vertex,Vertex>>, op : BoolOp,
-                                                      nea : Array<HalfEdge>, neb : Array<HalfEdge> ) : Void {
+    public static function insertAllVertexVertexEventNullEdges( sps : Array<Array<SectorIntersection>>,
+                                                                nea : Array<HalfEdge>,
+                                                                neb : Array<HalfEdge> ) : Void {
 
-        for (vv in vvs){
-            processVertexVertexEvent( vv.item0, vv.item1, op, nea, neb );
+        for (sp in sps){
+            insertVertexVertexEventNullEdges( sp, nea, neb );
         }
     }
 
-    public static function processVertexVertexEvent( a : Vertex, b : Vertex, op : BoolOp,
-                                                     nea : Array<HalfEdge>, neb : Array<HalfEdge> ) : Void {
+    public static function classifyAllVertexVertexEvents ( vvs : Array<Pair<Vertex,Vertex>>, op : BoolOp ) : Array<Array<SectorIntersection>>{
+        return [for (vv in vvs) classifyVertexVertexEvent(vv.item0, vv.item1, op )];
+    }
 
-        var sps = classifyVertexVertex( a, b );
+    public static function classifyVertexVertexEvent( a : Vertex, b : Vertex, op : BoolOp ) : Array<SectorIntersection> {
+        var sps = classifyVertexVertexCore( a, b );
         reclassifyCoplanarSectorPairs( sps, op );
         reclassifyCoplanarSectorEdge( sps, op );
-        insertVertexVertexEventNullEdges( sps, nea, neb );
+        return sps;
     }
 
     public static function insertVertexVertexEventNullEdges( ar : Array<SectorIntersection>,
-                                                             nea : Array<HalfEdge>, neb : Array<HalfEdge> ) : Void {
+                                                             nea : Array<HalfEdge>,
+                                                             neb : Array<HalfEdge> ) : Void {
 
         var i = 0;
         var arl = ar.length;
@@ -276,11 +406,11 @@ class Boolean {
     }
 
 
-    public static function classifyVertexFaceEvents( a : Array<Pair<Vertex,Face>>, op : BoolOp, isA : Bool ) : Array<Array<EdgeFacePosition>> {
-        return [for (vf in a) classifyVertexFace( vf.item0, vf.item1, op, isA )];
+    public static function classifyAllVertexFaceEvents( a : Array<Pair<Vertex,Face>>, op : BoolOp, isA : Bool ) : Array<Array<EdgeFacePosition>> {
+        return [for (vf in a) classifyVertexFaceEvent( vf.item0, vf.item1, op, isA )];
     }
 
-    public static function classifyVertexFace( v : Vertex, f : Face, op : BoolOp, isA : Bool ) : Array<EdgeFacePosition> {
+    public static function classifyVertexFaceEvent( v : Vertex, f : Face, op : BoolOp, isA : Bool ) : Array<EdgeFacePosition> {
 
         var p = planeFromFace(f);
         var ecs = new Array<EdgeFacePosition>();
@@ -429,7 +559,7 @@ class Boolean {
 
     }
 
-    public static function classifyVertexVertex( a : Vertex, b : Vertex ) : Array<SectorIntersection> {
+    public static function classifyVertexVertexCore( a : Vertex, b : Vertex ) : Array<SectorIntersection> {
 
         var res = new Array<SectorIntersection>();
 

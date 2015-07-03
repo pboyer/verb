@@ -57,7 +57,7 @@ class Split {
     // 4. connect the null edges, forming cross-section polygons
 
         var afaces = [];
-        connectNullEdges( nulledges, afaces );
+        connect( nulledges, afaces );
 
     // 5. close the resultant solids
 
@@ -82,7 +82,7 @@ class Split {
         cleanup(b, s);
     }
 
-    public static function connectNullEdges( nulledges : Array<HalfEdge>, afaces : Array<Face>  ) : Void {
+    public static function connect( nulledges : Array<HalfEdge>, afaces : Array<Face>  ) : Void {
 
         // now we have all of the null edges inserted and need to separate the solid
         // into two pieces
@@ -238,7 +238,7 @@ class Split {
         }
     }
 
-    private static function canJoin( e : HalfEdge, looseends : Array<HalfEdge> ) : HalfEdge {
+    public static function canJoin( e : HalfEdge, looseends : Array<HalfEdge> ) : HalfEdge {
         for (i in 0...looseends.length){
             if ( neighbor( e, looseends[i]) ){  //
                 var r = looseends[i];
@@ -251,16 +251,16 @@ class Split {
         return null;
     }
 
-    private static function neighbor( e0 : HalfEdge, e1 : HalfEdge ) : Bool {
+    public static function neighbor( e0 : HalfEdge, e1 : HalfEdge ) : Bool {
         return e0.l.f == e1.l.f; // || e0.opp == e1;    // opposite orientation
     }
 
-    private static function isLoose( e : HalfEdge, le : Array<HalfEdge> ) : Bool {
+    public static function isLoose( e : HalfEdge, le : Array<HalfEdge> ) : Bool {
         return le.indexOf(e) != -1;
     }
 
     // join a new null edge into the expanding slice polygon
-    private static function join( e0 : HalfEdge, e1 : HalfEdge ) {
+    public static function join( e0 : HalfEdge, e1 : HalfEdge ) {
         var of = e0.l.f;
         var nf : Face = null;
         var s = e0.l.f.s;
@@ -269,7 +269,8 @@ class Split {
             if (e0.prv.prv != e1){
                 nf = s.lmef( e0, e1.nxt );
             }
-        } else {
+        }
+        else {
             s.lmekr( e0, e1.nxt );
         }
 
@@ -284,7 +285,7 @@ class Split {
     }
 
     // remove a null edge
-    private static function cut( e : HalfEdge, faces : Array<Face> ) {
+    public static function cut( e : HalfEdge, faces : Array<Face> ) {
         if (e.l == e.opp.l){
             faces.push(e.l.f);
             e.l.f.s.lkemr( e );
@@ -293,7 +294,7 @@ class Split {
         }
     }
 
-    private static function lexicographicalSort( es : Array<HalfEdge> ){
+    public static function lexicographicalSort( es : Array<HalfEdge> ){
         es.sort(function(a : HalfEdge, b : HalfEdge){
             var ap = a.v.pt;
             var bp = b.v.pt;
