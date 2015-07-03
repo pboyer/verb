@@ -1872,7 +1872,7 @@ class Sweep {
         * contained between eTopLeft->Oprev and eTopLeft; otherwise eTopLeft
         * should be NULL.
         */
-        var reg, regPrev;
+        var reg = null, regPrev;
         var e, ePrev;
         var firstTime = true;
 
