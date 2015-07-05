@@ -4,6 +4,8 @@ var should = require('should')
 // necessary for multi-threading
 verb.exe.WorkerPool.basePath = process.cwd() + "/build/js/";
 
+console.log(verb.exe.WorkerPool.basePath);
+
 // some testing utilities
 function vecShouldBe( expected, test, tol ){
 
@@ -1168,18 +1170,18 @@ describe("verb.geom.NurbsSurface.tessellate",function(){
 
 	});
 
-	it('is correct for basic case async', function(done){
-		surface.tessellateAsync( 0.5, true ).then(function(d){
-			console.log("Hello");
-
-			d.faces.length.should.be.greaterThan( 2 );
-			d.normals.length.should.be.greaterThan( 2 );
-			d.points.length.should.be.greaterThan( 2 );
-			d.uvs.length.should.be.greaterThan( 2 );
-
-			done();
-		});
-	});
+//	it('is correct for basic case async', function(done){
+//		surface.tessellateAsync( 0.5, true ).then(function(d){
+//			console.log("Hello");
+//
+//			d.faces.length.should.be.greaterThan( 2 );
+//			d.normals.length.should.be.greaterThan( 2 );
+//			d.points.length.should.be.greaterThan( 2 );
+//			d.uvs.length.should.be.greaterThan( 2 );
+//
+//			done();
+//		});
+//	});
 });
 
 describe("verb.geom.NurbsSurface.transform",function(){

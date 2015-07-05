@@ -28,7 +28,7 @@ if ( typeof window != 'object'){
 	onmessage = function( e ){
 
 		var method = lookup( e.data.className, e.data.methodName );
-
+		
 		if (!method){
 			return console.error("could not find " + e.data.className + "." + e.data.methodName)
 		}
@@ -37,6 +37,7 @@ if ( typeof window != 'object'){
 
 	};
 }
+
 (function (console, $hx_exports) { "use strict";
 $hx_exports.topo = $hx_exports.topo || {};
 $hx_exports.geom = $hx_exports.geom || {};
