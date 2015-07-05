@@ -5,11 +5,9 @@
 
 <strong>verb</strong> is a library for creating and manipulating NURBS surfaces and curves in many languages including JavaScript.
 
-verb provides advanced tools like derivative evaluation, adaptive tessellation, and intersection.  Verb provides a parallel execution runtime via WebWorkers in modern browsers.
+verb provides advanced tools like derivative evaluation, adaptive tessellation, and intersection.  Verb provides a concurrent execution runtime via WebWorkers in modern browsers and is suitable for use in a datacenter or in the browser.
 
-### API Status : Unstable
-
-verb is in a period of active, heavy development.  
+### API Status : Stabilish
 
 ###Getting started
 
