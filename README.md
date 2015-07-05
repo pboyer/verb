@@ -1,9 +1,9 @@
-[![Build Status](https://travis-ci.org/pboyer/verb.svg?branch=master)](https://travis-ci.org/pboyer/verb) [![Coverage Status](https://coveralls.io/repos/pboyer/verb/badge.svg)](https://coveralls.io/r/pboyer/verb)
+[![Build Status](https://travis-ci.org/pboyer/verb.svg?branch=master)](https://travis-ci.org/pboyer/verb)
 
 #verb
-###A CAD Library
+###A CAD Library for the Web
 
-<strong>verb</strong> is a library for creating and manipulating NURBS surfaces and curves in many languages.
+<strong>verb</strong> is a library for creating and manipulating NURBS surfaces and curves in many languages including JavaScript.
 
 verb provides advanced tools like derivative evaluation, adaptive tessellation, and intersection.  Verb provides a parallel execution runtime via WebWorkers in modern browsers.
 
@@ -17,8 +17,7 @@ Install <a href="http://haxe.org/">haxe</a> and <a href="http://haxe.org/">node.
 
 Install haxe dependencies:
 
-	haxelib install promhx
-	haxelib install nodejs
+	sudo haxelib install promhx
 
 Install node.js dependencies:
 
@@ -40,7 +39,7 @@ Run all unit tests:
 
 The MIT License (MIT)
 
-Copyright (c) Peter Boyer 2015
+Copyright (c) Peter Boyer 2014-2015
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
