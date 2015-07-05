@@ -141,9 +141,6 @@ class Boolean {
                                     nesb : Array<HalfEdge>,
                                     afaces : Array<Face>,
                                     bfaces : Array<Face> ) : Void {
-//    Split.connect(nesa, afaces);
-//    Split.connect(nesb, bfaces);
-
 
         Split.lexicographicalSort( nesa );
         Split.lexicographicalSort( nesb );
@@ -156,13 +153,12 @@ class Boolean {
 
         // for every pair, one of the edges will be naked!
 
+	// join means to take two vertices and join them into one edge
+
         for (i in 0...nesa.length){
 
             var nea = nesa[i];
             var neb = nesb[i];
-
-            trace("edges at:", nea.v.pt, neb.v.pt); // definitely these edges are paired correctly!
-            trace("edges at:", nea.opp.id, neb.opp.id); // definitely these edges are paired correctly!
 
             if ( (h0 = canJoin( nea, neb.opp, looseendsa, looseendsb )) != null){
 

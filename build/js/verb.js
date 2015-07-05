@@ -6453,31 +6453,29 @@ verb_topo_Boolean.connect = function(nesa,nesb,afaces,bfaces) {
 		var i = _g1++;
 		var nea = nesa[i];
 		var neb = nesb[i];
-		haxe_Log.trace("edges at:",{ fileName : "Boolean.hx", lineNumber : 164, className : "verb.topo.Boolean", methodName : "connect", customParams : [nea.v.pt,neb.v.pt]});
-		haxe_Log.trace("edges at:",{ fileName : "Boolean.hx", lineNumber : 165, className : "verb.topo.Boolean", methodName : "connect", customParams : [nea.opp.id,neb.opp.id]});
 		if((h0 = verb_topo_Boolean.canJoin(nea,neb.opp,looseendsa,looseendsb)) != null) {
-			haxe_Log.trace("joining 1!",{ fileName : "Boolean.hx", lineNumber : 169, className : "verb.topo.Boolean", methodName : "connect"});
+			haxe_Log.trace("joining 1!",{ fileName : "Boolean.hx", lineNumber : 165, className : "verb.topo.Boolean", methodName : "connect"});
 			var h0a = h0.item0;
 			var h0b = h0.item1;
-			haxe_Log.trace("connecting:",{ fileName : "Boolean.hx", lineNumber : 174, className : "verb.topo.Boolean", methodName : "connect", customParams : [h0a.id,nea.id]});
+			haxe_Log.trace("connecting:",{ fileName : "Boolean.hx", lineNumber : 170, className : "verb.topo.Boolean", methodName : "connect", customParams : [h0a.id,nea.id]});
 			verb_topo_Split.join(h0a,nea);
 			if(!verb_topo_Split.isLoose(h0a.opp,looseendsa)) verb_topo_Split.cut(h0a,afaces);
 			verb_topo_Split.join(h0b,neb.opp);
 			if(!verb_topo_Split.isLoose(h0b.opp,looseendsb)) verb_topo_Split.cut(h0b,bfaces);
 		}
 		if((h1 = verb_topo_Boolean.canJoin(nea.opp,neb,looseendsa,looseendsb)) != null) {
-			haxe_Log.trace("joining 2!",{ fileName : "Boolean.hx", lineNumber : 190, className : "verb.topo.Boolean", methodName : "connect"});
+			haxe_Log.trace("joining 2!",{ fileName : "Boolean.hx", lineNumber : 186, className : "verb.topo.Boolean", methodName : "connect"});
 			var h1a = h1.item0;
 			var h1b = h1.item1;
-			haxe_Log.trace("connecting:",{ fileName : "Boolean.hx", lineNumber : 195, className : "verb.topo.Boolean", methodName : "connect", customParams : [h1a.id,h1b.id,neb.id,nea.opp.id]});
+			haxe_Log.trace("connecting:",{ fileName : "Boolean.hx", lineNumber : 191, className : "verb.topo.Boolean", methodName : "connect", customParams : [h1a.id,h1b.id,neb.id,nea.opp.id]});
 			verb_topo_Split.join(h1a,nea.opp);
 			if(!verb_topo_Split.isLoose(h1a.opp,looseendsa)) verb_topo_Split.cut(h1a,afaces);
-			haxe_Log.trace("alright",{ fileName : "Boolean.hx", lineNumber : 202, className : "verb.topo.Boolean", methodName : "connect"});
+			haxe_Log.trace("alright",{ fileName : "Boolean.hx", lineNumber : 198, className : "verb.topo.Boolean", methodName : "connect"});
 			verb_topo_Split.join(h1b,neb);
 			if(!verb_topo_Split.isLoose(h1b.opp,looseendsb)) verb_topo_Split.cut(h1b,bfaces);
 		}
 		if(h0 != null && h1 != null) {
-			haxe_Log.trace("cutting",{ fileName : "Boolean.hx", lineNumber : 210, className : "verb.topo.Boolean", methodName : "connect"});
+			haxe_Log.trace("cutting",{ fileName : "Boolean.hx", lineNumber : 206, className : "verb.topo.Boolean", methodName : "connect"});
 			verb_topo_Split.cut(nea,afaces);
 			verb_topo_Split.cut(neb,bfaces);
 		}
@@ -7577,7 +7575,7 @@ verb_topo_Split.join = function(e0,e1) {
 	} else s.lmekr(e0,e1.nxt);
 	if(e0.nxt.nxt != e1) {
 		s.lmef(e1,e0.nxt);
-		if(nf != null && of.l.nxt != of.l) haxe_Log.trace("PANIC!",{ fileName : "Split.hx", lineNumber : 280, className : "verb.topo.Split", methodName : "join"});
+		if(nf != null && of.l.nxt != of.l) haxe_Log.trace("PANIC!",{ fileName : "Split.hx", lineNumber : 285, className : "verb.topo.Split", methodName : "join"});
 	}
 };
 verb_topo_Split.cut = function(e,faces) {

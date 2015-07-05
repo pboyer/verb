@@ -5,17 +5,7 @@
 <head>
   <title>verb - A CAD Library for the Web</title>
 
-  <script src="js/numeric-1.2.6.min.js"></script>
-  <script src="js/binomial.js"></script>
-  <script src="js/labor.js"></script>
-  <script src="js/verb.js"></script>
-
-  <script src="js/lightgl.js"></script>
-  <script src="js/conversions.js"></script>
-  <script src="js/viewer.js"></script>
-  
   <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
-
   <link rel="stylesheet" href="css/style.css">
 
 </head>
@@ -26,7 +16,7 @@
 		<div class="container" id="title" style="z-index: 1;">
 			<div id="titlecontainer">
 
-				<h1><img src="assets/v2.png" style="height: 64px; padding-right: 10px; display: inline-block">verb<span style="font-size: 12px; padding-left: 5px">0.1.0</span></h1>
+				<h1><img src="assets/v2.png" style="height: 64px; padding-right: 10px; display: inline-block">verb<span style="font-size: 12px; padding-left: 5px">0.2.0</span></h1>
 				<h2>A CAD Library for the Web</h2>
 
 				<p><a href="geometry.html" style="padding-right: 10px">Examples</a><a href="https://github.com/pboyer/verb" style="padding-right: 10px">Source code</a> <a href="docs/verb.html">Documentation</a></p>
@@ -40,12 +30,31 @@
 	
 			<p>
 
-			<strong>verb</strong> is a JavaScript library for creating and manipulating <a href="http://en.wikipedia.org/wiki/Non-uniform_rational_B-spline">NURBS</a> surfaces and curves in the browser or <a href="http://nodejs.org/">node.js</a>.  It provides a rich set of features with <a href="geometry.html">many types of surfaces and curves</a> in a <a href="js/verb.min.js">10kb (gzipped, minified) package</a>.
+			<strong>verb</strong> is a library for creating, manipulating, and analyzing <a href="http://en.wikipedia.org/wiki/Non-uniform_rational_B-spline">NURBS</a> surfaces and curves in the browser or <a href="http://nodejs.org/">node.js</a>. The library can be compiled for many languages, including JavaScript. It provides a rich set of features with <a href="geometry.html">many types of surfaces and curves</a> in a <a href="js/verb.min.js">10kb (gzipped, minified) package</a>.
 
 			</p>
 
 		</div>
 	</div>
+
+	<div class="section"> 
+		<div class="container">
+
+			<h3>New features in 0.2.0</h3>
+
+			<p>
+				<ul>
+					<li>Rewritten in Haxe - verb for JavaScript, C#, C++, Python, and more...</li>
+					<li>New examples showing how to integrate with three.js</li>
+					<li>Surfaces - Lofts, reverse, split, closest point, isocurves, adaptive tessellation, marching surface-surface intersection</li>
+					<li>Curve - Interpolation, closest point, reverse, split, length, divide by length</li>
+					<li>Mesh - Mesh-mesh intersection, mesh slicing</li>
+					<li>BReps - Experimental in 0.2.0</li>
+				</ul>
+			</p>
+		</div>
+	</div>
+
 
 	<div class="section"> 
 		<div class="container">
@@ -58,16 +67,15 @@
 
 			<p> verb supplies a large set of routines for creating common pieces of geometry.
 
-				For surfaces, these include cylinders, cones, surfaces of revolution, sweeps, extrusions.  
+				For surfaces, these include conics, lofts, surfaces of revolution, sweeps, and extrusions.  
 
-				For curves, these include lines, cicles, arcs, polylines, and ellipses.  
+				For curves, these include lines, cicles, interpolating curves, arcs, polylines, and ellipses.  
 			</p>
 
-			<div class="viewer" id="0"><b>Extrusion</b><pre>new verb.Extrusion( profile, axis, distance);</pre></div>
+			<div class="viewer" id="0"><b>Loft</b><pre>new verb.Extrusion( profile, axis, distance);</pre></div>
 			<div class="viewer" id="1"><b>RevolveSurface</b><pre>new verb.RevolveSurface( profile );</pre></div>
 			<div class="viewer" id="2"><b>BezierCurve</b><pre>new verb.BezierCurve( points );</pre></div>
 			
-
 			<h4>Evaluation</h4>
 
 			<p> verb supplies methods for evaluation of points and arbitrary derivatives on NURBS curves and surfaces.</p>
@@ -95,10 +103,10 @@ surface.tessellate( tessellationOptions, function(tessellation){
 });</pre>
 
 			<h4>
-				Intersection
+				Intersection and Analysis
 			</h4>
 
-			<p>verb supplies routines for curve-surface intersection and curve-curve intersection.  These algorithms can be tuned any tolerance and designed to detect multiple intersections.  Algorithms for surface-surface intersection are in the works.</p>
+			<p>verb supplies many intersection of curves, surfaces, and meshes.  These algorithms can be tuned any tolerance and designed to detect multiple intersections.</p>
 
 			<p> <strong> Intersecting a curve and surface </strong> </p>
 
@@ -118,7 +126,7 @@ var res = verb.intersect.curveSurface( crv, srf, options );</pre>
 			<h3>Asynchronous or synchronous</h3>
 
 			<p>
-				verb's verb.core geometry library can be called either asynchronously or synchronously.  This allows verb to be extended for multi-threading and remote evaluation.
+				verb's can be called either asynchronously or synchronously.  This allows verb to be extended for multi-threading and remote evaluation.
 			</p>
 
 			<pre>var curve = new verb.BezierCurve( [p1, p2, p3, p4] );
@@ -140,7 +148,7 @@ curve.tessellate({}, function(points){
 			<h3>Multi-threaded execution</h3>
 
 				<p>
-					verb uses <a href="https://github.com/pboyer/labor.js">labor.js</a> for multi-threading using WebWorkers.  If these are available, verb will automatically put them to use - potentially running multiple instances of a stateless NURBS engine.  This allows expensive operations like tessellation or intersection to be elegantly handled in the background via verb's async API. 
+					verb can use WebWorkers if they are available in the browser.  verb can automatically put them to use - potentially running multiple instances of a stateless NURBS engine.  This allows expensive operations like tessellation or intersection to be elegantly handled in the background via verb's async API. 
 				</p>
 
 				<p> Here's an example of building an Engine and calling it directly: </p>
@@ -159,31 +167,6 @@ engine.eval('rational_curve_derivs', [degree, control_points, weights, knots, u,
 	
 		</div>
 	</div>
-
-	<div class="section"> 
-		<div class="container">
-
-			<h3>Reactive programming</h3>
-
-				<p>
-					All verb geometry types (NurbsCurve, Cone, etc) inherit from WatchObject - a prototype for watching for property changes on an object.  This can be useful for operations like tessellation, where a change to the control points should cause retessellation.
-				</p>
-
-				<pre>
-var l = new verb.BezierCurve( [p1, p2, p3, p4] );
-
-var watcherId = l.watch('controlPoints', function(changeData) {
-	l.tessellate(function(tessellation){
-
-		... update view ...
-
-	});
-});</pre>
-
-		</div>
-	</div>
-
-
 
 	<div class="section" id="contribute"> 
 		<div class="container">
@@ -213,6 +196,9 @@ var watcherId = l.watch('controlPoints', function(changeData) {
   ga('send', 'pageview');
 
 </script>
+
+<script src="js/verb.js"></script>
+<script src="js/title.js"></script>
 
 </body>
 

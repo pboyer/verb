@@ -95,8 +95,6 @@ function setControlPoints(timestamp, controlPoints){
 
   for (var i = 0; i < controlPoints.length; i++){
     for (var j = 0; j < controlPoints[1].length; j++){
-
-      // nice!
       controlPoints[i][j][2] = 0.3 * Math.cos( (controlPoints[i][j][0] + date) / L ) * Math.sin( (controlPoints[i][j][1] + date) / L  )
     }
   }
