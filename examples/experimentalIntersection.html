@@ -58,7 +58,8 @@
 
     var ints = bm.result;
 
-    ints.forEach(function(x){
+    ints.forEach(function(x,i){
+        // if (i != 0) return;
         addCurveToScene( (new verb.geom.NurbsCurve( x )).toThreeGeometry() );
     });
 

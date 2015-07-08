@@ -606,7 +606,7 @@ class Make {
         // 4) solve for c in all 3 dimensions
 
         if (points.length < degree + 1){
-            throw "You need to supply at least degree + 1 points!";
+            throw "You need to supply at least degree + 1 points! You only supplied " + points.length + " points.";
         }
 
         var us = [ 0.0 ];

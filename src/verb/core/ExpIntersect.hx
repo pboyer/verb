@@ -129,7 +129,7 @@ class ExpIntersect {
                                     currentIndex : Int,
                                     allStartPts : Array<SurfaceSurfaceIntersectionPoint>,
                                     tol : Float ) {
-
+    
         var first = allStartPts[currentIndex];
 
         var uv0 = prev.uv0;
@@ -229,7 +229,7 @@ class ExpIntersect {
             return new MarchStep( step, prev.uv0, prev.uv1, first.uv0, first.uv1, prev.point, first.point, MarchStepState.CompleteLoop, prev.stepCount+1 );
         }
 
-        if ( isCoincidentWithStartPoint( relaxed.point, currentIndex, allStartPts, tol )){
+        if ( prev.stepCount > 5 && isCoincidentWithStartPoint( relaxed.point, currentIndex, allStartPts, 10 * tol )){
             state = MarchStepState.CoincidentStartPoint;
         }
 
@@ -247,8 +247,11 @@ class ExpIntersect {
         if (currentIndex == 0) return false;
 
         for (i in 0...currentIndex){
-            if ( Vec.distSquared( allStartPts[i].point, allStartPts[currentIndex].point ) < tol ){
-                //return true;
+            
+            var dist = Vec.distSquared( allStartPts[i].point, allStartPts[currentIndex].point );  
+            if ( dist < tol ){
+                trace("Coincident start point!");
+                return true;
             }
         }
 
@@ -268,7 +271,7 @@ class ExpIntersect {
         var step = march( surface0, surface1, MarchStep.init( start ), startIndex, allStartPts, tol );
 
         // if we're out of bounds, exit
-        if (step.state == MarchStepState.AtBoundary){
+        if (step.state == MarchStepState.AtBoundary || step.state == MarchStepState.CoincidentStartPoint ){
             return null;
         }
 
@@ -280,13 +283,14 @@ class ExpIntersect {
                 step.state != MarchStepState.AtBoundary && 
                 step.state != MarchStepState.CompleteLoop ) {
             final.push( new SurfaceSurfaceIntersectionPoint( step.uv0, step.uv1, step.point, -1 ) );
+
+            if ( step.state == MarchStepState.CoincidentStartPoint ){
+                return null;
+            }
+
             step = march( surface0, surface1, step, startIndex, allStartPts, tol );
         }
     
-        if ( step.state != MarchStepState.CoincidentStartPoint ){
-            return null;
-        }
-
         final.push( new SurfaceSurfaceIntersectionPoint( step.uv0, step.uv1, step.point, -1 ) );
 
         return final;
@@ -317,9 +321,22 @@ class ExpIntersect {
             startPts.push( int );
         }
 
-        for (i in 0...startPts.length){
+        var i = 0; 
+        while (i < startPts.length){
+            trace( "starting at", startPts[i].point ); 
             var res = completeMarch( surface0, surface1, i, startPts, tol );
-            if (res != null) final.push( res );
+            
+            if (res != null){
+                final.push( res );
+                
+                startPts.insert( i, res.last() );
+               
+                trace("inserting", res.last().point );
+
+                i += 2;
+            
+            }
+            i++;
         }
 
         return [ for (pts in final) Make.rationalInterpCurve( pts.map(function(x){ return x.point; }) )];

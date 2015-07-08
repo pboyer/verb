@@ -1746,7 +1746,7 @@ verb_core_Eval.knotSpanGivenN = function(n,degree,u,knots) {
 	}
 	return mid;
 };
-var verb_core_MarchStepState = { __ename__ : true, __constructs__ : ["OutOfBounds","InsideDomain","AtBoundary","CompleteLoop"] };
+var verb_core_MarchStepState = { __ename__ : true, __constructs__ : ["OutOfBounds","InsideDomain","AtBoundary","CompleteLoop","CoincidentStartPoint"] };
 verb_core_MarchStepState.OutOfBounds = ["OutOfBounds",0];
 verb_core_MarchStepState.OutOfBounds.toString = $estr;
 verb_core_MarchStepState.OutOfBounds.__enum__ = verb_core_MarchStepState;
@@ -1759,6 +1759,9 @@ verb_core_MarchStepState.AtBoundary.__enum__ = verb_core_MarchStepState;
 verb_core_MarchStepState.CompleteLoop = ["CompleteLoop",3];
 verb_core_MarchStepState.CompleteLoop.toString = $estr;
 verb_core_MarchStepState.CompleteLoop.__enum__ = verb_core_MarchStepState;
+verb_core_MarchStepState.CoincidentStartPoint = ["CoincidentStartPoint",4];
+verb_core_MarchStepState.CoincidentStartPoint.toString = $estr;
+verb_core_MarchStepState.CoincidentStartPoint.__enum__ = verb_core_MarchStepState;
 var verb_core_MarchStep = function(step,olduv0,olduv1,uv0,uv1,oldpoint,point,state,stepCount) {
 	this.stepCount = 0;
 	this.step = step;
@@ -1803,7 +1806,8 @@ verb_core_ExpIntersect.clampStep = function(surface,uv,step) {
 	if(nv > verb_core_ArrayExtensions.last(surface.knotsV) + 1e-10) step = verb_core_Vec.mul((verb_core_ArrayExtensions.last(surface.knotsV) - v) / step[1],step); else if(nv < surface.knotsV[0] - 1e-10) step = verb_core_Vec.mul((surface.knotsV[0] - v) / step[1],step);
 	return step;
 };
-verb_core_ExpIntersect.march = function(surface0,surface1,prev,first,tol) {
+verb_core_ExpIntersect.march = function(surface0,surface1,prev,currentIndex,allStartPts,tol) {
+	var first = allStartPts[currentIndex];
 	var uv0 = prev.uv0;
 	var uv1 = prev.uv1;
 	var derivs0 = verb_core_Eval.rationalSurfaceDerivatives(surface0,uv0[0],uv0[1],1);
@@ -1859,55 +1863,75 @@ verb_core_ExpIntersect.march = function(surface0,surface1,prev,first,tol) {
 	newuv1 = verb_core_Vec.add(uv1,stepuv1);
 	var relaxed = verb_core_Intersect.surfacesAtPointWithEstimate(surface0,surface1,newuv0,newuv1,tol);
 	if(prev.stepCount > 5 && prev.olduv0 != null && verb_core_Trig.distToSegment(prev.point,first.point,relaxed.point) < 10 * tol) return new verb_core_MarchStep(step,prev.uv0,prev.uv1,first.uv0,first.uv1,prev.point,first.point,verb_core_MarchStepState.CompleteLoop,prev.stepCount + 1);
+	if(prev.stepCount > 5 && verb_core_ExpIntersect.isCoincidentWithStartPoint(relaxed.point,currentIndex,allStartPts,10 * tol)) state = verb_core_MarchStepState.CoincidentStartPoint;
 	return new verb_core_MarchStep(step,prev.uv0,prev.uv1,relaxed.uv0,relaxed.uv1,prev.point,relaxed.point,state,prev.stepCount + 1);
 };
-verb_core_ExpIntersect.completeMarch = function(surface0,surface1,start,tol) {
-	var step = verb_core_ExpIntersect.march(surface0,surface1,verb_core_MarchStep.init(start),start,tol);
-	if(step.state == verb_core_MarchStepState.AtBoundary) return null;
+verb_core_ExpIntersect.isCoincidentWithStartPoint = function(point,currentIndex,allStartPts,tol) {
+	if(currentIndex == 0) return false;
+	var _g = 0;
+	while(_g < currentIndex) {
+		var i = _g++;
+		var dist = verb_core_Vec.distSquared(allStartPts[i].point,allStartPts[currentIndex].point);
+		if(dist < tol) {
+			haxe_Log.trace("Coincident start point!",{ fileName : "ExpIntersect.hx", lineNumber : 253, className : "verb.core.ExpIntersect", methodName : "isCoincidentWithStartPoint"});
+			return true;
+		}
+	}
+	return false;
+};
+verb_core_ExpIntersect.completeMarch = function(surface0,surface1,startIndex,allStartPts,tol) {
+	var start = allStartPts[startIndex];
+	var step = verb_core_ExpIntersect.march(surface0,surface1,verb_core_MarchStep.init(start),startIndex,allStartPts,tol);
+	if(step.state == verb_core_MarchStepState.AtBoundary || step.state == verb_core_MarchStepState.CoincidentStartPoint) return null;
 	var $final = [];
 	$final.push(start);
-	while(step.state != verb_core_MarchStepState.AtBoundary && step.state != verb_core_MarchStepState.CompleteLoop) {
+	while(step.state != verb_core_MarchStepState.CoincidentStartPoint && step.state != verb_core_MarchStepState.AtBoundary && step.state != verb_core_MarchStepState.CompleteLoop) {
 		$final.push(new verb_core_types_SurfaceSurfaceIntersectionPoint(step.uv0,step.uv1,step.point,-1));
-		step = verb_core_ExpIntersect.march(surface0,surface1,step,start,tol);
+		if(step.state == verb_core_MarchStepState.CoincidentStartPoint) return null;
+		step = verb_core_ExpIntersect.march(surface0,surface1,step,startIndex,allStartPts,tol);
 	}
 	$final.push(new verb_core_types_SurfaceSurfaceIntersectionPoint(step.uv0,step.uv1,step.point,-1));
 	return $final;
 };
 verb_core_ExpIntersect.surfaces = function(surface0,surface1,tol) {
 	var $final = [];
-	var _g = 0;
-	var _g1 = verb_core_ExpIntersect.intersectBoundaryCurves(surface0,surface1,tol);
-	while(_g < _g1.length) {
-		var $int = _g1[_g];
-		++_g;
-		var res = verb_core_ExpIntersect.completeMarch(surface0,surface1,$int,tol);
-		if(res != null) $final.push(res);
-	}
+	var startPts = verb_core_ExpIntersect.intersectBoundaryCurves(surface0,surface1,tol);
 	var approxInner = verb_core_ExpIntersect.approxInnerCriticalPts(surface0,surface1);
 	var refinedInner = verb_core_ExpIntersect.refineInnerCriticalPts(surface0,surface1,approxInner,tol);
 	var b = true;
-	var _g2 = 0;
-	while(_g2 < refinedInner.length) {
-		var pair = refinedInner[_g2];
-		++_g2;
-		var res1 = verb_core_Intersect.curveAndSurface(verb_core_Make.surfaceIsocurve(surface0,pair.item0[0],false),surface1);
-		if(res1.length == 0) continue;
+	var _g = 0;
+	while(_g < refinedInner.length) {
+		var pair = refinedInner[_g];
+		++_g;
+		var res = verb_core_Intersect.curveAndSurface(verb_core_Make.surfaceIsocurve(surface0,pair.item0[0],false),surface1);
+		if(res.length == 0) continue;
 		if(!b) continue;
 		b = false;
-		var int1 = new verb_core_types_SurfaceSurfaceIntersectionPoint([pair.item0[0],res1[0].u],res1[0].uv,res1[0].curvePoint,-1);
-		var res2 = verb_core_ExpIntersect.completeMarch(surface0,surface1,int1,tol);
-		if(res2 != null) $final.push(res2);
+		var $int = new verb_core_types_SurfaceSurfaceIntersectionPoint([pair.item0[0],res[0].u],res[0].uv,res[0].curvePoint,-1);
+		startPts.push($int);
 	}
-	var _g3 = [];
+	var i = 0;
+	while(i < startPts.length) {
+		haxe_Log.trace("starting at",{ fileName : "ExpIntersect.hx", lineNumber : 326, className : "verb.core.ExpIntersect", methodName : "surfaces", customParams : [startPts[i].point]});
+		var res1 = verb_core_ExpIntersect.completeMarch(surface0,surface1,i,startPts,tol);
+		if(res1 != null) {
+			$final.push(res1);
+			startPts.splice(i,0,res1[res1.length - 1]);
+			haxe_Log.trace("inserting",{ fileName : "ExpIntersect.hx", lineNumber : 334, className : "verb.core.ExpIntersect", methodName : "surfaces", customParams : [res1[res1.length - 1].point]});
+			i += 2;
+		}
+		i++;
+	}
+	var _g1 = [];
 	var _g11 = 0;
 	while(_g11 < $final.length) {
 		var pts = $final[_g11];
 		++_g11;
-		_g3.push(verb_core_Make.rationalInterpCurve(pts.map(function(x) {
+		_g1.push(verb_core_Make.rationalInterpCurve(pts.map(function(x) {
 			return x.point;
 		})));
 	}
-	return _g3;
+	return _g1;
 };
 verb_core_ExpIntersect.refineInnerCriticalPts = function(surface0,surface1,approx,tol) {
 	return approx.map(function(x) {
@@ -3197,7 +3221,7 @@ verb_core_Make.conicalSurface = function(axis,xaxis,base,height,radius) {
 verb_core_Make.rationalInterpCurve = function(points,degree,homogeneousPoints,start_tangent,end_tangent) {
 	if(homogeneousPoints == null) homogeneousPoints = false;
 	if(degree == null) degree = 3;
-	if(points.length < degree + 1) throw new js__$Boot_HaxeError("You need to supply at least degree + 1 points!");
+	if(points.length < degree + 1) throw new js__$Boot_HaxeError("You need to supply at least degree + 1 points! You only supplied " + points.length + " points.");
 	var us = [0.0];
 	var _g1 = 1;
 	var _g = points.length;
