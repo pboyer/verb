@@ -51,7 +51,7 @@
     var d2 = srf2.asNurbs();
 
     var runs = 20;
-    var bm = benchmark( function(){ return verb.core.Intersect.surfaces( d1, d2, 1e-3 ) }, runs );
+    var bm = benchmark( function(){ return verb.core.ExpIntersect.surfaces( d1, d2, 1e-3 ) }, runs );
 
     console.log( bm );
     console.log( runs, " runs completed in ", bm.each, " ms each");
