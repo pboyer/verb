@@ -2426,22 +2426,50 @@ verb_core_Intersect.polylineAndMesh = function(polyline,mesh,tol) {
 	}
 	return finalResults;
 };
-verb_core_Intersect.boundingBoxTrees = function(a,b,tol) {
+verb_core_Intersect.boundingBoxTrees = function(ai,bi,tol) {
 	if(tol == null) tol = 1e-9;
-	if(a.empty() || b.empty()) return [];
-	if(!a.boundingBox().intersects(b.boundingBox(),tol)) return [];
-	var ai = a.indivisible(tol);
-	var bi = b.indivisible(tol);
-	if(ai && bi) return [new verb_core_types_Pair(a["yield"](),b["yield"]())]; else if(ai && !bi) {
-		var bs1 = b.split();
-		return verb_core_Intersect.boundingBoxTrees(a,bs1.item0,tol).concat(verb_core_Intersect.boundingBoxTrees(a,bs1.item1,tol));
-	} else if(!ai && bi) {
-		var as1 = a.split();
-		return verb_core_Intersect.boundingBoxTrees(as1.item0,b,tol).concat(verb_core_Intersect.boundingBoxTrees(as1.item1,b,tol));
+	var atrees = [];
+	var btrees = [];
+	atrees.push(ai);
+	btrees.push(bi);
+	var results = [];
+	while(atrees.length > 0) {
+		var a = atrees.pop();
+		var b = btrees.pop();
+		if(a.empty() || b.empty()) continue;
+		if(!a.boundingBox().intersects(b.boundingBox(),tol)) continue;
+		var ai1 = a.indivisible(tol);
+		var bi1 = b.indivisible(tol);
+		if(ai1 && bi1) {
+			results.push(new verb_core_types_Pair(a["yield"](),b["yield"]()));
+			continue;
+		} else if(ai1 && !bi1) {
+			var bs1 = b.split();
+			atrees.push(a);
+			btrees.push(bs1.item1);
+			atrees.push(a);
+			btrees.push(bs1.item0);
+			continue;
+		} else if(!ai1 && bi1) {
+			var as1 = a.split();
+			atrees.push(as1.item1);
+			btrees.push(b);
+			atrees.push(as1.item0);
+			btrees.push(b);
+			continue;
+		}
+		var $as = a.split();
+		var bs = b.split();
+		atrees.push($as.item1);
+		btrees.push(bs.item1);
+		atrees.push($as.item1);
+		btrees.push(bs.item0);
+		atrees.push($as.item0);
+		btrees.push(bs.item1);
+		atrees.push($as.item0);
+		btrees.push(bs.item0);
 	}
-	var $as = a.split();
-	var bs = b.split();
-	return verb_core_Intersect.boundingBoxTrees($as.item0,bs.item0,tol).concat(verb_core_Intersect.boundingBoxTrees($as.item0,bs.item1,tol)).concat(verb_core_Intersect.boundingBoxTrees($as.item1,bs.item0,tol)).concat(verb_core_Intersect.boundingBoxTrees($as.item1,bs.item1,tol));
+	return results;
 };
 verb_core_Intersect.curves = function(curve1,curve2,tolerance) {
 	var ints = verb_core_Intersect.boundingBoxTrees(new verb_core_types_LazyCurveBoundingBoxTree(curve1),new verb_core_types_LazyCurveBoundingBoxTree(curve2),0);

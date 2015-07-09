@@ -36,7 +36,7 @@
                     [ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] , [40, -20, -2], [50, -20, 0] 	],
                     [ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] , [40, -30, 0], [50, -30, 0]     ],
                     [ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , [40, -40, -20], [50, -40, 0]     ],
-                    [ [0, -50, 12], [10, -50, 0], 	[20, -50, 0], 	[30, -50, 0] , [50, -50, 0], [50, -50, 15]     ],     ];
+                    [ [0, -50, 0], [10, -50, 0], 	[20, -50, 0], 	[30, -50, 0] , [50, -50, 0], [50, -50,  -15]     ],     ];
     var srf1 =  new verb.geom.NurbsSurface.byKnotsControlPointsWeights( degree, degree, knots, knots, pts );
 
     var p5 = [50,-60,3]
@@ -50,8 +50,8 @@
     var d1 = srf1.asNurbs();
     var d2 = srf2.asNurbs();
 
-    var runs = 1;
-    var bm = benchmark( function(){ return verb.core.ExpIntersect.surfaces( d1, d2, 1e-3 ) }, runs );
+    var runs = 20;
+    var bm = benchmark( function(){ return verb.core.Intersect.surfaces( d1, d2, 1e-3 ) }, runs );
 
     console.log( bm );
     console.log( runs, " runs completed in ", bm.each, " ms each");

@@ -544,34 +544,71 @@ class Intersect {
     // **returns**
     // + an array of Pair objects extracted from the yield method of IBoundingBoxTree
 
-    public static function boundingBoxTrees<T1, T2>( a : IBoundingBoxTree<T1>, b : IBoundingBoxTree<T2>, tol : Float = 1e-9 )
+    public static function boundingBoxTrees<T1, T2>( ai : IBoundingBoxTree<T1>, bi : IBoundingBoxTree<T2>, tol : Float = 1e-9 )
         : Array<Pair<T1,T2>> {
 
-        if (a.empty() || b.empty()) return [];
+        var atrees = [];
+        var btrees = [];
+        
+        atrees.push(ai);
+        btrees.push(bi);
 
-        if ( !a.boundingBox().intersects( b.boundingBox(), tol ) ) return [];
+        var results = [];
 
-        var ai = a.indivisible(tol);
-        var bi = b.indivisible(tol);
+        while ( atrees.length > 0 ){
 
-        if (ai && bi) {
-            return [ new Pair(a.yield(), b.yield()) ];
-        } else if (ai && !bi) {
-            var bs = b.split();
-            return     Intersect.boundingBoxTrees( a, bs.item0, tol )
-                .concat( Intersect.boundingBoxTrees( a, bs.item1, tol  ) );
+            var a = atrees.pop();
+            var b = btrees.pop();
 
-        } else if (!ai && bi){
-            var as = a.split();
-            return     Intersect.boundingBoxTrees( as.item0, b, tol )
-                .concat( Intersect.boundingBoxTrees( as.item1, b, tol  ) );
+            if (a.empty() || b.empty()) continue;
+            if ( !a.boundingBox().intersects( b.boundingBox(), tol ) ) continue;
+
+            var ai = a.indivisible(tol);
+            var bi = b.indivisible(tol);
+
+            if (ai && bi) {
+                results.push( new Pair(a.yield(), b.yield()) );
+                continue;
+            } else if (ai && !bi) {
+                var bs = b.split();
+                
+                atrees.push( a );
+                btrees.push( bs.item1 );
+                              
+                atrees.push( a );
+                btrees.push( bs.item0 );
+               
+                continue;
+            } else if (!ai && bi){
+                var as = a.split();
+                
+                atrees.push( as.item1 );
+                btrees.push( b );
+                 
+                atrees.push( as.item0 );
+                btrees.push( b );
+               
+                continue;
+            }
+
+            var as = a.split(), bs = b.split();
+            
+            atrees.push( as.item1 );
+            btrees.push( bs.item1 );
+  
+            atrees.push( as.item1 );
+            btrees.push( bs.item0 );
+           
+            atrees.push( as.item0 );
+            btrees.push( bs.item1 );
+ 
+            atrees.push( as.item0 );
+            btrees.push( bs.item0 );
+
+
         }
 
-        var as = a.split(), bs = b.split();
-        return     Intersect.boundingBoxTrees( as.item0, bs.item0, tol )
-            .concat( Intersect.boundingBoxTrees( as.item0, bs.item1, tol  ) )
-            .concat( Intersect.boundingBoxTrees( as.item1, bs.item0, tol  ) )
-            .concat( Intersect.boundingBoxTrees( as.item1, bs.item1, tol  ) );
+        return results;
     }
 
     // Approximate the intersection of two NURBS curves
