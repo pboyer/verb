@@ -13,7 +13,7 @@ class Eval {
 	// Compute a point in a non-uniform, non-rational B spline volume
 	//
 	// **params**
-	// + VolumeData
+    // + VolumeData
 	// + u parameter at which to evaluate the volume point
 	// + v parameter at which to evaluate the volume point
 	// + w parameter at which to evaluate the volume point

@@ -1,0 +1,1 @@
+require("blanket")({ /* optional options */ }),  require("./test");

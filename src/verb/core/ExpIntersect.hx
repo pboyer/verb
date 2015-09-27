@@ -16,7 +16,7 @@ import verb.core.types.NurbsSurfaceData;
 import verb.core.types.NurbsCurveData;
 
 
-enum MarchStepState { OutOfBounds; InsideDomain; AtBoundary; CompleteLoop; }
+enum MarchStepState { OutOfBounds; InsideDomain; AtBoundary; CompleteLoop; CoincidentStartPoint; }
 
 class MarchStep {
 
@@ -126,8 +126,11 @@ class ExpIntersect {
     public static function march(   surface0 : NurbsSurfaceData,
                                     surface1 : NurbsSurfaceData,
                                     prev : MarchStep,
-                                    first : SurfaceSurfaceIntersectionPoint,
+                                    currentIndex : Int,
+                                    allStartPts : Array<SurfaceSurfaceIntersectionPoint>,
                                     tol : Float ) {
+    
+        var first = allStartPts[currentIndex];
 
         var uv0 = prev.uv0;
         var uv1 = prev.uv1;
@@ -226,34 +229,68 @@ class ExpIntersect {
             return new MarchStep( step, prev.uv0, prev.uv1, first.uv0, first.uv1, prev.point, first.point, MarchStepState.CompleteLoop, prev.stepCount+1 );
         }
 
+        if ( prev.stepCount > 5 && isCoincidentWithStartPoint( relaxed.point, currentIndex, allStartPts, 10 * tol )){
+            state = MarchStepState.CoincidentStartPoint;
+        }
+
         return new MarchStep( step, prev.uv0, prev.uv1, relaxed.uv0, relaxed.uv1, prev.point, relaxed.point, state, prev.stepCount+1 );
     }
 
     private static var INIT_STEP_LENGTH = 1e-3;
     private static var LINEAR_STEP_LENGTH = 0.1;
 
+    public static function isCoincidentWithStartPoint(  point : Point,
+                                                        currentIndex : Int, 
+                                                        allStartPts : Array<SurfaceSurfaceIntersectionPoint>, 
+                                                        tol : Float ) : Bool {
+        // if were marching along the first point, then we couldn't possibly be
+        if (currentIndex == 0) return false;
+
+        for (i in 0...currentIndex){
+            
+            var dist = Vec.distSquared( allStartPts[i].point, allStartPts[currentIndex].point );  
+            if ( dist < tol ){
+                trace("Coincident start point!");
+                return true;
+            }
+        }
+
+        // are we coincident with a point from which we've already started?
+        return false;
+    }
+
     public static function completeMarch(surface0 : NurbsSurfaceData,
                                          surface1 : NurbsSurfaceData,
-                                         start : SurfaceSurfaceIntersectionPoint,
+                                         startIndex : Int,
+                                         allStartPts : Array<SurfaceSurfaceIntersectionPoint>,
                                          tol : Float ) : Array<SurfaceSurfaceIntersectionPoint> {
 
+        var start = allStartPts[startIndex];
+
         // take first step along curve
-        var step = march( surface0, surface1, MarchStep.init( start ), start, tol );
+        var step = march( surface0, surface1, MarchStep.init( start ), startIndex, allStartPts, tol );
 
         // if we're out of bounds, exit
-        if (step.state == MarchStepState.AtBoundary){
+        if (step.state == MarchStepState.AtBoundary || step.state == MarchStepState.CoincidentStartPoint ){
             return null;
         }
 
-        // march until you hit a boundary
+        // march until you hit a boundary or a start point we already traversed
         var final = [];
         final.push( start );
 
-        while ( step.state != MarchStepState.AtBoundary && step.state != MarchStepState.CompleteLoop ) {
+        while ( step.state != MarchStepState.CoincidentStartPoint && 
+                step.state != MarchStepState.AtBoundary && 
+                step.state != MarchStepState.CompleteLoop ) {
             final.push( new SurfaceSurfaceIntersectionPoint( step.uv0, step.uv1, step.point, -1 ) );
-            step = march( surface0, surface1, step, start, tol );
-        }
 
+            if ( step.state == MarchStepState.CoincidentStartPoint ){
+                return null;
+            }
+
+            step = march( surface0, surface1, step, startIndex, allStartPts, tol );
+        }
+    
         final.push( new SurfaceSurfaceIntersectionPoint( step.uv0, step.uv1, step.point, -1 ) );
 
         return final;
@@ -261,13 +298,9 @@ class ExpIntersect {
 
     public static function surfaces(surface0 : NurbsSurfaceData, surface1 : NurbsSurfaceData, tol : Float) {
 
-
         var final = [];
 
-        for (int in intersectBoundaryCurves( surface0, surface1, tol )){
-            var res = completeMarch( surface0, surface1, int, tol );
-            if (res != null) final.push( res );
-        }
+	    var startPts = intersectBoundaryCurves( surface0, surface1, tol );
 
         var approxInner = approxInnerCriticalPts( surface0, surface1 );
         var refinedInner = refineInnerCriticalPts( surface0, surface1, approxInner, tol );
@@ -281,13 +314,29 @@ class ExpIntersect {
             if (res.length == 0 ) continue;
 
             if (!b) continue;
-
             b = false;
 
             var int = new SurfaceSurfaceIntersectionPoint( [ pair.item0[0], res[0].u ], res[0].uv, res[0].curvePoint, -1 );
+            
+            startPts.push( int );
+        }
 
-            var res = completeMarch( surface0, surface1, int, tol );
-            if (res != null) final.push( res );
+        var i = 0; 
+        while (i < startPts.length){
+            trace( "starting at", startPts[i].point ); 
+            var res = completeMarch( surface0, surface1, i, startPts, tol );
+            
+            if (res != null){
+                final.push( res );
+                
+                startPts.insert( i, res.last() );
+               
+                trace("inserting", res.last().point );
+
+                i += 2;
+            
+            }
+            i++;
         }
 
         return [ for (pts in final) Make.rationalInterpCurve( pts.map(function(x){ return x.point; }) )];

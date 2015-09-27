@@ -1,4 +1,4 @@
-package verb.geom;
+:package verb.geom;
 
 import verb.core.Mat.Vector;
 import verb.core.types.NurbsCurveData.Point;

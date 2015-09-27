@@ -261,15 +261,20 @@ class Split {
 
     // join a new null edge into the expanding slice polygon
     public static function join( e0 : HalfEdge, e1 : HalfEdge ) {
-        var of = e0.l.f;
+        // get the face of e0
+	var of = e0.l.f;
         var nf : Face = null;
-        var s = e0.l.f.s;
+        
+	// get the solid of e0
+	var s = e0.l.f.s;
 
+	// if e0 and e1 have the same loop, do lmef
         if (e0.l == e1.l){
             if (e0.prv.prv != e1){
                 nf = s.lmef( e0, e1.nxt );
             }
         }
+	// otherwise, make edge kill ring
         else {
             s.lmekr( e0, e1.nxt );
         }

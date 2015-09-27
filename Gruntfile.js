@@ -42,7 +42,7 @@ module.exports = function(grunt) {
           reporter: 'spec',
           quiet: false // Optionally suppress output to standard out (defaults to false)
         },
-        src: ['test/test.js']
+        src: ['test/testCore.js', 'test/testGeom.js', 'test/testTopo.js']
       }
     },
 
@@ -79,7 +79,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-benchmark');
 
   var build_steps = [ 'haxe', 'concat', 'replace', 'uglify' ]; // 'docco'];
-  grunt.registerTask('default', build_steps );
+  grunt.registerTask('default', ['haxe', 'concat', 'replace'] );
 
   grunt.registerTask('build', build_steps);
   grunt.registerTask('test', ['haxe', 'concat', 'replace', 'mochaTest']);
