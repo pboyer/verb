@@ -1,6 +1,7 @@
 coverage.html
 .DS_Store
 out/
+.idea/
 build/cs/
 lib-cov
 *.seed
