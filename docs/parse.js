@@ -1,17 +1,22 @@
 var fs = require('fs')
     , path = require('path');
 
-parse( path.join( __dirname, "../src/verb/geom/NurbsCurve.hx") );  
+parse( path.join( __dirname, "../src/verb/geom/ISurface.hx") );  
 
 function parse(srcfn){
 
     var input = fs.readFileSync( srcfn, "utf8" ); 
-
+    
     var tokenStream = new TokenStream( input );
     var parser = new Parser( tokenStream );
 
     return parser.parse();
 }
+
+//
+// An incomplete parser for Haxe that to aid in 
+// constructing documentation
+//
 
 function Parser( tokenStream ){
    
@@ -20,7 +25,6 @@ function Parser( tokenStream ){
     var currentToken, lastComment, types = [];
    
     function tokenMatchesAny( possibleTypes ){
-        
         for(var i = 0; i < possibleTypes.length; i++) {
             if ( possibleTypes[i] === currentToken.type){ 
                 return true;
@@ -37,13 +41,15 @@ function Parser( tokenStream ){
 
         if ( expectedType && !tokenMatchesAny( Array.prototype.slice.call(arguments) )){
             console.log(tokenStream.neighborhood());
-            throw new Error("Syntax Error - expectedType \"" + expectedType + "\", but got \"" + currentToken.type + "\"");
+            throw new Error(
+                "Syntax Error - expectedType \"" + Array.prototype.join.call( arguments, ", ") + "\", but got \"" + currentToken.type + "\"" + "\n\n" +
+                tokenStream.neighborhood() + "\n" +
+                "          ^          "
+            );
         } 
 
         return currentToken;
     }
-
-
 
     function peak(){
         return tokenStream.peak();
@@ -92,11 +98,11 @@ function Parser( tokenStream ){
         var typeName = consume().contents;
     
         // build the class type
-        var classDef = new Class( typeName, visibility ); 
+        var def = new Class( typeName, visibility ); 
     
         // set the description
         if (lastComment){
-            classDef.description = lastComment 
+            def.description = lastComment 
         
             // don't reuse the lastComment
             lastComment = undefined;
@@ -107,7 +113,7 @@ function Parser( tokenStream ){
         // parent class
         if ( peaked.type === "extends" ){
 
-            classDef.parentClass = parseExtends();
+            def.parentClass = parseExtends();
             
             // look further ahead
             peaked = peak();
@@ -115,14 +121,14 @@ function Parser( tokenStream ){
         
         // parse interfaces
         if ( peaked.type === "implements" ){
-            classDef.interfaces = parseImplements();                       
+            def.interfaces = parseImplements();                       
         }
         
-        parseClassBody( classDef );
+        parseClassBody( def );
 
-        // console.log(classDef);
+        console.log(def);
 
-        return classDef; 
+        return def; 
     }
 
     function consumeBlock(){
@@ -198,7 +204,7 @@ function Parser( tokenStream ){
         var defaultVal;
         if (peaked.type === "="){    
             consume("=");
-            defaultVal = consume("number", "string", "null").contents; 
+            defaultVal = consume("number", "string", "boolean", "null").contents; 
         }
     
         return new MethodArgument(name, type, defaultVal);
@@ -229,7 +235,7 @@ function Parser( tokenStream ){
 
         var lc = lastComment;
         lastComment = undefined;
-        return lc;
+        return lc ? lc.contents : lc;
 
     }
 
@@ -261,14 +267,14 @@ function Parser( tokenStream ){
         return new Method( name, args, type, getLastComment() );
     }
 
-    function parseClassMember( classDef, visibility ){
+    function parseClassMember( def, visibility ){
 
         // parse "public" or "private"
         var visibility = visibility ? visibility : consume("visibility").contents;     
 
         // hack to ignore private members
         if ( visibility === "private"){
-            classDef = new Class();
+            def = new Class();
         }
 
         var peaked = peak();
@@ -282,15 +288,15 @@ function Parser( tokenStream ){
         }
 
         if ( peaked.type === "var" ){
-            return classDef.properties.push( parseProperty( isStatic ));
+            return def.properties.push( parseProperty( isStatic ));
         } else if (peaked.type === "function"){
-            return classDef.properties.push( parseMethod( isStatic )); 
+            return def.methods.push( parseMethod( isStatic )); 
         }
 
-        throw new Error("Unknown member type encountered" + JSON.stringify( peaked ));
+        throw new Error("Unknown class member encountered" + JSON.stringify( peaked ));
     }
 
-    function parseClassBody( classDef ){
+    function parseClassBody( def ){
 
         consume("{");
 
@@ -301,16 +307,16 @@ function Parser( tokenStream ){
                 parseComment();
                 continue;
             } else if (peaked.type === "visibility"){
-                parseClassMember( classDef );
+                parseClassMember( def );
                 continue;
             } else if (peaked.type === "function"){
-                parseClassMember( classDef, "private" );
+                parseClassMember( def, "private" );
                 continue;
             } else if (peaked.type === "var"){
-                parseClassMember( classDef, "private" );
+                parseClassMember( def, "private" );
                 continue;
             } else if (peaked.type === "static"){
-                parseClassMember( classDef, "private" );
+                parseClassMember( def, "private" );
                 continue; 
             }
 
@@ -320,13 +326,108 @@ function Parser( tokenStream ){
         consume("}");
     }
 
+    function parseMethodDefinition(){
+    
+        // function MethodName( methodArgument, methodArgument ) : ExpectedType; 
+        consume("function");
+
+        var name = consume("id", "new").contents;
+        
+        var args = parseMethodArguments();
+
+        peaked = peak();
+   
+        var type;
+        if (peaked.type === ":"){
+           type = parseTypeAnnotation(); 
+        }
+    
+        consumeUntilInclusive(";");
+
+        return new Method( name, args, type, getLastComment() );
+    }
+
+    function parseInterfaceMember( def, visibility ){
+
+        // parse "public" or "private"
+        var visibility = visibility ? visibility : consume("visibility").contents;     
+
+        // hack to ignore private members
+        if ( visibility === "private"){
+            def = new Interface();
+        }
+
+        var peaked = peak();
+    
+        if ( peaked.type === "var" ){
+            return def.properties.push( parseProperty());
+        } else if (peaked.type === "function"){
+            return def.methods.push( parseMethodDefinition()); 
+        }
+
+        throw new Error("Unknown interface member type encountered" + JSON.stringify( peaked ));
+    }
+    
+    function parseInterfaceBody( def ){
+
+        consume("{");
+
+        var peaked; 
+
+        while ( (peaked = peak()) && peaked.type != "}"){
+            if (peaked.type === "comment"){    
+                parseComment();
+                continue;
+            } else if (peaked.type === "visibility"){
+                parseInterfaceMember( def );
+                continue;
+            } else if (peaked.type === "function"){
+                parseInterfaceMember( def, "public" );
+                continue;
+            }  
+
+            consume();
+        }
+
+        consume("}");
+    }
+
+    function parseInterface( visibility ){
+      
+        // get visibility from current token or default
+        visibility = visibility || "public";
+        
+        consume("interface");  
+       
+        // get the type name for the class
+        var typeName = consume().contents;
+    
+        // build the class type
+        var def = new Interface( typeName, visibility ); 
+    
+        // set the description
+        def.description = getLastComment();
+        
+        if ( peak().type === "implements" ){
+            def.interfaces = parseImplements();                       
+        }
+        
+        parseInterfaceBody( def );
+
+        console.log( def );
+
+        return def; 
+    }
+
     function parseTypeDefinition(){ 
         var visibility = consume("visibility").contents;
 
         var peaked = peak();
         
         if (peaked.contents === "class"){
-           return parseClass(); 
+            return parseClass(); 
+        } else if (peaked.contents === "interface"){
+            return parseInterface(); 
         }
 
         throw new Error("Not implemented" + JSON.stringify( peaked ));    
@@ -337,7 +438,7 @@ function Parser( tokenStream ){
 
         while ( peak().type === "comment" ){
             currentToken = consume();
-
+            
             squashed.contents += "\n";
             squashed.contents += currentToken.contents; 
         }
@@ -352,6 +453,8 @@ function Parser( tokenStream ){
         while ( (peaked = peak()) ){
             if (peaked.type === "class"){
                 types.push( parseClass() ); 
+            } else if (peaked.type === "interface"){
+                types.push( parseInterface() ); 
             } else if ( peaked.type === "visibility" ){
                 types.push( parseTypeDefinition() ); 
             } else if (peaked.type === "comment"){
@@ -381,50 +484,41 @@ function TokenStream( input ){
     var isSeparator = (c) => c === ";" || c === "(" || c === ")" || c === "{" || c === "}" || c === "," || c === ":" || c === "="; 
     var isLineEnd = (c) => c === '\n';
     var isAlpha = (c) => (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z');
-    var make = (type, contents) => ({ type : type, contents : contents || type, line: line, col: col });
+    var make = (type, contents) => ({ type : type, contents : contents, line: line, col: col });
     var categorizeId = (s) => {
 
         if (s === "class"){
-            return make(s);
+            return make(s,s);
+        } else if (s === "interface") {
+            return make(s,s);
+        } else if (s === "true"){
+            return make("boolean", s);
+        } else if (s === "true"){
+            return make("boolean", s);
         } else if (s === "private"){
             return make("visibility", s);
         } else if (s === "public"){
             return make("visibility", s);
         } else if (s === "extends"){
-            return make(s);
+            return make(s,s);
         } else if (s === "implements"){
-            return make(s);
+            return make(s,s);
         } else if (s === "typedef"){
-            return make(s);
+            return make(s,s);
         } else if (s === "function"){
-            return make(s);
+            return make(s,s);
         } else if (s === "static"){
-            return make(s);
+            return make(s,s);
         } else if (s === "new"){
-            return make(s);
+            return make(s,s);
         } else if (s === "null"){
-            return make(s);
+            return make(s,s);
         } else if (s === "var"){
-            return make(s);
+            return make(s,s);
         }
 
         return make("id", s); 
-
-    }
-
-    // functions
-    this.empty = () => i >= input.length;
-    this.peak = () => {
-        peaking = true;
-        var m = i;
-        var t = this.consume();
-        i = m;
-        peaking = false;
-        return t;
     };
-    this.neighborhood = () => {
-        return input.slice(i-10, i+10);
-    }
 
     var inc = () => {
         if (!peaking){
@@ -439,6 +533,19 @@ function TokenStream( input ){
         return i;
     };
 
+    // functions
+    this.empty = () => i >= input.length;
+    this.peak = () => {
+        peaking = true;
+        var m = i;
+        var t = this.consume();
+        i = m;
+        peaking = false;
+        return t;
+    };
+    this.neighborhood = () => {
+        return input.slice(i-10, i+10);
+    }
     this.consume = () => {
        
         var c = input.charAt(i);
@@ -480,20 +587,16 @@ function TokenStream( input ){
             } else if (isComment(c) && isComment(input.charAt(i+1))) {
 
                 // trim comments
-                inc(); inc();
+                while (isComment(input.charAt(i))){ inc() } 
+                
                 c = input.charAt(i);
-            
-                // trim starting whitespace
-                while ( c && isWhitespace(c) ){
-                    c = input.charAt(inc());
-                }
 
                 // consume comments
                 while ( c && !isLineEnd(c) ){
                     s += c;
                     c = input.charAt(inc());
                 }
-
+                
                 return make("comment", s);    
 
             }
@@ -507,7 +610,7 @@ function TokenStream( input ){
 
 function Method(name, args, returnType, description){
     this.name = name;
-    this.description = "";
+    this.description = description || "";
     this.args = args || [];
     this.returnType = returnType;
 }
@@ -547,5 +650,4 @@ function Class(name, visibility){
     this.interfaces = [];
     this.properties = [];
 }
-
 
