@@ -2,9 +2,17 @@ package verb.core;
 
 class ArrayExtensions {
 
-    public static function alloc<T>( a : Array<T>, l : Int ){
-        if (l < 0) return;
-        while (a.length < l) {
+    // Fill an array with n copies of null
+    //
+    // **params**
+    // + the array to fill
+    // + the number of null's to add to the array
+    //
+    // **returns**
+
+    public static function alloc<T>( a : Array<T>, n : Int ){
+        if (n < 0) return;
+        while (a.length < n) {
             a.push(null);
         }
     }
@@ -23,7 +31,6 @@ class ArrayExtensions {
         return ac;
     }
 
-    //
     // Get the last element of an array
     //
     // **params**
@@ -31,12 +38,11 @@ class ArrayExtensions {
     //
     // **returns**
     // + the last element of the array
-    //
-    public static inline function last<T>(a : Array<T>) : T {
+    
+    public static function last<T>(a : Array<T>) : T {
         return a[a.length-1];
     }
 
-    //
     // Get the first element of an array
     //
     // **params**
@@ -44,8 +50,8 @@ class ArrayExtensions {
     //
     // **returns**
     // + the last element of the array
-    //
-    public static inline function first<T>(a : Array<T>) : T {
+    
+    public static function first<T>(a : Array<T>) : T {
         return a[0];
     }
 
@@ -54,7 +60,6 @@ class ArrayExtensions {
         a.insert(start, ele);
     }
 
-    //
     // Get the first half of an array including the pivot
     //
     // **params**
@@ -62,7 +67,6 @@ class ArrayExtensions {
     //
     // **returns**
     // + the left half
-    //
 
     public static function left<T>(arr : Array<T>) : Array<T>{
         if (arr.length == 0) return [];
@@ -70,7 +74,6 @@ class ArrayExtensions {
         return arr.slice( 0, len );
     }
 
-    //
     // Get the second half of an array, not including the pivot
     //
     // **params**
@@ -78,7 +81,6 @@ class ArrayExtensions {
     //
     // **returns**
     // + the right half
-    //
 
     public static function right<T>(arr : Array<T>) : Array<T>{
         if (arr.length == 0) return [];
@@ -86,7 +88,6 @@ class ArrayExtensions {
         return arr.slice( len );
     }
 
-    //
     // Get the second half of an array including the pivot
     //
     // **params**
@@ -94,7 +95,6 @@ class ArrayExtensions {
     //
     // **returns**
     // + the right half
-    //
 
     public static function rightWithPivot<T>(arr : Array<T>) : Array<T>{
         if (arr.length == 0) return [];
@@ -102,7 +102,6 @@ class ArrayExtensions {
         return arr.slice( len-1 );
     }
 
-    //
     // Obtain the unique set of elements in an array
     //
     // **params**
@@ -112,7 +111,6 @@ class ArrayExtensions {
     //
     // **returns**
     // + array of unique elements
-    //
 
     public static function unique<T>( arr : Array<T>, comp : T -> T -> Bool ){
 
@@ -139,7 +137,5 @@ class ArrayExtensions {
 
         return uniques;
     }
-
-
 
 }

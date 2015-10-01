@@ -36,7 +36,6 @@ class NurbsCurve extends AsyncObject implements ICurve {
     public function weights() : Array<Float> { return Eval.weight1d(_data.controlPoints); }
 
     // Construct a NurbsCurve by a NurbsCurveData object
-    //
     // **params**
     // + The data object
     //
