@@ -4,6 +4,8 @@
 
 
 
+[Go to source](https://github.com/pboyer/verb/blob/master/src/verb/exe/ThreadPool.hx/)
+
 
 
 
@@ -11,6 +13,8 @@
 **`Class`**
 
 [object Object]
+
+[Go to source](https://github.com/pboyer/verb/blob/master/src/verb/exe/ThreadPool.hx/)
 
 
 

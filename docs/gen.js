@@ -10,6 +10,7 @@ var glob = require('glob')
 // CONSTANTS
 //
 
+var REPO_URL = "https://github.com/pboyer/verb/";
 var TARGET_DIR = __dirname + "/docs"; 
 var SRC = path.resolve(__dirname, "..", "src/verb");
 var HX_GLOB = SRC + "/*/*.hx";
@@ -67,11 +68,14 @@ function compile(srcfn, outputfn){
 
     var parsed = parseHaxe(srcfn); 
     var stream = fs.createWriteStream(outputfn);
-    console.log(parsed);
 
-    writeln(stream,TEMPLATE({ types: parsed })); 
+    // build the url of the file on github
+    var index0 = srcfn.indexOf("src/verb"); 
+    var fn = srcfn.slice( index0 );
+    var loc = REPO_URL + "blob/master/" + fn + "/";  // verb/Verb.hx/
+    
+    writeln(stream,TEMPLATE({ types: parsed, sourceFile: loc })); 
     stream.end();
-
 }
 
 function writeln(stream, text){

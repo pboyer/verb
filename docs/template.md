@@ -4,6 +4,8 @@
 
 <%= x.description %>
 
+[Go to source](<%= sourceFile %>)
+
 <% if (x.$type === "Class" || x.$type === "Interface") { %>
 
 <% if (x.parentClass) { %>
@@ -18,7 +20,7 @@
 ## `<%= y.name %>`
 *PROPERTY*
 
-**`<%= y.name %> <% if (y.type) { %>: <%=_.escape( y.type ) %><% } %><% if (y.type) { %> = <%=y.type %><% } %>`**
+**`<%= y.name %> <% if (y.type) { %>: <%=_.escape( y.type ) %><% } %><% if (y.defaultValue) { %> = <%=y.defaultValue %><% } %>`**
 
 <%= y.description %>
     <% }) %>

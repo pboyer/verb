@@ -4,6 +4,8 @@
 
 
 
+[Go to source](https://github.com/pboyer/verb/blob/master/src/verb/exe/WorkerPool.hx/)
+
 
 
 
@@ -14,28 +16,28 @@
 ## `className`
 *PROPERTY*
 
-**`className : String = String`**
+**`className : String`**
 
 
     
 ## `methodName`
 *PROPERTY*
 
-**`methodName : String = String`**
+**`methodName : String`**
 
 
     
 ## `args`
 *PROPERTY*
 
-**`args : Array&lt;Dynamic&gt; = Array<Dynamic>`**
+**`args : Array&lt;Dynamic&gt;`**
 
 
     
 ## `id`
 *PROPERTY*
 
-**`id : Int = Int`**
+**`id : Int`**
 
 
     
@@ -56,6 +58,8 @@
 **`Class`**
 
 
+
+[Go to source](https://github.com/pboyer/verb/blob/master/src/verb/exe/WorkerPool.hx/)
 
 
 

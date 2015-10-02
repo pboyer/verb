@@ -7,13 +7,11 @@ import verb.core.types.NurbsCurveData.Point;
 @:expose("geom.ConicalSurface")
 class ConicalSurface extends NurbsSurface {
 
-    public var _axis : Vector;
-    public var _xaxis : Vector;
-    public var _base : Point;
-    public var _height : Float;
-    public var _radius : Float;
-
-    // public properties
+    private var _axis : Vector;
+    private var _xaxis : Vector;
+    private var _base : Point;
+    private var _height : Float;
+    private var _radius : Float;
 
     public function axis(){ return _axis; }
     public function xaxis(){ return _xaxis; }

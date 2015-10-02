@@ -463,7 +463,7 @@ function Parser( tokenStream ){
         
         parseInterfaceBody( def );
 
-        console.log( def );
+        if (debug) console.log( def );
 
         return def; 
     }

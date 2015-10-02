@@ -7,11 +7,11 @@ import verb.core.Mat;
 @:expose("geom.CylindricalSurface")
 class CylindricalSurface extends NurbsSurface {
 
-    public var _axis : Vector;
-    public var _xaxis : Vector;
-    public var _base : Point;
-    public var _height : Float;
-    public var _radius : Float;
+    private var _axis : Vector;
+    private var _xaxis : Vector;
+    private var _base : Point;
+    private var _height : Float;
+    private var _radius : Float;
 
     // public properties
 

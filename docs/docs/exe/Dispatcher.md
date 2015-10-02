@@ -4,6 +4,8 @@
 
 
 
+[Go to source](https://github.com/pboyer/verb/blob/master/src/verb/exe/Dispatcher.hx/)
+
 
 
 
@@ -14,7 +16,7 @@
 ## `THREADS`
 *PROPERTY*
 
-**`THREADS : Int = Int`**
+**`THREADS : Int`**
 
 
     
