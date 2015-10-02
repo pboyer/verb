@@ -20,9 +20,9 @@
 ## `<%= y.name %>`
 *PROPERTY*
 
-**`<%= y.name %> <% if (y.type) { %>: <%=_.escape( y.type ) %><% } %><% if (y.defaultValue) { %> = <%=y.defaultValue %><% } %>`**
+**`<%= y.name %> <% if (y.type) { %>: y.type %><% } %><% if (y.defaultValue) { %> = <%=y.defaultValue %><% } %>`**
 
-<%= y.description %>
+<%= (y.description || "").replace(/\n\+/g,"\n*") %>
     <% }) %>
 
     <% _.each(x.methods, function(y) { %>

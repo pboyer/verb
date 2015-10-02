@@ -16,28 +16,28 @@
 ## `className`
 *PROPERTY*
 
-**`className : String`**
+**`className : y.type %>`**
 
 
     
 ## `methodName`
 *PROPERTY*
 
-**`methodName : String`**
+**`methodName : y.type %>`**
 
 
     
 ## `args`
 *PROPERTY*
 
-**`args : Array&lt;Dynamic&gt;`**
+**`args : y.type %>`**
 
 
     
 ## `id`
 *PROPERTY*
 
-**`id : Int`**
+**`id : y.type %>`**
 
 
     

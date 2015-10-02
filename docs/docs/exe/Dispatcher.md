@@ -16,7 +16,7 @@
 ## `THREADS`
 *PROPERTY*
 
-**`THREADS : Int`**
+**`THREADS : y.type %>`**
 
 
     
