@@ -1,10 +1,27 @@
-### Foo
 
-Some text
+# `AsyncObject` 
+**`Class`**
 
-### Bar
 
-Some more text
-* ok
-* please
+
+
+
+
+
+
+
+    
+
+    
+## `defer<T>`
+*METHOD*
+
+**`defer<T>(classType : Class<Dynamic>, methodName : String, args : Array<Dynamic>) : Promise<T>`**
+
+
+    
+   
+
+
+
 

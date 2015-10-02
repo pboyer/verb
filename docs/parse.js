@@ -15,6 +15,7 @@ exports.parse = parse;
 
 function parse(srcfn){
 
+    console.log("Parsing ", srcfn);
     var input = fs.readFileSync( srcfn, "utf8" ); 
     
     var tokenStream = new TokenStream( input );
@@ -24,7 +25,7 @@ function parse(srcfn){
 }
 
 //
-// An incomplete parser for Haxe that to aid in 
+// An incomplete parser for Haxe powerful enough to aid in 
 // constructing documentation
 //
 
@@ -35,7 +36,6 @@ function Parser( tokenStream ){
     var currentToken, lastComment, types = [];
    
     function isAnyOf( type, possibleTypes ){
-
         for(var i = 0; i < possibleTypes.length; i++) {
             if ( possibleTypes[i] === type ){ 
                 return true;
@@ -550,6 +550,8 @@ function Parser( tokenStream ){
        
         var peaked;
 
+        var types = [];
+    
         while ( (peaked = peak()) ){
             if (peaked.type === "class"){
                 types.push( parseClass() ); 
@@ -790,6 +792,7 @@ function Property(name, type, description){
     this.type = type;
     this.description = description;
     this.isStatic = false;
+    this.value = undefined;
 }
 
 function Typedef(name, alias){

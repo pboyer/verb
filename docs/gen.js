@@ -3,8 +3,9 @@ var glob = require('glob')
     , fs = require('fs')
     , path = require('path')
     , rimraf = require('rimraf')
-    , _ = require('underscore');
-
+    , _ = require('underscore')
+    , parseHaxe = require('./parse').parse;
+    
 //
 // CONSTANTS
 //
@@ -64,21 +65,12 @@ function gen(srcfn, outputfn) {
 
 function compile(srcfn, outputfn){
 
-    var parsed = parse(srcfn);
-    
+    var parsed = parseHaxe(srcfn); 
     var stream = fs.createWriteStream(outputfn);
-    
-    writeln(stream,TEMPLATE(parsed)); 
+    console.log(parsed);
+
+    writeln(stream,TEMPLATE({ types: parsed })); 
     stream.end();
-
-}
-
-function parse(srcfn){
-
-    // go until you see a class
-    //
-
-    // proceed until you hit 
 
 }
 

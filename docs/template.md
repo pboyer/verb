@@ -1,9 +1,37 @@
-### Foo
+<% _.each(types, function(x) { %>
+# `<%= x.name %>` 
+**`<%= x.$type %>`**
 
-Some text
+<%= x.description %>
 
-### Bar
+<% if (x.$type === "Class" || x.$type === "Interface") { %>
 
-Some more text
-* ok
-* please
+<% if (x.parentClass) { %>
+*Extends:* [`<%= x.parentClass %>`]( <%= x.parentClass %>)
+<% } %>
+
+<% if (x.interfaces && x.interfaces.length) { %>
+*Implements:* <%= _.map(x.interfaces, function(x){ return "[`" + x + "`](" + x + ")"}).join(", ") %>
+<% } %>
+
+    <% _.each(x.properties, function(y) { %>
+## `<%= y.name %>`
+*PROPERTY*
+
+**`<%= y.name %> <% if (y.type) { %>: <%=_.escape( y.type ) %><% } %><% if (y.type) { %> = <%=y.type %><% } %>`**
+
+<%= y.description %>
+    <% }) %>
+
+    <% _.each(x.methods, function(y) { %>
+## `<%= y.name === "new" ? "constructor" : y.name %>`
+*METHOD*
+
+**`<%= y.name %>(<%= _.map(y.args,function(x){ return x.name + " : " + x.type }).join(", ") %>) <% if (y.returnType) { %>: <%= y.returnType %><% } %>`**
+
+<%= y.description %>
+    <% }) %>
+   
+<% } %>
+
+<% }) %>
