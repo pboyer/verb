@@ -8,20 +8,6 @@ import verb.core.types.NurbsCurveData.Point;
 @:expose("geom.EllipseArc")
 class EllipseArc extends NurbsCurve {
 
-    private var _center : Point;
-    private var _xaxis : Vector;
-    private var _yaxis : Vector;
-    private var _minAngle : Float;
-    private var _maxAngle : Float;
-
-    //public properties
-
-    public function center(){ return _center; }
-    public function xaxis(){ return _xaxis; }
-    public function yaxis(){ return _yaxis; }
-    public function minAngle(){ return _minAngle; }
-    public function maxAngle(){ return _maxAngle; }
-
     //Create an EllipseArc
     //
     //**params**
@@ -33,10 +19,10 @@ class EllipseArc extends NurbsCurve {
     //* Maximum angle of the EllipseArc
 
     public function new(   center : Point,
-                            xaxis : Vector,
-                            yaxis : Vector,
-                            minAngle : Float,
-                            maxAngle : Float ) {
+                           xaxis : Vector,
+                           yaxis : Vector,
+                           minAngle : Float,
+                           maxAngle : Float ) {
         super( Make.ellipseArc(center, xaxis, yaxis, minAngle, maxAngle) );
 
         _center = center;
@@ -45,4 +31,27 @@ class EllipseArc extends NurbsCurve {
         _minAngle = minAngle;
         _maxAngle = maxAngle;
     }
+
+    private var _center : Point;
+    private var _xaxis : Vector;
+    private var _yaxis : Vector;
+    private var _minAngle : Float;
+    private var _maxAngle : Float;
+
+    //Length 3 array representing the center of the arc
+    public function center(){ return _center; }
+
+    //Length 3 array representing the xaxis
+    public function xaxis(){ return _xaxis; }
+
+    //Length 3 array representing the perpendicular yaxis
+    public function yaxis(){ return _yaxis; }
+
+    //Minimum angle of the EllipseArc
+    public function minAngle(){ return _minAngle; }
+
+    //Maximum angle of the EllipseArc
+    public function maxAngle(){ return _maxAngle; }
+
+
 }

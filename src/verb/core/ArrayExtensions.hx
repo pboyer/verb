@@ -2,7 +2,7 @@ package verb.core;
 
 class ArrayExtensions {
 
-    //Fill an array with n copies of null
+    //Fill an array with n copies of null by mutation
     //
     //**params**
     //
@@ -10,6 +10,8 @@ class ArrayExtensions {
     //* the number of null's to add to the array
     //
     //**returns**
+    //
+    //* nothing, just mutates the given array
 
     public static function alloc<T>( a : Array<T>, n : Int ){
         if (n < 0) return;
@@ -43,7 +45,7 @@ class ArrayExtensions {
     //**returns**
     //
     //* the last element of the array
-    
+
     public static function last<T>(a : Array<T>) : T {
         return a[a.length-1];
     }
@@ -57,7 +59,7 @@ class ArrayExtensions {
     //**returns**
     //
     //* the last element of the array
-    
+
     public static function first<T>(a : Array<T>) : T {
         return a[0];
     }

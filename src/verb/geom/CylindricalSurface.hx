@@ -4,22 +4,9 @@ import verb.core.types.NurbsCurveData.Point;
 import verb.core.Make;
 import verb.core.Mat;
 
+// A CylindricalSurface is a surface making up part of a cylinder.
 @:expose("geom.CylindricalSurface")
 class CylindricalSurface extends NurbsSurface {
-
-    private var _axis : Vector;
-    private var _xaxis : Vector;
-    private var _base : Point;
-    private var _height : Float;
-    private var _radius : Float;
-
-    //public properties
-
-    public function axis(){ return _axis; }
-    public function xaxis(){ return _xaxis; }
-    public function base(){ return _base; }
-    public function height(){ return _height; }
-    public function radius(){ return _radius; }
 
     //Constructor for Cylinder
     //
@@ -40,4 +27,25 @@ class CylindricalSurface extends NurbsSurface {
         _height = height;
         _radius = radius;
     }
+
+    private var _axis : Vector;
+    private var _xaxis : Vector;
+    private var _base : Point;
+    private var _height : Float;
+    private var _radius : Float;
+
+    //Length 3 array representing the axis of the cylinder
+    public function axis(){ return _axis; }
+
+    //Length 3 array representing the x axis, perpendicular to the axis
+    public function xaxis(){ return _xaxis; }
+
+    //Length 3 array representing the base of the cylinder
+    public function base(){ return _base; }
+
+    //Height of the cylinder
+    public function height(){ return _height; }
+
+    //Radius of the cylinder
+    public function radius(){ return _radius; }
 }

@@ -24,6 +24,8 @@ class Intersect {
         return verb.core.Intersect.curves( first.asNurbs(), second.asNurbs(), tol );
     }
 
+    // The async version of the same method
+
     public static function curvesAsync( first : ICurve, second : ICurve, tol : Float = 1e-3 ) : Promise<Array<CurveCurveIntersection>> {
         return Dispatcher.dispatchMethod( verb.core.Intersect, "curves", [first.asNurbs(), second.asNurbs(), tol ]);
     }
@@ -44,6 +46,8 @@ class Intersect {
         return verb.core.Intersect.curveAndSurface( curve.asNurbs(), surface.asNurbs(), tol);
     }
 
+    // The async version of the same method
+
     public static function curveAndSurfaceAsync( curve : ICurve, surface : ISurface, tol : Float = 1e-3 ) : Promise<Array<CurveSurfaceIntersection>> {
         return Dispatcher.dispatchMethod( verb.core.Intersect, "curveAndSurface", [curve.asNurbs(), surface.asNurbs(), tol ]);
     }
@@ -63,6 +67,8 @@ class Intersect {
         return verb.core.Intersect.surfaces( first.asNurbs(), second.asNurbs(), tol )
             .map(function(cd){ return new NurbsCurve(cd); });
     }
+
+    // The async version of the same method
 
     public static function surfacesAsync( first : ISurface, second : ISurface, tol : Float = 1e-3  ) : Promise<Array<NurbsCurve>> {
         return Dispatcher.dispatchMethod( verb.core.Intersect, "surfaces", [first.asNurbs(), second.asNurbs(), tol])

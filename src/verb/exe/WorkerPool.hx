@@ -4,6 +4,7 @@ import haxe.ds.IntMap;
 
 import js.html.Worker;
 
+@:expose("exe.Work")
 class Work {
 
     private static var uuid : Int = 0;

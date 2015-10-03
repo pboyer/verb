@@ -4,16 +4,10 @@ import verb.core.Make;
 import verb.core.types.NurbsCurveData;
 import verb.core.Mat;
 
+// A surface that has a spherical shape
+
 @:expose("geom.SphericalSurface")
 class SphericalSurface extends NurbsSurface {
-
-    private var _center : Point;
-    private var _radius : Float;
-
-    //public properties
-
-    public function center(){ return _center; }
-    public function radius(){ return _radius; }
 
     //Create a spherical surface
     //
@@ -29,4 +23,17 @@ class SphericalSurface extends NurbsSurface {
         _center = center;
         _radius = radius;
     }
+
+    private var _center : Point;
+    private var _radius : Float;
+
+    //Length 3 array representing the center of the circle
+
+    public function center() : Point{ return _center; }
+
+    //Radius of the circle
+
+    public function radius() : Float{ return _radius; }
+
+
 }

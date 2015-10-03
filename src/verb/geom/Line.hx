@@ -8,14 +8,6 @@ import verb.core.types.NurbsCurveData.Point;
 @:expose("geom.Line")
 class Line extends NurbsCurve {
 
-    private var _start : Point;
-    private var _end : Point;
-
-    //public properties
-
-    public function start(){ return _start; }
-    public function end(){ return _end; }
-
     //Create a line
     //
     //**params**
@@ -29,4 +21,14 @@ class Line extends NurbsCurve {
         _start = start;
         _end = end;
     }
+
+    private var _start : Point;
+    private var _end : Point;
+
+    //Length 3 array representing the start point
+    public function start(){ return _start; }
+
+    //Length 3 array representing the end point
+    public function end(){ return _end; }
+
 }

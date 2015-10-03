@@ -24,17 +24,6 @@ import verb.core.types.NurbsCurveData;
 @:expose("geom.NurbsCurve")
 class NurbsCurve extends AsyncObject implements ICurve {
 
-    //underlying serializable, data object
-
-    private var _data : NurbsCurveData;
-
-    //public properties
-
-    public function degree() : Int { return _data.degree; }
-    public function knots() : KnotArray { return _data.knots.slice(0); }
-    public function controlPoints() : Array<Point> { return Eval.dehomogenize1d(_data.controlPoints); }
-    public function weights() : Array<Float> { return Eval.weight1d(_data.controlPoints); }
-
     //Construct a NurbsCurve by a NurbsCurveData object
     //**params**
     //
@@ -84,6 +73,17 @@ class NurbsCurve extends AsyncObject implements ICurve {
         return new NurbsCurve( Make.rationalInterpCurve(points, degree) );
     }
 
+    //underlying serializable, data object
+
+    private var _data : NurbsCurveData;
+
+    //public properties
+
+    public function degree() : Int { return _data.degree; }
+    public function knots() : KnotArray { return _data.knots.slice(0); }
+    public function controlPoints() : Array<Point> { return Eval.dehomogenize1d(_data.controlPoints); }
+    public function weights() : Array<Float> { return Eval.weight1d(_data.controlPoints); }
+
     //Obtain a copy of the underlying data structure for the Curve. Used with verb.core.
     //
     //**returns**
@@ -94,7 +94,6 @@ class NurbsCurve extends AsyncObject implements ICurve {
         return new NurbsCurveData( degree(), knots(), Eval.homogenize1d( controlPoints(), weights() ));
     }
 
-
     //Obtain a copy of the curve
     //
     //**returns**
@@ -104,7 +103,6 @@ class NurbsCurve extends AsyncObject implements ICurve {
     public function clone(){
         return new NurbsCurve( this._data );
     }
-
 
     //Determine the valid domain of the curve
     //

@@ -3,6 +3,7 @@ package verb.geom;
 import verb.core.Mat.Vector;
 import verb.core.types.NurbsCurveData.Point;
 
+// A CylindricalSurface is a surface making up part of a cylinder.
 @:expose("geom.Ellipse")
 class Ellipse extends EllipseArc {
 
@@ -20,5 +21,4 @@ class Ellipse extends EllipseArc {
                             yaxis : Vector ) {
         super( center, xaxis, yaxis, 0, Math.PI * 2 );
     }
-
 }

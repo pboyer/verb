@@ -9,18 +9,12 @@ using verb.core.ArrayExtensions;
 using Lambda;
 using verb.core.Mat;
 
-// Analyze handles analytical operations of NURBS geometry. This includes, but is not limited to:
+// Analyze contains static immutable methods for analyzing NURBS geometry. This includes, but is not limited to:
 //
 //* Determining the closest points on NURBS geometry to given points
 //* Determining knot structure
 //* Evaluating geometric properties (like arc length) of NURBS curves
 //* Determining the parameter of at arc length of NURBS curves
-//
-// Like all types in the core, *it often makes more sense to use the types in geom for your work*. Most types in core are:
-//
-//* static
-//* immutable
-//* form the foundation of the types in verb.geom
 
 @:expose("core.Analyze")
 class Analyze {
@@ -453,15 +447,15 @@ class Analyze {
     //
     //**params**
     //
-    //*The curve for which to do the procedure
-    //*The arc length for which to do the procedure
-    //*the tolerance - increasing the tolerance can make this computation quite expensive
-    //*The curve decomposed into a sequence of beziers - this will be computed if omitted but speeds up the computation computed repeatedly
-    //*The lengths of the beziers after being decomposed
+    //* The curve for which to do the procedure
+    //* The arc length for which to do the procedure
+    //* the tolerance - increasing the tolerance can make this computation quite expensive
+    //* The curve decomposed into a sequence of beziers - this will be computed if omitted but speeds up the computation computed repeatedly
+    //* The lengths of the beziers after being decomposed
     //
     //**returns**
     //
-    //*The parameter
+    //* The parameter
 
     public static function rationalCurveParamAtArcLength(curve : NurbsCurveData,
                                                          len : Float,
@@ -498,14 +492,14 @@ class Analyze {
     //
     //**params**
     //
-    //*NurbsCurveData object representing the curve
-    //*the arc length to find the parameter
-    //*the tolerance - increasing the tolerance can make this computation quite expensive
-    //*the total length of the curve, if already computed
+    //* NurbsCurveData object representing the curve
+    //* the arc length to find the parameter
+    //* the tolerance - increasing the tolerance can make this computation quite expensive
+    //* the total length of the curve, if already computed
     //
     //**returns**
     //
-    //*the parameter
+    //* the parameter
 
     public static function rationalBezierCurveParamAtArcLength(curve : NurbsCurveData,
                                                                len : Float,
@@ -547,13 +541,13 @@ class Analyze {
     //
     //**params**
     //
-    //*NurbsCurveData object representing the curve
-    //*the parameter at which to approximate the length
-    //*the degree of gaussian quadrature to perform - a higher number yields a more exact result
+    //* NurbsCurveData object representing the curve
+    //* the parameter at which to approximate the length
+    //* the degree of gaussian quadrature to perform - a higher number yields a more exact result
     //
     //**returns**
     //
-    //*the approximate length
+    //* the approximate length
 
     public static function rationalCurveArcLength(curve : NurbsCurveData, u : Float = null, gaussDegIncrease : Int = 16){
         u = (u == null) ? curve.knots.last() : u;
@@ -576,13 +570,13 @@ class Analyze {
     //
     //**params**
     //
-    //*NurbsCurveData object representing the curve
-    //*the parameter at which to approximate the length
-    //*the degree of gaussian quadrature to perform - a higher number yields a more exact result
+    //* NurbsCurveData object representing the curve
+    //* the parameter at which to approximate the length
+    //* the degree of gaussian quadrature to perform - a higher number yields a more exact result
     //
     //**returns**
     //
-    //*the approximate length
+    //* the approximate length
 
     public static function rationalBezierCurveArcLength(curve : NurbsCurveData, u : Float = null, gaussDegIncrease : Int = 16) : Float {
 
@@ -676,8 +670,8 @@ class KnotMultiplicity {
     // Create a new KnotMultiplicity object
     //**params**
     //
-    //*The knot position
-    //*The multiplicity of the knot
+    //* The knot position
+    //* The multiplicity of the knot
 
     public function new(knot : Float, mult : Int ){
         this.knot = knot;

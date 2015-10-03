@@ -4,20 +4,9 @@ import verb.core.Make;
 import verb.core.Mat.Vector;
 import verb.core.types.NurbsCurveData.Point;
 
+// A ConicalSurface is a surface making up part of a cone.
 @:expose("geom.ConicalSurface")
 class ConicalSurface extends NurbsSurface {
-
-    private var _axis : Vector;
-    private var _xaxis : Vector;
-    private var _base : Point;
-    private var _height : Float;
-    private var _radius : Float;
-
-    public function axis(){ return _axis; }
-    public function xaxis(){ return _xaxis; }
-    public function base(){ return _base; }
-    public function height(){ return _height; }
-    public function radius(){ return _radius; }
 
     //Make a conical surface
     //
@@ -38,4 +27,26 @@ class ConicalSurface extends NurbsSurface {
         _height = height;
         _radius = radius;
     }
+
+    private var _axis : Vector;
+    private var _xaxis : Vector;
+    private var _base : Point;
+    private var _height : Float;
+    private var _radius : Float;
+
+    //Length 3 array representing the axis of the cone
+    public function axis(){ return _axis; }
+
+    //Length 3 array representing the x axis, perpendicular to the axis
+    public function xaxis(){ return _xaxis; }
+
+    //Length 3 array representing the base of the cone
+    public function base(){ return _base; }
+
+    //Height of the cone
+    public function height(){ return _height; }
+
+    //Radius of the cone
+    public function radius(){ return _radius; }
+
 }

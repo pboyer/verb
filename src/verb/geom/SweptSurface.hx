@@ -5,14 +5,6 @@ import verb.core.Make;
 @:expose("geom.SweptSurface")
 class SweptSurface extends NurbsSurface {
 
-    private var _profile : ICurve;
-    private var _rail : ICurve;
-
-    //public properties
-
-    public function profile() { return _profile; }
-    public function rail() { return _rail; }
-
     //Construct a Surface by translating along a rail curve
     //
     //**params**
@@ -26,5 +18,17 @@ class SweptSurface extends NurbsSurface {
         _profile = profile;
         _rail = rail;
     }
+
+    private var _profile : ICurve;
+    private var _rail : ICurve;
+
+    //The profile curve
+
+    public function profile() : ICurve { return _profile; }
+
+    //The rail curve
+
+    public function rail() : ICurve { return _rail; }
+
 
 }

@@ -6,14 +6,6 @@ import verb.core.Mat.Vector;
 @:expose("geom.ExtrudedSurface")
 class ExtrudedSurface extends NurbsSurface {
 
-    private var _profile : ICurve;
-    private var _direction : Vector;
-
-    //public properties
-
-    public function profile() { return _profile; }
-    public function direction() { return _direction; }
-
     //Construct a Surface by extruding a curve
     //
     //**params**
@@ -27,5 +19,14 @@ class ExtrudedSurface extends NurbsSurface {
         _profile = profile;
         _direction = direction;
     }
+
+    private var _profile : ICurve;
+    private var _direction : Vector;
+
+    //The profile curve
+    public function profile() : ICurve { return _profile; }
+
+    //The direction and magnitude of the extrusion
+    public function direction() : Vector { return _direction; }
 
 }

@@ -4,6 +4,7 @@ import verb.core.Mat.Vector;
 import verb.core.types.NurbsCurveData.Point;
 import verb.core.Make;
 
+// A Circle is a three dimensional curve representing the points that are equidistant from a point in a particular plane
 @:expose("geom.Circle")
 class Circle extends Arc {
 

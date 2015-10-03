@@ -5,11 +5,48 @@ import verb.core.types.Interval;
 import verb.core.types.NurbsCurveData;
 import verb.core.Mat;
 
+//An interface representing a Curve
+
 interface ICurve {
 
-    function asNurbs() : NurbsCurveData;
-    function domain() : Interval<Float>;
-    function point(u : Float) : Point;
-    function derivatives(u : Float, numDerivs : Int = 1) : Array<Vector>;
+    //Provide the NURBS representation of the curve
+    //
+    //**returns**
+    //
+    //* A NurbsCurveData object representing the curve
 
+    function asNurbs() : NurbsCurveData;
+
+    //Obtain the parametric domain of the curve
+    //
+    //**returns**
+    //
+    //* An Interval object containing the min and max of the domain
+
+    function domain() : Interval<Float>;
+
+    //Evaluate a point on the curve
+    //
+    //**params**
+    //
+    //* The parameter on the curve
+    //
+    //**returns**
+    //
+    //* The evaluated point
+
+    function point(u : Float) : Point;
+
+    //Evaluate the derivatives at a point on a curve
+    //
+    //**params**
+    //
+    //* The parameter on the curve
+    //* The number of derivatives to evaluate on the curve
+    //
+    //**returns**
+    //
+    //* An array of derivative vectors
+
+    function derivatives(u : Float, numDerivs : Int = 1) : Array<Vector>;
 }

@@ -67,9 +67,9 @@ function gen(srcfn, outputfn) {
 function compile(srcfn, outputfn){
 
     var parsed = parseHaxe(srcfn); 
+    if (parsed.length === 0) return;
+    
     var stream = fs.createWriteStream(outputfn);
-
-    console.log( parsed );
 
     // build the url of the file on github
     var index0 = srcfn.indexOf("src/verb"); 

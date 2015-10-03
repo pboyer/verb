@@ -19,20 +19,10 @@ import verb.core.types.NurbsSurfaceData;
 import verb.exe.AsyncObject;
 import verb.core.Mat;
 
+// A NURBS curve - this class represents the base class of many of verb's curve types and provides many tools for analysis and evaluation
+
 @:expose("geom.NurbsSurface")
 class NurbsSurface extends AsyncObject implements ISurface {
-
-    //underlying serializable, data object
-    private var _data : NurbsSurfaceData;
-
-    //public properties
-
-    public function degreeU() : Int { return _data.degreeU; }
-    public function degreeV() : Int { return _data.degreeV; }
-    public function knotsU() : Array<Float> { return _data.knotsU.slice(0); }
-    public function knotsV() : Array<Float> { return _data.knotsV.slice(0); }
-    public function controlPoints() : Array<Array<Point>> { return Eval.dehomogenize2d(_data.controlPoints); }
-    public function weights() : Array<Point> { return Eval.weight2d(_data.controlPoints); }
 
     //Construct a NurbsSurface by a NurbsSurfaceData object
     //
@@ -103,6 +93,35 @@ class NurbsSurface extends AsyncObject implements ISurface {
     public static function byLoftingCurves( curves : Array<ICurve>, degreeV : Int = null ) : NurbsSurface {
         return new NurbsSurface( Make.loftedSurface([for (c in curves) c.asNurbs() ], degreeV ));
     }
+
+    //underlying serializable, data object
+
+    private var _data : NurbsSurfaceData;
+
+
+    //The degree in the U direction
+
+    public function degreeU() : Int { return _data.degreeU; }
+
+    //The degree in the V direction
+
+    public function degreeV() : Int { return _data.degreeV; }
+
+    //The knot array in the U direction
+
+    public function knotsU() : Array<Float> { return _data.knotsU.slice(0); }
+
+    //The knot array in the V direction
+
+    public function knotsV() : Array<Float> { return _data.knotsV.slice(0); }
+
+    //Two dimensional array of points
+
+    public function controlPoints() : Array<Array<Point>> { return Eval.dehomogenize2d(_data.controlPoints); }
+
+    //Two dimensional array of weight values
+
+    public function weights() : Array<Point> { return Eval.weight2d(_data.controlPoints); }
 
     //Obtain a copy of the underlying data structure for the Surface. Used with verb.core.
     //

@@ -511,22 +511,6 @@ function Parser( tokenStream ){
         return def; 
     }
 
-    function parseType(){ 
-        var visibility = consume("visibility").contents;
-
-        var peaked = peak();
-        
-        if (peaked.type === "class"){
-            return parseClass( visibility ); 
-        } else if (peaked.type === "interface"){
-            return parseInterface( visibility ); 
-        } else if (peaked.type === "typedef"){
-            return parseTypedef( visibility );    
-        } 
-
-        error("Parser for type not implemented");    
-    }
-
     function parseComment() {
         var squashed = consume("comment");
 
@@ -540,6 +524,27 @@ function Parser( tokenStream ){
     
         return lastComment = squashed;
     }
+
+    function parseType(){ 
+        
+        var peaked = peak();
+        var visibility = "public";
+        
+        if (peaked.type === "visibility"){
+            consume("visibility");
+            peaked = peak();
+        }
+
+        if (peaked.type === "class"){
+            return parseClass( visibility ); 
+        } else if (peaked.type === "interface"){
+            return parseInterface( visibility ); 
+        } else if (peaked.type === "typedef"){
+            return parseTypedef( visibility );    
+        } 
+
+        error("Parser for type not implemented");    
+    }
     
     this.parse = () => {
        
@@ -548,8 +553,11 @@ function Parser( tokenStream ){
         var types = [];
     
         while ( (peaked = peak()) ){
-            if (peaked.type === "class"){
-                types.push( parseClass() ); 
+            if (peaked.type === "expose"){
+                consume("expose"); 
+                types.push( parseType() ); 
+            } else if (peaked.type === "class"){
+                parseClass(); 
             } else if (peaked.type === "typedef"){
                 types.push( parseTypedef() ); 
             } else if (peaked.type === "interface"){
@@ -680,6 +688,16 @@ function TokenStream( input ){
                 inc();
                 return make(c,c); 
 
+            }
+            // @
+            else if ( c === "@" ){
+
+                while ( c && !isWhitespace(c) ){
+                    s += c;
+                    c = input.charAt(inc());
+                }
+
+                return make("expose", s);
             }
             // Name
             else if ( isAlpha(c) ){
