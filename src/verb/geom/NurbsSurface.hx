@@ -19,7 +19,12 @@ import verb.core.types.NurbsSurfaceData;
 import verb.exe.AsyncObject;
 import verb.core.Mat;
 
-// A NURBS curve - this class represents the base class of many of verb's curve types and provides many tools for analysis and evaluation
+// A NURBS surface - this class represents the base class of many of verb's surface types and provides many tools for analysis and evaluation.
+// This object is deliberately constrained to be immutable. There are methods to gain access to the underlying fields. `asNurbs` can
+// be used to obtain a simplified NurbsCurveData object that can be used with verb.core.
+//
+// Under the hood, this type takes advantage of verb's asynchronous runtime from the Async methods. Calling one of these
+// methods returns a `Promise`. You can find further documentation for this type at https://github.com/jdonaldson/promhx.
 
 @:expose("geom.NurbsSurface")
 class NurbsSurface extends AsyncObject implements ISurface {
@@ -178,6 +183,8 @@ class NurbsSurface extends AsyncObject implements ISurface {
         return Eval.rationalSurfacePoint( _data, u, v );
     }
 
+    //The async version of `point`
+
     public function pointAsync( u : Float, v : Float ) : Promise<Point> {
         return defer( Eval, 'rationalSurfacePoint', [ _data, u, v ] );
     }
@@ -196,6 +203,8 @@ class NurbsSurface extends AsyncObject implements ISurface {
     public function normal( u : Float, v : Float ) : Point {
         return Eval.rationalSurfaceNormal( _data, u, v );
     }
+
+    //The async version of `normal`
 
     public function normalAsync( u : Float, v : Float ) : Promise<Array<Array<Vector>>> {
         return defer( Eval, 'rationalSurfaceNormal', [ _data, u, v ] );
@@ -221,6 +230,8 @@ class NurbsSurface extends AsyncObject implements ISurface {
         return Eval.rationalSurfaceDerivatives( _data, u, v, numDerivs );
     }
 
+    //The async version of `derivatives`
+
     public function derivativesAsync( u : Float, v : Float, numDerivs : Int = 1 ) : Promise<Array<Array<Vector>>> {
         return defer( Eval, 'rationalSurfaceDerivatives', [ _data, u, v, numDerivs ] );
     }
@@ -239,6 +250,8 @@ class NurbsSurface extends AsyncObject implements ISurface {
         return Analyze.rationalSurfaceClosestParam( _data, pt );
     }
 
+    //The async version of `closestParam`
+
     public function closestParamAsync( pt : Point ) : Promise<UV> {
         return defer( Analyze, 'rationalSurfaceClosestParam', [ _data, pt ] );
     }
@@ -256,6 +269,8 @@ class NurbsSurface extends AsyncObject implements ISurface {
     public function closestPoint( pt : Point ) : Point {
         return Analyze.rationalSurfaceClosestPoint( _data, pt );
     }
+
+    //The async version of `closestParam`
 
     public function closestPointAsync( pt : Point ) : Promise<Point> {
         return defer( Analyze, 'rationalSurfaceClosestPoint', [ _data, pt ] );
@@ -276,6 +291,8 @@ class NurbsSurface extends AsyncObject implements ISurface {
         return Modify.surfaceSplit( _data, u, useV )
             .map(function(x){ return new NurbsSurface(x); });
     }
+
+    //The async version of `split`
 
     public function splitAsync( u : Float, useV : Bool = false ) : Promise<Array<NurbsSurface>> {
         return defer( Modify, 'surfaceSplit', [ _data, u, useV ] )
@@ -298,6 +315,8 @@ class NurbsSurface extends AsyncObject implements ISurface {
         return new NurbsSurface( Modify.surfaceReverse( _data, useV ) );
     }
 
+    //The async version of `reverse`
+
     public function reverseAsync( useV : Bool = false ) : Promise<NurbsSurface> {
         return defer( Modify, 'surfaceReverse', [ _data, useV ])
             .then(function(c){ return new NurbsSurface(c); });
@@ -318,6 +337,8 @@ class NurbsSurface extends AsyncObject implements ISurface {
         return new NurbsCurve( Make.surfaceIsocurve( _data, u, useV ) );
     }
 
+    //The async version of `isocurve`
+
     public function isocurveAsync( u : Float, useV : Bool = false ) : Promise<NurbsCurve> {
         return defer( Make, 'surfaceIsocurve', [ _data, u, useV ] )
             .then(function(x){ return new NurbsCurve(x); });
@@ -332,6 +353,8 @@ class NurbsSurface extends AsyncObject implements ISurface {
     public function boundaries( options : AdaptiveRefinementOptions = null) : Array<NurbsCurve> {
         return Make.surfaceBoundaryCurves( _data ).map(function(x){ return new NurbsCurve(x); });
     }
+
+    //The async version of `boundaries`
 
     public function boundariesAsync( options : AdaptiveRefinementOptions = null ) : Promise<Array<NurbsCurve>> {
         return defer( Make, 'surfaceBoundaryCurves', [ _data ] )
@@ -355,6 +378,8 @@ class NurbsSurface extends AsyncObject implements ISurface {
         return Tess.rationalSurfaceAdaptive( _data, options );
     }
 
+    //The async version of `boundaries`
+
     public function tessellateAsync( options : AdaptiveRefinementOptions = null ) : Promise<MeshData> {
         return defer( Tess, 'rationalSurfaceAdaptive', [ _data,  options ] );
     }
@@ -372,6 +397,8 @@ class NurbsSurface extends AsyncObject implements ISurface {
     public function transform( mat : Matrix ) : NurbsSurface {
         return new NurbsSurface( Modify.rationalSurfaceTransform( _data, mat ) );
     }
+
+    //The async version of `transform`
 
     public function transformAsync( mat : Matrix ) : Promise<NurbsSurface> {
         return defer( Modify, 'rationalSurfaceTransform', [ _data,  mat ] )

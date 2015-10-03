@@ -3,6 +3,8 @@ import verb.core.Make;
 import verb.core.Vec;
 import verb.core.Mat.Vector;
 
+// Form a Surface by extruding a curve along a vector
+
 @:expose("geom.ExtrudedSurface")
 class ExtrudedSurface extends NurbsSurface {
 
@@ -24,9 +26,11 @@ class ExtrudedSurface extends NurbsSurface {
     private var _direction : Vector;
 
     //The profile curve
+
     public function profile() : ICurve { return _profile; }
 
     //The direction and magnitude of the extrusion
+
     public function direction() : Vector { return _direction; }
 
 }

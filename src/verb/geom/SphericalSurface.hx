@@ -4,7 +4,7 @@ import verb.core.Make;
 import verb.core.types.NurbsCurveData;
 import verb.core.Mat;
 
-// A surface that has a spherical shape
+// A surface representing the doubly curved surface of a sphere
 
 @:expose("geom.SphericalSurface")
 class SphericalSurface extends NurbsSurface {

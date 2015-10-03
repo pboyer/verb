@@ -5,6 +5,8 @@ import verb.core.Make;
 import verb.core.Mat.Vector;
 import verb.core.types.NurbsCurveData.Point;
 
+// An EllipseArc is a subset of an Ellipse
+
 @:expose("geom.EllipseArc")
 class EllipseArc extends NurbsCurve {
 

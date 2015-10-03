@@ -21,10 +21,18 @@ import verb.core.Eval;
 import verb.core.types.Interval;
 import verb.core.types.NurbsCurveData;
 
+// A NURBS curve - this class represents the base class of many of verb.geom's curve types and provides many tools for analysis and evaluation.
+// This object is deliberately constrained to be immutable. There are methods to gain access to the underlying fields. `asNurbs` can
+// be used to obtain a simplified NurbsCurveData object that can be used with verb.core.
+//
+// Under the hood, this type takes advantage of verb's asynchronous runtime using the _Async methods. Calling one of these
+// methods returns a `Promise`. You can find further documentation for this type at https://github.com/jdonaldson/promhx.
+
 @:expose("geom.NurbsCurve")
 class NurbsCurve extends AsyncObject implements ICurve {
 
     //Construct a NurbsCurve by a NurbsCurveData object
+    //
     //**params**
     //
     //* The data object
@@ -74,14 +82,18 @@ class NurbsCurve extends AsyncObject implements ICurve {
     }
 
     //underlying serializable, data object
-
     private var _data : NurbsCurveData;
 
-    //public properties
-
+    //The degree of the curve
     public function degree() : Int { return _data.degree; }
+
+    //The knot array
     public function knots() : KnotArray { return _data.knots.slice(0); }
+
+    //Array of control points
     public function controlPoints() : Array<Point> { return Eval.dehomogenize1d(_data.controlPoints); }
+
+    //Array of weight values
     public function weights() : Array<Float> { return Eval.weight1d(_data.controlPoints); }
 
     //Obtain a copy of the underlying data structure for the Curve. Used with verb.core.
@@ -128,6 +140,8 @@ class NurbsCurve extends AsyncObject implements ICurve {
         return new NurbsCurve( Modify.rationalCurveTransform( _data, mat ) );
     }
 
+    //The async version of `transform`
+
     public function transformAsync( mat : Matrix ) : Promise<NurbsCurve> {
         return defer( Modify, 'rationalCurveTransform', [ _data,  mat ] )
             .then(function(x){ return new NurbsCurve(x); });
@@ -146,6 +160,8 @@ class NurbsCurve extends AsyncObject implements ICurve {
     public function point( u : Float ) : Point {
         return Eval.rationalCurvePoint( _data, u );
     }
+
+    //The async version of `point`
 
     public function pointAsync( u : Float) : Promise<Point> {
         return defer( Eval, 'rationalCurvePoint', [ _data,  u ] );
@@ -166,6 +182,8 @@ class NurbsCurve extends AsyncObject implements ICurve {
         return Eval.rationalCurveTangent( _data, u );
     }
 
+    //The async version of `tangent`
+
     public function tangentAsync( u : Float ) : Promise<Vector> {
         return defer( Eval, 'rationalCurveTangent', [ _data, u ] );
     }
@@ -185,6 +203,8 @@ class NurbsCurve extends AsyncObject implements ICurve {
         return Eval.rationalCurveDerivatives( _data, u, numDerivs );
     }
 
+    //The async version of `derivatives`
+
     public function derivativesAsync( u : Float, numDerivs : Int = 1 ) : Promise<Array<Vector>> {
         return defer( Eval, 'rationalCurveDerivatives', [ _data, u, numDerivs ] );
     }
@@ -202,6 +222,8 @@ class NurbsCurve extends AsyncObject implements ICurve {
     public function closestPoint( pt : Point ) : Point {
         return Analyze.rationalCurveClosestPoint( _data, pt );
     }
+
+    //The async version of `closestPoint`
 
     public function closestPointAsync( pt : Point ) : Promise<Point> {
         return defer( Analyze, 'rationalCurveClosestPoint', [ _data,  pt ] );
@@ -221,6 +243,8 @@ class NurbsCurve extends AsyncObject implements ICurve {
         return Analyze.rationalCurveClosestParam( _data, pt );
     }
 
+    //The async version of `length`
+
     public function closestParamAsync( pt : Dynamic ) : Promise<Point> {
         return defer( Analyze, 'rationalCurveClosestParam', [ _data,  pt ] );
     }
@@ -234,6 +258,8 @@ class NurbsCurve extends AsyncObject implements ICurve {
     public function length() : Float {
         return Analyze.rationalCurveArcLength( _data );
     }
+
+    //The async version of `length`
 
     public function lengthAsync() : Promise<Float> {
         return defer( Analyze, 'rationalCurveArcLength', [ _data ] );
@@ -253,6 +279,8 @@ class NurbsCurve extends AsyncObject implements ICurve {
         return Analyze.rationalCurveArcLength( _data, u );
     }
 
+    //The async version of `lengthAtParam`
+
     public function lengthAtParamAsync() : Promise<Float> {
         return defer( Analyze, 'rationalCurveArcLength', [ _data ] );
     }
@@ -270,6 +298,8 @@ class NurbsCurve extends AsyncObject implements ICurve {
     public function paramAtLength( len : Float, tolerance : Float = null ) : Float {
         return Analyze.rationalCurveParamAtArcLength( _data, len, tolerance );
     }
+
+    //The async version of `paramAtLength`
 
     public function paramAtLengthAsync( len : Float, tolerance : Float = null ) : Promise<Float> {
         return defer( Analyze, 'rationalCurveParamAtArcLength', [ _data, len, tolerance ] );
@@ -289,6 +319,8 @@ class NurbsCurve extends AsyncObject implements ICurve {
         return Divide.rationalCurveByEqualArcLength( _data, divisions );
     }
 
+    //The async version of `divideByEqualArcLength``
+
     public function divideByEqualArcLengthAsync( divisions : Int ) : Promise<Array<CurveLengthSample>> {
         return defer( Divide, 'rationalCurveByEqualArcLength', [ _data, divisions ] );
     }
@@ -306,6 +338,8 @@ class NurbsCurve extends AsyncObject implements ICurve {
     public function divideByArcLength( arcLength : Float ) : Array<CurveLengthSample> {
         return Divide.rationalCurveByArcLength( _data, arcLength );
     }
+
+    //The async version of `divideByArcLength`
 
     public function divideByArcLengthAsync( divisions : Int ) : Promise<Array<CurveLengthSample>> {
         return defer( Divide, 'rationalCurveByArcLength', [ _data, divisions ] );
@@ -325,6 +359,8 @@ class NurbsCurve extends AsyncObject implements ICurve {
         return Modify.curveSplit( _data, u ).map(function(x){ return new NurbsCurve(x); });
     }
 
+    // The async version of `split`
+
     public function splitAsync( u : Float ) : Promise<Array<NurbsCurve>> {
         return defer( Modify, 'curveSplit', [ _data, u ])
         .then(function(cs : Array<NurbsCurveData>) : Array<NurbsCurve>{
@@ -342,6 +378,8 @@ class NurbsCurve extends AsyncObject implements ICurve {
         return new NurbsCurve( Modify.curveReverse( _data ) );
     }
 
+    // The async version of `reverse`
+
     public function reverseAsync() : Promise<NurbsCurve> {
         return defer( Modify, 'curveReverse', [ _data ])
             .then(function(c){ return new NurbsCurve(c); });
@@ -351,8 +389,7 @@ class NurbsCurve extends AsyncObject implements ICurve {
     //
     //**params**
     //
-    //* The parameter to sample the curve
-    //* The number of derivatives to obtain
+    //* The tolerance at which to sample the curve
     //
     //**returns**
     //
@@ -361,6 +398,8 @@ class NurbsCurve extends AsyncObject implements ICurve {
     public function tessellate(tolerance : Float = null) : Array<Point> {
         return Tess.rationalCurveAdaptiveSample( _data, tolerance, false );
     }
+
+    // The async version of `tessellate`
 
     public function tessellateAsync( tolerance : Float = null ) : Promise<Array<Point>> {
         return defer( Tess, 'rationalCurveAdaptiveSample', [ _data, tolerance, false ] );

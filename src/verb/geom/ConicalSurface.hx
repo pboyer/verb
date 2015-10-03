@@ -4,7 +4,8 @@ import verb.core.Make;
 import verb.core.Mat.Vector;
 import verb.core.types.NurbsCurveData.Point;
 
-// A ConicalSurface is a surface making up part of a cone.
+// A ConicalSurface is a surface making up the curve surface of a cone
+
 @:expose("geom.ConicalSurface")
 class ConicalSurface extends NurbsSurface {
 

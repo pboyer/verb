@@ -4,7 +4,8 @@ import verb.core.types.NurbsCurveData.Point;
 import verb.core.Make;
 import verb.core.Mat;
 
-// A CylindricalSurface is a surface making up part of a cylinder.
+// A CylindricalSurface is a surface making up the curve surface of a cylinder
+
 @:expose("geom.CylindricalSurface")
 class CylindricalSurface extends NurbsSurface {
 

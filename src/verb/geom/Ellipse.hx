@@ -4,6 +4,7 @@ import verb.core.Mat.Vector;
 import verb.core.types.NurbsCurveData.Point;
 
 // A CylindricalSurface is a surface making up part of a cylinder.
+
 @:expose("geom.Ellipse")
 class Ellipse extends EllipseArc {
 

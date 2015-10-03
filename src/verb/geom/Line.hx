@@ -5,6 +5,7 @@ import verb.core.Make;
 import verb.core.Mat.Vector;
 import verb.core.types.NurbsCurveData.Point;
 
+// A curve representing a straight line
 @:expose("geom.Line")
 class Line extends NurbsCurve {
 
