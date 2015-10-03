@@ -11,15 +11,16 @@ using verb.core.ArrayExtensions;
 @:expose("core.Mesh")
 class Mesh {
 
+    //Get triangle normal
     //
-    // Get triangle normal
+    //**params**
     //
-    // **params**
-    // + array of length 3 arrays of numbers representing the points
-    // + length 3 array of point indices for the triangle
+    //* array of length 3 arrays of numbers representing the points
+    //* length 3 array of point indices for the triangle
     //
-    // **returns**
-    // + a normal vector represented by an array of length 3
+    //**returns**
+    //
+    //* a normal vector represented by an array of length 3
     //
 
     public static function getTriangleNorm( points : Array<Point>, tri : Tri ) : Point {
@@ -35,15 +36,16 @@ class Mesh {
 
     }
 
+    //Form axis-aligned bounding box from triangles of mesh
     //
-    // Form axis-aligned bounding box from triangles of mesh
+    //**params**
     //
-    // **params**
-    // + a mesh
-    // + face indices of the mesh to include in the bounding box
+    //* a mesh
+    //* face indices of the mesh to include in the bounding box
     //
-    // **returns**
-    // + a BoundingBox containing the mesh
+    //**returns**
+    //
+    //* a BoundingBox containing the mesh
     //
 
     public static function makeMeshAabb( mesh : MeshData, faceIndices : Array<Int> ) : BoundingBox {
@@ -59,16 +61,17 @@ class Mesh {
         return bb;
     }
 
+    //Make tree of axis aligned bounding boxes
     //
-    // Make tree of axis aligned bounding boxes
+    //**params**
     //
-    // **params**
-    // + array of length 3 arrays of numbers representing the points
-    // + array of length 3 arrays of number representing the triangles
-    // + array of numbers representing the relevant triangles to use to form aabb
+    //* array of length 3 arrays of numbers representing the points
+    //* array of length 3 arrays of number representing the triangles
+    //* array of numbers representing the relevant triangles to use to form aabb
     //
-    // **returns**
-    // + a point represented by an array of length (dim)
+    //**returns**
+    //
+    //* a point represented by an array of length (dim)
     //
 
     public static function makeMeshAabbTree( mesh : MeshData, faceIndices : Array<Int> ) : BoundingBoxNode {
@@ -80,22 +83,23 @@ class Mesh {
         }
 
         var sortedIndices = sortTrianglesOnLongestAxis( aabb, mesh, faceIndices )
-        , leftIndices = sortedIndices.left() // slice( 0, Math.floor( sorted_tri_indices.length / 2 ) )
-        , rightIndices = sortedIndices.right(); // slice( Math.floor( sorted_tri_indices.length / 2 ), sorted_tri_indices.length );
+        , leftIndices = sortedIndices.left() //slice( 0, Math.floor( sorted_tri_indices.length / 2 ) )
+        , rightIndices = sortedIndices.right(); //slice( Math.floor( sorted_tri_indices.length / 2 ), sorted_tri_indices.length );
 
         return new BoundingBoxInnerNode( aabb, [ makeMeshAabbTree(mesh, leftIndices), makeMeshAabbTree(mesh, rightIndices) ]);
     }
 
+    //Sort particular faces of a mesh on the longest axis
     //
-    // Sort particular faces of a mesh on the longest axis
+    //**params**
     //
-    // **params**
-    // + bounding box containing the faces
-    // + the mesh it self
-    // + the indices of the mesh faces to inspect
+    //* bounding box containing the faces
+    //* the mesh it self
+    //* the indices of the mesh faces to inspect
     //
-    // **returns**
-    // + a point represented by an array of length (dim)
+    //**returns**
+    //
+    //* a point represented by an array of length (dim)
     //
 
     public static function sortTrianglesOnLongestAxis( bb : BoundingBox, mesh : MeshData, faceIndices : Array<Int> ) : Array<Int> {
@@ -123,16 +127,17 @@ class Mesh {
         return sortedFaceIndices;
     }
 
+    //Get min coordinate on an axis
     //
-    // Get min coordinate on an axis
+    //**params**
     //
-    // **params**
-    // + array of length 3 arrays of numbers representing the points
-    // + length 3 array of point indices for the triangle
-    // + index of the axis to test - 0 for x, 1 for y, 2 for z
+    //* array of length 3 arrays of numbers representing the points
+    //* length 3 array of point indices for the triangle
+    //* index of the axis to test - 0 for x, 1 for y, 2 for z
     //
-    // **returns**
-    // + the minimum coordinate
+    //**returns**
+    //
+    //* the minimum coordinate
     //
 
     private static function getMinCoordOnAxis( points : Array<Point>, tri : Tri, axis : Int ) : Float {
@@ -147,15 +152,16 @@ class Mesh {
         return min;
     }
 
+    //Get triangle centroid
     //
-    // Get triangle centroid
+    //**params**
     //
-    // **params**
-    // + array of length 3 arrays of numbers representing the points
-    // + length 3 array of point indices for the triangle
+    //* array of length 3 arrays of numbers representing the points
+    //* length 3 array of point indices for the triangle
     //
-    // **returns**
-    // + a point represented by an array of length 3
+    //**returns**
+    //
+    //* a point represented by an array of length 3
     //
 
     public static function getTriangleCentroid( points : Array<Point>, tri : Tri ) : Point {
@@ -192,13 +198,13 @@ class Mesh {
         var f2 = Vec.sub(p2, f);
         var f3 = Vec.sub(p3, f);
 
-        // calculate the areas and factors (order of parameters doesn't matter):
-        var a = Vec.norm( Vec.cross( Vec.sub(p1, p2), Vec.sub(p1, p3) ) ); // main triangle area a
-        var a1 = Vec.norm( Vec.cross(f2, f3) ) / a; // p1's triangle area / a
-        var a2 = Vec.norm( Vec.cross(f3, f1) ) / a; // p2's triangle area / a
-        var a3 = Vec.norm( Vec.cross(f1, f2) ) / a; // p3's triangle area / a
+        //calculate the areas and factors (order of parameters doesn't matter):
+        var a = Vec.norm( Vec.cross( Vec.sub(p1, p2), Vec.sub(p1, p3) ) ); //main triangle area a
+        var a1 = Vec.norm( Vec.cross(f2, f3) ) / a; //p1's triangle area / a
+        var a2 = Vec.norm( Vec.cross(f3, f1) ) / a; //p2's triangle area / a
+        var a3 = Vec.norm( Vec.cross(f1, f2) ) / a; //p3's triangle area / a
 
-        // find the uv corresponding to point f (uv1/uv2/uv3 are associated to p1/p2/p3):
+        //find the uv corresponding to point f (uv1/uv2/uv3 are associated to p1/p2/p3):
         return Vec.add( Vec.mul( a1, uv1), Vec.add( Vec.mul( a2, uv2), Vec.mul( a3, uv3)));
     }
 }

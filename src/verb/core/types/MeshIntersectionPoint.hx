@@ -12,7 +12,7 @@ class MeshIntersectionPoint {
     public var faceIndex0 : Int;
     public var faceIndex1 : Int;
 
-// tags to navigate a segment structure
+//tags to navigate a segment structure
     public var opp : MeshIntersectionPoint = null;
     public var adj : MeshIntersectionPoint = null;
     public var visited : Bool = false;

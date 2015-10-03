@@ -84,8 +84,8 @@ class Split {
 
     public static function connect( nulledges : Array<HalfEdge>, afaces : Array<Face>  ) : Void {
 
-        // now we have all of the null edges inserted and need to separate the solid
-        // into two pieces
+        //now we have all of the null edges inserted and need to separate the solid
+        //into two pieces
         lexicographicalSort( nulledges );
 
         var h0 : HalfEdge;
@@ -113,13 +113,13 @@ class Split {
 
         var s = v.e.l.f.s;
 
-        // find the first in ABOVE seq
+        //find the first in ABOVE seq
         var i = nextOfClass( PlanePosition.Above, ecs, 0 );
 
-        // there's no above edge in the seq (all below), continue
+        //there's no above edge in the seq (all below), continue
         if (i == -1) return;
 
-        // if all of the edges are of the same type, just continue
+        //if all of the edges are of the same type, just continue
         if (nextOfClass( PlanePosition.Below, ecs, 0 ) == -1) return;
 
         var start = ecs[i].edge;
@@ -129,25 +129,25 @@ class Split {
 
         while(true){
 
-            // find the end of the ABOVE sequence
+            //find the end of the ABOVE sequence
             while (ecs[i].pos == PlanePosition.Above){
                 tail = ecs[i].edge;
                 i = (i + 1) % el;
             }
 
-            // insert a null edge
+            //insert a null edge
             s.lmev( head, tail.opp.nxt, head.v.pt.copy() );
             nulledges.push( head.prv );
 
-            // find the next start sequence and assign to head
+            //find the next start sequence and assign to head
             i = nextOfClass( PlanePosition.Above, ecs, i );
 
-            // there is no other above edge, we're done with this vertex
+            //there is no other above edge, we're done with this vertex
             if (i == -1) break;
 
             head = ecs[i].edge;
 
-            // we've come back to the beginning (should never happen)
+            //we've come back to the beginning (should never happen)
             if (head == start) break;
         }
     }
@@ -160,15 +160,15 @@ class Split {
         for (e in v.halfEdges()){
             ecs.push({ edge: e, pos : classify(e, p) });
 
-            // for each edge, we also need to check the sector width - i.e. the angle
-            // bisector between two adjacent edges. If more than 180, we bisect the edge
+            //for each edge, we also need to check the sector width - i.e. the angle
+            //bisector between two adjacent edges. If more than 180, we bisect the edge
             if ( wideSector(e) ){
                 ecs.push({ edge: e, pos : classifyBisector(e, p) });
             }
         }
 
         // 2. now, for each "on" edge, we need to determine its face - is this face aligned with the plane normal?
-        // if so,
+        //if so,
         //      if aligned with plane normal (dot(fn, sp) > 0), BELOW, along with the next edge
         //      else ABOVE
         var el = ecs.length;
@@ -221,7 +221,7 @@ class Split {
         }
     }
 
-    // move vertices of ks to s by traversing the faces of s
+    //move vertices of ks to s by traversing the faces of s
     private static function cleanup( s : Solid, ks : Solid ) : Void {
         var memo = new IntMap<Vertex>();
 
@@ -252,29 +252,29 @@ class Split {
     }
 
     public static function neighbor( e0 : HalfEdge, e1 : HalfEdge ) : Bool {
-        return e0.l.f == e1.l.f; // || e0.opp == e1;    // opposite orientation
+        return e0.l.f == e1.l.f; // || e0.opp == e1;    //opposite orientation
     }
 
     public static function isLoose( e : HalfEdge, le : Array<HalfEdge> ) : Bool {
         return le.indexOf(e) != -1;
     }
 
-    // join a new null edge into the expanding slice polygon
+    //join a new null edge into the expanding slice polygon
     public static function join( e0 : HalfEdge, e1 : HalfEdge ) {
-        // get the face of e0
+        //get the face of e0
 	var of = e0.l.f;
         var nf : Face = null;
         
-	// get the solid of e0
+	//get the solid of e0
 	var s = e0.l.f.s;
 
-	// if e0 and e1 have the same loop, do lmef
+	//if e0 and e1 have the same loop, do lmef
         if (e0.l == e1.l){
             if (e0.prv.prv != e1){
                 nf = s.lmef( e0, e1.nxt );
             }
         }
-	// otherwise, make edge kill ring
+	//otherwise, make edge kill ring
         else {
             s.lmekr( e0, e1.nxt );
         }
@@ -283,13 +283,13 @@ class Split {
             s.lmef( e1, e0.nxt );
             if (nf != null && of.l.nxt != of.l){
                 trace('PANIC!');
-                // TODO - move internal rings to the new face as appropriate
-                // s.laringmv(of, nf);
+                //TODO - move internal rings to the new face as appropriate
+                //s.laringmv(of, nf);
             }
         }
     }
 
-    // remove a null edge
+    //remove a null edge
     public static function cut( e : HalfEdge, faces : Array<Face> ) {
         if (e.l == e.opp.l){
             faces.push(e.l.f);
@@ -349,8 +349,8 @@ class Split {
 
     private static function reclassifyCoplanarSector( e : HalfEdge, p : Plane ) : PlanePosition {
 
-        var n = e.l.f.normal(); // TODO: cache me
-        var n1 = e.opp.l.f.normal(); // TODO: cache me
+        var n = e.l.f.normal(); //TODO: cache me
+        var n1 = e.opp.l.f.normal(); //TODO: cache me
 
         var ndc = n.dot(p.n);
         var ndc1 = n1.dot(p.n);
@@ -402,11 +402,11 @@ class Split {
     public static function splitEdge( e : HalfEdge, p : Float ) : HalfEdge {
         var s = e.l.f.s;
 
-        // given the intersecting halfedge, is there a way to use the euler operators?
+        //given the intersecting halfedge, is there a way to use the euler operators?
         var pt0 = pointOnHalfEdge( e, p );
         var pt1 = pt0.copy();
 
-        // insert a coincident vertices along the HalfEdge
+        //insert a coincident vertices along the HalfEdge
         var nv = s.lmev( e, e.opp.nxt, pt1 );
 
         return nv.e;

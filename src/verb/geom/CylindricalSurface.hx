@@ -13,7 +13,7 @@ class CylindricalSurface extends NurbsSurface {
     private var _height : Float;
     private var _radius : Float;
 
-    // public properties
+    //public properties
 
     public function axis(){ return _axis; }
     public function xaxis(){ return _xaxis; }
@@ -21,14 +21,15 @@ class CylindricalSurface extends NurbsSurface {
     public function height(){ return _height; }
     public function radius(){ return _radius; }
 
-    // Constructor for Cylinder
+    //Constructor for Cylinder
     //
-    // **params**
-    // + Length 3 array representing the axis of the cylinder
-    // + Length 3 array representing the x axis, perpendicular to the axis
-    // + Length 3 array representing the base of the cylinder
-    // + Height of the cylinder
-    // + Radius of the cylinder
+    //**params**
+    //
+    //* Length 3 array representing the axis of the cylinder
+    //* Length 3 array representing the x axis, perpendicular to the axis
+    //* Length 3 array representing the base of the cylinder
+    //* Height of the cylinder
+    //* Radius of the cylinder
 
     public function new(axis : Vector, xaxis : Vector, base : Point, height : Float, radius : Float) {
         super(Make.cylindricalSurface(axis, xaxis, base, height, radius));

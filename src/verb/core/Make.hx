@@ -12,14 +12,16 @@ using verb.core.ArrayExtensions;
 @:expose("core.Make")
 class Make {
 
-    // Generate a surface by translating a profile curve along a rail curve
+    //Generate a surface by translating a profile curve along a rail curve
     //
-    // **params**
-    // + profile NurbsCurveData
-    // + rail NurbsCurveData
+    //**params**
     //
-    // **returns**
-    // + NurbsSurfaceData object
+    //* profile NurbsCurveData
+    //* rail NurbsCurveData
+    //
+    //**returns**
+    //
+    //* NurbsSurfaceData object
 
     public static function rationalTranslationalSurface( profile : NurbsCurveData, rail : NurbsCurveData ) : NurbsSurfaceData {
 
@@ -43,10 +45,11 @@ class Make {
         return Make.loftedSurface( crvs );
     }
 
-    // Extract the boundary curves from a surface
+    //Extract the boundary curves from a surface
     //
-    // **returns**
-    // + an array containing 4 elements, first 2 curves in the V direction, then 2 curves in the U direction
+    //**returns**
+    //
+    //* an array containing 4 elements, first 2 curves in the V direction, then 2 curves in the U direction
 
     public static function surfaceBoundaryCurves(surface : NurbsSurfaceData) : Array<NurbsCurveData> {
         var crvs = [];
@@ -67,7 +70,7 @@ class Make {
 
         var knotMults = Analyze.knotMultiplicities( knots );
 
-        // if the knot already exists in the array, don't make duplicates
+        //if the knot already exists in the array, don't make duplicates
         var reqKnotIndex : Int = -1;
         for ( i in 0...knotMults.length ){
             if ( Math.abs( u - knotMults[i].knot ) < Constants.EPSILON ){
@@ -81,10 +84,10 @@ class Make {
             numKnotsToInsert = numKnotsToInsert - knotMults[reqKnotIndex].mult;
         }
 
-        // insert the knots
+        //insert the knots
         var newSrf = numKnotsToInsert > 0 ? Modify.surfaceKnotRefine( surface, Vec.rep(numKnotsToInsert, u), useV ) : surface;
 
-        // obtain the correct index of control points to extract
+        //obtain the correct index of control points to extract
         var span = Eval.knotSpan( degree, u, knots );
 
         if ( Math.abs( u - knots.first() ) < Constants.EPSILON  ){
@@ -104,29 +107,29 @@ class Make {
 
         curves = Modify.unifyCurveKnotVectors( curves );
 
-        // degree
+        //degree
         var degreeU = curves[0].degree;
         if (degreeV == null) degreeV = 3;
         if (degreeV > curves.length - 1){
             degreeV = curves.length - 1;
         }
 
-        // knots
+        //knots
         var knotsU = curves[0].knots;
 
         var knotsV = [];
         var controlPoints = [];
         for ( i in 0...curves[0].controlPoints.length ){
 
-            // extract the ith control pt of each curve
+            //extract the ith control pt of each curve
             var points = curves.map(function(x){
                 return x.controlPoints[i];
             });
 
-            // construct an interpolating curve using this list
+            //construct an interpolating curve using this list
             var c = Make.rationalInterpCurve( points, degreeV, true );
             controlPoints.push( c.controlPoints );
-            knotsV = c.knots; // redundant computation
+            knotsV = c.knots; //redundant computation
         }
 
         return new NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
@@ -136,16 +139,18 @@ class Make {
         return new NurbsCurveData( curve.degree, curve.knots.copy(), curve.controlPoints.map(function(x){ return x.copy(); }) );
     }
 
-    // Generate the control points, weights, and knots for a bezier curve of any degree
+    //Generate the control points, weights, and knots for a bezier curve of any degree
     //
-    // **params**
-    // + first point in counter-clockwise form
-    // + second point in counter-clockwise form
-    // + third point in counter-clockwise form
-    // + forth point in counter-clockwise form
+    //**params**
     //
-    // **returns**
-    // + NurbsSurfaceData object
+    //* first point in counter-clockwise form
+    //* second point in counter-clockwise form
+    //* third point in counter-clockwise form
+    //* forth point in counter-clockwise form
+    //
+    //**returns**
+    //
+    //* NurbsSurfaceData object
 
     public static function rationalBezierCurve( controlPoints : Array<Point>, weights : Array<Float> = null ) : NurbsCurveData {
 
@@ -155,22 +160,24 @@ class Make {
         for (i in 0...degree+1) { knots.push(0.0); }
         for (i in 0...degree+1) { knots.push(1.0); }
 
-        // if weights aren't provided, build uniform weights
+        //if weights aren't provided, build uniform weights
         if (weights == null) weights = Vec.rep( controlPoints.length, 1.0 );
 
         return new NurbsCurveData( degree, knots, Eval.homogenize1d( controlPoints, weights ));
     }
 
-    // Generate the control points, weights, and knots of a surface defined by 4 points
+    //Generate the control points, weights, and knots of a surface defined by 4 points
     //
-    // **params**
-    // + first point in counter-clockwise form
-    // + second point in counter-clockwise form
-    // + third point in counter-clockwise form
-    // + forth point in counter-clockwise form
+    //**params**
     //
-    // **returns**
-    // + NurbsSurfaceData object
+    //* first point in counter-clockwise form
+    //* second point in counter-clockwise form
+    //* third point in counter-clockwise form
+    //* forth point in counter-clockwise form
+    //
+    //**returns**
+    //
+    //* NurbsSurfaceData object
 
    public static function fourPointSurface( p1 : Point, p2 : Point, p3 : Point, p4 : Point, degree : Int = 3 ) : NurbsSurfaceData {
 
@@ -187,7 +194,7 @@ class Make {
                 var p4p3 = Vec.lerp( l, p4, p3 );
 
                 var res = Vec.lerp( 1.0 - j / degreeFloat, p1p2, p4p3 );
-                res.push(1.0); // add the weight
+                res.push(1.0); //add the weight
 
                 row.push(res);
             }
@@ -202,17 +209,19 @@ class Make {
 
     }
 
-    // Generate the control points, weights, and knots of an elliptical arc
+    //Generate the control points, weights, and knots of an elliptical arc
     //
-    // **params**
-    // + the center
-    // + the scaled x axis
-    // + the scaled y axis
-    // + start angle of the ellipse arc, between 0 and 2pi, where 0 points at the xaxis
-    // + end angle of the arc, between 0 and 2pi, greater than the start angle
+    //**params**
     //
-    // **returns**
-    // + a NurbsCurveData object representing a NURBS curve
+    //* the center
+    //* the scaled x axis
+    //* the scaled y axis
+    //* start angle of the ellipse arc, between 0 and 2pi, where 0 points at the xaxis
+    //* end angle of the arc, between 0 and 2pi, greater than the start angle
+    //
+    //**returns**
+    //
+    //* a NurbsCurveData object representing a NURBS curve
 
     public static function ellipseArc( center : Point, xaxis : Point, yaxis : Point, startAngle : Float, endAngle : Float ) : NurbsCurveData {
 
@@ -222,13 +231,13 @@ class Make {
         xaxis = Vec.normalized( xaxis );
         yaxis = Vec.normalized( yaxis );
 
-        // if the end angle is less than the start angle, do a circle
+        //if the end angle is less than the start angle, do a circle
         if (endAngle < startAngle) endAngle = 2.0 * Math.PI + startAngle;
 
         var theta = endAngle - startAngle
         , numArcs = 0;
 
-        // how many arcs?
+        //how many arcs?
         if (theta <= Math.PI / 2) {
             numArcs = 1;
         } else {
@@ -303,32 +312,36 @@ class Make {
     }
 
 
-    // Generate the control points, weights, and knots of an arbitrary arc
+    //Generate the control points, weights, and knots of an arbitrary arc
     // (Corresponds to Algorithm A7.1 from Piegl & Tiller)
     //
-    // **params**
-    // + the center of the arc
-    // + the xaxis of the arc
-    // + orthogonal yaxis of the arc
-    // + radius of the arc
-    // + start angle of the arc, between 0 and 2pi
-    // + end angle of the arc, between 0 and 2pi, greater than the start angle
+    //**params**
     //
-    // **returns**
-    // + a NurbsCurveData object representing a NURBS curve
+    //* the center of the arc
+    //* the xaxis of the arc
+    //* orthogonal yaxis of the arc
+    //* radius of the arc
+    //* start angle of the arc, between 0 and 2pi
+    //* end angle of the arc, between 0 and 2pi, greater than the start angle
+    //
+    //**returns**
+    //
+    //* a NurbsCurveData object representing a NURBS curve
 
     public static function arc( center : Point, xaxis : Vector, yaxis : Vector, radius : Float, startAngle : Float,
                                 endAngle : Float ) : NurbsCurveData {
         return ellipseArc(  center, Vec.mul( radius, Vec.normalized( xaxis ) ), Vec.mul( radius, Vec.normalized( yaxis ) ), startAngle, endAngle );
     }
 
-    // Generate the control points, weights, and knots of a polyline curve
+    //Generate the control points, weights, and knots of a polyline curve
     //
-    // **params**
-    // + array of points in curve
+    //**params**
     //
-    // **returns**
-    // + a NurbsCurveData object representing a NURBS curve
+    //* array of points in curve
+    //
+    //**returns**
+    //
+    //* a NurbsCurveData object representing a NURBS curve
 
     public static function polyline( pts : Array<Point>) : NurbsCurveData {
 
@@ -341,7 +354,7 @@ class Make {
         }
         knots.push( lsum );
 
-        // normalize the knot array
+        //normalize the knot array
         knots = Vec.mul( 1 / lsum, knots );
 
         var weights = [ for (i in 0...pts.length) 1.0 ];
@@ -350,15 +363,17 @@ class Make {
 
     }
 
-    // Generate the control points, weights, and knots of an extruded surface
+    //Generate the control points, weights, and knots of an extruded surface
     //
-    // **params**
-    // + axis of the extrusion
-    // + length of the extrusion
-    // + a NurbsCurveData object representing a NURBS surface
+    //**params**
     //
-    // **returns**
-    // + an object with the following properties: controlPoints, weights, knots, degree
+    //* axis of the extrusion
+    //* length of the extrusion
+    //* a NurbsCurveData object representing a NURBS surface
+    //
+    //**returns**
+    //
+    //* an object with the following properties: controlPoints, weights, knots, degree
 
     public static function extrudedSurface( axis : Point, length : Float, profile : NurbsCurveData ) : NurbsSurfaceData {
 
@@ -371,7 +386,7 @@ class Make {
         var translation = Vec.mul( length, axis );
         var halfTranslation = Vec.mul( 0.5 * length, axis );
 
-        // original control points
+        //original control points
         for (j in 0...prof_controlPoints.length){
 
             controlPoints[2][j] = prof_controlPoints[j];
@@ -386,17 +401,19 @@ class Make {
         return new NurbsSurfaceData( 2, profile.degree, [0,0,0,1,1,1], profile.knots, Eval.homogenize2d( controlPoints, weights) );
     }
 
-    // Generate the control points, weights, and knots of a cylinder
+    //Generate the control points, weights, and knots of a cylinder
     //
-    // **params**
-    // + normalized axis of cylinder
-    // + xaxis in plane of cylinder
-    // + position of base of cylinder
-    // + height from base to top
-    // + radius of the cylinder
+    //**params**
     //
-    // **returns**
-    // + an object with the following properties: controlPoints, weights, knotsU, knotsV, degreeU, degreeV
+    //* normalized axis of cylinder
+    //* xaxis in plane of cylinder
+    //* position of base of cylinder
+    //* height from base to top
+    //* radius of the cylinder
+    //
+    //**returns**
+    //
+    //* an object with the following properties: controlPoints, weights, knotsU, knotsV, degreeU, degreeV
 
     public static function cylindricalSurface( axis : Point, xaxis : Point, base : Point, height : Float, radius : Float ) : NurbsSurfaceData {
 
@@ -408,19 +425,21 @@ class Make {
 
     }
 
-    // Generate the control points, weights, and knots of a revolved surface
+    //Generate the control points, weights, and knots of a revolved surface
     // (Corresponds to Algorithm A7.1 from Piegl & Tiller)
     //
-    // **params**
-    // + center of the rotation axis
-    // + axis of the rotation axis
-    // + angle to revolve around axis
-    // + degree of the generatrix
-    // + control points of the generatrix
-    // + weights of the generatrix
+    //**params**
     //
-    // **returns**
-    // + an object with the following properties: controlPoints, weights, knots, degree
+    //* center of the rotation axis
+    //* axis of the rotation axis
+    //* angle to revolve around axis
+    //* degree of the generatrix
+    //* control points of the generatrix
+    //* weights of the generatrix
+    //
+    //**returns**
+    //
+    //* an object with the following properties: controlPoints, weights, knots, degree
 
     public static function revolvedSurface( profile : NurbsCurveData, center : Point, axis : Point, theta : Float ) : NurbsSurfaceData {
 
@@ -429,20 +448,20 @@ class Make {
 
         var narcs, knotsU, controlPoints, weights;
 
-        if (theta <= Math.PI / 2) { // less than 90
+        if (theta <= Math.PI / 2) { //less than 90
             narcs = 1;
             knotsU = Vec.zeros1d( 6 + 2  * (narcs-1) );
         } else {
-            if (theta <= Math.PI){  // between 90 and 180
+            if (theta <= Math.PI){  //between 90 and 180
                 narcs = 2;
                 knotsU = Vec.zeros1d( 6 + 2 * (narcs-1) );
                 knotsU[3]= knotsU[4] = 0.5;
-            } else if (theta <= 3 * Math.PI / 2){ // between 180 and 270
+            } else if (theta <= 3 * Math.PI / 2){ //between 180 and 270
                 narcs = 3;
                 knotsU = Vec.zeros1d( 6 + 2 * (narcs-1) );
                 knotsU[3]= knotsU[4] = 1/3;
                 knotsU[5]= knotsU[6] = 2/3;
-            } else { // between 270 and 360
+            } else { //between 270 and 360
                 narcs = 4;
                 knotsU = Vec.zeros1d( 6 + 2 * (narcs-1) );
                 knotsU[3]= knotsU[4] = 1/4;
@@ -451,17 +470,17 @@ class Make {
             }
         }
 
-        var dtheta = theta / narcs // divide the interval into several points
+        var dtheta = theta / narcs //divide the interval into several points
         , j = 3 + 2 * (narcs-1);
 
-        // initialize the start and end knots
-        // keep in mind that we only return the knot vector for thes
+        //initialize the start and end knots
+        //keep in mind that we only return the knot vector for thes
         for (i in 0...3){
             knotsU[i] = 0.0;
             knotsU[j+i] = 1.0;
         }
 
-        // do some initialization
+        //do some initialization
         var n = 2 * narcs
         , wm = Math.cos( dtheta/2.0 )
         , angle = 0.0
@@ -470,24 +489,24 @@ class Make {
         , controlPoints = Vec.zeros3d( 2*narcs + 1, prof_controlPoints.length, 3 )
         , weights = Vec.zeros2d( 2*narcs + 1, prof_controlPoints.length );
 
-        // initialize the sines and cosines
+        //initialize the sines and cosines
         for (i in 1...narcs+1){
             angle += dtheta;
             cosines[i] = Math.cos(angle);
             sines[i] = Math.sin(angle);
         }
 
-        // for each pt in the generatrix
-        // i.e. for each row of the 2d knot vectors
+        //for each pt in the generatrix
+        //i.e. for each row of the 2d knot vectors
         for (j in 0...prof_controlPoints.length){
 
-            // get the closest point of the generatrix point on the axis
+            //get the closest point of the generatrix point on the axis
             var O = Trig.rayClosestPoint(prof_controlPoints[j], center, axis)
-            // X is the vector from the axis to generatrix control pt
+            //X is the vector from the axis to generatrix control pt
             , X = Vec.sub( prof_controlPoints[j], O )
-            // radius at that height
+            //radius at that height
             , r = Vec.norm(X)
-            // Y is perpendicular to X and axis, and complete the coordinate system
+            //Y is perpendicular to X and axis, and complete the coordinate system
             , Y = Vec.cross(axis,X);
 
             if ( r > Constants.EPSILON ){
@@ -495,30 +514,30 @@ class Make {
                 Y = Vec.mul( 1 / r, Y);
             }
 
-            // the first row of controlPoints and weights is just the generatrix
+            //the first row of controlPoints and weights is just the generatrix
             controlPoints[0][j] = prof_controlPoints[j];
             var P0 = prof_controlPoints[j];
             weights[0][j] = prof_weights[j];
 
-            // store T0 as the Y vector
+            //store T0 as the Y vector
             var T0 = Y
             , index = 0
             , angle = 0.0;
 
-            // proceed around the circle
+            //proceed around the circle
             for (i in 1...narcs+1){
 
-                // O + r * cos(theta) * X + r * sin(theta) * Y
-                // rotated generatrix pt
+                //O + r * cos(theta) * X + r * sin(theta) * Y
+                //rotated generatrix pt
                 var P2 = r == 0 ? O : Vec.add( O, Vec.add( Vec.mul( r * cosines[i], X), Vec.mul( r * sines[i], Y) ) );
 
                 controlPoints[index+2][j] = P2;
                 weights[index+2][j] = prof_weights[j];
 
-                // construct the vector tangent to the rotation
+                //construct the vector tangent to the rotation
                 var T2 = Vec.sub( Vec.mul( cosines[i], Y), Vec.mul(sines[i], X));
 
-                 // construct the next control pt
+                 //construct the next control pt
                 if (r == 0){
                     controlPoints[index+1][j] = O;
                 } else {
@@ -544,17 +563,18 @@ class Make {
 
     }
 
+    //Generate the control points, weights, and knots of a sphere
     //
-    // Generate the control points, weights, and knots of a sphere
+    //**params**
     //
-    // **params**
-    // + the center of the sphere
-    // + normalized axis of sphere
-    // + vector perpendicular to axis of sphere, starting the rotation of the sphere
-    // + radius of the sphere
+    //* the center of the sphere
+    //* normalized axis of sphere
+    //* vector perpendicular to axis of sphere, starting the rotation of the sphere
+    //* radius of the sphere
     //
-    // **returns**
-    // + an object with the following properties: controlPoints, weights, knotsU, knotsV, degreeU, degreeV
+    //**returns**
+    //
+    //* an object with the following properties: controlPoints, weights, knotsU, knotsV, degreeU, degreeV
     //
 
     public static function sphericalSurface( center : Point, axis : Point, xaxis : Point, radius : Float ){
@@ -564,17 +584,18 @@ class Make {
 
     }
 
+    //Generate the control points, weights, and knots of a cone
     //
-    // Generate the control points, weights, and knots of a cone
+    //**params**
     //
-    // **params**
-    // + normalized axis of cone
-    // + position of base of cone
-    // + height from base to tip
-    // + radius at the base of the cone
+    //* normalized axis of cone
+    //* position of base of cone
+    //* height from base to tip
+    //* radius at the base of the cone
     //
-    // **returns**
-    // + an object with the following properties: controlPoints, weights, knots, degree
+    //**returns**
+    //
+    //* an object with the following properties: controlPoints, weights, knots, degree
     //
 
     public static function conicalSurface( axis : Point, xaxis : Point, base : Point, height : Float, radius : Float ) : NurbsSurfaceData {
@@ -601,7 +622,7 @@ class Make {
         // 2) construct set of coordinattes to interpolate vector (p)
         // 3) set of control points (c)
 
-        // Wc = p
+        //Wc = p
 
         // 4) solve for c in all 3 dimensions
 
@@ -616,7 +637,7 @@ class Make {
             us.push( last + chord );
         }
 
-        // normalize
+        //normalize
         var max = us[us.length-1];
         for (i in 0...us.length){
             us[i] = us[i] / max;
@@ -624,7 +645,7 @@ class Make {
 
         var knotsStart = Vec.rep( degree + 1, 0.0 );
 
-        // we need two more control points, two more knots
+        //we need two more control points, two more knots
 
         var hasTangents = start_tangent != null && end_tangent != null;
         var start = hasTangents ? 0 : 1;
@@ -641,7 +662,7 @@ class Make {
 
         var knots = knotsStart.concat( Vec.rep( degree + 1, 1.0 ) );
 
-        // build matrix of basis function coeffs (TODO: use sparse rep)
+        //build matrix of basis function coeffs (TODO: use sparse rep)
         var A = [];
         var n = hasTangents ? points.length + 1 : points.length - 1;
 
@@ -670,7 +691,7 @@ class Make {
             A.spliceAndInsert( A.length-1, 0, tanRow1 );
         }
 
-        // for each dimension, solve
+        //for each dimension, solve
         var dim = points[0].length;
         var xs = [];
 
@@ -685,7 +706,7 @@ class Make {
             }
 
             else {
-                // insert the tangents at the second and second to last index
+                //insert the tangents at the second and second to last index
                 b = [ points[0][i] ];
                 b.push( mult0 * start_tangent[i]);
                 for (j in 1...points.length-1) b.push( points[j][i] );

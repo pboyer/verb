@@ -8,7 +8,7 @@ import verb.core.types.NurbsCurveData.Point;
 @:expose("topo.Vertex")
 class Vertex implements IDoublyLinkedList<Vertex> extends Topo {
     public var pt : Point;
-    public var e : HalfEdge; // a vertex may be "owned" by many HalfEdge's - this is one of them
+    public var e : HalfEdge; //a vertex may be "owned" by many HalfEdge's - this is one of them
     public var prv : Vertex;
     public var nxt : Vertex;
 
@@ -16,10 +16,10 @@ class Vertex implements IDoublyLinkedList<Vertex> extends Topo {
         this.pt = point;
     }
 
-    // TODO: test
+    //TODO: test
     public function neighbors() : Array<Vertex> {
         var memo = new IntMap<Vertex>();
-        memo.set(id, this); // do not include self ref's
+        memo.set(id, this); //do not include self ref's
 
         var a = [];
         var ce = e;
@@ -32,13 +32,13 @@ class Vertex implements IDoublyLinkedList<Vertex> extends Topo {
         return a;
     }
 
-    // TODO: test
+    //TODO: test
     public function halfEdges() : Array<HalfEdge> {
         var a = [];
         var ce = e;
         do {
             a.push(ce);
-            if (ce.opp == null) break; // the solid base case
+            if (ce.opp == null) break; //the solid base case
             ce = ce.opp.nxt;
         } while (ce != e);
 

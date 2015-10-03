@@ -18,15 +18,17 @@ class Trig {
         return Vec.dist( b, res.pt );
     }
 
-    // Find the closest point on a ray
+    //Find the closest point on a ray
     //
-    // **params**
-    // + point to project
-    // + origin for ray
-    // + direction of ray 1, assumed normalized
+    //**params**
     //
-    // **returns**
-    // + pt
+    //* point to project
+    //* origin for ray
+    //* direction of ray 1, assumed normalized
+    //
+    //**returns**
+    //
+    //* pt
 
     public static function rayClosestPoint( pt, o, r ) {
         var o2pt = Vec.sub(pt,o)
@@ -36,15 +38,17 @@ class Trig {
         return proj;
     }
 
-    // Find the distance of a point to a ray
+    //Find the distance of a point to a ray
     //
-    // **params**
-    // + point to project
-    // + origin for ray
-    // + direction of ray 1, assumed normalized
+    //**params**
     //
-    // **returns**
-    // + the distance
+    //* point to project
+    //* origin for ray
+    //* direction of ray 1, assumed normalized
+    //
+    //**returns**
+    //
+    //* the distance
 
     public static function distToRay( pt, o, r ) {
         var d = rayClosestPoint( pt, o, r );
@@ -54,7 +58,7 @@ class Trig {
 
     }
 
-    // Determine if three points form a straight line within a given tolerance for their 2 * squared area
+    //Determine if three points form a straight line within a given tolerance for their 2 * squared area
     //
     //          * p2
     //         / \
@@ -63,20 +67,22 @@ class Trig {
     //      /       \
     //     * p1 ---- * p3
     //
-    // The area metric is 2 * the squared norm of the cross product of two edges, requiring no square roots and no divisions
+    //The area metric is 2 * the squared norm of the cross product of two edges, requiring no square roots and no divisions
     //
-    // **params**
-    // + p1
-    // + p2
-    // + p3
-    // + The tolerance
+    //**params**
     //
-    // **returns**
-    // + Whether the triangle passes the test
+    //* p1
+    //* p2
+    //* p3
+    //* The tolerance
     //
+    //**returns**
+    //
+    //* Whether the triangle passes the test
+
     public static function threePointsAreFlat( p1, p2, p3, tol ) {
 
-        // find the area of the triangle without using a square root
+        //find the area of the triangle without using a square root
         var p2mp1 = Vec.sub( p2, p1 )
         , p3mp1 = Vec.sub( p3, p1 )
         , norm = Vec.cross( p2mp1, p3mp1 )
@@ -86,17 +92,19 @@ class Trig {
 
     }
 
-    // Find the closest point on a segment
+    //Find the closest point on a segment
     //
-    // **params**
-    // + point to project
-    // + first point of segment
-    // + second point of segment
-    // + first param of segment
-    // + second param of segment
+    //**params**
     //
-    // **returns**
-    // + *Object* with u and pt properties
+    //* point to project
+    //* first point of segment
+    //* second point of segment
+    //* first param of segment
+    //* second param of segment
+    //
+    //**returns**
+    //
+    //* *Object* with u and pt properties
 
     public static function segmentClosestPoint( pt : Point, segpt0 : Point, segpt1 : Point, u0 : Float, u1 : Float ) {
 

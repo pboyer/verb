@@ -2,13 +2,14 @@ package verb.core;
 
 class ArrayExtensions {
 
-    // Fill an array with n copies of null
+    //Fill an array with n copies of null
     //
-    // **params**
-    // + the array to fill
-    // + the number of null's to add to the array
+    //**params**
     //
-    // **returns**
+    //* the array to fill
+    //* the number of null's to add to the array
+    //
+    //**returns**
 
     public static function alloc<T>( a : Array<T>, n : Int ){
         if (n < 0) return;
@@ -17,13 +18,15 @@ class ArrayExtensions {
         }
     }
 
-    // Obtain a reversed copy of an array
+    //Obtain a reversed copy of an array
     //
-    // **params**
-    // + array of stuff
+    //**params**
     //
-    // **returns**
-    // + a reversed copy of the array
+    //* array of stuff
+    //
+    //**returns**
+    //
+    //* a reversed copy of the array
 
     public static function reversed<T>(a : Array<T>) : Array<T> {
         var ac = a.copy();
@@ -31,25 +34,29 @@ class ArrayExtensions {
         return ac;
     }
 
-    // Get the last element of an array
+    //Get the last element of an array
     //
-    // **params**
-    // + array of stuff
+    //**params**
     //
-    // **returns**
-    // + the last element of the array
+    //* array of stuff
+    //
+    //**returns**
+    //
+    //* the last element of the array
     
     public static function last<T>(a : Array<T>) : T {
         return a[a.length-1];
     }
 
-    // Get the first element of an array
+    //Get the first element of an array
     //
-    // **params**
-    // + array of stuff
+    //**params**
     //
-    // **returns**
-    // + the last element of the array
+    //* array of stuff
+    //
+    //**returns**
+    //
+    //* the last element of the array
     
     public static function first<T>(a : Array<T>) : T {
         return a[0];
@@ -60,13 +67,15 @@ class ArrayExtensions {
         a.insert(start, ele);
     }
 
-    // Get the first half of an array including the pivot
+    //Get the first half of an array including the pivot
     //
-    // **params**
-    // + array of stuff
+    //**params**
     //
-    // **returns**
-    // + the left half
+    //* array of stuff
+    //
+    //**returns**
+    //
+    //* the left half
 
     public static function left<T>(arr : Array<T>) : Array<T>{
         if (arr.length == 0) return [];
@@ -74,13 +83,15 @@ class ArrayExtensions {
         return arr.slice( 0, len );
     }
 
-    // Get the second half of an array, not including the pivot
+    //Get the second half of an array, not including the pivot
     //
-    // **params**
-    // + array of stuff
+    //**params**
     //
-    // **returns**
-    // + the right half
+    //* array of stuff
+    //
+    //**returns**
+    //
+    //* the right half
 
     public static function right<T>(arr : Array<T>) : Array<T>{
         if (arr.length == 0) return [];
@@ -88,13 +99,15 @@ class ArrayExtensions {
         return arr.slice( len );
     }
 
-    // Get the second half of an array including the pivot
+    //Get the second half of an array including the pivot
     //
-    // **params**
-    // + array of stuff
+    //**params**
     //
-    // **returns**
-    // + the right half
+    //* array of stuff
+    //
+    //**returns**
+    //
+    //* the right half
 
     public static function rightWithPivot<T>(arr : Array<T>) : Array<T>{
         if (arr.length == 0) return [];
@@ -102,15 +115,17 @@ class ArrayExtensions {
         return arr.slice( len-1 );
     }
 
-    // Obtain the unique set of elements in an array
+    //Obtain the unique set of elements in an array
     //
-    // **params**
-    // + array of stuff
-    // + *Function*, a function that receives two arguments (two objects from the array).  Returning true indicates
-    // the objects are equal.
+    //**params**
     //
-    // **returns**
-    // + array of unique elements
+    //* array of stuff
+    //* *Function*, a function that receives two arguments (two objects from the array).  Returning true indicates
+    //the objects are equal.
+    //
+    //**returns**
+    //
+    //* array of unique elements
 
     public static function unique<T>( arr : Array<T>, comp : T -> T -> Bool ){
 

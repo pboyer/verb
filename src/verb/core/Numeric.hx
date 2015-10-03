@@ -98,7 +98,7 @@ class Numeric {
             t = 1.0;
             df0 = Vec.dot(g0,step);
 
-            // line search
+            //line search
             x1 = x0;
             while(it < maxit) {
                 if(t*nstep < tol) { break; }

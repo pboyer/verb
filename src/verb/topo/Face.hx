@@ -22,11 +22,11 @@ using verb.core.Vec;
 class Face implements IDoublyLinkedList<Face> extends Topo {
 
     public var s : Solid;
-    public var ol : Loop; // outer loop
+    public var ol : Loop; //outer loop
     public var l : Loop;
     public var prv : Face;
     public var nxt : Face;
-//    public var srf : ISurface; // TODO: all faces now planar
+//    public var srf : ISurface; //TODO: all faces now planar
 
     public function new(solid) {
         this.s = solid;
@@ -36,7 +36,7 @@ class Face implements IDoublyLinkedList<Face> extends Topo {
         return l.iter().array();
     }
 
-    // TODO: test
+    //TODO: test
     public function rings() : Array<Loop> {
         var a = [];
         for (il in l.iter()){
@@ -50,21 +50,21 @@ class Face implements IDoublyLinkedList<Face> extends Topo {
         if (nl == null) {
             nl = new Loop(this);
         }
-        if (ol == null) ol = nl; // the first loop is the outer loop
+        if (ol == null) ol = nl; //the first loop is the outer loop
         return l = l.push(nl);
     }
 
     public function delLoop(kl : Loop) : Void {
         if (kl == ol) {
-            throw new Exception("Cannot delete outer loop!"); // this may be overly conservative
+            throw new Exception("Cannot delete outer loop!"); //this may be overly conservative
         }
         l = l.kill(kl);
     }
 
-    // TODO: test
+    //TODO: test
     public function neighbors() : Array<Face> {
         var memo = new IntMap<Face>();
-        memo.set(id, this); // do not include self
+        memo.set(id, this); //do not include self
 
         var a = [];
 
@@ -82,7 +82,7 @@ class Face implements IDoublyLinkedList<Face> extends Topo {
         return a;
     }
 
-    // TODO: test
+    //TODO: test
     public function halfEdges() : Array<HalfEdge>{
         return loops().fold(function(l : Loop, a : Array<HalfEdge>){
             return a.concat( l.halfEdges() );

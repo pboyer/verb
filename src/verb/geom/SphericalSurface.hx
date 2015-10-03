@@ -10,16 +10,17 @@ class SphericalSurface extends NurbsSurface {
     private var _center : Point;
     private var _radius : Float;
 
-    // public properties
+    //public properties
 
     public function center(){ return _center; }
     public function radius(){ return _radius; }
 
-    // Create a spherical surface
+    //Create a spherical surface
     //
-    // **params**
-    // + Length 3 array representing the center of the circle
-    // + Radius of the circle
+    //**params**
+    //
+    //* Length 3 array representing the center of the circle
+    //* Radius of the circle
 
     public function new(   center : Point,
                            radius : Float ) {

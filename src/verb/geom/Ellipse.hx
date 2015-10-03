@@ -6,12 +6,14 @@ import verb.core.types.NurbsCurveData.Point;
 @:expose("geom.Ellipse")
 class Ellipse extends EllipseArc {
 
-    // Create an ellipse
+    //Create an ellipse
     //
-    // **params**
-    // + Length 3 array representing the center of the circle
-    // + Length 3 array representing the xaxis
-    // + Length 3 array representing the perpendicular yaxis
+    //**params**
+    //
+    //
+    //* Length 3 array representing the center of the circle
+    //* Length 3 array representing the xaxis
+    //* Length 3 array representing the perpendicular yaxis
 
     public function new(   center : Point,
                             xaxis : Vector,

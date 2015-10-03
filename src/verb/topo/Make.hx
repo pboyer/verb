@@ -26,9 +26,9 @@ class Make {
             ce = nv.e;
         }
 
-        // the initial lmev moves the first half-edge to
-        // start at the second vertex, so we need to
-        // use e.nxt here
+        //the initial lmev moves the first half-edge to
+        //start at the second vertex, so we need to
+        //use e.nxt here
         s.lmef( e.nxt, ce );
 
         return s;
@@ -36,21 +36,21 @@ class Make {
 
     public static function extrusion( profile : Polygon, dir : Array<Float> ) : Solid {
 
-        // assume all points are not coincident, form one continuous outline
+        //assume all points are not coincident, form one continuous outline
         if (profile.length < 3) {
             throw new Exception("More than three points are required to define a polygon!");
         }
 
-        // TODO: make sure you go through profile in the right order
+        //TODO: make sure you go through profile in the right order
 //        var a = profile[0];
 //        var b = profile[1];
 //        var c = profile[2];
 //
-//        // pick 3 points and use the extrusion direction to define the plane
+//        //pick 3 points and use the extrusion direction to define the plane
 //        var n = a.sub(b).cross( c.sub(b) );
 //
 //        if ( n.dot(dir) > 0 ){
-//            // reverse
+//            //reverse
 //        }
 
         var s = lamina( profile );

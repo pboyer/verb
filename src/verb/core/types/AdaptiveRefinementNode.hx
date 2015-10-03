@@ -32,8 +32,8 @@ class AdaptiveRefinementNode {
     public function new( srf : NurbsSurfaceData, corners : Array<SurfacePoint>, neighbors : Array<AdaptiveRefinementNode> = null ) {
 
         //
-        // Structure of the child nodes
-        // in the adaptive refinement tree
+        //Structure of the child nodes
+        //in the adaptive refinement tree
         //
         //  v
         //  ^
@@ -46,7 +46,7 @@ class AdaptiveRefinementNode {
         //                  |           |          |
         //                  |     3     |     2    |
         //                  |           |          |
-        // neighbors[3]   (u0,v05)--(u05,v05)--(u1,v05)   neighbors[1]
+        //neighbors[3]   (u0,v05)--(u05,v05)--(u1,v05)   neighbors[1]
         //                  |           |          |
         //                  |     0     |     1    |
         //                  |           |          |
@@ -60,7 +60,7 @@ class AdaptiveRefinementNode {
 
         this.corners = corners;
 
-        // if no corners, we need to construct initial corners from the surface
+        //if no corners, we need to construct initial corners from the surface
         if (this.corners == null){
             var u0 : Float = srf.knotsU[0];
             var u1 : Float = srf.knotsU.last();
@@ -86,15 +86,15 @@ class AdaptiveRefinementNode {
 
     public function evalCorners(){
 
-        // eval the center
+        //eval the center
         this.u05 = (this.corners[0].uv[0] + this.corners[2].uv[0]) / 2;
         this.v05 = (this.corners[0].uv[1] + this.corners[2].uv[1]) / 2;
 
-        // eval all of the corners
+        //eval all of the corners
         for (i in 0...4) {
-            // if it's not already evaluated
+            //if it's not already evaluated
             if ( this.corners[i].point == null ){
-                // evaluate it
+                //evaluate it
                 var c = this.corners[i];
                 this.evalSrf( c.uv[0], c.uv[1], c );
             }
@@ -122,7 +122,7 @@ class AdaptiveRefinementNode {
 
     public function getEdgeCorners( edgeIndex : Int ) : Array<SurfacePoint> {
 
-        // if its a leaf, there are no children to obtain uvs from
+        //if its a leaf, there are no children to obtain uvs from
         if ( this.isLeaf() ) return [ this.corners[ edgeIndex ] ];
 
         if ( this.horizontal ){
@@ -140,7 +140,7 @@ class AdaptiveRefinementNode {
 
         }
 
-        // vertical case
+        //vertical case
         switch (edgeIndex) {
             case 0:
                 return this.children[0].getEdgeCorners( 0 ).concat( this.children[1].getEdgeCorners( 0 ) );
@@ -163,7 +163,7 @@ class AdaptiveRefinementNode {
             return baseArr;
         }
 
-        // get opposite edges uvs
+        //get opposite edges uvs
         var corners = this.neighbors[edgeIndex].getEdgeCorners( ( edgeIndex + 2 ) % 4 );
 
         var funcIndex = edgeIndex % 2;
@@ -171,13 +171,13 @@ class AdaptiveRefinementNode {
         var e = verb.core.Constants.EPSILON;
         var that = this;
 
-        // range clipping functions
+        //range clipping functions
         var rangeFuncMap = [
             function(c){ return c.uv[0] > that.corners[0].uv[0] + e && c.uv[0] < that.corners[2].uv[0] - e;  },
             function(c){ return c.uv[1] > that.corners[0].uv[1] + e && c.uv[1] < that.corners[2].uv[1] - e;  }
         ];
 
-        // clip the range of uvs to match this one
+        //clip the range of uvs to match this one
         var cornercopy = corners.filter( rangeFuncMap[ funcIndex ] );
         cornercopy.reverse();
         return baseArr.concat( cornercopy );
@@ -215,11 +215,11 @@ class AdaptiveRefinementNode {
             var corn = this.corners[i];
 
             if (this.corners[i].degen) {
-                // get neighbors
+                //get neighbors
                 var v1 = this.corners[(i + 1) % l];
                 var v2 = this.corners[(i + 3) % l];
 
-                // correct the normal
+                //correct the normal
                 this.corners[i].normal = v1.degen ? v2.normal : v1.normal;
             }
         }
@@ -232,7 +232,7 @@ class AdaptiveRefinementNode {
 
         if ( this.hasBadNormals() ) {
             this.fixNormals();
-            // don't divide any further when encountering a degenerate normal
+            //don't divide any further when encountering a degenerate normal
             return false;
         }
 
@@ -271,7 +271,7 @@ class AdaptiveRefinementNode {
 
         currentDepth++;
 
-        // is the quad flat in one dir and curved in the other?
+        //is the quad flat in one dir and curved in the other?
         if (this.splitVert && !this.splitHoriz) {
             horiz = false;
         } else if (!this.splitVert && this.splitHoriz){
@@ -287,10 +287,10 @@ class AdaptiveRefinementNode {
 
             this.children = [ new AdaptiveRefinementNode( this.srf, bott ), new AdaptiveRefinementNode( this.srf, top ) ];
 
-            // assign neighbors to bottom node
+            //assign neighbors to bottom node
             this.children[0].neighbors = [ this.neighbors[0], this.neighbors[1], this.children[1], this.neighbors[3] ];
 
-            // assign neighbors to top node
+            //assign neighbors to top node
             this.children[1].neighbors = [ this.children[0], this.neighbors[1], this.neighbors[2], this.neighbors[3] ];
 
         } else {
@@ -305,7 +305,7 @@ class AdaptiveRefinementNode {
 
         }
 
-        // divide all children recursively
+        //divide all children recursively
         for (child in this.children){
             child._divide( options, currentDepth, !horiz );
         }
@@ -318,7 +318,7 @@ class AdaptiveRefinementNode {
 
         if ( this.isLeaf() ) return this.triangulateLeaf( mesh );
 
-// recurse on the children
+//recurse on the children
         for (x in this.children){
             if (x == null) break;
             x.triangulate( mesh );
@@ -334,12 +334,12 @@ class AdaptiveRefinementNode {
         , ids = []
         , splitid = 0;
 
-        // enumerate all uvs in counter clockwise direction
+        //enumerate all uvs in counter clockwise direction
         for (i in 0...4){
 
             var edgeCorners = this.getAllCorners(i);
 
-            // this is the vertex that is split
+            //this is the vertex that is split
             if (edgeCorners.length == 2 ) splitid = i + 1;
 
             for (j in 0...edgeCorners.length) {
@@ -349,7 +349,7 @@ class AdaptiveRefinementNode {
 
         for (corner in uvs){
 
-            // if the id is defined, we can just push it and continue
+            //if the id is defined, we can just push it and continue
             if (corner.id != -1){
                 ids.push(corner.id);
                 continue;
@@ -367,20 +367,20 @@ class AdaptiveRefinementNode {
 
         if (uvs.length == 4){
 
-            // if the number of points is 4, we're just doing a
-            // rectangle - just build the basic triangulated square
+            //if the number of points is 4, we're just doing a
+            //rectangle - just build the basic triangulated square
             mesh.faces.push( [ ids[0], ids[3], ids[1] ] );
             mesh.faces.push( [ ids[3], ids[2], ids[1] ] );
 
-            // all done
+            //all done
             return mesh;
 
         } else if (uvs.length == 5){
 
-            // use the splitcorner to triangulate
+            //use the splitcorner to triangulate
             var il = ids.length;
 
-            // there will be 3 triangles
+            //there will be 3 triangles
             mesh.faces.push( [ ids[ splitid ], ids[ (splitid + 2) % il ], ids[ (splitid + 1) % il ] ] );
             mesh.faces.push( [ ids[ (splitid + 4) % il ],  ids[ (splitid + 3) % il ], ids[ splitid ] ] );
             mesh.faces.push( [ ids[ splitid ], ids[ (splitid + 3) % il ],ids[ (splitid + 2) % il ] ]);
@@ -389,17 +389,17 @@ class AdaptiveRefinementNode {
 
         }
 
-        // make point at center of face
+        //make point at center of face
         var center = this.center();
 
         mesh.uvs.push( center.uv );
         mesh.points.push( center.point );
         mesh.normals.push( center.normal );
 
-        // get index
+        //get index
         var centerIndex = mesh.points.length - 1;
 
-        // build triangle fan from center
+        //build triangle fan from center
         var i = 0;
         var j = uvs.length - 1;
         while (i < uvs.length){

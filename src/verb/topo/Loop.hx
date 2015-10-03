@@ -60,7 +60,7 @@ class Loop implements IDoublyLinkedList<Loop> extends Topo {
             throw new Exception("HalfEdge is not part of this Loop!");
         }
 
-        // the base case - a half-edge cycle
+        //the base case - a half-edge cycle
         if (he.nxt == he){
             he.opp = null;
             this.e = he;
@@ -68,7 +68,7 @@ class Loop implements IDoublyLinkedList<Loop> extends Topo {
             return this;
         }
 
-        // reassign parent edge for vertex
+        //reassign parent edge for vertex
         if (he.opp.nxt != null){
             he.v.e = he.opp.nxt;
         }

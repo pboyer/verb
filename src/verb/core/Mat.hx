@@ -22,7 +22,7 @@ class Mat {
     }
 
     public static function mult(x : Matrix, y : Matrix) : Matrix {
-        // based on the numeric.js routine - numeric.dotMMsmall
+        //based on the numeric.js routine - numeric.dotMMsmall
 
         var p,q,r,ret,foo,bar,woo,i0,k0,p0,r0;
 
@@ -141,10 +141,10 @@ class Mat {
         var abs = Math.abs;
         var i, j, k, absAjk, Akk, Ak, Pk, Ai;
         var max;
-        // copy A
+        //copy A
         A = [ for (i in 0...A.length) A[i].copy() ];
         var n = A.length, n1 = n-1;
-        var P = new Array<Int>(); // new Array(n);
+        var P = new Array<Int>(); //new Array(n);
 
         k = 0;
         while (k < n){

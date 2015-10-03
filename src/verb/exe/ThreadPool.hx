@@ -127,41 +127,41 @@ class ThreadPool
         #if (neko || cpp)
 			while (!allTasksAreDone())
 			{
-				// get a free thread
+				//get a free thread
 				var thread:PoolThread = getNextFreeThread();
-				// but if it doesn't exist, try again
+				//but if it doesn't exist, try again
 				if (thread == null)
 					continue;
 
 				for (task in tasks)
 				{
-					// skip any tasks that are done
+					//skip any tasks that are done
 					if (task.done)
 						continue;
 
-					// if this task is currently being run, see if it's done yet
+					//if this task is currently being run, see if it's done yet
 					if (task.thread != null && task.thread.started)
 					{
 						if (task.thread.done)
 						{
-							// yay, it finished!
+							//yay, it finished!
 							task.done = true;
-							// reset the thread
+							//reset the thread
 							task.thread.started = false;
-							// call the on finish function
+							//call the on finish function
 							if (task.onFinish != null)
 								task.onFinish(task.thread.result);
 						}
 						continue;
 					}
 
-					// ok, we have a task that needs running
-					// and a thread to run it
-					// combine forces!
+					//ok, we have a task that needs running
+					//and a thread to run it
+					//combine forces!
 					task.thread = thread;
 					thread.start(task.task, task.arg);
 
-					// break to try to assign the next thread
+					//break to try to assign the next thread
 					break;
 				}
 			}
@@ -173,7 +173,7 @@ class ThreadPool
         }
         #end
 
-        // clear the old tasks
+        //clear the old tasks
         tasks = new Array<Task>();
     }
 }

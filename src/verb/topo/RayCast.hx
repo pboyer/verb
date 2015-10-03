@@ -10,7 +10,7 @@ using verb.core.types.DoublyLinkedListExtensions;
 
 class RayCast {
 
-    // TODO : slow as shit
+    //TODO : slow as shit
     public static function raycast(s : Solid, ray : Ray, tol : Float = 0.001) : RayCastResult {
 
         var s0 = ray.origin;
@@ -59,7 +59,7 @@ class RayCast {
 }
 
 enum RayCastResultKind {
-    None; HalfEdge; Vertex;  // Face;
+    None; HalfEdge; Vertex;  //Face;
 }
 
 typedef RayCastResult = {

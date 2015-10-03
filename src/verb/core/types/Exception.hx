@@ -5,6 +5,6 @@ class Exception {
     public function new(message : String) {
         this.message = message;
 
-        // TODO : callstack
+        //TODO : callstack
     }
 }

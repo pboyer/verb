@@ -7,13 +7,14 @@ import verb.core.Make;
 @:expose("geom.Circle")
 class Circle extends Arc {
 
-    // Create a circle
+    //Create a circle
     //
-    // **params**
-    // + Length 3 array representing the center of the circle
-    // + Length 3 array representing the xaxis
-    // + Length 3 array representing the perpendicular yaxis
-    // + Radius of the circle
+    //**params**
+    //
+    //* Length 3 array representing the center of the circle
+    //* Length 3 array representing the xaxis
+    //* Length 3 array representing the perpendicular yaxis
+    //* Radius of the circle
 
     public function new(   center : Point,
                             xaxis : Vector,

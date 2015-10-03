@@ -8,15 +8,17 @@ import verb.core.types.CurveSurfaceIntersection;
 @:expose("geom.Intersect")
 class Intersect {
 
-    // Determine the intersection of two curves
+    //Determine the intersection of two curves
     //
-    // **params**
-    // + ICurve object
-    // + ICurve object
-    // + tolerance for the intersection
+    //**params**
     //
-    // **returns**
-    // + a possibly empty array of CurveCurveIntersection objects
+    //* ICurve object
+    //* ICurve object
+    //* tolerance for the intersection
+    //
+    //**returns**
+    //
+    //* a possibly empty array of CurveCurveIntersection objects
 
     public static function curves( first : ICurve, second : ICurve, tol : Float = 1e-3  ) : Array<CurveCurveIntersection> {
         return verb.core.Intersect.curves( first.asNurbs(), second.asNurbs(), tol );
@@ -26,15 +28,17 @@ class Intersect {
         return Dispatcher.dispatchMethod( verb.core.Intersect, "curves", [first.asNurbs(), second.asNurbs(), tol ]);
     }
 
-    // Determine the intersection of a curve and a surface
+    //Determine the intersection of a curve and a surface
     //
-    // **params**
-    // + ICurve
-    // + ISurface
-    // + tolerance for the curve intersection
+    //**params**
     //
-    // **returns**
-    // + array of CurveSurfaceIntersection objects
+    //* ICurve
+    //* ISurface
+    //* tolerance for the curve intersection
+    //
+    //**returns**
+    //
+    //* array of CurveSurfaceIntersection objects
 
     public static function curveAndSurface( curve : ICurve, surface : ISurface, tol : Float = 1e-3 ) : Array<CurveSurfaceIntersection> {
         return verb.core.Intersect.curveAndSurface( curve.asNurbs(), surface.asNurbs(), tol);
@@ -44,14 +48,16 @@ class Intersect {
         return Dispatcher.dispatchMethod( verb.core.Intersect, "curveAndSurface", [curve.asNurbs(), surface.asNurbs(), tol ]);
     }
 
-    // Determine the intersection of two surfaces
+    //Determine the intersection of two surfaces
     //
-    // **params**
-    // + ISurface
-    // + ISurface
+    //**params**
     //
-    // **returns**
-    // + array of NurbsCurveData objects
+    //* ISurface
+    //* ISurface
+    //
+    //**returns**
+    //
+    //* array of NurbsCurveData objects
 
     public static function surfaces( first : ISurface, second : ISurface, tol : Float = 1e-3  ) : Array<NurbsCurve> {
         return verb.core.Intersect.surfaces( first.asNurbs(), second.asNurbs(), tol )

@@ -8,10 +8,11 @@ import verb.core.types.NurbsCurveData.Point;
 @:expose("geom.BezierCurve")
 class BezierCurve extends NurbsCurve {
 
-    // Create a bezier curve
+    //Create a bezier curve
     //
-    // **params**
-    // + Array of control points
+    //**params**
+    //
+    //* Array of control points
 
     public function new( points : Array<Point>, weights : Array<Float> = null ) {
         super( Make.rationalBezierCurve( points, weights ) );

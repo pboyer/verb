@@ -73,9 +73,9 @@ class Vec {
         #if (!cs && !cpp && !java)
             if (step == null) return [];
         #end
-        if (step < Constants.EPSILON) return []; // infinite
-        if (min > max && step > 0.0) return []; // infinite
-        if (max > min && step < 0.0) return []; // infinite
+        if (step < Constants.EPSILON) return []; //infinite
+        if (min > max && step > 0.0) return []; //infinite
+        if (max > min && step < 0.0) return []; //infinite
 
         var l = [];
         var cur = min;
@@ -231,13 +231,13 @@ class Vec {
             }
 
             if (diff > 0.0){
-                // add the smaller
+                //add the smaller
                 merged.push( b[bi] );
                 bi++;
                 continue;
             }
 
-            // thus diff < 0.0
+            //thus diff < 0.0
             merged.push( a[ai] );
             ai++;
 
@@ -246,7 +246,7 @@ class Vec {
         return merged;
     }
 
-    // a is superset, hence it is always longer or equal
+    //a is superset, hence it is always longer or equal
     public static function sortedSetSub( a : Array<Float>, b : Array<Float>) : Array<Float> {
 
         var result = [];

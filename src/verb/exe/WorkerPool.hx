@@ -61,7 +61,7 @@ class WorkerPool {
 
             _working.set(workId, worker);
 
-            // upon completing your task...
+            //upon completing your task...
             worker.onmessage = function( e ){
 
                 _working.remove( workId );

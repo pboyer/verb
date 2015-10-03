@@ -455,7 +455,7 @@ class TESSmesh {
     * depending on whether a and b belong to different face or vertex rings.
     * For more explanation see tessMeshSplice() below.
     */
-    // static void Splice( TESShalfEdge *a, TESShalfEdge *b )
+    //static void Splice( TESShalfEdge *a, TESShalfEdge *b )
     public function splice_(a : TESShalfEdge, b : TESShalfEdge) : Void{
         var aOnext = a.Onext;
         var bOnext = b.Onext;
@@ -500,7 +500,7 @@ class TESSmesh {
     * the new face *before* fNext so that algorithms which walk the face
     * list will not see the newly created faces.
     */
-    // static void MakeFace( TESSface *newFace, TESShalfEdge *eOrig, TESSface *fNext )
+    //static void MakeFace( TESSface *newFace, TESShalfEdge *eOrig, TESSface *fNext )
     public function makeFace_(newFace : TESSface, eOrig : TESShalfEdge, fNext : TESSface ) : Void {
         var fNew = newFace;
         Tess2.assert(fNew != null);
@@ -734,7 +734,7 @@ class TESSmesh {
     * eNew == eOrg->Lnext, and eNew->Dst is a newly created vertex.
     * eOrg and eNew will have the same left face.
     */
-    // TESShalfEdge *tessMeshAddEdgeVertex( TESSmesh *mesh, TESShalfEdge *eOrg );
+    //TESShalfEdge *tessMeshAddEdgeVertex( TESSmesh *mesh, TESShalfEdge *eOrg );
     public function addEdgeVertex(eOrg : TESShalfEdge) : TESShalfEdge {
         var eNew = this.makeEdge_( eOrg );
         var eNewSym = eNew.Sym;
@@ -757,7 +757,7 @@ class TESSmesh {
     * such that eNew == eOrg->Lnext.  The new vertex is eOrg->Dst == eNew->Org.
     * eOrg and eNew will have the same left face.
     */
-    // TESShalfEdge *tessMeshSplitEdge( TESSmesh *mesh, TESShalfEdge *eOrg );
+    //TESShalfEdge *tessMeshSplitEdge( TESSmesh *mesh, TESShalfEdge *eOrg );
     public function splitEdge( eOrg : TESShalfEdge ) : TESShalfEdge{
         var tempHalfEdge = this.addEdgeVertex( eOrg );
         var eNew = tempHalfEdge.Sym;
@@ -787,7 +787,7 @@ class TESSmesh {
     * If (eOrg->Lnext->Lnext == eDst), the old face is reduced to two edges.
     */
 
-    // TESShalfEdge *tessMeshConnect( TESSmesh *mesh, TESShalfEdge *eOrg, TESShalfEdge *eDst );
+    //TESShalfEdge *tessMeshConnect( TESSmesh *mesh, TESShalfEdge *eOrg, TESShalfEdge *eDst );
     public function connect(eOrg : TESShalfEdge, eDst : TESShalfEdge) : TESShalfEdge{
         var joiningLoops = false;
         var eNew = this.makeEdge_( eOrg );
@@ -890,7 +890,7 @@ class TESSmesh {
         var f = this.fHead.next;
         while (f != this.fHead){
 //			for( f = this.fHead.next; ; f = f.next ){
-            // Skip faces which are outside the result.
+            //Skip faces which are outside the result.
             if( !f.inside ){
                 f = f.next;
                 continue;
@@ -904,16 +904,16 @@ class TESSmesh {
                 eNext = eCur.Lnext;
                 eSym = eCur.Sym;
 
-                // Try to merge if the neighbour face is valid.
+                //Try to merge if the neighbour face is valid.
                 if( eSym != null && eSym.Lface != null && eSym.Lface.inside )
                 {
-                    // Try to merge the neighbour faces if the resulting polygons
-                    // does not exceed maximum number of vertices.
+                    //Try to merge the neighbour faces if the resulting polygons
+                    //does not exceed maximum number of vertices.
                     curNv = this.countFaceVerts_( f );
                     symNv = this.countFaceVerts_( eSym.Lface );
                     if( (curNv+symNv-2) <= maxVertsPerFace )
                     {
-                        // Merge if the resulting poly is convex.
+                        //Merge if the resulting poly is convex.
                         if( Geom.vertCCW( eCur.getLprev().Org, eCur.Org, eSym.Lnext.Lnext.Org ) &&
                             Geom.vertCCW( eSym.getLprev().Org, eSym.Org, eCur.Lnext.Lnext.Org ) )
                         {
@@ -928,7 +928,7 @@ class TESSmesh {
                 if( eCur != null && eCur.Lnext.Org == vStart )
                     break;
 
-                // Continue to next edge.
+                //Continue to next edge.
                 eCur = eNext;
             }
             f = f.next;
@@ -1154,8 +1154,8 @@ class Geom {
     #define Interpolate(a,x,b,y)	RealInterpolate(a,x,b,y)
     #else
 
-    // Claim: the ONLY property the sweep algorithm relies on is that
-    // MIN(x,y) <= r <= MAX(x,y).  This is a nasty way to test that.
+    //Claim: the ONLY property the sweep algorithm relies on is that
+    //MIN(x,y) <= r <= MAX(x,y).  This is a nasty way to test that.
     #include <stdlib.h>
     extern int RandomInterpolate;
 
@@ -1343,7 +1343,7 @@ class PriorityQ {
         this.nodes = [];
         this.nodes.alloc( size+1 );
         for (i in 0...this.nodes.length)
-        // for (var i = 0; i < this.nodes.length; i++)
+        //for (var i = 0; i < this.nodes.length; i++)
         {
             this.nodes[i] = new PQnode();
         }
@@ -1352,7 +1352,7 @@ class PriorityQ {
         this.handles.alloc( size+1 );
 
         for (i in 0...this.handles.length)
-        // for (var i = 0; i < this.handles.length; i++)
+        //for (var i = 0; i < this.handles.length; i++)
         {
             this.handles[i] = new PQhandleElem();
         }
@@ -1479,7 +1479,7 @@ class PriorityQ {
             s = this.nodes.length;
             this.nodes.alloc(  this.max+1 );
             for (i in s...this.nodes.length)
-            // for (var i = s; i < this.nodes.length; i++)
+            //for (var i = s; i < this.nodes.length; i++)
             {
                 this.nodes[i] = new PQnode();
             }
@@ -1602,7 +1602,7 @@ class Sweep {
     }
 
     public static function debugEvent( tess : Tessellator ) : Void {
-        // empty
+        //empty
     }
 
     /*
@@ -1894,7 +1894,7 @@ class Sweep {
         regPrev = regUp;
         ePrev = eTopLeft;
         while(true){
-        // for( ;; ) {
+        //for( ;; ) {
             reg = Sweep.regionBelow( regPrev );
             e = reg.eUp.Sym;
             if( e.Org != ePrev.Org ) break;
@@ -2241,7 +2241,7 @@ class Sweep {
         var eUp, eLo;
 
         while(true){
-        // for( ;; ) {
+        //for( ;; ) {
             /* Find the lowest dirty region (we walk from the bottom up). */
             while( regLo.dirty ) {
                 regUp = regLo;
@@ -2494,7 +2494,7 @@ class Sweep {
         regUp = tess.dict.search( tmp ).key;
         regLo = Sweep.regionBelow( regUp );
         if( regLo == null ) {
-            // This may happen if the input polygon is coplanar.
+            //This may happen if the input polygon is coplanar.
             return;
         }
         eUp = regUp.eUp;
@@ -2715,7 +2715,7 @@ class Sweep {
         vHead = tess.mesh.vHead;
         v = vHead.next;
         while(v != vHead){
-        // for( v = vHead.next; v != vHead; v = v.next ) {
+        //for( v = vHead.next; v != vHead; v = v.next ) {
             v.pqHandle = pq.insert( v );
     //		if (v.pqHandle == INV_HANDLE)
     //			break;
@@ -2756,7 +2756,7 @@ class Sweep {
         /*LINTED*/
         var f = mesh.fHead.next;
         while (f != mesh.fHead ){
-        // for( f = mesh.fHead.next; f != mesh.fHead; f = fNext ) {
+        //for( f = mesh.fHead.next; f != mesh.fHead; f = fNext ) {
             fNext = f.next;
             e = f.anEdge;
             Tess2.assert( e.Lnext != e );
@@ -2793,7 +2793,7 @@ class Sweep {
 
         while( (v = tess.pq.extractMin()) != null ) {
             while (true){
-            // for( ;; ) {
+            //for( ;; ) {
                 vNext = tess.pq.min();
                 if( vNext == null || ! Geom.vertEq( vNext, v )) break;
 
@@ -2927,7 +2927,7 @@ class Tessellator {
         while (v != vHead){
 //			for( v = vHead.next; v != vHead; v = v.next ) {
             for ( i in 0...3){
-            // for( i = 0; i < 3; ++i ) {
+            //for( i = 0; i < 3; ++i ) {
                 c = v.coords[i];
                 if( c < minVal[i] ) { minVal[i] = c; minVert[i] = v; }
                 if( c > maxVal[i] ) { maxVal[i] = c; maxVert[i] = v; }
@@ -3033,7 +3033,7 @@ class Tessellator {
     * direction to be something unusual (ie. not parallel to one of the
     * coordinate axes).
     */
-/*	#define S_UNIT_X	(TESSreal)0.50941539564955385	// Pre-normalized
+/*	#define S_UNIT_X	(TESSreal)0.50941539564955385	//Pre-normalized
     #define S_UNIT_Y	(TESSreal)0.86052074622010633
     #else
     #define S_UNIT_X	(TESSreal)1.0
@@ -3062,8 +3062,8 @@ class Tessellator {
         i = this.longAxis_( norm );
 
 /*	#if defined(FOR_TRITE_TEST_PROGRAM) || defined(TRUE_PROJECT)
-        // Choose the initial sUnit vector to be approximately perpendicular
-        // to the normal.
+        //Choose the initial sUnit vector to be approximately perpendicular
+        //to the normal.
 
         Normalize( norm );
 
@@ -3071,14 +3071,14 @@ class Tessellator {
         sUnit[(i+1)%3] = S_UNIT_X;
         sUnit[(i+2)%3] = S_UNIT_Y;
 
-        // Now make it exactly perpendicular
+        //Now make it exactly perpendicular
         w = Dot( sUnit, norm );
         sUnit[0] -= w * norm[0];
         sUnit[1] -= w * norm[1];
         sUnit[2] -= w * norm[2];
         Normalize( sUnit );
 
-        // Choose tUnit so that (sUnit,tUnit,norm) form a right-handed frame
+        //Choose tUnit so that (sUnit,tUnit,norm) form a right-handed frame
         tUnit[0] = norm[1]*sUnit[2] - norm[2]*sUnit[1];
         tUnit[1] = norm[2]*sUnit[0] - norm[0]*sUnit[2];
         tUnit[2] = norm[0]*sUnit[1] - norm[1]*sUnit[0];
@@ -3318,14 +3318,14 @@ class Tessellator {
         var elements = 0;
         var vert;
 
-        // Assume that the input data is triangles now.
-        // Try to merge as many polygons as possible
+        //Assume that the input data is triangles now.
+        //Try to merge as many polygons as possible
         if (polySize > 3)
         {
             mesh.mergeConvexFaces( polySize );
         }
 
-        // Mark unused
+        //Mark unused
 //			for ( v = mesh.vHead.next; v != mesh.vHead; v = v.next )
 //				v.n = -1;
         v = mesh.vHead.next;
@@ -3334,7 +3334,7 @@ class Tessellator {
             v = v.next;
         }
 
-        // Create unique IDs for all vertices and faces.
+        //Create unique IDs for all vertices and faces.
         f = mesh.fHead.next;
         while( f != mesh.fHead ){
 //			for ( f = mesh.fHead.next; f != mesh.fHead; f = f.next )
@@ -3401,25 +3401,25 @@ class Tessellator {
         this.vertexIndices.alloc( maxVertexCount );
 
 
-        // Output vertices.
+        //Output vertices.
         v = mesh.vHead.next;
         while( v != mesh.vHead ){
 //			for ( v = mesh.vHead.next; v != mesh.vHead; v = v.next )
             if ( v.n != -1 )
             {
-                // Store coordinate
+                //Store coordinate
                 var idx = v.n * vertexSize;
                 this.vertices[idx+0] = v.coords[0];
                 this.vertices[idx+1] = v.coords[1];
                 if ( vertexSize > 2 )
                     this.vertices[idx+2] = v.coords[2];
-                // Store vertex index.
+                //Store vertex index.
                 this.vertexIndices[v.n] = v.idx;
             }
             v = v.next;
         }
 
-        // Output indices.
+        //Output indices.
         var nel = 0;
         f = mesh.fHead.next;
         while( f != mesh.fHead ){
@@ -3429,7 +3429,7 @@ class Tessellator {
                 continue;
             }
 
-            // Store polygon
+            //Store polygon
             edge = f.anEdge;
             faceVerts = 0;
             do
@@ -3440,13 +3440,13 @@ class Tessellator {
                 edge = edge.Lnext;
             }
             while (edge != f.anEdge);
-            // Fill unused.
+            //Fill unused.
             for (i in faceVerts...polySize){
 //				for (i = faceVerts; i < polySize; ++i){
                 this.elements[nel++] = -1;
             }
 
-            // Store polygon connectivity
+            //Store polygon connectivity
             if ( elementType == Tess2.CONNECTED_POLYGONS )
             {
                 edge = f.anEdge;
@@ -3456,7 +3456,7 @@ class Tessellator {
                     edge = edge.Lnext;
                 }
                 while (edge != f.anEdge);
-                // Fill unused.
+                //Fill unused.
                 for (i in faceVerts...polySize){
 //					for (i = faceVerts; i < polySize; ++i)
                     this.elements[nel++] = -1;
@@ -3647,7 +3647,7 @@ class Tessellator {
             vertexSize = 3;
 
 /*		if (setjmp(tess->env) != 0) {
-            // come back here if out of memory
+            //come back here if out of memory
             return 0;
         }*/
 

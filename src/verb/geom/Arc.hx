@@ -15,7 +15,7 @@ class Arc extends NurbsCurve {
     private var _minAngle : Float;
     private var _maxAngle : Float;
 
-    // public properties
+    //public properties
 
     public function center(){ return _center; }
     public function xaxis(){ return _xaxis; }
@@ -24,15 +24,16 @@ class Arc extends NurbsCurve {
     public function minAngle(){ return _minAngle; }
     public function maxAngle(){ return _maxAngle; }
 
-    // Constructor for Arc
+    //Constructor for Arc
     //
-    // **params**
-    // + Length 3 array representing the center of the arc
-    // + Length 3 array representing the xaxis
-    // + Length 3 array representing the perpendicular yaxis
-    // + Radius of the arc arc
-    // + Start angle in radians
-    // + End angle in radians
+    //**params**
+    //
+    //* Length 3 array representing the center of the arc
+    //* Length 3 array representing the xaxis
+    //* Length 3 array representing the perpendicular yaxis
+    //* Radius of the arc arc
+    //* Start angle in radians
+    //* End angle in radians
 
     public function new(   center : Point,
                             xaxis : Vector,

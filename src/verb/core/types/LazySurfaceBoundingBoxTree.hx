@@ -41,7 +41,7 @@ class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
         }
 
         var dom = max - min;
-        var pivot = (min + max) / 2.0; // + dom * 0.01 * Math.random();
+        var pivot = (min + max) / 2.0; //* dom * 0.01 * Math.random();
 
         var srfs = Modify.surfaceSplit( _surface, pivot, _splitV );
 

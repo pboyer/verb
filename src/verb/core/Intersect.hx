@@ -30,14 +30,16 @@ using verb.core.ArrayExtensions;
 @:expose("core.Intersect")
 class Intersect {
 
-    // Intersect two meshes, yielding a list of polylines
+    //Intersect two meshes, yielding a list of polylines
     //
-    // **params**
-    // + MeshData for the first mesh
-    // + MeshData for the latter
+    //**params**
     //
-    // **returns**
-    // + array of array of MeshIntersectionPoints
+    //* MeshData for the first mesh
+    //* MeshData for the latter
+    //
+    //**returns**
+    //
+    //* array of array of MeshIntersectionPoints
 
     public static function meshSlices( mesh : MeshData, min : Float, max : Float, step : Float ) : Array<Array<Array<MeshIntersectionPoint>>> {
         var bbtree = new MeshBoundingBoxTree( mesh );
@@ -65,14 +67,16 @@ class Intersect {
         return slices;
     }
 
-    // Intersect two NURBS surfaces, yielding a list of curves
+    //Intersect two NURBS surfaces, yielding a list of curves
     //
-    // **params**
-    // + NurbsSurfaceData for the first surface
-    // + NurbsSurfaceData for the second
+    //**params**
     //
-    // **returns**
-    // + array of NurbsCurveData objects
+    //* NurbsSurfaceData for the first surface
+    //* NurbsSurfaceData for the second
+    //
+    //**returns**
+    //
+    //* array of NurbsCurveData objects
 
     public static function surfaces( surface0 : NurbsSurfaceData, surface1 : NurbsSurfaceData, tol : Float) : Array<NurbsCurveData> {
 
@@ -96,17 +100,19 @@ class Intersect {
         });
     }
 
-    // Refine a pair of surface points to a point where the two surfaces intersect
+    //Refine a pair of surface points to a point where the two surfaces intersect
     //
-    // **params**
-    // + NurbsSurfaceData for the first surface
-    // + NurbsSurfaceData for the second
-    // + the UV for the point on the first surface
-    // + the UV for the point on the second surface
-    // + a tolerance value to terminate the refinement procedure
+    //**params**
     //
-    // **returns**
-    // + a SurfaceSurfaceIntersectionPoint object
+    //* NurbsSurfaceData for the first surface
+    //* NurbsSurfaceData for the second
+    //* the UV for the point on the first surface
+    //* the UV for the point on the second surface
+    //* a tolerance value to terminate the refinement procedure
+    //
+    //**returns**
+    //
+    //* a SurfaceSurfaceIntersectionPoint object
 
     public static function surfacesAtPointWithEstimate(surface0 : NurbsSurfaceData,
                                                        surface1 : NurbsSurfaceData,
@@ -134,7 +140,7 @@ class Intersect {
             qn = Vec.normalized( Vec.cross( qu, qv ) );
             qd = Vec.dot( qn, q );
 
-            // if tolerance is met, exit loop
+            //if tolerance is met, exit loop
             dist = Vec.distSquared(p, q);
 
             if (dist < tol*tol) {
@@ -171,7 +177,7 @@ class Intersect {
             uv1 = Vec.add( [dw, dt], uv1 );
             uv2 = Vec.add( [du, dv], uv2 );
 
-            // repeat
+            //repeat
             its++;
 
         } while( its < maxits );
@@ -179,16 +185,18 @@ class Intersect {
         return new SurfaceSurfaceIntersectionPoint(uv1, uv2, p, dist);
     }
 
-    // Intersect two meshes, yielding a list of polylines
+    //Intersect two meshes, yielding a list of polylines
     //
-    // **params**
-    // + MeshData for the first mesh
-    // + MeshData for the latter
-    // + optional boundingbox tree for first mesh
-    // + optional boundingbox tree for second mesh
+    //**params**
     //
-    // **returns**
-    // + array of array of MeshIntersectionPoints
+    //* MeshData for the first mesh
+    //* MeshData for the latter
+    //* optional boundingbox tree for first mesh
+    //* optional boundingbox tree for second mesh
+    //
+    //**returns**
+    //
+    //* array of array of MeshIntersectionPoints
 
     public static function meshes( mesh0 : MeshData,
                                    mesh1 : MeshData,
@@ -198,10 +206,10 @@ class Intersect {
         if (bbtree0 == null) bbtree0 = new LazyMeshBoundingBoxTree( mesh0 );
         if (bbtree1 == null) bbtree1 = new LazyMeshBoundingBoxTree( mesh1 );
 
-        // bounding box intersection to get all of the face pairs
+        //bounding box intersection to get all of the face pairs
         var bbints = Intersect.boundingBoxTrees( bbtree0, bbtree1, 0 );
 
-        // get the segments of the intersection crv with uvs
+        //get the segments of the intersection crv with uvs
         var segments = bbints.map(function(ids : Pair<Int, Int>){
             return Intersect.triangles( mesh0, ids.item0, mesh1, ids.item1 );
         }).filter(function(x){
@@ -210,7 +218,7 @@ class Intersect {
             return Vec.distSquared( x.min.point, x.max.point ) > Constants.EPSILON;
         }).unique(function(a, b){
 
-            // TODO: this is too expensive and this only occurs when the intersection
+            //TODO: this is too expensive and this only occurs when the intersection
             // 		line is on an edge.  we should mark these to avoid doing all of
             //		these computations
 
@@ -233,28 +241,30 @@ class Intersect {
         return makeMeshIntersectionPolylines( segments );
     }
 
-    // Given a list of unstructured mesh intersection segments, reconstruct into polylines
+    //Given a list of unstructured mesh intersection segments, reconstruct into polylines
     //
-    // **params**
-    // + unstructured collection of segments
+    //**params**
     //
-    // **returns**
-    // + array of array of MeshIntersectionPoint
+    //* unstructured collection of segments
+    //
+    //**returns**
+    //
+    //* array of array of MeshIntersectionPoint
 
     public static function makeMeshIntersectionPolylines( segments : Array<Interval<MeshIntersectionPoint>> ) : Array<Array<MeshIntersectionPoint>> {
 
         if (segments.length == 0) return [];
 
-        // we need to tag the segment ends
+        //we need to tag the segment ends
         for (s in segments){
             s.max.opp = s.min;
             s.min.opp = s.max;
         }
 
-        // construct a tree for fast lookup
+        //construct a tree for fast lookup
         var tree = kdTreeFromSegments( segments );
 
-        // flatten everything, we no longer need the segments
+        //flatten everything, we no longer need the segments
         var ends : Array<MeshIntersectionPoint> = [];
 
         for (seg in segments){
@@ -262,7 +272,7 @@ class Intersect {
             ends.push(seg.max);
         }
 
-        // step 1: assigning the vertices to the segment ends
+        //step 1: assigning the vertices to the segment ends
         for (segEnd in ends){
             if (segEnd.adj != null) continue;
 
@@ -274,12 +284,12 @@ class Intersect {
             }
         }
 
-        // step 2: traversing the topology to construct the pls
+        //step 2: traversing the topology to construct the pls
         var freeEnds = ends.filter(function(x){
             return x.adj == null;
         });
 
-        // if you cant find one, youve got a loop (or multiple), we run through all
+        //if you cant find one, youve got a loop (or multiple), we run through all
         if (freeEnds.length == 0) {
             freeEnds = ends;
         }
@@ -294,18 +304,18 @@ class Intersect {
 
             if (!end.visited){
 
-                // traverse to end
+                //traverse to end
                 var pl = [];
                 var curEnd = end;
 
                 while (curEnd != null) {
 
-                    // debug
+                    //debug
                     if (curEnd.visited) {
                         break;
                     }
 
-                    // consume both ends of the segment
+                    //consume both ends of the segment
                     curEnd.visited = true;
                     curEnd.opp.visited = true;
 
@@ -314,7 +324,7 @@ class Intersect {
 
                     curEnd = curEnd.opp.adj;
 
-                    // loop condition
+                    //loop condition
                     if (curEnd == end) {
                         break;
                     }
@@ -336,59 +346,65 @@ class Intersect {
         return pls;
     }
 
-    // Form a KD-tree from a collection of mesh intersection segments
+    //Form a KD-tree from a collection of mesh intersection segments
     //
-    // **params**
-    // + unstructured collection of segments
+    //**params**
     //
-    // **returns**
-    // + array of array of MeshIntersectionPoint
+    //* unstructured collection of segments
+    //
+    //**returns**
+    //
+    //* array of array of MeshIntersectionPoint
 
     private static function kdTreeFromSegments( segments: Array<Interval<MeshIntersectionPoint>> ) : KdTree<MeshIntersectionPoint> {
 
         var treePoints = [];
 
-        // for each segment, transform into two elements, each keyed by pt1 and pt2
+        //for each segment, transform into two elements, each keyed by pt1 and pt2
         for (seg in segments){
             treePoints.push(new KdPoint(seg.min.point, seg.min ));
             treePoints.push(new KdPoint(seg.max.point, seg.max ));
         }
 
-        // make our tree
+        //make our tree
         return new KdTree(treePoints, Vec.distSquared);
     }
 
-    // Given a segment end
+    //Given a segment end
     //
-    // **params**
-    // + unstructured collection of segments
+    //**params**
     //
-    // **returns**
-    // + array of array of MeshIntersectionPoint
+    //* unstructured collection of segments
     //
+    //**returns**
+    //
+    //* array of array of MeshIntersectionPoint
+
     public static function lookupAdjacentSegment( segEnd: MeshIntersectionPoint, tree : KdTree<MeshIntersectionPoint>, numResults : Int ) {
 
-        // we look up 3 elements because we need to find the unique adj ele
-        // we expect one result to be self, one to be neighbor and no more
+        //we look up 3 elements because we need to find the unique adj ele
+        //we expect one result to be self, one to be neighbor and no more
         var adj = tree.nearest(segEnd.point, numResults, Constants.EPSILON)
         .filter(function(r){
             return segEnd != r.item0.obj;
         })
         .map(function(r){ return r.item0.obj; });
 
-        // if its not unique (i.e. were at a branching point) we dont return it
+        //if its not unique (i.e. were at a branching point) we dont return it
         return (adj.length == 1) ? adj[0] : null;
     }
 
-    // Get the intersection of a NURBS curve and a NURBS surface without an estimate
+    //Get the intersection of a NURBS curve and a NURBS surface without an estimate
     //
-    // **params**
-    // + NurbsCurveData
-    // + NurbsSurfaceData
-    // + tolerance for the curve intersection
+    //**params**
     //
-    // **returns**
-    // + array of CurveSurfaceIntersection objects
+    //* NurbsCurveData
+    //* NurbsSurfaceData
+    //* tolerance for the curve intersection
+    //
+    //**returns**
+    //
+    //* array of CurveSurfaceIntersection objects
 
     public static function curveAndSurface( curve : NurbsCurveData,
                                               surface : NurbsSurfaceData,
@@ -406,13 +422,13 @@ class Intersect {
             var crvSeg = inter.item0;
             var srfPart = inter.item1;
 
-            // get the middle param of the curve
+            //get the middle param of the curve
             var min = crvSeg.knots.first();
             var max = crvSeg.knots.last();
 
             var u = (min + max) / 2.0;
 
-            // get the middle param of the surface
+            //get the middle param of the surface
             var minu = srfPart.knotsU.first();
             var maxu = srfPart.knotsU.last();
 
@@ -429,16 +445,18 @@ class Intersect {
         });
     }
 
-    // Refine an intersection pair for a surface and curve given an initial guess.  This is an unconstrained minimization,
-    // so the caller is responsible for providing a very good initial guess.
+    //Refine an intersection pair for a surface and curve given an initial guess.  This is an unconstrained minimization,
+    //so the caller is responsible for providing a very good initial guess.
     //
-    // **params**
-    // + NurbsCurveData
-    // + NurbsSurfaceData
-    // + array of initial parameter values [ u_crv, u_srf, v_srf ]
+    //**params**
     //
-    // **returns**
-    // + a CurveSurfaceIntersection object
+    //* NurbsCurveData
+    //* NurbsSurfaceData
+    //* array of initial parameter values [ u_crv, u_srf, v_srf ]
+    //
+    //**returns**
+    //
+    //* a CurveSurfaceIntersection object
 
     public static function curveAndSurfaceWithEstimate(    curve : NurbsCurveData,
                                                            surface : NurbsSurfaceData,
@@ -455,22 +473,22 @@ class Intersect {
 
         // 3 params
 
-        // r = s(u, v) - c(t)
-        // f = r(u,v,t) . r(u,v,t)
+        //r = s(u, v) - c(t)
+        //f = r(u,v,t) . r(u,v,t)
 
-        // d = [ du, dv, dt ]
-        // k = - [ f(u,v,t) ]
-        // J = [ df/du, df/dv, df/dt ]
+        //d = [ du, dv, dt ]
+        //k = - [ f(u,v,t) ]
+        //J = [ df/du, df/dv, df/dt ]
 
-        // dr/dt = -dc/dt
-        // dr/du = ds/du
-        // dr/dv = ds/dv
+        //dr/dt = -dc/dt
+        //dr/du = ds/du
+        //dr/dv = ds/dv
 
-        // gradient :
+        //gradient :
 
-        // df/dt = 2 * dr/dt . r(u,v,t)
-        // df/du = 2 * dr/du . r(u,v,t)
-        // df/dv = 2 * dr/dv . r(u,v,t)
+        //df/dt = 2 * dr/dt . r(u,v,t)
+        //df/du = 2 * dr/du . r(u,v,t)
+        //df/dv = 2 * dr/dv . r(u,v,t)
 
         var grad = function(x){
 
@@ -495,14 +513,16 @@ class Intersect {
             Eval.rationalCurvePoint( curve, final[0] ), Eval.rationalSurfacePoint( surface, final[1], final[2]) );
     }
 
-    // Approximate the intersection of a polyline and mesh while maintaining parameter information
+    //Approximate the intersection of a polyline and mesh while maintaining parameter information
     //
-    // **params**
-    // + PolylineData
-    // + MeshData
+    //**params**
     //
-    // **returns**
-    // + an array of PolylineMeshIntersection object
+    //* PolylineData
+    //* MeshData
+    //
+    //**returns**
+    //
+    //* an array of PolylineMeshIntersection object
 
     public static function polylineAndMesh( polyline : PolylineData,
                                               mesh : MeshData,
@@ -533,16 +553,18 @@ class Intersect {
         return finalResults;
     }
 
-    // The core algorithm for bounding box tree intersection, supporting both lazy and pre-computed bounding box trees
-    // via the IBoundingBoxTree interface
+    //The core algorithm for bounding box tree intersection, supporting both lazy and pre-computed bounding box trees
+    //via the IBoundingBoxTree interface
     //
-    // **params**
-    // + an IBoundingBoxTree object
-    // + a second IBoundingBoxTree object
-    // + the tolerance for the intersection, used by BoundingBox.intersects
+    //**params**
     //
-    // **returns**
-    // + an array of Pair objects extracted from the yield method of IBoundingBoxTree
+    //* an IBoundingBoxTree object
+    //* a second IBoundingBoxTree object
+    //* the tolerance for the intersection, used by BoundingBox.intersects
+    //
+    //**returns**
+    //
+    //* an array of Pair objects extracted from the yield method of IBoundingBoxTree
 
     public static function boundingBoxTrees<T1, T2>( ai : IBoundingBoxTree<T1>, bi : IBoundingBoxTree<T2>, tol : Float = 1e-9 )
         : Array<Pair<T1,T2>> {
@@ -611,15 +633,17 @@ class Intersect {
         return results;
     }
 
-    // Approximate the intersection of two NURBS curves
+    //Approximate the intersection of two NURBS curves
     //
-    // **params**
-    // + NurbsCurveData object representing the first NURBS curve
-    // + NurbsCurveData object representing the second NURBS curve
-    // + tolerance for the intersection
+    //**params**
     //
-    // **returns**
-    // + the intersections
+    //* NurbsCurveData object representing the first NURBS curve
+    //* NurbsCurveData object representing the second NURBS curve
+    //* tolerance for the intersection
+    //
+    //**returns**
+    //
+    //* the intersections
 
     public static function curves( curve1 : NurbsCurveData, curve2 : NurbsCurveData, tolerance : Float ) : Array<CurveCurveIntersection> {
 
@@ -636,18 +660,20 @@ class Intersect {
         });
     }
 
-    // Refine an intersection pair for two curves given an initial guess.  This is an unconstrained minimization,
-    // so the caller is responsible for providing a very good initial guess.
+    //Refine an intersection pair for two curves given an initial guess.  This is an unconstrained minimization,
+    //so the caller is responsible for providing a very good initial guess.
     //
-    // **params**
-    // + NurbsCurveData object representing the first NURBS curve
-    // + NurbsCurveData object representing the second NURBS curve
-    // + guess for first parameter
-    // + guess for second parameter
-    // + tolerance for the intersection
+    //**params**
     //
-    // **returns**
-    // + array of CurveCurveIntersection objects
+    //* NurbsCurveData object representing the first NURBS curve
+    //* NurbsCurveData object representing the second NURBS curve
+    //* guess for first parameter
+    //* guess for second parameter
+    //* tolerance for the intersection
+    //
+    //**returns**
+    //
+    //* array of CurveCurveIntersection objects
 
     private static function curvesWithEstimate( curve0 : NurbsCurveData,
                                                   curve1 : NurbsCurveData,
@@ -665,16 +691,16 @@ class Intersect {
 
         // 2 params
 
-        // r = c0(u) - c1(t)
-        // f = r(u,t) . r(u,t)
+        //r = c0(u) - c1(t)
+        //f = r(u,t) . r(u,t)
 
-        // dr/du = dc0/du
-        // dr/dt = -dc1/dt
+        //dr/du = dc0/du
+        //dr/dt = -dc1/dt
 
-        // gradient :
+        //gradient :
 
-        // df/du = 2 * dr/du . r(u,t)
-        // df/dt = 2 * dr/dt . r(u,t)
+        //df/du = 2 * dr/du . r(u,t)
+        //df/dt = 2 * dr/dt . r(u,t)
 
         var grad = function(x){
             var dc0 = Eval.rationalCurveDerivatives( curve0, x[0], 1 )
@@ -700,16 +726,18 @@ class Intersect {
         return new CurveCurveIntersection(p1, p2, u1, u2);
     }
 
-    // Intersect two triangles
+    //Intersect two triangles
     //
-    // **params**
-    // + array of length 3 arrays of numbers representing the points of mesh1
-    // + array of length 3 arrays of number representing the triangles of mesh1
-    // + array of length 3 arrays of numbers representing the points of mesh2
-    // + array of length 3 arrays of number representing the triangles of mesh2
+    //**params**
     //
-    // **returns**
-    // + a point represented by an array of length (dim)
+    //* array of length 3 arrays of numbers representing the points of mesh1
+    //* array of length 3 arrays of number representing the triangles of mesh1
+    //* array of length 3 arrays of numbers representing the points of mesh2
+    //* array of length 3 arrays of number representing the triangles of mesh2
+    //
+    //**returns**
+    //
+    //* a point represented by an array of length (dim)
 
     public static function triangles( mesh0 : MeshData, faceIndex0 : Int, mesh1 : MeshData, faceIndex1 : Int ) : Interval<MeshIntersectionPoint>{
 
@@ -759,7 +787,7 @@ class Intersect {
         var minU : CurveTriPoint = null;
         var maxU : CurveTriPoint = null;
 
-        // need to clip in order to maximize the width of the intervals
+        //need to clip in order to maximize the width of the intervals
         for (i in 0...3){
             var o0 = o[i];
             var d0 = d[i];
@@ -773,10 +801,10 @@ class Intersect {
             var useg = res.u0;
             var uray = res.u1;
 
-            // if outside of triangle edge interval, discard
+            //if outside of triangle edge interval, discard
             if (useg < -Constants.EPSILON || useg > l[i] + Constants.EPSILON) continue;
 
-            // if inside interval
+            //if inside interval
             if (minU == null || uray < minU.u){
                 minU = new CurveTriPoint( uray, Vec.onRay( ray.origin, ray.dir, uray ), Vec.onRay( uvs[i], uvd[i], useg / l[i]));
             }
@@ -798,13 +826,13 @@ class Intersect {
     public static function mergeTriangleClipIntervals(clip1 : Interval<CurveTriPoint>, clip2 : Interval<CurveTriPoint>,
                                                     mesh1 : MeshData, faceIndex1 : Int, mesh2 : MeshData, faceIndex2 : Int ) : Interval<MeshIntersectionPoint> {
 
-        // if the intervals dont overlap, fail
+        //if the intervals dont overlap, fail
         if ( clip2.min.u > clip1.max.u + Constants.EPSILON
             || clip1.min.u > clip2.max.u + Constants.EPSILON) {
             return null;
         }
 
-        // are these assigned properly?
+        //are these assigned properly?
         var min = (clip1.min.u > clip2.min.u) ? new Pair<CurveTriPoint, Int>(clip1.min, 0) : new Pair<CurveTriPoint, Int>(clip2.min, 1);
         var max = (clip1.max.u < clip2.max.u) ? new Pair<CurveTriPoint, Int>(clip1.max, 0) : new Pair<CurveTriPoint, Int>(clip2.max, 1);
 
@@ -831,16 +859,18 @@ class Intersect {
         return res;
     }
 
-    // Intersect two planes, yielding a Ray
+    //Intersect two planes, yielding a Ray
     //
-    // **params**
-    // + point in plane 0
-    // + normal to plane 0
-    // + point in plane 1
-    // + normal to plane 1
+    //**params**
     //
-    // **returns**
-    // + a point represented by an array of length (dim)
+    //* point in plane 0
+    //* normal to plane 0
+    //* point in plane 1
+    //* normal to plane 1
+    //
+    //**returns**
+    //
+    //* a point represented by an array of length (dim)
 
     public static function planes(origin0 : Point, normal0 : Vector, origin1 : Point, normal1: Vector) : Ray {
 
@@ -848,7 +878,7 @@ class Intersect {
 
         if (Vec.dot(d, d) < Constants.EPSILON) return null;
 
-        // find the largest index of d
+        //find the largest index of d
         var li = 0;
         var mi = Math.abs( d[0] );
         var m1 = Math.abs( d[1] );
@@ -883,7 +913,7 @@ class Intersect {
             b2 = normal1[1];
         }
 
-        // n dot X = d
+        //n dot X = d
         var d1 = -Vec.dot( origin0, normal0 );
         var d2 = -Vec.dot( origin1, normal1 );
 
@@ -905,19 +935,21 @@ class Intersect {
 
     }
 
-    // Intersect three planes, expects the planes to form a single point of
-    // intersection
+    //Intersect three planes, expects the planes to form a single point of
+    //intersection
     //
-    // **params**
-    // + normal for plane 0
-    // + d for plane 0 ( where the plane eq is normal * (x,y,z) = d )
-    // + normal for plane 1
-    // + d for plane 1 ( where the plane eq is normal * (x,y,z) = d )
-    // + normal for plane 2
-    // + d for plane 2 ( where the plane eq is normal * (x,y,z) = d )
+    //**params**
     //
-    // **returns**
-    // + the point representing the intersection
+    //* normal for plane 0
+    //* d for plane 0 ( where the plane eq is normal * (x,y,z) = d )
+    //* normal for plane 1
+    //* d for plane 1 ( where the plane eq is normal * (x,y,z) = d )
+    //* normal for plane 2
+    //* d for plane 2 ( where the plane eq is normal * (x,y,z) = d )
+    //
+    //**returns**
+    //
+    //* the point representing the intersection
 
     public static function threePlanes(n0 : Point, d0 : Float, n1 : Point, d1 : Float, n2 : Point, d2 : Float) : Point {
 
@@ -933,15 +965,17 @@ class Intersect {
 
     }
 
-    // Intersect two polyline curves, keeping track of parameterization on each
+    //Intersect two polyline curves, keeping track of parameterization on each
     //
-    // **params**
-    // + PolylineData for first polyline
-    // + PolylineData for second polyline
-    // + tolerance for the intersection
+    //**params**
     //
-    // **returns**
-    // + array of parameter pairs representing the intersection of the two parameteric polylines
+    //* PolylineData for first polyline
+    //* PolylineData for second polyline
+    //* tolerance for the intersection
+    //
+    //**returns**
+    //
+    //* array of parameter pairs representing the intersection of the two parameteric polylines
 
     public static function polylines( polyline0 : PolylineData, polyline1 : PolylineData, tol : Float )
         : Array<CurveCurveIntersection> {
@@ -961,7 +995,7 @@ class Intersect {
 
             if ( inter == null ) continue;
 
-            // remap to full parametric domain of polyline
+            //remap to full parametric domain of polyline
             inter.u0 = Vec.lerp(inter.u0, [ polyline0.params[polid0] ], [ polyline0.params[polid0+1] ] )[0];
             inter.u1 = Vec.lerp(inter.u1, [ polyline1.params[polid1] ], [ polyline1.params[polid1+1] ] )[0];
 
@@ -971,17 +1005,19 @@ class Intersect {
         return finalResults;
     }
 
-    // Find the closest parameter on two rays, see http://geomalgorithms.com/a07-_distance.html
+    //Find the closest parameter on two rays, see http://geomalgorithms.com/a07-_distance.html
     //
-    // **params**
-    // + first end of the first segment
-    // + second end of the first segment
-    // + first end of the second segment
-    // + second end of the second segment
-    // + tolerance for the intersection
+    //**params**
     //
-    // **returns**
-    // + a CurveCurveIntersection object
+    //* first end of the first segment
+    //* second end of the first segment
+    //* first end of the second segment
+    //* second end of the second segment
+    //* tolerance for the intersection
+    //
+    //**returns**
+    //
+    //* a CurveCurveIntersection object
 
     public static function segments( a0 : Point, a1 : Point, b0 : Point, b1 : Point, tol : Float ) : CurveCurveIntersection {
 
@@ -1009,16 +1045,18 @@ class Intersect {
         return null;
     }
 
-    // Find the closest parameter on two rays, see http://geomalgorithms.com/a07-_distance.html
+    //Find the closest parameter on two rays, see http://geomalgorithms.com/a07-_distance.html
     //
-    // **params**
-    // + origin for ray 1
-    // + direction of ray 1, assumed normalized
-    // + origin for ray 1
-    // + direction of ray 1, assumed normalized
+    //**params**
     //
-    // **returns**
-    // + a CurveCurveIntersection object
+    //* origin for ray 1
+    //* direction of ray 1, assumed normalized
+    //* origin for ray 1
+    //* direction of ray 1, assumed normalized
+    //
+    //**returns**
+    //
+    //* a CurveCurveIntersection object
 
     public static function rays( a0 : Point, a : Point, b0 : Point, b : Point ) : CurveCurveIntersection {
 
@@ -1031,7 +1069,7 @@ class Intersect {
         dbb = Vec.dot( b, b ),
         div = daa*dbb - dab*dab;
 
-        // parallel case
+        //parallel case
         if ( Math.abs( div ) < Constants.EPSILON ) {
             return null;
         }
@@ -1048,14 +1086,16 @@ class Intersect {
 
     //  Intersect segment with triangle (from http://geomalgorithms.com/a06-_intersect-2.html)
     //
-    // **params**
-    // + array of length 3 representing first point of the segment
-    // + array of length 3 representing second point of the segment
-    // + array of length 3 arrays representing the points of the triangle
-    // + array of length 3 containing int indices in the array of points, this allows passing a full mesh
+    //**params**
     //
-    // **returns**
-    // + a TriangleSegmentIntersection or null if failed
+    //* array of length 3 representing first point of the segment
+    //* array of length 3 representing second point of the segment
+    //* array of length 3 arrays representing the points of the triangle
+    //* array of length 3 containing int indices in the array of points, this allows passing a full mesh
+    //
+    //**returns**
+    //
+    //* a TriangleSegmentIntersection or null if failed
 
     public static function segmentWithTriangle( p0 : Point, p1 : Point, points : Array<Point>, tri : Tri ) : TriSegmentIntersection {
 
@@ -1071,22 +1111,22 @@ class Intersect {
         , a = -Vec.dot( n, w0 )
         , b = Vec.dot( n, dir );
 
-        // is ray is parallel to triangle plane?
+        //is ray is parallel to triangle plane?
         if ( Math.abs( b ) < Constants.EPSILON ){
             return null;
         }
 
         var r = a / b;
 
-        // segment goes away from triangle or is beyond segment
+        //segment goes away from triangle or is beyond segment
         if ( r < 0 || r > 1 ){
             return null;
         }
 
-        // get proposed intersection
+        //get proposed intersection
         var pt = Vec.add( p0, Vec.mul( r, dir ) );
 
-        // is I inside T?
+        //is I inside T?
         var uv = Vec.dot(u,v)
         , uu = Vec.dot(u,u)
         , vv = Vec.dot(v,v)
@@ -1115,21 +1155,22 @@ class Intersect {
     //  If intersecting a ray, the param needs to be between 0 and 1 and the caller is responsible
     //  for making that check
     //
-    // **params**
-    // + array of length 3 representing first point of the segment
-    // + array of length 3 representing second point of the segment
-    // + array of length 3 representing an origin point on the plane
-    // + array of length 3 representing the normal of the plane
+    //**params**
     //
-    // **returns**
-    // null or an object with a p property representing the param on the segment
+    //* array of length 3 representing first point of the segment
+    //* array of length 3 representing second point of the segment
+    //* array of length 3 representing an origin point on the plane
+    //* array of length 3 representing the normal of the plane
+    //
+    //**returns**
+    //null or an object with a p property representing the param on the segment
 
     public static function segmentAndPlane( p0 : Point, p1 : Point, v0 : Point, n : Point ) {
 
-        // the length of the segment
+        //the length of the segment
         var denom = Vec.dot( n, Vec.sub(p1,p0) );
 
-        // parallel case
+        //parallel case
         if ( Math.abs( denom ) < Constants.EPSILON ) {
             return null;
         }

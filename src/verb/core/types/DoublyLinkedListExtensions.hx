@@ -24,7 +24,7 @@ class DoublyLinkedListExtensions {
 
         if (t == null) return null;
 
-        if (t.nxt == t){ // a loop
+        if (t.nxt == t){ //a loop
             return null;
         }
 

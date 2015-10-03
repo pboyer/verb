@@ -55,10 +55,10 @@ class SectorIntersection {
     public var SectorB : SectorDescription;
 
     // -1, 0, 1
-    public var s1a : Int; // whether edge a of sector 1 is in, on, or out
-    public var s2a : Int; // whether edge a of sector 2 is in, on, or out
-    public var s1b : Int; // whether edge b of sector 1 is in, on, or out
-    public var s2b : Int; // whether edge b of sector 2 is in, on, or out
+    public var s1a : Int; //whether edge a of sector 1 is in, on, or out
+    public var s2a : Int; //whether edge a of sector 2 is in, on, or out
+    public var s1b : Int; //whether edge b of sector 1 is in, on, or out
+    public var s2b : Int; //whether edge b of sector 2 is in, on, or out
 
     public var intersect : Bool = true;
     public function new() {}
@@ -133,7 +133,7 @@ class Boolean {
 
     // 5.
 
-//      close( parts, op );  // from the various resultant parts  BinA, AinB, BoutA, etc, reconnect
+//      close( parts, op );  //from the various resultant parts  BinA, AinB, BoutA, etc, reconnect
 
     }
 
@@ -151,9 +151,9 @@ class Boolean {
         var looseendsa = [];
         var looseendsb = [];
 
-        // for every pair, one of the edges will be naked!
+        //for every pair, one of the edges will be naked!
 
-	// join means to take two vertices and join them into one edge
+	//join means to take two vertices and join them into one edge
 
         for (i in 0...nesa.length){
 
@@ -261,7 +261,7 @@ class Boolean {
 
         insertVertexFaceEventNullEdgesCore( v, f, efs, isA, isA ? nea : neb );
 
-        // this results in invalid an edge with an invalid nxt field
+        //this results in invalid an edge with an invalid nxt field
         insertNullEdgeIntoFace( v.pt.copy(), f, isA ? neb : nea );
     }
 
@@ -271,10 +271,10 @@ class Boolean {
         var s = v.e.l.f.s;
         var i = nextOfClass( above(isA), efs, 0 );
 
-        // there's no above edge in the seq (all below), continue
+        //there's no above edge in the seq (all below), continue
         if (i == -1) return;
 
-        // if all of the edges are of the same type, just continue
+        //if all of the edges are of the same type, just continue
         if (nextOfClass( below(isA), efs, 0 ) == -1) return;
 
         var start = efs[i].edge;
@@ -284,25 +284,25 @@ class Boolean {
 
         while(true){
 
-            // find the end of the ABOVE sequence
+            //find the end of the ABOVE sequence
             while (efs[i].pos == above(isA)){
                 tail = efs[i].edge;
                 i = (i + 1) % el;
             }
 
-            // insert a null edge
+            //insert a null edge
             s.lmev( head, tail.opp.nxt, head.v.pt.copy() );
             nulledges.push( head.prv );
 
-            // find the next start sequence and assign to head
+            //find the next start sequence and assign to head
             i = nextOfClass( above(isA), efs, i );
 
-            // there is no other above edge, we're done with this vertex
+            //there is no other above edge, we're done with this vertex
             if (i == -1) break;
 
             head = efs[i].edge;
 
-            // we've come back to the beginning (should never happen)
+            //we've come back to the beginning (should never happen)
             if (head == start) break;
         }
 
@@ -415,15 +415,15 @@ class Boolean {
         for (e in v.halfEdges()){
             ecs.push({ edge: e, pos : asFacePosition(Split.classify(e, p), isA) });
 
-            // for each edge, we also need to check the sector width - i.e. the angle
-            // bisector between two adjacent edges. If more than 180, we bisect the edge
+            //for each edge, we also need to check the sector width - i.e. the angle
+            //bisector between two adjacent edges. If more than 180, we bisect the edge
             if ( Split.wideSector(e) ){
                 ecs.push({ edge: e, pos : asFacePosition(Split.classifyBisector(e, p), isA) });
             }
         }
 
         // 2. now, for each "on" edge, we need to determine if its face is aligned with the plane normal
-        // if so,
+        //if so,
         //      if aligned with plane normal (dot(fn, sp) > 0), AonBp else AonBm
         var el = ecs.length;
         for (i in 0...el){
@@ -435,7 +435,7 @@ class Boolean {
             }
         }
 
-        // reclassify faces that are on
+        //reclassify faces that are on
         for (i in 0...el){
             var ep = ecs[i];
             var ei = Type.enumIndex( ep.pos );
@@ -444,8 +444,8 @@ class Boolean {
             }
         }
 
-        // it's possible that an edge was on, but its neighbors were not, indicating that its parent face is not coplanar
-        // here, we reclassify based on neighbor edges
+        //it's possible that an edge was on, but its neighbors were not, indicating that its parent face is not coplanar
+        //here, we reclassify based on neighbor edges
         for (i in 0...el){
             var ep = ecs[i];
             if (ep.pos == FacePosition.On){
@@ -481,13 +481,13 @@ class Boolean {
 
             throw new Exception("Coplanar sector edge classification not yet implemented!");
 
-            // TODO: 2 varieties
-                // edges lying within a sector face
-                    // look at neighbor sectors of the edge
-                        // both in -> in
-                        // both out -> out
-                        // in-out -> not an intersection?
-            // edges aligned with an edge from the other solid
+            //TODO: 2 varieties
+                //edges lying within a sector face
+                    //look at neighbor sectors of the edge
+                        //both in -> in
+                        //both out -> out
+                        //in-out -> not an intersection?
+            //edges aligned with an edge from the other solid
                 //
 
         }
@@ -500,7 +500,7 @@ class Boolean {
 
             if (!( sp.s1a == 0 && sp.s1b == 0 && sp.s2a == 0 && sp.s2b == 0 ) ) continue;
 
-            // do reclassification
+            //do reclassification
             var sa = sp.SectorA;
             var sb = sp.SectorB;
 
@@ -559,15 +559,15 @@ class Boolean {
 
         var res = new Array<SectorIntersection>();
 
-        // preprocess the sectors with extra geometric info
+        //preprocess the sectors with extra geometric info
         var svsa = preprocessVertexSectors( a );
         var svsb = preprocessVertexSectors( b );
 
-        // for each sector pair
+        //for each sector pair
         for (sva in svsa){
             for (svb in svsb){
 
-                // if the pair intersects, classify the pair
+                //if the pair intersects, classify the pair
                 if ( sectorsIntersect( sva, svb ) ){
 
                     var sp = new SectorIntersection();
@@ -615,7 +615,7 @@ class Boolean {
     }
 
     public static function withinSector( vec : Array<Float>, sv : SectorDescription ) : Bool {
-        // TODO: not sure how robust this is
+        //TODO: not sure how robust this is
         return vec.positiveAngleBetween( sv.ref1, sv.ref12 ) < sv.ref1.positiveAngleBetween( sv.ref2, sv.ref12 );
     }
 
@@ -642,14 +642,14 @@ class Boolean {
             sv.ref2 = e.nxt.v.pt.sub( e.v.pt );
             sv.updateNormal();
 
-            // are the two edges coincident? or is the angle between them > 180?
+            //are the two edges coincident? or is the angle between them > 180?
             if (sv.ref12.norm() < tol || e.l.f.normal().dot( sv.ref12 ) > 0.0 ){
 
-                // bisect the sector!
+                //bisect the sector!
                 var bisector : Array<Float>;
 
                 if ( sv.ref12.norm() < tol ){
-                    // TODO not sure how to handle this case
+                    //TODO not sure how to handle this case
                     throw new Exception("Coincident consecutive edges encountered!");
 //                    bisector = inside( e );
                 } else {
@@ -694,12 +694,12 @@ class Boolean {
 
     private static function reclassifyCoplanarEdge( e : HalfEdge, p : Plane, isA : Bool ) : FacePosition {
 
-        var n = e.l.f.normal(); // TODO: cache me
+        var n = e.l.f.normal(); //TODO: cache me
         var ndc = n.dot(p.n);
 
         var eps2 = Constants.EPSILON * Constants.EPSILON;
 
-        // face and plane are aligned
+        //face and plane are aligned
         if ( Math.abs(ndc - 1.0) < eps2 ) {
             return isA ? FacePosition.AonBp : FacePosition.BonAp;
         }
@@ -718,7 +718,7 @@ class Boolean {
             return isA ? FacePosition.AinB : FacePosition.BinA;
         }
 
-        return FacePosition.On; // will need to be recategorized later
+        return FacePosition.On; //will need to be recategorized later
     }
 
     private static var boolOnSectorMap =
@@ -747,11 +747,11 @@ class Boolean {
         };
     }
 
-    // find the intersecting edges of the two solids and split them
+    //find the intersecting edges of the two solids and split them
     public static function splitAllEdges( a : Solid, b : Solid, tol : Float ) : Array<Pair<Vertex,Vertex>> {
         var c = new Array<Pair<Vertex,Vertex>>();
 
-        // TODO spatial partition
+        //TODO spatial partition
         for (e0 in a.edges()){
             for (e1 in b.edges()){
                 var a = splitEdges(e0.item0, e1.item0, tol);
@@ -767,12 +767,12 @@ class Boolean {
 
         var i = verb.core.Intersect.segments( a.v.pt, a.nxt.v.pt, b.v.pt, b.nxt.v.pt, tol  );
 
-        // no intersection
+        //no intersection
         if (i == null) {
             return null;
         }
 
-        // if the intersection is on a vertex, ignore it
+        //if the intersection is on a vertex, ignore it
         if ( i.u0 > 1.0 - Constants.EPSILON || i.u0 < Constants.EPSILON ||
              i.u1 > 1.0 - Constants.EPSILON || i.u1 < Constants.EPSILON ){
             return null;
@@ -786,12 +786,12 @@ class Boolean {
         var i = Trig.segmentClosestPoint( v.pt, e.v.pt, e.nxt.v.pt, 0.0, 1.0 );
         var d = v.pt.distSquared( i.pt );
 
-        // too far
+        //too far
         if ( d > tol*tol ) {
             return null;
         }
 
-        // if the intersection is on a vertex, ignore it
+        //if the intersection is on a vertex, ignore it
         if ( i.u > 1.0 - Constants.EPSILON || i.u < Constants.EPSILON ){
             return null;
         }
@@ -804,8 +804,8 @@ class Boolean {
         return s.lmev( e, e.opp.nxt, pt );
     }
 
-    // determine if a point is within a face of a solid
-    // TODO test
+    //determine if a point is within a face of a solid
+    //TODO test
     public static function isPointInFace( pt : Point, f : Face, tol : Float ) : Bool {
 
         var n = f.normal();
@@ -823,7 +823,7 @@ class Boolean {
         return true;
     }
 
-    // determine if a point is within a polygon
+    //determine if a point is within a polygon
     public static function isPointInPolygon( pt : Point, pts : Array<Point>, n : Array<Float> ) : Bool {
         var ptsl = pts.length;
         var a = 0.0;
@@ -838,11 +838,11 @@ class Boolean {
         return Math.abs(a) > Math.PI;
     }
 
-    // find the edges of a that intersect with the vertices of b and intersect them
+    //find the edges of a that intersect with the vertices of b and intersect them
     public static function splitEdgesByVertices( a : Solid, b : Solid, tol : Float ) : Array<Pair<Vertex,Vertex>> {
         var c = new Array<Pair<Vertex,Vertex>>();
 
-        // TODO spatial partition
+        //TODO spatial partition
         for (e in a.edges()){
             for (v in b.v.iter()){
                 var a = splitEdgeByVertex(e.item0, v, tol);
@@ -854,10 +854,10 @@ class Boolean {
         return c;
     }
 
-    // get the vertex pairs that are coincident between a and b, third argument is array of pairs we already know are coincident
+    //get the vertex pairs that are coincident between a and b, third argument is array of pairs we already know are coincident
     public static function getCoincidentVertices( a : Solid, b : Solid, v : Array<Pair<Vertex,Vertex>>, tol : Float ) : Array<Pair<Vertex,Vertex>> {
 
-        // prevent formation of duplicates
+        //prevent formation of duplicates
         var m = new IntMap<Vertex>();
 
         for (p in v){
@@ -883,7 +883,7 @@ class Boolean {
         return v;
     }
 
-    // split the edges of a that intersect faces of b
+    //split the edges of a that intersect faces of b
     public static function splitEdgesWithFaces( a : Solid, b : Solid, tol : Float ) : Array<Pair<Vertex, Face>> {
         var v = new Array<Pair<Vertex, Face>>();
 
@@ -904,17 +904,17 @@ class Boolean {
 
         var r = verb.core.Intersect.segmentAndPlane(he.v.pt, he.nxt.v.pt, o, n );
 
-        // no intersection
+        //no intersection
         if (r == null) {
             return null;
         }
 
-        // on vertex
+        //on vertex
         if ( r.p > 1.0 - Constants.EPSILON || r.p < Constants.EPSILON ){
             return null;
         }
 
-        // get the actual intersection point
+        //get the actual intersection point
         var pt = Vec.lerp( r.p, he.nxt.v.pt, he.v.pt );
 
         if (!isPointInFace( pt, f, tol )){
@@ -924,10 +924,10 @@ class Boolean {
         return splitEdge( he, pt );
     }
 
-    // find the vertices of a that are coplanar with a face of b, third argument is vertices we already know are coplanar
+    //find the vertices of a that are coplanar with a face of b, third argument is vertices we already know are coplanar
     public static function getCoplanarVertices( a : Solid, b : Solid, ar : Array<Pair<Vertex, Face>>, tol : Float ) : Array<Pair<Vertex,Face>> {
 
-        // prevent formation of duplicates
+        //prevent formation of duplicates
         var m = new IntMap<Vertex>();
 
         for (p in ar){

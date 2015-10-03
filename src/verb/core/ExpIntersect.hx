@@ -1,6 +1,6 @@
 package verb.core;
 
-// experimental surface intersection work
+//experimental surface intersection work
 
 import verb.core.types.IBoundingBoxTree;
 import verb.core.types.SurfaceSurfaceIntersectionPoint;
@@ -22,25 +22,25 @@ class MarchStep {
 
     public var stepCount = 0;
 
-    // the last step taken
+    //the last step taken
     public var step : Point;
 
-    // the uv from which the last step was taken on srf0
+    //the uv from which the last step was taken on srf0
     public var olduv0 : UV;
 
-    // the uv after the step was taken
+    //the uv after the step was taken
     public var uv0 : UV;
 
-    // the uv from which the last step was taken on srf0
+    //the uv from which the last step was taken on srf0
     public var olduv1 : UV;
 
-    // the uv after the step was taken
+    //the uv after the step was taken
     public var uv1 : UV;
 
-    // the point from which last step was taken
+    //the point from which last step was taken
     public var oldpoint : Point;
 
-    // the point after the step was taken
+    //the point after the step was taken
     public var point : Point;
 
     public var state : MarchStepState;
@@ -157,12 +157,12 @@ class ExpIntersect {
         // 3) determine the new step length
         var stepLength = INIT_STEP_LENGTH;
 
-        // if possible, build adaptive step
+        //if possible, build adaptive step
         if ( prev.oldpoint != null ){
 
             var denom = Math.acos( Vec.dot( prev.step.normalized(), unitStep ) );
 
-            // linear intersection curve
+            //linear intersection curve
             if ( Math.abs( denom ) < Constants.EPSILON ){
                 stepLength = LINEAR_STEP_LENGTH;
             } else {
@@ -173,10 +173,10 @@ class ExpIntersect {
             }
         }
 
-        // scale the step
+        //scale the step
         var step = Vec.mul( stepLength, unitStep );
 
-        // project the step back to the surfaces
+        //project the step back to the surfaces
         var x = prev.point.add(step);
 
         var pdif = x.sub(p);
@@ -221,10 +221,10 @@ class ExpIntersect {
         newuv0 = uv0.add( stepuv0 );
         newuv1 = uv1.add( stepuv1 );
 
-        // TODO: if doesn't converge, make d smaller
+        //TODO: if doesn't converge, make d smaller
         var relaxed = Intersect.surfacesAtPointWithEstimate( surface0, surface1, newuv0, newuv1, tol );
 
-        // have we made a loop?
+        //have we made a loop?
         if ( prev.stepCount > 5 && prev.olduv0 != null && Trig.distToSegment( prev.point, first.point, relaxed.point ) < 10 * tol ){
             return new MarchStep( step, prev.uv0, prev.uv1, first.uv0, first.uv1, prev.point, first.point, MarchStepState.CompleteLoop, prev.stepCount+1 );
         }
@@ -243,7 +243,7 @@ class ExpIntersect {
                                                         currentIndex : Int, 
                                                         allStartPts : Array<SurfaceSurfaceIntersectionPoint>, 
                                                         tol : Float ) : Bool {
-        // if were marching along the first point, then we couldn't possibly be
+        //if were marching along the first point, then we couldn't possibly be
         if (currentIndex == 0) return false;
 
         for (i in 0...currentIndex){
@@ -255,7 +255,7 @@ class ExpIntersect {
             }
         }
 
-        // are we coincident with a point from which we've already started?
+        //are we coincident with a point from which we've already started?
         return false;
     }
 
@@ -267,15 +267,15 @@ class ExpIntersect {
 
         var start = allStartPts[startIndex];
 
-        // take first step along curve
+        //take first step along curve
         var step = march( surface0, surface1, MarchStep.init( start ), startIndex, allStartPts, tol );
 
-        // if we're out of bounds, exit
+        //if we're out of bounds, exit
         if (step.state == MarchStepState.AtBoundary || step.state == MarchStepState.CoincidentStartPoint ){
             return null;
         }
 
-        // march until you hit a boundary or a start point we already traversed
+        //march until you hit a boundary or a start point we already traversed
         var final = [];
         final.push( start );
 
@@ -305,7 +305,7 @@ class ExpIntersect {
         var approxInner = approxInnerCriticalPts( surface0, surface1 );
         var refinedInner = refineInnerCriticalPts( surface0, surface1, approxInner, tol );
 
-        // todo prevent duplicate points
+        //todo prevent duplicate points
         var b = true;
 
         for (pair in refinedInner){
@@ -392,20 +392,20 @@ class ExpIntersect {
 
     public static function approxInnerCriticalPts(surface0 : NurbsSurfaceData, surface1 : NurbsSurfaceData) : Array<Pair<UV,UV>> {
 
-        // TODO: adaptive division
+        //TODO: adaptive division
 
         var div0 = new LazySurfaceBoundingBoxTree( surface0, false, 0.6, 0.6 );
         var div1 = new LazySurfaceBoundingBoxTree( surface1, false, 0.6, 0.6 );
 
         var res = Intersect.boundingBoxTrees(div0, div1, 0);
 
-        // TODO sampling density?
-        // faster closest point?
+        //TODO sampling density?
+        //faster closest point?
         var numSamples = 4;
 
         var criticalPts = [];
 
-        // for each surface pair, construct del phi 2d array
+        //for each surface pair, construct del phi 2d array
         for (srfpair in res){
             var a = approxSurfaceDelPhiField( srfpair.item0, srfpair.item1, numSamples, numSamples );
 
@@ -413,7 +413,7 @@ class ExpIntersect {
             var uvs0 = a.uvs0;
             var uvs1 = a.uvs1;
 
-            // iterate through loops in field
+            //iterate through loops in field
             for ( i in 1...f.length ){
                 for ( j in 1...f[i].length ){
                     var num = approxRotationNumber( [ f[i][j-1], f[i][j], f[i-1][j], f[i-1][j-1] ] );
@@ -434,7 +434,7 @@ class ExpIntersect {
         return criticalPts;
     }
 
-    // approximate the rotation number from del phi
+    //approximate the rotation number from del phi
     public static function approxRotationNumber( vs : Array<Array<Float>> ){
         var sum = 0.0;
 
@@ -465,7 +465,7 @@ class ExpIntersect {
                 var minDist = Math.POSITIVE_INFINITY;
                 var minUV = [ Math.POSITIVE_INFINITY, Math.POSITIVE_INFINITY ];
 
-                // for each pt in second sampling
+                //for each pt in second sampling
                 for (k in 0...tess1.uvs.length){
                     for (l in 0...tess1.uvs[k].length){
                         var dist = Vec.distSquared( tess0.points[i][j], tess0.points[k][l] );
@@ -481,7 +481,7 @@ class ExpIntersect {
 
         var delphifield = [];
 
-        // develop del phi field using min uvs
+        //develop del phi field using min uvs
         for (i in 0...minuvs.length){
 
             var delphirow = [];
@@ -566,7 +566,7 @@ class ExpIntersect {
             var res = Intersect.curveAndSurface( crv, surface1, tol );
 
             for (int in res){
-                // reconstruct the uv on the isocurve
+                //reconstruct the uv on the isocurve
                 var uv = switch i {
                     case 0: [ surface0.knotsU.first(), int.u ];
                     case 1: [ surface0.knotsU.last(), int.u ];
@@ -584,7 +584,7 @@ class ExpIntersect {
             var res = Intersect.curveAndSurface( crv, surface0, tol );
 
             for (int in res){
-                // reconstruct the uv on the isocurve
+                //reconstruct the uv on the isocurve
                 var uv = switch i {
                     case 0: [ surface1.knotsU.first(), int.u ];
                     case 1: [ surface1.knotsU.last(), int.u ];
@@ -605,21 +605,21 @@ class ExpIntersect {
 }
 
 
-// developing the del phi field
+//developing the del phi field
 
-    // subdivide two surfaces and intersect via recursive aabb intersection
+    //subdivide two surfaces and intersect via recursive aabb intersection
     //  - this allows us to omit non-intersecting subpatches
-    // get closest pt for each
+    //get closest pt for each
 
-    // dot prod this vector with surface partial derivs to get del phi (pg 45 first paragraph)
+    //dot prod this vector with surface partial derivs to get del phi (pg 45 first paragraph)
 
-// approximating critical pts in field
+//approximating critical pts in field
 
-    // iterate through the rectangles formed by 4 points in the initial subdivision
-    // we determine the approximate rotation number in each area by sampling del phi vectors and determining their rotation
-    // see second paragraph pg 45
+    //iterate through the rectangles formed by 4 points in the initial subdivision
+    //we determine the approximate rotation number in each area by sampling del phi vectors and determining their rotation
+    //see second paragraph pg 45
 
-// do minimization to determine minima
+//do minimization to determine minima
 
 /*
 

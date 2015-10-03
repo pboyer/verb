@@ -14,7 +14,7 @@ class EllipseArc extends NurbsCurve {
     private var _minAngle : Float;
     private var _maxAngle : Float;
 
-    // public properties
+    //public properties
 
     public function center(){ return _center; }
     public function xaxis(){ return _xaxis; }
@@ -22,14 +22,15 @@ class EllipseArc extends NurbsCurve {
     public function minAngle(){ return _minAngle; }
     public function maxAngle(){ return _maxAngle; }
 
-    // Create an EllipseArc
+    //Create an EllipseArc
     //
-    // **params**
-    // + Length 3 array representing the center of the arc
-    // + Length 3 array representing the xaxis
-    // + Length 3 array representing the perpendicular yaxis
-    // + Minimum angle of the EllipseArc
-    // + Maximum angle of the EllipseArc
+    //**params**
+    //
+    //* Length 3 array representing the center of the arc
+    //* Length 3 array representing the xaxis
+    //* Length 3 array representing the perpendicular yaxis
+    //* Minimum angle of the EllipseArc
+    //* Maximum angle of the EllipseArc
 
     public function new(   center : Point,
                             xaxis : Vector,

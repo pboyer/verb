@@ -37,13 +37,15 @@ class Check {
         return true;
     }
 
-    // Validate a NurbsCurveData object
+    //Validate a NurbsCurveData object
     //
-    // **params**
-    // + The data object
+    //**params**
     //
-    // **returns**
-    // + The original, unmodified data
+    //* The data object
+    //
+    //**returns**
+    //
+    //* The original, unmodified data
 
     public static function nurbsCurveData( data : NurbsCurveData ) : NurbsCurveData {
         if ( data.controlPoints == null ) throw "Control points array cannot be null!";
@@ -64,13 +66,15 @@ class Check {
         return data;
     }
 
-    // Validate a NurbsSurfaceData object
+    //Validate a NurbsSurfaceData object
     //
-    // **params**
-    // + The data object
+    //**params**
     //
-    // **returns**
-    // + The original, unmodified data
+    //* The data object
+    //
+    //**returns**
+    //
+    //* The original, unmodified data
 
     public static function nurbsSurfaceData( data : NurbsSurfaceData ) : NurbsSurfaceData {
         if ( data.controlPoints == null ) throw "Control points array cannot be null!";

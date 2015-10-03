@@ -30,7 +30,7 @@ class Analyze {
         return v / 6.0;
     }
 
-    // helper method for volume of a solid, as an optimization does not mult by 6
+    //helper method for volume of a solid, as an optimization does not mult by 6
     private static function tetravol( a : Array<Float>, b : Array<Float>, c : Array<Float>, d : Array<Float> ){
         return ( a.sub(d) ).dot( b.sub(d).cross( c.sub(d) ) );
     }

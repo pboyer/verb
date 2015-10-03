@@ -49,11 +49,11 @@ class Dispatcher {
 
         #if js
 
-            // use WorkerPool
+            //use WorkerPool
             _workerPool.addWork( Type.getClassName( classType ), methodName, args, callback );
 
         #else
-            // TODO: neko || cpp use ThreadPool
+            //TODO: neko || cpp use ThreadPool
             var result = Reflect.callMethod(classType, Reflect.field(classType, methodName), args );
             callback( result );
         #end

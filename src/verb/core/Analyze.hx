@@ -27,15 +27,16 @@ class KnotMultiplicity {
 @:expose("core.Analyze")
 class Analyze {
 
+    //Determine the multiplicities of the values in a knot vector
     //
-    // Determine the multiplicities of the values in a knot vector
+    //**params**
     //
-    // **params**
-    // + array of nondecreasing knot values
+    //*array of nondecreasing knot values
     //
-    // **returns**
-    // + *Array* of length 2 arrays, [knotValue, knotMultiplicity]
+    //**returns**
     //
+    //**Array* of length 2 arrays, [knotValue, knotMultiplicity]
+
     public static function knotMultiplicities( knots : KnotArray ) : Array<KnotMultiplicity> {
 
         var mults = [  new KnotMultiplicity( knots[0], 0 ) ];
@@ -72,14 +73,14 @@ class Analyze {
 
     public static function rationalSurfaceClosestParam( surface : NurbsSurfaceData, p : Point ) : UV {
 
-        // for surfaces, we try to minimize the following:
+        //for surfaces, we try to minimize the following:
         //
-        // f = Su(u,v) * r = 0
-        // g = Sv(u,v) * r = 0
+        //f = Su(u,v) * r = 0
+        //g = Sv(u,v) * r = 0
         //
         //  where r = S(u,v) - P
         //
-        // Again, this requires newton iteration, but this time our objective function is vector valued
+        //Again, this requires newton iteration, but this time our objective function is vector valued
         //
         //    J d = k
         //
@@ -128,9 +129,9 @@ class Analyze {
         , closedv = isRationalSurfaceClosed(surface, false)
         , cuv;
 
-        // todo: divide surface instead of a full on tessellation
+        //todo: divide surface instead of a full on tessellation
 
-        // approximate closest point with tessellation
+        //approximate closest point with tessellation
         var tess = Tess.rationalSurfaceAdaptive( surface, new AdaptiveRefinementOptions() );
 
         var dmin = Math.POSITIVE_INFINITY;
@@ -151,8 +152,8 @@ class Analyze {
 
         function n(uv : UV, e : Array<Array<Point>>, r : Array<Float>) : UV {
 
-            // f = Su(u,v) * r = 0
-            // g = Sv(u,v) * r = 0
+            //f = Su(u,v) * r = 0
+            //g = Sv(u,v) * r = 0
 
             var Su = e[1][0];
             var Sv = e[0][1];
@@ -222,15 +223,15 @@ class Analyze {
             var c2a = c2av < eps2;
             var c2b = c2bv < eps2;
 
-            // if all of the tolerance are met, we're done
+            //if all of the tolerance are met, we're done
             if (c1 && c2a && c2b){
                 return cuv;
             }
 
-            // otherwise, take a step
+            //otherwise, take a step
             var ct = n(cuv, e, dif);
 
-            // correct for exceeding bounds
+            //correct for exceeding bounds
             if ( ct[0] < minu ){
                 ct = closedu ? [ maxu - ( ct[0] - minu ), ct[1] ] : [ minu + Constants.EPSILON, ct[1] ];
             } else if (ct[0] > maxu){
@@ -243,7 +244,7 @@ class Analyze {
                 ct = closedv ? [ ct[0], minv + ( ct[0] - maxv ) ] : [ ct[0], maxv - Constants.EPSILON ];
             }
 
-            // if |(u* - u) C'(u)| < e1, halt
+            //if |(u* - u) C'(u)| < e1, halt
             var c3v0 =  Vec.norm( Vec.mul(ct[0] - cuv[0], e[1][0] ) );
             var c3v1 =  Vec.norm( Vec.mul(ct[1] - cuv[1], e[0][1] ) );
 
@@ -272,15 +273,15 @@ class Analyze {
         //
         //  C(u) is the curve, p is the point, * is a dot product
         //
-        // We'll use newton's method:
+        //We'll use newton's method:
         //
         // 	 u* = u - f / f'
         //
-        // We use the product rule in order to form the derivative, f':
+        //We use the product rule in order to form the derivative, f':
         //
         //	f' = C"(u) * ( C(u) - p ) + C'(u) * C'(u)
         //
-        // What is the conversion criteria? (Piegl & Tiller suggest)
+        //What is the conversion criteria? (Piegl & Tiller suggest)
         //
         // |C(u) - p| < e1
         //
@@ -353,7 +354,7 @@ class Analyze {
             // |C(u) - p| < e1
             var c1v = Vec.norm( dif );
 
-            // C'(u) * (C(u) - P)
+            //C'(u) * (C(u) - P)
             // ------------------ < e2
             // |C'(u)| |C(u) - P|
             var c2n = Vec.dot( e[1], dif);
@@ -364,21 +365,21 @@ class Analyze {
             var c1 = c1v < eps1;
             var c2 = Math.abs(c2v) < eps2;
 
-            // if both tolerances are met
+            //if both tolerances are met
             if (c1 && c2){
                 return cu;
             }
 
             var ct = n(cu, e, dif);
 
-            // are we outside of the bounds of the curve?
+            //are we outside of the bounds of the curve?
             if ( ct < minu ){
                 ct = closed ? maxu - ( ct - minu ) : minu;
             } else if (ct > maxu){
                 ct = closed ? minu + ( ct - maxu ) : maxu;
             }
 
-            // will our next step force us out of the curve?
+            //will our next step force us out of the curve?
             var c3v = Vec.norm( Vec.mul(ct - cu, e[1] ) );
 
             if (c3v < eps1) {
@@ -408,7 +409,7 @@ class Analyze {
         , cl = -Constants.EPSILON
         , bezier_lengths = if (bezierLengths != null) bezierLengths else [];
 
-        // iterate through the curves consuming the bezier's, summing their length along the way
+        //iterate through the curves consuming the bezier's, summing their length along the way
         while (cl < len && i < crvs.length){
 
             bezier_lengths[i] = i < bezier_lengths.length ? bezier_lengths[i] : rationalBezierCurveArcLength( curve );
@@ -425,31 +426,32 @@ class Analyze {
         return -1;
     }
 
+    //Get the curve parameter at an arc length
     //
-    // Get the curve parameter at an arc length
+    //**params**
     //
-    // **params**
-    // + NurbsCurveData object representing the curve
-    // + the arc length to find the parameter
-    // + the tolerance - increasing the tolerance can make this computation quite expensive
-    // + the total length of the curve, if already computed
+    //*NurbsCurveData object representing the curve
+    //*the arc length to find the parameter
+    //*the tolerance - increasing the tolerance can make this computation quite expensive
+    //*the total length of the curve, if already computed
     //
-    // **returns**
-    // + the parameter
+    //**returns**
     //
+    //*the parameter
+
     public static function rationalBezierCurveParamAtArcLength(curve : NurbsCurveData,
                                                                len : Float,
                                                                tol : Float = null,
                                                                totalLength : Float = null) : Float {
         if (len < 0) return curve.knots[0];
 
-        // we compute the whole length.  if desired length is outside of that, give up
+        //we compute the whole length.  if desired length is outside of that, give up
         var totalLen = totalLength != null ? totalLength : rationalBezierCurveArcLength( curve );
 
         if (len > totalLen) return curve.knots.last();
 
-        // divide & conquer
-        // TODO: can we use derivative?
+        //divide & conquer
+        //TODO: can we use derivative?
         var start = { p : curve.knots[0], l : 0.0 }
         , end = { p : curve.knots.last(), l : totalLen }
         , mid = { p : 0.0, l : 0.0 }
@@ -473,17 +475,18 @@ class Analyze {
         return (start.p + end.p) / 2;
     }
 
+    //Approximate the length of a rational curve by gaussian quadrature - assumes a smooth curve
     //
-    // Approximate the length of a rational curve by gaussian quadrature - assumes a smooth curve
+    //**params**
     //
-    // **params**
-    // + NurbsCurveData object representing the curve
-    // + the parameter at which to approximate the length
-    // + the degree of gaussian quadrature to perform - a higher number yields a more exact result
+    //*NurbsCurveData object representing the curve
+    //*the parameter at which to approximate the length
+    //*the degree of gaussian quadrature to perform - a higher number yields a more exact result
     //
-    // **returns**
-    // + the approximate length
+    //**returns**
     //
+    //*the approximate length
+
     public static function rationalCurveArcLength(curve : NurbsCurveData, u : Float = null, gaussDegIncrease : Int = 16){
         u = (u == null) ? curve.knots.last() : u;
 
@@ -501,17 +504,18 @@ class Analyze {
         return sum;
     }
 
+    //Approximate the length of a rational bezier curve by gaussian quadrature - assumes a smooth curve
     //
-    // Approximate the length of a rational bezier curve by gaussian quadrature - assumes a smooth curve
+    //**params**
     //
-    // **params**
-    // + NurbsCurveData object representing the curve
-    // + the parameter at which to approximate the length
-    // + the degree of gaussian quadrature to perform - a higher number yields a more exact result
+    //*NurbsCurveData object representing the curve
+    //*the parameter at which to approximate the length
+    //*the degree of gaussian quadrature to perform - a higher number yields a more exact result
     //
-    // **returns**
-    // + the approximate length
+    //**returns**
     //
+    //*the approximate length
+
     public static function rationalBezierCurveArcLength(curve : NurbsCurveData, u : Float = null, gaussDegIncrease : Int = 16) : Float {
 
         var u = u == null ? curve.knots.last() : u
@@ -533,7 +537,7 @@ class Analyze {
         return z * sum;
     }
 
-    // Legendre-Gauss abscissae (xi values, defined at i=n as the roots of the nth order Legendre polynomial Pn(x))
+    //Legendre-Gauss abscissae (xi values, defined at i=n as the roots of the nth order Legendre polynomial Pn(x))
     static var Tvalues : Array<Array<Float>> = [
         [], [],
         [  -0.5773502691896257645091487805019574556476,0.5773502691896257645091487805019574556476],
@@ -561,7 +565,7 @@ class Analyze {
         [  -0.0640568928626056260850430826247450385909,0.0640568928626056260850430826247450385909,-0.1911188674736163091586398207570696318404,0.1911188674736163091586398207570696318404,-0.3150426796961633743867932913198102407864,0.3150426796961633743867932913198102407864,-0.4337935076260451384870842319133497124524,0.4337935076260451384870842319133497124524,-0.5454214713888395356583756172183723700107,0.5454214713888395356583756172183723700107,-0.6480936519369755692524957869107476266696,0.6480936519369755692524957869107476266696,-0.7401241915785543642438281030999784255232,0.7401241915785543642438281030999784255232,-0.8200019859739029219539498726697452080761,0.8200019859739029219539498726697452080761,-0.8864155270044010342131543419821967550873,0.8864155270044010342131543419821967550873,-0.9382745520027327585236490017087214496548,0.9382745520027327585236490017087214496548,-0.9747285559713094981983919930081690617411,0.9747285559713094981983919930081690617411,-0.9951872199970213601799974097007368118745,0.9951872199970213601799974097007368118745]
     ];
 
-    // Legendre-Gauss weights
+    //Legendre-Gauss weights
    static var Cvalues : Array<Array<Float>> = [
         [],[],
         [1.0,1.0],
