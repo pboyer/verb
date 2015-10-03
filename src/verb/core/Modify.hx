@@ -13,10 +13,30 @@ using verb.core.ArrayExtensions;
 @:expose("core.Modify")
 class Modify {
 
+    //Reverses the parameterization of a NURBS curve. The domain is unaffected.
+    //
+    //**params**
+    //
+    //* A NURBS curve to be reversed
+    //
+    //**returns**
+    //
+    //* A new NURBS curve with a reversed parameterization
 
     public static function curveReverse( curve : NurbsCurveData ) : NurbsCurveData {
         return new NurbsCurveData( curve.degree, knotsReverse( curve.knots ), curve.controlPoints.reversed() );
     }
+
+    //Reverse the parameterization of a NURBS surface in the specified direction. The domain is unaffected.
+    //
+    //**params**
+    //
+    //* A NURBS surface to be reversed
+    //* Whether to use the U direction or V direction
+    //
+    //**returns**
+    //
+    //* A new NURBS surface with a reversed parameterization in the given direction
 
     public static function surfaceReverse( surface : NurbsSurfaceData, useV : Bool = false ) : NurbsSurfaceData {
         if (useV){
@@ -28,6 +48,16 @@ class Modify {
         return new NurbsSurfaceData( surface.degreeU, surface.degreeV, knotsReverse(surface.knotsU), surface.knotsV,
             surface.controlPoints.reversed());
     }
+
+    //Reverse a knot vector
+    //
+    //**params**
+    //
+    //* An array of knots
+    //
+    //**returns**
+    //
+    //* The reversed array of knots
 
     public static function knotsReverse( knots : KnotArray ) : KnotArray {
         var min = knots.first();
@@ -41,6 +71,16 @@ class Modify {
 
         return l;
     }
+
+    //Unify the knot vectors of a collection of NURBS curves. This can be used, for example, is used for lofting between curves.
+    //
+    //**params**
+    //
+    //* An array of NURBS curves
+    //
+    //**returns**
+    //
+    //* A collection of NURBS curves, all with the same knot vector
 
     public static function unifyCurveKnotVectors( curves : Array<NurbsCurveData> ) : Array<NurbsCurveData> {
         curves = curves.map(Make.clonedCurve);
@@ -94,6 +134,17 @@ class Modify {
     public static inline function imax( a : Int, b : Int ) : Int {
         return a > b ? a : b;
     }
+
+    //Elevate the degree of a NURBS curve
+    //
+    //**params**
+    //
+    //* The curve to elevate
+    //* The expected final degree
+    //
+    //**returns**
+    //
+    //* The NURBS curve after degree elevation - if the supplied degree is <= the curve is returned unmodified
 
     public static function curveElevateDegree( curve : NurbsCurveData, finalDegree : Int ) : NurbsCurveData {
 
@@ -260,6 +311,17 @@ class Modify {
         return new NurbsCurveData( finalDegree, Uh, Qw );
     }
 
+    //Transform a NURBS surface using a matrix
+    //
+    //**params**
+    //
+    //* The surface to transform
+    //* The matrix to use for the transform - the dimensions should be the dimension of the surface + 1 in both directions
+    //
+    //**returns**
+    //
+    //* A new NURBS surface after transformation
+
     public static function rationalSurfaceTransform( surface : NurbsSurfaceData, mat : Matrix ) : NurbsSurfaceData {
 
         var pts = Eval.dehomogenize2d( surface.controlPoints );
@@ -276,6 +338,17 @@ class Modify {
         return new NurbsSurfaceData( surface.degreeU, surface.degreeV, surface.knotsU.copy(), surface.knotsV.copy(), Eval.homogenize2d(pts, Eval.weight2d( surface.controlPoints)) );
     }
 
+    //Transform a NURBS curve using a matrix
+    //
+    //**params**
+    //
+    //* The curve to transform
+    //* The matrix to use for the transform - the dimensions should be the dimension of the curve + 1 in both directions
+    //
+    //**returns**
+    //
+    //* A new NURBS surface after transformation
+
     public static function rationalCurveTransform( curve : NurbsCurveData, mat : Matrix ) : NurbsCurveData {
 
         var pts = Eval.dehomogenize1d( curve.controlPoints );
@@ -291,6 +364,18 @@ class Modify {
         return new NurbsCurveData( curve.degree, curve.knots.copy(), Eval.homogenize1d( pts, Eval.weight1d( curve.controlPoints) ) );
 
     }
+
+    //Perform knot refinement on a NURBS surface by inserting knots at various parameters
+    //
+    //**params**
+    //
+    //* The surface to insert the knots into
+    //* The knots to insert - an array of parameter positions within the surface domain
+    //* Whether to insert in the U direction or V direction of the surface
+    //
+    //**returns**
+    //
+    //* A new NURBS surface with the knots inserted
 
     public static function surfaceKnotRefine( surface : NurbsSurfaceData, knotsToInsert : Array<Float>, useV : Bool ) : NurbsSurfaceData {
 
@@ -332,6 +417,18 @@ class Modify {
             return new NurbsSurfaceData( surface.degreeU, surface.degreeV, surface.knotsU.copy(), newknots, newPts );
         }
     }
+
+    //Split a NURBS surface in two at a given parameter
+    //
+    //**params**
+    //
+    //* The surface to split
+    //* The parameter at which to split the surface
+    //* Whether to split in the U direction or V direction of the surface
+    //
+    //**returns**
+    //
+    //* A length two array of new surfaces
 
     public static function surfaceSplit( surface : NurbsSurfaceData, u : Float, useV : Bool = false) : Array<NurbsSurfaceData> {
 
@@ -435,7 +532,7 @@ class Modify {
 
     }
 
-    //Split a curve into two parts
+    //Split a NURBS curve into two parts at a given parameter
     //
     //**params**
     //

@@ -1,18 +1,16 @@
 <% _.each(types, function(x) { %>
 # `<%= x.name %>` 
-**`<%= x.$type %>`**
+**<%= x.$type.toUpperCase() %>**
+
+[Go to source](<%= sourceFile + "#L" + x.line %>)
 
 <%= x.description %>
 
 <% if (x.$type === "Class" || x.$type === "Interface") { %>
 
-[Go to source](<%= sourceFile + "#L" + x.line %>)
-
 <% if (x.parentClass) { %>
 *Extends:* [`<%= x.parentClass %>`]( <%= x.parentClass %>)
 <% } %>
-
-
 
 <% if (x.interfaces && x.interfaces.length) { %>
 *Implements:* <%= _.map(x.interfaces, function(x){ return "[`" + x + "`](" + x + ")"}).join(", ") %>
@@ -20,7 +18,7 @@
 
     <% _.each(x.properties, function(y) { %>
 ## `<%= y.name %>`
-*PROPERTY*
+*<%= y.isStatic ? "STATIC " : "" %>PROPERTY*
 
 [Go to source](<%= sourceFile + "#L" + y.line %>)
 
@@ -31,7 +29,7 @@
 
     <% _.each(x.methods, function(y) { %>
 ## `<%= y.name === "new" ? "constructor" : y.name %>`
-*METHOD*
+*<%= y.isStatic ? "STATIC " : "" %>METHOD*
 
 [Go to source](<%= sourceFile + "#L" + y.line %>)
 

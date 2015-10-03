@@ -9,20 +9,18 @@ using verb.core.ArrayExtensions;
 using Lambda;
 using verb.core.Mat;
 
-@:expose("core.KnotMultiplicity")
-class KnotMultiplicity {
-    public var knot : Float;
-    public var mult : Int;
-
-    public function new(knot : Float, mult : Int ){
-        this.knot = knot;
-        this.mult = mult;
-    }
-
-    public function inc(){
-        mult++;
-    }
-}
+// Analyze handles analytical operations of NURBS geometry. This includes, but is not limited to:
+//
+//* Determining the closest points on NURBS geometry to given points
+//* Determining knot structure
+//* Evaluating geometric properties (like arc length) of NURBS curves
+//* Determining the parameter of at arc length of NURBS curves
+//
+// Like all types in the core, *it often makes more sense to use the types in geom for your work*. Most types in core are:
+//
+//* static
+//* immutable
+//* form the foundation of the types in verb.geom
 
 @:expose("core.Analyze")
 class Analyze {
@@ -31,11 +29,11 @@ class Analyze {
     //
     //**params**
     //
-    //*array of nondecreasing knot values
+    //* array of nondecreasing knot values
     //
     //**returns**
     //
-    //**Array* of length 2 arrays, [knotValue, knotMultiplicity]
+    //* Array of KnotMultiplicity objects
 
     public static function knotMultiplicities( knots : KnotArray ) : Array<KnotMultiplicity> {
 
@@ -54,6 +52,18 @@ class Analyze {
         return mults;
     }
 
+    //Determine whether a NURBS surface is "closed" in the given direction. Essentially, this determines if the end of the
+    //surface in the given direction is continuous at its end. This is an experimental method and not hightly reliable.
+    //
+    //**params**
+    //
+    //* The NURBS surface
+    //* Whether to analyze the continuity in the U direction or the V direction
+    //
+    //**returns**
+    //
+    //* Whether the surface is continuous or not in the supplied direction.
+
     public static function isRationalSurfaceClosed(surface : NurbsSurfaceData, uDir : Bool = true ) : Bool {
 
         var cpts = if (uDir) surface.controlPoints else surface.controlPoints.transpose();
@@ -66,10 +76,32 @@ class Analyze {
         return true;
     }
 
+    //Determine the closest point on a NURBS surface to a given point. *This is an experimental method and not hightly reliable.*
+    //
+    //**params**
+    //
+    //* The NURBS surface
+    //* The point to which we're trying to locate the closest point on the surface
+    //
+    //**returns**
+    //
+    //* The closest point on the surface, bounded by the parametric range of the surface
+
     public static function rationalSurfaceClosestPoint( surface : NurbsSurfaceData, p : Point ) : Point {
         var uv = Analyze.rationalSurfaceClosestParam( surface, p );
         return Eval.rationalSurfacePoint( surface, uv[0], uv[1] );
     }
+
+    //Determine the closest parameters on a NURBS surface to a given point. *This is an experimental method and not hightly reliable.*
+    //
+    //**params**
+    //
+    //* The NURBS surface
+    //* The point to which we're trying to locate the closest parameters on the surface
+    //
+    //**returns**
+    //
+    //* The closest parameters on the surface, bounded by the parametric domain of the surface
 
     public static function rationalSurfaceClosestParam( surface : NurbsSurfaceData, p : Point ) : UV {
 
@@ -261,9 +293,31 @@ class Analyze {
 
     }
 
+    //Determine the closest point on a NURBS curve to a given point.
+    //
+    //**params**
+    //
+    //* The NURBS curve
+    //* The point to which we're trying to locate the closest point on the curve
+    //
+    //**returns**
+    //
+    //* The closest point on the surface, bounded by the parametric domain of the surface
+
     public static function rationalCurveClosestPoint( curve : NurbsCurveData, p : Point ) : Point {
         return Eval.rationalCurvePoint( curve, rationalCurveClosestParam(curve, p));
     }
+
+    //Determine the closest parameters on a NURBS curve to a given point.
+    //
+    //**params**
+    //
+    //* The NURBS curve
+    //* The point to which we're trying to locate the closest parameter on the curve
+    //
+    //**returns**
+    //
+    //* The closest parameter on the curve, bounded by the parametric domain of the curve
 
     public static function rationalCurveClosestParam( curve : NurbsCurveData, p : Point ) : Float {
 
@@ -394,6 +448,20 @@ class Analyze {
         return cu;
 
     }
+
+    //Approximate the parameter at a given arc length on a NURBS curve
+    //
+    //**params**
+    //
+    //*The curve for which to do the procedure
+    //*The arc length for which to do the procedure
+    //*the tolerance - increasing the tolerance can make this computation quite expensive
+    //*The curve decomposed into a sequence of beziers - this will be computed if omitted but speeds up the computation computed repeatedly
+    //*The lengths of the beziers after being decomposed
+    //
+    //**returns**
+    //
+    //*The parameter
 
     public static function rationalCurveParamAtArcLength(curve : NurbsCurveData,
                                                          len : Float,
@@ -593,4 +661,31 @@ class Analyze {
         [0.1279381953467521569740561652246953718517,0.1279381953467521569740561652246953718517,0.1258374563468282961213753825111836887264,0.1258374563468282961213753825111836887264,0.1216704729278033912044631534762624256070,0.1216704729278033912044631534762624256070,0.1155056680537256013533444839067835598622,0.1155056680537256013533444839067835598622,0.1074442701159656347825773424466062227946,0.1074442701159656347825773424466062227946,0.0976186521041138882698806644642471544279,0.0976186521041138882698806644642471544279,0.0861901615319532759171852029837426671850,0.0861901615319532759171852029837426671850,0.0733464814110803057340336152531165181193,0.0733464814110803057340336152531165181193,0.0592985849154367807463677585001085845412,0.0592985849154367807463677585001085845412,0.0442774388174198061686027482113382288593,0.0442774388174198061686027482113382288593,0.0285313886289336631813078159518782864491,0.0285313886289336631813078159518782864491,0.0123412297999871995468056670700372915759,0.0123412297999871995468056670700372915759]
     ];
 
+}
+
+// A simple helper class to represent the multiplicity of a knot at a given position.
+@:expose("core.KnotMultiplicity")
+class KnotMultiplicity {
+
+    // The parameter of the knot
+    public var knot : Float;
+
+    // The multiplicity (i.e. the number of repeated occurrences) of the given knot in a knot vector
+    public var mult : Int;
+
+    // Create a new KnotMultiplicity object
+    //**params**
+    //
+    //*The knot position
+    //*The multiplicity of the knot
+
+    public function new(knot : Float, mult : Int ){
+        this.knot = knot;
+        this.mult = mult;
+    }
+
+    // Increments the multiplicity of the knot
+    public function inc(){
+        mult++;
+    }
 }

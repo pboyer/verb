@@ -115,12 +115,7 @@ function Parser( tokenStream ){
         def.line = currentToken.line;
     
         // set the description
-        if (lastComment){
-            def.description = lastComment 
-        
-            // don't reuse the lastComment
-            lastComment = undefined;
-        }
+        def.description = getLastComment();
 
         var peaked = peak(); 
         var parsedExtends = false;
