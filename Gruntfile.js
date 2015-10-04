@@ -9,18 +9,19 @@ module.exports = function(grunt) {
       build: {
         files: {
           'build/js/<%= pkg.name %>.js': [ 'src/support/header.js',
-                                        'build/js/verbHaxe.js']
+                                        'build/js/verbHaxe.js',
+                                        'src/support/footer.js',]
         }
       }
     },
 
     replace: {
       build: {
-        src: ['build/js/verb.js'],
+        src: ['build/js/verbHaxe.js'],
         overwrite: true,                 // overwrite matched source files
         replacements: [{
-          from: "typeof window != \"undefined\" ? window : exports",
-          to: "typeof verb != \"undefined\" ? verb : exports"
+          from: "})(typeof window != \"undefined\" ? window : exports);",
+          to: "})(verb);"
         }]
       }
     },
@@ -42,7 +43,7 @@ module.exports = function(grunt) {
           reporter: 'spec',
           quiet: false // Optionally suppress output to standard out (defaults to false)
         },
-        src: ['test/testCore.js', 'test/testGeom.js', 'test/testTopo.js']
+        src: ['test/testCore.js', 'test/testEval.js', 'test/testGeom.js']
       }
     },
 
@@ -78,11 +79,11 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-docco');
   grunt.loadNpmTasks('grunt-benchmark');
 
-  var build_steps = [ 'haxe', 'concat', 'replace', 'uglify' ]; // 'docco'];
+  var build_steps = [ 'haxe', 'replace', 'concat', 'uglify' ];
   grunt.registerTask('default', ['haxe', 'concat', 'replace'] );
 
   grunt.registerTask('build', build_steps);
-  grunt.registerTask('test', ['haxe', 'concat', 'replace', 'mochaTest']);
+  grunt.registerTask('test', ['haxe', 'replace','concat', 'mochaTest']);
   grunt.registerTask('benchmarks', ['concat', 'benchmark']);
 
 };

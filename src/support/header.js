@@ -1,39 +1,60 @@
-// browser context
-if ( typeof exports != 'object' || exports === undefined )
-{
-    // todo fix this
-	var verb = exports = {};
-} else  {
-	var Worker = require('webworker-threads').Worker;
-}
+// Header for verb for JavaScript
+// Borrowed from browserify, this header supports AMD (define) and common js (require) style modules
 
-// web worker context
-if ( typeof window != 'object'){
+(function(f){
+    if(typeof exports==="object"&&typeof module!=="undefined"){
+        module.exports=f()
+    } else if(typeof define==="function"&&define.amd){
+        define([],f)
+    } else {
+        var g;
+        if(typeof window!=="undefined"){
+            g=window
+        } else if(typeof global!=="undefined"){
+            g=global
+        } else if(typeof self!=="undefined"){
+            g=self
+        } else{
+            g=this
+        }
 
-	var global = this;
-	var window = global; // required for promhx
-	var lookup = function(className, methodName){
+        g.verb = f()
+    }
+})(function(){
 
-		var obj = global;
+    var verb = {};
 
-		className.split(".").forEach(function(x){
-			if (obj) obj = obj[ x ];
-		});
+    if (typeof require=="function" && require){
+    	var Worker = require('webworker-threads').Worker;
+    }
 
-		if (!obj) return null;
+    // web worker / node.js context
+    if ( typeof window !== 'object'){
 
-		return obj[ methodName ];
-	}
+        var global = this;
+        var window = global; // required for promhx
+        var lookup = function(className, methodName){
 
-	onmessage = function( e ){
+            var obj = global;
 
-		var method = lookup( e.data.className, e.data.methodName );
-		
-		if (!method){
-			return console.error("could not find " + e.data.className + "." + e.data.methodName)
-		}
+            className.split(".").forEach(function(x){
+                if (obj) obj = obj[ x ];
+            });
 
-		postMessage( { result: method.apply( null, e.data.args ), id: e.data.id } );
+            if (!obj) return null;
 
-	};
-}
+            return obj[ methodName ];
+        }
+
+        onmessage = function( e ){
+
+            var method = lookup( e.data.className, e.data.methodName );
+
+            if (!method){
+                return console.error("could not find " + e.data.className + "." + e.data.methodName)
+            }
+
+            postMessage( { result: method.apply( null, e.data.args ), id: e.data.id } );
+
+        };
+    }

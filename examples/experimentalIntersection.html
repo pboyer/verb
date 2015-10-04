@@ -51,7 +51,7 @@
     var d2 = srf2.asNurbs();
 
     var runs = 20;
-    var bm = benchmark( function(){ return verb.core.ExpIntersect.surfaces( d1, d2, 1e-3 ) }, runs );
+    var bm = benchmark( function(){ return verb.eval.ExpIntersect.surfaces( d1, d2, 1e-3 ) }, runs );
 
     console.log( bm );
     console.log( runs, " runs completed in ", bm.each, " ms each");
@@ -72,7 +72,7 @@
 
 
     var bbox = new verb.core.LazySurfaceBoundingBoxTree( d2, false, 0.4, 0.4 );
-    var surfs = verb.core.ExpIntersect.boundingBoxLeaves( bbox );
+    var surfs = verb.eval.ExpIntersect.boundingBoxLeaves( bbox );
 
     var mat1 = new THREE.MeshPhongMaterial({
                                color: '#00ff00',
@@ -93,7 +93,7 @@
     });
 
     var runs = 50;
-    var bm = benchmark( function(){ return verb.core.ExpIntersect.refineInnerCriticalPts( d1, d2, verb.core.ExpIntersect.approxInnerCriticalPts( d1, d2 ), 1e-3 ); }, runs );
+    var bm = benchmark( function(){ return verb.eval.ExpIntersect.refineInnerCriticalPts( d1, d2, verb.eval.ExpIntersect.approxInnerCriticalPts( d1, d2 ), 1e-3 ); }, runs );
 
     console.log( bm );
     console.log( runs, " runs completed in ", bm.each, " ms each");

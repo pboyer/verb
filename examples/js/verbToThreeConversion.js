@@ -10,45 +10,6 @@
         return tessellateSurface( this );
     }
 
-//    verb.topo.Solid.prototype.toThreeGeometry = function(){
-//
-//        var f = this.faces().map(function(x){
-//            return x.tessellate();
-//        });
-//
-//
-//
-//
-//
-////        return tessellateSurface( this );
-//    }
-
-    verb.topo.Face.prototype.toThreeGeometry = function(){
-
-        var geometry = new THREE.Geometry();
-
-        var t = this.tessellate();
-
-        var verts = [];
-        for (var i = 0; i < t.vertexCount; i++){
-            verts.push( new THREE.Vector3( t.vertices[i * 3], t.vertices[i * 3 + 1], t.vertices[i * 3 + 2] ));
-        }
-
-        geometry.vertices.push.apply( geometry.vertices, verts );
-
-        var an = this.normal();
-        var n = new THREE.Vector3( an[0], an[1], an[2] );
-
-        var faces = [];
-        for (var i = 0; i < t.elementCount; i++){
-            faces.push(  new THREE.Face3(t.elements[i * 3], t.elements[i * 3 + 1], t.elements[i * 3 + 2], n ) );
-        }
-
-        geometry.faces.push.apply(geometry.faces, faces);
-
-        return geometry;
-    }
-
     function asVector3(pts){
         return pts.map(function(x){
             return new THREE.Vector3(x[0],x[1],x[2]);

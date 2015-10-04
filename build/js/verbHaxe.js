@@ -6516,4 +6516,4 @@ verb.exe.Dispatcher._init = false;
 verb.exe.Work.uuid = 0;
 verb.exe.WorkerPool.basePath = "";
 verb.Verb.main();
-})(typeof window != "undefined" ? window : exports);
+})(verb);
