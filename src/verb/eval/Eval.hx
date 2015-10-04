@@ -5,100 +5,15 @@ import verb.core.Vec;
 import verb.core.Binomial;
 import verb.core.Constants;
 
+// `Eval` provides all of the core algorithms for evaluating points and derivatives on NURBS curves and surfaces. Most of the
+// time, it makes more sense to use the tools in verb.geom for this, but in some cases this will make more sense.
+//
+// Eval also provides experimental tools for evaluating points in NURBS volumes.
+//
+// Many of these algorithms owe their implementation to Piegl & Tiller's "The NURBS Book"
+
 @:expose("eval.Eval")
 class Eval {
-
-    //Compute a point in a non-uniform, non-rational B spline volume
-    //
-    //**params**
-    //* VolumeData
-    //* u parameter at which to evaluate the volume point
-    //* v parameter at which to evaluate the volume point
-    //* w parameter at which to evaluate the volume point
-    //
-    //**returns**
-    //
-    //* a point represented by an array of length (dim)
-
-    public static function volumePoint( volume : VolumeData, u : Float, v : Float, w : Float ) : Point {
-        var n = volume.knotsU.length - volume.degreeU - 2
-        , m = volume.knotsV.length - volume.degreeV - 2
-        , l = volume.knotsW.length - volume.degreeW - 2;
-
-        return volumePointGivenNML( volume, n, m, l, u, v, w );
-    }
-
-    //Compute a point in a non-uniform, non-rational B spline volume
-    //
-    //**params**
-    //
-    //* VolumeData
-    //* u parameter at which to evaluate the volume point
-    //* v parameter at which to evaluate the volume point
-    //* w parameter at which to evaluate the volume point
-    //
-    //**returns**
-    //
-    //* a point represented by an array of length (dim)
-
-    public static function volumePointGivenNML( volume : VolumeData,
-                                                     n : Int,
-                                                     m : Int,
-                                                     l : Int,
-                                                     u : Float,
-                                                     v : Float,
-                                                     w : Float  ) : Point {
-
-        if ( !areValidRelations(volume.degreeU, volume.controlPoints.length, volume.knotsU.length ) ||
-            !areValidRelations(volume.degreeV, volume.controlPoints[0].length, volume.knotsV.length ) ||
-            !areValidRelations(volume.degreeW, volume.controlPoints[0][0].length, volume.knotsW.length ) ) {
-            throw 'Invalid relations between control points and knot vector';
-        }
-
-        var controlPoints = volume.controlPoints
-            , degreeU = volume.degreeU
-            , degreeV = volume.degreeV
-            , degreeW = volume.degreeW
-            , knotsU = volume.knotsU
-            , knotsV = volume.knotsV
-            , knotsW = volume.knotsW;
-
-        var dim = controlPoints[0][0][0].length
-            , knotSpan_index_u = knotSpanGivenN( n, degreeU, u, knotsU )
-            , knotSpan_index_v = knotSpanGivenN( m, degreeV, v, knotsV )
-            , knotSpan_index_w = knotSpanGivenN( l, degreeW, w, knotsW )
-            , u_basis_vals = basisFunctionsGivenKnotSpanIndex( knotSpan_index_u, u, degreeU, knotsU )
-            , v_basis_vals = basisFunctionsGivenKnotSpanIndex( knotSpan_index_v, v, degreeV, knotsV )
-            , w_basis_vals = basisFunctionsGivenKnotSpanIndex( knotSpan_index_w, w, degreeW, knotsW )
-            , uind = knotSpan_index_u - degreeU
-            , position = Vec.zeros1d( dim )
-            , temp = Vec.zeros1d( dim )
-            , temp2 = Vec.zeros1d( dim );
-
-        for ( i in 0...degreeW + 1 ){
-
-            temp2 = Vec.zeros1d( dim );
-            var wind = knotSpan_index_w - degreeW + i;
-
-            for ( j in 0...degreeV + 1 ){
-
-                temp = Vec.zeros1d( dim );
-                var vind = knotSpan_index_v  - degreeV + j;
-
-                for ( k in 0...degreeU + 1 ){
-                    temp = Vec.add( temp, Vec.mul( u_basis_vals[k], controlPoints[uind+k][vind][wind] ));
-                }
-
-                //add weighted contribution of u isoline
-                temp2 = Vec.add( temp2, Vec.mul( v_basis_vals[j], temp ) );
-            }
-
-            //add weighted contribution from uv isosurfaces
-            position = Vec.add( position, Vec.mul( w_basis_vals[i], temp2 ) );
-        }
-
-        return position;
-    }
 
     //Compute the tangent at a point on a NURBS curve
     //
@@ -259,187 +174,6 @@ class Eval {
 
     public static function rationalCurvePoint( curve : NurbsCurveData, u : Float) : Point {
         return dehomogenize( curvePoint( curve, u) );
-    }
-
-    //Dehomogenize a point
-    //
-    //**params**
-    //
-    //* a point represented by an array (wi*pi, wi) with length (dim+1)
-    //
-    //**returns**
-    //
-    //* a point represented by an array pi with length (dim)
-
-    public static function dehomogenize( homoPoint : Point ) : Point {
-
-        var dim = homoPoint.length
-        , point = []
-        , wt = homoPoint[dim-1]
-        , l = homoPoint.length - 1;
-
-        for (i in 0...l){
-            point.push( homoPoint[i] / wt );
-        }
-
-        return point;
-    }
-
-    //Obtain the point from a point in homogeneous space without dehomogenization, assuming all are the same
-    //length
-    //
-    //**params**
-    //
-    //* array of points represented by an array (wi*pi, wi) with length (dim+1)
-    //
-    //**returns**
-    //
-    //* array of points represented by an array (wi*pi) with length (dim)
-
-    public static function rational1d( homoPoints : Array<Point> ) : Array<Point> {
-        var dim = homoPoints[0].length - 1;
-        return homoPoints.map(function(x : Point){ return x.slice(0,dim); });
-    }
-
-    //Obtain the weight from a collection of points in homogeneous space, assuming all
-    //are the same dimension
-    //
-    //**params**
-    //
-    //* array of arrays of of points represented by an array (wi*pi, wi) with length (dim+1)
-    //
-    //**returns**
-    //
-    //*  array of arrays of points, each represented by an array pi with length (dim)
-
-    public static function rational2d( homoPoints : Array<Array<Point>> ) : Array<Array<Point>> {
-        return homoPoints.map(rational1d);
-    }
-
-    //Obtain the weight from a collection of points in homogeneous space, assuming all
-    //are the same dimension
-    //
-    //**params**
-    //
-    //* array of points represented by an array (wi*pi, wi) with length (dim+1)
-    //
-    //**returns**
-    //
-    //* a point represented by an array pi with length (dim)
-
-    public static function weight1d( homoPoints : Array<Point> ) : Array<Float> {
-        var dim = homoPoints[0].length - 1;
-        return homoPoints.map(function(x){ return x[dim]; });
-    }
-
-    //Obtain the weight from a collection of points in homogeneous space, assuming all
-    //are the same dimension
-    //
-    //**params**
-    //
-    //* array of arrays of of points represented by an array (wi*pi, wi) with length (dim+1)
-    //
-    //**returns**
-    //
-    //*  array of arrays of points, each represented by an array pi with length (dim)
-
-    public static function weight2d( homoPoints : Array<Array<Point>> ) : Array<Array<Float>> {
-        return homoPoints.map(weight1d);
-    }
-
-
-    //Dehomogenize an array of points
-    //
-    //**params**
-    //
-    //* array of points represented by an array (wi*pi, wi) with length (dim+1)
-    //
-    //**returns**
-    //
-    //* an array of points, each of length dim
-
-    public static function dehomogenize1d( homoPoints : Array<Point> ) : Array<Point>{
-        return homoPoints.map(dehomogenize);
-    }
-
-    //Dehomogenize a 2d array of pts
-    //
-    //**params**
-    //
-    //* array of arrays of points represented by an array (wi*pi, wi) with length (dim+1)
-    //
-    //**returns**
-    //
-    //* array of arrays of points, each of length dim
-
-    public static function dehomogenize2d( homoPoints : Array<Array<Point>> ) : Array<Array<Point>> {
-        return homoPoints.map(dehomogenize1d);
-    }
-
-    //Transform a 1d array of points into their homogeneous equivalents
-    //
-    //**params**
-    //
-    //* 1d array of control points, (actually a 2d array of size (m x dim) )
-    //* array of control point weights, the same size as the array of control points (m x 1)
-    //
-    //**returns**
-    //
-    //* 1d array of control points where each point is (wi*pi, wi) where wi
-    //i the ith control point weight and pi is the ith control point,
-    //hence the dimension of the point is dim + 1
-
-    public static function homogenize1d( controlPoints : Array<Point>, weights : Array<Float> = null) : Array<Point> {
-
-        var rows = controlPoints.length
-        , dim = controlPoints[0].length
-        , homo_controlPoints = new Array<Point>()
-        , wt : Float = 0.0
-        , ref_pt = new Point()
-        , weights = weights != null ? weights : Vec.rep( controlPoints.length, 1.0 );
-
-        for (i in 0...rows) {
-
-            var pt = [];
-            ref_pt = controlPoints[i];
-            wt = weights[i];
-
-            for (k in 0...dim) {
-                pt.push( ref_pt[k] * wt );
-            }
-
-            //append the weight
-            pt.push(wt);
-
-            homo_controlPoints.push(pt);
-        }
-
-        return homo_controlPoints;
-
-    }
-
-    //**params**
-    //
-    //* 2d array of control points, (actually a 3d array of size m x n x dim)
-    //* array of control point weights, the same size as the control points array (m x n x 1)
-    //
-    //**returns**
-    //
-    //* 1d array of control points where each point is (wi*pi, wi) where wi
-    //i the ith control point weight and pi is the ith control point, the size is
-    // (m x n x dim+1)
-
-    public static function homogenize2d( controlPoints : Array<Array<Point>>,
-                                          weights: Array<Array<Float>> = null ) : Array<Array<Point>> {
-        var rows = controlPoints.length
-        , homo_controlPoints = new Array<Array<Point>>()
-        , weights = weights != null ? weights : [ for (i in 0...rows ) Vec.rep( controlPoints[0].length, 1.0 ) ];
-
-        for (i in 0...rows) {
-            homo_controlPoints.push( homogenize1d(controlPoints[i], weights[i]) );
-        }
-
-        return homo_controlPoints;
     }
 
     //Compute the derivatives on a non-uniform, non-rational B spline surface
@@ -741,7 +475,101 @@ class Eval {
         return position;
     }
 
-    //Compute the non-vanishing basis functions and their derivatives
+    //Compute a point in a non-uniform, non-rational B spline volume
+    //
+    //**params**
+    //
+    //* VolumeData
+    //* u parameter at which to evaluate the volume point
+    //* v parameter at which to evaluate the volume point
+    //* w parameter at which to evaluate the volume point
+    //
+    //**returns**
+    //
+    //* a point represented by an array of length (dim)
+
+    public static function volumePoint( volume : VolumeData, u : Float, v : Float, w : Float ) : Point {
+        var n = volume.knotsU.length - volume.degreeU - 2
+        , m = volume.knotsV.length - volume.degreeV - 2
+        , l = volume.knotsW.length - volume.degreeW - 2;
+
+        return volumePointGivenNML( volume, n, m, l, u, v, w );
+    }
+
+    //Compute a point in a non-uniform, non-rational B spline volume
+    //
+    //**params**
+    //
+    //* VolumeData
+    //* u parameter at which to evaluate the volume point
+    //* v parameter at which to evaluate the volume point
+    //* w parameter at which to evaluate the volume point
+    //
+    //**returns**
+    //
+    //* a point represented by an array of length (dim)
+
+    public static function volumePointGivenNML( volume : VolumeData,
+                                                n : Int,
+                                                m : Int,
+                                                l : Int,
+                                                u : Float,
+                                                v : Float,
+                                                w : Float  ) : Point {
+
+        if ( !areValidRelations(volume.degreeU, volume.controlPoints.length, volume.knotsU.length ) ||
+        !areValidRelations(volume.degreeV, volume.controlPoints[0].length, volume.knotsV.length ) ||
+        !areValidRelations(volume.degreeW, volume.controlPoints[0][0].length, volume.knotsW.length ) ) {
+            throw 'Invalid relations between control points and knot vector';
+        }
+
+        var controlPoints = volume.controlPoints
+        , degreeU = volume.degreeU
+        , degreeV = volume.degreeV
+        , degreeW = volume.degreeW
+        , knotsU = volume.knotsU
+        , knotsV = volume.knotsV
+        , knotsW = volume.knotsW;
+
+        var dim = controlPoints[0][0][0].length
+        , knotSpan_index_u = knotSpanGivenN( n, degreeU, u, knotsU )
+        , knotSpan_index_v = knotSpanGivenN( m, degreeV, v, knotsV )
+        , knotSpan_index_w = knotSpanGivenN( l, degreeW, w, knotsW )
+        , u_basis_vals = basisFunctionsGivenKnotSpanIndex( knotSpan_index_u, u, degreeU, knotsU )
+        , v_basis_vals = basisFunctionsGivenKnotSpanIndex( knotSpan_index_v, v, degreeV, knotsV )
+        , w_basis_vals = basisFunctionsGivenKnotSpanIndex( knotSpan_index_w, w, degreeW, knotsW )
+        , uind = knotSpan_index_u - degreeU
+        , position = Vec.zeros1d( dim )
+        , temp = Vec.zeros1d( dim )
+        , temp2 = Vec.zeros1d( dim );
+
+        for ( i in 0...degreeW + 1 ){
+
+            temp2 = Vec.zeros1d( dim );
+            var wind = knotSpan_index_w - degreeW + i;
+
+            for ( j in 0...degreeV + 1 ){
+
+                temp = Vec.zeros1d( dim );
+                var vind = knotSpan_index_v  - degreeV + j;
+
+                for ( k in 0...degreeU + 1 ){
+                    temp = Vec.add( temp, Vec.mul( u_basis_vals[k], controlPoints[uind+k][vind][wind] ));
+                }
+
+             //add weighted contribution of u isoline
+                temp2 = Vec.add( temp2, Vec.mul( v_basis_vals[j], temp ) );
+            }
+
+            //add weighted contribution from uv isosurfaces
+            position = Vec.add( position, Vec.mul( w_basis_vals[i], temp2 ) );
+        }
+
+        return position;
+    }
+
+
+//Compute the non-vanishing basis functions and their derivatives
     //
     //**params**
     //
@@ -940,7 +768,6 @@ class Eval {
         return basisFunctions;
     }
 
-
     //Find the span on the knot Array without supplying n
     //
     //**params**
@@ -1005,6 +832,187 @@ class Eval {
 
         return mid;
     }
+
+    //Dehomogenize a point
+    //
+    //**params**
+    //
+    //* a point represented by an array (wi*pi, wi) with length (dim+1)
+    //
+    //**returns**
+    //
+    //* a point represented by an array pi with length (dim)
+
+    public static function dehomogenize( homoPoint : Point ) : Point {
+
+        var dim = homoPoint.length
+        , point = []
+        , wt = homoPoint[dim-1]
+        , l = homoPoint.length - 1;
+
+        for (i in 0...l){
+            point.push( homoPoint[i] / wt );
+        }
+
+        return point;
+    }
+
+    //Obtain the point from a point in homogeneous space without dehomogenization, assuming all are the same
+    //length
+    //
+    //**params**
+    //
+    //* array of points represented by an array (wi*pi, wi) with length (dim+1)
+    //
+    //**returns**
+    //
+    //* array of points represented by an array (wi*pi) with length (dim)
+
+    public static function rational1d( homoPoints : Array<Point> ) : Array<Point> {
+        var dim = homoPoints[0].length - 1;
+        return homoPoints.map(function(x : Point){ return x.slice(0,dim); });
+    }
+
+    //Obtain the weight from a collection of points in homogeneous space, assuming all
+    //are the same dimension
+    //
+    //**params**
+    //
+    //* array of arrays of of points represented by an array (wi*pi, wi) with length (dim+1)
+    //
+    //**returns**
+    //
+    //*  array of arrays of points, each represented by an array pi with length (dim)
+
+    public static function rational2d( homoPoints : Array<Array<Point>> ) : Array<Array<Point>> {
+        return homoPoints.map(rational1d);
+    }
+
+    //Obtain the weight from a collection of points in homogeneous space, assuming all
+    //are the same dimension
+    //
+    //**params**
+    //
+    //* array of points represented by an array (wi*pi, wi) with length (dim+1)
+    //
+    //**returns**
+    //
+    //* a point represented by an array pi with length (dim)
+
+    public static function weight1d( homoPoints : Array<Point> ) : Array<Float> {
+        var dim = homoPoints[0].length - 1;
+        return homoPoints.map(function(x){ return x[dim]; });
+    }
+
+    //Obtain the weight from a collection of points in homogeneous space, assuming all
+    //are the same dimension
+    //
+    //**params**
+    //
+    //* array of arrays of of points represented by an array (wi*pi, wi) with length (dim+1)
+    //
+    //**returns**
+    //
+    //*  array of arrays of points, each represented by an array pi with length (dim)
+
+    public static function weight2d( homoPoints : Array<Array<Point>> ) : Array<Array<Float>> {
+        return homoPoints.map(weight1d);
+    }
+
+    //Dehomogenize an array of points
+    //
+    //**params**
+    //
+    //* array of points represented by an array (wi*pi, wi) with length (dim+1)
+    //
+    //**returns**
+    //
+    //* an array of points, each of length dim
+
+    public static function dehomogenize1d( homoPoints : Array<Point> ) : Array<Point>{
+        return homoPoints.map(dehomogenize);
+    }
+
+    //Dehomogenize a 2d array of pts
+    //
+    //**params**
+    //
+    //* array of arrays of points represented by an array (wi*pi, wi) with length (dim+1)
+    //
+    //**returns**
+    //
+    //* array of arrays of points, each of length dim
+
+    public static function dehomogenize2d( homoPoints : Array<Array<Point>> ) : Array<Array<Point>> {
+        return homoPoints.map(dehomogenize1d);
+    }
+
+    //Transform a 1d array of points into their homogeneous equivalents
+    //
+    //**params**
+    //
+    //* 1d array of control points, (actually a 2d array of size (m x dim) )
+    //* array of control point weights, the same size as the array of control points (m x 1)
+    //
+    //**returns**
+    //
+    //* 1d array of control points where each point is (wi*pi, wi) where wi
+    //i the ith control point weight and pi is the ith control point,
+    //hence the dimension of the point is dim + 1
+
+    public static function homogenize1d( controlPoints : Array<Point>, weights : Array<Float> = null) : Array<Point> {
+
+        var rows = controlPoints.length
+        , dim = controlPoints[0].length
+        , homo_controlPoints = new Array<Point>()
+        , wt : Float = 0.0
+        , ref_pt = new Point()
+        , weights = weights != null ? weights : Vec.rep( controlPoints.length, 1.0 );
+
+        for (i in 0...rows) {
+
+            var pt = [];
+            ref_pt = controlPoints[i];
+            wt = weights[i];
+
+            for (k in 0...dim) {
+                pt.push( ref_pt[k] * wt );
+            }
+
+            //append the weight
+            pt.push(wt);
+
+            homo_controlPoints.push(pt);
+        }
+
+        return homo_controlPoints;
+
+    }
+
+    //**params**
+    //
+    //* 2d array of control points, (actually a 3d array of size m x n x dim)
+    //* array of control point weights, the same size as the control points array (m x n x 1)
+    //
+    //**returns**
+    //
+    //* 1d array of control points where each point is (wi*pi, wi) where wi
+    //i the ith control point weight and pi is the ith control point, the size is
+    // (m x n x dim+1)
+
+    public static function homogenize2d( controlPoints : Array<Array<Point>>,
+                                         weights: Array<Array<Float>> = null ) : Array<Array<Point>> {
+        var rows = controlPoints.length
+        , homo_controlPoints = new Array<Array<Point>>()
+        , weights = weights != null ? weights : [ for (i in 0...rows ) Vec.rep( controlPoints[0].length, 1.0 ) ];
+
+        for (i in 0...rows) {
+            homo_controlPoints.push( homogenize1d(controlPoints[i], weights[i]) );
+        }
+
+        return homo_controlPoints;
+    }
+
 }
 
 /*

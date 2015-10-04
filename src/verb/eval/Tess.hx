@@ -9,6 +9,15 @@ import verb.core.Data;
 import verb.core.Vec;
 import verb.core.Trig;
 
+// `Tess` contains static, immutable algorithms for tessellation of NURBS curves and sufaces. Tessellation is the decomposition
+// of the analytical NURBS representation into discrete meshes or polylines that are useful for drawing.
+//
+// Some of these algorithms are "adaptive" - using certain heuristics to sample geometry where such samples make sense - while
+// others are "regular" in that they sample regularly throughout a parametric domain. There are tradeoffs here. While
+// adaptive algorithms can sometimes yield "better" results that are smaller or more economical, this can sometimes come at
+// increased computational cost. For example, it is sometimes necessarily to compute higher order derivatives in order to
+// obtain these more economical results. Your usage of these algorithms should consider these tradeoffs.
+
 @:expose("eval.Tess")
 class Tess {
 
@@ -69,7 +78,7 @@ class Tess {
 	}
 
 
-	//Sample a NURBS curve over its entire domain, corresponds to http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf
+	//Sample a NURBS curve over its entire domain, corresponds to [this algorithm](http://ariel.chronotext.org/dd/defigueiredo93adaptive.pdf)
 	//
     //**params**
     //
@@ -216,7 +225,6 @@ class Tess {
 
 	}
 
-	//
 	//Divide a NURBS surface int equal spaced intervals in the parametric domain as AdaptiveRefinementNodes
 	//
     //**params**

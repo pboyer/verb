@@ -16,7 +16,7 @@ import verb.core.Trig;
 
 using Lambda;
 
-// Analyze contains static immutable methods for analyzing NURBS geometry. This includes, but is not limited to:
+// `Analyze` contains static immutable methods for analyzing NURBS geometry. This includes, but is not limited to:
 //
 //* Determining the closest points on NURBS geometry to given points
 //* Determining knot structure

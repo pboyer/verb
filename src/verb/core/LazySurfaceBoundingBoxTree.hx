@@ -4,7 +4,7 @@ using verb.core.ArrayExtensions;
 using verb.core.Vec;
 
 import verb.eval.Eval;
-import verb.eval.Modify;
+import verb.eval.Divide;
 import verb.core.Data;
 
 class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
@@ -46,7 +46,7 @@ class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
         var dom = max - min;
         var pivot = (min + max) / 2.0; //* dom * 0.01 * Math.random();
 
-        var srfs = Modify.surfaceSplit( _surface, pivot, _splitV );
+        var srfs = Divide.surfaceSplit( _surface, pivot, _splitV );
 
         return new Pair<IBoundingBoxTree<NurbsSurfaceData>, IBoundingBoxTree<NurbsSurfaceData>>(
             new LazySurfaceBoundingBoxTree( srfs[0], !_splitV, _knotTolU, _knotTolV ),

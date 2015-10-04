@@ -7,8 +7,31 @@ import verb.core.Constants;
 import verb.core.ArrayExtensions;
 using verb.core.ArrayExtensions;
 
+// `Check` includes various tools for checking the validity of various NURBS data structures. This is important because it is
+// very easy to construct such data structures with incorrect structure. This class contains static, immutable functions for
+// doing those checks.
+//
+// **Note that the classes in verb.eval are very tolerant of incorrect NURBS data structures for performance reasons.** You should
+// perform these checks before using these classes.
+
 @:expose("eval.Check")
 class Check {
+
+    //Check whether a given array is a valid NURBS knot vector. This also checks the validity of the end points.
+    //More specifically, this method checks if the knot vector is of the following structure:
+    //
+    // The knot vector must be non-decreasing and of length (degree + 1) * 2 or greater
+    //
+    // [ (degree + 1 copies of the first knot), internal non-decreasing knots, (degree + 1 copies of the last knot) ]
+    //
+    //**params**
+    //
+    //* The knot vector to test
+    //* The degree
+    //
+    //**returns**
+    //
+    //* Whether the array is a valid knot vector or knot
 
     public static function isValidKnotVector(vec : Array<Float>, degree : Int) : Bool {
 
@@ -30,6 +53,17 @@ class Check {
         return isNonDecreasing( vec );
     }
 
+    //Check if an array of floating point numbers is non-decreasing, although there may be repeats. This is an important
+    //validation step for NURBS knot vectors.
+    //
+    //**params**
+    //
+    //* The data object
+    //
+    //**returns**
+    //
+    //* Whether the array is non-decreasing
+
     public static function isNonDecreasing(vec : Array<Float>){
         var rep = vec.first();
         for ( i in 0...vec.length ){
@@ -49,7 +83,7 @@ class Check {
     //
     //* The original, unmodified data
 
-    public static function nurbsCurveData( data : NurbsCurveData ) : NurbsCurveData {
+    public static function isValidNurbsCurveData( data : NurbsCurveData ) : NurbsCurveData {
         if ( data.controlPoints == null ) throw "Control points array cannot be null!";
         #if (!cpp && !cs && !java)
             if ( data.degree == null ) throw "Degree cannot be null!";
@@ -78,7 +112,7 @@ class Check {
     //
     //* The original, unmodified data
 
-    public static function nurbsSurfaceData( data : NurbsSurfaceData ) : NurbsSurfaceData {
+    public static function isValidNurbsSurfaceData( data : NurbsSurfaceData ) : NurbsSurfaceData {
         if ( data.controlPoints == null ) throw "Control points array cannot be null!";
         #if (!cpp && !cs && !java)
             if ( data.degreeU == null ) throw "DegreeU cannot be null!";

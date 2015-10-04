@@ -1568,7 +1568,7 @@ verb.core.LazyCurveBoundingBoxTree.prototype = {
 		var min = verb.core.ArrayExtensions.first(this._curve.knots);
 		var max = verb.core.ArrayExtensions.last(this._curve.knots);
 		var dom = max - min;
-		var crvs = verb.eval.Modify.curveSplit(this._curve,(max + min) / 2.0 + dom * 0.1 * Math.random());
+		var crvs = verb.eval.Divide.curveSplit(this._curve,(max + min) / 2.0 + dom * 0.1 * Math.random());
 		return new verb.core.Pair(new verb.core.LazyCurveBoundingBoxTree(crvs[0],this._knotTol),new verb.core.LazyCurveBoundingBoxTree(crvs[1],this._knotTol));
 	}
 	,boundingBox: function() {
@@ -1679,7 +1679,7 @@ verb.core.LazySurfaceBoundingBoxTree.prototype = {
 		}
 		var dom = max - min;
 		var pivot = (min + max) / 2.0;
-		var srfs = verb.eval.Modify.surfaceSplit(this._surface,pivot,this._splitV);
+		var srfs = verb.eval.Divide.surfaceSplit(this._surface,pivot,this._splitV);
 		return new verb.core.Pair(new verb.core.LazySurfaceBoundingBoxTree(srfs[0],!this._splitV,this._knotTolU,this._knotTolV),new verb.core.LazySurfaceBoundingBoxTree(srfs[1],!this._splitV,this._knotTolU,this._knotTolV));
 	}
 	,boundingBox: function() {
@@ -2314,7 +2314,7 @@ verb.core.SurfaceBoundingBoxTree = function(surface,splitV,knotTolU,knotTolV) {
 	}
 	var dom = max - min;
 	var pivot = (min + max) / 2.0 + dom * 0.1 * Math.random();
-	var srfs = verb.eval.Modify.surfaceSplit(this._surface,pivot,splitV);
+	var srfs = verb.eval.Divide.surfaceSplit(this._surface,pivot,splitV);
 	this._children = new verb.core.Pair(new verb.core.SurfaceBoundingBoxTree(srfs[0],!splitV,knotTolU,knotTolV),new verb.core.SurfaceBoundingBoxTree(srfs[1],!splitV,knotTolU,knotTolV));
 };
 verb.core.SurfaceBoundingBoxTree.__name__ = ["verb","core","SurfaceBoundingBoxTree"];
@@ -2943,7 +2943,7 @@ verb.eval.Check.isNonDecreasing = function(vec) {
 	}
 	return true;
 };
-verb.eval.Check.nurbsCurveData = function(data) {
+verb.eval.Check.isValidNurbsCurveData = function(data) {
 	if(data.controlPoints == null) throw "Control points array cannot be null!";
 	if(data.degree == null) throw "Degree cannot be null!";
 	if(data.degree < 1) throw "Degree must be greater than 1!";
@@ -2952,7 +2952,7 @@ verb.eval.Check.nurbsCurveData = function(data) {
 	if(!verb.eval.Check.isValidKnotVector(data.knots,data.degree)) throw "Invalid knot vector format!  Should begin with degree + 1 repeats and end with degree + 1 repeats!";
 	return data;
 };
-verb.eval.Check.nurbsSurfaceData = function(data) {
+verb.eval.Check.isValidNurbsSurfaceData = function(data) {
 	if(data.controlPoints == null) throw "Control points array cannot be null!";
 	if(data.degreeU == null) throw "DegreeU cannot be null!";
 	if(data.degreeV == null) throw "DegreeV cannot be null!";
@@ -2967,6 +2967,71 @@ verb.eval.Check.nurbsSurfaceData = function(data) {
 };
 verb.eval.Divide = $hx_exports.eval.Divide = function() { };
 verb.eval.Divide.__name__ = ["verb","eval","Divide"];
+verb.eval.Divide.surfaceSplit = function(surface,u,useV) {
+	if(useV == null) useV = false;
+	var knots;
+	var degree;
+	var controlPoints;
+	if(!useV) {
+		controlPoints = verb.core.Mat.transpose(surface.controlPoints);
+		knots = surface.knotsU;
+		degree = surface.degreeU;
+	} else {
+		controlPoints = surface.controlPoints;
+		knots = surface.knotsV;
+		degree = surface.degreeV;
+	}
+	var knots_to_insert;
+	var _g = [];
+	var _g2 = 0;
+	var _g1 = degree + 1;
+	while(_g2 < _g1) {
+		var i = _g2++;
+		_g.push(u);
+	}
+	knots_to_insert = _g;
+	var newpts0 = new Array();
+	var newpts1 = new Array();
+	var s = verb.eval.Eval.knotSpan(degree,u,knots);
+	var res = null;
+	var _g11 = 0;
+	while(_g11 < controlPoints.length) {
+		var cps = controlPoints[_g11];
+		++_g11;
+		res = verb.eval.Modify.curveKnotRefine(new verb.core.NurbsCurveData(degree,knots,cps),knots_to_insert);
+		newpts0.push(res.controlPoints.slice(0,s + 1));
+		newpts1.push(res.controlPoints.slice(s + 1));
+	}
+	var knots0 = res.knots.slice(0,s + degree + 2);
+	var knots1 = res.knots.slice(s + 1);
+	if(!useV) {
+		newpts0 = verb.core.Mat.transpose(newpts0);
+		newpts1 = verb.core.Mat.transpose(newpts1);
+		return [new verb.core.NurbsSurfaceData(degree,surface.degreeV,knots0,surface.knotsV.slice(),newpts0),new verb.core.NurbsSurfaceData(degree,surface.degreeV,knots1,surface.knotsV.slice(),newpts1)];
+	}
+	return [new verb.core.NurbsSurfaceData(surface.degreeU,degree,surface.knotsU.slice(),knots0,newpts0),new verb.core.NurbsSurfaceData(surface.degreeU,degree,surface.knotsU.slice(),knots1,newpts1)];
+};
+verb.eval.Divide.curveSplit = function(curve,u) {
+	var degree = curve.degree;
+	var controlPoints = curve.controlPoints;
+	var knots = curve.knots;
+	var knots_to_insert;
+	var _g = [];
+	var _g2 = 0;
+	var _g1 = degree + 1;
+	while(_g2 < _g1) {
+		var i = _g2++;
+		_g.push(u);
+	}
+	knots_to_insert = _g;
+	var res = verb.eval.Modify.curveKnotRefine(curve,knots_to_insert);
+	var s = verb.eval.Eval.knotSpan(degree,u,knots);
+	var knots0 = res.knots.slice(0,s + degree + 2);
+	var knots1 = res.knots.slice(s + 1);
+	var cpts0 = res.controlPoints.slice(0,s + 1);
+	var cpts1 = res.controlPoints.slice(s + 1);
+	return [new verb.core.NurbsCurveData(degree,knots0,cpts0),new verb.core.NurbsCurveData(degree,knots1,cpts1)];
+};
 verb.eval.Divide.rationalCurveByEqualArcLength = function(curve,num) {
 	var tlen = verb.eval.Analyze.rationalCurveArcLength(curve);
 	var inc = tlen / num;
@@ -5266,50 +5331,6 @@ verb.eval.Modify.surfaceKnotRefine = function(surface,knotsToInsert,useV) {
 		return new verb.core.NurbsSurfaceData(surface.degreeU,surface.degreeV,newknots,surface.knotsV.slice(),newPts);
 	} else return new verb.core.NurbsSurfaceData(surface.degreeU,surface.degreeV,surface.knotsU.slice(),newknots,newPts);
 };
-verb.eval.Modify.surfaceSplit = function(surface,u,useV) {
-	if(useV == null) useV = false;
-	var knots;
-	var degree;
-	var controlPoints;
-	if(!useV) {
-		controlPoints = verb.core.Mat.transpose(surface.controlPoints);
-		knots = surface.knotsU;
-		degree = surface.degreeU;
-	} else {
-		controlPoints = surface.controlPoints;
-		knots = surface.knotsV;
-		degree = surface.degreeV;
-	}
-	var knots_to_insert;
-	var _g = [];
-	var _g2 = 0;
-	var _g1 = degree + 1;
-	while(_g2 < _g1) {
-		var i = _g2++;
-		_g.push(u);
-	}
-	knots_to_insert = _g;
-	var newpts0 = new Array();
-	var newpts1 = new Array();
-	var s = verb.eval.Eval.knotSpan(degree,u,knots);
-	var res = null;
-	var _g11 = 0;
-	while(_g11 < controlPoints.length) {
-		var cps = controlPoints[_g11];
-		++_g11;
-		res = verb.eval.Modify.curveKnotRefine(new verb.core.NurbsCurveData(degree,knots,cps),knots_to_insert);
-		newpts0.push(res.controlPoints.slice(0,s + 1));
-		newpts1.push(res.controlPoints.slice(s + 1));
-	}
-	var knots0 = res.knots.slice(0,s + degree + 2);
-	var knots1 = res.knots.slice(s + 1);
-	if(!useV) {
-		newpts0 = verb.core.Mat.transpose(newpts0);
-		newpts1 = verb.core.Mat.transpose(newpts1);
-		return [new verb.core.NurbsSurfaceData(degree,surface.degreeV,knots0,surface.knotsV.slice(),newpts0),new verb.core.NurbsSurfaceData(degree,surface.degreeV,knots1,surface.knotsV.slice(),newpts1)];
-	}
-	return [new verb.core.NurbsSurfaceData(surface.degreeU,degree,surface.knotsU.slice(),knots0,newpts0),new verb.core.NurbsSurfaceData(surface.degreeU,degree,surface.knotsU.slice(),knots1,newpts1)];
-};
 verb.eval.Modify.decomposeCurveIntoBeziers = function(curve) {
 	var degree = curve.degree;
 	var controlPoints = curve.controlPoints;
@@ -5338,27 +5359,6 @@ verb.eval.Modify.decomposeCurveIntoBeziers = function(curve) {
 		i += reqMult;
 	}
 	return crvs;
-};
-verb.eval.Modify.curveSplit = function(curve,u) {
-	var degree = curve.degree;
-	var controlPoints = curve.controlPoints;
-	var knots = curve.knots;
-	var knots_to_insert;
-	var _g = [];
-	var _g2 = 0;
-	var _g1 = degree + 1;
-	while(_g2 < _g1) {
-		var i = _g2++;
-		_g.push(u);
-	}
-	knots_to_insert = _g;
-	var res = verb.eval.Modify.curveKnotRefine(curve,knots_to_insert);
-	var s = verb.eval.Eval.knotSpan(degree,u,knots);
-	var knots0 = res.knots.slice(0,s + degree + 2);
-	var knots1 = res.knots.slice(s + 1);
-	var cpts0 = res.controlPoints.slice(0,s + 1);
-	var cpts1 = res.controlPoints.slice(s + 1);
-	return [new verb.core.NurbsCurveData(degree,knots0,cpts0),new verb.core.NurbsCurveData(degree,knots1,cpts1)];
 };
 verb.eval.Modify.curveKnotRefine = function(curve,knotsToInsert) {
 	if(knotsToInsert.length == 0) return verb.eval.Make.clonedCurve(curve);
@@ -5774,7 +5774,7 @@ verb.geom = {};
 verb.geom.ICurve = function() { };
 verb.geom.ICurve.__name__ = ["verb","geom","ICurve"];
 verb.geom.NurbsCurve = $hx_exports.geom.NurbsCurve = function(data) {
-	this._data = verb.eval.Check.nurbsCurveData(data);
+	this._data = verb.eval.Check.isValidNurbsCurveData(data);
 };
 verb.geom.NurbsCurve.__name__ = ["verb","geom","NurbsCurve"];
 verb.geom.NurbsCurve.__interfaces__ = [verb.geom.ICurve];
@@ -5879,7 +5879,7 @@ verb.geom.NurbsCurve.prototype = $extend(verb.exe.AsyncObject.prototype,{
 		return this.defer(verb.eval.Divide,"rationalCurveByArcLength",[this._data,divisions]);
 	}
 	,split: function(u) {
-		return verb.eval.Modify.curveSplit(this._data,u).map(function(x) {
+		return verb.eval.Divide.curveSplit(this._data,u).map(function(x) {
 			return new verb.geom.NurbsCurve(x);
 		});
 	}
@@ -5953,7 +5953,7 @@ verb.geom.Circle.prototype = $extend(verb.geom.Arc.prototype,{
 verb.geom.ISurface = function() { };
 verb.geom.ISurface.__name__ = ["verb","geom","ISurface"];
 verb.geom.NurbsSurface = $hx_exports.geom.NurbsSurface = function(data) {
-	this._data = verb.eval.Check.nurbsSurfaceData(data);
+	this._data = verb.eval.Check.isValidNurbsSurfaceData(data);
 };
 verb.geom.NurbsSurface.__name__ = ["verb","geom","NurbsSurface"];
 verb.geom.NurbsSurface.__interfaces__ = [verb.geom.ISurface];
@@ -6045,7 +6045,7 @@ verb.geom.NurbsSurface.prototype = $extend(verb.exe.AsyncObject.prototype,{
 	}
 	,split: function(u,useV) {
 		if(useV == null) useV = false;
-		return verb.eval.Modify.surfaceSplit(this._data,u,useV).map(function(x) {
+		return verb.eval.Divide.surfaceSplit(this._data,u,useV).map(function(x) {
 			return new verb.geom.NurbsSurface(x);
 		});
 	}

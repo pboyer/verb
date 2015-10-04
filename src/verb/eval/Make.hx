@@ -14,6 +14,20 @@ import verb.core.Mat;
 import verb.core.ArrayExtensions;
 using verb.core.ArrayExtensions;
 
+// `Make` provides algorithms for generating NURBS representations of various special surfaces and curves. One of the very
+// desirable properties of NURBS is the ability to represent common curve types like conics in NURBS. As a result, verb
+// is able to represent many curve types with exceptional economy as many of the algorithms (for example, for intersection)
+// can be reused.
+//
+// This class includes methods for building:
+//
+//* conics
+//* polylines
+//* lofts
+//* swept surfaces
+//
+// Many of these algorithms owe their implementation to Piegl & Tiller's "The NURBS Book"
+
 @:expose("eval.Make")
 class Make {
 

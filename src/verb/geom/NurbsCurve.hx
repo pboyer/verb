@@ -41,7 +41,7 @@ class NurbsCurve extends AsyncObject implements ICurve {
     //* A new NurbsCurve
 
     public function new( data : NurbsCurveData ) {
-        this._data = Check.nurbsCurveData( data );
+        this._data = Check.isValidNurbsCurveData( data );
     }
 
     //Construct a NurbsCurve by degree, knots, control points, weights
@@ -355,7 +355,7 @@ class NurbsCurve extends AsyncObject implements ICurve {
     //* Two curves - one at the lower end of the parameter range and one at the higher end.
 
     public function split( u : Float ) : Array<NurbsCurve> {
-        return Modify.curveSplit( _data, u ).map(function(x){ return new NurbsCurve(x); });
+        return Divide.curveSplit( _data, u ).map(function(x){ return new NurbsCurve(x); });
     }
 
     // The async version of `split`

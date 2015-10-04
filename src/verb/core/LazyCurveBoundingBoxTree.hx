@@ -4,8 +4,8 @@ using verb.core.ArrayExtensions;
 using verb.core.Vec;
 import verb.core.Data;
 
-import verb.eval.Modify;
 import verb.eval.Eval;
+import verb.eval.Divide;
 
 class LazyCurveBoundingBoxTree implements IBoundingBoxTree<NurbsCurveData> {
 
@@ -26,7 +26,7 @@ class LazyCurveBoundingBoxTree implements IBoundingBoxTree<NurbsCurveData> {
         var max = _curve.knots.last();
         var dom = max - min;
 
-        var crvs = Modify.curveSplit( _curve, (max + min) / 2.0 + dom * 0.1 * Math.random());
+        var crvs = Divide.curveSplit( _curve, (max + min) / 2.0 + dom * 0.1 * Math.random());
 
         return new Pair<IBoundingBoxTree<NurbsCurveData>, IBoundingBoxTree<NurbsCurveData>>(
             new LazyCurveBoundingBoxTree( crvs[0], _knotTol ),

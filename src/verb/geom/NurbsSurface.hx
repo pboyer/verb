@@ -6,6 +6,8 @@ import verb.core.Data;
 import verb.eval.Make;
 import promhx.Promise;
 
+import verb.eval.Divide;
+
 import verb.core.AdaptiveRefinementNode.AdaptiveRefinementOptions;
 import verb.eval.Tess;
 import verb.eval.Modify;
@@ -39,7 +41,7 @@ class NurbsSurface extends AsyncObject implements ISurface {
     //* A new NurbsSurface
 
     public function new( data : NurbsSurfaceData ) {
-        _data = Check.nurbsSurfaceData(data);
+        _data = Check.isValidNurbsSurfaceData(data);
     }
 
 
@@ -287,7 +289,7 @@ class NurbsSurface extends AsyncObject implements ISurface {
     //* A length 2 array with two new NurbsSurface objects
 
     public function split( u : Float, useV : Bool = false ) : Array<NurbsSurface> {
-        return Modify.surfaceSplit( _data, u, useV )
+        return Divide.surfaceSplit( _data, u, useV )
             .map(function(x){ return new NurbsSurface(x); });
     }
 

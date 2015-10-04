@@ -3,7 +3,7 @@ package verb.core;
 import verb.core.Data;
 using verb.core.ArrayExtensions;
 using verb.core.Vec;
-import verb.eval.Modify;
+import verb.eval.Divide;
 import verb.eval.Eval;
 
 class SurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
@@ -47,7 +47,7 @@ class SurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
         var dom = max - min;
         var pivot = (min + max) / 2.0 + dom * 0.1 * Math.random();
 
-        var srfs = Modify.surfaceSplit( _surface, pivot, splitV );
+        var srfs = Divide.surfaceSplit( _surface, pivot, splitV );
 
         _children = new Pair<IBoundingBoxTree<NurbsSurfaceData>, IBoundingBoxTree<NurbsSurfaceData>>(
             new SurfaceBoundingBoxTree( srfs[0], !splitV, knotTolU, knotTolV ),

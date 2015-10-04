@@ -23,6 +23,16 @@ using verb.core.Vec;
 import verb.core.ArrayExtensions;
 using verb.core.ArrayExtensions;
 
+// `Intersect` provides various tools for all kinds of intersection. This includes but not limited to:
+//
+//* curves
+//* surfaces
+//* meshes
+//* polylines
+//
+// Under the hood, most of these algorithms call the recursive bounding box intersection algorithm
+// (`Intersect.boundingBoxTrees<T1, T2>`) followed by some kind of minimization.
+
 @:expose("eval.Intersect")
 class Intersect {
 
@@ -622,7 +632,6 @@ class Intersect {
  
             atrees.push( as.item0 );
             btrees.push( bs.item0 );
-
 
         }
 
