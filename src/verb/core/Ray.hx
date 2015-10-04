@@ -1,7 +1,7 @@
 package verb.core;
 
-import verb.core.NurbsCurveData.Point;
-import verb.core.Vec.Vector;
+import verb.core.Data;
+import verb.core.Vec;
 
 @:expose("core.Ray")
 class Ray {

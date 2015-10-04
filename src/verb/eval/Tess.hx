@@ -1,13 +1,13 @@
 package verb.eval;
 
+import verb.core.ArrayExtensions;
 using verb.core.ArrayExtensions;
 
-import verb.core.SurfacePoint;
-import verb.core.MeshData;
+import verb.core.Intersections;
 import verb.core.AdaptiveRefinementNode;
-import verb.core.NurbsSurfaceData;
-
-import verb.core.NurbsCurveData;
+import verb.core.Data;
+import verb.core.Vec;
+import verb.core.Trig;
 
 @:expose("eval.Tess")
 class Tess {

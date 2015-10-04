@@ -1,6 +1,6 @@
 {
   "name": "verb",
-  "version": "0.2.0",
+  "version": "2.0.0",
   "author": "pboyer <peter.b.boyer@gmail.com>",
   "description": "A CAD library for the web",
   "repository": {
@@ -12,10 +12,8 @@
   },
   "keywords": [
     "NURBS",
-    "webworker",
     "geometry",
-    "cad",
-    "nurbs"
+    "cad"
   ],
   "devDependencies": {
     "benchmark": "^1.0.0",

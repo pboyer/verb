@@ -1,5 +1,7 @@
 package verb.core;
 
+import verb.core.Data;
+
 class LazyPolylineBoundingBoxTree implements IBoundingBoxTree<Int> {
 
     var _interval : Interval<Int>;

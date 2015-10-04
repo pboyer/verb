@@ -1,7 +1,8 @@
 package verb.geom;
 
-import verb.core.Mat.Vector;
-import verb.core.NurbsCurveData.Point;
+import verb.core.Data;
+import verb.core.Vec;
+
 import verb.eval.Make;
 
 // A Circle is a three dimensional curve representing the points that are equidistant from a point in a particular plane

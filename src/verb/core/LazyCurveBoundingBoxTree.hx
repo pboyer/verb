@@ -2,7 +2,10 @@ package verb.core;
 
 using verb.core.ArrayExtensions;
 using verb.core.Vec;
+import verb.core.Data;
 
+import verb.eval.Modify;
+import verb.eval.Eval;
 
 class LazyCurveBoundingBoxTree implements IBoundingBoxTree<NurbsCurveData> {
 

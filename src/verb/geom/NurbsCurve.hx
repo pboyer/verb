@@ -1,25 +1,24 @@
 package verb.geom;
 
-import verb.core.Check;
+import verb.eval.Check;
 import verb.core.Vec;
 import verb.eval.Make;
 import promhx.Promise;
 import verb.exe.AsyncObject;
 
-import verb.core.NurbsCurveData;
+import verb.core.Data;
 import verb.core.Mat;
 
 import verb.core.ArrayExtensions;
 using verb.core.ArrayExtensions;
 
 import verb.core.CurveLengthSample;
-import verb.core.Modify;
-import verb.core.Tess;
-import verb.core.Divide;
-import verb.core.Analyze;
+import verb.eval.Modify;
+import verb.eval.Tess;
+import verb.eval.Divide;
+import verb.eval.Analyze;
 import verb.eval.Eval;
 import verb.core.Interval;
-import verb.core.NurbsCurveData;
 
 // A NURBS curve - this class represents the base class of many of verb.geom's curve types and provides many tools for analysis and evaluation.
 // This object is deliberately constrained to be immutable. There are methods to gain access to the underlying fields. `asNurbs` can

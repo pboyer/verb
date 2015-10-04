@@ -40,7 +40,6 @@ import verb.eval.Analyze;
 import verb.eval.Divide;
 import verb.eval.Check;
 
-
 class Verb {
 	public static function main():Void {
 		trace("verb 2.0.0");

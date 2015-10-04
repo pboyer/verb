@@ -1,7 +1,7 @@
 package verb.geom;
 
-import verb.core.Mat.Vector;
-import verb.core.NurbsCurveData.Point;
+import verb.core.Vec;
+import verb.core.Data;
 
 // A CylindricalSurface is a surface making up part of a cylinder.
 

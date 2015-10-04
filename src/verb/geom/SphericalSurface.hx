@@ -1,7 +1,8 @@
 package verb.geom;
 
 import verb.eval.Make;
-import verb.core.NurbsCurveData;
+import verb.core.Vec;
+import verb.core.Data;
 import verb.core.Mat;
 
 // A surface representing the doubly curved surface of a sphere

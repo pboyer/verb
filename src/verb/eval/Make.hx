@@ -1,12 +1,17 @@
 package verb.eval;
 
-import verb.core.ExpIntersect;
+import verb.eval.ExpIntersect;
 import verb.geom.NurbsSurface;
 import verb.core.Interval;
-import verb.core.Mat.Vector;
-import verb.core.NurbsSurfaceData;
-import verb.core.NurbsCurveData;
+import verb.core.Vec;
+using verb.core.Vec;
+import verb.core.Data;
 
+import verb.core.Constants;
+import verb.core.Trig;
+import verb.core.Mat;
+
+import verb.core.ArrayExtensions;
 using verb.core.ArrayExtensions;
 
 @:expose("eval.Make")

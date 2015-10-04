@@ -2,8 +2,8 @@ package verb.geom;
 
 import verb.eval.Eval;
 import verb.eval.Make;
-import verb.core.Mat.Vector;
-import verb.core.NurbsCurveData.Point;
+import verb.core.Vec;
+import verb.core.Data;
 
 // An EllipseArc is a subset of an Ellipse
 

@@ -1,31 +1,24 @@
 package verb.eval;
 
 import verb.core.MeshBoundingBoxTree;
-import verb.core.TriSegmentIntersection;
+import verb.core.Intersections;
 import verb.core.Ray;
-import verb.core.CurveTriPoint;
-import verb.core.CurveCurveIntersection;
 import verb.core.IBoundingBoxTree;
 import verb.core.LazyPolylineBoundingBoxTree;
-import verb.core.PolylineMeshIntersection;
-import verb.core.PolylineData;
-import verb.core.CurveSurfaceIntersection;
+import verb.core.Data;
 import verb.core.LazySurfaceBoundingBoxTree;
 import verb.core.LazyCurveBoundingBoxTree;
 import verb.core.Interval;
 import verb.core.LazyMeshBoundingBoxTree;
-import verb.core.MeshIntersectionPoint;
-import verb.core.SurfaceSurfaceIntersectionPoint;
-import verb.core.NurbsSurfaceData;
-import verb.core.KdTree.KdPoint;
+import verb.core.KdTree;
 import verb.core.AdaptiveRefinementNode.AdaptiveRefinementOptions;
 import verb.core.Pair;
 import verb.core.Vec.Vector;
-import verb.core.MeshData;
 import verb.core.Numeric;
 import verb.core.Mesh;
-import verb.core.NurbsCurveData;
 import verb.core.Constants;
+
+using verb.core.Vec;
 
 import verb.core.ArrayExtensions;
 using verb.core.ArrayExtensions;

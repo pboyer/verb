@@ -5,6 +5,7 @@ using verb.core.Vec;
 
 import verb.eval.Eval;
 import verb.eval.Modify;
+import verb.core.Data;
 
 class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
 

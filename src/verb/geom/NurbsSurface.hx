@@ -1,21 +1,20 @@
 package verb.geom;
 
-import verb.core.Check;
+import verb.eval.Check;
 import verb.core.Vec;
+import verb.core.Data;
 import verb.eval.Make;
 import promhx.Promise;
-import verb.core.MeshData;
+
 import verb.core.AdaptiveRefinementNode.AdaptiveRefinementOptions;
-import verb.core.Tess;
-import verb.core.Modify;
-import verb.core.Analyze;
+import verb.eval.Tess;
+import verb.eval.Modify;
+import verb.eval.Analyze;
 import verb.core.ArrayExtensions;
 using verb.core.ArrayExtensions;
 
 import verb.core.Interval;
-import verb.core.NurbsCurveData;
 import verb.eval.Eval;
-import verb.core.NurbsSurfaceData;
 import verb.exe.AsyncObject;
 import verb.core.Mat;
 

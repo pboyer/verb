@@ -1,6 +1,7 @@
 package verb.core;
 
-import verb.core.NurbsCurveData.Point;
+import verb.core.Data;
+
 using Lambda;
 
 @:expose("core.BoundingBox")

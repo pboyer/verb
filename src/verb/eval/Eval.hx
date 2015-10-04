@@ -1,8 +1,6 @@
 package verb.eval;
 
-import verb.core.VolumeData;
-import verb.core.NurbsSurfaceData;
-import verb.core.NurbsCurveData;
+import verb.core.Data;
 import verb.core.Vec;
 import verb.core.Binomial;
 import verb.core.Constants;

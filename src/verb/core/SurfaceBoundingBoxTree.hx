@@ -1,5 +1,6 @@
 package verb.core;
 
+import verb.core.Data;
 using verb.core.ArrayExtensions;
 using verb.core.Vec;
 import verb.eval.Modify;

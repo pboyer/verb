@@ -2,6 +2,9 @@ package verb.core;
 
 using verb.core.ArrayExtensions;
 
+import verb.core.Data;
+
+
 class MeshBoundingBoxTree implements IBoundingBoxTree<Int> {
 
     var _children : Pair<IBoundingBoxTree<Int>, IBoundingBoxTree<Int>>;

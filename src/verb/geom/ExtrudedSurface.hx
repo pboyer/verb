@@ -1,7 +1,7 @@
 package verb.geom;
 import verb.eval.Make;
 import verb.core.Vec;
-import verb.core.Mat.Vector;
+import verb.core.Data;
 
 // Form a Surface by extruding a curve along a vector
 

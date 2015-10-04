@@ -2,9 +2,7 @@ package verb.core;
 
 import verb.core.BoundingBox;
 import verb.core.Pair;
-import verb.core.BoundingBoxNode;
-import verb.core.MeshData;
-import verb.core.NurbsCurveData.Point;
+import verb.core.Data;
 
 using verb.core.ArrayExtensions;
 

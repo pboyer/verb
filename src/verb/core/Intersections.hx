@@ -1,5 +1,7 @@
 package verb.core;
 
+import verb.core.Data;
+
 @:expose("core.CurveCurveIntersection")
 class CurveCurveIntersection {
 
@@ -154,3 +156,13 @@ class SurfacePoint {
     }
 }
 
+@:expose("core.CurvePoint")
+class CurvePoint {
+    public var u : Float;
+    public var pt : Point;
+
+    public function new(u, pt) {
+        this.u = u;
+        this.pt = pt;
+    }
+}

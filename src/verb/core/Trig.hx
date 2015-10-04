@@ -1,10 +1,9 @@
 package verb.core;
 
 import verb.core.Vec;
+import verb.core.Data;
+import verb.core.Intersections;
 using verb.core.Vec;
-
-import verb.topo.Split.Plane;
-import verb.core.NurbsCurveData.Point;
 
 @:expose("core.Trig")
 class Trig {

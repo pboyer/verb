@@ -1,7 +1,6 @@
 package verb.core;
 
-import verb.core.NurbsCurveData.Point;
-import verb.core.Mat.Vector;
+import verb.core.Data;
 
 using verb.core.ArrayExtensions;
 

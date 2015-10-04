@@ -1,6 +1,8 @@
 package verb.geom;
 
 import verb.eval.Make;
+import verb.core.Vec;
+import verb.core.Data;
 
 // A SweptSurface uses a profile curve and a guide rail to form a surface. The profile curve is "swept" along the guide
 // rail by a lofting operation.

@@ -3,6 +3,9 @@ package verb.core;
 using verb.core.ArrayExtensions;
 
 import verb.eval.Eval;
+import verb.core.Vec;
+import verb.core.Data;
+import verb.core.Intersections;
 
 @:expose("core.AdaptiveRefinementOptions")
 class AdaptiveRefinementOptions {

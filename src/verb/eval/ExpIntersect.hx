@@ -3,18 +3,22 @@ package verb.eval;
 //experimental surface intersection work
 
 import verb.core.IBoundingBoxTree;
-import verb.core.SurfaceSurfaceIntersectionPoint;
+import verb.core.Intersections;
+import verb.core.Data;
 import verb.core.SurfaceBoundingBoxTree;
 import verb.core.Pair;
-import verb.core.MeshData.UV;
 import verb.core.LazySurfaceBoundingBoxTree;
-import verb.core.CurveSurfaceIntersection;
+import verb.core.ArrayExtensions;
 using verb.core.ArrayExtensions;
+
+import verb.core.Trig;
+import verb.core.Numeric;
+
+import verb.core.Vec;
 using verb.core.Vec;
 
-import verb.core.NurbsSurfaceData;
-import verb.core.NurbsCurveData;
-
+import verb.core.Constants;
+using verb.core.Constants;
 
 enum MarchStepState { OutOfBounds; InsideDomain; AtBoundary; CompleteLoop; CoincidentStartPoint; }
 

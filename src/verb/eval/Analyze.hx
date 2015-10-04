@@ -1,9 +1,7 @@
 package verb.eval;
 
 import verb.core.AdaptiveRefinementNode.AdaptiveRefinementOptions;
-import verb.core.NurbsSurfaceData;
-import verb.core.MeshData.UV;
-import verb.core.NurbsCurveData;
+import verb.core.Data;
 
 import verb.core.ArrayExtensions;
 using verb.core.ArrayExtensions;

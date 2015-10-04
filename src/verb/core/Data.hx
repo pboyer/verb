@@ -1,10 +1,12 @@
 package verb.core;
 
-import verb.core.NurbsCurveData;
-
 typedef Point = Array<Float>;
 typedef KnotArray = Array<Float>;
 typedef CurvePointArray = Array<Point>;
+typedef Plane = {
+    n : Array<Float>,
+    o : Array<Float>
+}
 
 @:expose("core.NurbsSurfaceData")
 class NurbsSurfaceData {

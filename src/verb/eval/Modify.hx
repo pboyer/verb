@@ -1,14 +1,18 @@
 package verb.eval;
 
-import verb.geom.NurbsSurface;
 import verb.core.Interval;
 import verb.core.Mat.Matrix;
-import verb.core.NurbsCurveData;
-import verb.core.NurbsCurveData;
-import verb.core.NurbsSurfaceData;
+import verb.core.Data;
 
 using Lambda;
+
+import verb.core.Vec;
+import verb.core.Binomial;
+import verb.core.Constants;
+import verb.core.ArrayExtensions;
 using verb.core.ArrayExtensions;
+
+using verb.core.Mat;
 
 @:expose("eval.Modify")
 class Modify {

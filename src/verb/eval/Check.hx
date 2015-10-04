@@ -1,7 +1,6 @@
 package verb.eval;
 
-import verb.core.NurbsSurfaceData;
-import verb.core.NurbsCurveData;
+import verb.core.Data;
 
 import verb.core.Constants;
 

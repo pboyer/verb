@@ -1,6 +1,6 @@
 package verb.eval;
 
-import verb.core.NurbsCurveData;
+import verb.core.Data;
 import verb.core.CurveLengthSample;
 import verb.core.Vec;
 import verb.core.Constants;
