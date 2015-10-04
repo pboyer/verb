@@ -37,8 +37,8 @@ function sameCurve( crvd0, crvd1 ){
 	var step = (u1 - u0) / (numSamples-1);
 
 	for (var i  = 0; i < numSamples; i++ ){
-		var p0 = verb.core.Eval.rationalCurvePoint( crvd0, u0 + step*i );
-		var p1 = verb.core.Eval.rationalCurvePoint( crvd1, u0 + step*i );
+		var p0 = verb.eval.Eval.rationalCurvePoint( crvd0, u0 + step*i );
+		var p1 = verb.eval.Eval.rationalCurvePoint( crvd1, u0 + step*i );
 
 		var dist = verb.core.Vec.dist( p0, p1 );
 		dist.should.be.lessThan( verb.core.Constants.TOLERANCE );

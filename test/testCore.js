@@ -21,7 +21,7 @@ function last(a){
 }
 
 
-describe("verb.core.Eval.knotSpanGivenN",function(){
+describe("verb.eval.Eval.knotSpanGivenN",function(){
 
 	it('returns correct result', function(){
 
@@ -29,39 +29,39 @@ describe("verb.core.Eval.knotSpanGivenN",function(){
 			, degree = 2
 			, knots = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5];
 
-		should.equal( 4, verb.core.Eval.knotSpanGivenN( n, degree, 2.5, knots ) );
-		should.equal( 3, verb.core.Eval.knotSpanGivenN( n, degree, 1, knots ) );
-		should.equal( 3, verb.core.Eval.knotSpanGivenN( n, degree, 1.5, knots ) );
-		should.equal( 7, verb.core.Eval.knotSpanGivenN( n, degree, 4.9, knots ) );
-		should.equal( 7, verb.core.Eval.knotSpanGivenN( n, degree, 10, knots ) );
-		should.equal( 7, verb.core.Eval.knotSpanGivenN( n, degree, 5, knots ) );
-		should.equal( 2, verb.core.Eval.knotSpanGivenN( n, degree, 0, knots ) );
-		should.equal( 2, verb.core.Eval.knotSpanGivenN( n, degree, -1, knots ) );
+		should.equal( 4, verb.eval.Eval.knotSpanGivenN( n, degree, 2.5, knots ) );
+		should.equal( 3, verb.eval.Eval.knotSpanGivenN( n, degree, 1, knots ) );
+		should.equal( 3, verb.eval.Eval.knotSpanGivenN( n, degree, 1.5, knots ) );
+		should.equal( 7, verb.eval.Eval.knotSpanGivenN( n, degree, 4.9, knots ) );
+		should.equal( 7, verb.eval.Eval.knotSpanGivenN( n, degree, 10, knots ) );
+		should.equal( 7, verb.eval.Eval.knotSpanGivenN( n, degree, 5, knots ) );
+		should.equal( 2, verb.eval.Eval.knotSpanGivenN( n, degree, 0, knots ) );
+		should.equal( 2, verb.eval.Eval.knotSpanGivenN( n, degree, -1, knots ) );
 
 	});
 
 });
 
-describe("verb.core.Eval.knotSpan",function(){
+describe("verb.eval.Eval.knotSpan",function(){
 
 	it('returns correct result for degree 2 curve', function(){
 
 		var degree = 2
 			, knots = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5];
 
-		should.equal( 4, verb.core.Eval.knotSpan( degree, 2.5, knots ) );
-		should.equal( 3, verb.core.Eval.knotSpan( degree, 1, knots ) );
-		should.equal( 3, verb.core.Eval.knotSpan( degree, 1.5, knots ) );
-		should.equal( 7, verb.core.Eval.knotSpan( degree, 4.9, knots ) );
-		should.equal( 7, verb.core.Eval.knotSpan( degree, 10, knots ) ); // above span
-		should.equal( 7, verb.core.Eval.knotSpan( degree, 5, knots ) ); // top of span
-		should.equal( 2, verb.core.Eval.knotSpan( degree, 0, knots ) ); // bottom span
+		should.equal( 4, verb.eval.Eval.knotSpan( degree, 2.5, knots ) );
+		should.equal( 3, verb.eval.Eval.knotSpan( degree, 1, knots ) );
+		should.equal( 3, verb.eval.Eval.knotSpan( degree, 1.5, knots ) );
+		should.equal( 7, verb.eval.Eval.knotSpan( degree, 4.9, knots ) );
+		should.equal( 7, verb.eval.Eval.knotSpan( degree, 10, knots ) ); // above span
+		should.equal( 7, verb.eval.Eval.knotSpan( degree, 5, knots ) ); // top of span
+		should.equal( 2, verb.eval.Eval.knotSpan( degree, 0, knots ) ); // bottom span
 
 	});
 
 });
 
-describe("verb.core.Eval.basisFunctions, basisFunctionsGivenKnotSpanIndex",function(){
+describe("verb.eval.Eval.basisFunctions, basisFunctionsGivenKnotSpanIndex",function(){
 
 	it('return correct results', function(){
 
@@ -69,13 +69,13 @@ describe("verb.core.Eval.basisFunctions, basisFunctionsGivenKnotSpanIndex",funct
 			, span = 4
 			, knots = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5];
 
-		var N1 = verb.core.Eval.basisFunctionsGivenKnotSpanIndex( 4, 2.5, degree, knots );
+		var N1 = verb.eval.Eval.basisFunctionsGivenKnotSpanIndex( 4, 2.5, degree, knots );
 		should.equal( 3, N1.length );
 		should.equal( 0.125, N1[0] );
 		should.equal( 0.75, N1[1] );
 		should.equal( 0.125, N1[2] );
 
-		var N2 = verb.core.Eval.basisFunctions( 2.5, degree, knots );
+		var N2 = verb.eval.Eval.basisFunctions( 2.5, degree, knots );
 		should.equal( 3, N2.length );
 		should.equal( 0.125, N2[0] );
 		should.equal( 0.75, N2[1] );
@@ -85,7 +85,7 @@ describe("verb.core.Eval.basisFunctions, basisFunctionsGivenKnotSpanIndex",funct
 
 });
 
-describe("verb.core.Eval.curvePoint",function(){
+describe("verb.eval.Eval.curvePoint",function(){
 
 	it('returns correct result for simple curve', function(){
 
@@ -95,17 +95,17 @@ describe("verb.core.Eval.curvePoint",function(){
 			, controlPoints = [ [10, 0], [20, 10], [30, 20], [40, 30], [50, 40], [60, 30], [70, 80]]
 			, crv = new verb.core.NurbsCurveData( degree, knots, controlPoints  );
 
-		var p = verb.core.Eval.curvePointGivenN( n, crv, 2.5);
+		var p = verb.eval.Eval.curvePointGivenN( n, crv, 2.5);
 
 		should.equal( p[0], 40 );
 		should.equal( p[1], 30 );
 
-		var p_start = verb.core.Eval.curvePointGivenN( n, crv, 0);
+		var p_start = verb.eval.Eval.curvePointGivenN( n, crv, 0);
 
 		should.equal( p_start[0], 10 );
 		should.equal( p_start[1], 0 );
 
-		var p_end = verb.core.Eval.curvePointGivenN( n, crv, 5);
+		var p_end = verb.eval.Eval.curvePointGivenN( n, crv, 5);
 
 		should.equal( p_end[0], 70 );
 		should.equal( p_end[1], 80 );
@@ -114,7 +114,7 @@ describe("verb.core.Eval.curvePoint",function(){
 
 });
 
-describe("verb.core.Eval.curvePointGivenN",function(){
+describe("verb.eval.Eval.curvePointGivenN",function(){
 
 	it('returns correct result for simple curve', function(){
 
@@ -125,12 +125,12 @@ describe("verb.core.Eval.curvePointGivenN",function(){
 			, controlPoints = [ [10, 0], [20, 10], [30, 20], [50, 50] ]
 			, crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
-		var p = verb.core.Eval.curvePoint( crv, u);
+		var p = verb.eval.Eval.curvePoint( crv, u);
 
 		should.equal( p[0], 10 );
 		should.equal( p[1], 0 );
 
-		var p2 = verb.core.Eval.curvePoint( crv, 1.0);
+		var p2 = verb.eval.Eval.curvePoint( crv, 1.0);
 
 		should.equal( p2[0], 50 );
 		should.equal( p2[1], 50 );
@@ -139,17 +139,17 @@ describe("verb.core.Eval.curvePointGivenN",function(){
 	});
 });
 
-describe("verb.core.Eval.areValidRelations",function(){
+describe("verb.eval.Eval.areValidRelations",function(){
 
 	it('returns correct result for two cases', function(){
 
-		should.equal( false, verb.core.Eval.areValidRelations( 0, 0, 0 ) );
-		should.equal( true, verb.core.Eval.areValidRelations( 2, 2, 5 ) );
+		should.equal( false, verb.eval.Eval.areValidRelations( 0, 0, 0 ) );
+		should.equal( true, verb.eval.Eval.areValidRelations( 2, 2, 5 ) );
 
 	});
 });
 
-describe("verb.core.Eval.derivativeBasisFunctionsGivenNI",function(){
+describe("verb.eval.Eval.derivativeBasisFunctionsGivenNI",function(){
 
 	it('returns correct results', function(){
 
@@ -159,7 +159,7 @@ describe("verb.core.Eval.derivativeBasisFunctionsGivenNI",function(){
 			, span = 4
 			, knots = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5];
 
-		var N1 = verb.core.Eval.derivativeBasisFunctionsGivenNI( span, 2.5, degree, n, knots );
+		var N1 = verb.eval.Eval.derivativeBasisFunctionsGivenNI( span, 2.5, degree, n, knots );
 		// weights
 		should.equal( 0.125, N1[0][0] );
 		should.equal( 0.75, N1[0][1] );
@@ -181,7 +181,7 @@ describe("verb.core.Eval.derivativeBasisFunctionsGivenNI",function(){
 
 });
 
-describe("verb.core.Eval.curveDerivativesGivenN",function(){
+describe("verb.eval.Eval.curveDerivativesGivenN",function(){
 
 	it('returns correct result for simple curve', function(){
 
@@ -193,7 +193,7 @@ describe("verb.core.Eval.curveDerivativesGivenN",function(){
 			, num_derivs = 2
 			, crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
-		var p = verb.core.Eval.curveDerivativesGivenN( n, crv, u, num_derivs ) ;
+		var p = verb.eval.Eval.curveDerivativesGivenN( n, crv, u, num_derivs ) ;
 
 		should.equal( p[0][0], 10 );
 		should.equal( p[0][1], 0 );
@@ -203,7 +203,7 @@ describe("verb.core.Eval.curveDerivativesGivenN",function(){
 
 });
 
-describe("verb.core.Eval.curveDerivatives",function(){
+describe("verb.eval.Eval.curveDerivatives",function(){
 
 	it('returns correct result for simple curve', function(){
 
@@ -215,7 +215,7 @@ describe("verb.core.Eval.curveDerivatives",function(){
 			, num_derivs = 2
 			, crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
-		var p = verb.core.Eval.curveDerivatives( crv, u, num_derivs ) ;
+		var p = verb.eval.Eval.curveDerivatives( crv, u, num_derivs ) ;
 
 		should.equal( p[0][0], 10 );
 		should.equal( p[0][1], 0 );
@@ -226,7 +226,7 @@ describe("verb.core.Eval.curveDerivatives",function(){
 
 });
 
-describe("verb.core.Eval.surfacePointGivenNM",function(){
+describe("verb.eval.Eval.surfacePointGivenNM",function(){
 
 	it('returns correct result for simple surface', function(){
 
@@ -243,13 +243,13 @@ describe("verb.core.Eval.surfacePointGivenNM",function(){
 			, n = 3
 			, m = 3;
 
-		var p = verb.core.Eval.surfacePointGivenNM( n, m, surface, 0, 0 );
+		var p = verb.eval.Eval.surfacePointGivenNM( n, m, surface, 0, 0 );
 		
 		should.equal( p[0], 0 );
 		should.equal( p[1], 0 );
 		should.equal( p[2], 50 );
 
-		p = verb.core.Eval.surfacePointGivenNM( n, m, surface, 1, 1 );
+		p = verb.eval.Eval.surfacePointGivenNM( n, m, surface, 1, 1 );
 
 		should.equal( p[0], 30 );
 		should.equal( p[1], -30 );
@@ -259,7 +259,7 @@ describe("verb.core.Eval.surfacePointGivenNM",function(){
 
 });
 
-describe("verb.core.Eval.surfacePoint",function(){
+describe("verb.eval.Eval.surfacePoint",function(){
 
 	it('returns correct result for simple surface', function(){
 
@@ -274,13 +274,13 @@ describe("verb.core.Eval.surfacePoint",function(){
 									[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
 			, surface = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
 
-		var p = verb.core.Eval.surfacePoint( surface, 0, 0 );
+		var p = verb.eval.Eval.surfacePoint( surface, 0, 0 );
 
 		should.equal( p[0], 0 );
 		should.equal( p[1], 0 );
 		should.equal( p[2], 50 );
 
-		p = verb.core.Eval.surfacePoint( surface, 1, 1 );
+		p = verb.eval.Eval.surfacePoint( surface, 1, 1 );
 
 		should.equal( p[0], 30 );
 		should.equal( p[1], -30 );
@@ -298,7 +298,7 @@ describe("verb.core.Eval.surfacePoint",function(){
 									[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] 	] ]
 			, surface = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
 
-		var p = verb.core.Eval.surfacePoint( surface, 0, 0 );
+		var p = verb.eval.Eval.surfacePoint( surface, 0, 0 );
 
 		should.equal( p[0], 0 );
 		should.equal( p[1], 0 );
@@ -308,7 +308,7 @@ describe("verb.core.Eval.surfacePoint",function(){
 
 });
 
-describe("verb.core.Eval.surfaceDerivativesGivenNM",function(){
+describe("verb.eval.Eval.surfaceDerivativesGivenNM",function(){
 
 	it('returns correct derivatives for simple surface', function(){
 
@@ -327,7 +327,7 @@ describe("verb.core.Eval.surfaceDerivativesGivenNM",function(){
 			, num_derivatives = 1
 			, surface = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
 
-		var p = verb.core.Eval.surfaceDerivativesGivenNM( n, m, surface, 0, 0, num_derivatives );
+		var p = verb.eval.Eval.surfaceDerivativesGivenNM( n, m, surface, 0, 0, num_derivatives );
 
 		// 0th derivative with respect to u & v
 		should.equal( p[0][0][0], 0 );
@@ -351,7 +351,7 @@ describe("verb.core.Eval.surfaceDerivativesGivenNM",function(){
 	});
 });
 
-describe("verb.core.Eval.surfaceDerivatives",function(){
+describe("verb.eval.Eval.surfaceDerivatives",function(){
 
 	it('returns correct derivatives for simple surface', function(){
 
@@ -370,7 +370,7 @@ describe("verb.core.Eval.surfaceDerivatives",function(){
 			, num_derivatives = 1
 			, surface = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
 
-		var p = verb.core.Eval.surfaceDerivatives( surface, 0, 0, num_derivatives );
+		var p = verb.eval.Eval.surfaceDerivatives( surface, 0, 0, num_derivatives );
 
 		// 0th derivative with respect to u & v
 		should.equal( p[0][0][0], 0 );
@@ -395,13 +395,13 @@ describe("verb.core.Eval.surfaceDerivatives",function(){
 
 });
 
-describe("verb.core.Eval.homogenize1d",function(){
+describe("verb.eval.Eval.homogenize1d",function(){
 
 	it('returns correct results', function(){
 
 		var weights = [1, 2, 3, 4]
 			, controlPoints = [ [10, 0], [20, 10], [30, 20], [50, 50] ]
-			, homo_controlPoints = verb.core.Eval.homogenize1d( controlPoints, weights);
+			, homo_controlPoints = verb.eval.Eval.homogenize1d( controlPoints, weights);
 
 		for (var i = 0; i < controlPoints.length; i++)
 		{
@@ -412,7 +412,7 @@ describe("verb.core.Eval.homogenize1d",function(){
 
 		weights = [1, 2, 3, 4];
 		controlPoints = [ [10, 0, 4], [20, 10, 3], [30, 20, 0], [50, 50, 10] ];
-		homo_controlPoints = verb.core.Eval.homogenize1d( controlPoints, weights);
+		homo_controlPoints = verb.eval.Eval.homogenize1d( controlPoints, weights);
 
 		for (var i = 0; i < controlPoints.length; i++)
 		{
@@ -426,7 +426,7 @@ describe("verb.core.Eval.homogenize1d",function(){
 
 });
 
-describe("verb.core.Eval.homogenize2d",function(){
+describe("verb.eval.Eval.homogenize2d",function(){
 
 	it('homogenize2d', function(){
 
@@ -438,7 +438,7 @@ describe("verb.core.Eval.homogenize2d",function(){
 														[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] 	],
 														[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] 	],
 														[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
-			, homo_controlPoints = verb.core.Eval.homogenize2d( controlPoints, weights)
+			, homo_controlPoints = verb.eval.Eval.homogenize2d( controlPoints, weights)
 			, j = 0;
 
 		for (var i = 0; i < controlPoints.length; i++)
@@ -456,7 +456,7 @@ describe("verb.core.Eval.homogenize2d",function(){
 
 });
 
-describe("verb.core.Eval.dehomogenize",function(){
+describe("verb.eval.Eval.dehomogenize",function(){
 
 	it('returns correct result', function(){
 
@@ -468,7 +468,7 @@ describe("verb.core.Eval.dehomogenize",function(){
 														[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] 	],
 														[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] 	],
 														[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ]
-			, homo_controlPoints = verb.core.Eval.homogenize2d( controlPoints, weights)
+			, homo_controlPoints = verb.eval.Eval.homogenize2d( controlPoints, weights)
 			, j = 0
 			, dehomo_pt = [];
 
@@ -476,7 +476,7 @@ describe("verb.core.Eval.dehomogenize",function(){
 		{
 			for (j = 0; j < controlPoints[i].length; j++)
 			{
-				dehomo_pt = verb.core.Eval.dehomogenize( homo_controlPoints[i][j] );
+				dehomo_pt = verb.eval.Eval.dehomogenize( homo_controlPoints[i][j] );
 				should.equal( dehomo_pt.length, controlPoints[i][j].length );
 				should.equal( dehomo_pt[0], controlPoints[i][j][0] );
 				should.equal( dehomo_pt[1], controlPoints[i][j][1] );
@@ -488,7 +488,7 @@ describe("verb.core.Eval.dehomogenize",function(){
 
 });
 
-describe("verb.core.Eval.rationalCurvePoint",function(){
+describe("verb.eval.Eval.rationalCurvePoint",function(){
 
 	it('returns correct result for quarter circle', function(){
 
@@ -498,17 +498,17 @@ describe("verb.core.Eval.rationalCurvePoint",function(){
 			, controlPoints = [ [1, 0, 1], [1,1,1], [0,2,2] ]
 			, crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
-		var p = verb.core.Eval.rationalCurvePoint( crv, 0);
+		var p = verb.eval.Eval.rationalCurvePoint( crv, 0);
 
 		should.equal( p[0], 1 );
 		should.equal( p[1], 0 );
 
-		p = verb.core.Eval.rationalCurvePoint( crv, 0.5);
+		p = verb.eval.Eval.rationalCurvePoint( crv, 0.5);
 
 		should.equal( p[0], 0.6 );
 		should.equal( p[1], 0.8 );
 
-		p = verb.core.Eval.rationalCurvePoint( crv, 1);
+		p = verb.eval.Eval.rationalCurvePoint( crv, 1);
 
 		should.equal( p[0], 0 );
 		should.equal( p[1], 1 );
@@ -517,7 +517,7 @@ describe("verb.core.Eval.rationalCurvePoint",function(){
 
 });
 
-describe("verb.core.Eval.rationalSurfacePoint",function(){
+describe("verb.eval.Eval.rationalSurfacePoint",function(){
 
 	it('returns correct result for cylinder patch', function(){
 
@@ -530,19 +530,19 @@ describe("verb.core.Eval.rationalSurfacePoint",function(){
 													 		  [ [-1, 1, 0, 1], 	[-1, 1, 1, 1], [-2, 0, 2, 2] ] ]
 			, surface = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
 
-		var p = verb.core.Eval.rationalSurfacePoint( surface, 0, 0 );
+		var p = verb.eval.Eval.rationalSurfacePoint( surface, 0, 0 );
 
 		should.equal( p[0], 1 );
 		should.equal( p[1], 1 );
 		should.equal( p[2], 0 );
 
-		p = verb.core.Eval.rationalSurfacePoint( surface, 0.5, 0.5 );
+		p = verb.eval.Eval.rationalSurfacePoint( surface, 0.5, 0.5 );
 
 		should.equal( p[0], 0 );
 		should.equal( p[1], 0.6 );
 		should.equal( p[2], 0.8 );
 
-		p = verb.core.Eval.rationalSurfacePoint( surface, 1, 1 );
+		p = verb.eval.Eval.rationalSurfacePoint( surface, 1, 1 );
 
 		should.equal( p[0], -1 );
 		should.equal( p[1], 0 );
@@ -551,7 +551,7 @@ describe("verb.core.Eval.rationalSurfacePoint",function(){
 	});
 });
 
-describe("verb.core.Eval.rationalCurveDerivatives",function(){
+describe("verb.eval.Eval.rationalCurveDerivatives",function(){
 
 	it('returns expected results', function(){
 
@@ -561,7 +561,7 @@ describe("verb.core.Eval.rationalCurveDerivatives",function(){
 			, controlPoints = [ [1,0,1], [1,1,1], [0,2,2] ]
 			, crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
-		var p = verb.core.Eval.rationalCurveDerivatives( crv, 0, 2);
+		var p = verb.eval.Eval.rationalCurveDerivatives( crv, 0, 2);
 
 		should.equal( p[0][0], 1 );
 		should.equal( p[0][1], 0 );
@@ -572,7 +572,7 @@ describe("verb.core.Eval.rationalCurveDerivatives",function(){
 		should.equal( p[2][0], -4 );
 		should.equal( p[2][1], 0 );
 
-		p = verb.core.Eval.rationalCurveDerivatives( crv, 1, 2);
+		p = verb.eval.Eval.rationalCurveDerivatives( crv, 1, 2);
 
 		should.equal( p[0][0], 0 );
 		should.equal( p[0][1], 1 );
@@ -587,7 +587,7 @@ describe("verb.core.Eval.rationalCurveDerivatives",function(){
 
 });
 
-describe("verb.core.Eval.rationalSurfaceDerivatives",function(){
+describe("verb.eval.Eval.rationalSurfaceDerivatives",function(){
 
 	it('returns expected results', function(){
 
@@ -601,7 +601,7 @@ describe("verb.core.Eval.rationalSurfaceDerivatives",function(){
 			, num_derivatives = 1
 			, surface = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
 
-		var p = verb.core.Eval.rationalSurfaceDerivatives( surface, 0, 0, num_derivatives );
+		var p = verb.eval.Eval.rationalSurfaceDerivatives( surface, 0, 0, num_derivatives );
 
 		should.equal( p[0][0][0], 1 );
 		should.equal( p[0][0][1], 1 );
@@ -615,7 +615,7 @@ describe("verb.core.Eval.rationalSurfaceDerivatives",function(){
 		should.equal( p[1][0][1], 0 );
 		should.equal( p[1][0][2], 0 );
 
-		p = verb.core.Eval.rationalSurfaceDerivatives( surface, 1, 1, num_derivatives);
+		p = verb.eval.Eval.rationalSurfaceDerivatives( surface, 1, 1, num_derivatives);
 
 		should.equal( p[0][0][0], -1 );
 		should.equal( p[0][0][1], 0 );
@@ -632,7 +632,7 @@ describe("verb.core.Eval.rationalSurfaceDerivatives",function(){
 	});
 });
 
-describe("verb.core.Eval.rationalCurvePoint",function(){
+describe("verb.eval.Eval.rationalCurvePoint",function(){
 
 	it('returns correct results for a line', function(){
 
@@ -645,9 +645,9 @@ describe("verb.core.Eval.rationalCurvePoint",function(){
 			, u3 = 1.0
 			, crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
-		var p1 = verb.core.Eval.rationalCurvePoint( crv, u1);
-		var p2 = verb.core.Eval.rationalCurvePoint( crv, u2);
-		var p3 = verb.core.Eval.rationalCurvePoint( crv, u3);
+		var p1 = verb.eval.Eval.rationalCurvePoint( crv, u1);
+		var p2 = verb.eval.Eval.rationalCurvePoint( crv, u2);
+		var p3 = verb.eval.Eval.rationalCurvePoint( crv, u3);
 
 		should.equal(p1[0], 0);
 		should.equal(p2[0], 5);
@@ -657,7 +657,7 @@ describe("verb.core.Eval.rationalCurvePoint",function(){
 
 });
 
-describe("verb.core.Modify.curveKnotInsert",function(){
+describe("verb.eval.Modify.curveKnotInsert",function(){
 
 	it('returns expected results when inserting 1 knot in the middle of a non-rational, cubic b-spline', function(){
 
@@ -671,7 +671,7 @@ describe("verb.core.Modify.curveKnotInsert",function(){
 
 		var crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
-		var after = verb.core.Modify.curveKnotInsert( crv, u, r );
+		var after = verb.eval.Modify.curveKnotInsert( crv, u, r );
 
 		after.controlPoints.forEach(function(cp){ should.exist(cp); });
 		after.knots.forEach(function(cp){ should.exist(cp); });
@@ -683,8 +683,8 @@ describe("verb.core.Modify.curveKnotInsert",function(){
 		after.controlPoints[4][0].should.be.approximately( 3.5, verb.core.Constants.TOLERANCE );
 		after.controlPoints[5][0].should.be.approximately( 4.1666666666, verb.core.Constants.TOLERANCE );
 
-		var p0 = verb.core.Eval.curvePoint( crv, 2.5);
-		var p1 = verb.core.Eval.curvePoint( after, 2.5);
+		var p0 = verb.eval.Eval.curvePoint( crv, 2.5);
+		var p1 = verb.eval.Eval.curvePoint( after, 2.5);
 
 		p0[0].should.be.approximately(p1[0], verb.core.Constants.TOLERANCE);
 		p0[1].should.be.approximately(p1[1], verb.core.Constants.TOLERANCE);
@@ -704,7 +704,7 @@ describe("verb.core.Modify.curveKnotInsert",function(){
 		
 		var crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
-		var after = verb.core.Modify.curveKnotInsert( crv, u, r );
+		var after = verb.eval.Modify.curveKnotInsert( crv, u, r );
 
 		after.controlPoints.forEach(function(cp){ should.exist(cp); });
 		after.knots.forEach(function(cp){ should.exist(cp); });
@@ -712,8 +712,8 @@ describe("verb.core.Modify.curveKnotInsert",function(){
 		should.equal(knots.length + r, after.knots.length);
 		should.equal(controlPoints.length + r, after.controlPoints.length);
 
-		var p0 = verb.core.Eval.curvePoint( crv, 2.5);
-		var p1 = verb.core.Eval.curvePoint( after, 2.5);
+		var p0 = verb.eval.Eval.curvePoint( crv, 2.5);
+		var p1 = verb.eval.Eval.curvePoint( after, 2.5);
 
 		p0[0].should.be.approximately(p1[0], verb.core.Constants.TOLERANCE);
 		p0[1].should.be.approximately(p1[1], verb.core.Constants.TOLERANCE);
@@ -732,7 +732,7 @@ describe("verb.core.Modify.curveKnotInsert",function(){
 		for (var i = 0; i < 8; i++) controlPoints.push([i, 0, 0]);
 
 		var crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
-		var after = verb.core.Modify.curveKnotInsert( crv, u, r );
+		var after = verb.eval.Modify.curveKnotInsert( crv, u, r );
 
 		after.controlPoints.forEach(function(cp){ should.exist(cp); });
 		after.knots.forEach(function(cp){ should.exist(cp); });
@@ -740,8 +740,8 @@ describe("verb.core.Modify.curveKnotInsert",function(){
 		should.equal(knots.length + r, after.knots.length);
 		should.equal(controlPoints.length + r, after.controlPoints.length);
 
-		var p0 = verb.core.Eval.curvePoint( crv, 2.5);
-		var p1 = verb.core.Eval.curvePoint( after, 2.5);
+		var p0 = verb.eval.Eval.curvePoint( crv, 2.5);
+		var p1 = verb.eval.Eval.curvePoint( after, 2.5);
 
 		p0[0].should.be.approximately(p1[0], verb.core.Constants.TOLERANCE);
 		p0[1].should.be.approximately(p1[1], verb.core.Constants.TOLERANCE);
@@ -760,7 +760,7 @@ describe("verb.core.Modify.curveKnotInsert",function(){
 		for (var i = 0; i < 6; i++) controlPoints.push([i, 0, 0]);
 
 		var crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
-		var after = verb.core.Modify.curveKnotInsert( crv, u, r );
+		var after = verb.eval.Modify.curveKnotInsert( crv, u, r );
 
 		after.controlPoints.forEach(function(cp){ should.exist(cp); });
 		after.knots.forEach(function(cp){ should.exist(cp); });
@@ -768,8 +768,8 @@ describe("verb.core.Modify.curveKnotInsert",function(){
 		should.equal(knots.length + r, after.knots.length);
 		should.equal(controlPoints.length + r, after.controlPoints.length);
 
-		var p0 = verb.core.Eval.curvePoint( crv, 2.5);
-		var p1 = verb.core.Eval.curvePoint( after, 2.5);
+		var p0 = verb.eval.Eval.curvePoint( crv, 2.5);
+		var p1 = verb.eval.Eval.curvePoint( after, 2.5);
 
 		p0[0].should.be.approximately(p1[0], verb.core.Constants.TOLERANCE);
 		p0[1].should.be.approximately(p1[1], verb.core.Constants.TOLERANCE);
@@ -778,7 +778,7 @@ describe("verb.core.Modify.curveKnotInsert",function(){
 	});
 });
 
-describe("verb.core.Eval.curveKnotRefine",function(){
+describe("verb.eval.Eval.curveKnotRefine",function(){
 
 	function cubicInsert(u, r){
 
@@ -794,7 +794,7 @@ describe("verb.core.Eval.curveKnotRefine",function(){
 		for (var i = 0; i < 8; i++) controlPoints.push([i, 0, 0]);
 
 		var crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
-		var after = verb.core.Modify.curveKnotRefine( crv, new_knots );
+		var after = verb.eval.Modify.curveKnotRefine( crv, new_knots );
 
 		after.controlPoints.forEach(function(cp){ should.exist(cp); });
 		after.knots.forEach(function(cp){ should.exist(cp); });
@@ -802,8 +802,8 @@ describe("verb.core.Eval.curveKnotRefine",function(){
 		should.equal(knots.length + r, after.knots.length);
 		should.equal(controlPoints.length + r, after.controlPoints.length);
 
-		var p0 = verb.core.Eval.curvePoint( crv, 2.5);
-		var p1 = verb.core.Eval.curvePoint( after, 2.5);
+		var p0 = verb.eval.Eval.curvePoint( crv, 2.5);
+		var p1 = verb.eval.Eval.curvePoint( after, 2.5);
 
 		p0[0].should.be.approximately(p1[0], verb.core.Constants.TOLERANCE);
 		p0[1].should.be.approximately(p1[1], verb.core.Constants.TOLERANCE);
@@ -830,7 +830,7 @@ describe("verb.core.Eval.curveKnotRefine",function(){
 
 });
 
-describe("verb.core.Modify.curveSplit",function(){
+describe("verb.eval.Modify.curveSplit",function(){
 
 	function cubicSplit(u){
 
@@ -841,7 +841,7 @@ describe("verb.core.Modify.curveSplit",function(){
 		for (var i = 0; i < 8; i++) controlPoints.push([i, 0, 0, 1]);
 
 		var crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
-		var after = verb.core.Modify.curveSplit( crv, u );
+		var after = verb.eval.Modify.curveSplit( crv, u );
 
 		for (var i = 0; i < degree + 1; i++ ){
 			var d = after[0].knots.length - (degree+1);
@@ -854,8 +854,8 @@ describe("verb.core.Modify.curveSplit",function(){
 		}
 
 		// a point evaluated on each curve is the same
-		var p0 = verb.core.Eval.curvePoint( after[0], after[0].knots[ after[0].knots.length-1] );
-		var p1 = verb.core.Eval.curvePoint( after[1], after[1].knots[ 0] );
+		var p0 = verb.eval.Eval.curvePoint( after[0], after[0].knots[ after[0].knots.length-1] );
+		var p1 = verb.eval.Eval.curvePoint( after[1], after[1].knots[ 0] );
 
 		p0[0].should.be.approximately(p1[0], verb.core.Constants.TOLERANCE);
 		p0[1].should.be.approximately(p1[1], verb.core.Constants.TOLERANCE);
@@ -872,11 +872,11 @@ describe("verb.core.Modify.curveSplit",function(){
 
 });
 
-describe("verb.core.Analyze.knotMultiplicities",function(){
+describe("verb.eval.Analyze.knotMultiplicities",function(){
 
 	it('is correct for a basic example', function(){
 
-		var res = verb.core.Analyze.knotMultiplicities( [ 0, 0, 0, 0, 1, 1, 2, 2, 2, 3, 3.3] );
+		var res = verb.eval.Analyze.knotMultiplicities( [ 0, 0, 0, 0, 1, 1, 2, 2, 2, 3, 3.3] );
 
 		res.length.should.be.equal( 5 );
 
@@ -898,7 +898,7 @@ describe("verb.core.Analyze.knotMultiplicities",function(){
 	});
 });
 
-describe("verb.core.Modify.decomposeCurveIntoBeziers",function(){
+describe("verb.eval.Modify.decomposeCurveIntoBeziers",function(){
 
 	it('is correct for a basic example', function(){
 
@@ -911,7 +911,7 @@ describe("verb.core.Modify.decomposeCurveIntoBeziers",function(){
 		}
 
 		var crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
-		var res = verb.core.Modify.decomposeCurveIntoBeziers( crv );
+		var res = verb.eval.Modify.decomposeCurveIntoBeziers( crv );
 
 		res.length.should.be.equal( 5 );
 
@@ -919,8 +919,8 @@ describe("verb.core.Modify.decomposeCurveIntoBeziers",function(){
 
 			var u0 = x.knots[0];
 
-			var pt0 = verb.core.Eval.curvePoint( x, u0);
-			var pt1 = verb.core.Eval.curvePoint( crv, u0);
+			var pt0 = verb.eval.Eval.curvePoint( x, u0);
+			var pt1 = verb.eval.Eval.curvePoint( crv, u0);
 
 			( verb.core.Vec.norm(verb.core.Vec.sub(pt0, pt1))).should.be.approximately(0, verb.core.Constants.TOLERANCE );
 
@@ -941,7 +941,7 @@ describe("verb.core.Mat.transpose",function(){
 	});
 });
 
-describe("verb.core.Modify.surfaceKnotRefine",function(){
+describe("verb.eval.Modify.surfaceKnotRefine",function(){
 
 	var degree = 3
 		, knotsV = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
@@ -964,7 +964,7 @@ describe("verb.core.Modify.surfaceKnotRefine",function(){
 			new_knots.push(u);
 		}
 
-		var res = verb.core.Modify.surfaceKnotRefine( surface, new_knots, false );
+		var res = verb.eval.Modify.surfaceKnotRefine( surface, new_knots, false );
 
 		res.controlPoints.forEach(function(cp){ should.exist(cp); });
 		res.knotsU.forEach(function(cp){ should.exist(cp); });
@@ -973,8 +973,8 @@ describe("verb.core.Modify.surfaceKnotRefine",function(){
 		should.equal(knotsU.length + r, res.knotsU.length);
 		should.equal(controlPoints.length + r, res.controlPoints.length);
 
-		var p0 = verb.core.Eval.surfacePoint( surface, 0.5, 0.25 );
-		var p1 = verb.core.Eval.surfacePoint( res, 0.5, 0.25);
+		var p0 = verb.eval.Eval.surfacePoint( surface, 0.5, 0.25 );
+		var p1 = verb.eval.Eval.surfacePoint( res, 0.5, 0.25);
 
 		p0[0].should.be.approximately(p1[0], verb.core.Constants.TOLERANCE);
 		p0[1].should.be.approximately(p1[1], verb.core.Constants.TOLERANCE);
@@ -992,7 +992,7 @@ describe("verb.core.Modify.surfaceKnotRefine",function(){
 			new_knots.push(u);
 		}
 
-		var res = verb.core.Modify.surfaceKnotRefine( surface, new_knots, true );
+		var res = verb.eval.Modify.surfaceKnotRefine( surface, new_knots, true );
 
 		res.controlPoints.forEach(function(cp){ should.exist(cp); });
 		res.knotsU.forEach(function(cp){ should.exist(cp); });
@@ -1001,8 +1001,8 @@ describe("verb.core.Modify.surfaceKnotRefine",function(){
 		should.equal(knotsV.length + r, res.knotsV.length);
 		should.equal(controlPoints[0].length + r, res.controlPoints[0].length);
 
-		var p0 = verb.core.Eval.surfacePoint( surface, 0.5, 0.25 );
-		var p1 = verb.core.Eval.surfacePoint( res, 0.5, 0.25);
+		var p0 = verb.eval.Eval.surfacePoint( surface, 0.5, 0.25 );
+		var p1 = verb.eval.Eval.surfacePoint( res, 0.5, 0.25);
 
 		p0[0].should.be.approximately(p1[0], verb.core.Constants.TOLERANCE);
 		p0[1].should.be.approximately(p1[1], verb.core.Constants.TOLERANCE);
@@ -1012,7 +1012,7 @@ describe("verb.core.Modify.surfaceKnotRefine",function(){
 	});
 });
 
-describe("verb.core.Modify.surfaceSplit", function(){
+describe("verb.eval.Modify.surfaceSplit", function(){
 
 	var degree = 3
 		, knotsV = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
@@ -1029,7 +1029,7 @@ describe("verb.core.Modify.surfaceSplit", function(){
 
 		var u = 0.2;
 
-		var res = verb.core.Modify.surfaceSplit( surface, u, false );
+		var res = verb.eval.Modify.surfaceSplit( surface, u, false );
 
 		res[0].controlPoints.forEach(function(cp){ should.exist(cp); });
 		res[0].knotsU.forEach(function(cp){ should.exist(cp); });
@@ -1043,15 +1043,15 @@ describe("verb.core.Modify.surfaceSplit", function(){
 		should.exist( res[1].degreeU );
 		should.exist( res[1].degreeV );
 
-		var p0 = verb.core.Eval.surfacePoint( surface, 0.1, 0.1 );
-		var p1 = verb.core.Eval.surfacePoint( res[0], 0.1, 0.1);
+		var p0 = verb.eval.Eval.surfacePoint( surface, 0.1, 0.1 );
+		var p1 = verb.eval.Eval.surfacePoint( res[0], 0.1, 0.1);
 
 		p0[0].should.be.approximately(p1[0], verb.core.Constants.TOLERANCE);
 		p0[1].should.be.approximately(p1[1], verb.core.Constants.TOLERANCE);
 		p0[2].should.be.approximately(p1[2], verb.core.Constants.TOLERANCE);
 
-		p0 = verb.core.Eval.surfacePoint( surface, 0.8, 0.8 );
-		p1 = verb.core.Eval.surfacePoint( res[1], 0.8, 0.8);
+		p0 = verb.eval.Eval.surfacePoint( surface, 0.8, 0.8 );
+		p1 = verb.eval.Eval.surfacePoint( res[1], 0.8, 0.8);
 
 		p0[0].should.be.approximately(p1[0], verb.core.Constants.TOLERANCE);
 		p0[1].should.be.approximately(p1[1], verb.core.Constants.TOLERANCE);
@@ -1064,7 +1064,7 @@ describe("verb.core.Modify.surfaceSplit", function(){
 
 		var u = 0.2;
 
-		var res = verb.core.Modify.surfaceSplit( surface, u, true );
+		var res = verb.eval.Modify.surfaceSplit( surface, u, true );
 
 		res[0].controlPoints.forEach(function(cp){ should.exist(cp); });
 		res[0].knotsU.forEach(function(cp){ should.exist(cp); });
@@ -1078,15 +1078,15 @@ describe("verb.core.Modify.surfaceSplit", function(){
 		should.exist( res[1].degreeU );
 		should.exist( res[1].degreeV );
 
-		var p0 = verb.core.Eval.surfacePoint( surface, 0.1, 0.1 );
-		var p1 = verb.core.Eval.surfacePoint( res[0], 0.1, 0.1);
+		var p0 = verb.eval.Eval.surfacePoint( surface, 0.1, 0.1 );
+		var p1 = verb.eval.Eval.surfacePoint( res[0], 0.1, 0.1);
 
 		p0[0].should.be.approximately(p1[0], verb.core.Constants.TOLERANCE);
 		p0[1].should.be.approximately(p1[1], verb.core.Constants.TOLERANCE);
 		p0[2].should.be.approximately(p1[2], verb.core.Constants.TOLERANCE);
 
-		p0 = verb.core.Eval.surfacePoint( surface, 0.8, 0.8 );
-		p1 = verb.core.Eval.surfacePoint( res[1], 0.8, 0.8);
+		p0 = verb.eval.Eval.surfacePoint( surface, 0.8, 0.8 );
+		p1 = verb.eval.Eval.surfacePoint( res[1], 0.8, 0.8);
 
 		p0[0].should.be.approximately(p1[0], verb.core.Constants.TOLERANCE);
 		p0[1].should.be.approximately(p1[1], verb.core.Constants.TOLERANCE);
@@ -1264,7 +1264,7 @@ describe("verb.core.BoundingBox.clear",function(){
 
 });
 
-describe("verb.core.Eval.rationalCurveRegularSample",function(){
+describe("verb.eval.Eval.rationalCurveRegularSample",function(){
 	it('should return 10 samples when asked to', function(){
 
 		var degree = 2
@@ -1273,7 +1273,7 @@ describe("verb.core.Eval.rationalCurveRegularSample",function(){
 			, numSamples = 10
 			, curve = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
-		var p = verb.core.Tess.rationalCurveRegularSample( curve, numSamples);
+		var p = verb.eval.Tess.rationalCurveRegularSample( curve, numSamples);
 
 		should.equal(p.length, 10);
 
@@ -1282,7 +1282,7 @@ describe("verb.core.Eval.rationalCurveRegularSample",function(){
 	});
 });
 
-describe("verb.core.Eval.threePointsAreFlat",function(){
+describe("verb.eval.Eval.threePointsAreFlat",function(){
 
 	it('should identify flat line by returning true', function(){
 
@@ -1297,7 +1297,7 @@ describe("verb.core.Eval.threePointsAreFlat",function(){
 
 });
 
-describe("verb.core.Tess.rationalCurveAdaptiveSample",function(){
+describe("verb.eval.Tess.rationalCurveAdaptiveSample",function(){
 
 	it('returns two end points for a line', function(){
 
@@ -1306,7 +1306,7 @@ describe("verb.core.Tess.rationalCurveAdaptiveSample",function(){
 			, controlPoints = [ [0, 0, 0, 1], [10, 0, 0, 1] ]
 			, curve = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
-		var p = verb.core.Tess.rationalCurveAdaptiveSample( curve, 1e-5);
+		var p = verb.eval.Tess.rationalCurveAdaptiveSample( curve, 1e-5);
 		
 		should.equal(p[0][0], 0);
 		should.equal(p[1][0], 10);
@@ -1322,7 +1322,7 @@ describe("verb.core.Tess.rationalCurveAdaptiveSample",function(){
 			, controlPoints = [ [0, 0, 0, 1], [10, 10, 0, 1], [14, 20, 0, 1], [10, 32, 4, 1], [12, 16, 22, 1]]
 			, curve = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
-		var p = verb.core.Tess.rationalCurveAdaptiveSample( curve, 1e-5);
+		var p = verb.eval.Tess.rationalCurveAdaptiveSample( curve, 1e-5);
 		
 		p.should.be.instanceof(Array).and.have.lengthOf(5);
 		p[0].should.be.instanceof(Array).and.have.lengthOf(3);
@@ -1341,8 +1341,8 @@ describe("verb.core.Tess.rationalCurveAdaptiveSample",function(){
 			, controlPoints = [ [1, 0, 0, 1], [v, v, 0, v], [0, 1, 0, 1] ]
 			, curve = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
-		var p = verb.core.Tess.rationalCurveAdaptiveSample( curve, 1e-8, true);
-		var p2 = verb.core.Tess.rationalCurveAdaptiveSample( curve, 1e-4, true);
+		var p = verb.eval.Tess.rationalCurveAdaptiveSample( curve, 1e-8, true);
+		var p2 = verb.eval.Tess.rationalCurveAdaptiveSample( curve, 1e-4, true);
 		
 		var prev = - 1e-8;
 		for (var i = 0; i < p.length; i++){
@@ -1382,7 +1382,7 @@ function getFlatSurface(){
 					[p2, 		p2p3, 		p3] ];
 	var wts = [[1,1,1], [1,1,1], [1,1,1]];
 
-	cpts = verb.core.Eval.homogenize2d(cpts, wts);
+	cpts = verb.eval.Eval.homogenize2d(cpts, wts);
 
 	return {"knotsU": [0,0,0,1,1,1],
 			"knotsV": [0,0,0,1,1,1],
@@ -1570,7 +1570,7 @@ describe("verb.core.AdaptiveRefinementNode.triangulate",function(){
 						[p2, 		p2p3, 		p3] ];
 		var wts = [[1,1,1], [1,1,1], [1,1,1]];
 
-		cpts = verb.core.Eval.homogenize2d(cpts, wts);
+		cpts = verb.eval.Eval.homogenize2d(cpts, wts);
 
 		return {"knotsU": [0,0,0,1,1,1],
 				"knotsV": [0,0,0,1,1,1],
@@ -1686,7 +1686,7 @@ describe("verb.core.AdaptiveRefinementNode.triangulate",function(){
 
 });
 
-describe("verb.core.Tess.rationalSurfaceAdaptive",function(){
+describe("verb.eval.Tess.rationalSurfaceAdaptive",function(){
 
 	function getComplexSurface(){
 
@@ -1705,7 +1705,7 @@ describe("verb.core.Tess.rationalSurfaceAdaptive",function(){
 						[ 1, 1, 1, 1, 1, 1],
 						[ 1, 1, 1, 1, 1, 1] ];
 
-		pts = verb.core.Eval.homogenize2d(pts, wts);
+		pts = verb.eval.Eval.homogenize2d(pts, wts);
 
 		var srfObj = {
 			degreeU : degree,
@@ -1722,7 +1722,7 @@ describe("verb.core.Tess.rationalSurfaceAdaptive",function(){
 
 		var srf = getComplexSurface();
 
-		var mesh = verb.core.Tess.rationalSurfaceAdaptive( srf, { minDivsU: 1, minDivsV: 4 } );
+		var mesh = verb.eval.Tess.rationalSurfaceAdaptive( srf, { minDivsU: 1, minDivsV: 4 } );
 
 		mesh.faces.length.should.be.greaterThan( 8 );
 		mesh.points.forEach(function(x){ x.length.should.be.equal( 3 ); })
@@ -1732,7 +1732,7 @@ describe("verb.core.Tess.rationalSurfaceAdaptive",function(){
 	});
 });
 
-describe("verb.core.Make.ellipseArc",function(){
+describe("verb.eval.Make.ellipseArc",function(){
 
 	it('returns correct result for unit arc from 0 to 90 deg', function(){
 
@@ -1744,25 +1744,25 @@ describe("verb.core.Make.ellipseArc",function(){
 			, start = 0
 			, end = Math.PI/2;
 
-		var ellipse = verb.core.Make.ellipseArc(center, x, y, start, end);
+		var ellipse = verb.eval.Make.ellipseArc(center, x, y, start, end);
 
 		// the typical parametric rep of an ellipse
 		var xmid = rx * Math.cos( Math.PI / 4 )
 			, ymid = ry * Math.sin( Math.PI / 4 );
 
-		var p = verb.core.Eval.rationalCurvePoint( ellipse, 0.5);
+		var p = verb.eval.Eval.rationalCurvePoint( ellipse, 0.5);
 
 		p[0].should.be.approximately( xmid, verb.core.Constants.EPSILON );
 		p[1].should.be.approximately( ymid, verb.core.Constants.EPSILON );
 		p[2].should.be.approximately( 0, verb.core.Constants.EPSILON );
 
-		p = verb.core.Eval.rationalCurvePoint( ellipse, 1);
+		p = verb.eval.Eval.rationalCurvePoint( ellipse, 1);
 
 		p[0].should.be.approximately( 0, verb.core.Constants.EPSILON );
 		p[1].should.be.approximately( ry, verb.core.Constants.EPSILON );
 		p[2].should.be.approximately( 0, verb.core.Constants.EPSILON );
 
-		p = verb.core.Eval.rationalCurvePoint( ellipse, 0);
+		p = verb.eval.Eval.rationalCurvePoint( ellipse, 0);
 
 		p[0].should.be.approximately( rx, verb.core.Constants.EPSILON );
 		p[1].should.be.approximately( 0, verb.core.Constants.EPSILON );
@@ -1780,9 +1780,9 @@ describe("verb.core.Make.ellipseArc",function(){
 			, start = 0
 			, end = Math.PI / 2;
 
-		var arc = verb.core.Make.ellipseArc(center, x, y, start, end);
+		var arc = verb.eval.Make.ellipseArc(center, x, y, start, end);
 
-		var p = verb.core.Eval.rationalCurvePoint( arc, 1);
+		var p = verb.eval.Eval.rationalCurvePoint( arc, 1);
 		
 		p[0].should.be.approximately( 0, verb.core.Constants.EPSILON );
 		p[1].should.be.approximately( ry, verb.core.Constants.EPSILON );
@@ -1800,9 +1800,9 @@ describe("verb.core.Make.ellipseArc",function(){
 			, start = Math.PI/4
 			, end = 3 * Math.PI/4;
 
-		var arc = verb.core.Make.ellipseArc(center, x, y, start, end);
+		var arc = verb.eval.Make.ellipseArc(center, x, y, start, end);
 
-		var p = verb.core.Eval.rationalCurvePoint( arc, 1);
+		var p = verb.eval.Eval.rationalCurvePoint( arc, 1);
 		
 		// the typical parametric rep of an ellipse
 		var xmid = rx * Math.cos( 3 * Math.PI / 4 )
@@ -1824,31 +1824,31 @@ describe("verb.core.Make.ellipseArc",function(){
 			, start = 0
 			, end = Math.PI * 2;
 
-		var ellipse = verb.core.Make.ellipseArc(center, x, y, start, end);
+		var ellipse = verb.eval.Make.ellipseArc(center, x, y, start, end);
 
 		// the typical parametric rep of an ellipse
 		var xmid = rx * Math.cos( Math.PI / 4 )
 			, ymid = ry * Math.sin( Math.PI / 4 );
 
-		var p = verb.core.Eval.rationalCurvePoint( ellipse, 0.125);
+		var p = verb.eval.Eval.rationalCurvePoint( ellipse, 0.125);
 
 		p[0].should.be.approximately( xmid, verb.core.Constants.EPSILON );
 		p[1].should.be.approximately( ymid, verb.core.Constants.EPSILON );
 		p[2].should.be.approximately( 0, verb.core.Constants.EPSILON );
 
-		p = verb.core.Eval.rationalCurvePoint( ellipse, 0.25);
+		p = verb.eval.Eval.rationalCurvePoint( ellipse, 0.25);
 
 		p[0].should.be.approximately( 0, verb.core.Constants.EPSILON );
 		p[1].should.be.approximately( ry, verb.core.Constants.EPSILON );
 		p[2].should.be.approximately( 0, verb.core.Constants.EPSILON );
 
-		p = verb.core.Eval.rationalCurvePoint( ellipse, 0.5);
+		p = verb.eval.Eval.rationalCurvePoint( ellipse, 0.5);
 
 		p[0].should.be.approximately( -rx, verb.core.Constants.EPSILON );
 		p[1].should.be.approximately( 0, verb.core.Constants.EPSILON );
 		p[2].should.be.approximately( 0, verb.core.Constants.EPSILON );
 
-		p = verb.core.Eval.rationalCurvePoint( ellipse, 0);
+		p = verb.eval.Eval.rationalCurvePoint( ellipse, 0);
 
 		p[0].should.be.approximately( rx, verb.core.Constants.EPSILON );
 		p[1].should.be.approximately( 0, verb.core.Constants.EPSILON );
@@ -1858,7 +1858,7 @@ describe("verb.core.Make.ellipseArc",function(){
 
 });
 
-describe("verb.core.Make.extrudedSurface",function(){
+describe("verb.eval.Make.extrudedSurface",function(){
 
 	it('can extrude a line into a plane', function(){
 
@@ -1869,7 +1869,7 @@ describe("verb.core.Make.extrudedSurface",function(){
 			, prof_knots = [0,0,1,1]
 			, profile = new verb.core.NurbsCurveData( prof_degree, prof_knots, prof_ctrl_pts  );
 
-		var comps = verb.core.Make.extrudedSurface(axis, length, profile);
+		var comps = verb.eval.Make.extrudedSurface(axis, length, profile);
 
 		// the first row are the profile control pts
 		should.equal( 0, comps.controlPoints[2][0][0] );
@@ -1881,7 +1881,7 @@ describe("verb.core.Make.extrudedSurface",function(){
 		should.equal( 0, comps.controlPoints[2][1][2] );
 
 		// sample at the center
-		var p = verb.core.Eval.rationalSurfacePoint( comps, 0.5, 0.5);
+		var p = verb.eval.Eval.rationalSurfacePoint( comps, 0.5, 0.5);
 
 		should.equal( Math.abs( 0.5 - p[0]) < verb.core.Constants.EPSILON, true );
 		should.equal( Math.abs( 0.5 - p[1]) < verb.core.Constants.EPSILON, true );
@@ -1898,9 +1898,9 @@ describe("verb.core.Make.extrudedSurface",function(){
 			, prof_knots = [0,0,0,1,1,1]
 			, prof_weights = [1, Math.sqrt(2) / 2, 1]
 			, profile = new verb.core.NurbsCurveData( prof_degree, prof_knots,
-													verb.core.Eval.homogenize1d(prof_ctrl_pts, prof_weights)  );
+													verb.eval.Eval.homogenize1d(prof_ctrl_pts, prof_weights)  );
 
-		var comps = verb.core.Make.extrudedSurface(axis, length, profile);
+		var comps = verb.eval.Make.extrudedSurface(axis, length, profile);
 
 		// the first row are the profile control pts
 		should.equal( 0, comps.controlPoints[2][0][0] );
@@ -1919,7 +1919,7 @@ describe("verb.core.Make.extrudedSurface",function(){
 		should.equal( 1, comps.controlPoints[2][2][3] );
 
 		// sample at the center
-		var p = verb.core.Eval.rationalSurfacePoint( comps, 0.5, 0.5);
+		var p = verb.eval.Eval.rationalSurfacePoint( comps, 0.5, 0.5);
 
 		should.equal( Math.abs( Math.sqrt(2)/2 - p[0]) < verb.core.Constants.EPSILON, true );
 		should.equal( Math.abs( Math.sqrt(2)/2 - p[1]) < verb.core.Constants.EPSILON, true );
@@ -1929,7 +1929,7 @@ describe("verb.core.Make.extrudedSurface",function(){
 
 });
 
-describe("verb.core.Make.arc",function(){
+describe("verb.eval.Make.arc",function(){
 
 	it('returns correct result for unit arc from 0 to 90 deg', function(){
 
@@ -1940,9 +1940,9 @@ describe("verb.core.Make.arc",function(){
 			, start = 0
 			, end = Math.PI/2;
 
-		var arc = verb.core.Make.arc(center, x, y, 1, start, end);
+		var arc = verb.eval.Make.arc(center, x, y, 1, start, end);
 
-		var p = verb.core.Eval.rationalCurvePoint( arc, 0.5);
+		var p = verb.eval.Eval.rationalCurvePoint( arc, 0.5);
 
 		should.equal( Math.abs( p[0] - Math.sqrt(2)/2 ) < verb.core.Constants.EPSILON, true );
 		should.equal( Math.abs( p[1] - Math.sqrt(2)/2 ) < verb.core.Constants.EPSILON, true );
@@ -1959,9 +1959,9 @@ describe("verb.core.Make.arc",function(){
 			, start = 0
 			, end = Math.PI/4;
 
-		var arc = verb.core.Make.arc(center, x, y, 1, start, end);
+		var arc = verb.eval.Make.arc(center, x, y, 1, start, end);
 
-		var p = verb.core.Eval.rationalCurvePoint( arc, 1);
+		var p = verb.eval.Eval.rationalCurvePoint( arc, 1);
 
 		should.equal( Math.abs( p[0] - Math.sqrt(2)/2 ) < verb.core.Constants.EPSILON, true );
 		should.equal( Math.abs( p[1] - Math.sqrt(2)/2 ) < verb.core.Constants.EPSILON, true );
@@ -1978,9 +1978,9 @@ describe("verb.core.Make.arc",function(){
 			, start = Math.PI/4
 			, end = 3 * Math.PI/4;
 
-		var arc = verb.core.Make.arc(center, x, y, 1, start, end);
+		var arc = verb.eval.Make.arc(center, x, y, 1, start, end);
 
-		var p = verb.core.Eval.rationalCurvePoint( arc, 0.5);
+		var p = verb.eval.Eval.rationalCurvePoint( arc, 0.5);
 
 		should.equal( Math.abs( p[0] ) < verb.core.Constants.EPSILON, true );
 		should.equal( Math.abs( p[1] - 1 ) < verb.core.Constants.EPSILON, true );
@@ -1997,9 +1997,9 @@ describe("verb.core.Make.arc",function(){
 			, start = 0
 			, end = Math.PI;
 
-		var arc = verb.core.Make.arc(center, x, y, r, start, end);
+		var arc = verb.eval.Make.arc(center, x, y, r, start, end);
 
-		var p = verb.core.Eval.rationalCurvePoint( arc, 0.5);
+		var p = verb.eval.Eval.rationalCurvePoint( arc, 0.5);
 
 		p[0].should.be.approximately( 0, verb.core.Constants.EPSILON );
 		p[1].should.be.approximately( 5 , verb.core.Constants.EPSILON);
@@ -2016,9 +2016,9 @@ describe("verb.core.Make.arc",function(){
 			, start = 0
 			, end = Math.PI * 2;
 
-		var arc = verb.core.Make.arc(center, x, y, 1, start, end);
+		var arc = verb.eval.Make.arc(center, x, y, 1, start, end);
 
-		var p = verb.core.Eval.rationalCurvePoint( arc, 0.5);
+		var p = verb.eval.Eval.rationalCurvePoint( arc, 0.5);
 
 		should.equal( Math.abs( p[0] + 1) < verb.core.Constants.EPSILON, true );
 		should.equal( Math.abs( p[1] ) < verb.core.Constants.EPSILON, true );
@@ -2028,7 +2028,7 @@ describe("verb.core.Make.arc",function(){
 
 });
 
-describe("verb.core.Make.polyline",function(){
+describe("verb.eval.Make.polyline",function(){
 
 	it('can create a polyline with correct structure', function(){
 
@@ -2037,21 +2037,21 @@ describe("verb.core.Make.polyline",function(){
 			, controlPoints = [ [0, 0, 0], [10, 10, 0], [14, 20, 0], [10, 32, 4], [12, 16, 22] ]
 			, weights = [1, 1, 1, 1, 1];
 
-		var comps = verb.core.Make.polyline( controlPoints );
+		var comps = verb.eval.Make.polyline( controlPoints );
 
 		comps.degree.should.equal(degree);
-		comps.controlPoints.should.eql( verb.core.Eval.homogenize1d( controlPoints, weights ));
+		comps.controlPoints.should.eql( verb.eval.Eval.homogenize1d( controlPoints, weights ));
 
 		// natural parameterization
 		for (var i = 1; i < knots.length-1; i++){
-			vecShouldBe( controlPoints[i-1], verb.core.Eval.rationalCurvePoint(comps, comps.knots[i] ) );
+			vecShouldBe( controlPoints[i-1], verb.eval.Eval.rationalCurvePoint(comps, comps.knots[i] ) );
 		}
 
 	});
 
 });
 
-describe("verb.core.Make.cylindricalSurface",function(){
+describe("verb.eval.Make.cylindricalSurface",function(){
 
 	it('can create a cylinder', function(){
 
@@ -2061,19 +2061,19 @@ describe("verb.core.Make.cylindricalSurface",function(){
 			, height = 5
 			, radius = 5;
 
-		var comps = verb.core.Make.cylindricalSurface(axis, xaxis, base, height, radius);
+		var comps = verb.eval.Make.cylindricalSurface(axis, xaxis, base, height, radius);
 
 		comps.degreeU.should.equal(2);
 		comps.degreeV.should.equal(2);
 
 		// sample at the center
-		var p = verb.core.Eval.rationalSurfacePoint( comps, 0.5, 0.5);
+		var p = verb.eval.Eval.rationalSurfacePoint( comps, 0.5, 0.5);
 
 		p[0].should.be.approximately(-radius, verb.core.Constants.EPSILON);
 		p[1].should.be.approximately(0, verb.core.Constants.EPSILON);
 		p[2].should.be.approximately(radius/2, verb.core.Constants.EPSILON);
 
-		p = verb.core.Eval.rationalSurfacePoint( comps,
+		p = verb.eval.Eval.rationalSurfacePoint( comps,
 														0,
 														0);
 
@@ -2081,7 +2081,7 @@ describe("verb.core.Make.cylindricalSurface",function(){
 		p[1].should.be.approximately(0, verb.core.Constants.EPSILON);
 		p[2].should.be.approximately(height, verb.core.Constants.EPSILON);
 
-		p = verb.core.Eval.rationalSurfacePoint( comps,
+		p = verb.eval.Eval.rationalSurfacePoint( comps,
 														1,
 														0);
 
@@ -2089,7 +2089,7 @@ describe("verb.core.Make.cylindricalSurface",function(){
 		p[1].should.be.approximately(0, verb.core.Constants.EPSILON);
 		p[2].should.be.approximately(0, verb.core.Constants.EPSILON);
 
-		p = verb.core.Eval.rationalSurfacePoint( comps,
+		p = verb.eval.Eval.rationalSurfacePoint( comps,
 														0,
 														1);
 
@@ -2101,7 +2101,7 @@ describe("verb.core.Make.cylindricalSurface",function(){
 
 });
 
-describe("verb.core.Make.revolvedSurface",function(){
+describe("verb.eval.Make.revolvedSurface",function(){
 
 	it('creates a 90 degree cone with the given line for a profile', function(){
 
@@ -2113,7 +2113,7 @@ describe("verb.core.Make.revolvedSurface",function(){
 			, prof_knots = [0,0,1,1]
 			, profile = new verb.core.NurbsCurveData( prof_degree, prof_knots, prof_ctrl_pts );
 
-		var comps = verb.core.Make.revolvedSurface(profile, center, axis, angle );
+		var comps = verb.eval.Make.revolvedSurface(profile, center, axis, angle );
 
 		// the first row are the profile control pts
 		should.equal( 0, comps.controlPoints[0][0][0] );
@@ -2126,7 +2126,7 @@ describe("verb.core.Make.revolvedSurface",function(){
 		should.equal( 0, comps.controlPoints[0][1][2] );
 		should.equal( 1, comps.controlPoints[0][1][3] );
 
-		var p = verb.core.Eval.rationalSurfacePoint( comps,
+		var p = verb.eval.Eval.rationalSurfacePoint( comps,
 														0.5,
 														0.5);
 
@@ -2146,7 +2146,7 @@ describe("verb.core.Make.revolvedSurface",function(){
 			, prof_knots = [0,0,1,1]
 			, profile = new verb.core.NurbsCurveData( prof_degree, prof_knots, prof_ctrl_pts );
 
-		var comps = verb.core.Make.revolvedSurface( profile, center, axis, angle );
+		var comps = verb.eval.Make.revolvedSurface( profile, center, axis, angle );
 
 		// the first row are the profile control pts
 		should.equal( 0, comps.controlPoints[0][0][0] );
@@ -2159,7 +2159,7 @@ describe("verb.core.Make.revolvedSurface",function(){
 		should.equal( 0, comps.controlPoints[0][1][2] );
 		should.equal( 0, comps.controlPoints[0][1][2] );
 
-		var p = verb.core.Eval.rationalSurfacePoint( comps,
+		var p = verb.eval.Eval.rationalSurfacePoint( comps,
 														0.5,
 														0.5);
 
@@ -2180,7 +2180,7 @@ describe("verb.core.Make.revolvedSurface",function(){
 			, prof_knots = [0,0,1,1]
 			, profile = new verb.core.NurbsCurveData( prof_degree, prof_knots, prof_ctrl_pts );
 
-		var comps = verb.core.Make.revolvedSurface( profile, center, axis, angle );
+		var comps = verb.eval.Make.revolvedSurface( profile, center, axis, angle );
 
 		// the first row are the profile control pts
 		should.equal( 0, comps.controlPoints[0][0][0] );
@@ -2193,7 +2193,7 @@ describe("verb.core.Make.revolvedSurface",function(){
 		should.equal( 0, comps.controlPoints[0][1][2] );
 		should.equal( 1, comps.controlPoints[0][1][3] );
 
-		var p = verb.core.Eval.rationalSurfacePoint( comps,
+		var p = verb.eval.Eval.rationalSurfacePoint( comps,
 														0.5,
 														0.5);
 
@@ -2239,7 +2239,7 @@ describe("verb.core.Trig.distToRay",function(){
 
 });
 
-describe("verb.core.Make.conicalSurface",function(){
+describe("verb.eval.Make.conicalSurface",function(){
 
 	it('can create a cone', function(){
 
@@ -2249,13 +2249,13 @@ describe("verb.core.Make.conicalSurface",function(){
 			, height = 5
 			, radius = 10;
 
-		var comps = verb.core.Make.conicalSurface(axis, xaxis, base, height, radius);
+		var comps = verb.eval.Make.conicalSurface(axis, xaxis, base, height, radius);
 
 		comps.degreeU.should.equal(2);
 		comps.degreeV.should.equal(1);
 
 		// sample at the center
-		var p = verb.core.Eval.rationalSurfacePoint( comps,
+		var p = verb.eval.Eval.rationalSurfacePoint( comps,
 														0.5,
 														0.5);
 
@@ -2263,7 +2263,7 @@ describe("verb.core.Make.conicalSurface",function(){
 		p[1].should.be.approximately(0, verb.core.Constants.EPSILON);
 		p[2].should.be.approximately(height/2, verb.core.Constants.EPSILON);
 
-		p = verb.core.Eval.rationalSurfacePoint( comps,
+		p = verb.eval.Eval.rationalSurfacePoint( comps,
 														0,
 														0);
 
@@ -2271,7 +2271,7 @@ describe("verb.core.Make.conicalSurface",function(){
 		p[1].should.be.approximately(0, verb.core.Constants.EPSILON);
 		p[2].should.be.approximately(height, verb.core.Constants.EPSILON);
 
-		p = verb.core.Eval.rationalSurfacePoint( comps,
+		p = verb.eval.Eval.rationalSurfacePoint( comps,
 														1,
 														0);
 
@@ -2279,7 +2279,7 @@ describe("verb.core.Make.conicalSurface",function(){
 		p[1].should.be.approximately(0, verb.core.Constants.EPSILON);
 		p[2].should.be.approximately(height, verb.core.Constants.EPSILON);
 
-		p = verb.core.Eval.rationalSurfacePoint( comps,
+		p = verb.eval.Eval.rationalSurfacePoint( comps,
 														0,
 														1);
 
@@ -2290,7 +2290,7 @@ describe("verb.core.Make.conicalSurface",function(){
 
 });
 
-describe("verb.core.Make.sphericalSurface",function(){
+describe("verb.eval.Make.sphericalSurface",function(){
 
 	it('can create a unit sphere', function(){
 
@@ -2299,13 +2299,13 @@ describe("verb.core.Make.sphericalSurface",function(){
 			, xaxis = [1,0,0]
 			, radius = 1;
 
-		var comps = verb.core.Make.sphericalSurface(center, axis, xaxis, radius);
+		var comps = verb.eval.Make.sphericalSurface(center, axis, xaxis, radius);
 
 		comps.degreeU.should.equal(2);
 		comps.degreeV.should.equal(2);
 
 		// sample at the center
-		var p = verb.core.Eval.rationalSurfacePoint( comps,
+		var p = verb.eval.Eval.rationalSurfacePoint( comps,
 														0.5,
 														0.5);
 
@@ -2376,14 +2376,14 @@ describe("verb.core.Mat.solve",function(){
 	});
 });
 
-describe("verb.core.Make.rationalInterpCurve",function(){
+describe("verb.eval.Make.rationalInterpCurve",function(){
 
 	function shouldInterpPointsWithTangents(pts, degree, isHomo, start_tangent, end_tangent){
 
 		var crv = shouldInterpPoints(pts, degree, isHomo, start_tangent, end_tangent);
 
-		var tan0 = verb.core.Eval.rationalCurveDerivatives( crv, 0, 1)[1];
-		var tan1 = verb.core.Eval.rationalCurveDerivatives( crv, 1, 1)[1];
+		var tan0 = verb.eval.Eval.rationalCurveDerivatives( crv, 0, 1)[1];
+		var tan1 = verb.eval.Eval.rationalCurveDerivatives( crv, 1, 1)[1];
 
 		vecShouldBe( start_tangent, tan0 );
 		vecShouldBe( end_tangent, tan1 );
@@ -2392,7 +2392,7 @@ describe("verb.core.Make.rationalInterpCurve",function(){
 
 	function shouldInterpPoints(pts, degree, isHomo, start_tangent, end_tangent){
 
-		var crv = verb.core.Make.rationalInterpCurve( pts, degree, isHomo, start_tangent, end_tangent );
+		var crv = verb.eval.Make.rationalInterpCurve( pts, degree, isHomo, start_tangent, end_tangent );
 
 		crv.degree.should.be.equal( degree );
 
@@ -2403,7 +2403,7 @@ describe("verb.core.Make.rationalInterpCurve",function(){
 		last(crv.controlPoints)[1].should.be.approximately(last(pts)[1], verb.core.Constants.TOLERANCE);
 
 		// // the internal points are interped (TODO: do this more efficiently)
-		var tess = verb.core.Tess.rationalCurveAdaptiveSample( crv, 1e-8  );
+		var tess = verb.eval.Tess.rationalCurveAdaptiveSample( crv, 1e-8  );
 
 		for (var j = 0; j < pts.length; j++){
 
@@ -2495,7 +2495,7 @@ describe("verb.core.Make.rationalInterpCurve",function(){
 
 });
 
-describe("verb.core.Analyze.rationalBezierCurveArcLength",function(){
+describe("verb.eval.Analyze.rationalBezierCurveArcLength",function(){
 
 	it('can compute entire arc length of straight cubic bezier parameterized from 0 to 1', function(){
 
@@ -2504,7 +2504,7 @@ describe("verb.core.Analyze.rationalBezierCurveArcLength",function(){
 			, controlPoints = [ [0,0,0,1], [1.5,0,0,1], [2,0,0,1], [3,0,0,1] ]
 			, curve = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
-		var res = verb.core.Analyze.rationalBezierCurveArcLength( curve, 1 );
+		var res = verb.eval.Analyze.rationalBezierCurveArcLength( curve, 1 );
 
 		res.should.be.approximately( 3, verb.core.Constants.TOLERANCE );
 
@@ -2517,7 +2517,7 @@ describe("verb.core.Analyze.rationalBezierCurveArcLength",function(){
 			, controlPoints = [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1] ]
 			, curve = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
-		var res = verb.core.Analyze.rationalBezierCurveArcLength( curve, 4 );
+		var res = verb.eval.Analyze.rationalBezierCurveArcLength( curve, 4 );
 
 		res.should.be.approximately( 3, verb.core.Constants.TOLERANCE );
 
@@ -2525,7 +2525,7 @@ describe("verb.core.Analyze.rationalBezierCurveArcLength",function(){
 
 });
 
-describe("verb.core.Analyze.rationalCurveArcLength",function(){
+describe("verb.eval.Analyze.rationalCurveArcLength",function(){
 
 	it('can compute entire arc length of straight nurbs curve parameterized from 0 to 2', function(){
 
@@ -2538,8 +2538,8 @@ describe("verb.core.Analyze.rationalCurveArcLength",function(){
 		var steps = 2;
 		var inc = (last(knots) - knots[0]) / (steps-1);
 		for (var i = 0; i < steps; i++){
-			var pt = verb.core.Eval.rationalCurvePoint( curve, u );
-			var res2 = verb.core.Analyze.rationalCurveArcLength( curve, u );
+			var pt = verb.eval.Eval.rationalCurvePoint( curve, u );
+			var res2 = verb.eval.Analyze.rationalCurveArcLength( curve, u );
 
 			res2.should.be.approximately( verb.core.Vec.norm( pt ), verb.core.Constants.TOLERANCE );
 
@@ -2554,10 +2554,10 @@ describe("verb.core.Analyze.rationalCurveArcLength",function(){
 			, controlPoints = [ [1,1,1,1], [1.5,0,1,1], [1.8,0,0,1], [2,0.1,5,1], [3.1,0,0,1] ]
 			, curve = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
-		var gaussLen = verb.core.Analyze.rationalCurveArcLength( curve );
+		var gaussLen = verb.eval.Analyze.rationalCurveArcLength( curve );
 
 		// sample the curve with 10,000 pts
-		var samples = verb.core.Tess.rationalCurveRegularSampleRange( curve, 0, 1, 10000 );
+		var samples = verb.eval.Tess.rationalCurveRegularSampleRange( curve, 0, 1, 10000 );
 
 		var red = samples.reduce(function(acc, v){
 			return { pt: v, l : acc.l + verb.core.Vec.norm( verb.core.Vec.sub( acc.pt, v ) ) };
@@ -2579,8 +2579,8 @@ describe("verb.core.Analyze.rationalCurveArcLength",function(){
 		var inc = (last(knots) - knots[0]) / (steps-1);
 		for (var i = 0; i < steps; i++){
 
-			var pt = verb.core.Eval.rationalCurvePoint( curve, u );
-			var res2 = verb.core.Analyze.rationalCurveArcLength( curve, u );
+			var pt = verb.eval.Eval.rationalCurvePoint( curve, u );
+			var res2 = verb.eval.Analyze.rationalCurveArcLength( curve, u );
 
 			res2.should.be.approximately( verb.core.Vec.norm( pt ), verb.core.Constants.TOLERANCE );
 
@@ -2591,7 +2591,7 @@ describe("verb.core.Analyze.rationalCurveArcLength",function(){
 
 });
 
-describe("verb.core.Analyze.rationalBezierCurveParamAtArcLength",function(){
+describe("verb.eval.Analyze.rationalBezierCurveParamAtArcLength",function(){
 
 	it('can compute parameter at arc length of straight bezier curve', function(){
 
@@ -2607,8 +2607,8 @@ describe("verb.core.Analyze.rationalBezierCurveParamAtArcLength",function(){
 
 		for (var i = 0; i < steps; i++){
 
-			var u = verb.core.Analyze.rationalBezierCurveParamAtArcLength(curve, d, tol);
-			var len = verb.core.Analyze.rationalBezierCurveArcLength(curve, u);
+			var u = verb.eval.Analyze.rationalBezierCurveParamAtArcLength(curve, d, tol);
+			var len = verb.eval.Analyze.rationalBezierCurveArcLength(curve, u);
 
 			len.should.be.approximately( d, tol );
 
@@ -2631,8 +2631,8 @@ describe("verb.core.Analyze.rationalBezierCurveParamAtArcLength",function(){
 
 		for (var i = 0; i < steps; i++){
 
-			var u = verb.core.Analyze.rationalBezierCurveParamAtArcLength(curve, d, tol);
-			var len = verb.core.Analyze.rationalBezierCurveArcLength(curve, u);
+			var u = verb.eval.Analyze.rationalBezierCurveParamAtArcLength(curve, d, tol);
+			var len = verb.eval.Analyze.rationalBezierCurveArcLength(curve, u);
 
 			len.should.be.approximately( d, tol );
 
@@ -2643,7 +2643,7 @@ describe("verb.core.Analyze.rationalBezierCurveParamAtArcLength",function(){
 
 });
 
-describe("verb.core.Analyze.rationalCurveParamAtArcLength",function(){
+describe("verb.eval.Analyze.rationalCurveParamAtArcLength",function(){
 
 	it('can compute parameter at arc length of straight NURBS curve', function(){
 
@@ -2657,12 +2657,12 @@ describe("verb.core.Analyze.rationalCurveParamAtArcLength",function(){
 		var steps = 10;
 		var inc = 4 / (steps-1);
 
-		var u = verb.core.Analyze.rationalCurveParamAtArcLength(curve, 2, tol);
+		var u = verb.eval.Analyze.rationalCurveParamAtArcLength(curve, 2, tol);
 
 		for (var i = 0; i < steps; i++){
 
-			var u = verb.core.Analyze.rationalCurveParamAtArcLength(curve, d, tol);
-			var len = verb.core.Analyze.rationalCurveArcLength(curve, u);
+			var u = verb.eval.Analyze.rationalCurveParamAtArcLength(curve, d, tol);
+			var len = verb.eval.Analyze.rationalCurveArcLength(curve, u);
 
 			len.should.be.approximately( d, tol );
 
@@ -2685,8 +2685,8 @@ describe("verb.core.Analyze.rationalCurveParamAtArcLength",function(){
 
 		for (var i = 0; i < steps; i++){
 
-			var u = verb.core.Analyze.rationalCurveParamAtArcLength(curve, d, tol);
-			var len = verb.core.Analyze.rationalCurveArcLength(curve, u);
+			var u = verb.eval.Analyze.rationalCurveParamAtArcLength(curve, d, tol);
+			var len = verb.eval.Analyze.rationalCurveArcLength(curve, u);
 
 			len.should.be.approximately( d, tol );
 
@@ -2697,7 +2697,7 @@ describe("verb.core.Analyze.rationalCurveParamAtArcLength",function(){
 
 });
 
-describe("verb.core.Divide.rationalCurveByArcLength",function(){
+describe("verb.eval.Divide.rationalCurveByArcLength",function(){
 
 	it('can divide a straight NURBS curve', function(){
 
@@ -2708,12 +2708,12 @@ describe("verb.core.Divide.rationalCurveByArcLength",function(){
 			, d = 0.5
 			, tol = 1e-3;
 
-		var res = verb.core.Divide.rationalCurveByArcLength(curve, d);
+		var res = verb.eval.Divide.rationalCurveByArcLength(curve, d);
 
 		var s = 0;
 		res.forEach(function(u){
 
-			var pt = verb.core.Eval.rationalCurvePoint( curve, u.u );
+			var pt = verb.eval.Eval.rationalCurvePoint( curve, u.u );
 			u.len.should.be.approximately( s, tol );
 			s += d;
 
@@ -2723,7 +2723,7 @@ describe("verb.core.Divide.rationalCurveByArcLength",function(){
 
 });
 
-describe("verb.core.Divide.rationalCurveByEqualArcLength",function(){
+describe("verb.eval.Divide.rationalCurveByEqualArcLength",function(){
 
 	it('can divide a straight NURBS curve', function(){
 
@@ -2735,12 +2735,12 @@ describe("verb.core.Divide.rationalCurveByEqualArcLength",function(){
 			, tol = 1e-3
 			, d = 4 / divs;
 
-		var res = verb.core.Divide.rationalCurveByEqualArcLength(curve, divs );
+		var res = verb.eval.Divide.rationalCurveByEqualArcLength(curve, divs );
 
 		var s = 0;
 		res.forEach(function(u){
 
-			var pt = verb.core.Eval.rationalCurvePoint( curve, u.u );
+			var pt = verb.eval.Eval.rationalCurvePoint( curve, u.u );
 			u.len.should.be.approximately( s, tol );
 			s += d;
 
@@ -2750,7 +2750,7 @@ describe("verb.core.Divide.rationalCurveByEqualArcLength",function(){
 
 });
 
-describe("verb.core.Analyze.rationalCurveClosestParam",function(){
+describe("verb.eval.Analyze.rationalCurveClosestParam",function(){
 
 	it('can get closest point to a straight curve', function(){
 
@@ -2760,25 +2760,25 @@ describe("verb.core.Analyze.rationalCurveClosestParam",function(){
 			, curve = new verb.core.NurbsCurveData( degree, knots, controlPoints )
 			, pt = [1,0.2,0];
 
-		var res = verb.core.Analyze.rationalCurveClosestParam(curve, [1,0.2,0] );
-		var p = verb.core.Eval.rationalCurvePoint( curve, res );
+		var res = verb.eval.Analyze.rationalCurveClosestParam(curve, [1,0.2,0] );
+		var p = verb.eval.Eval.rationalCurvePoint( curve, res );
 
 		vecShouldBe( [1,0,0], p, 1e-3 );
 
-		res = verb.core.Analyze.rationalCurveClosestParam(curve, [2,0.2,0] );
-		p = verb.core.Eval.rationalCurvePoint( curve, res );
+		res = verb.eval.Analyze.rationalCurveClosestParam(curve, [2,0.2,0] );
+		p = verb.eval.Eval.rationalCurvePoint( curve, res );
 
 		vecShouldBe( [2,0,0], p, 1e-3 );
 
 		// before start
-		res = verb.core.Analyze.rationalCurveClosestParam(curve, [-1,0.2,1] );
-		p = verb.core.Eval.rationalCurvePoint( curve, res );
+		res = verb.eval.Analyze.rationalCurveClosestParam(curve, [-1,0.2,1] );
+		p = verb.eval.Eval.rationalCurvePoint( curve, res );
 
 		vecShouldBe( [0,0,0], p, 1e-3 );
 
 		// beyond end
-		res = verb.core.Analyze.rationalCurveClosestParam(curve, [5,0.2,0] );
-		p = verb.core.Eval.rationalCurvePoint( curve, res );
+		res = verb.eval.Analyze.rationalCurveClosestParam(curve, [5,0.2,0] );
+		p = verb.eval.Eval.rationalCurvePoint( curve, res );
 
 		vecShouldBe( [4,0,0], p, 1e-3 );
 
@@ -2786,7 +2786,7 @@ describe("verb.core.Analyze.rationalCurveClosestParam",function(){
 
 });
 
-describe("verb.core.Analyze.rationalSurfaceClosestParam",function(){
+describe("verb.eval.Analyze.rationalSurfaceClosestParam",function(){
 
 	it('can get closest point to flat bezier patch', function(){
 
@@ -2801,8 +2801,8 @@ describe("verb.core.Analyze.rationalSurfaceClosestParam",function(){
 			, surface = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints )
 			, point = [12,-20,5];
 
-		var res = verb.core.Analyze.rationalSurfaceClosestParam( surface, point );
-		var p = verb.core.Eval.rationalSurfacePoint( surface, res[0], res[1] );
+		var res = verb.eval.Analyze.rationalSurfaceClosestParam( surface, point );
+		var p = verb.eval.Eval.rationalSurfacePoint( surface, res[0], res[1] );
 
 		vecShouldBe( [12,-20,0], p, 1e-3 );
 
@@ -2810,7 +2810,7 @@ describe("verb.core.Analyze.rationalSurfaceClosestParam",function(){
 
 });
 
-describe("verb.core.Intersect.segmentWithTriangle",function(){
+describe("verb.eval.Intersect.segmentWithTriangle",function(){
 
 	it('gives correct result for intersecting axis aligned segment and triangle ', function(){
 
@@ -2820,7 +2820,7 @@ describe("verb.core.Intersect.segmentWithTriangle",function(){
 			, points = [ [0,0,0], [10,0,0], [5,10,1] ]
 			, tri = [ 0, 1, 2 ];
 
-		var res = verb.core.Intersect.segmentWithTriangle( p0, p1, points, tri );
+		var res = verb.eval.Intersect.segmentWithTriangle( p0, p1, points, tri );
 
 		res.p.should.be.approximately(0.3, verb.core.Constants.TOLERANCE);
 		res.s.should.be.approximately(0.25, verb.core.Constants.TOLERANCE);
@@ -2844,7 +2844,7 @@ describe("verb.core.Intersect.segmentWithTriangle",function(){
 			, points = [ [0,0,0], [10,0,0], [5,10,0] ]
 			, tri = [ 0, 1, 2 ];
 
-		var res = verb.core.Intersect.segmentWithTriangle( p0, p1, points, tri );
+		var res = verb.eval.Intersect.segmentWithTriangle( p0, p1, points, tri );
 
 		res.p.should.be.approximately(0.333333333333, verb.core.Constants.TOLERANCE);
 		res.s.should.be.approximately(0.25, verb.core.Constants.TOLERANCE);
@@ -2868,7 +2868,7 @@ describe("verb.core.Intersect.segmentWithTriangle",function(){
 			, points = [ [0,0,0], [10,0,0], [5,10,0] ]
 			, tri = [ 0, 1, 2 ];
 
-		var res = verb.core.Intersect.segmentWithTriangle( p0, p1, points, tri );
+		var res = verb.eval.Intersect.segmentWithTriangle( p0, p1, points, tri );
 
 		(null === res).should.be.true;
 
@@ -3015,7 +3015,7 @@ describe("verb.core.Mesh.getTriangleCentroid",function(){
 
 });
 
-describe("verb.core.Eval.getMinCoordOnAxis",function(){
+describe("verb.eval.Eval.getMinCoordOnAxis",function(){
 
 	it('should return correct value', function(){
 
@@ -3069,7 +3069,7 @@ describe("verb.core.Mesh.sortTrianglesOnLongestAxis",function(){
 
 });
 
-describe("verb.core.Make.fourPointSurface",function(){
+describe("verb.eval.Make.fourPointSurface",function(){
 
 	it('can create an inclined plane', function(){
 
@@ -3078,13 +3078,13 @@ describe("verb.core.Make.fourPointSurface",function(){
 			, p3 = [1,1,1]
 			, p4 = [0,1,1];
 
-		var comps = verb.core.Make.fourPointSurface(p1, p2, p3, p4);
+		var comps = verb.eval.Make.fourPointSurface(p1, p2, p3, p4);
 
 		comps.degreeU.should.equal(3);
 		comps.degreeV.should.equal(3);
 
 		// sample at the center
-		var p = verb.core.Eval.rationalSurfacePoint( comps,
+		var p = verb.eval.Eval.rationalSurfacePoint( comps,
 														0.5,
 														0.5);
 
@@ -3101,13 +3101,13 @@ describe("verb.core.Make.fourPointSurface",function(){
 			, p3 = [1,1,1]
 			, p4 = [0,1,0];
 
-		var comps = verb.core.Make.fourPointSurface(p1, p2, p3, p4);
+		var comps = verb.eval.Make.fourPointSurface(p1, p2, p3, p4);
 
 		comps.degreeU.should.equal(3);
 		comps.degreeV.should.equal(3);
 
 		// sample at the center
-		var p = verb.core.Eval.rationalSurfacePoint( comps,
+		var p = verb.eval.Eval.rationalSurfacePoint( comps,
 														0.5,
 														0.5);
 
@@ -3116,7 +3116,7 @@ describe("verb.core.Make.fourPointSurface",function(){
 		p[2].should.be.approximately(0.5, verb.core.Constants.EPSILON );
 
 		// bottom left
-		p = verb.core.Eval.rationalSurfacePoint( comps,
+		p = verb.eval.Eval.rationalSurfacePoint( comps,
 														0,
 														0);
 
@@ -3125,7 +3125,7 @@ describe("verb.core.Make.fourPointSurface",function(){
 		p[2].should.be.approximately(1, verb.core.Constants.EPSILON );
 
 		// bottom right
-		p = verb.core.Eval.rationalSurfacePoint( comps,
+		p = verb.eval.Eval.rationalSurfacePoint( comps,
 														1,
 														0);
 
@@ -3137,7 +3137,7 @@ describe("verb.core.Make.fourPointSurface",function(){
 
 });
 
-describe("verb.core.Intersect.polylines",function(){
+describe("verb.eval.Intersect.polylines",function(){
 
 	it('can intersect two simple lines', function(){
 
@@ -3148,7 +3148,7 @@ describe("verb.core.Intersect.polylines",function(){
 			, pl0 = new verb.core.PolylineData([ p1, p2 ], [0, 1])
 			, pl1 = new verb.core.PolylineData([ p3, p4 ], [0, 1]);
 
-		var inter = verb.core.Intersect.polylines( pl0, pl1, verb.core.Constants.TOLERANCE );
+		var inter = verb.eval.Intersect.polylines( pl0, pl1, verb.core.Constants.TOLERANCE );
 
 		inter.length.should.be.equal(1);
 
@@ -3169,7 +3169,7 @@ describe("verb.core.Intersect.polylines",function(){
 			, pl0 = new verb.core.PolylineData([ p1, p2 ], [0, 1])
 			, pl1 = new verb.core.PolylineData([ p3, p4, p5], [0, 0.5, 1]);
 
-		var inter = verb.core.Intersect.polylines( pl0, pl1, verb.core.Constants.TOLERANCE );
+		var inter = verb.eval.Intersect.polylines( pl0, pl1, verb.core.Constants.TOLERANCE );
 
 		inter.length.should.be.equal(1);
 
@@ -3192,7 +3192,7 @@ describe("verb.core.Intersect.polylines",function(){
 			, pl0 = new verb.core.PolylineData([ p1, p2, p3 ], [0, 0.5, 1])
 			, pl1 = new verb.core.PolylineData([ p4, p5, p6 ], [0, 0.5, 1]);
 
-		var inter = verb.core.Intersect.polylines( pl0, pl1, verb.core.Constants.TOLERANCE );
+		var inter = verb.eval.Intersect.polylines( pl0, pl1, verb.core.Constants.TOLERANCE );
 
 		inter.length.should.be.equal(2);
 
@@ -3219,14 +3219,14 @@ describe("verb.core.Intersect.polylines",function(){
 			, pl0 = new verb.core.PolylineData([ p1, p2 ], [0, 1])
 			, pl1 = new verb.core.PolylineData([ p3, p4 ], [0, 1]);
 
-		var inter = verb.core.Intersect.polylines( pl0, pl1, verb.core.Constants.TOLERANCE );
+		var inter = verb.eval.Intersect.polylines( pl0, pl1, verb.core.Constants.TOLERANCE );
 
 		inter.length.should.be.equal(0);
 
 	});
 });
 
-describe("verb.core.Intersect.threePlanes",function(){
+describe("verb.eval.Intersect.threePlanes",function(){
 
 	it('is correct for intersection of 3 basis planes', function(){
 
@@ -3237,7 +3237,7 @@ describe("verb.core.Intersect.threePlanes",function(){
 		var d3 = 0;
 		var n3 = [0,0,1];
 
-		var res = verb.core.Intersect.threePlanes(n1, d1, n2, d2, n3, d3);
+		var res = verb.eval.Intersect.threePlanes(n1, d1, n2, d2, n3, d3);
 		res.should.be.eql( [0,0,0] );
 
 	});
@@ -3255,7 +3255,7 @@ describe("verb.core.Intersect.threePlanes",function(){
 			d2 = (Math.random() - 0.5) * 10000;
 			d3 = (Math.random() - 0.5) * 10000;
 
-			res = verb.core.Intersect.threePlanes(n1, d1, n2, d2, n3, d3);
+			res = verb.eval.Intersect.threePlanes(n1, d1, n2, d2, n3, d3);
 
 			res[0].should.be.approximately( d1, verb.core.Constants.EPSILON );
 			res[1].should.be.approximately( d2, verb.core.Constants.EPSILON );
@@ -3274,14 +3274,14 @@ describe("verb.core.Intersect.threePlanes",function(){
 		var d3 = 10;
 		var n3 = [0,0,1];
 
-		var res = verb.core.Intersect.threePlanes(n1, d1, n2, d2, n3, d3);
+		var res = verb.eval.Intersect.threePlanes(n1, d1, n2, d2, n3, d3);
 		should.equal( res, null ); //non-intersect is null
 
 	});
 
 });
 
-describe("verb.core.Intersect.planes",function(){
+describe("verb.eval.Intersect.planes",function(){
 
 	it('is correct for intersection of xz and yz planes', function(){
 
@@ -3290,7 +3290,7 @@ describe("verb.core.Intersect.planes",function(){
 		var o2 = [0,0,0];
 		var n2 = [0,1,0];
 
-		var res = verb.core.Intersect.planes(o1, n1, o2, n2);
+		var res = verb.eval.Intersect.planes(o1, n1, o2, n2);
 
 		res.origin.should.be.eql( [0,0,0] );
 		res.dir.should.be.eql( [0,0,1] );
@@ -3304,7 +3304,7 @@ describe("verb.core.Intersect.planes",function(){
 		var o2 = [0,0,0];
 		var n2 = [0,1,0];
 
-		var res = verb.core.Intersect.planes(o1, n1, o2, n2);
+		var res = verb.eval.Intersect.planes(o1, n1, o2, n2);
 
 		res.origin.should.be.eql( [20,0,0] );
 		res.dir.should.be.eql( [0,0,1] );
@@ -3319,7 +3319,7 @@ describe("verb.core.Intersect.planes",function(){
 		var n2 = [0,1,0];
 
 		// should be z-axis
-		var res = verb.core.Intersect.planes(o1, n1, o2, n2);
+		var res = verb.eval.Intersect.planes(o1, n1, o2, n2);
 
 		res.origin.should.be.eql( [0,20,0] );
 		res.dir.should.be.eql( [0,0,1] );
@@ -3328,7 +3328,7 @@ describe("verb.core.Intersect.planes",function(){
 
 });
 
-describe("verb.core.Intersect.clipRayInCoplanarTriangle",function(){
+describe("verb.eval.Intersect.clipRayInCoplanarTriangle",function(){
 
 	it('is correct for a basic example 1', function(){
 
@@ -3340,7 +3340,7 @@ describe("verb.core.Intersect.clipRayInCoplanarTriangle",function(){
 		var uvs = [ [0,0], [2,0], [2, 2] ];
 		var mesh = new verb.core.MeshData(tri, pts, null, uvs);
 
-		var res = verb.core.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh, 0);
+		var res = verb.eval.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh, 0);
 
 
 
@@ -3365,7 +3365,7 @@ describe("verb.core.Intersect.clipRayInCoplanarTriangle",function(){
 		var uvs = [ [0,0], [2,0], [2, 2] ];
 
 		var mesh = new verb.core.MeshData(tri, pts, null, uvs);
-		var res = verb.core.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh, 0 );
+		var res = verb.eval.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh, 0 );
 
 		res.min.u.should.be.approximately(0.5, verb.core.Constants.TOLERANCE);
 		res.max.u.should.be.approximately(1, verb.core.Constants.TOLERANCE);
@@ -3388,7 +3388,7 @@ describe("verb.core.Intersect.clipRayInCoplanarTriangle",function(){
 		var uvs = [ [0,0], [2,0], [2, 2] ];
 
 		var mesh = new verb.core.MeshData(tri, pts, null, uvs);
-		var res = verb.core.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh, 0 );
+		var res = verb.eval.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh, 0 );
 
 		res.min.u.should.be.approximately(Math.sqrt(2)/2, verb.core.Constants.TOLERANCE);
 		res.max.u.should.be.approximately(3 * Math.sqrt(2)/2, verb.core.Constants.TOLERANCE);
@@ -3411,7 +3411,7 @@ describe("verb.core.Intersect.clipRayInCoplanarTriangle",function(){
 		var uvs = [ [0,0], [2,0], [2, 2] ];
 
 		var mesh = new verb.core.MeshData(tri, pts, null, uvs);
-		var res = verb.core.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh, 0 );
+		var res = verb.eval.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh, 0 );
 
 		res.min.u.should.be.approximately(Math.sqrt(2), verb.core.Constants.TOLERANCE);
 		res.max.u.should.be.approximately(2 * Math.sqrt(2), verb.core.Constants.TOLERANCE);
@@ -3434,7 +3434,7 @@ describe("verb.core.Intersect.clipRayInCoplanarTriangle",function(){
 		var uvs = [ [0,0], [2,0], [2, 2] ];
 
 		var mesh = new verb.core.MeshData(tri, pts, null, uvs);
-		var res = verb.core.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh, 0 );
+		var res = verb.eval.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh, 0 );
 
 		res.min.u.should.be.approximately(0, verb.core.Constants.TOLERANCE);
 		res.max.u.should.be.approximately(Math.sqrt(2), verb.core.Constants.TOLERANCE);
@@ -3457,7 +3457,7 @@ describe("verb.core.Intersect.clipRayInCoplanarTriangle",function(){
 		var uvs = [ [0,0], [2,0], [2, 2] ];
 
 		var mesh = new verb.core.MeshData(tri, pts, null, uvs);
-		var res = verb.core.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh, 0 );
+		var res = verb.eval.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh, 0 );
 
 		res.min.u.should.be.approximately(1, verb.core.Constants.TOLERANCE);
 		res.max.u.should.be.approximately(2, verb.core.Constants.TOLERANCE);
@@ -3472,7 +3472,7 @@ describe("verb.core.Intersect.clipRayInCoplanarTriangle",function(){
 
 });
 
-describe("verb.core.Intersect.mergeTriangleClipIntervals",function(){
+describe("verb.eval.Intersect.mergeTriangleClipIntervals",function(){
 
 	it('is correct for a basic example', function(){
 
@@ -3484,16 +3484,16 @@ describe("verb.core.Intersect.mergeTriangleClipIntervals",function(){
 		var uvs1 = [ [0,0], [2,0], [2, 2] ];
 		var mesh1 = new verb.core.MeshData(tri1, pts1, null, uvs1);
 
-		var clip1 = verb.core.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh1, 0 );
+		var clip1 = verb.eval.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh1, 0 );
 
 		var pts2 = [ [1,0.5,-1], [1,2.5,-1], [1,0.5,1] ];
 		var tri2 = [[ 0, 1, 2 ]];
 		var uvs2 = [ [0,0], [2,0], [0,2] ];
 		var mesh2 = new verb.core.MeshData(tri2, pts2, null, uvs2);
 
-		var clip2 = verb.core.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh2, 0 );
+		var clip2 = verb.eval.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh2, 0 );
 
-		var res = verb.core.Intersect.mergeTriangleClipIntervals(clip1, clip2, mesh1, 0, mesh2, 0);
+		var res = verb.eval.Intersect.mergeTriangleClipIntervals(clip1, clip2, mesh1, 0, mesh2, 0);
 
 		vecShouldBe( [1, 0.5], res.min.uv0 );
 		vecShouldBe( [0, 1], res.min.uv1 );
@@ -3515,16 +3515,16 @@ describe("verb.core.Intersect.mergeTriangleClipIntervals",function(){
 		var uvs1 = [ [0,0], [2,0], [2, 2] ];
 		var mesh1 = new verb.core.MeshData(tri1, pts1, null, uvs1);
 
-		var clip1 = verb.core.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh1, 0 );
+		var clip1 = verb.eval.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh1, 0 );
 
 		var pts2 = [ [2,0,0], [2, 2, 0], [2, 0, 2] ];
 		var tri2 = [[ 0, 1, 2 ]];
 		var uvs2 = [ [0,0], [2,0], [0,2] ];
 		var mesh2 = new verb.core.MeshData(tri2, pts2, null, uvs2);
 
-		var clip2 = verb.core.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh2, 0 );
+		var clip2 = verb.eval.Intersect.clipRayInCoplanarTriangle(new verb.core.Ray(o, d), mesh2, 0 );
 
-		var res = verb.core.Intersect.mergeTriangleClipIntervals(clip1, clip2, mesh1, 0, mesh2, 0);
+		var res = verb.eval.Intersect.mergeTriangleClipIntervals(clip1, clip2, mesh1, 0, mesh2, 0);
 
 		vecShouldBe( [2, 0], res.min.uv0 );
 		vecShouldBe( [0, 0], res.min.uv1 );
@@ -3538,7 +3538,7 @@ describe("verb.core.Intersect.mergeTriangleClipIntervals",function(){
 
 });
 
-describe("verb.core.Intersect.triangles",function(){
+describe("verb.eval.Intersect.triangles",function(){
 
 	it('is correct for a basic example', function(){
 
@@ -3552,7 +3552,7 @@ describe("verb.core.Intersect.triangles",function(){
 		var uvs2 = [ [0,0], [2,0], [0,2] ];
 		var mesh2 = new verb.core.MeshData(tri2, pts2, null, uvs2);
 
-		var res = verb.core.Intersect.triangles( mesh1, 0, mesh2, 0 );
+		var res = verb.eval.Intersect.triangles( mesh1, 0, mesh2, 0 );
 
 		vecShouldBe( [1, 0.5], res.min.uv0 );
 		vecShouldBe( [0, 1], res.min.uv1 );
@@ -3576,7 +3576,7 @@ describe("verb.core.Intersect.triangles",function(){
 		var uvs2 = [ [0,0], [2,0], [0,2] ];
 		var mesh2 = new verb.core.MeshData(tri2, pts2, null, uvs2);
 
-		var res = verb.core.Intersect.triangles( mesh1, 0, mesh2, 0 );
+		var res = verb.eval.Intersect.triangles( mesh1, 0, mesh2, 0 );
 
 		vecShouldBe( [2,0], res.min.uv0 );
 		vecShouldBe( [0,0], res.min.uv1 );
@@ -3591,7 +3591,7 @@ describe("verb.core.Intersect.triangles",function(){
 
 });
 
-describe("verb.core.Intersect.curves",function(){
+describe("verb.eval.Intersect.curves",function(){
 
 	it('gives valid result for two planar lines', function(){
 
@@ -3604,7 +3604,7 @@ describe("verb.core.Intersect.curves",function(){
 				controlPoints2 = [[0.5,0.5,0,1], [0.5,-1.5,0,1]]
 				curve2 = new verb.core.NurbsCurveData( degree2, knots2, controlPoints2 );
 
-		var res = verb.core.Intersect.curves( curve1, curve2, verb.core.Constants.TOLERANCE );
+		var res = verb.eval.Intersect.curves( curve1, curve2, verb.core.Constants.TOLERANCE );
 
 		res.length.should.be.equal(1);
 
@@ -3624,7 +3624,7 @@ describe("verb.core.Intersect.curves",function(){
 				controlPoints2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]]
 				curve2 = new verb.core.NurbsCurveData( degree2, knots2, controlPoints2 );
 
-		var res = verb.core.Intersect.curves( 	curve1,curve2, verb.core.Constants.TOLERANCE );
+		var res = verb.eval.Intersect.curves( 	curve1,curve2, verb.core.Constants.TOLERANCE );
 
 		res.length.should.be.equal(1);
 
@@ -3644,7 +3644,7 @@ describe("verb.core.Intersect.curves",function(){
 				controlPoints2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]]
 				curve2 = new verb.core.NurbsCurveData( degree2, knots2, controlPoints2 );
 
-		var res = verb.core.Intersect.curves(curve2, curve1, verb.core.Constants.TOLERANCE );
+		var res = verb.eval.Intersect.curves(curve2, curve1, verb.core.Constants.TOLERANCE );
 
 		res.length.should.be.equal(1);
 
@@ -3664,7 +3664,7 @@ describe("verb.core.Intersect.curves",function(){
 				controlPoints2 = [[0.5,0.5,0,1], [0.7,0,0,1], [0.5,-1.5,0,1]]
 				curve2 = new verb.core.NurbsCurveData( degree2, knots2, controlPoints2 );
 
-		var res = verb.core.Intersect.curves( curve1, curve2, verb.core.Constants.TOLERANCE );
+		var res = verb.eval.Intersect.curves( curve1, curve2, verb.core.Constants.TOLERANCE );
 
 		res.length.should.be.equal(1);
 
@@ -3674,7 +3674,7 @@ describe("verb.core.Intersect.curves",function(){
 
 });
 
-describe("verb.core.Intersect.curveAndSurface",function(){
+describe("verb.eval.Intersect.curveAndSurface",function(){
 
 	it('gives valid result for planar surface and line', function(){
 
@@ -3692,7 +3692,7 @@ describe("verb.core.Intersect.curveAndSurface",function(){
 			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.2,5.2,-10,1] ]
 			, curve = new verb.core.NurbsCurveData( degree_crv, knots_crv, homo_controlPoints_crv );
 
-		var res = verb.core.Intersect.curveAndSurface( curve, surface, verb.core.Constants.TOLERANCE );
+		var res = verb.eval.Intersect.curveAndSurface( curve, surface, verb.core.Constants.TOLERANCE );
 
 		res.length.should.be.equal( 1 );
 
@@ -3718,7 +3718,7 @@ describe("verb.core.Intersect.curveAndSurface",function(){
 			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.2,5.2,-2.5,1], [5.2,5.2,-10,1] ]
 			, curve = new verb.core.NurbsCurveData( degree_crv, knots_crv, homo_controlPoints_crv );
 
-		var res = verb.core.Intersect.curveAndSurface( curve, surface, verb.core.Constants.TOLERANCE );
+		var res = verb.eval.Intersect.curveAndSurface( curve, surface, verb.core.Constants.TOLERANCE );
 
 		res.length.should.be.equal( 1 );
 		res[0].u.should.be.approximately( 1/3, 1e-3 );
@@ -3743,7 +3743,7 @@ describe("verb.core.Intersect.curveAndSurface",function(){
 			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.4,4.8,0,1], [5.2,5.2,-5,1] ]
 			, curve = new verb.core.NurbsCurveData( degree_crv, knots_crv, homo_controlPoints_crv );
 
-		var res =  verb.core.Intersect.curveAndSurface( curve, surface, verb.core.Constants.TOLERANCE  );
+		var res =  verb.eval.Intersect.curveAndSurface( curve, surface, verb.core.Constants.TOLERANCE  );
 
 		res.length.should.be.equal( 1 );
 		res[0].u.should.be.approximately( 0.5, 1e-3 );
@@ -3768,14 +3768,14 @@ describe("verb.core.Intersect.curveAndSurface",function(){
 			, homo_controlPoints_crv = [ [5.2,5.2,5,1], [5.2,5.2,2,1] ]
 			, curve = new verb.core.NurbsCurveData( degree_crv, knots_crv, homo_controlPoints_crv );
 
-		var res =  verb.core.Intersect.curveAndSurface( curve, surface );
+		var res =  verb.eval.Intersect.curveAndSurface( curve, surface );
 		res.length.should.be.equal( 0 );
 
 	});
 
 });
 
-describe("verb.core.Intersect.curveAndSurfaceWithEstimate",function(){
+describe("verb.eval.Intersect.curveAndSurfaceWithEstimate",function(){
 
 	it('gives valid result for planar surface and degree 2 bezier', function(){
 
@@ -3793,7 +3793,7 @@ describe("verb.core.Intersect.curveAndSurfaceWithEstimate",function(){
 
 		var start_params = [ 0.45, 0.25, 0.55 ];
 
-		var res = verb.core.Intersect.curveAndSurfaceWithEstimate( curve, surface, start_params, verb.core.Constants.TOLERANCE );
+		var res = verb.eval.Intersect.curveAndSurfaceWithEstimate( curve, surface, start_params, verb.core.Constants.TOLERANCE );
 
 		res.u.should.be.approximately(0.5, 1e-3);
 		res.uv[0].should.be.approximately(0.265, 1e-3);
@@ -3832,7 +3832,7 @@ describe("verb.core.KdTree",function(){
 
 });
 
-describe("verb.core.Intersect.lookupAdjacentSegment",function(){
+describe("verb.eval.Intersect.lookupAdjacentSegment",function(){
 
 	var segs = [
 		new verb.core.Interval(
@@ -3849,8 +3849,8 @@ describe("verb.core.Intersect.lookupAdjacentSegment",function(){
 
 		var end = segs[0].min;
 
-		var tree = verb.core.Intersect.kdTreeFromSegments( segs );
-		var nearest = verb.core.Intersect.lookupAdjacentSegment( end, tree, 3 );
+		var tree = verb.eval.Intersect.kdTreeFromSegments( segs );
+		var nearest = verb.eval.Intersect.lookupAdjacentSegment( end, tree, 3 );
 
 		should.equal( nearest, null );
 
@@ -3860,8 +3860,8 @@ describe("verb.core.Intersect.lookupAdjacentSegment",function(){
 
 		var end = new verb.core.MeshIntersectionPoint([0,0], [0,0], [1,2,3], 0, 0 ); // same pos, but different object
 
-		var tree = verb.core.Intersect.kdTreeFromSegments( segs );
-		var nearest = verb.core.Intersect.lookupAdjacentSegment( end, tree, 3 );
+		var tree = verb.eval.Intersect.kdTreeFromSegments( segs );
+		var nearest = verb.eval.Intersect.lookupAdjacentSegment( end, tree, 3 );
 
 		nearest.should.be.equal(segs[0].min)
 
@@ -3869,7 +3869,7 @@ describe("verb.core.Intersect.lookupAdjacentSegment",function(){
 
 });
 
-describe("verb.core.Intersect.makeMeshIntersectionPolylines ",function(){
+describe("verb.eval.Intersect.makeMeshIntersectionPolylines ",function(){
 
 	it('is correct for a basic example', function(){
 
@@ -3884,7 +3884,7 @@ describe("verb.core.Intersect.makeMeshIntersectionPolylines ",function(){
 				new verb.core.MeshIntersectionPoint([0,0], [0,0], [5,0,0], 0, 0 ),
 				new verb.core.MeshIntersectionPoint([0,0], [0,0], [0,10,0], 0, 0 ))  ];
 
-		var pls = verb.core.Intersect.makeMeshIntersectionPolylines( segs );
+		var pls = verb.eval.Intersect.makeMeshIntersectionPolylines( segs );
 
 
 		pls.length.should.be.equal( 1 );
@@ -3898,7 +3898,7 @@ describe("verb.core.Intersect.makeMeshIntersectionPolylines ",function(){
 
 });
 
-describe("verb.core.Intersect.kdTreeFromSegments",function(){
+describe("verb.eval.Intersect.kdTreeFromSegments",function(){
 
 	it('is correct for a basic example', function(){
 
@@ -3913,7 +3913,7 @@ describe("verb.core.Intersect.kdTreeFromSegments",function(){
 				new verb.core.MeshIntersectionPoint([0,0], [0,0], [3,2,3], 0, 0 ),
 				new verb.core.MeshIntersectionPoint([0,0], [0,0], [7,6,7], 0, 0 ))  ];
 
-		var tree = verb.core.Intersect.kdTreeFromSegments( segs );
+		var tree = verb.eval.Intersect.kdTreeFromSegments( segs );
 
 		tree.should.not.be.null;
 
@@ -3921,7 +3921,7 @@ describe("verb.core.Intersect.kdTreeFromSegments",function(){
 
 });
 
-describe("verb.core.Intersect.meshes",function(){
+describe("verb.eval.Intersect.meshes",function(){
 
 	it('is correct for two intersecting triangles', function(){
 
@@ -3935,7 +3935,7 @@ describe("verb.core.Intersect.meshes",function(){
 		var uvs2 = [ [0,0], [3,0], [3,3] ];
 		var mesh2 = new verb.core.MeshData(tris2, pts2, null, uvs2);
 
-		var pls = verb.core.Intersect.meshes( mesh1, mesh2 );
+		var pls = verb.eval.Intersect.meshes( mesh1, mesh2 );
 
 		pls.length.should.be.equal( 1 );
 		pls[0].length.should.be.equal( 2 );
@@ -3954,7 +3954,7 @@ describe("verb.core.Intersect.meshes",function(){
 		var uvs2 = [ [0,0], [3,0], [3,3] ];
 		var mesh2 = new verb.core.MeshData(tris2, pts2, null, uvs2);
 
-		var res = verb.core.Intersect.meshes( mesh1, mesh2 );
+		var res = verb.eval.Intersect.meshes( mesh1, mesh2 );
 
 		res.length.should.be.equal( 0 );
 
@@ -3967,19 +3967,19 @@ describe("verb.core.Intersect.meshes",function(){
 			, p3 = [1,1,0]
 			, p4 = [0,1,0];
 
-		var srf1 = verb.core.Make.fourPointSurface( p1, p2, p3, p4 );
+		var srf1 = verb.eval.Make.fourPointSurface( p1, p2, p3, p4 );
 
 		var p5 = [0.5,-0.5,-0.5]
 			, p6 = [0.5,0.5,-0.5]
 			, p7 = [0.5,0.5,0.5]
 			, p8 = [0.5,-0.5,0.5];
 
-		var srf2 = verb.core.Make.fourPointSurface( p5, p6, p7, p8 );
+		var srf2 = verb.eval.Make.fourPointSurface( p5, p6, p7, p8 );
 
-		var tess1 = verb.core.Tess.rationalSurfaceAdaptive( srf1 );
-		var tess2 = verb.core.Tess.rationalSurfaceAdaptive( srf2 );
+		var tess1 = verb.eval.Tess.rationalSurfaceAdaptive( srf1 );
+		var tess2 = verb.eval.Tess.rationalSurfaceAdaptive( srf2 );
 
-		var res = verb.core.Intersect.meshes( tess1, tess2 );
+		var res = verb.eval.Intersect.meshes( tess1, tess2 );
 
 		res.length.should.be.equal( 1 );
 	});
@@ -4004,7 +4004,7 @@ describe("verb.core.Mesh.triangleUVFromPoint",function(){
 	});
 });
 
-describe("verb.core.Eval.volumePoint",function(){
+describe("verb.eval.Eval.volumePoint",function(){
 
 	it('gives valid result for uniform 3x3x3 cube', function(){
 
@@ -4041,7 +4041,7 @@ describe("verb.core.Eval.volumePoint",function(){
 		for (var i = 0; i < 10; i++){
 
 			var u = Math.random(), v = Math.random(), w = Math.random()
-			var result = verb.core.Eval.volumePoint( volume, u, v, w );
+			var result = verb.eval.Eval.volumePoint( volume, u, v, w );
 
 			result[0].should.be.approximately( u, verb.core.Constants.TOLERANCE );
 			result[1].should.be.approximately( v, verb.core.Constants.TOLERANCE );
@@ -4067,15 +4067,15 @@ function sameCurve( crvd0, crvd1 ){
 	var step = (u1 - u0) / (numSamples-1);
 
 	for (var i  = 0; i < numSamples; i++ ){
-		var p0 = verb.core.Eval.rationalCurvePoint( crvd0, u0 + step*i );
-		var p1 = verb.core.Eval.rationalCurvePoint( crvd1, u0 + step*i );
+		var p0 = verb.eval.Eval.rationalCurvePoint( crvd0, u0 + step*i );
+		var p1 = verb.eval.Eval.rationalCurvePoint( crvd1, u0 + step*i );
 
 		var dist = verb.core.Vec.dist( p0, p1 );
 		dist.should.be.lessThan( verb.core.Constants.TOLERANCE );
 	}
 }
 
-describe("verb.core.Modify.curveElevateDegree",function(){
+describe("verb.eval.Modify.curveElevateDegree",function(){
 
 	// line from [5,5,5] to [5,5,-5]
 	var degree_crv = 2
@@ -4086,21 +4086,21 @@ describe("verb.core.Modify.curveElevateDegree",function(){
 	var lineCurveData = new verb.core.NurbsCurveData( 1, [0,0,1,1], [[7,3,-10,1], [5,4,3,1]] );
 
 	it('can elevate degree 2 bezier to degree 3', function(){
-		var curveData = verb.core.Modify.curveElevateDegree( bezierCurveData, 3 );
+		var curveData = verb.eval.Modify.curveElevateDegree( bezierCurveData, 3 );
 
 		curveData.degree.should.be.equal( 3 );
 		sameCurve( bezierCurveData, curveData );
 	});
 
 	it('can elevate degree 2 bezier to degree 4', function(){
-		var curveData = verb.core.Modify.curveElevateDegree( bezierCurveData, 4 );
+		var curveData = verb.eval.Modify.curveElevateDegree( bezierCurveData, 4 );
 
 		curveData.degree.should.be.equal( 4 );
 		sameCurve( bezierCurveData, curveData );
 	});
 
 	it('can elevate degree 1 line to degree 3', function(){
-		var curveData = verb.core.Modify.curveElevateDegree( lineCurveData, 3 );
+		var curveData = verb.eval.Modify.curveElevateDegree( lineCurveData, 3 );
 
 		curveData.degree.should.be.equal( 3 );
 		sameCurve( lineCurveData, curveData );
@@ -4152,7 +4152,7 @@ describe("verb.core.Vec.sortedSetSub",function(){
 
   });
 
-describe("verb.core.Modify.unifyCurveKnotVectors",function(){
+describe("verb.eval.Modify.unifyCurveKnotVectors",function(){
 
 	var c0 = new verb.core.NurbsCurveData( 2, [0,0,0,1,1,1], [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
 	var c1 = new verb.core.NurbsCurveData( 3, [0,0,0,0,1,1,1,1], [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1] ] );
@@ -4161,7 +4161,7 @@ describe("verb.core.Modify.unifyCurveKnotVectors",function(){
 	it('can handle straight beziers', function(){
 
 		var curves = [c0, c1, c2]
-		var res = verb.core.Modify.unifyCurveKnotVectors(curves);
+		var res = verb.eval.Modify.unifyCurveKnotVectors(curves);
 
 		res.forEach(function(x,i){
 			sameCurve(x, curves[i]);
@@ -4171,7 +4171,7 @@ describe("verb.core.Modify.unifyCurveKnotVectors",function(){
 	});
 });
 
-describe("verb.core.Make.loftedSurface",function(){
+describe("verb.eval.Make.loftedSurface",function(){
 
 	var c0 = new verb.core.NurbsCurveData( 2, [0,0,0,1,1,1], [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
 	var c1 = new verb.core.NurbsCurveData( 3, [0,0,0,0,1,1,1,1], [ [0,0,1,1], [1,0,1,1], [2,0,1,1], [3,0,1,1] ] );
@@ -4180,84 +4180,84 @@ describe("verb.core.Make.loftedSurface",function(){
 	it('can handle straight beziers', function(){
 
 		var curves = [c0, c1, c2];
-		var surface = verb.core.Make.loftedSurface( curves );
+		var surface = verb.eval.Make.loftedSurface( curves );
 
-		var p0 = verb.core.Eval.dehomogenize( c0.controlPoints[0] );
-		var closest0 = verb.core.Analyze.rationalSurfaceClosestPoint( surface, p0 ) ;
+		var p0 = verb.eval.Eval.dehomogenize( c0.controlPoints[0] );
+		var closest0 = verb.eval.Analyze.rationalSurfaceClosestPoint( surface, p0 ) ;
 		vecShouldBe( p0, closest0 );
 
-		var p1 = verb.core.Eval.dehomogenize( c0.controlPoints[2] );
-		var closest1 = verb.core.Analyze.rationalSurfaceClosestPoint( surface, p1 ) ;
+		var p1 = verb.eval.Eval.dehomogenize( c0.controlPoints[2] );
+		var closest1 = verb.eval.Analyze.rationalSurfaceClosestPoint( surface, p1 ) ;
 		vecShouldBe( p1, closest1 );
 
-		var p2 = verb.core.Eval.dehomogenize( c1.controlPoints[0] );
-		var closest2 = verb.core.Analyze.rationalSurfaceClosestPoint( surface, p2 ) ;
+		var p2 = verb.eval.Eval.dehomogenize( c1.controlPoints[0] );
+		var closest2 = verb.eval.Analyze.rationalSurfaceClosestPoint( surface, p2 ) ;
 		vecShouldBe( p2, closest2 );
 
-		var p3 = verb.core.Eval.dehomogenize( c1.controlPoints[3] );
-		var closest3 = verb.core.Analyze.rationalSurfaceClosestPoint( surface, p3 ) ;
+		var p3 = verb.eval.Eval.dehomogenize( c1.controlPoints[3] );
+		var closest3 = verb.eval.Analyze.rationalSurfaceClosestPoint( surface, p3 ) ;
 		vecShouldBe( p3, closest3 );
 
-		var p4 = verb.core.Eval.dehomogenize( c2.controlPoints[0] );
-		var closest4 = verb.core.Analyze.rationalSurfaceClosestPoint( surface, p4 ) ;
+		var p4 = verb.eval.Eval.dehomogenize( c2.controlPoints[0] );
+		var closest4 = verb.eval.Analyze.rationalSurfaceClosestPoint( surface, p4 ) ;
 		vecShouldBe( p4, closest4 );
 
-		var p5 = verb.core.Eval.dehomogenize( c2.controlPoints[4] );
-		var closest5 = verb.core.Analyze.rationalSurfaceClosestPoint( surface, p5 ) ;
+		var p5 = verb.eval.Eval.dehomogenize( c2.controlPoints[4] );
+		var closest5 = verb.eval.Analyze.rationalSurfaceClosestPoint( surface, p5 ) ;
 		vecShouldBe( p5, closest5 );
 
 	});
 });
-describe("verb.core.Check.nurbsCurveData",function(){
+describe("verb.eval.Check.nurbsCurveData",function(){
 
 	it('is correct for basic case', function(){
 		var c = new verb.core.NurbsCurveData( 2, [0,0,0,1,1,1], [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
-		verb.core.Check.nurbsCurveData(c);
+		verb.eval.Check.nurbsCurveData(c);
 	});
 
 	it('detects negative degree', function( done ){
 		var c = new verb.core.NurbsCurveData( -1, [0,0,0,1,1,1], [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
-		try { verb.core.Check.nurbsCurveData(c) } catch (e) { done(); }
+		try { verb.eval.Check.nurbsCurveData(c) } catch (e) { done(); }
 	});
 
 	it('detects low degree', function( done ){
 		var c = new verb.core.NurbsCurveData( 1, [0,0,0,1,1,1], [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
-		try { verb.core.Check.nurbsCurveData(c) } catch (e) { done(); }
+		try { verb.eval.Check.nurbsCurveData(c) } catch (e) { done(); }
 	});
 
 	it('detects high degree', function( done ){
 		var c = new verb.core.NurbsCurveData( 3, [0,0,0,1,1,1], [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
-		try { verb.core.Check.nurbsCurveData(c) } catch (e) { done(); }
+		try { verb.eval.Check.nurbsCurveData(c) } catch (e) { done(); }
 	});
 
 	it('detects null degree', function( done ){
 		var c = new verb.core.NurbsCurveData( null, [0,0,0,0.5,1,1,2], [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
-		try { verb.core.Check.nurbsCurveData(c) } catch (e) { done(); }
+		try { verb.eval.Check.nurbsCurveData(c) } catch (e) { done(); }
 	});
 
 	it('detects null knots', function( done ){
 		var c = new verb.core.NurbsCurveData( 2, null, [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
-		try { verb.core.Check.nurbsCurveData(c) } catch (e) { done(); }
+		try { verb.eval.Check.nurbsCurveData(c) } catch (e) { done(); }
 	});
 
 	it('detects null control points', function( done ){
 		var c = new verb.core.NurbsCurveData( 2, [0,0,0,0.5,1,1,2], null );
-		try { verb.core.Check.nurbsCurveData(c) } catch (e) { done(); }
+		try { verb.eval.Check.nurbsCurveData(c) } catch (e) { done(); }
 	});
 
 	it('detects too few control points', function( done ){
 		var c = new verb.core.NurbsCurveData( 2, [0,0,0,0.5,1,1,2], [ [0,0,0,1],  [2,0,0,1] ] );
-		try { verb.core.Check.nurbsCurveData(c) } catch (e) { done(); }
+		try { verb.eval.Check.nurbsCurveData(c) } catch (e) { done(); }
 	});
 
 	it('detects too many control points', function( done ){
 		var c = new verb.core.NurbsCurveData( 2, [0,0,0,0.5,1,1,2], [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [2,0,0,1] ] );
-		try { verb.core.Check.nurbsCurveData(c) } catch (e) { done(); }
+		try { verb.eval.Check.nurbsCurveData(c) } catch (e) { done(); }
 	});
 
 });
 
-describe("verb.core.Check.nurbsSurfaceData",function(){
+describe("verb.eval.Check.nurbsSurfaceData",function(){
 
 
 	var degreeU = 3
@@ -4271,62 +4271,62 @@ describe("verb.core.Check.nurbsSurfaceData",function(){
 
 	it('is correct for basic case', function(){
 		var c = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
-		verb.core.Check.nurbsSurfaceData(c);
+		verb.eval.Check.nurbsSurfaceData(c);
 	});
 
 	it('detects negative degree', function( done ){
 		var c = new verb.core.NurbsSurfaceData( -1, degreeV, knotsU, knotsV, controlPoints );
-		try { verb.core.Check.nurbsSurfaceData(c) } catch (e) { done(); }
+		try { verb.eval.Check.nurbsSurfaceData(c) } catch (e) { done(); }
 	});
 
 	it('detects negative degree', function( done ){
 		var c = new verb.core.NurbsSurfaceData( degreeU, -1, knotsU, knotsV, controlPoints );
-		try { verb.core.Check.nurbsSurfaceData(c) } catch (e) { done(); }
+		try { verb.eval.Check.nurbsSurfaceData(c) } catch (e) { done(); }
 	});
 
 	it('detects low degreeU', function( done ){
 		var c = new verb.core.NurbsSurfaceData( degreeU, 1, knotsU, knotsV, controlPoints );
-		try { verb.core.Check.nurbsSurfaceData(c) } catch (e) { done(); }
+		try { verb.eval.Check.nurbsSurfaceData(c) } catch (e) { done(); }
 	});
 
 	it('detects low degreeV', function( done ){
 		var c = new verb.core.NurbsSurfaceData( 1, degreeV, knotsU, knotsV, controlPoints );
-		try { verb.core.Check.nurbsSurfaceData(c) } catch (e) { done(); }
+		try { verb.eval.Check.nurbsSurfaceData(c) } catch (e) { done(); }
 	});
 
 	it('detects high degreeU', function( done ){
 		var c = new verb.core.NurbsSurfaceData( degreeU, 5, knotsU, knotsV, controlPoints );
-		try { verb.core.Check.nurbsSurfaceData(c) } catch (e) { done(); }
+		try { verb.eval.Check.nurbsSurfaceData(c) } catch (e) { done(); }
 	});
 
 	it('detects high degreeV', function( done ){
 		var c = new verb.core.NurbsSurfaceData( 5, degreeV, knotsU, knotsV, controlPoints );
-		try { verb.core.Check.nurbsSurfaceData(c) } catch (e) { done(); }
+		try { verb.eval.Check.nurbsSurfaceData(c) } catch (e) { done(); }
 	});
 
 	it('detects null degreeU', function( done ){
 		var c = new verb.core.NurbsSurfaceData( degreeU, 1, knotsU, knotsV, controlPoints );
-		try { verb.core.Check.nurbsSurfaceData(c) } catch (e) { done(); }
+		try { verb.eval.Check.nurbsSurfaceData(c) } catch (e) { done(); }
 	});
 
 	it('detects null degreeV', function( done ){
 		var c = new verb.core.NurbsSurfaceData( 1, degreeV, knotsU, knotsV, controlPoints );
-		try { verb.core.Check.nurbsSurfaceData(c) } catch (e) { done(); }
+		try { verb.eval.Check.nurbsSurfaceData(c) } catch (e) { done(); }
 	});
 
 	it('detects null knotsU', function( done ){
 		var c = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, null, controlPoints );
-		try { verb.core.Check.nurbsSurfaceData(c) } catch (e) { done(); }
+		try { verb.eval.Check.nurbsSurfaceData(c) } catch (e) { done(); }
 	});
 
 	it('detects null knotsV', function( done ){
 		var c = new verb.core.NurbsSurfaceData( degreeU, degreeV, null, knotsV, controlPoints );
-		try { verb.core.Check.nurbsSurfaceData(c) } catch (e) { done(); }
+		try { verb.eval.Check.nurbsSurfaceData(c) } catch (e) { done(); }
 	});
 
 	it('detects null control points', function( done ){
 		var c = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, null );
-		try { verb.core.Check.nurbsSurfaceData(c) } catch (e) { done(); }
+		try { verb.eval.Check.nurbsSurfaceData(c) } catch (e) { done(); }
 	});
 
 	it('detects too few control points', function( done ){
@@ -4334,7 +4334,7 @@ describe("verb.core.Check.nurbsSurfaceData",function(){
 								[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] 	],
 								[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] 	] ];
 		var c = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
-		try { verb.core.Check.nurbsSurfaceData(c) } catch (e) { done(); }
+		try { verb.eval.Check.nurbsSurfaceData(c) } catch (e) { done(); }
 	});
 
 	it('detects too many control points', function( done ){
@@ -4345,41 +4345,41 @@ describe("verb.core.Check.nurbsSurfaceData",function(){
 								[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ];
 
 		var c = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
-		try { verb.core.Check.nurbsSurfaceData(c) } catch (e) { done(); }
+		try { verb.eval.Check.nurbsSurfaceData(c) } catch (e) { done(); }
 
 	});
 
 });
 
-describe("verb.core.Check.isValidKnotVector",function(){
+describe("verb.eval.Check.isValidKnotVector",function(){
 
 	it('detects correct knot vector', function(){
-		verb.core.Check.isValidKnotVector( [0,0,0,1,1,1], 2 ).should.be.equal(true);
-		verb.core.Check.isValidKnotVector( [0,0,0,0.5,1,1,1], 2 ).should.be.equal(true);
+		verb.eval.Check.isValidKnotVector( [0,0,0,1,1,1], 2 ).should.be.equal(true);
+		verb.eval.Check.isValidKnotVector( [0,0,0,0.5,1,1,1], 2 ).should.be.equal(true);
 	});
 
 	it('detects incorrect knot vector 0', function(){
-		verb.core.Check.isValidKnotVector( [0,0,1,1,1], 2 ).should.be.equal(false);
+		verb.eval.Check.isValidKnotVector( [0,0,1,1,1], 2 ).should.be.equal(false);
 	});
 
 	it('detects incorrect knot vector 1', function(){
-		verb.core.Check.isValidKnotVector( [0,0,0.5,1,1,1], 2 ).should.be.equal(false);
+		verb.eval.Check.isValidKnotVector( [0,0,0.5,1,1,1], 2 ).should.be.equal(false);
 	});
 
 	it('detects incorrect knot vector 2', function(){
-		verb.core.Check.isValidKnotVector( [0,0,0,1,1,2], 2 ).should.be.equal(false);
+		verb.eval.Check.isValidKnotVector( [0,0,0,1,1,2], 2 ).should.be.equal(false);
 	});
 
 	it('detects incorrect knot vector 3', function(){
-		verb.core.Check.isValidKnotVector( [0,0,0,0.5,1,1,2], 2 ).should.be.equal(false);
+		verb.eval.Check.isValidKnotVector( [0,0,0,0.5,1,1,2], 2 ).should.be.equal(false);
 	});
 
 	it('detects incorrect knot vector 4', function(){
-		verb.core.Check.isValidKnotVector( [0,0,0,0.5,0.25,1,1,1], 2 ).should.be.equal(false);
+		verb.eval.Check.isValidKnotVector( [0,0,0,0.5,0.25,1,1,1], 2 ).should.be.equal(false);
 	});
 });
 
-describe("verb.core.Intersect.meshes",function(){
+describe("verb.eval.Intersect.meshes",function(){
 
 	function glancingPlaneCylindricalSurface(){
 
@@ -4446,41 +4446,41 @@ describe("verb.core.Intersect.meshes",function(){
 
 	it('detects all 4 polylines in nurbs surface plane intersection', function(){
 		var srfs = nurbsSurfacePlane();
-		var res = verb.core.Intersect.meshes( srfs[0].tessellate(), srfs[1].tessellate() );
+		var res = verb.eval.Intersect.meshes( srfs[0].tessellate(), srfs[1].tessellate() );
 
 		res.length.should.be.equal( 4 );
 	});
 
 	it('detects all 8 intersection lines in torus cylinder intersection', function(){
 		var srfs = torusCylindricalSurface();
-		var res = verb.core.Intersect.meshes( srfs[0].tessellate(), srfs[1].tessellate() );
+		var res = verb.eval.Intersect.meshes( srfs[0].tessellate(), srfs[1].tessellate() );
 
 		res.length.should.be.equal( 8 );
 	});
 
 	it('detects glancing intersection between cylinder and plane', function(){
 		var srfs = glancingPlaneCylindricalSurface();
-		var res = verb.core.Intersect.meshes( srfs[0].tessellate(), srfs[1].tessellate() );
+		var res = verb.eval.Intersect.meshes( srfs[0].tessellate(), srfs[1].tessellate() );
 
 		res.length.should.be.equal( 1 );
 	});
 
 });
 
-describe("verb.core.Modify.knotsReverse",function(){
+describe("verb.eval.Modify.knotsReverse",function(){
  	it('can reverse basic knot array', function(){
-		verb.core.Modify.knotsReverse( [0,1,3,5] ).should.be.eql( [0,2,4,5] );
+		verb.eval.Modify.knotsReverse( [0,1,3,5] ).should.be.eql( [0,2,4,5] );
  	});
  });
 
-describe("verb.core.Modify.curveReverse",function(){
+describe("verb.eval.Modify.curveReverse",function(){
 	it('can reverse curve with uneven parameterization', function(){
 		var c = new verb.core.NurbsCurveData( 2, [0,0,0,0.24,1,1,1], [ [0,0,0,1], [1,0,0,1], [0.5,1,0,1], [2,0,0,1] ] );
-		var cr = verb.core.Modify.curveReverse( c );
-		var crr = verb.core.Modify.curveReverse( cr );
+		var cr = verb.eval.Modify.curveReverse( c );
+		var crr = verb.eval.Modify.curveReverse( cr );
 
-		var cp0 = verb.core.Eval.rationalCurvePoint( c, 0 );
-		var cp1 = verb.core.Eval.rationalCurvePoint( cr, 1.0 );
+		var cp0 = verb.eval.Eval.rationalCurvePoint( c, 0 );
+		var cp1 = verb.eval.Eval.rationalCurvePoint( cr, 1.0 );
 
 		vecShouldBe( cp0, cp1, verb.core.Constants.EPSILON );
 
@@ -4488,7 +4488,7 @@ describe("verb.core.Modify.curveReverse",function(){
 	});
 });
 
-describe("verb.core.Modify.surfaceReverse",function(){
+describe("verb.eval.Modify.surfaceReverse",function(){
 
 	var degreeU = 3
 		, degreeV = 3
@@ -4503,20 +4503,20 @@ describe("verb.core.Modify.surfaceReverse",function(){
 
 	it('is correct for u direction', function(){
 
-		var sr = verb.core.Modify.surfaceReverse( s, true );
+		var sr = verb.eval.Modify.surfaceReverse( s, true );
 
-		var sp0 = verb.core.Eval.surfacePoint( s, 0, 0 );
-		var sp1 = verb.core.Eval.surfacePoint( sr, 0, 1.0 );
+		var sp0 = verb.eval.Eval.surfacePoint( s, 0, 0 );
+		var sp1 = verb.eval.Eval.surfacePoint( sr, 0, 1.0 );
 		vecShouldBe( sp0, sp1, verb.core.Constants.EPSILON );
 
-		var srr = verb.core.Modify.surfaceReverse( sr, true );
+		var srr = verb.eval.Modify.surfaceReverse( sr, true );
 
-		var sp0 = verb.core.Eval.surfacePoint( s, 0, 0 );
-		var sp1 = verb.core.Eval.surfacePoint( srr, 0, 0 );
+		var sp0 = verb.eval.Eval.surfacePoint( s, 0, 0 );
+		var sp1 = verb.eval.Eval.surfacePoint( srr, 0, 0 );
 		vecShouldBe( sp0, sp1, verb.core.Constants.EPSILON );
 
-		var sp0 = verb.core.Eval.surfacePoint( s, 1.0, 0 );
-		var sp1 = verb.core.Eval.surfacePoint( srr, 1.0, 0 );
+		var sp0 = verb.eval.Eval.surfacePoint( s, 1.0, 0 );
+		var sp1 = verb.eval.Eval.surfacePoint( srr, 1.0, 0 );
 		vecShouldBe( sp0, sp1, verb.core.Constants.EPSILON );
 
 
@@ -4524,34 +4524,34 @@ describe("verb.core.Modify.surfaceReverse",function(){
 
 	it('is correct for v direction', function(){
 
-		var sr = verb.core.Modify.surfaceReverse( s, false );
+		var sr = verb.eval.Modify.surfaceReverse( s, false );
 
-		var sp0 = verb.core.Eval.surfacePoint( s, 0, 0 );
-		var sp1 = verb.core.Eval.surfacePoint( sr, 1.0, 0 );
+		var sp0 = verb.eval.Eval.surfacePoint( s, 0, 0 );
+		var sp1 = verb.eval.Eval.surfacePoint( sr, 1.0, 0 );
 		vecShouldBe( sp0, sp1, verb.core.Constants.EPSILON );
 
-		var srr = verb.core.Modify.surfaceReverse( sr, false );
+		var srr = verb.eval.Modify.surfaceReverse( sr, false );
 
-		sp0 = verb.core.Eval.surfacePoint( s, 0, 0 );
-		sp1 = verb.core.Eval.surfacePoint( srr, 0, 0 );
+		sp0 = verb.eval.Eval.surfacePoint( s, 0, 0 );
+		sp1 = verb.eval.Eval.surfacePoint( srr, 0, 0 );
 		vecShouldBe( sp0, sp1, verb.core.Constants.EPSILON );
 
-		sp0 = verb.core.Eval.surfacePoint( s, 1.0, 0 );
-		sp1 = verb.core.Eval.surfacePoint( srr, 1.0, 0 );
+		sp0 = verb.eval.Eval.surfacePoint( s, 1.0, 0 );
+		sp1 = verb.eval.Eval.surfacePoint( srr, 1.0, 0 );
 		vecShouldBe( sp0, sp1, verb.core.Constants.EPSILON );
 
 
 	});
 });
 
-describe("verb.core.Intersect.sliceMeshes",function(){
+describe("verb.eval.Intersect.sliceMeshes",function(){
 
 	it('is correct for basic example', function(){
 
 		var srf = verb.geom.NurbsSurface.byCorners( [0,1,0], [10,0,0], [10,10,10], [0,10,10] );
 		var mesh = srf.tessellate();
 
-		var res = verb.core.Intersect.meshSlices( mesh, 0, 10, 0.5 );
+		var res = verb.eval.Intersect.meshSlices( mesh, 0, 10, 0.5 );
 
         // need better example
 
@@ -4559,39 +4559,39 @@ describe("verb.core.Intersect.sliceMeshes",function(){
 });
 
 
-describe("verb.core.Make.rationalTranslationalSurface",function(){
+describe("verb.eval.Make.rationalTranslationalSurface",function(){
 
 	it('provides expected result for linear rail and profile', function(){
 
-		var rail = verb.core.Make.rationalBezierCurve( [[0,0,0], [1,1,1]] );
-        var prof = verb.core.Make.rationalBezierCurve( [[0,0,0], [1,0,0]] );
+		var rail = verb.eval.Make.rationalBezierCurve( [[0,0,0], [1,1,1]] );
+        var prof = verb.eval.Make.rationalBezierCurve( [[0,0,0], [1,0,0]] );
 
-        var srf = verb.core.Make.rationalTranslationalSurface( prof, rail );
+        var srf = verb.eval.Make.rationalTranslationalSurface( prof, rail );
 
-        vecShouldBe( verb.core.Eval.rationalSurfacePoint( srf, 0, 0 ), [0,0,0] );
-        vecShouldBe( verb.core.Eval.rationalSurfacePoint( srf, 1, 0 ), [1,0,0] );
-        vecShouldBe( verb.core.Eval.rationalSurfacePoint( srf, 1, 1 ), [2,1,1] );
-        vecShouldBe( verb.core.Eval.rationalSurfacePoint( srf, 0, 1 ), [1,1,1] );
+        vecShouldBe( verb.eval.Eval.rationalSurfacePoint( srf, 0, 0 ), [0,0,0] );
+        vecShouldBe( verb.eval.Eval.rationalSurfacePoint( srf, 1, 0 ), [1,0,0] );
+        vecShouldBe( verb.eval.Eval.rationalSurfacePoint( srf, 1, 1 ), [2,1,1] );
+        vecShouldBe( verb.eval.Eval.rationalSurfacePoint( srf, 0, 1 ), [1,1,1] );
 
 	});
 
     it('provides expected result for linear profile, curved rail', function(){
 
-        var rail = verb.core.Make.rationalBezierCurve( [[0,0,0], [1,0.5,1], [2,1,1]] );
-        var prof = verb.core.Make.rationalBezierCurve( [[0,0,0], [2,0,0]] );
+        var rail = verb.eval.Make.rationalBezierCurve( [[0,0,0], [1,0.5,1], [2,1,1]] );
+        var prof = verb.eval.Make.rationalBezierCurve( [[0,0,0], [2,0,0]] );
 
-        var srf = verb.core.Make.rationalTranslationalSurface( prof, rail );
+        var srf = verb.eval.Make.rationalTranslationalSurface( prof, rail );
 
-        vecShouldBe( verb.core.Eval.rationalSurfacePoint( srf, 0, 0 ), [0,0,0] );
-        vecShouldBe( verb.core.Eval.rationalSurfacePoint( srf, 1, 0 ), [2,0,0] );
-        vecShouldBe( verb.core.Eval.rationalSurfacePoint( srf, 1, 1 ), [4,1,1] );
-        vecShouldBe( verb.core.Eval.rationalSurfacePoint( srf, 0, 1 ), [2,1,1] );
+        vecShouldBe( verb.eval.Eval.rationalSurfacePoint( srf, 0, 0 ), [0,0,0] );
+        vecShouldBe( verb.eval.Eval.rationalSurfacePoint( srf, 1, 0 ), [2,0,0] );
+        vecShouldBe( verb.eval.Eval.rationalSurfacePoint( srf, 1, 1 ), [4,1,1] );
+        vecShouldBe( verb.eval.Eval.rationalSurfacePoint( srf, 0, 1 ), [2,1,1] );
 
     });
 
 });
 
-describe("verb.core.ExpIntersect.sampleSurfaceInteriorRegular",function(){
+describe("verb.eval.ExpIntersect.sampleSurfaceInteriorRegular",function(){
 
     it('provides expected result for planar surface', function(){
 
@@ -4600,9 +4600,9 @@ describe("verb.core.ExpIntersect.sampleSurfaceInteriorRegular",function(){
         var c = [1,1,0];
         var d = [0,1,0];
 
-        var srf = verb.core.Make.fourPointSurface( a, b, c, d );
+        var srf = verb.eval.Make.fourPointSurface( a, b, c, d );
 
-        var samples = verb.core.ExpIntersect.sampleSurfaceRegular( srf, 10, 10 );
+        var samples = verb.eval.ExpIntersect.sampleSurfaceRegular( srf, 10, 10 );
 
 //        samples.uvs[0][0].should.be.eql([0,0]);
 //        samples.uvs[0][10].should.be.eql([0,1]);
@@ -4614,7 +4614,7 @@ describe("verb.core.ExpIntersect.sampleSurfaceInteriorRegular",function(){
 
 });
 
-describe("verb.core.ExpIntersect.approxRotationNumber",function(){
+describe("verb.eval.ExpIntersect.approxRotationNumber",function(){
 
     it('should be non-zero for case 0', function(){
         var a = [1,0];
@@ -4622,7 +4622,7 @@ describe("verb.core.ExpIntersect.approxRotationNumber",function(){
         var c = [-1,0];
         var d = [0,-1];
 
-        verb.core.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.not.equal( 0 );
+        verb.eval.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.not.equal( 0 );
     });
 
     it('should be non-zero for case 1', function(){
@@ -4631,7 +4631,7 @@ describe("verb.core.ExpIntersect.approxRotationNumber",function(){
         var c = verb.core.Vec.normalized([-1,1]);
         var d = verb.core.Vec.normalized([-1,0.5]);
 
-        verb.core.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.equal( 0 );
+        verb.eval.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.equal( 0 );
     });
 
     it('should be non-zero for case 2', function(){
@@ -4640,7 +4640,7 @@ describe("verb.core.ExpIntersect.approxRotationNumber",function(){
         var c = verb.core.Vec.normalized([-1,1]);
         var d = [-1,0];
 
-        verb.core.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.not.equal( 0 );
+        verb.eval.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.not.equal( 0 );
     });
 
     it('should be zero for case 3', function(){
@@ -4649,7 +4649,7 @@ describe("verb.core.ExpIntersect.approxRotationNumber",function(){
         var c = verb.core.Vec.normalized([-1,1]);
         var d = [-1,0];
 
-        verb.core.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.equal(0);
+        verb.eval.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.equal(0);
     });
 
     it('should be non-zero for case 4', function(){
@@ -4658,7 +4658,7 @@ describe("verb.core.ExpIntersect.approxRotationNumber",function(){
         var c = verb.core.Vec.normalized([-1,1]);
         var d = [-1,0];
 
-        verb.core.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.not.equal(0);
+        verb.eval.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.not.equal(0);
     });
 
     it('should be non-zero for case 5', function(){
@@ -4667,12 +4667,12 @@ describe("verb.core.ExpIntersect.approxRotationNumber",function(){
         var c = verb.core.Vec.normalized([-1,0]);
         var d = verb.core.Vec.normalized([1,-1]);
 
-        verb.core.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.not.equal(0);
+        verb.eval.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.not.equal(0);
     });
 
     it('should be zero for case 6', function(){
         var a = verb.core.Vec.normalized([1,-0.5]);
-        verb.core.ExpIntersect.approxRotationNumber( [ a, a, a, a ] ).should.equal(0);
+        verb.eval.ExpIntersect.approxRotationNumber( [ a, a, a, a ] ).should.equal(0);
     });
 
     it('should be zero for case 7', function(){
@@ -4681,7 +4681,7 @@ describe("verb.core.ExpIntersect.approxRotationNumber",function(){
         var c = verb.core.Vec.normalized([-1,1]);
         var d = verb.core.Vec.normalized([1,0.5]);
 
-        verb.core.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.equal(0);
+        verb.eval.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.equal(0);
     });
 
     it('should be non-zero for case 8', function(){
@@ -4690,7 +4690,7 @@ describe("verb.core.ExpIntersect.approxRotationNumber",function(){
         var c = verb.core.Vec.normalized([-1,-0.1]);
         var d = verb.core.Vec.normalized([1,0.4]);
 
-        verb.core.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.not.equal(0);
+        verb.eval.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.not.equal(0);
     });
 
     it('should be non-zero for case 9', function(){
@@ -4699,7 +4699,7 @@ describe("verb.core.ExpIntersect.approxRotationNumber",function(){
         var c = verb.core.Vec.normalized([-1,-1]);
         var d = verb.core.Vec.normalized([0,-1]);
 
-        verb.core.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.not.equal(0);
+        verb.eval.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.not.equal(0);
     });
 
     it('should be non-zero for case 10', function(){
@@ -4708,7 +4708,7 @@ describe("verb.core.ExpIntersect.approxRotationNumber",function(){
         var c = verb.core.Vec.normalized([1,-1]);
         var d = verb.core.Vec.normalized([0,-1]);
 
-        verb.core.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.not.equal(0);
+        verb.eval.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.not.equal(0);
     });
 
     it('should be non-zero for case 11', function(){
@@ -4717,7 +4717,7 @@ describe("verb.core.ExpIntersect.approxRotationNumber",function(){
         var c = verb.core.Vec.normalized([0,-1]);
         var d = verb.core.Vec.normalized([1,-1]);
 
-        verb.core.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.not.equal(0);
+        verb.eval.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.not.equal(0);
     });
 
     it('should be non-zero for case 12', function(){
@@ -4726,7 +4726,7 @@ describe("verb.core.ExpIntersect.approxRotationNumber",function(){
         var c = verb.core.Vec.normalized([-1,1]);
         var d = verb.core.Vec.normalized([1,-1]);
 
-        verb.core.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.not.equal(0);
+        verb.eval.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.not.equal(0);
     });
 
     it('should be zero for case 13', function(){
@@ -4735,7 +4735,7 @@ describe("verb.core.ExpIntersect.approxRotationNumber",function(){
         var c = verb.core.Vec.normalized([-1,1]);
         var d = verb.core.Vec.normalized([-1,1]);
 
-        verb.core.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.equal(0);
+        verb.eval.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.equal(0);
     });
 
     it('should be zero for case 14', function(){
@@ -4744,11 +4744,11 @@ describe("verb.core.ExpIntersect.approxRotationNumber",function(){
         var c = verb.core.Vec.normalized([1,-1]);
         var d = verb.core.Vec.normalized([-1,-1]);
 
-        verb.core.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.equal(0);
+        verb.eval.ExpIntersect.approxRotationNumber( [ a, b, c, d ] ).should.equal(0);
     });
 });
 
-describe("verb.core.ExpIntersect.approxSurfaceDelPhiField",function(){
+describe("verb.eval.ExpIntersect.approxSurfaceDelPhiField",function(){
 
    it('provides expected result for two planar surfaces', function(){
 
@@ -4757,16 +4757,16 @@ describe("verb.core.ExpIntersect.approxSurfaceDelPhiField",function(){
        var c = [1,1,0];
        var d = [0,1,0];
 
-       var srf = verb.core.Make.fourPointSurface( a, b, c, d );
+       var srf = verb.eval.Make.fourPointSurface( a, b, c, d );
 
        var a1 = [0,0,1];
        var b1 = [1,0,1];
        var c1 = [1,1,2];
        var d1 = [0,1,2];
 
-       var srf1 = verb.core.Make.fourPointSurface( a1, b1, c1, d1 );
+       var srf1 = verb.eval.Make.fourPointSurface( a1, b1, c1, d1 );
 
-       var samples = verb.core.ExpIntersect.approxSurfaceDelPhiField( srf, srf1, 10, 10 );
+       var samples = verb.eval.ExpIntersect.approxSurfaceDelPhiField( srf, srf1, 10, 10 );
 
 //       console.log(samples.delphi)
 
@@ -4774,7 +4774,7 @@ describe("verb.core.ExpIntersect.approxSurfaceDelPhiField",function(){
 
 });
 
-describe("verb.core.ExpIntersect.surfaces",function(){
+describe("verb.eval.ExpIntersect.surfaces",function(){
 
     it('provides expected result for two planar surfaces', function(){
 
@@ -4783,16 +4783,16 @@ describe("verb.core.ExpIntersect.surfaces",function(){
         var c = [1,1,0];
         var d = [0,1,0];
 
-        var srf = verb.core.Make.fourPointSurface( a, b, c, d );
+        var srf = verb.eval.Make.fourPointSurface( a, b, c, d );
 
         var a1 = [0,0,-1];
         var b1 = [1,0,-1];
         var c1 = [1,1,1];
         var d1 = [0,1,1];
 
-        var srf1 = verb.core.Make.fourPointSurface( a1, b1, c1, d1 );
+        var srf1 = verb.eval.Make.fourPointSurface( a1, b1, c1, d1 );
 
-        var ints = verb.core.ExpIntersect.surfaces( srf, srf1, 1e-3 );
+        var ints = verb.eval.ExpIntersect.surfaces( srf, srf1, 1e-3 );
 
     });
 
@@ -4815,7 +4815,7 @@ describe("verb.core.ExpIntersect.surfaces",function(){
 //
 //		var srf2 = verb.geom.NurbsSurface.byCorners( p5, p6, p7, p8 );
 //
-//        var ints = verb.core.ExpIntersect.surfaces( srf1.asNurbs(), srf2.asNurbs(), 1e-4 );
+//        var ints = verb.eval.ExpIntersect.surfaces( srf1.asNurbs(), srf2.asNurbs(), 1e-4 );
 //
 //        console.log(ints);
 //
@@ -4824,7 +4824,7 @@ describe("verb.core.ExpIntersect.surfaces",function(){
 });
 
 
-describe("verb.core.ExpIntersect.clampStep",function(){
+describe("verb.eval.ExpIntersect.clampStep",function(){
 
     it('provides expected result for two planar surfaces', function(){
 
@@ -4832,41 +4832,41 @@ describe("verb.core.ExpIntersect.clampStep",function(){
 
         var uv = [0.5,0.5];
         var d = [1,0];
-        verb.core.ExpIntersect.clampStep(s, uv, d).should.eql([0.5,0]);
+        verb.eval.ExpIntersect.clampStep(s, uv, d).should.eql([0.5,0]);
 
         d = [-1,0];
-        verb.core.ExpIntersect.clampStep(s, uv, d).should.eql([-0.5,0]);
+        verb.eval.ExpIntersect.clampStep(s, uv, d).should.eql([-0.5,0]);
 
         d = [0,1];
-        verb.core.ExpIntersect.clampStep(s, uv, d).should.eql([0,0.5]);
+        verb.eval.ExpIntersect.clampStep(s, uv, d).should.eql([0,0.5]);
 
         d = [0,-1];
-        verb.core.ExpIntersect.clampStep(s, uv, d).should.eql([0,-0.5]);
+        verb.eval.ExpIntersect.clampStep(s, uv, d).should.eql([0,-0.5]);
 
         d = [1,2];
-        verb.core.ExpIntersect.clampStep(s, uv, d).should.eql([0.25,0.5]);
+        verb.eval.ExpIntersect.clampStep(s, uv, d).should.eql([0.25,0.5]);
 
         d = [-1,2];
-        verb.core.ExpIntersect.clampStep(s, uv, d).should.eql([-0.25,0.5]);
+        verb.eval.ExpIntersect.clampStep(s, uv, d).should.eql([-0.25,0.5]);
 
         d = [2,1];
-        verb.core.ExpIntersect.clampStep(s, uv, d).should.eql([0.5,0.25]);
+        verb.eval.ExpIntersect.clampStep(s, uv, d).should.eql([0.5,0.25]);
 
         d = [-2,1];
-        verb.core.ExpIntersect.clampStep(s, uv, d).should.eql([-0.5,0.25]);
+        verb.eval.ExpIntersect.clampStep(s, uv, d).should.eql([-0.5,0.25]);
 
         d = [-2,-1];
-        verb.core.ExpIntersect.clampStep(s, uv, d).should.eql([-0.5,-0.25]);
+        verb.eval.ExpIntersect.clampStep(s, uv, d).should.eql([-0.5,-0.25]);
 
         d = [2,-1];
-        verb.core.ExpIntersect.clampStep(s, uv, d).should.eql([0.5,-0.25]);
+        verb.eval.ExpIntersect.clampStep(s, uv, d).should.eql([0.5,-0.25]);
 
     });
 
 });
 
 
-describe("verb.core.Make.surfaceIsocurve",function(){
+describe("verb.eval.Make.surfaceIsocurve",function(){
 
 	var degreeU = 3
 		, degreeV = 3
@@ -4881,12 +4881,12 @@ describe("verb.core.Make.surfaceIsocurve",function(){
 
     it('provides boundary isocurves at extremes of domain', function(){
 
-        var res = verb.core.Make.surfaceIsocurve( bezier, 0, false );
+        var res = verb.eval.Make.surfaceIsocurve( bezier, 0, false );
 
         var cpts = res.controlPoints;
 
-        var pt0 = verb.core.Eval.surfacePoint( bezier, 0, 0.0 );
-        var pt1 = verb.core.Eval.surfacePoint( bezier, 0, 1.0 );
+        var pt0 = verb.eval.Eval.surfacePoint( bezier, 0, 0.0 );
+        var pt1 = verb.eval.Eval.surfacePoint( bezier, 0, 1.0 );
 
         vecShouldBe( pt0, cpts[0] );
         vecShouldBe( pt1, cpts[cpts.length-1] );
@@ -4897,12 +4897,12 @@ describe("verb.core.Make.surfaceIsocurve",function(){
 
 		for (var i = 0; i <= 1.0; i += 0.1 ){
 
-			var res = verb.core.Make.surfaceIsocurve( bezier, i, true );
+			var res = verb.eval.Make.surfaceIsocurve( bezier, i, true );
 
 			var cpts = res.controlPoints;
 
-			var pt0 = verb.core.Eval.surfacePoint( bezier, 0.0, i );
-			var pt1 = verb.core.Eval.surfacePoint( bezier, 1.0, i );
+			var pt0 = verb.eval.Eval.surfacePoint( bezier, 0.0, i );
+			var pt1 = verb.eval.Eval.surfacePoint( bezier, 1.0, i );
 
 			vecShouldBe( pt0, cpts[0] );
 			vecShouldBe( pt1, cpts[cpts.length-1] );
@@ -4912,7 +4912,7 @@ describe("verb.core.Make.surfaceIsocurve",function(){
 	});
 
 });
-describe("verb.core.Make.surfaceBoundaryCurves",function(){
+describe("verb.eval.Make.surfaceBoundaryCurves",function(){
 
     it('provides expected result for planar surface', function(){
 
@@ -4921,37 +4921,37 @@ describe("verb.core.Make.surfaceBoundaryCurves",function(){
         var c = [1,1,0];
         var d = [0,1,0];
 
-        var srf = verb.core.Make.fourPointSurface( a, b, c, d );
+        var srf = verb.eval.Make.fourPointSurface( a, b, c, d );
 
-        var crvs = verb.core.Make.surfaceBoundaryCurves( srf );
+        var crvs = verb.eval.Make.surfaceBoundaryCurves( srf );
 
         crvs[0].degree.should.be.equal( srf.degreeV );
         crvs[1].degree.should.be.equal( srf.degreeV );
         crvs[2].degree.should.be.equal( srf.degreeU );
         crvs[3].degree.should.be.equal( srf.degreeU );
 
-        vecShouldBe( verb.core.Eval.dehomogenize( crvs[0].controlPoints[0] ), a );
-        vecShouldBe( verb.core.Eval.dehomogenize( crvs[0].controlPoints[3] ), d );
+        vecShouldBe( verb.eval.Eval.dehomogenize( crvs[0].controlPoints[0] ), a );
+        vecShouldBe( verb.eval.Eval.dehomogenize( crvs[0].controlPoints[3] ), d );
 
-        vecShouldBe( verb.core.Eval.dehomogenize( crvs[1].controlPoints[0] ), b );
-        vecShouldBe( verb.core.Eval.dehomogenize( crvs[1].controlPoints[3] ), c );
+        vecShouldBe( verb.eval.Eval.dehomogenize( crvs[1].controlPoints[0] ), b );
+        vecShouldBe( verb.eval.Eval.dehomogenize( crvs[1].controlPoints[3] ), c );
 
-        vecShouldBe( verb.core.Eval.dehomogenize( crvs[2].controlPoints[0] ), a );
-        vecShouldBe( verb.core.Eval.dehomogenize( crvs[2].controlPoints[3] ), b );
+        vecShouldBe( verb.eval.Eval.dehomogenize( crvs[2].controlPoints[0] ), a );
+        vecShouldBe( verb.eval.Eval.dehomogenize( crvs[2].controlPoints[3] ), b );
 
-        vecShouldBe( verb.core.Eval.dehomogenize( crvs[3].controlPoints[0] ), d );
-        vecShouldBe( verb.core.Eval.dehomogenize( crvs[3].controlPoints[3] ), c );
+        vecShouldBe( verb.eval.Eval.dehomogenize( crvs[3].controlPoints[0] ), d );
+        vecShouldBe( verb.eval.Eval.dehomogenize( crvs[3].controlPoints[3] ), c );
 
     });
 
 });
-describe("verb.core.Intersect.segmentAndPlane",function(){
+describe("verb.eval.Intersect.segmentAndPlane",function(){
 	it('works for simple cases', function(){
-		verb.core.Intersect.segmentAndPlane( [0,0,0], [0,0,1], [0,0,0.5], [0,0,1] ).p.should.be.approximately( 0.5, verb.core.Constants.EPSILON );
-		verb.core.Intersect.segmentAndPlane( [0,0,0], [0,0,1], [0,0,0.1], [0,0,1] ).p.should.be.approximately( 0.1, verb.core.Constants.EPSILON );
-		verb.core.Intersect.segmentAndPlane( [0,0,0], [0,0,1], [0,0,0.9], [0,0,1] ).p.should.be.approximately( 0.9, verb.core.Constants.EPSILON );
-		verb.core.Intersect.segmentAndPlane( [0,0,0], [0,1,0], [0,0.5,0], [0,1,0] ).p.should.be.approximately( 0.5, verb.core.Constants.EPSILON );
-		verb.core.Intersect.segmentAndPlane( [0,0,0], [0,1,0], [0,0.1,0], [0,1,0] ).p.should.be.approximately( 0.1, verb.core.Constants.EPSILON );
+		verb.eval.Intersect.segmentAndPlane( [0,0,0], [0,0,1], [0,0,0.5], [0,0,1] ).p.should.be.approximately( 0.5, verb.core.Constants.EPSILON );
+		verb.eval.Intersect.segmentAndPlane( [0,0,0], [0,0,1], [0,0,0.1], [0,0,1] ).p.should.be.approximately( 0.1, verb.core.Constants.EPSILON );
+		verb.eval.Intersect.segmentAndPlane( [0,0,0], [0,0,1], [0,0,0.9], [0,0,1] ).p.should.be.approximately( 0.9, verb.core.Constants.EPSILON );
+		verb.eval.Intersect.segmentAndPlane( [0,0,0], [0,1,0], [0,0.5,0], [0,1,0] ).p.should.be.approximately( 0.5, verb.core.Constants.EPSILON );
+		verb.eval.Intersect.segmentAndPlane( [0,0,0], [0,1,0], [0,0.1,0], [0,1,0] ).p.should.be.approximately( 0.1, verb.core.Constants.EPSILON );
 	});
 });
 describe("verb.core.Vec.signedAngleBetween",function(){
