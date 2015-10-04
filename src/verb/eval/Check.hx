@@ -3,6 +3,9 @@ package verb.eval;
 import verb.core.NurbsSurfaceData;
 import verb.core.NurbsCurveData;
 
+import verb.core.Constants;
+
+import verb.core.ArrayExtensions;
 using verb.core.ArrayExtensions;
 
 @:expose("eval.Check")

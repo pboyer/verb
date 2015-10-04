@@ -1,7 +1,7 @@
 package verb.geom;
 import verb.core.Mat.Vector;
 import verb.core.NurbsCurveData.Point;
-import verb.core.Make;
+import verb.eval.Make;
 
 // A surface formed by revolving a profile curve around a given axis line
 

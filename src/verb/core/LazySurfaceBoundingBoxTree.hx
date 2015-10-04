@@ -2,9 +2,10 @@ package verb.core;
 
 using verb.core.ArrayExtensions;
 using verb.core.Vec;
-using verb.eval.Modify;
 
-@:expose("core.LazySurfaceBoundingBoxTree")
+import verb.eval.Eval;
+import verb.eval.Modify;
+
 class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
 
     var _surface : NurbsSurfaceData;

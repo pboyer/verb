@@ -1,5 +1,5 @@
 package verb.geom;
-import verb.core.Make;
+import verb.eval.Make;
 import verb.core.Vec;
 import verb.core.Mat.Vector;
 

@@ -2,7 +2,7 @@ package verb.geom;
 
 import verb.core.Check;
 import verb.core.Vec;
-import verb.core.Make;
+import verb.eval.Make;
 import promhx.Promise;
 import verb.exe.AsyncObject;
 
@@ -17,7 +17,7 @@ import verb.core.Modify;
 import verb.core.Tess;
 import verb.core.Divide;
 import verb.core.Analyze;
-import verb.core.Eval;
+import verb.eval.Eval;
 import verb.core.Interval;
 import verb.core.NurbsCurveData;
 

@@ -5,8 +5,16 @@ import verb.core.NurbsSurfaceData;
 import verb.core.MeshData.UV;
 import verb.core.NurbsCurveData;
 
+import verb.core.ArrayExtensions;
 using verb.core.ArrayExtensions;
+
+import verb.core.Mat;
 using verb.core.Mat;
+
+import verb.core.Vec;
+import verb.core.Constants;
+
+import verb.core.Trig;
 
 using Lambda;
 

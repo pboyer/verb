@@ -2,6 +2,9 @@ package verb.eval;
 
 import verb.core.NurbsCurveData;
 import verb.core.CurveLengthSample;
+import verb.core.Vec;
+import verb.core.Constants;
+
 using Lambda;
 
 @:expose("eval.Divide")

@@ -2,6 +2,9 @@ package verb.core;
 
 using verb.core.ArrayExtensions;
 
+import verb.eval.Eval;
+
+@:expose("core.AdaptiveRefinementOptions")
 class AdaptiveRefinementOptions {
     public var normTol : Float = 2.5e-2;
     public var minDepth : Int = 0;

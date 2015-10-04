@@ -1,6 +1,6 @@
 package verb.geom;
 
-import verb.core.Make;
+import verb.eval.Make;
 import verb.core.NurbsCurveData;
 import verb.core.Mat;
 

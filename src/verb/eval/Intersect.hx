@@ -19,12 +19,15 @@ import verb.core.SurfaceSurfaceIntersectionPoint;
 import verb.core.NurbsSurfaceData;
 import verb.core.KdTree.KdPoint;
 import verb.core.AdaptiveRefinementNode.AdaptiveRefinementOptions;
-import verb.core.BoundingBoxNode;
 import verb.core.Pair;
-import verb.core.Mat.Vector;
+import verb.core.Vec.Vector;
 import verb.core.MeshData;
+import verb.core.Numeric;
+import verb.core.Mesh;
 import verb.core.NurbsCurveData;
+import verb.core.Constants;
 
+import verb.core.ArrayExtensions;
 using verb.core.ArrayExtensions;
 
 @:expose("eval.Intersect")

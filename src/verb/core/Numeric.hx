@@ -1,6 +1,8 @@
 package verb.core;
 import verb.core.Mat;
 
+import verb.core.Vec;
+
 class MinimizationResult {
 
     public var solution : Vector;

@@ -2,6 +2,8 @@ package verb.core;
 
 using verb.core.ArrayExtensions;
 using verb.core.Vec;
+import verb.eval.Modify;
+import verb.eval.Eval;
 
 class SurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
 

@@ -3,6 +3,7 @@ package verb.core;
 using verb.core.ArrayExtensions;
 using verb.core.Vec;
 
+
 class LazyCurveBoundingBoxTree implements IBoundingBoxTree<NurbsCurveData> {
 
     var _curve : NurbsCurveData;

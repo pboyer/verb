@@ -7,6 +7,8 @@ using verb.core.ArrayExtensions;
 
 using Lambda;
 
+typedef Vector = Array<Float>
+
 @:expose("core.Vec")
 class Vec {
 

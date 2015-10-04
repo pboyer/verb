@@ -1,18 +1,8 @@
 package verb.core;
 
+import verb.core.Vec;
+
 typedef Matrix = Array<Array<Float>>
-typedef Vector = Array<Float>
-
-class LUDecomp {
-
-    public var LU : Matrix;
-    public var P : Array<Int>;
-    public function new( lu : Matrix, p : Array<Int> ){
-        this.LU = lu;
-        this.P = p;
-    }
-
-}
 
 @:expose("core.Mat")
 class Mat {
@@ -195,6 +185,17 @@ class Mat {
         }
 
         return new LUDecomp(A, P);
+    }
+
+}
+
+class LUDecomp {
+
+    public var LU : Matrix;
+    public var P : Array<Int>;
+    public function new( lu : Matrix, p : Array<Int> ){
+        this.LU = lu;
+        this.P = p;
     }
 
 }

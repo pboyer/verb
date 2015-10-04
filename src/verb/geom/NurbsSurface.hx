@@ -2,7 +2,7 @@ package verb.geom;
 
 import verb.core.Check;
 import verb.core.Vec;
-import verb.core.Make;
+import verb.eval.Make;
 import promhx.Promise;
 import verb.core.MeshData;
 import verb.core.AdaptiveRefinementNode.AdaptiveRefinementOptions;
@@ -14,7 +14,7 @@ using verb.core.ArrayExtensions;
 
 import verb.core.Interval;
 import verb.core.NurbsCurveData;
-import verb.core.Eval;
+import verb.eval.Eval;
 import verb.core.NurbsSurfaceData;
 import verb.exe.AsyncObject;
 import verb.core.Mat;
