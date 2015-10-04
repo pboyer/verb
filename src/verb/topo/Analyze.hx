@@ -1,8 +1,8 @@
 package verb.topo;
 
-import verb.core.types.IDoublyLinkedList;
-import verb.core.types.DoublyLinkedListExtensions;
-using verb.core.types.DoublyLinkedListExtensions;
+import verb.core.IDoublyLinkedList;
+import verb.core.DoublyLinkedListExtensions;
+using verb.core.DoublyLinkedListExtensions;
 
 import verb.core.Vec;
 using verb.core.Vec;

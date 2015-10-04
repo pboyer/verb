@@ -2,14 +2,14 @@ package verb.eval;
 
 using verb.core.ArrayExtensions;
 
-import verb.core.types.SurfacePoint;
-import verb.core.types.MeshData;
-import verb.core.types.AdaptiveRefinementNode;
-import verb.core.types.NurbsSurfaceData;
+import verb.core.SurfacePoint;
+import verb.core.MeshData;
+import verb.core.AdaptiveRefinementNode;
+import verb.core.NurbsSurfaceData;
 
-import verb.core.types.NurbsCurveData;
+import verb.core.NurbsCurveData;
 
-@:expose("core.Tess")
+@:expose("eval.Tess")
 class Tess {
 
 	//Sample a NURBS curve at equally spaced parametric intervals

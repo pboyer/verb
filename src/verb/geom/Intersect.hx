@@ -2,8 +2,8 @@ package verb.geom;
 
 import promhx.Promise;
 import verb.exe.Dispatcher;
-import verb.core.types.CurveCurveIntersection;
-import verb.core.types.CurveSurfaceIntersection;
+import verb.core.CurveCurveIntersection;
+import verb.core.CurveSurfaceIntersection;
 
 // A class providing simplified access to verb's intersection tools. Intersect contains only static methods.
 //

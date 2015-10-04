@@ -3,7 +3,7 @@ package verb.geom;
 import verb.core.Eval;
 import verb.core.Make;
 import verb.core.Mat.Vector;
-import verb.core.types.NurbsCurveData.Point;
+import verb.core.NurbsCurveData.Point;
 
 // An Arc is a three dimensional curve representing a subset of a full Circle
 @:expose("geom.Arc")

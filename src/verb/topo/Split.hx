@@ -4,17 +4,17 @@ import verb.topo.Split.PlanePosition;
 import verb.topo.Split.PlanePosition;
 import verb.topo.Split.PlanePosition;
 import verb.topo.Split.EdgePlanePosition;
-import verb.core.types.Exception;
+import verb.core.Exception;
 import haxe.ds.IntMap;
 import verb.core.Constants;
 import verb.core.Vec;
 using verb.core.Vec;
-import verb.core.types.NurbsCurveData.Point;
-import verb.core.types.Pair;
+import verb.core.NurbsCurveData.Point;
+import verb.core.Pair;
 import verb.core.Intersect;
 
-import verb.core.types.DoublyLinkedListExtensions;
-using verb.core.types.DoublyLinkedListExtensions;
+import verb.core.DoublyLinkedListExtensions;
+using verb.core.DoublyLinkedListExtensions;
 
 typedef Plane = {
     n : Array<Float>,

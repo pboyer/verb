@@ -1,13 +1,14 @@
 package verb.eval;
 
-import verb.core.types.AdaptiveRefinementNode.AdaptiveRefinementOptions;
-import verb.core.types.NurbsSurfaceData;
-import verb.core.types.MeshData.UV;
-import verb.core.types.NurbsCurveData;
+import verb.core.AdaptiveRefinementNode.AdaptiveRefinementOptions;
+import verb.core.NurbsSurfaceData;
+import verb.core.MeshData.UV;
+import verb.core.NurbsCurveData;
 
 using verb.core.ArrayExtensions;
-using Lambda;
 using verb.core.Mat;
+
+using Lambda;
 
 // Analyze contains static immutable methods for analyzing NURBS geometry. This includes, but is not limited to:
 //
@@ -16,7 +17,7 @@ using verb.core.Mat;
 //* Evaluating geometric properties (like arc length) of NURBS curves
 //* Determining the parameter of at arc length of NURBS curves
 
-@:expose("core.Analyze")
+@:expose("eval.Analyze")
 class Analyze {
 
     //Determine the multiplicities of the values in a knot vector
@@ -658,7 +659,7 @@ class Analyze {
 }
 
 // A simple helper class to represent the multiplicity of a knot at a given position.
-@:expose("core.KnotMultiplicity")
+@:expose("eval.KnotMultiplicity")
 class KnotMultiplicity {
 
     // The parameter of the knot

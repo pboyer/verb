@@ -3,7 +3,7 @@ package verb.geom;
 import verb.core.Eval;
 import verb.core.Make;
 import verb.core.Mat.Vector;
-import verb.core.types.NurbsCurveData.Point;
+import verb.core.NurbsCurveData.Point;
 
 // A curve representing a straight line
 @:expose("geom.Line")

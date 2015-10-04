@@ -1,33 +1,33 @@
 package verb.eval;
 
-import verb.core.types.MeshBoundingBoxTree;
-import verb.core.types.TriSegmentIntersection;
-import verb.core.types.Ray;
-import verb.core.types.CurveTriPoint;
-import verb.core.types.CurveCurveIntersection;
-import verb.core.types.IBoundingBoxTree;
-import verb.core.types.LazyPolylineBoundingBoxTree;
-import verb.core.types.PolylineMeshIntersection;
-import verb.core.types.PolylineData;
-import verb.core.types.CurveSurfaceIntersection;
-import verb.core.types.LazySurfaceBoundingBoxTree;
-import verb.core.types.LazyCurveBoundingBoxTree;
-import verb.core.types.Interval;
-import verb.core.types.LazyMeshBoundingBoxTree;
-import verb.core.types.MeshIntersectionPoint;
-import verb.core.types.SurfaceSurfaceIntersectionPoint;
-import verb.core.types.NurbsSurfaceData;
+import verb.core.MeshBoundingBoxTree;
+import verb.core.TriSegmentIntersection;
+import verb.core.Ray;
+import verb.core.CurveTriPoint;
+import verb.core.CurveCurveIntersection;
+import verb.core.IBoundingBoxTree;
+import verb.core.LazyPolylineBoundingBoxTree;
+import verb.core.PolylineMeshIntersection;
+import verb.core.PolylineData;
+import verb.core.CurveSurfaceIntersection;
+import verb.core.LazySurfaceBoundingBoxTree;
+import verb.core.LazyCurveBoundingBoxTree;
+import verb.core.Interval;
+import verb.core.LazyMeshBoundingBoxTree;
+import verb.core.MeshIntersectionPoint;
+import verb.core.SurfaceSurfaceIntersectionPoint;
+import verb.core.NurbsSurfaceData;
 import verb.core.KdTree.KdPoint;
-import verb.core.types.AdaptiveRefinementNode.AdaptiveRefinementOptions;
-import verb.core.types.BoundingBoxNode;
-import verb.core.types.Pair;
+import verb.core.AdaptiveRefinementNode.AdaptiveRefinementOptions;
+import verb.core.BoundingBoxNode;
+import verb.core.Pair;
 import verb.core.Mat.Vector;
-import verb.core.types.MeshData;
-import verb.core.types.NurbsCurveData;
+import verb.core.MeshData;
+import verb.core.NurbsCurveData;
 
 using verb.core.ArrayExtensions;
 
-@:expose("core.Intersect")
+@:expose("eval.Intersect")
 class Intersect {
 
     //Intersect two meshes, yielding a list of polylines

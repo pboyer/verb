@@ -1,9 +1,9 @@
 package verb.topo;
 
-import verb.core.types.Ray;
+import verb.core.Ray;
 import haxe.ds.IntMap;
-import verb.core.types.IDoublyLinkedList;
-import verb.core.types.NurbsCurveData.Point;
+import verb.core.IDoublyLinkedList;
+import verb.core.NurbsCurveData.Point;
 
 @:expose("topo.Vertex")
 class Vertex implements IDoublyLinkedList<Vertex> extends Topo {

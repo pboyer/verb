@@ -1,10 +1,10 @@
 package verb.core;
 
-import verb.core.types.BoundingBox;
-import verb.core.types.Pair;
-import verb.core.types.BoundingBoxNode;
-import verb.core.types.MeshData;
-import verb.core.types.NurbsCurveData.Point;
+import verb.core.BoundingBox;
+import verb.core.Pair;
+import verb.core.BoundingBoxNode;
+import verb.core.MeshData;
+import verb.core.NurbsCurveData.Point;
 
 using verb.core.ArrayExtensions;
 
@@ -50,7 +50,7 @@ class Mesh {
 
     public static function makeMeshAabb( mesh : MeshData, faceIndices : Array<Int> ) : BoundingBox {
 
-        var bb = new verb.core.types.BoundingBox();
+        var bb = new verb.core.BoundingBox();
 
         for ( x in faceIndices ){
             bb.add( mesh.points[ mesh.faces[ x ][0] ] );

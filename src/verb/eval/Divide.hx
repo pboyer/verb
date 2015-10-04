@@ -1,10 +1,10 @@
 package verb.eval;
 
-import verb.core.types.NurbsCurveData;
-import verb.core.types.CurveLengthSample;
+import verb.core.NurbsCurveData;
+import verb.core.CurveLengthSample;
 using Lambda;
 
-@:expose("core.Divide")
+@:expose("eval.Divide")
 class Divide {
 
     public static function rationalCurveByEqualArcLength(curve : NurbsCurveData, num : Int) : Array<CurveLengthSample> {

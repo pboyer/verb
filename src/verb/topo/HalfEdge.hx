@@ -1,7 +1,7 @@
 package verb.topo;
 
 import verb.geom.ICurve;
-import verb.core.types.IDoublyLinkedList;
+import verb.core.IDoublyLinkedList;
 
 @:expose("topo.HalfEdge")
 class HalfEdge implements IDoublyLinkedList<HalfEdge> extends Topo {

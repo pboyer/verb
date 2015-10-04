@@ -4,7 +4,7 @@ import verb.core.Vec;
 using verb.core.Vec;
 
 import verb.topo.Split.Plane;
-import verb.core.types.NurbsCurveData.Point;
+import verb.core.NurbsCurveData.Point;
 
 @:expose("core.Trig")
 class Trig {

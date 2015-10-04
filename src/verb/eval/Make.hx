@@ -2,14 +2,14 @@ package verb.eval;
 
 import verb.core.ExpIntersect;
 import verb.geom.NurbsSurface;
-import verb.core.types.Interval;
+import verb.core.Interval;
 import verb.core.Mat.Vector;
-import verb.core.types.NurbsSurfaceData;
-import verb.core.types.NurbsCurveData;
+import verb.core.NurbsSurfaceData;
+import verb.core.NurbsCurveData;
 
 using verb.core.ArrayExtensions;
 
-@:expose("core.Make")
+@:expose("eval.Make")
 class Make {
 
     //Generate a surface by translating a profile curve along a rail curve

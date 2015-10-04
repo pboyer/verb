@@ -1,13 +1,13 @@
 package verb.topo;
 
-import verb.core.types.NurbsCurveData.Point;
-import verb.core.types.Exception;
-import verb.core.types.DoublyLinkedListExtensions;
+import verb.core.NurbsCurveData.Point;
+import verb.core.Exception;
+import verb.core.DoublyLinkedListExtensions;
 
 using Lambda;
 
-import verb.core.types.IDoublyLinkedList;
-using verb.core.types.DoublyLinkedListExtensions;
+import verb.core.IDoublyLinkedList;
+using verb.core.DoublyLinkedListExtensions;
 
 @:expose("topo.Loop")
 class Loop implements IDoublyLinkedList<Loop> extends Topo {

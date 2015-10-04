@@ -3,10 +3,10 @@ import verb.core.Trig;
 import verb.core.Intersect;
 import verb.core.Vec;
 using verb.core.Vec;
-import verb.core.types.Ray;
+import verb.core.Ray;
 
-import verb.core.types.DoublyLinkedListExtensions;
-using verb.core.types.DoublyLinkedListExtensions;
+import verb.core.DoublyLinkedListExtensions;
+using verb.core.DoublyLinkedListExtensions;
 
 class RayCast {
 

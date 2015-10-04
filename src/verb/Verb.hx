@@ -1,19 +1,6 @@
 package verb;
 
-//iopology
-import verb.topo.Analyze;
-import verb.topo.Make;
-import verb.topo.Split;
-import verb.topo.Boolean;
-
-import verb.topo.Solid;
-import verb.topo.Face;
-import verb.topo.Vertex;
-import verb.topo.Loop;
-import verb.topo.HalfEdge;
-
 //intersection
-import verb.core.ExpIntersect;
 import verb.geom.Intersect;
 
 //curves
@@ -35,21 +22,24 @@ import verb.geom.ConicalSurface;
 import verb.geom.SweptSurface;
 
 //core
-import verb.core.types.BoundingBox;
+import verb.core.BoundingBox;
 import verb.core.Constants;
 import verb.core.Trig;
 import verb.core.Numeric;
 import verb.core.ArrayExtensions;
-import verb.core.Eval;
 import verb.core.Mesh;
 import verb.core.KdTree;
-import verb.core.Intersect;
-import verb.core.Tess;
-import verb.core.Make;
-import verb.core.Modify;
-import verb.core.Analyze;
-import verb.core.Divide;
-import verb.core.Check;
+
+import verb.eval.Eval;
+import verb.eval.Intersect;
+import verb.eval.ExpIntersect;
+import verb.eval.Tess;
+import verb.eval.Make;
+import verb.eval.Modify;
+import verb.eval.Analyze;
+import verb.eval.Divide;
+import verb.eval.Check;
+
 
 class Verb {
 	public static function main():Void {

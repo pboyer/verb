@@ -1,8 +1,8 @@
 package verb.topo;
 
 
-import verb.core.types.Exception;
-import verb.core.types.NurbsCurveData.Point;
+import verb.core.Exception;
+import verb.core.NurbsCurveData.Point;
 
 import verb.core.Vec;
 using verb.core.Vec;

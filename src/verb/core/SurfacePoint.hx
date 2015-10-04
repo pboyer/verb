@@ -1,6 +1,6 @@
 package verb.core;
-import verb.core.types.NurbsCurveData.Point;
-import verb.core.types.MeshData.UV;
+import verb.core.NurbsCurveData.Point;
+import verb.core.MeshData.UV;
 
 class SurfacePoint {
 

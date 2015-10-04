@@ -1,6 +1,6 @@
 package verb.core;
 
-import verb.core.types.NurbsCurveData.Point;
+import verb.core.NurbsCurveData.Point;
 
 typedef Tri = Array<Int>;
 typedef UV = Array<Float>;

@@ -1,8 +1,8 @@
 package verb.geom;
 
-import verb.core.types.NurbsSurfaceData;
-import verb.core.types.Interval;
-import verb.core.types.NurbsCurveData.Point;
+import verb.core.NurbsSurfaceData;
+import verb.core.Interval;
+import verb.core.NurbsCurveData.Point;
 import verb.core.Mat;
 
 // An interface representing a Surface

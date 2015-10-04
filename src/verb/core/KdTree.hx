@@ -1,7 +1,7 @@
 package verb.core;
 
-import verb.core.types.Pair;
-import verb.core.types.NurbsCurveData.Point;
+import verb.core.Pair;
+import verb.core.NurbsCurveData.Point;
 
 //A Haxe port of:
 //

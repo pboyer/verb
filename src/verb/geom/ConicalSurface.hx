@@ -2,7 +2,7 @@ package verb.geom;
 
 import verb.core.Make;
 import verb.core.Mat.Vector;
-import verb.core.types.NurbsCurveData.Point;
+import verb.core.NurbsCurveData.Point;
 
 // A ConicalSurface is a surface making up the curve surface of a cone
 

@@ -1,12 +1,13 @@
 package verb.eval;
 
-import verb.core.types.VolumeData;
-import verb.core.types.NurbsSurfaceData;
-import verb.core.types.NurbsCurveData;
-
+import verb.core.VolumeData;
+import verb.core.NurbsSurfaceData;
+import verb.core.NurbsCurveData;
+import verb.core.Vec;
 import verb.core.Binomial;
+import verb.core.Constants;
 
-@:expose("core.Eval")
+@:expose("eval.Eval")
 class Eval {
 
     //Compute a point in a non-uniform, non-rational B spline volume

@@ -4,20 +4,20 @@ import verb.topo.Tess2.PriorityQ;
 import verb.core.Intersect;
 import verb.core.Vec;
 import verb.core.Trig;
-import verb.core.types.Ray;
+import verb.core.Ray;
 import haxe.ds.IntMap;
-import verb.core.types.Exception;
+import verb.core.Exception;
 
 using Lambda;
 
 using verb.core.Vec;
 
-import verb.core.types.Pair;
-import verb.core.types.NurbsCurveData.Point;
+import verb.core.Pair;
+import verb.core.NurbsCurveData.Point;
 
-import verb.core.types.IDoublyLinkedList;
-import verb.core.types.DoublyLinkedListExtensions;
-using verb.core.types.DoublyLinkedListExtensions;
+import verb.core.IDoublyLinkedList;
+import verb.core.DoublyLinkedListExtensions;
+using verb.core.DoublyLinkedListExtensions;
 
 @:expose("topo.Solid")
 class Solid extends Topo {

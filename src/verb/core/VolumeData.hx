@@ -1,6 +1,6 @@
 package verb.core;
 
-import verb.core.types.NurbsCurveData;
+import verb.core.NurbsCurveData;
 
 @:expose("core.VolumeData")
 class VolumeData {

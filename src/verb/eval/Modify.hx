@@ -1,16 +1,16 @@
 package verb.eval;
 
 import verb.geom.NurbsSurface;
-import verb.core.types.Interval;
+import verb.core.Interval;
 import verb.core.Mat.Matrix;
-import verb.core.types.NurbsCurveData;
-import verb.core.types.NurbsCurveData;
-import verb.core.types.NurbsSurfaceData;
+import verb.core.NurbsCurveData;
+import verb.core.NurbsCurveData;
+import verb.core.NurbsSurfaceData;
 
 using Lambda;
 using verb.core.ArrayExtensions;
 
-@:expose("core.Modify")
+@:expose("eval.Modify")
 class Modify {
 
     //Reverses the parameterization of a NURBS curve. The domain is unaffected.

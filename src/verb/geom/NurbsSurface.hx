@@ -4,18 +4,18 @@ import verb.core.Check;
 import verb.core.Vec;
 import verb.core.Make;
 import promhx.Promise;
-import verb.core.types.MeshData;
-import verb.core.types.AdaptiveRefinementNode.AdaptiveRefinementOptions;
+import verb.core.MeshData;
+import verb.core.AdaptiveRefinementNode.AdaptiveRefinementOptions;
 import verb.core.Tess;
 import verb.core.Modify;
 import verb.core.Analyze;
 import verb.core.ArrayExtensions;
 using verb.core.ArrayExtensions;
 
-import verb.core.types.Interval;
-import verb.core.types.NurbsCurveData;
+import verb.core.Interval;
+import verb.core.NurbsCurveData;
 import verb.core.Eval;
-import verb.core.types.NurbsSurfaceData;
+import verb.core.NurbsSurfaceData;
 import verb.exe.AsyncObject;
 import verb.core.Mat;
 

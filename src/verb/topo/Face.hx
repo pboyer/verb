@@ -1,17 +1,17 @@
 package verb.topo;
 
 import verb.core.Constants;
-import verb.core.types.NurbsCurveData.Point;
-import verb.core.types.Exception;
+import verb.core.NurbsCurveData.Point;
+import verb.core.Exception;
 import haxe.ds.IntMap;
 
-import verb.core.types.DoublyLinkedListExtensions;
+import verb.core.DoublyLinkedListExtensions;
 import verb.geom.ISurface;
 
 using Lambda;
 
-import verb.core.types.IDoublyLinkedList;
-using verb.core.types.DoublyLinkedListExtensions;
+import verb.core.IDoublyLinkedList;
+using verb.core.DoublyLinkedListExtensions;
 
 import verb.topo.Tess2;
 

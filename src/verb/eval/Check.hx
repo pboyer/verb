@@ -1,11 +1,11 @@
 package verb.eval;
 
-import verb.core.types.NurbsSurfaceData;
-import verb.core.types.NurbsCurveData;
+import verb.core.NurbsSurfaceData;
+import verb.core.NurbsCurveData;
 
 using verb.core.ArrayExtensions;
 
-@:expose("core.Check")
+@:expose("eval.Check")
 class Check {
 
     public static function isValidKnotVector(vec : Array<Float>, degree : Int) : Bool {

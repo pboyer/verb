@@ -2,6 +2,7 @@ package verb.core;
 
 using verb.core.ArrayExtensions;
 using verb.core.Vec;
+using verb.eval.Modify;
 
 @:expose("core.LazySurfaceBoundingBoxTree")
 class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {

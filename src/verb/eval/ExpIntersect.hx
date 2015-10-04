@@ -2,18 +2,18 @@ package verb.eval;
 
 //experimental surface intersection work
 
-import verb.core.types.IBoundingBoxTree;
-import verb.core.types.SurfaceSurfaceIntersectionPoint;
-import verb.core.types.SurfaceBoundingBoxTree;
-import verb.core.types.Pair;
-import verb.core.types.MeshData.UV;
-import verb.core.types.LazySurfaceBoundingBoxTree;
-import verb.core.types.CurveSurfaceIntersection;
+import verb.core.IBoundingBoxTree;
+import verb.core.SurfaceSurfaceIntersectionPoint;
+import verb.core.SurfaceBoundingBoxTree;
+import verb.core.Pair;
+import verb.core.MeshData.UV;
+import verb.core.LazySurfaceBoundingBoxTree;
+import verb.core.CurveSurfaceIntersection;
 using verb.core.ArrayExtensions;
 using verb.core.Vec;
 
-import verb.core.types.NurbsSurfaceData;
-import verb.core.types.NurbsCurveData;
+import verb.core.NurbsSurfaceData;
+import verb.core.NurbsCurveData;
 
 
 enum MarchStepState { OutOfBounds; InsideDomain; AtBoundary; CompleteLoop; CoincidentStartPoint; }
@@ -66,7 +66,7 @@ class MarchStep {
     }
 }
 
-@:expose("core.ExpIntersect")
+@:expose("eval.ExpIntersect")
 class ExpIntersect {
 
     public static function outsideDomain( surface : NurbsSurfaceData, uv : UV) : Bool {
