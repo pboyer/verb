@@ -32,7 +32,6 @@ import verb.core.KdTree;
 
 import verb.eval.Eval;
 import verb.eval.Intersect;
-import verb.eval.ExpIntersect;
 import verb.eval.Tess;
 import verb.eval.Make;
 import verb.eval.Modify;
