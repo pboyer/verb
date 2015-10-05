@@ -361,7 +361,7 @@ class NurbsCurve extends AsyncObject implements ICurve {
     // The async version of `split`
 
     public function splitAsync( u : Float ) : Promise<Array<NurbsCurve>> {
-        return defer( Modify, 'curveSplit', [ _data, u ])
+        return defer( Divide, 'curveSplit', [ _data, u ])
         .then(function(cs : Array<NurbsCurveData>) : Array<NurbsCurve>{
             return cs.map(function(x){ return new NurbsCurve(x); });
         });

@@ -7,11 +7,8 @@ using Lambda;
 @:expose("core.BoundingBox")
 class BoundingBox {
 
-    public static var TOLERANCE : Float = 1e-4;
     var initialized : Bool = false;
     var dim : Int = 3;
-    public var min : Point = null;
-    public var max : Point = null;
 
     //BoundingBox Constructor
     //
@@ -24,6 +21,12 @@ class BoundingBox {
             this.addRange( pts );
         }
     }
+
+    // The minimum point of the BoundingBox - the coordinates of this point are always <= max.
+    public var min : Point = null;
+
+    // The maximum point of the BoundingBox. The coordinates of this point are always >= min.
+    public var max : Point = null;
 
     //Create a bounding box initialized with a single element
     //
@@ -128,7 +131,7 @@ class BoundingBox {
 
     public static function intervalsOverlap( a1 : Float, a2: Float, b1: Float, b2: Float, tol : Float = -1 ) : Bool {
 
-        var tol = tol < -0.5 ? TOLERANCE : tol
+        var tol = tol < -0.5 ? Constants.TOLERANCE : tol
         , x1 = Math.min(a1, a2) - tol
         , x2 = Math.max(a1, a2) + tol
         , y1 = Math.min(b1, b2) - tol

@@ -296,7 +296,7 @@ class NurbsSurface extends AsyncObject implements ISurface {
     //The async version of `split`
 
     public function splitAsync( u : Float, useV : Bool = false ) : Promise<Array<NurbsSurface>> {
-        return defer( Modify, 'surfaceSplit', [ _data, u, useV ] )
+        return defer( Divide, 'surfaceSplit', [ _data, u, useV ] )
             .then(function(s){
                 return s.map(function(x){ return new NurbsSurface(x); });
             });
