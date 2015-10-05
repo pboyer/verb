@@ -12,7 +12,6 @@ import verb.core.Mat;
 import verb.core.ArrayExtensions;
 using verb.core.ArrayExtensions;
 
-import verb.core.CurveLengthSample;
 import verb.eval.Modify;
 import verb.eval.Tess;
 import verb.eval.Divide;

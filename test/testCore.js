@@ -742,63 +742,6 @@ describe("verb.core.Mesh.makeMeshAabb",function(){
 
 });
 
-describe("verb.core.Mesh.makeMeshAabbTree",function(){
-
-	it('should return the correct structure', function(){
-
-		//
-		//  0 --  1
-		//  |   /  \
-		//  2  ---  3
-		//  |   \  /
-		//  4 --  5
-		//
-
-		var points = [ [0,0,0], [1,0,0], [0, -1, 0 ], [2, -1, 0], [0, -2, 0], [1, -2, 0] ]
-			, tris = [ [0,2,1], [1,2,3], [2,4,5], [2,5,3] ]
-			, mesh = new verb.core.MeshData(tris, points, null, null)
-			, tri_indices = [0,1,2,3]
-			, root = verb.core.Mesh.makeMeshAabbTree( mesh, tri_indices );
-
-		// root bb is correct
-		should.equal( 2, root.boundingBox.max[0] );
-		should.equal( 0, root.boundingBox.min[0] );
-		should.equal( 0, root.boundingBox.max[1] );
-		should.equal( -2, root.boundingBox.min[1] );
-		should.equal( 0, root.boundingBox.max[2] );
-		should.equal( 0, root.boundingBox.min[2] );
-
-		// root is not a leaf
-		should.equal( 2, root.children.length);
-
-		// children should have 2 children, too
-		var child1 = root.children[0],
-			child2 = root.children[1];
-
-		should.equal( 2, child1.children.length );
-		should.equal( 2, child2.children.length );
-
-		// the children's children should be leaves
-		var child1child1 = child1.children[0],
-			child1child2 = child1.children[1],
-			child2child1 = child2.children[0],
-			child2child2 = child2.children[1];
-
-		should.not.exist( child1child1.children );
-		should.not.exist( child1child2.children );
-		should.not.exist( child2child1.children );
-		should.not.exist( child2child2.children );
-
-		// the grandchildren have the correct items in them
-		should.equal( 0, child1child1.item );
-		should.equal( 1, child1child2.item );
-
-		should.equal( 2, child2child1.item );
-		should.equal( 3, child2child2.item );
-	});
-
-});
-
 describe("verb.core.Mesh.getTriangleCentroid",function(){
 
 	it('should return origin for zeroed triangle', function(){

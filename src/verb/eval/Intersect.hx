@@ -14,7 +14,7 @@ import verb.core.KdTree;
 import verb.core.AdaptiveRefinementNode.AdaptiveRefinementOptions;
 import verb.core.Pair;
 import verb.core.Vec.Vector;
-import verb.core.Numeric;
+import verb.core.Minimizer;
 import verb.core.Mesh;
 import verb.core.Constants;
 
@@ -512,7 +512,7 @@ class Intersect {
                         2.0 * Vec.dot( drdv, r ) ];
         }
 
-        var sol_obj = Numeric.uncmin( objective, start_params, tol*tol, grad );
+        var sol_obj = Minimizer.uncmin( objective, start_params, tol*tol, grad );
         var final = sol_obj.solution;
 
         return new CurveSurfaceIntersection( final[0], [ final[1], final[2] ],
@@ -720,7 +720,7 @@ class Intersect {
                         2.0 * Vec.dot( drdt, r ) ];
         }
 
-        var sol_obj = Numeric.uncmin( objective, [u0, u1], tolerance * tolerance, grad );
+        var sol_obj = Minimizer.uncmin( objective, [u0, u1], tolerance * tolerance, grad );
 
         var u1 = sol_obj.solution[0]
             , u2 = sol_obj.solution[1];
@@ -1192,3 +1192,12 @@ class Intersect {
 
 }
 
+@:expose("core.CurveCurveIntersectionOptions")
+class CurveCurveIntersectionOptions {
+
+    public var sampleTol : Float = Constants.TOLERANCE;
+    public var tol : Float = Constants.TOLERANCE;
+
+    public function new(){ }
+
+}

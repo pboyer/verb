@@ -3,27 +3,7 @@ import verb.core.Mat;
 
 import verb.core.Vec;
 
-class MinimizationResult {
-
-    public var solution : Vector;
-    public var value : Float;
-    public var gradient : Vector;
-    public var invHessian : Matrix;
-    public var iterations : Int;
-    public var message : String;
-
-    public function new(solution, value, gradient, invHessian, iterations, message){
-        this.solution = solution;
-        this.value = value;
-        this.gradient = gradient;
-        this.invHessian = invHessian;
-        this.iterations = iterations;
-        this.message = message;
-    }
-
-}
-
-class Numeric {
+class Minimizer {
 
     public static function numericalGradient(f : Vector -> Float, x : Vector) : Vector {
 
@@ -160,4 +140,23 @@ class Numeric {
         return A;
     }
 
+}
+
+class MinimizationResult {
+
+    public var solution : Vector;
+    public var value : Float;
+    public var gradient : Vector;
+    public var invHessian : Matrix;
+    public var iterations : Int;
+    public var message : String;
+
+    public function new(solution, value, gradient, invHessian, iterations, message){
+        this.solution = solution;
+        this.value = value;
+        this.gradient = gradient;
+        this.invHessian = invHessian;
+        this.iterations = iterations;
+        this.message = message;
+    }
 }

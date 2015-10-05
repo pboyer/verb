@@ -4,6 +4,11 @@ import verb.core.Data;
 
 using Lambda;
 
+// `BoundingBox` is an n-dimensional bounding box implementation. It is used by many of verb's intersection algorithms.
+//
+// The first point added to the `BoundingBox` using `BoundingBox.add` will be used to define the dimensionality of the
+// bounding box.
+
 @:expose("core.BoundingBox")
 class BoundingBox {
 

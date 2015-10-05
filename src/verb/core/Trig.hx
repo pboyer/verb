@@ -5,6 +5,8 @@ import verb.core.Data;
 import verb.core.Intersections;
 using verb.core.Vec;
 
+// `Trig` provides various convenient trigonometric methods
+
 @:expose("core.Trig")
 class Trig {
 

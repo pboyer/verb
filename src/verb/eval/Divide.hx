@@ -2,7 +2,6 @@ package verb.eval;
 
 import verb.core.Mat;
 import verb.core.Data;
-import verb.core.CurveLengthSample;
 import verb.core.Vec;
 import verb.core.Constants;
 
@@ -180,3 +179,16 @@ class Divide {
     }
 
 }
+
+
+@:expose("eval.CurveLengthSample")
+class CurveLengthSample {
+    public var u : Float;
+    public var len : Float;
+
+    public function new(u, len) {
+        this.u = u;
+        this.len = len;
+    }
+}
+

@@ -6,6 +6,8 @@ import verb.core.Data;
 
 using verb.core.ArrayExtensions;
 
+// `Mesh` provides various convenience methods for working with meshes.
+
 @:expose("core.Mesh")
 class Mesh {
 
@@ -59,34 +61,6 @@ class Mesh {
         return bb;
     }
 
-    //Make tree of axis aligned bounding boxes
-    //
-    //**params**
-    //
-    //* array of length 3 arrays of numbers representing the points
-    //* array of length 3 arrays of number representing the triangles
-    //* array of numbers representing the relevant triangles to use to form aabb
-    //
-    //**returns**
-    //
-    //* a point represented by an array of length (dim)
-    //
-
-    public static function makeMeshAabbTree( mesh : MeshData, faceIndices : Array<Int> ) : BoundingBoxNode {
-
-        var aabb = makeMeshAabb( mesh, faceIndices );
-
-        if (faceIndices.length == 1){
-            return new BoundingBoxLeaf<Int>( aabb, faceIndices[0] );
-        }
-
-        var sortedIndices = sortTrianglesOnLongestAxis( aabb, mesh, faceIndices )
-        , leftIndices = sortedIndices.left() //slice( 0, Math.floor( sorted_tri_indices.length / 2 ) )
-        , rightIndices = sortedIndices.right(); //slice( Math.floor( sorted_tri_indices.length / 2 ), sorted_tri_indices.length );
-
-        return new BoundingBoxInnerNode( aabb, [ makeMeshAabbTree(mesh, leftIndices), makeMeshAabbTree(mesh, rightIndices) ]);
-    }
-
     //Sort particular faces of a mesh on the longest axis
     //
     //**params**
@@ -136,7 +110,6 @@ class Mesh {
     //**returns**
     //
     //* the minimum coordinate
-    //
 
     private static function getMinCoordOnAxis( points : Array<Point>, tri : Tri, axis : Int ) : Float {
 
@@ -180,6 +153,17 @@ class Mesh {
 
     }
 
+    //Given a point on a mesh triangle, obtain the UV on the triangle
+    //
+    //**params**
+    //
+    //* the mesh
+    //* index of the face to test
+    //
+    //**returns**
+    //
+    //* the UV on the face
+
     public static function triangleUVFromPoint( mesh : MeshData, faceIndex : Int, f : Point ) : UV {
 
         var tri = mesh.faces[faceIndex];
@@ -204,34 +188,5 @@ class Mesh {
 
         //find the uv corresponding to point f (uv1/uv2/uv3 are associated to p1/p2/p3):
         return Vec.add( Vec.mul( a1, uv1), Vec.add( Vec.mul( a2, uv2), Vec.mul( a3, uv3)));
-    }
-}
-
-@:expose("core.BoundingBoxNode")
-class BoundingBoxNode {
-    public var boundingBox : BoundingBox;
-
-    public function new(bb : BoundingBox){
-        this.boundingBox = bb;
-    }
-}
-
-@:expose("core.BoundingBoxInnerNode")
-class BoundingBoxInnerNode extends BoundingBoxNode {
-    public var children : Array<BoundingBoxNode>;
-
-    public function new(bb : BoundingBox, children : Array<BoundingBoxNode>){
-        super(bb);
-        this.children = children;
-    }
-}
-
-@:expose("core.BoundingBoxLeaf")
-class BoundingBoxLeaf<T> extends BoundingBoxNode {
-    public var item : T;
-
-    public function new(bb : BoundingBox, item : T){
-        super(bb);
-        this.item = item;
     }
 }

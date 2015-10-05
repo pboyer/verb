@@ -12,7 +12,7 @@ import verb.core.ArrayExtensions;
 using verb.core.ArrayExtensions;
 
 import verb.core.Trig;
-import verb.core.Numeric;
+import verb.core.Minimizer;
 
 import verb.core.Vec;
 using verb.core.Vec;
@@ -377,7 +377,7 @@ class ExpIntersect {
         };
 
         var start = [ approx.item0[0], approx.item0[1], approx.item1[0], approx.item1[1] ];
-        var sol = Numeric.uncmin( obj, start, tol );
+        var sol = Minimizer.uncmin( obj, start, tol );
         var final = sol.solution;
 
         return new Pair<UV,UV>( [ final[0], final[1] ], [ final[2], final[3] ] );

@@ -1247,11 +1247,6 @@ verb.core.BoundingBox.prototype = {
 };
 verb.core.Constants = $hx_exports.core.Constants = function() { };
 verb.core.Constants.__name__ = ["verb","core","Constants"];
-verb.core.CurveLengthSample = $hx_exports.core.CurveLengthSample = function(u,len) {
-	this.u = u;
-	this.len = len;
-};
-verb.core.CurveLengthSample.__name__ = ["verb","core","CurveLengthSample"];
 verb.core.NurbsSurfaceData = $hx_exports.core.NurbsSurfaceData = function(degreeU,degreeV,knotsU,knotsV,controlPoints,closedU,closedV) {
 	if(closedV == null) closedV = false;
 	if(closedU == null) closedU = false;
@@ -1971,14 +1966,6 @@ verb.core.Mesh.makeMeshAabb = function(mesh,faceIndices) {
 	}
 	return bb;
 };
-verb.core.Mesh.makeMeshAabbTree = function(mesh,faceIndices) {
-	var aabb = verb.core.Mesh.makeMeshAabb(mesh,faceIndices);
-	if(faceIndices.length == 1) return new verb.core.BoundingBoxLeaf(aabb,faceIndices[0]);
-	var sortedIndices = verb.core.Mesh.sortTrianglesOnLongestAxis(aabb,mesh,faceIndices);
-	var leftIndices = verb.core.ArrayExtensions.left(sortedIndices);
-	var rightIndices = verb.core.ArrayExtensions.right(sortedIndices);
-	return new verb.core.BoundingBoxInnerNode(aabb,[verb.core.Mesh.makeMeshAabbTree(mesh,leftIndices),verb.core.Mesh.makeMeshAabbTree(mesh,rightIndices)]);
-};
 verb.core.Mesh.sortTrianglesOnLongestAxis = function(bb,mesh,faceIndices) {
 	var longAxis = bb.getLongestAxis();
 	var minCoordFaceMap = new Array();
@@ -2048,26 +2035,6 @@ verb.core.Mesh.triangleUVFromPoint = function(mesh,faceIndex,f) {
 	var a3 = verb.core.Vec.norm(verb.core.Vec.cross(f1,f2)) / a;
 	return verb.core.Vec.add(verb.core.Vec.mul(a1,uv1),verb.core.Vec.add(verb.core.Vec.mul(a2,uv2),verb.core.Vec.mul(a3,uv3)));
 };
-verb.core.BoundingBoxNode = $hx_exports.core.BoundingBoxNode = function(bb) {
-	this.boundingBox = bb;
-};
-verb.core.BoundingBoxNode.__name__ = ["verb","core","BoundingBoxNode"];
-verb.core.BoundingBoxInnerNode = $hx_exports.core.BoundingBoxInnerNode = function(bb,children) {
-	verb.core.BoundingBoxNode.call(this,bb);
-	this.children = children;
-};
-verb.core.BoundingBoxInnerNode.__name__ = ["verb","core","BoundingBoxInnerNode"];
-verb.core.BoundingBoxInnerNode.__super__ = verb.core.BoundingBoxNode;
-verb.core.BoundingBoxInnerNode.prototype = $extend(verb.core.BoundingBoxNode.prototype,{
-});
-verb.core.BoundingBoxLeaf = $hx_exports.core.BoundingBoxLeaf = function(bb,item) {
-	verb.core.BoundingBoxNode.call(this,bb);
-	this.item = item;
-};
-verb.core.BoundingBoxLeaf.__name__ = ["verb","core","BoundingBoxLeaf"];
-verb.core.BoundingBoxLeaf.__super__ = verb.core.BoundingBoxNode;
-verb.core.BoundingBoxLeaf.prototype = $extend(verb.core.BoundingBoxNode.prototype,{
-});
 verb.core.MeshBoundingBoxTree = function(mesh,faceIndices) {
 	this._empty = false;
 	this._face = -1;
@@ -2113,18 +2080,9 @@ verb.core.MeshBoundingBoxTree.prototype = {
 		return this._empty;
 	}
 };
-verb.core.MinimizationResult = function(solution,value,gradient,invHessian,iterations,message) {
-	this.solution = solution;
-	this.value = value;
-	this.gradient = gradient;
-	this.invHessian = invHessian;
-	this.iterations = iterations;
-	this.message = message;
-};
-verb.core.MinimizationResult.__name__ = ["verb","core","MinimizationResult"];
-verb.core.Numeric = function() { };
-verb.core.Numeric.__name__ = ["verb","core","Numeric"];
-verb.core.Numeric.numericalGradient = function(f,x) {
+verb.core.Minimizer = function() { };
+verb.core.Minimizer.__name__ = ["verb","core","Minimizer"];
+verb.core.Minimizer.numericalGradient = function(f,x) {
 	var n = x.length;
 	var f0 = f(x);
 	if(f0 == Math.NaN) throw "gradient: f(x) is a NaN!";
@@ -2172,10 +2130,10 @@ verb.core.Numeric.numericalGradient = function(f,x) {
 	}
 	return J;
 };
-verb.core.Numeric.uncmin = function(f,x0,tol,gradient,maxit) {
+verb.core.Minimizer.uncmin = function(f,x0,tol,gradient,maxit) {
 	if(tol == null) tol = 1e-8;
 	if(gradient == null) gradient = function(x) {
-		return verb.core.Numeric.numericalGradient(f,x);
+		return verb.core.Minimizer.numericalGradient(f,x);
 	};
 	if(maxit == null) maxit = 1000;
 	x0 = x0.slice(0);
@@ -2246,7 +2204,7 @@ verb.core.Numeric.uncmin = function(f,x0,tol,gradient,maxit) {
 		y = verb.core.Vec.sub(g1,g0);
 		ys = verb.core.Vec.dot(y,s);
 		Hy = verb.core.Mat.dot(H1,y);
-		H1 = verb.core.Mat.sub(verb.core.Mat.add(H1,verb.core.Mat.mul((ys + verb.core.Vec.dot(y,Hy)) / (ys * ys),verb.core.Numeric.tensor(s,s))),verb.core.Mat.div(verb.core.Mat.add(verb.core.Numeric.tensor(Hy,s),verb.core.Numeric.tensor(s,Hy)),ys));
+		H1 = verb.core.Mat.sub(verb.core.Mat.add(H1,verb.core.Mat.mul((ys + verb.core.Vec.dot(y,Hy)) / (ys * ys),verb.core.Minimizer.tensor(s,s))),verb.core.Mat.div(verb.core.Mat.add(verb.core.Minimizer.tensor(Hy,s),verb.core.Minimizer.tensor(s,Hy)),ys));
 		x0 = x1;
 		f0 = f1;
 		g0 = g1;
@@ -2254,7 +2212,7 @@ verb.core.Numeric.uncmin = function(f,x0,tol,gradient,maxit) {
 	}
 	return new verb.core.MinimizationResult(x0,f0,g0,H1,it,msg);
 };
-verb.core.Numeric.tensor = function(x,y) {
+verb.core.Minimizer.tensor = function(x,y) {
 	var m = x.length;
 	var n = y.length;
 	var A = [];
@@ -2284,6 +2242,15 @@ verb.core.Numeric.tensor = function(x,y) {
 	}
 	return A;
 };
+verb.core.MinimizationResult = function(solution,value,gradient,invHessian,iterations,message) {
+	this.solution = solution;
+	this.value = value;
+	this.gradient = gradient;
+	this.invHessian = invHessian;
+	this.iterations = iterations;
+	this.message = message;
+};
+verb.core.MinimizationResult.__name__ = ["verb","core","MinimizationResult"];
 verb.core.Pair = $hx_exports.core.Pair = function(item1,item2) {
 	this.item0 = item1;
 	this.item1 = item2;
@@ -3043,7 +3010,7 @@ verb.eval.Divide.rationalCurveByArcLength = function(curve,l) {
 		return verb.eval.Analyze.rationalBezierCurveArcLength(x);
 	});
 	var totlen = verb.core.Vec.sum(crvlens);
-	var pts = [new verb.core.CurveLengthSample(curve.knots[0],0.0)];
+	var pts = [new verb.eval.CurveLengthSample(curve.knots[0],0.0)];
 	if(l > totlen) return pts;
 	var inc = l;
 	var i = 0;
@@ -3055,7 +3022,7 @@ verb.eval.Divide.rationalCurveByArcLength = function(curve,l) {
 		runsum += crvlens[i];
 		while(lc < runsum + verb.core.Constants.EPSILON) {
 			u = verb.eval.Analyze.rationalBezierCurveParamAtArcLength(crvs[i],lc - runsum1,verb.core.Constants.TOLERANCE,crvlens[i]);
-			pts.push(new verb.core.CurveLengthSample(u,lc));
+			pts.push(new verb.eval.CurveLengthSample(u,lc));
 			lc += inc;
 		}
 		runsum1 += crvlens[i];
@@ -3063,6 +3030,11 @@ verb.eval.Divide.rationalCurveByArcLength = function(curve,l) {
 	}
 	return pts;
 };
+verb.eval.CurveLengthSample = $hx_exports.eval.CurveLengthSample = function(u,len) {
+	this.u = u;
+	this.len = len;
+};
+verb.eval.CurveLengthSample.__name__ = ["verb","eval","CurveLengthSample"];
 verb.eval.Eval = $hx_exports.eval.Eval = function() { };
 verb.eval.Eval.__name__ = ["verb","eval","Eval"];
 verb.eval.Eval.rationalCurveTangent = function(curve,u) {
@@ -3771,7 +3743,7 @@ verb.eval.ExpIntersect.refineCriticalPt = function(surface0,surface1,approx,tol)
 		return dist - vecnorm * vecnorm + 1 - normdot * normdot;
 	};
 	var start = [approx.item0[0],approx.item0[1],approx.item1[0],approx.item1[1]];
-	var sol = verb.core.Numeric.uncmin(obj,start,tol);
+	var sol = verb.core.Minimizer.uncmin(obj,start,tol);
 	var $final = sol.solution;
 	return new verb.core.Pair([$final[0],$final[1]],[$final[2],$final[3]]);
 };
@@ -4224,7 +4196,7 @@ verb.eval.Intersect.curveAndSurfaceWithEstimate = function(curve,surface,start_p
 		var drdv = ds[0][1];
 		return [2.0 * verb.core.Vec.dot(drdt,r),2.0 * verb.core.Vec.dot(drdu,r),2.0 * verb.core.Vec.dot(drdv,r)];
 	};
-	var sol_obj = verb.core.Numeric.uncmin(objective,start_params,tol * tol,grad);
+	var sol_obj = verb.core.Minimizer.uncmin(objective,start_params,tol * tol,grad);
 	var $final = sol_obj.solution;
 	return new verb.core.CurveSurfaceIntersection($final[0],[$final[1],$final[2]],verb.eval.Eval.rationalCurvePoint(curve,$final[0]),verb.eval.Eval.rationalSurfacePoint(surface,$final[1],$final[2]));
 };
@@ -4316,7 +4288,7 @@ verb.eval.Intersect.curvesWithEstimate = function(curve0,curve1,u0,u1,tolerance)
 		var drdt = verb.core.Vec.mul(-1.0,dc1[1]);
 		return [2.0 * verb.core.Vec.dot(drdu,r),2.0 * verb.core.Vec.dot(drdt,r)];
 	};
-	var sol_obj = verb.core.Numeric.uncmin(objective,[u0,u1],tolerance * tolerance,grad);
+	var sol_obj = verb.core.Minimizer.uncmin(objective,[u0,u1],tolerance * tolerance,grad);
 	var u11 = sol_obj.solution[0];
 	var u2 = sol_obj.solution[1];
 	var p11 = verb.eval.Eval.rationalCurvePoint(curve0,u11);
@@ -4529,6 +4501,11 @@ verb.eval.Intersect.segmentAndPlane = function(p0,p1,v0,n) {
 	if(p > 1.0 + verb.core.Constants.EPSILON || p < -verb.core.Constants.EPSILON) return null;
 	return { p : p};
 };
+verb.eval.CurveCurveIntersectionOptions = $hx_exports.core.CurveCurveIntersectionOptions = function() {
+	this.tol = verb.core.Constants.TOLERANCE;
+	this.sampleTol = verb.core.Constants.TOLERANCE;
+};
+verb.eval.CurveCurveIntersectionOptions.__name__ = ["verb","eval","CurveCurveIntersectionOptions"];
 verb.eval.Make = $hx_exports.eval.Make = function() { };
 verb.eval.Make.__name__ = ["verb","eval","Make"];
 verb.eval.Make.rationalTranslationalSurface = function(profile,rail) {

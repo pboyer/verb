@@ -25,7 +25,7 @@ import verb.geom.SweptSurface;
 import verb.core.BoundingBox;
 import verb.core.Constants;
 import verb.core.Trig;
-import verb.core.Numeric;
+import verb.core.Minimizer;
 import verb.core.ArrayExtensions;
 import verb.core.Mesh;
 import verb.core.KdTree;

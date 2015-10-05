@@ -11,8 +11,8 @@ class Mat {
         return [ for (i in 0...b.length) Vec.mul(a, b[i]) ];
     }
 
+    //based on the numeric.js routine - numeric.dotMMsmall
     public static function mult(x : Matrix, y : Matrix) : Matrix {
-        //based on the numeric.js routine - numeric.dotMMsmall
 
         var p,q,r,ret,foo,bar,woo,i0,k0,p0,r0;
 
