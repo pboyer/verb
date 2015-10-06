@@ -4,9 +4,75 @@ import verb.core.Mat;
 import verb.core.Vec;
 import verb.core.Data;
 
+@:expose("core.Minimizer")
 class Minimizer {
 
-    public static function numericalGradient(f : Vector -> Float, x : Vector) : Vector {
+    public static function uncmin(f : Vector -> Float, x0 : Vector, tol : Float = null, gradient : Vector -> Vector=  null, maxit : Int =  null) : MinimizationResult {
+
+        if(tol == null) { tol = 1e-8; }
+        if(gradient == null) { gradient = function(x) { return numericalGradient(f,x); }; }
+        if(maxit == null) maxit = 1000;
+
+        x0 = x0.slice(0);
+        var n = x0.length;
+        var f0 = f(x0),f1 = f0, df0;
+
+        if(Math.isNaN(f0)) throw 'uncmin: f(x0) is a NaN!';
+
+        tol = Math.max(tol, Constants.EPSILON);
+        var step,g0,g1,H1 = Mat.identity(n);
+        var it=0,i,s =[],x1,y,Hy,Hs,ys,i0,t,nstep,t1,t2;
+        var msg = "";
+        g0 = gradient( x0 );
+
+        while(it < maxit) {
+
+            if(!Vec.all(Vec.finite(g0))) { msg = "Gradient has Infinity or NaN"; break; }
+            step = Vec.neg(Mat.dot(H1,g0));
+
+            if(!Vec.all(Vec.finite(step))) { msg = "Search direction has Infinity or NaN"; break; }
+
+            nstep = Vec.norm(step);
+            if(nstep < tol) { msg= "Newton step smaller than tol"; break; }
+
+            t = 1.0;
+            df0 = Vec.dot(g0,step);
+
+//line search
+            x1 = x0;
+            while(it < maxit) {
+                if(t*nstep < tol) { break; }
+                s = Vec.mul(t, step);
+                x1 = Vec.add(x0,s);
+                f1 = f(x1);
+                if(f1-f0 >= 0.1*t*df0 || Math.isNaN(f1)) {
+                    t *= 0.5;
+                    ++it;
+                    continue;
+                }
+                break;
+            }
+
+            if(t*nstep < tol) { msg = "Line search step size smaller than tol"; break; }
+            if(it == maxit) { msg = "maxit reached during line search"; break; }
+
+            g1 = gradient(x1);
+            y = Vec.sub(g1,g0);
+            ys = Vec.dot(y,s);
+            Hy = Mat.dot(H1,y);
+            H1 = Mat.sub(
+                Mat.add(H1, Mat.mul( (ys+Vec.dot(y,Hy))/(ys*ys),  tensor(s,s)  )),
+                Mat.div(Mat.add(tensor(Hy,s),tensor(s,Hy)),ys));
+            x0 = x1;
+            f0 = f1;
+            g0 = g1;
+            ++it;
+        }
+
+        return new MinimizationResult( x0, f0, g0, H1, it, msg);
+    }
+
+    private static function numericalGradient(f : Vector -> Float, x : Vector) : Vector {
 
         var n = x.length;
         var f0 = f(x);
@@ -50,72 +116,7 @@ class Minimizer {
         return J;
     }
 
-    public static function uncmin(f : Vector -> Float, x0 : Vector, tol : Float = null, gradient : Vector -> Vector=  null, maxit : Int =  null) : MinimizationResult {
-
-        if(tol == null) { tol = 1e-8; }
-        if(gradient == null) { gradient = function(x) { return numericalGradient(f,x); }; }
-        if(maxit == null) maxit = 1000;
-
-        x0 = x0.slice(0);
-        var n = x0.length;
-        var f0 = f(x0),f1 = f0, df0;
-
-        if(Math.isNaN(f0)) throw 'uncmin: f(x0) is a NaN!';
-
-        tol = Math.max(tol, Constants.EPSILON);
-        var step,g0,g1,H1 = Mat.identity(n);
-        var it=0,i,s =[],x1,y,Hy,Hs,ys,i0,t,nstep,t1,t2;
-        var msg = "";
-        g0 = gradient( x0 );
-
-        while(it < maxit) {
-
-            if(!Vec.all(Vec.finite(g0))) { msg = "Gradient has Infinity or NaN"; break; }
-            step = Vec.neg(Mat.dot(H1,g0));
-
-            if(!Vec.all(Vec.finite(step))) { msg = "Search direction has Infinity or NaN"; break; }
-
-            nstep = Vec.norm(step);
-            if(nstep < tol) { msg= "Newton step smaller than tol"; break; }
-
-            t = 1.0;
-            df0 = Vec.dot(g0,step);
-
-            //line search
-            x1 = x0;
-            while(it < maxit) {
-                if(t*nstep < tol) { break; }
-                s = Vec.mul(t, step);
-                x1 = Vec.add(x0,s);
-                f1 = f(x1);
-                if(f1-f0 >= 0.1*t*df0 || Math.isNaN(f1)) {
-                    t *= 0.5;
-                    ++it;
-                    continue;
-                }
-                break;
-            }
-
-            if(t*nstep < tol) { msg = "Line search step size smaller than tol"; break; }
-            if(it == maxit) { msg = "maxit reached during line search"; break; }
-
-            g1 = gradient(x1);
-            y = Vec.sub(g1,g0);
-            ys = Vec.dot(y,s);
-            Hy = Mat.dot(H1,y);
-            H1 = Mat.sub(
-                Mat.add(H1, Mat.mul( (ys+Vec.dot(y,Hy))/(ys*ys),  tensor(s,s)  )),
-                Mat.div(Mat.add(tensor(Hy,s),tensor(s,Hy)),ys));
-            x0 = x1;
-            f0 = f1;
-            g0 = g1;
-            ++it;
-        }
-
-        return new MinimizationResult( x0, f0, g0, H1, it, msg);
-    }
-
-    public static function tensor(x : Vector, y : Vector) : Matrix {
+    private static function tensor(x : Vector, y : Vector) : Matrix {
 
         var m = x.length, n = y.length, A = [], Ai, xi;
 

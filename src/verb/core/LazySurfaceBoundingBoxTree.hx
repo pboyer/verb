@@ -6,6 +6,7 @@ using verb.core.Vec;
 import verb.eval.Eval;
 import verb.eval.Divide;
 import verb.core.Data;
+import verb.eval.Intersect;
 
 class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
 

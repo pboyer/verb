@@ -139,11 +139,11 @@ class Modify {
         return curves;
     }
 
-    public static inline function imin( a : Int, b : Int ) : Int {
+    private static function imin( a : Int, b : Int ) : Int {
         return a < b ? a : b;
     }
 
-    public static inline function imax( a : Int, b : Int ) : Int {
+    private static function imax( a : Int, b : Int ) : Int {
         return a > b ? a : b;
     }
 

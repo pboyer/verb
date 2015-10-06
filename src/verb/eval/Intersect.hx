@@ -1,18 +1,19 @@
 package verb.eval;
 
-import verb.core.MeshBoundingBoxTree;
 import verb.core.Intersections;
-import verb.core.IBoundingBoxTree;
-import verb.core.LazyPolylineBoundingBoxTree;
+import verb.core.BoundingBox;
 import verb.core.Data;
-import verb.core.LazySurfaceBoundingBoxTree;
-import verb.core.LazyCurveBoundingBoxTree;
-import verb.core.LazyMeshBoundingBoxTree;
 import verb.core.KdTree;
 import verb.core.Minimizer;
 import verb.core.Mesh;
 import verb.core.Constants;
 import verb.core.Vec;
+
+import verb.core.LazySurfaceBoundingBoxTree;
+import verb.core.LazyCurveBoundingBoxTree;
+import verb.core.LazyMeshBoundingBoxTree;
+import verb.core.LazyPolylineBoundingBoxTree;
+import verb.core.MeshBoundingBoxTree;
 
 import verb.eval.Tess;
 
@@ -1189,3 +1190,10 @@ class Intersect {
 
 }
 
+interface IBoundingBoxTree<T> {
+    public function boundingBox() : BoundingBox;
+    public function split() : Pair<IBoundingBoxTree<T>, IBoundingBoxTree<T>>;
+    public function yield() : T;
+    public function indivisible( tolerance : Float ) : Bool;
+    public function empty() : Bool;
+}

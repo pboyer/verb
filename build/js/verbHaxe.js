@@ -912,8 +912,6 @@ verb.core.Interval = $hx_exports.core.Interval = function(min,max) {
 	this.max = max;
 };
 verb.core.Interval.__name__ = ["verb","core","Interval"];
-verb.core.IBoundingBoxTree = function() { };
-verb.core.IBoundingBoxTree.__name__ = ["verb","core","IBoundingBoxTree"];
 verb.core.CurveCurveIntersection = $hx_exports.core.CurveCurveIntersection = function(point0,point1,u0,u1) {
 	this.point0 = point0;
 	this.point1 = point1;
@@ -1165,6 +1163,9 @@ verb.core.KdNode = $hx_exports.core.KdNode = function(kdPoint,dimension,parent) 
 	this.dimension = dimension;
 };
 verb.core.KdNode.__name__ = ["verb","core","KdNode"];
+verb["eval"] = {};
+verb.eval.IBoundingBoxTree = function() { };
+verb.eval.IBoundingBoxTree.__name__ = ["verb","eval","IBoundingBoxTree"];
 verb.core.LazyCurveBoundingBoxTree = function(curve,knotTol) {
 	this._boundingBox = null;
 	this._curve = curve;
@@ -1172,7 +1173,7 @@ verb.core.LazyCurveBoundingBoxTree = function(curve,knotTol) {
 	this._knotTol = knotTol;
 };
 verb.core.LazyCurveBoundingBoxTree.__name__ = ["verb","core","LazyCurveBoundingBoxTree"];
-verb.core.LazyCurveBoundingBoxTree.__interfaces__ = [verb.core.IBoundingBoxTree];
+verb.core.LazyCurveBoundingBoxTree.__interfaces__ = [verb.eval.IBoundingBoxTree];
 verb.core.LazyCurveBoundingBoxTree.prototype = {
 	split: function() {
 		var min = verb.core.ArrayExtensions.first(this._curve.knots);
@@ -1211,7 +1212,7 @@ verb.core.LazyMeshBoundingBoxTree = function(mesh,faceIndices) {
 	this._faceIndices = faceIndices;
 };
 verb.core.LazyMeshBoundingBoxTree.__name__ = ["verb","core","LazyMeshBoundingBoxTree"];
-verb.core.LazyMeshBoundingBoxTree.__interfaces__ = [verb.core.IBoundingBoxTree];
+verb.core.LazyMeshBoundingBoxTree.__interfaces__ = [verb.eval.IBoundingBoxTree];
 verb.core.LazyMeshBoundingBoxTree.prototype = {
 	split: function() {
 		var $as = verb.core.Mesh.sortTrianglesOnLongestAxis(this.boundingBox(),this._mesh,this._faceIndices);
@@ -1240,7 +1241,7 @@ verb.core.LazyPolylineBoundingBoxTree = function(polyline,interval) {
 	this._interval = interval;
 };
 verb.core.LazyPolylineBoundingBoxTree.__name__ = ["verb","core","LazyPolylineBoundingBoxTree"];
-verb.core.LazyPolylineBoundingBoxTree.__interfaces__ = [verb.core.IBoundingBoxTree];
+verb.core.LazyPolylineBoundingBoxTree.__interfaces__ = [verb.eval.IBoundingBoxTree];
 verb.core.LazyPolylineBoundingBoxTree.prototype = {
 	split: function() {
 		var min = this._interval.min;
@@ -1275,7 +1276,7 @@ verb.core.LazySurfaceBoundingBoxTree = function(surface,splitV,knotTolU,knotTolV
 	this._knotTolV = knotTolV;
 };
 verb.core.LazySurfaceBoundingBoxTree.__name__ = ["verb","core","LazySurfaceBoundingBoxTree"];
-verb.core.LazySurfaceBoundingBoxTree.__interfaces__ = [verb.core.IBoundingBoxTree];
+verb.core.LazySurfaceBoundingBoxTree.__interfaces__ = [verb.eval.IBoundingBoxTree];
 verb.core.LazySurfaceBoundingBoxTree.prototype = {
 	split: function() {
 		var min;
@@ -1678,7 +1679,7 @@ verb.core.MeshBoundingBoxTree = function(mesh,faceIndices) {
 	this._children = new verb.core.Pair(new verb.core.MeshBoundingBoxTree(mesh,l),new verb.core.MeshBoundingBoxTree(mesh,r));
 };
 verb.core.MeshBoundingBoxTree.__name__ = ["verb","core","MeshBoundingBoxTree"];
-verb.core.MeshBoundingBoxTree.__interfaces__ = [verb.core.IBoundingBoxTree];
+verb.core.MeshBoundingBoxTree.__interfaces__ = [verb.eval.IBoundingBoxTree];
 verb.core.MeshBoundingBoxTree.prototype = {
 	split: function() {
 		return this._children;
@@ -1696,56 +1697,8 @@ verb.core.MeshBoundingBoxTree.prototype = {
 		return this._empty;
 	}
 };
-verb.core.Minimizer = function() { };
+verb.core.Minimizer = $hx_exports.core.Minimizer = function() { };
 verb.core.Minimizer.__name__ = ["verb","core","Minimizer"];
-verb.core.Minimizer.numericalGradient = function(f,x) {
-	var n = x.length;
-	var f0 = f(x);
-	if(f0 == Math.NaN) throw "gradient: f(x) is a NaN!";
-	var i;
-	var x0 = x.slice(0);
-	var f1;
-	var f2;
-	var J = [];
-	var errest;
-	var roundoff;
-	var eps = 1e-3;
-	var t0;
-	var t1;
-	var t2;
-	var it = 0;
-	var d1;
-	var d2;
-	var N;
-	var _g = 0;
-	while(_g < n) {
-		var i1 = _g++;
-		var h = Math.max(1e-6 * f0,1e-8);
-		while(true) {
-			++it;
-			if(it > 20) throw "Numerical gradient fails";
-			x0[i1] = x[i1] + h;
-			f1 = f(x0);
-			x0[i1] = x[i1] - h;
-			f2 = f(x0);
-			x0[i1] = x[i1];
-			if(Math.isNaN(f1) || Math.isNaN(f2)) {
-				h /= 16;
-				continue;
-			}
-			J[i1] = (f1 - f2) / (2 * h);
-			t0 = x[i1] - h;
-			t1 = x[i1];
-			t2 = x[i1] + h;
-			d1 = (f1 - f0) / h;
-			d2 = (f0 - f2) / h;
-			N = verb.core.Vec.max([Math.abs(J[i1]),Math.abs(f0),Math.abs(f1),Math.abs(f2),Math.abs(t0),Math.abs(t1),Math.abs(t2),1e-8]);
-			errest = Math.min(verb.core.Vec.max([Math.abs(d1 - J[i1]),Math.abs(d2 - J[i1]),Math.abs(d1 - d2)]) / N,h / N);
-			if(errest > eps) h /= 16; else break;
-		}
-	}
-	return J;
-};
 verb.core.Minimizer.uncmin = function(f,x0,tol,gradient,maxit) {
 	if(tol == null) tol = 1e-8;
 	if(gradient == null) gradient = function(x) {
@@ -1827,6 +1780,54 @@ verb.core.Minimizer.uncmin = function(f,x0,tol,gradient,maxit) {
 		++it;
 	}
 	return new verb.core.MinimizationResult(x0,f0,g0,H1,it,msg);
+};
+verb.core.Minimizer.numericalGradient = function(f,x) {
+	var n = x.length;
+	var f0 = f(x);
+	if(f0 == Math.NaN) throw "gradient: f(x) is a NaN!";
+	var i;
+	var x0 = x.slice(0);
+	var f1;
+	var f2;
+	var J = [];
+	var errest;
+	var roundoff;
+	var eps = 1e-3;
+	var t0;
+	var t1;
+	var t2;
+	var it = 0;
+	var d1;
+	var d2;
+	var N;
+	var _g = 0;
+	while(_g < n) {
+		var i1 = _g++;
+		var h = Math.max(1e-6 * f0,1e-8);
+		while(true) {
+			++it;
+			if(it > 20) throw "Numerical gradient fails";
+			x0[i1] = x[i1] + h;
+			f1 = f(x0);
+			x0[i1] = x[i1] - h;
+			f2 = f(x0);
+			x0[i1] = x[i1];
+			if(Math.isNaN(f1) || Math.isNaN(f2)) {
+				h /= 16;
+				continue;
+			}
+			J[i1] = (f1 - f2) / (2 * h);
+			t0 = x[i1] - h;
+			t1 = x[i1];
+			t2 = x[i1] + h;
+			d1 = (f1 - f0) / h;
+			d2 = (f0 - f2) / h;
+			N = verb.core.Vec.max([Math.abs(J[i1]),Math.abs(f0),Math.abs(f1),Math.abs(f2),Math.abs(t0),Math.abs(t1),Math.abs(t2),1e-8]);
+			errest = Math.min(verb.core.Vec.max([Math.abs(d1 - J[i1]),Math.abs(d2 - J[i1]),Math.abs(d1 - d2)]) / N,h / N);
+			if(errest > eps) h /= 16; else break;
+		}
+	}
+	return J;
 };
 verb.core.Minimizer.tensor = function(x,y) {
 	var m = x.length;
@@ -2177,7 +2178,6 @@ verb.core.Vec.sortedSetSub = function(a,b) {
 	}
 	return result;
 };
-verb["eval"] = {};
 verb.eval.Analyze = $hx_exports.eval.Analyze = function() { };
 verb.eval.Analyze.__name__ = ["verb","eval","Analyze"];
 verb.eval.Analyze.knotMultiplicities = function(knots) {
@@ -4214,8 +4214,7 @@ verb.eval.Modify.curveElevateDegree = function(curve,finalDegree) {
 	while(_g1 < _g) {
 		var i = _g1++;
 		var inv = 1.0 / verb.core.Binomial.get(ph,i);
-		var mpi;
-		if(newDegree < i) mpi = newDegree; else mpi = i;
+		var mpi = verb.eval.Modify.imin(newDegree,i);
 		var _g3 = verb.eval.Modify.imax(0,i - degreeInc);
 		var _g2 = mpi + 1;
 		while(_g3 < _g2) {
@@ -4226,8 +4225,7 @@ verb.eval.Modify.curveElevateDegree = function(curve,finalDegree) {
 	var _g4 = ph2 + 1;
 	while(_g4 < ph) {
 		var i1 = _g4++;
-		var mpi1;
-		if(newDegree < i1) mpi1 = newDegree; else mpi1 = i1;
+		var mpi1 = verb.eval.Modify.imin(newDegree,i1);
 		var _g21 = verb.eval.Modify.imax(0,i1 - degreeInc);
 		var _g11 = mpi1 + 1;
 		while(_g21 < _g11) {
@@ -4294,8 +4292,7 @@ verb.eval.Modify.curveElevateDegree = function(curve,finalDegree) {
 		while(_g15 < _g8) {
 			var i5 = _g15++;
 			ebpts[i5] = verb.core.Vec.zeros1d(dim);
-			var mpi2;
-			if(newDegree < i5) mpi2 = newDegree; else mpi2 = i5;
+			var mpi2 = verb.eval.Modify.imin(newDegree,i5);
 			var _g31 = verb.eval.Modify.imax(0,i5 - degreeInc);
 			var _g22 = mpi2 + 1;
 			while(_g31 < _g22) {

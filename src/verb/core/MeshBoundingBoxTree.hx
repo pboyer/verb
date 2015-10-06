@@ -3,6 +3,7 @@ package verb.core;
 using verb.core.ArrayExtensions;
 
 import verb.core.Data;
+import verb.eval.Intersect;
 
 class MeshBoundingBoxTree implements IBoundingBoxTree<Int> {
 

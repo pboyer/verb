@@ -6,6 +6,7 @@ import verb.core.Data;
 
 import verb.eval.Eval;
 import verb.eval.Divide;
+import verb.eval.Intersect;
 
 class LazyCurveBoundingBoxTree implements IBoundingBoxTree<NurbsCurveData> {
 

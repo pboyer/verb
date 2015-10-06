@@ -1,9 +1,7 @@
 package verb;
 
-//intersection
-import verb.geom.Intersect;
+// geom
 
-//curves
 import verb.geom.NurbsCurve;
 import verb.geom.Arc;
 import verb.geom.Line;
@@ -11,8 +9,6 @@ import verb.geom.BezierCurve;
 import verb.geom.Circle;
 import verb.geom.Ellipse;
 import verb.geom.EllipseArc;
-
-//surfaces
 import verb.geom.NurbsSurface;
 import verb.geom.SphericalSurface;
 import verb.geom.RevolvedSurface;
@@ -20,8 +16,10 @@ import verb.geom.ExtrudedSurface;
 import verb.geom.CylindricalSurface;
 import verb.geom.ConicalSurface;
 import verb.geom.SweptSurface;
+import verb.geom.Intersect;
 
-//core
+// core
+
 import verb.core.BoundingBox;
 import verb.core.Constants;
 import verb.core.Trig;
@@ -29,6 +27,8 @@ import verb.core.Minimizer;
 import verb.core.ArrayExtensions;
 import verb.core.Mesh;
 import verb.core.KdTree;
+
+// eval
 
 import verb.eval.Eval;
 import verb.eval.Intersect;

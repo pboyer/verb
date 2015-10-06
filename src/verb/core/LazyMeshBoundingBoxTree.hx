@@ -1,6 +1,7 @@
 package verb.core;
 
 import verb.core.Data;
+import verb.eval.Intersect;
 
 using verb.core.ArrayExtensions;
 

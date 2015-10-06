@@ -5,6 +5,7 @@ using verb.core.ArrayExtensions;
 using verb.core.Vec;
 import verb.eval.Divide;
 import verb.eval.Eval;
+import verb.eval.Intersect;
 
 class SurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
 
