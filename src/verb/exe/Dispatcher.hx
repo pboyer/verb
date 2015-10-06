@@ -14,8 +14,6 @@ class Dispatcher {
 
     public static var THREADS : Int = 1;
 
-    private static var _instance: Dispatcher = null;
-
     #if (neko || cpp)
         private static var _threadPool : ThreadPool;
     #elseif js
@@ -50,16 +48,15 @@ class Dispatcher {
 
         #if js
 
-            //use WorkerPool
             _workerPool.addWork( Type.getClassName( classType ), methodName, args, callback );
 
         #else
-            //TODO: neko || cpp use ThreadPool
-            var result = Reflect.callMethod(classType, Reflect.field(classType, methodName), args );
-            callback( result );
+
+            _threadPool.addTask(function(){ return Reflect.callMethod(classType, Reflect.field(classType, methodName), args )  },
+                null, callback);
+
         #end
 
         return new Promise<T>( def );
     }
-
 }

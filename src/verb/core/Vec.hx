@@ -8,6 +8,8 @@ using Lambda;
 
 import verb.core.Data;
 
+// Tools for working with matrices
+
 @:expose("core.Vec")
 class Vec {
 

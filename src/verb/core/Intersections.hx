@@ -23,7 +23,6 @@ class CurveCurveIntersection {
         this.u0 = u0;
         this.u1 = u1;
     }
-
 }
 
 @:expose("core.CurveSurfaceIntersection")
@@ -44,6 +43,7 @@ class CurveSurfaceIntersection {
 
 @:expose("core.MeshIntersectionPoint")
 class MeshIntersectionPoint {
+
     public var uv0 : UV;
     public var uv1 : UV;
     public var point : Point;

@@ -3,14 +3,21 @@ package verb.core;
 import verb.core.Vec;
 import verb.core.Data;
 
+// Tools for working with matrices
+
 @:expose("core.Mat")
 class Mat {
+
+    // Multiply a `Matrix` by a constant
 
     public static function mul(a : Float, b : Matrix ) : Matrix {
         return [ for (i in 0...b.length) Vec.mul(a, b[i]) ];
     }
 
-    //based on the numeric.js routine - numeric.dotMMsmall
+    // Multiply two matrices assuming they are of compatible dimensions.
+    //
+    // Based on the numeric.js routine - `numeric.dotMMsmall`
+
     public static function mult(x : Matrix, y : Matrix) : Matrix {
 
         var p,q,r,ret,foo,bar,woo,i0,k0,p0,r0;
@@ -46,21 +53,31 @@ class Mat {
         return ret;
     }
 
+    // Add two matrices
+
     public static function add(a : Matrix, b : Matrix ) : Matrix {
         return [ for (i in 0...a.length) Vec.add(a[i], b[i]) ];
     }
+
+    // Divide each of entry of a Matrix by a constant
 
     public static function div(a : Matrix, b : Float ) : Matrix {
         return [ for (i in 0...a.length) Vec.div(a[i], b) ];
     }
 
+    // Subtract two matrices
+
     public static function sub(a : Matrix, b : Matrix ) : Matrix {
         return [ for (i in 0...a.length) Vec.sub(a[i], b[i]) ];
     }
 
+    // Multiply a `Matrix` by a `Vector`
+
     public static function dot(a : Matrix, b : Vector ) : Vector {
         return [ for (i in 0...a.length) Vec.dot(a[i], b) ];
     }
+
+    // Build an identity matrix of a given size
 
     public static function identity(n : Int) : Matrix {
         var zeros = Vec.zeros2d(n, n);
@@ -68,14 +85,20 @@ class Mat {
         return zeros;
     }
 
+    // Transpose a matrix
+
     public static function transpose<T>(a : Array<Array<T>>) : Array<Array<T>> {
         if (a.length == 0) return [];
         return [ for (i in 0...a[0].length) [for (j in 0...a.length) a[j][i] ]  ];
     }
 
+    // Solve a system of equations
+
     public static function solve(A : Matrix, b : Vector) : Vector {
         return LUsolve( LU(A), b );
     }
+
+    // Based on methods from numeric.js
 
     private static function LUsolve(LUP : LUDecomp, b : Vector) : Vector {
         var i, j;
@@ -124,6 +147,8 @@ class Mat {
 
         return x;
     }
+
+    // Based on methods from numeric.js
 
     private static function LU( A : Matrix ) : LUDecomp {
 
@@ -188,7 +213,9 @@ class Mat {
 
 }
 
-class LUDecomp {
+// Based on methods from numeric.js
+
+private class LUDecomp {
 
     public var LU : Matrix;
     public var P : Array<Int>;

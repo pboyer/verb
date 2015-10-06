@@ -4,33 +4,22 @@ import haxe.ds.IntMap;
 
 import js.html.Worker;
 
-@:expose("exe.Work")
-class Work {
-
-    private static var uuid : Int = 0;
-
-    public var className : String;
-    public var methodName : String;
-    public var args : Array<Dynamic>;
-    public var id : Int;
-
-    public function new(className, methodName, args){
-        this.className = className;
-        this.methodName = methodName;
-        this.args = args;
-        this.id = uuid++;
-    }
-}
+// `WorkerPool` provides a pool of WebWorker objects for concurrent evaluation
 
 @:expose("exe.WorkerPool")
 class WorkerPool {
-
-    public static var basePath  = "";
 
     private var _queue : Array<Work> = [];
     private var _pool : Array<Worker> = [];
     private var _working = new IntMap<Worker>();
     private var _callbacks = new IntMap<Dynamic>();
+
+    // Create a new `WorkerPool
+    //
+    //**params
+    //
+    //* the number of `Worker` threads to form
+    //* the filename of verb's javascript file - defaults to "verb.js". The final path is formed by concatenating `WorkerPool.basePath` and this.
 
     public function new( numThreads : Int, fileName : String = "verb.js" ) {
 
@@ -46,6 +35,12 @@ class WorkerPool {
         }
     }
 
+    // The base path to look for verb's source code
+
+    public static var basePath  = "";
+
+    // Add work to perform to the queue
+
     public function addWork( className : String,
                              methodName : String,
                              arguments : Array<Dynamic>,
@@ -58,7 +53,7 @@ class WorkerPool {
         processQueue();
     }
 
-    public function processQueue() {
+    private function processQueue() {
 
         while (_queue.length > 0 && _pool.length > 0) {
 
@@ -93,4 +88,22 @@ class WorkerPool {
     }
 
 }
+
+private class Work {
+
+    private static var uuid : Int = 0;
+
+    public var className : String;
+    public var methodName : String;
+    public var args : Array<Dynamic>;
+    public var id : Int;
+
+    public function new(className, methodName, args){
+        this.className = className;
+        this.methodName = methodName;
+        this.args = args;
+        this.id = uuid++;
+    }
+}
+
 

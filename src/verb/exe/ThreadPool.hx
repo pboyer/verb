@@ -60,7 +60,7 @@ package verb.exe;
 	}
 #end
 
-typedef Task =
+private typedef Task =
 {
     var id:Int;
     var task:Dynamic->Dynamic;
