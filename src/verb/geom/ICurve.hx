@@ -1,7 +1,5 @@
 package verb.geom;
 
-import verb.core.Interval;
-
 import verb.core.Data;
 import verb.core.Vec;
 import verb.core.Mat;

@@ -2,6 +2,7 @@ package verb.core;
 import verb.core.Mat;
 
 import verb.core.Vec;
+import verb.core.Data;
 
 class Minimizer {
 

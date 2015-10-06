@@ -1,6 +1,5 @@
 package verb.eval;
 
-import verb.core.AdaptiveRefinementNode.AdaptiveRefinementOptions;
 import verb.core.Data;
 
 import verb.core.ArrayExtensions;
@@ -11,6 +10,7 @@ using verb.core.Mat;
 
 import verb.core.Vec;
 import verb.core.Constants;
+import verb.eval.Tess;
 
 import verb.core.Trig;
 

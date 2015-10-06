@@ -1,8 +1,7 @@
 package verb.core;
 
 import verb.core.Vec;
-
-typedef Matrix = Array<Array<Float>>
+import verb.core.Data;
 
 @:expose("core.Mat")
 class Mat {

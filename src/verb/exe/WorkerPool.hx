@@ -35,7 +35,14 @@ class WorkerPool {
     public function new( numThreads : Int, fileName : String = "verb.js" ) {
 
         for (i in 0...numThreads){
-           _pool.push( new Worker( basePath + fileName) );
+            var w : Worker;
+            try {
+                w = new Worker( basePath + fileName );
+            } catch (e : Dynamic ) {
+                w = new Worker( basePath + fileName.substring(0,-3) + ".min.js" );
+            }
+
+           _pool.push( w );
         }
     }
 

@@ -313,6 +313,22 @@ describe("verb.core.AdaptiveRefinementNode.getAllCorners",function(){
 
 });
 
+describe("verb.core.Vec.signedAngleBetween",function(){
+    it('computes correct area for triangular prism', function(){
+        verb.core.Vec.signedAngleBetween( [1,0,0], [0,1,0], [0,0,1] ).should.be.approximately( Math.PI / 2, verb.core.Constants.EPSILON );
+        verb.core.Vec.signedAngleBetween( [1,0,0], [-1,0,0], [0,0,1] ).should.be.approximately( Math.PI, verb.core.Constants.EPSILON );
+        verb.core.Vec.signedAngleBetween( [1,0,0], [0,-1,0], [0,0,1] ).should.be.approximately( 3 * Math.PI / 2, verb.core.Constants.EPSILON );
+    });
+});
+
+describe("verb.core.Trig.isPointInPlane",function(){
+    it('works for a few basic cases', function(){
+        verb.core.Trig.isPointInPlane( [0,0,0], new verb.core.Plane( [0,0,0], [1,0,0] ), verb.core.Constants.EPSILON  ).should.be.equal( true );
+        verb.core.Trig.isPointInPlane( [0,0,1], new verb.core.Plane( [0,0,0], [1,0,0] ), verb.core.Constants.EPSILON  ).should.be.equal( true );
+        verb.core.Trig.isPointInPlane( [1,0,1], new verb.core.Plane( [0,0,0], [1,0,0] ), verb.core.Constants.EPSILON  ).should.be.equal( false );
+    });
+});
+
 describe("verb.core.AdaptiveRefinementNode.divide",function(){
 
 	it('can be called with options.minDepth', function(){
@@ -566,125 +582,6 @@ describe("verb.core.Mat.solve",function(){
 		vecShouldBe( b, s );
 
 	});
-});
-
-describe("verb.eval.Make.rationalInterpCurve",function(){
-
-	function shouldInterpPointsWithTangents(pts, degree, isHomo, start_tangent, end_tangent){
-
-		var crv = shouldInterpPoints(pts, degree, isHomo, start_tangent, end_tangent);
-
-		var tan0 = verb.eval.Eval.rationalCurveDerivatives( crv, 0, 1)[1];
-		var tan1 = verb.eval.Eval.rationalCurveDerivatives( crv, 1, 1)[1];
-
-		vecShouldBe( start_tangent, tan0 );
-		vecShouldBe( end_tangent, tan1 );
-
-	}
-
-	function shouldInterpPoints(pts, degree, isHomo, start_tangent, end_tangent){
-
-		var crv = verb.eval.Make.rationalInterpCurve( pts, degree, isHomo, start_tangent, end_tangent );
-
-		crv.degree.should.be.equal( degree );
-
-		crv.controlPoints[0][0].should.be.approximately(pts[0][0], verb.core.Constants.TOLERANCE);
-		crv.controlPoints[0][1].should.be.approximately(pts[0][1], verb.core.Constants.TOLERANCE);
-
-		last(crv.controlPoints)[0].should.be.approximately(last(pts)[0], verb.core.Constants.TOLERANCE);
-		last(crv.controlPoints)[1].should.be.approximately(last(pts)[1], verb.core.Constants.TOLERANCE);
-
-		// // the internal points are interped (TODO: do this more efficiently)
-		var tess = verb.eval.Tess.rationalCurveAdaptiveSample( crv, 1e-8  );
-
-		for (var j = 0; j < pts.length; j++){
-
-			var min = Number.MAX_VALUE;
-			for (var i = 1; i < tess.length; i++){
-
-				var pt = pts[j];
-				var o = tess[i-1];
-				var r = verb.core.Vec.normalized( verb.core.Vec.sub( tess[i], tess[i-1] ) );
-
-				var dist = verb.core.Trig.distToRay( pt, o, r );
-
-				if (dist < min) {
-					min = dist;
-				}
-
-			}
-
-			min.should.be.lessThan( 1e-3 );
-		}
-
-		return crv;
-	}
-
-	it('can compute valid cubic interpolating curve for 4 points', function(){
-
-		var pts = [ [0, 0, 1], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ];
-
-		shouldInterpPoints( pts, 3 );
-
-	});
-
-
-	it('can compute valid degree 4 interpolating curve for 4 points', function(){
-
-		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ];
-
-		shouldInterpPoints( pts, 4 );
-
-	});
-
-	it('can compute valid quadratic interpolating curve for 4 points', function(){
-
-		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ];
-
-		shouldInterpPoints( pts, 2 );
-
-	});
-
-	it('can compute valid cubic interpolating curve for 100 points', function(){
-
-		var pts = [];
-		for (var i = 0; i < 100; i++){
-
-			pts.push( [ 50 * Math.sin( (i / 100) * Math.PI ),
-									50 * Math.cos( (i / 100) * Math.PI ),
-									0 ]);
-
-		}
-
-		shouldInterpPoints( pts, 3 );
-
-	});
-
-	it('can compute valid cubic interpolating points and tangents', function(){
-
-		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ];
-
-		shouldInterpPointsWithTangents( pts, 3, false, [1,0,0], [0,1,0] );
-
-	});
-
-	// this fails occasionally - don't know why
-	// it('can compute valid quadratic curve interpolating points and tangents', function(){
-
-	// 	var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ];
-
-	// 	shouldInterpPointsWithTangents( pts, 2, false, [1,0,0], [0,1,0] );
-
-	// });
-
-	// it('can compute valid quadratic curve interpolating points and tangents', function(){
-
-	// 	var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ];
-
-	// 	shouldInterpPointsWithTangents( pts, 4, false, [1,0,0], [0,1,0] );
-
-	// });
-
 });
 
 

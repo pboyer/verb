@@ -1,7 +1,6 @@
 package verb.core;
 
 import verb.core.BoundingBox;
-import verb.core.Pair;
 import verb.core.Data;
 
 using verb.core.ArrayExtensions;

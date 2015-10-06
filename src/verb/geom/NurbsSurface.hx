@@ -8,24 +8,23 @@ import promhx.Promise;
 
 import verb.eval.Divide;
 
-import verb.core.AdaptiveRefinementNode.AdaptiveRefinementOptions;
 import verb.eval.Tess;
 import verb.eval.Modify;
 import verb.eval.Analyze;
 import verb.core.ArrayExtensions;
 using verb.core.ArrayExtensions;
 
-import verb.core.Interval;
 import verb.eval.Eval;
 import verb.exe.AsyncObject;
 import verb.core.Mat;
 
 // A NURBS surface - this class represents the base class of many of verb's surface types and provides many tools for analysis and evaluation.
-// This object is deliberately constrained to be immutable. There are methods to gain access to the underlying fields. `asNurbs` can
-// be used to obtain a simplified NurbsCurveData object that can be used with verb.core.
+// This object is deliberately constrained to be immutable. The methods to inspect the properties of this class deliberately return copies. `asNurbs` can
+// be used to obtain a simplified NurbsCurveData object that can be used with `verb.core` or for serialization purposes.
 //
-// Under the hood, this type takes advantage of verb's asynchronous runtime from the Async methods. Calling one of these
-// methods returns a `Promise`. You can find further documentation for this type at https://github.com/jdonaldson/promhx.
+// Under the hood, this type takes advantage of verb's asynchronous runtime using the _Async methods. Calling one of these
+// methods returns a `Promise` that respect the  You can find further documentation for this type at
+// [https://github.com/jdonaldson/promhx](https://github.com/jdonaldson/promhx).
 
 @:expose("geom.NurbsSurface")
 class NurbsSurface extends AsyncObject implements ISurface {

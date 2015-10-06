@@ -1,5 +1,8 @@
 package verb.core;
 
+// `Constants` contains a collection of default constants used throughout the library. These can be set to adjust verb's
+// defaults.
+
 @:expose("core.Constants")
 class Constants {
     

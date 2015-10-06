@@ -691,252 +691,6 @@ verb.Verb.main = function() {
 	console.log("verb 2.0.0");
 };
 verb.core = {};
-verb.core.AdaptiveRefinementOptions = $hx_exports.core.AdaptiveRefinementOptions = function() {
-	this.minDivsV = 1;
-	this.minDivsU = 1;
-	this.refine = true;
-	this.maxDepth = 10;
-	this.minDepth = 0;
-	this.normTol = 2.5e-2;
-};
-verb.core.AdaptiveRefinementOptions.__name__ = ["verb","core","AdaptiveRefinementOptions"];
-verb.core.AdaptiveRefinementNode = $hx_exports.core.AdaptiveRefinementNode = function(srf,corners,neighbors) {
-	this.srf = srf;
-	if(neighbors == null) this.neighbors = [null,null,null,null]; else this.neighbors = neighbors;
-	this.corners = corners;
-	if(this.corners == null) {
-		var u0 = srf.knotsU[0];
-		var u1 = verb.core.ArrayExtensions.last(srf.knotsU);
-		var v0 = srf.knotsV[0];
-		var v1 = verb.core.ArrayExtensions.last(srf.knotsV);
-		this.corners = [verb.core.SurfacePoint.fromUv(u0,v0),verb.core.SurfacePoint.fromUv(u1,v0),verb.core.SurfacePoint.fromUv(u1,v1),verb.core.SurfacePoint.fromUv(u0,v1)];
-	}
-};
-verb.core.AdaptiveRefinementNode.__name__ = ["verb","core","AdaptiveRefinementNode"];
-verb.core.AdaptiveRefinementNode.prototype = {
-	isLeaf: function() {
-		return this.children == null;
-	}
-	,center: function() {
-		if(this.centerPoint != null) return this.centerPoint; else return this.evalSrf(this.u05,this.v05);
-	}
-	,evalCorners: function() {
-		this.u05 = (this.corners[0].uv[0] + this.corners[2].uv[0]) / 2;
-		this.v05 = (this.corners[0].uv[1] + this.corners[2].uv[1]) / 2;
-		var _g = 0;
-		while(_g < 4) {
-			var i = _g++;
-			if(this.corners[i].point == null) {
-				var c = this.corners[i];
-				this.evalSrf(c.uv[0],c.uv[1],c);
-			}
-		}
-	}
-	,evalSrf: function(u,v,srfPt) {
-		var derivs = verb.eval.Eval.rationalSurfaceDerivatives(this.srf,u,v,1);
-		var pt = derivs[0][0];
-		var norm = verb.core.Vec.cross(derivs[0][1],derivs[1][0]);
-		var degen = verb.core.Vec.isZero(norm);
-		if(!degen) norm = verb.core.Vec.normalized(norm);
-		if(srfPt != null) {
-			srfPt.degen = degen;
-			srfPt.point = pt;
-			srfPt.normal = norm;
-			return srfPt;
-		} else return new verb.core.SurfacePoint(pt,norm,[u,v],-1,degen);
-	}
-	,getEdgeCorners: function(edgeIndex) {
-		if(this.isLeaf()) return [this.corners[edgeIndex]];
-		if(this.horizontal) switch(edgeIndex) {
-		case 0:
-			return this.children[0].getEdgeCorners(0);
-		case 1:
-			return this.children[0].getEdgeCorners(1).concat(this.children[1].getEdgeCorners(1));
-		case 2:
-			return this.children[1].getEdgeCorners(2);
-		case 3:
-			return this.children[1].getEdgeCorners(3).concat(this.children[0].getEdgeCorners(3));
-		}
-		switch(edgeIndex) {
-		case 0:
-			return this.children[0].getEdgeCorners(0).concat(this.children[1].getEdgeCorners(0));
-		case 1:
-			return this.children[1].getEdgeCorners(1);
-		case 2:
-			return this.children[1].getEdgeCorners(2).concat(this.children[0].getEdgeCorners(2));
-		case 3:
-			return this.children[0].getEdgeCorners(3);
-		}
-		return null;
-	}
-	,getAllCorners: function(edgeIndex) {
-		var baseArr = [this.corners[edgeIndex]];
-		if(this.neighbors[edgeIndex] == null) return baseArr;
-		var corners = this.neighbors[edgeIndex].getEdgeCorners((edgeIndex + 2) % 4);
-		var funcIndex = edgeIndex % 2;
-		var e = verb.core.Constants.EPSILON;
-		var that = this;
-		var rangeFuncMap = [function(c) {
-			return c.uv[0] > that.corners[0].uv[0] + e && c.uv[0] < that.corners[2].uv[0] - e;
-		},function(c1) {
-			return c1.uv[1] > that.corners[0].uv[1] + e && c1.uv[1] < that.corners[2].uv[1] - e;
-		}];
-		var cornercopy = corners.filter(rangeFuncMap[funcIndex]);
-		cornercopy.reverse();
-		return baseArr.concat(cornercopy);
-	}
-	,midpoint: function(index) {
-		if(this.midPoints == null) this.midPoints = [null,null,null,null];
-		if(!(this.midPoints[index] == null)) return this.midPoints[index];
-		switch(index) {
-		case 0:
-			this.midPoints[0] = this.evalSrf(this.u05,this.corners[0].uv[1]);
-			break;
-		case 1:
-			this.midPoints[1] = this.evalSrf(this.corners[1].uv[0],this.v05);
-			break;
-		case 2:
-			this.midPoints[2] = this.evalSrf(this.u05,this.corners[2].uv[1]);
-			break;
-		case 3:
-			this.midPoints[3] = this.evalSrf(this.corners[0].uv[0],this.v05);
-			break;
-		}
-		return this.midPoints[index];
-	}
-	,hasBadNormals: function() {
-		return this.corners[0].degen || this.corners[1].degen || this.corners[2].degen || this.corners[3].degen;
-	}
-	,fixNormals: function() {
-		var l = this.corners.length;
-		var _g = 0;
-		while(_g < l) {
-			var i = _g++;
-			var corn = this.corners[i];
-			if(this.corners[i].degen) {
-				var v1 = this.corners[(i + 1) % l];
-				var v2 = this.corners[(i + 3) % l];
-				if(v1.degen) this.corners[i].normal = v2.normal; else this.corners[i].normal = v1.normal;
-			}
-		}
-	}
-	,shouldDivide: function(options,currentDepth) {
-		if(currentDepth < options.minDepth) return true;
-		if(currentDepth >= options.maxDepth) return false;
-		if(this.hasBadNormals()) {
-			this.fixNormals();
-			return false;
-		}
-		this.splitVert = verb.core.Vec.normSquared(verb.core.Vec.sub(this.corners[0].normal,this.corners[1].normal)) > options.normTol || verb.core.Vec.normSquared(verb.core.Vec.sub(this.corners[2].normal,this.corners[3].normal)) > options.normTol;
-		this.splitHoriz = verb.core.Vec.normSquared(verb.core.Vec.sub(this.corners[1].normal,this.corners[2].normal)) > options.normTol || verb.core.Vec.normSquared(verb.core.Vec.sub(this.corners[3].normal,this.corners[0].normal)) > options.normTol;
-		if(this.splitVert || this.splitHoriz) return true;
-		var center = this.center();
-		return verb.core.Vec.normSquared(verb.core.Vec.sub(center.normal,this.corners[0].normal)) > options.normTol || verb.core.Vec.normSquared(verb.core.Vec.sub(center.normal,this.corners[1].normal)) > options.normTol || verb.core.Vec.normSquared(verb.core.Vec.sub(center.normal,this.corners[2].normal)) > options.normTol || verb.core.Vec.normSquared(verb.core.Vec.sub(center.normal,this.corners[3].normal)) > options.normTol;
-	}
-	,divide: function(options) {
-		if(options == null) options = new verb.core.AdaptiveRefinementOptions();
-		if(options.normTol == null) options.normTol = 8.5e-2;
-		if(options.minDepth == null) options.minDepth = 0;
-		if(options.maxDepth == null) options.maxDepth = 10;
-		this._divide(options,0,true);
-	}
-	,_divide: function(options,currentDepth,horiz) {
-		this.evalCorners();
-		if(!this.shouldDivide(options,currentDepth)) return;
-		currentDepth++;
-		if(this.splitVert && !this.splitHoriz) horiz = false; else if(!this.splitVert && this.splitHoriz) horiz = true;
-		this.horizontal = horiz;
-		if(this.horizontal) {
-			var bott = [this.corners[0],this.corners[1],this.midpoint(1),this.midpoint(3)];
-			var top = [this.midpoint(3),this.midpoint(1),this.corners[2],this.corners[3]];
-			this.children = [new verb.core.AdaptiveRefinementNode(this.srf,bott),new verb.core.AdaptiveRefinementNode(this.srf,top)];
-			this.children[0].neighbors = [this.neighbors[0],this.neighbors[1],this.children[1],this.neighbors[3]];
-			this.children[1].neighbors = [this.children[0],this.neighbors[1],this.neighbors[2],this.neighbors[3]];
-		} else {
-			var left = [this.corners[0],this.midpoint(0),this.midpoint(2),this.corners[3]];
-			var right = [this.midpoint(0),this.corners[1],this.corners[2],this.midpoint(2)];
-			this.children = [new verb.core.AdaptiveRefinementNode(this.srf,left),new verb.core.AdaptiveRefinementNode(this.srf,right)];
-			this.children[0].neighbors = [this.neighbors[0],this.children[1],this.neighbors[2],this.neighbors[3]];
-			this.children[1].neighbors = [this.neighbors[0],this.neighbors[1],this.neighbors[2],this.children[0]];
-		}
-		var _g = 0;
-		var _g1 = this.children;
-		while(_g < _g1.length) {
-			var child = _g1[_g];
-			++_g;
-			child._divide(options,currentDepth,!horiz);
-		}
-	}
-	,triangulate: function(mesh) {
-		if(mesh == null) mesh = verb.core.MeshData.empty();
-		if(this.isLeaf()) return this.triangulateLeaf(mesh);
-		var _g = 0;
-		var _g1 = this.children;
-		while(_g < _g1.length) {
-			var x = _g1[_g];
-			++_g;
-			if(x == null) break;
-			x.triangulate(mesh);
-		}
-		return mesh;
-	}
-	,triangulateLeaf: function(mesh) {
-		var baseIndex = mesh.points.length;
-		var uvs = [];
-		var ids = [];
-		var splitid = 0;
-		var _g = 0;
-		while(_g < 4) {
-			var i = _g++;
-			var edgeCorners = this.getAllCorners(i);
-			if(edgeCorners.length == 2) splitid = i + 1;
-			var _g2 = 0;
-			var _g1 = edgeCorners.length;
-			while(_g2 < _g1) {
-				var j = _g2++;
-				uvs.push(edgeCorners[j]);
-			}
-		}
-		var _g3 = 0;
-		while(_g3 < uvs.length) {
-			var corner = uvs[_g3];
-			++_g3;
-			if(corner.id != -1) {
-				ids.push(corner.id);
-				continue;
-			}
-			mesh.uvs.push(corner.uv);
-			mesh.points.push(corner.point);
-			mesh.normals.push(corner.normal);
-			corner.id = baseIndex;
-			ids.push(baseIndex);
-			baseIndex++;
-		}
-		if(uvs.length == 4) {
-			mesh.faces.push([ids[0],ids[3],ids[1]]);
-			mesh.faces.push([ids[3],ids[2],ids[1]]);
-			return mesh;
-		} else if(uvs.length == 5) {
-			var il = ids.length;
-			mesh.faces.push([ids[splitid],ids[(splitid + 2) % il],ids[(splitid + 1) % il]]);
-			mesh.faces.push([ids[(splitid + 4) % il],ids[(splitid + 3) % il],ids[splitid]]);
-			mesh.faces.push([ids[splitid],ids[(splitid + 3) % il],ids[(splitid + 2) % il]]);
-			return mesh;
-		}
-		var center = this.center();
-		mesh.uvs.push(center.uv);
-		mesh.points.push(center.point);
-		mesh.normals.push(center.normal);
-		var centerIndex = mesh.points.length - 1;
-		var i1 = 0;
-		var j1 = uvs.length - 1;
-		while(i1 < uvs.length) {
-			mesh.faces.push([centerIndex,ids[i1],ids[j1]]);
-			j1 = i1++;
-		}
-		return mesh;
-	}
-};
 verb.core.ArrayExtensions = function() { };
 verb.core.ArrayExtensions.__name__ = ["verb","core","ArrayExtensions"];
 verb.core.ArrayExtensions.alloc = function(a,n) {
@@ -1153,6 +907,24 @@ verb.core.BoundingBox.prototype = {
 };
 verb.core.Constants = $hx_exports.core.Constants = function() { };
 verb.core.Constants.__name__ = ["verb","core","Constants"];
+verb.core.Plane = $hx_exports.core.Plane = function(origin,normal) {
+	this.origin = origin;
+	this.normal = normal;
+};
+verb.core.Plane.__name__ = ["verb","core","Plane"];
+verb.core.Ray = $hx_exports.core.Ray = function(origin,dir) {
+	this.origin = origin;
+	this.dir = dir;
+};
+verb.core.Ray.__name__ = ["verb","core","Ray"];
+verb.core.NurbsCurveData = $hx_exports.core.NurbsCurveData = function(degree,knots,controlPoints,closed) {
+	if(closed == null) closed = false;
+	this.degree = degree;
+	this.controlPoints = controlPoints;
+	this.knots = knots;
+	this.closed = closed;
+};
+verb.core.NurbsCurveData.__name__ = ["verb","core","NurbsCurveData"];
 verb.core.NurbsSurfaceData = $hx_exports.core.NurbsSurfaceData = function(degreeU,degreeV,knotsU,knotsV,controlPoints,closedU,closedV) {
 	if(closedV == null) closedV = false;
 	if(closedU == null) closedU = false;
@@ -1165,14 +937,6 @@ verb.core.NurbsSurfaceData = $hx_exports.core.NurbsSurfaceData = function(degree
 	this.closedV = closedV;
 };
 verb.core.NurbsSurfaceData.__name__ = ["verb","core","NurbsSurfaceData"];
-verb.core.NurbsCurveData = $hx_exports.core.NurbsCurveData = function(degree,knots,controlPoints,closed) {
-	if(closed == null) closed = false;
-	this.degree = degree;
-	this.controlPoints = controlPoints;
-	this.knots = knots;
-	this.closed = closed;
-};
-verb.core.NurbsCurveData.__name__ = ["verb","core","NurbsCurveData"];
 verb.core.MeshData = $hx_exports.core.MeshData = function(faces,points,normals,uvs) {
 	this.faces = faces;
 	this.points = points;
@@ -1198,6 +962,16 @@ verb.core.VolumeData = $hx_exports.core.VolumeData = function(degreeU,degreeV,de
 	this.controlPoints = controlPoints;
 };
 verb.core.VolumeData.__name__ = ["verb","core","VolumeData"];
+verb.core.Pair = $hx_exports.core.Pair = function(item1,item2) {
+	this.item0 = item1;
+	this.item1 = item2;
+};
+verb.core.Pair.__name__ = ["verb","core","Pair"];
+verb.core.Interval = $hx_exports.core.Interval = function(min,max) {
+	this.min = min;
+	this.max = max;
+};
+verb.core.Interval.__name__ = ["verb","core","Interval"];
 verb.core.IBoundingBoxTree = function() { };
 verb.core.IBoundingBoxTree.__name__ = ["verb","core","IBoundingBoxTree"];
 verb.core.CurveCurveIntersection = $hx_exports.core.CurveCurveIntersection = function(point0,point1,u0,u1) {
@@ -1271,11 +1045,6 @@ verb.core.CurvePoint = $hx_exports.core.CurvePoint = function(u,pt) {
 	this.pt = pt;
 };
 verb.core.CurvePoint.__name__ = ["verb","core","CurvePoint"];
-verb.core.Interval = $hx_exports.core.Interval = function(min,max) {
-	this.min = min;
-	this.max = max;
-};
-verb.core.Interval.__name__ = ["verb","core","Interval"];
 verb.core.KdTree = $hx_exports.core.KdTree = function(points,distanceFunction) {
 	this.dim = 3;
 	this.points = points;
@@ -2157,20 +1926,10 @@ verb.core.MinimizationResult = function(solution,value,gradient,invHessian,itera
 	this.message = message;
 };
 verb.core.MinimizationResult.__name__ = ["verb","core","MinimizationResult"];
-verb.core.Pair = $hx_exports.core.Pair = function(item1,item2) {
-	this.item0 = item1;
-	this.item1 = item2;
-};
-verb.core.Pair.__name__ = ["verb","core","Pair"];
-verb.core.Ray = $hx_exports.core.Ray = function(origin,dir) {
-	this.origin = origin;
-	this.dir = dir;
-};
-verb.core.Ray.__name__ = ["verb","core","Ray"];
 verb.core.Trig = $hx_exports.core.Trig = function() { };
 verb.core.Trig.__name__ = ["verb","core","Trig"];
 verb.core.Trig.isPointInPlane = function(pt,p,tol) {
-	return Math.abs(verb.core.Vec.dot(verb.core.Vec.sub(pt,p.o),p.n)) < tol;
+	return Math.abs(verb.core.Vec.dot(verb.core.Vec.sub(pt,p.origin),p.normal)) < tol;
 };
 verb.core.Trig.distToSegment = function(a,b,c) {
 	var res = verb.core.Trig.segmentClosestPoint(b,a,c,0.0,1.0);
@@ -2526,7 +2285,7 @@ verb.eval.Analyze.rationalSurfaceClosestParam = function(surface,p) {
 	var closedu = verb.eval.Analyze.isRationalSurfaceClosed(surface);
 	var closedv = verb.eval.Analyze.isRationalSurfaceClosed(surface,false);
 	var cuv;
-	var tess = verb.eval.Tess.rationalSurfaceAdaptive(surface,new verb.core.AdaptiveRefinementOptions());
+	var tess = verb.eval.Tess.rationalSurfaceAdaptive(surface,new verb.eval.AdaptiveRefinementOptions());
 	var dmin = Math.POSITIVE_INFINITY;
 	var _g1 = 0;
 	var _g = tess.points.length;
@@ -3931,11 +3690,6 @@ verb.eval.Intersect.segmentAndPlane = function(p0,p1,v0,n) {
 	if(p > 1.0 + verb.core.Constants.EPSILON || p < -verb.core.Constants.EPSILON) return null;
 	return { p : p};
 };
-verb.eval.CurveCurveIntersectionOptions = $hx_exports.core.CurveCurveIntersectionOptions = function() {
-	this.tol = verb.core.Constants.TOLERANCE;
-	this.sampleTol = verb.core.Constants.TOLERANCE;
-};
-verb.eval.CurveCurveIntersectionOptions.__name__ = ["verb","eval","CurveCurveIntersectionOptions"];
 verb.eval.Make = $hx_exports.eval.Make = function() { };
 verb.eval.Make.__name__ = ["verb","eval","Make"];
 verb.eval.Make.rationalTranslationalSurface = function(profile,rail) {
@@ -5006,7 +4760,7 @@ verb.eval.Tess.rationalSurfaceNaive = function(surface,divs_u,divs_v) {
 	return new verb.core.MeshData(faces,points,normals,uvs);
 };
 verb.eval.Tess.divideRationalSurfaceAdaptive = function(surface,options) {
-	if(options == null) options = new verb.core.AdaptiveRefinementOptions();
+	if(options == null) options = new verb.eval.AdaptiveRefinementOptions();
 	if(options.minDivsU != null) options.minDivsU = options.minDivsU; else options.minDivsU = 1;
 	if(options.minDivsV != null) options.minDivsU = options.minDivsV; else options.minDivsU = 1;
 	if(options.refine != null) options.refine = options.refine; else options.refine = true;
@@ -5048,7 +4802,7 @@ verb.eval.Tess.divideRationalSurfaceAdaptive = function(surface,options) {
 		while(_g11 < divsU) {
 			var j1 = _g11++;
 			var corners = [pts[divsV - i1 - 1][j1],pts[divsV - i1 - 1][j1 + 1],pts[divsV - i1][j1 + 1],pts[divsV - i1][j1]];
-			divs.push(new verb.core.AdaptiveRefinementNode(surface,corners));
+			divs.push(new verb.eval.AdaptiveRefinementNode(surface,corners));
 		}
 	}
 	if(!options.refine) return divs;
@@ -5096,9 +4850,255 @@ verb.eval.Tess.triangulateAdaptiveRefinementNodeTree = function(arrTree) {
 	return mesh;
 };
 verb.eval.Tess.rationalSurfaceAdaptive = function(surface,options) {
-	if(options != null) options = options; else options = new verb.core.AdaptiveRefinementOptions();
+	if(options != null) options = options; else options = new verb.eval.AdaptiveRefinementOptions();
 	var arrTrees = verb.eval.Tess.divideRationalSurfaceAdaptive(surface,options);
 	return verb.eval.Tess.triangulateAdaptiveRefinementNodeTree(arrTrees);
+};
+verb.eval.AdaptiveRefinementOptions = $hx_exports.core.AdaptiveRefinementOptions = function() {
+	this.minDivsV = 1;
+	this.minDivsU = 1;
+	this.refine = true;
+	this.maxDepth = 10;
+	this.minDepth = 0;
+	this.normTol = 2.5e-2;
+};
+verb.eval.AdaptiveRefinementOptions.__name__ = ["verb","eval","AdaptiveRefinementOptions"];
+verb.eval.AdaptiveRefinementNode = $hx_exports.core.AdaptiveRefinementNode = function(srf,corners,neighbors) {
+	this.srf = srf;
+	if(neighbors == null) this.neighbors = [null,null,null,null]; else this.neighbors = neighbors;
+	this.corners = corners;
+	if(this.corners == null) {
+		var u0 = srf.knotsU[0];
+		var u1 = verb.core.ArrayExtensions.last(srf.knotsU);
+		var v0 = srf.knotsV[0];
+		var v1 = verb.core.ArrayExtensions.last(srf.knotsV);
+		this.corners = [verb.core.SurfacePoint.fromUv(u0,v0),verb.core.SurfacePoint.fromUv(u1,v0),verb.core.SurfacePoint.fromUv(u1,v1),verb.core.SurfacePoint.fromUv(u0,v1)];
+	}
+};
+verb.eval.AdaptiveRefinementNode.__name__ = ["verb","eval","AdaptiveRefinementNode"];
+verb.eval.AdaptiveRefinementNode.prototype = {
+	isLeaf: function() {
+		return this.children == null;
+	}
+	,center: function() {
+		if(this.centerPoint != null) return this.centerPoint; else return this.evalSrf(this.u05,this.v05);
+	}
+	,evalCorners: function() {
+		this.u05 = (this.corners[0].uv[0] + this.corners[2].uv[0]) / 2;
+		this.v05 = (this.corners[0].uv[1] + this.corners[2].uv[1]) / 2;
+		var _g = 0;
+		while(_g < 4) {
+			var i = _g++;
+			if(this.corners[i].point == null) {
+				var c = this.corners[i];
+				this.evalSrf(c.uv[0],c.uv[1],c);
+			}
+		}
+	}
+	,evalSrf: function(u,v,srfPt) {
+		var derivs = verb.eval.Eval.rationalSurfaceDerivatives(this.srf,u,v,1);
+		var pt = derivs[0][0];
+		var norm = verb.core.Vec.cross(derivs[0][1],derivs[1][0]);
+		var degen = verb.core.Vec.isZero(norm);
+		if(!degen) norm = verb.core.Vec.normalized(norm);
+		if(srfPt != null) {
+			srfPt.degen = degen;
+			srfPt.point = pt;
+			srfPt.normal = norm;
+			return srfPt;
+		} else return new verb.core.SurfacePoint(pt,norm,[u,v],-1,degen);
+	}
+	,getEdgeCorners: function(edgeIndex) {
+		if(this.isLeaf()) return [this.corners[edgeIndex]];
+		if(this.horizontal) switch(edgeIndex) {
+		case 0:
+			return this.children[0].getEdgeCorners(0);
+		case 1:
+			return this.children[0].getEdgeCorners(1).concat(this.children[1].getEdgeCorners(1));
+		case 2:
+			return this.children[1].getEdgeCorners(2);
+		case 3:
+			return this.children[1].getEdgeCorners(3).concat(this.children[0].getEdgeCorners(3));
+		}
+		switch(edgeIndex) {
+		case 0:
+			return this.children[0].getEdgeCorners(0).concat(this.children[1].getEdgeCorners(0));
+		case 1:
+			return this.children[1].getEdgeCorners(1);
+		case 2:
+			return this.children[1].getEdgeCorners(2).concat(this.children[0].getEdgeCorners(2));
+		case 3:
+			return this.children[0].getEdgeCorners(3);
+		}
+		return null;
+	}
+	,getAllCorners: function(edgeIndex) {
+		var baseArr = [this.corners[edgeIndex]];
+		if(this.neighbors[edgeIndex] == null) return baseArr;
+		var corners = this.neighbors[edgeIndex].getEdgeCorners((edgeIndex + 2) % 4);
+		var funcIndex = edgeIndex % 2;
+		var e = verb.core.Constants.EPSILON;
+		var that = this;
+		var rangeFuncMap = [function(c) {
+			return c.uv[0] > that.corners[0].uv[0] + e && c.uv[0] < that.corners[2].uv[0] - e;
+		},function(c1) {
+			return c1.uv[1] > that.corners[0].uv[1] + e && c1.uv[1] < that.corners[2].uv[1] - e;
+		}];
+		var cornercopy = corners.filter(rangeFuncMap[funcIndex]);
+		cornercopy.reverse();
+		return baseArr.concat(cornercopy);
+	}
+	,midpoint: function(index) {
+		if(this.midPoints == null) this.midPoints = [null,null,null,null];
+		if(!(this.midPoints[index] == null)) return this.midPoints[index];
+		switch(index) {
+		case 0:
+			this.midPoints[0] = this.evalSrf(this.u05,this.corners[0].uv[1]);
+			break;
+		case 1:
+			this.midPoints[1] = this.evalSrf(this.corners[1].uv[0],this.v05);
+			break;
+		case 2:
+			this.midPoints[2] = this.evalSrf(this.u05,this.corners[2].uv[1]);
+			break;
+		case 3:
+			this.midPoints[3] = this.evalSrf(this.corners[0].uv[0],this.v05);
+			break;
+		}
+		return this.midPoints[index];
+	}
+	,hasBadNormals: function() {
+		return this.corners[0].degen || this.corners[1].degen || this.corners[2].degen || this.corners[3].degen;
+	}
+	,fixNormals: function() {
+		var l = this.corners.length;
+		var _g = 0;
+		while(_g < l) {
+			var i = _g++;
+			var corn = this.corners[i];
+			if(this.corners[i].degen) {
+				var v1 = this.corners[(i + 1) % l];
+				var v2 = this.corners[(i + 3) % l];
+				if(v1.degen) this.corners[i].normal = v2.normal; else this.corners[i].normal = v1.normal;
+			}
+		}
+	}
+	,shouldDivide: function(options,currentDepth) {
+		if(currentDepth < options.minDepth) return true;
+		if(currentDepth >= options.maxDepth) return false;
+		if(this.hasBadNormals()) {
+			this.fixNormals();
+			return false;
+		}
+		this.splitVert = verb.core.Vec.normSquared(verb.core.Vec.sub(this.corners[0].normal,this.corners[1].normal)) > options.normTol || verb.core.Vec.normSquared(verb.core.Vec.sub(this.corners[2].normal,this.corners[3].normal)) > options.normTol;
+		this.splitHoriz = verb.core.Vec.normSquared(verb.core.Vec.sub(this.corners[1].normal,this.corners[2].normal)) > options.normTol || verb.core.Vec.normSquared(verb.core.Vec.sub(this.corners[3].normal,this.corners[0].normal)) > options.normTol;
+		if(this.splitVert || this.splitHoriz) return true;
+		var center = this.center();
+		return verb.core.Vec.normSquared(verb.core.Vec.sub(center.normal,this.corners[0].normal)) > options.normTol || verb.core.Vec.normSquared(verb.core.Vec.sub(center.normal,this.corners[1].normal)) > options.normTol || verb.core.Vec.normSquared(verb.core.Vec.sub(center.normal,this.corners[2].normal)) > options.normTol || verb.core.Vec.normSquared(verb.core.Vec.sub(center.normal,this.corners[3].normal)) > options.normTol;
+	}
+	,divide: function(options) {
+		if(options == null) options = new verb.eval.AdaptiveRefinementOptions();
+		if(options.normTol == null) options.normTol = 8.5e-2;
+		if(options.minDepth == null) options.minDepth = 0;
+		if(options.maxDepth == null) options.maxDepth = 10;
+		this._divide(options,0,true);
+	}
+	,_divide: function(options,currentDepth,horiz) {
+		this.evalCorners();
+		if(!this.shouldDivide(options,currentDepth)) return;
+		currentDepth++;
+		if(this.splitVert && !this.splitHoriz) horiz = false; else if(!this.splitVert && this.splitHoriz) horiz = true;
+		this.horizontal = horiz;
+		if(this.horizontal) {
+			var bott = [this.corners[0],this.corners[1],this.midpoint(1),this.midpoint(3)];
+			var top = [this.midpoint(3),this.midpoint(1),this.corners[2],this.corners[3]];
+			this.children = [new verb.eval.AdaptiveRefinementNode(this.srf,bott),new verb.eval.AdaptiveRefinementNode(this.srf,top)];
+			this.children[0].neighbors = [this.neighbors[0],this.neighbors[1],this.children[1],this.neighbors[3]];
+			this.children[1].neighbors = [this.children[0],this.neighbors[1],this.neighbors[2],this.neighbors[3]];
+		} else {
+			var left = [this.corners[0],this.midpoint(0),this.midpoint(2),this.corners[3]];
+			var right = [this.midpoint(0),this.corners[1],this.corners[2],this.midpoint(2)];
+			this.children = [new verb.eval.AdaptiveRefinementNode(this.srf,left),new verb.eval.AdaptiveRefinementNode(this.srf,right)];
+			this.children[0].neighbors = [this.neighbors[0],this.children[1],this.neighbors[2],this.neighbors[3]];
+			this.children[1].neighbors = [this.neighbors[0],this.neighbors[1],this.neighbors[2],this.children[0]];
+		}
+		var _g = 0;
+		var _g1 = this.children;
+		while(_g < _g1.length) {
+			var child = _g1[_g];
+			++_g;
+			child._divide(options,currentDepth,!horiz);
+		}
+	}
+	,triangulate: function(mesh) {
+		if(mesh == null) mesh = verb.core.MeshData.empty();
+		if(this.isLeaf()) return this.triangulateLeaf(mesh);
+		var _g = 0;
+		var _g1 = this.children;
+		while(_g < _g1.length) {
+			var x = _g1[_g];
+			++_g;
+			if(x == null) break;
+			x.triangulate(mesh);
+		}
+		return mesh;
+	}
+	,triangulateLeaf: function(mesh) {
+		var baseIndex = mesh.points.length;
+		var uvs = [];
+		var ids = [];
+		var splitid = 0;
+		var _g = 0;
+		while(_g < 4) {
+			var i = _g++;
+			var edgeCorners = this.getAllCorners(i);
+			if(edgeCorners.length == 2) splitid = i + 1;
+			var _g2 = 0;
+			var _g1 = edgeCorners.length;
+			while(_g2 < _g1) {
+				var j = _g2++;
+				uvs.push(edgeCorners[j]);
+			}
+		}
+		var _g3 = 0;
+		while(_g3 < uvs.length) {
+			var corner = uvs[_g3];
+			++_g3;
+			if(corner.id != -1) {
+				ids.push(corner.id);
+				continue;
+			}
+			mesh.uvs.push(corner.uv);
+			mesh.points.push(corner.point);
+			mesh.normals.push(corner.normal);
+			corner.id = baseIndex;
+			ids.push(baseIndex);
+			baseIndex++;
+		}
+		if(uvs.length == 4) {
+			mesh.faces.push([ids[0],ids[3],ids[1]]);
+			mesh.faces.push([ids[3],ids[2],ids[1]]);
+			return mesh;
+		} else if(uvs.length == 5) {
+			var il = ids.length;
+			mesh.faces.push([ids[splitid],ids[(splitid + 2) % il],ids[(splitid + 1) % il]]);
+			mesh.faces.push([ids[(splitid + 4) % il],ids[(splitid + 3) % il],ids[splitid]]);
+			mesh.faces.push([ids[splitid],ids[(splitid + 3) % il],ids[(splitid + 2) % il]]);
+			return mesh;
+		}
+		var center = this.center();
+		mesh.uvs.push(center.uv);
+		mesh.points.push(center.point);
+		mesh.normals.push(center.normal);
+		var centerIndex = mesh.points.length - 1;
+		var i1 = 0;
+		var j1 = uvs.length - 1;
+		while(i1 < uvs.length) {
+			mesh.faces.push([centerIndex,ids[i1],ids[j1]]);
+			j1 = i1++;
+		}
+		return mesh;
+	}
 };
 verb.exe = {};
 verb.exe.AsyncObject = $hx_exports.exe.AsyncObject = function() { };
@@ -5108,7 +5108,7 @@ verb.exe.AsyncObject.prototype = {
 		return verb.exe.Dispatcher.dispatchMethod(classType,methodName,args);
 	}
 };
-verb.exe.Dispatcher = function() { };
+verb.exe.Dispatcher = $hx_exports.exe.Dispatcher = function() { };
 verb.exe.Dispatcher.__name__ = ["verb","exe","Dispatcher"];
 verb.exe.Dispatcher.init = function() {
 	if(verb.exe.Dispatcher._init) return;
@@ -5140,7 +5140,13 @@ verb.exe.WorkerPool = $hx_exports.exe.WorkerPool = function(numThreads,fileName)
 	var _g = 0;
 	while(_g < numThreads) {
 		var i = _g++;
-		this._pool.push(new Worker(verb.exe.WorkerPool.basePath + fileName));
+		var w;
+		try {
+			w = new Worker(verb.exe.WorkerPool.basePath + fileName);
+		} catch( e ) {
+			w = new Worker(verb.exe.WorkerPool.basePath + fileName.substring(0,-3) + ".min.js");
+		}
+		this._pool.push(w);
 	}
 };
 verb.exe.WorkerPool.__name__ = ["verb","exe","WorkerPool"];

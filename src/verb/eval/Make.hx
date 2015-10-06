@@ -1,7 +1,6 @@
 package verb.eval;
 
 import verb.geom.NurbsSurface;
-import verb.core.Interval;
 import verb.core.Vec;
 using verb.core.Vec;
 import verb.core.Data;

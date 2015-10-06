@@ -17,14 +17,14 @@ import verb.eval.Tess;
 import verb.eval.Divide;
 import verb.eval.Analyze;
 import verb.eval.Eval;
-import verb.core.Interval;
 
 // A NURBS curve - this class represents the base class of many of verb.geom's curve types and provides many tools for analysis and evaluation.
-// This object is deliberately constrained to be immutable. There are methods to gain access to the underlying fields. `asNurbs` can
-// be used to obtain a simplified NurbsCurveData object that can be used with verb.core.
+// This object is deliberately constrained to be immutable. The methods to inspect the properties of this class deliberately return copies. `asNurbs` can
+// be used to obtain a simplified NurbsCurveData object that can be used with `verb.core` or for serialization purposes.
 //
 // Under the hood, this type takes advantage of verb's asynchronous runtime using the _Async methods. Calling one of these
-// methods returns a `Promise`. You can find further documentation for this type at https://github.com/jdonaldson/promhx.
+// methods returns a `Promise` that respect the  You can find further documentation for this type at
+// [https://github.com/jdonaldson/promhx](https://github.com/jdonaldson/promhx).
 
 @:expose("geom.NurbsCurve")
 class NurbsCurve extends AsyncObject implements ICurve {

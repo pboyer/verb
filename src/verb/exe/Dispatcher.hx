@@ -9,6 +9,7 @@ package verb.exe;
 import promhx.Deferred;
 import promhx.Promise;
 
+@:expose("exe.Dispatcher")
 class Dispatcher {
 
     public static var THREADS : Int = 1;

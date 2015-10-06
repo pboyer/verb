@@ -1,11 +1,71 @@
 package verb.core;
 
+// A `Point` in verb is represented simply by an array of floating point numbers
+
 typedef Point = Array<Float>;
+
+// Like a `Point`, a `Vector` is simply an array of floating point numbers
+
+typedef Vector = Array<Float>
+
+// `Matrix` is represented by a nested array of floating point number arrays
+
+typedef Matrix = Array<Array<Float>>
+
+// A `KnotArray` is a non-decreasing sequence of floating point . Use the methods in `Check` to validate `KnotArray`'s
+
 typedef KnotArray = Array<Float>;
-typedef CurvePointArray = Array<Point>;
-typedef Plane = {
-    n : Array<Float>,
-    o : Array<Float>
+
+// A `Plane` is simply an origin point and normal
+
+@:expose("core.Plane")
+class Plane {
+
+    public var normal : Vector;
+    public var origin : Point;
+
+    public function new(origin, normal){
+        this.origin = origin;
+        this.normal = normal;
+    }
+}
+
+// A `Ray` is simply an origin point and a direction
+
+@:expose("core.Ray")
+class Ray {
+
+    public var dir : Vector;
+    public var origin : Point;
+
+    public function new(origin, dir){
+        this.origin = origin;
+        this.dir = dir;
+    }
+}
+
+@:expose("core.NurbsCurveData")
+class NurbsCurveData {
+
+    public function new(degree, knots, controlPoints, closed = false){
+        this.degree = degree;
+        this.controlPoints = controlPoints;
+        this.knots = knots;
+        this.closed = closed;
+    }
+
+    //integer degree of curve
+    public var degree : Int;
+
+    // 2d array of control points, where each control point is an array of length (dim)
+    public var controlPoints : Array<Point>;
+
+    //array of nondecreasing knot values
+    public var knots : Array<Float>;
+
+    //is the surface cyclic in U
+    public var closed : Bool;
+
 }
 
 @:expose("core.NurbsSurfaceData")
@@ -42,30 +102,6 @@ class NurbsSurfaceData {
 
     //is the surface cyclic in V
     public var closedV : Bool;
-
-}
-
-@:expose("core.NurbsCurveData")
-class NurbsCurveData {
-
-    public function new(degree, knots, controlPoints, closed = false){
-        this.degree = degree;
-        this.controlPoints = controlPoints;
-        this.knots = knots;
-        this.closed = closed;
-    }
-
-    //integer degree of curve
-    public var degree : Int;
-
-    // 2d array of control points, where each control point is an array of length (dim)
-    public var controlPoints : Array<Point>;
-
-    //array of nondecreasing knot values
-    public var knots : Array<Float>;
-
-    //is the surface cyclic in U
-    public var closed : Bool;
 
 }
 
@@ -138,4 +174,26 @@ class VolumeData {
     //and where each control point is an array of length (dim)
     public var controlPoints : Array<Array<Array<Point>>>;
 
+}
+
+@:expose("core.Pair")
+class Pair<T1, T2> {
+    public var item0 : T1;
+    public var item1 : T2;
+
+    public function new(item1 : T1, item2 : T2) {
+        this.item0 = item1;
+        this.item1 = item2;
+    }
+}
+
+@:expose("core.Interval")
+class Interval<T> {
+    public var min : T;
+    public var max : T;
+
+    public function new(min, max){
+        this.min = min;
+        this.max = max;
+    }
 }

@@ -1,18 +1,16 @@
 package verb.eval;
 
-import verb.core.Interval;
-import verb.core.Mat.Matrix;
 import verb.core.Data;
-
-using Lambda;
-
+import verb.core.Mat;
 import verb.core.Vec;
 import verb.core.Binomial;
 import verb.core.Constants;
 import verb.core.ArrayExtensions;
-using verb.core.ArrayExtensions;
 
+using verb.core.ArrayExtensions;
 using verb.core.Mat;
+
+using Lambda;
 
 // `Modify` contains many fundamental algorithms for working with NURBS. These include algorithms for:
 //
@@ -514,7 +512,7 @@ class Modify {
         , r = knotsToInsert.length - 1
         , a = Eval.knotSpan( degree, knotsToInsert[0], knots )
         , b = Eval.knotSpan( degree, knotsToInsert[r], knots )
-        , controlPoints_post = new CurvePointArray()
+        , controlPoints_post = new Array<Point>()
         , knots_post = new KnotArray();
 
         //new control pts
@@ -614,9 +612,9 @@ class Modify {
         var num_pts = controlPoints.length
         , k = Eval.knotSpan( degree, u, knots ) //the span in which the knot will be inserted
         , num_pts_post = num_pts + r //a new control pt for every new knot
-        , controlPoints_temp = new CurvePointArray() //new Array( degree - s )
+        , controlPoints_temp = new Array<Point>() //new Array( degree - s )
         , knots_post = new KnotArray() //new Array( knots.length + r )  //r new knots
-        , controlPoints_post = new CurvePointArray() //new Array( num_pts_post )
+        , controlPoints_post = new Array<Point>() //new Array( num_pts_post )
         , i = 0;
 
         //new knot vector

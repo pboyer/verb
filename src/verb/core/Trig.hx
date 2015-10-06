@@ -5,13 +5,13 @@ import verb.core.Data;
 import verb.core.Intersections;
 using verb.core.Vec;
 
-// `Trig` provides various convenient trigonometric methods
+// `Trig` provides various convenient methods for trigonometry
 
 @:expose("core.Trig")
 class Trig {
 
     public static function isPointInPlane( pt : Point, p : Plane, tol : Float ) : Bool{
-        return Math.abs( pt.sub( p.o ).dot( p.n ) ) < tol;
+        return Math.abs( pt.sub( p.origin ).dot( p.normal ) ) < tol;
     }
 
     public static function distToSegment(a : Point, b : Point, c : Point){

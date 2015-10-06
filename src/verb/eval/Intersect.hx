@@ -2,23 +2,21 @@ package verb.eval;
 
 import verb.core.MeshBoundingBoxTree;
 import verb.core.Intersections;
-import verb.core.Ray;
 import verb.core.IBoundingBoxTree;
 import verb.core.LazyPolylineBoundingBoxTree;
 import verb.core.Data;
 import verb.core.LazySurfaceBoundingBoxTree;
 import verb.core.LazyCurveBoundingBoxTree;
-import verb.core.Interval;
 import verb.core.LazyMeshBoundingBoxTree;
 import verb.core.KdTree;
-import verb.core.AdaptiveRefinementNode.AdaptiveRefinementOptions;
-import verb.core.Pair;
-import verb.core.Vec.Vector;
 import verb.core.Minimizer;
 import verb.core.Mesh;
 import verb.core.Constants;
+import verb.core.Vec;
 
-using verb.core.Vec;
+import verb.eval.Tess;
+
+using verb.core.Data;
 
 import verb.core.ArrayExtensions;
 using verb.core.ArrayExtensions;
@@ -936,8 +934,7 @@ class Intersect {
             p = [x,y,0];
         }
 
-        return new Ray(p, Vec.normalized( d ) );
-
+        return new Ray( p, Vec.normalized( d ) );
     }
 
     //Intersect three planes, expects the planes to form a single point of
@@ -1192,12 +1189,3 @@ class Intersect {
 
 }
 
-@:expose("core.CurveCurveIntersectionOptions")
-class CurveCurveIntersectionOptions {
-
-    public var sampleTol : Float = Constants.TOLERANCE;
-    public var tol : Float = Constants.TOLERANCE;
-
-    public function new(){ }
-
-}
