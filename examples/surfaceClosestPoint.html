@@ -1,17 +1,32 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<script src="../build/js/verb.js"></script>
-	<script src="js/three.min.js"></script>
-	<script src="js/verbToThreeConversion.js"></script>
-	<script src="js/OrbitControls.js"></script>
-	<script src="js/threeBasic.js"></script>
-	<style> body {  margin: 0; } </style>
+    <title>Closest Point to a Surface</title>
+
+    <script src="../build/js/verb.js"></script>
+    <script src="js/three.min.js"></script>
+    <script src="js/verbToThreeConversion.js"></script>
+    <script src="js/OrbitControls.js"></script>
+    <script src="js/codemirror.js"></script>
+    <script src="js/javascript.js"></script>
+    <script src="js/threeBasic.js"></script>
+
+    <link rel="stylesheet" href="css/codemirror.css">
+    <link rel="stylesheet" href="css/example.css">
+    <link rel="stylesheet" href="css/colorforth.css">
 </head>
 <body>
-<script>
 
-	threeSetup();
+<div id="button">Show/Hide Code</div>
+<div id="viewer" class="col">
+    <div id="title"></div>
+</div>
+<div id="code-container" class="col scroll-y"></div>
+
+</body>
+<script id="script">
+
+	setupScene();
 
 	var degree = 3
 		, knots = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
@@ -26,24 +41,28 @@
 
 	var lineMat = new THREE.LineBasicMaterial();
 
-	var c = 10;
+    var pts = [];
+	var c = 5;
 	for (var i = 0; i < c; i++){
 		for (var j = 0; j < c; j++){
 
 				var p0 = [60 * i / (c-1) - 10, -60 * j / (c-1) + 10, 7 ];
 
+                pts.push( p0 );
 				var p = srf.closestPoint( p0 );
 				var l = new verb.geom.Line(p, p0);
 				addCurveToScene( l.toThreeGeometry(), lineMat );
 		}
 	}
 
+    addPointsToScene( pts );
+
 	addMeshToScene( srf.toThreeGeometry() );
 
-	threeRender();
+	renderScene();
 
 </script>
 
-</body>
+<script src="js/example.js"></script>
 
 </html>

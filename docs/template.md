@@ -4,6 +4,8 @@
 
 [Go to source](<%= sourceFile + "#L" + x.line %>)
 
+<%= x.$type.toUpperCase() === "TYPEDEF" && x.alias ? "`" + x.name + " = " + x.alias + "`" : "" %>
+
 <%= x.description %>
 
 <% if (x.$type === "Class" || x.$type === "Interface") { %>
@@ -16,6 +18,17 @@
 *Implements:* <%= _.map(x.interfaces, function(x){ return "[`" + x + "`](" + x + ")"}).join(", ") %>
 <% } %>
 
+    <% _.each(x.methods, function(y) { %>
+## `<%= y.name === "new" ? "constructor" : y.name %>`
+*<%= y.isStatic ? "STATIC " : "" %>METHOD*
+
+[Go to source](<%= sourceFile + "#L" + y.line %>)
+
+**`<%= y.name %>(<%= _.map(y.args,function(x){ return x.name + " : " + x.type }).join(", ") %>) <% if (y.returnType) { %>: <%= y.returnType %><% } %>`**
+
+<%= y.description %>
+    <% }) %>
+
     <% _.each(x.properties, function(y) { %>
 ## `<%= y.name %>`
 *<%= y.isStatic ? "STATIC " : "" %>PROPERTY*
@@ -27,17 +40,6 @@
 <%= (y.description || "").replace(/\n\+/g,"\n*") %>
     <% }) %>
 
-    <% _.each(x.methods, function(y) { %>
-## `<%= y.name === "new" ? "constructor" : y.name %>`
-*<%= y.isStatic ? "STATIC " : "" %>METHOD*
-
-[Go to source](<%= sourceFile + "#L" + y.line %>)
-
-**`<%= y.name %>(<%= _.map(y.args,function(x){ return x.name + " : " + x.type }).join(", ") %>) <% if (y.returnType) { %>: <%= y.returnType %><% } %>`**
-
-<%= y.description %>
-    <% }) %>
-   
 <% } %>
 
 <% }) %>

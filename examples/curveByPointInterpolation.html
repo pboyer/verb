@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Curve-Curve Intersection</title>
+    <title>Curve by Point Interpolation</title>
 
     <script src="../build/js/verb.js"></script>
     <script src="js/three.min.js"></script>
@@ -27,23 +27,13 @@
 <script id="script">
 	setupScene();
 
-	var p1 = [-5,0,0], p2 = [10,0,0], p3 = [10,10,0], p4 = [0,10,0], p5 = [5, 5, 0];
+	var p1 = [-10,0,0], p2 = [10,0,0], p3 = [10,10,0], p4 = [0,10,0], p5 = [5, 5, 0];
 	var pts = [p1, p2, p3, p4, p5];
 	var interpCurve = verb.geom.NurbsCurve.byPoints( pts, 3 );
 
-    var p1a = [-5,0,0], p2a = [5,-1,0], p3a = [15,5,0], p4a = [3,10,0], p5a = [5, 12, 0];
-	var ptsa = [p1a, p2a, p3a, p4a, p5a];
-	var interpCurve2 = verb.geom.NurbsCurve.byPoints( ptsa, 3 );
-
 	addCurveToScene( interpCurve.toThreeGeometry() );
-	addCurveToScene( interpCurve2.toThreeGeometry() );
 
-    var runs = 50;
-    var res = benchmark( function(){ return verb.geom.Intersect.curves( interpCurve, interpCurve2, 1e-5 ); }, runs );
-
-    addPointsToScene( res.result.map(function(x){ return x.point0; } ) );
-
-    console.log( runs, " runs completed in ", res.each, " ms each");
+	addPointsToScene( pts );
 
 	renderScene();
 </script>

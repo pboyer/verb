@@ -1,19 +1,34 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <title>Swept Surface</title>
+
     <script src="../build/js/verb.js"></script>
     <script src="js/three.min.js"></script>
     <script src="js/verbToThreeConversion.js"></script>
     <script src="js/OrbitControls.js"></script>
+    <script src="js/codemirror.js"></script>
+    <script src="js/javascript.js"></script>
     <script src="js/threeBasic.js"></script>
-    <style> body {  margin: 0; } </style>
+
+    <link rel="stylesheet" href="css/codemirror.css">
+    <link rel="stylesheet" href="css/example.css">
+    <link rel="stylesheet" href="css/colorforth.css">
 </head>
 <body>
-<script>
-	threeSetup();
+
+<div id="button">Show/Hide Code</div>
+<div id="viewer" class="col">
+    <div id="title"></div>
+</div>
+<div id="code-container" class="col scroll-y"></div>
+
+</body>
+<script id="script">
+	setupScene();
 
     var rail = new verb.geom.BezierCurve( [[0,0,0], [10,5,10], [20,10,10]] );
-    var prof = new verb.geom.BezierCurve( [[0,0,0], [20,0,0]] );
+    var prof = new verb.geom.BezierCurve( [[0,0,0], [10,10,0], [20,0,0]] );
 
     var srf = new verb.geom.SweptSurface( prof, rail );
 
@@ -21,9 +36,9 @@
 	addCurveToScene( prof.toThreeGeometry() );
 	addMeshToScene( srf.toThreeGeometry() );
 
-	threeRender();
+	renderScene();
 </script>
 
-</body>
+<script src="js/example.js"></script>
 
 </html>

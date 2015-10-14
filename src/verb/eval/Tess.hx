@@ -367,24 +367,7 @@ class AdaptiveRefinementOptions {
 
 }
 
-@:expose("core.AdaptiveRefinementNode")
-class AdaptiveRefinementNode {
-
-    var srf : NurbsSurfaceData;
-    public var neighbors : Array<AdaptiveRefinementNode>;
-    var children : Array<AdaptiveRefinementNode>;
-    var corners : Array<SurfacePoint>;
-    var midPoints : Array<SurfacePoint>;
-    var centerPoint : SurfacePoint;
-    var splitVert : Bool;
-    var splitHoriz : Bool;
-    var horizontal : Bool;
-    var u05 : Float;
-    var v05 : Float;
-
-    public function new( srf : NurbsSurfaceData, corners : Array<SurfacePoint>, neighbors : Array<AdaptiveRefinementNode> = null ) {
-
-//
+//```
 //Structure of the child nodes
 //in the adaptive refinement tree
 //
@@ -406,14 +389,32 @@ class AdaptiveRefinementNode {
 //                (u0,v0)---(u05,v0)---(u1,v0)
 //
 //                        neighbors[0]
-//
+//```
+
+@:expose("core.AdaptiveRefinementNode")
+class AdaptiveRefinementNode {
+
+    var srf : NurbsSurfaceData;
+    public var neighbors : Array<AdaptiveRefinementNode>;
+    var children : Array<AdaptiveRefinementNode>;
+    var corners : Array<SurfacePoint>;
+    var midPoints : Array<SurfacePoint>;
+    var centerPoint : SurfacePoint;
+    var splitVert : Bool;
+    var splitHoriz : Bool;
+    var horizontal : Bool;
+    var u05 : Float;
+    var v05 : Float;
+
+    public function new( srf : NurbsSurfaceData, corners : Array<SurfacePoint>, neighbors : Array<AdaptiveRefinementNode> = null ) {
+
 
         this.srf = srf;
         this.neighbors = neighbors == null ? [null, null, null, null] : neighbors;
 
         this.corners = corners;
 
-//if no corners, we need to construct initial corners from the surface
+        //if no corners, we need to construct initial corners from the surface
         if (this.corners == null){
             var u0 : Float = srf.knotsU[0];
             var u1 : Float = srf.knotsU.last();

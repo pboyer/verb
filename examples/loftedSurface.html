@@ -1,17 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <title>Surface Lofting</title>
+
     <script src="../build/js/verb.js"></script>
     <script src="js/three.min.js"></script>
     <script src="js/verbToThreeConversion.js"></script>
-	<script src="js/OrbitControls.js"></script>
-	<script src="js/threeBasic.js"></script>
-    <style> body {  margin: 0; } </style>
+    <script src="js/OrbitControls.js"></script>
+    <script src="js/codemirror.js"></script>
+    <script src="js/javascript.js"></script>
+    <script src="js/threeBasic.js"></script>
+
+    <link rel="stylesheet" href="css/codemirror.css">
+    <link rel="stylesheet" href="css/example.css">
+    <link rel="stylesheet" href="css/colorforth.css">
 </head>
 <body>
-<script>
 
-	threeSetup();
+<div id="button">Show/Hide Code</div>
+<div id="viewer" class="col">
+    <div id="title"></div>
+</div>
+<div id="code-container" class="col scroll-y"></div>
+
+</body>
+<script id="script">
+	setupScene();
 
 	var c0 = verb.geom.NurbsCurve.byKnotsControlPointsWeights( 2, [0,0,0,1,1,1], [ [0,0,0], [10,0,0], [40,0,0] ], [ 1, 1, 1 ] );
 	var c1 = verb.geom.NurbsCurve.byKnotsControlPointsWeights( 3, [0,0,0,0,1,1,1,1], [ [0,10,10], [10,5,10], [20,-5,10], [40,10,10] ], [ 1, 1, 1, 1 ] );
@@ -25,8 +39,7 @@
 
 	curves.forEach(function(c){ addCurveToScene( c.toThreeGeometry() ); });
 
-	threeRender();
-
+	renderScene();
 </script>
-</body>
+<script src="js/example.js"></script>
 </html>

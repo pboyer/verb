@@ -22,7 +22,7 @@ class Mesh {
     //* a normal vector represented by an array of length 3
     //
 
-    public static function getTriangleNorm( points : Array<Point>, tri : Tri ) : Point {
+    public static function getTriangleNorm( points : Array<Point>, tri : MeshFace ) : Point {
 
         var v0 = points[ tri[0] ]
         , v1 = points[ tri[1] ]
@@ -110,7 +110,7 @@ class Mesh {
     //
     //* the minimum coordinate
 
-    private static function getMinCoordOnAxis( points : Array<Point>, tri : Tri, axis : Int ) : Float {
+    private static function getMinCoordOnAxis( points : Array<Point>, tri : MeshFace, axis : Int ) : Float {
 
         var min = Math.POSITIVE_INFINITY;
 
@@ -134,7 +134,7 @@ class Mesh {
     //* a point represented by an array of length 3
     //
 
-    public static function getTriangleCentroid( points : Array<Point>, tri : Tri ) : Point {
+    public static function getTriangleCentroid( points : Array<Point>, tri : MeshFace ) : Point {
 
         var centroid = [0.0,0.0,0.0];
 

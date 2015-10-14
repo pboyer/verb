@@ -1,16 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <title>Curve Reversal</title>
+
     <script src="../build/js/verb.js"></script>
     <script src="js/three.min.js"></script>
     <script src="js/verbToThreeConversion.js"></script>
     <script src="js/OrbitControls.js"></script>
+    <script src="js/codemirror.js"></script>
+    <script src="js/javascript.js"></script>
     <script src="js/threeBasic.js"></script>
-    <style> body {  margin: 0; } </style>
+
+    <link rel="stylesheet" href="css/codemirror.css">
+    <link rel="stylesheet" href="css/example.css">
+    <link rel="stylesheet" href="css/colorforth.css">
 </head>
 <body>
-<script>
-	threeSetup();
+
+<div id="button">Show/Hide Code</div>
+<div id="viewer" class="col">
+    <div id="title"></div>
+</div>
+<div id="code-container" class="col scroll-y"></div>
+
+</body>
+<script id="script">
+	setupScene();
 
     var c = new verb.geom.Arc([0,0,0], [1,0,0], [0,1,0], 20, 0, Math.PI/ 2 );
     var cr = c.reverse(); // returns a reversed copy
@@ -21,9 +36,9 @@
 	addCurveToScene( cr.toThreeGeometry(), new THREE.LineBasicMaterial({ color: 0x00ff00}) );
 	addCurveToScene( crr.toThreeGeometry(), new THREE.LineBasicMaterial({ color: 0x0000ff}) );
 
-	threeRender();
+	renderScene();
 </script>
 
-</body>
+<script src="js/example.js"></script>
 
 </html>

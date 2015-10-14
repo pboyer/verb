@@ -14,9 +14,9 @@ class WorkerPool {
     private var _working = new IntMap<Worker>();
     private var _callbacks = new IntMap<Dynamic>();
 
-    // Create a new `WorkerPool
+    // Create a new `WorkerPool`
     //
-    //**params
+    //**params**
     //
     //* the number of `Worker` threads to form
     //* the filename of verb's javascript file - defaults to "verb.js". The final path is formed by concatenating `WorkerPool.basePath` and this.

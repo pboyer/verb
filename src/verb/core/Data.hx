@@ -1,14 +1,20 @@
 package verb.core;
 
-// A `Point` in verb is represented simply by an array of floating point numbers
+// A `Point` in verb is represented simply by an array of floating point numbers.
+//
+// So, in JavaScript, one would write simply `[0,0,0]` to create a Point at the origin.
 
 typedef Point = Array<Float>;
 
 // Like a `Point`, a `Vector` is simply an array of floating point numbers
+//
+// So, in JavaScript, one would write simply `[1,0,0]` to create the a unit vector in the x direction
 
 typedef Vector = Array<Float>
 
 // `Matrix` is represented by a nested array of floating point number arrays
+//
+// So, in JavaScript, one would write simply `[[1,0],[0,1]]` to create a 2x2 identity matrix
 
 typedef Matrix = Array<Array<Float>>
 
@@ -44,14 +50,16 @@ class Ray {
     }
 }
 
+// A simple data structure representing a NURBS curve. `NurbsCurveData` does no checks for legality. You can use
+// `verb.eval.Check` for that.
+
 @:expose("core.NurbsCurveData")
 class NurbsCurveData {
 
-    public function new(degree, knots, controlPoints, closed = false){
+    public function new(degree, knots, controlPoints){
         this.degree = degree;
         this.controlPoints = controlPoints;
         this.knots = knots;
-        this.closed = closed;
     }
 
     //integer degree of curve
@@ -63,22 +71,20 @@ class NurbsCurveData {
     //array of nondecreasing knot values
     public var knots : Array<Float>;
 
-    //is the surface cyclic in U
-    public var closed : Bool;
-
 }
+
+// A simple data structure representing a NURBS surface. `NurbsSurfaceData` does no checks for legality. You can use
+// `verb.eval.Check` for that.
 
 @:expose("core.NurbsSurfaceData")
 class NurbsSurfaceData {
 
-    public function new(degreeU, degreeV, knotsU, knotsV, controlPoints, closedU = false, closedV = false){
+    public function new(degreeU, degreeV, knotsU, knotsV, controlPoints){
         this.degreeU = degreeU;
         this.degreeV = degreeV;
         this.knotsU = knotsU;
         this.knotsV = knotsV;
         this.controlPoints = controlPoints;
-        this.closedU = closedU;
-        this.closedV = closedV;
     }
 
     //integer degree of surface in u direction
@@ -97,26 +103,29 @@ class NurbsSurfaceData {
     //and where each control point is an array of length (dim)
     public var controlPoints : Array<Array<Point>>;
 
-    //is the surface cyclic in U
-    public var closedU : Bool;
-
-    //is the surface cyclic in V
-    public var closedV : Bool;
-
 }
 
-typedef Tri = Array<Int>;
+// A face of a mesh
+
+typedef MeshFace = Array<Int>;
+
+// A `UV` is simply an array of floating point numbers.
+//
+// So, in JavaScript, one would write simply `[1,0]` to create a UV
+
 typedef UV = Array<Float>;
+
+// A simple data structure representing a mesh. `MeshData` does not check for legality.
 
 @:expose("core.MeshData")
 class MeshData {
 
-    public var faces : Array<Tri>;
+    public var faces : Array<MeshFace>;
     public var points : Array<Point>;
     public var normals : Array<Point>;
     public var uvs : Array<UV>;
 
-    public function new(faces : Array<Tri>, points : Array<Point>, normals : Array<Point>, uvs : Array<UV> ) {
+    public function new(faces : Array<MeshFace>, points : Array<Point>, normals : Array<Point>, uvs : Array<UV> ) {
         this.faces = faces;
         this.points = points;
         this.normals = normals;
@@ -128,9 +137,15 @@ class MeshData {
     }
 }
 
+// A simple data structure representing a polyline. `PolylineData` is useful, for example, as the result of a curve tessellation.
+
 @:expose("core.PolylineData")
 class PolylineData {
+
+    // The points in the polyline
     public var points : Array<Point>;
+
+    // The parameters of the individual points
     public var params : Array<Float>;
 
     public function new(points, params){
@@ -138,6 +153,9 @@ class PolylineData {
         this.params = params;
     }
 }
+
+// A simple data structure representing a NURBS volume. This data structure is largely experimental in intent. Like CurveData
+// and SurfaceData, this data structure does no legality checks.
 
 @:expose("core.VolumeData")
 class VolumeData {
@@ -176,6 +194,8 @@ class VolumeData {
 
 }
 
+// A simple parametric data type representing a pair of two objects
+
 @:expose("core.Pair")
 class Pair<T1, T2> {
     public var item0 : T1;
@@ -186,6 +206,8 @@ class Pair<T1, T2> {
         this.item1 = item2;
     }
 }
+
+// A simple parametric data type representing an "interval" between two numbers. This data structure does no legality checks.
 
 @:expose("core.Interval")
 class Interval<T> {

@@ -3,11 +3,10 @@
 <html>
 
 <head>
-  <title>verb - A CAD Library for the Web</title>
+  <title>verb - Open-source NURBS</title>
 
   <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" href="css/style.css">
-
 </head>
 
 <body>
@@ -15,46 +14,52 @@
 	<div class="section" id="header" style="z-index: 1;"> 
 		<div class="container" id="title" style="z-index: 1;">
 			<div id="titlecontainer">
+				<h1>verb<span style="font-size: 12px; padding-left: 5px">2.0.0</span></h1>
+				<h2>Open-source NURBS</h2>
 
-				<h1><img src="assets/v2.png" style="height: 64px; padding-right: 10px; display: inline-block">verb<span style="font-size: 12px; padding-left: 5px">0.2.0</span></h1>
-				<h2>A CAD Library for the Web</h2>
-
-				<p><a href="geometry.html" style="padding-right: 10px">Examples</a><a href="https://github.com/pboyer/verb" style="padding-right: 10px">Source code</a> <a href="docs/verb.html">Documentation</a></p>
-
+				<p><a href="geometry.html" style="padding-right: 10px">Download</a><a href="https://github.com/pboyer/verb" style="padding-right: 10px">Source code</a> <a href="docs/verb.html">Documentation</a></p>
 			</div>
 		</div>
 	</div>
-	
-	<div class="section" id="description-section"> 
-		<div class="container" id="description">
-	
-			<p>
 
-			<strong>verb</strong> is a library for creating, manipulating, and analyzing <a href="http://en.wikipedia.org/wiki/Non-uniform_rational_B-spline">NURBS</a> surfaces and curves in the browser or <a href="http://nodejs.org/">node.js</a>. The library can be compiled for many languages, including JavaScript. It provides a rich set of features with <a href="geometry.html">many types of surfaces and curves</a> in a <a href="js/verb.min.js">10kb (gzipped, minified) package</a>.
+    <div class="section examples">
+        <img src="pictures/conics.png">
+        <img src="pictures/curveByPointInterpolation.png">
+        <img src="pictures/curveClosestPoint.png">
+        <img src="pictures/curveDivide.png">
+        <img src="pictures/curveIntersection.png">
+        <img src="pictures/curveSplit.png">
+        <img src="pictures/cylindricalSurface.png">
+        <img src="pictures/extrudedSurface.png">
+        <img src="pictures/loftedSurface.png">
+        <img src="pictures/meshIntersection.png">
+        <img src="pictures/meshSlicing.png">
+        <img src="pictures/surface.png">
+        <img src="pictures/surfaceBoundaries.png">
+        <img src="pictures/surfaceClosestPoint.png">
+        <img src="pictures/surfaceIntersection.png">
+        <img src="pictures/surfaceSplit.png">
+        <img src="pictures/sweptSurface.png">
+    </div>
 
-			</p>
 
-		</div>
-	</div>
+    <div class="section description-section">
+        <div class="container description">
 
-	<div class="section"> 
-		<div class="container">
+            <p>
+                <strong>verb</strong> is a library for working with <a href="http://en.wikipedia.org/wiki/Non-uniform_rational_B-spline">NURBS</a> surfaces and curves in the browser, a server, or desktop app.
+            </p>
 
-			<h3>New features in 0.2.0</h3>
+        </div>
+    </div>
 
-			<p>
-				<ul>
-					<li>Rewritten in Haxe - verb for JavaScript, C#, C++, Python, and more...</li>
-					<li>New examples showing how to integrate with three.js</li>
-					<li>Surfaces - Lofts, reverse, split, closest point, isocurves, adaptive tessellation, marching surface-surface intersection</li>
-					<li>Curve - Interpolation, closest point, reverse, split, length, divide by length</li>
-					<li>Mesh - Mesh-mesh intersection, mesh slicing</li>
-					<li>BReps - Experimental in 0.2.0</li>
-				</ul>
-			</p>
-		</div>
-	</div>
-
+    <div class="section description-section">
+        <div class="container description">
+            <p>
+                The library can be compiled for many languages, including JavaScript, C#, Python, and C++.
+            </p>
+        </div>
+    </div>
 
 	<div class="section"> 
 		<div class="container">
@@ -186,7 +191,29 @@ engine.eval('rational_curve_derivs', [degree, control_points, weights, knots, u,
 
 </div>
 
-<script>
+
+
+    <div class="section">
+        <div class="container">
+
+            <h3>New features in 2.0.0</h3>
+
+            <p>
+            <ul>
+                <li>Rewritten in Haxe - verb for JavaScript, C#, C++, Python, and more...</li>
+                <li>New examples showing how to integrate with three.js</li>
+                <li>Surfaces - Lofts, reverse, split, closest point, isocurves, adaptive tessellation, marching surface-surface intersection</li>
+                <li>Curve - Interpolation, closest point, reverse, split, length, divide by length</li>
+                <li>Mesh - Mesh-mesh intersection, mesh slicing</li>
+                <li>BReps - Experimental in 2.0.0</li>
+            </ul>
+            </p>
+        </div>
+    </div>
+
+
+
+    <script>
   (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
   (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
   m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)

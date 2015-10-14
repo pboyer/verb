@@ -1,5 +1,6 @@
 package verb.geom;
 
+import haxe.io.Error;
 import verb.eval.Eval;
 import verb.eval.Make;
 import verb.core.Vec;

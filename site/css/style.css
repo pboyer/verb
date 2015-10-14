@@ -21,7 +21,7 @@ canvas {
   padding: 0;
   display: block;
   width: 100%;
-  height: 600px;
+  height: 500px;
   position: absolute;
   border-bottom: 10px;
   margin: 0;
@@ -30,20 +30,36 @@ canvas {
 
 #titlecontainer {
   padding-top: 120px;
-  width: 900px;
   margin: auto;
   text-align: center;
   z-index: 3;
 }
 
-#description-section {
+.examples {
+    background-color: black;
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+}
+
+.examples img {
+    height: 240px;
+}
+
+
+#titlecontainer a {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.description-section {
   z-index: -1;
   padding: 0;
   background: #555;
   margin: 0;
 }
 
-#description {
+.description {
   color: #DDD;
   z-index: -1;
   margin-top: 0;
@@ -52,16 +68,15 @@ canvas {
   text-shadow:0 2px 1px rgba(0,0,0,1);
 }
 
-#description a {
+.description a {
   color: #AAA;
 }
 
-#description a:hover {
+.description a:hover {
   color: #888;
 }
 
-
-#description h3 {
+.description h3 {
   font-style: italic;
   font-size: 30px;
 }
@@ -71,13 +86,13 @@ h1 {
   padding-top: 40px;
   margin: 0;
   font-weight: bold;
-  font-size: 72px;
+  font-size: 88px;
   text-shadow:0 2px 1px rgba(200, 200, 200,1);
 }
 
 h2 {
   font-weight: bold;
-  font-size: 24px;
+  font-size: 32px;
   text-shadow:0 2px 1px rgba(200, 200, 200,1);
 }
 
@@ -106,8 +121,8 @@ h4 {
 }
 
 #header a {
-  font-size: 16px;
-  color: #444;
+  font-size: 18px;
+  color: #555;
 }
 
 #header a:hover {
@@ -124,11 +139,12 @@ h4 {
 }
 
 .section {
-  margin-bottom: 20px;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
 
 .container {
-  width: 900px;
+  padding: 20px;
   margin: 0 auto;
 }
 
@@ -151,8 +167,6 @@ a {
 a:hover { 
   color: #BBB;
 }
-
-
 
 .viewer { 
   width: 270px; 

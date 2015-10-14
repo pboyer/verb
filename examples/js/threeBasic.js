@@ -20,7 +20,7 @@ function onMouseMove( event ) {
 
 window.addEventListener( 'mousemove', onMouseMove, false );
 
-function threeSetup(doUseRaycaster){
+function setupScene(doUseRaycaster){
     useRaycaster = doUseRaycaster;
 
     scene = new THREE.Scene();
@@ -31,7 +31,10 @@ function threeSetup(doUseRaycaster){
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize( window.innerWidth, window.innerHeight );
-    document.body.appendChild( renderer.domElement );
+
+    var viewerele = document.getElementById("viewer");
+
+    viewerele.appendChild( renderer.domElement );
 
     var ambientLight = new THREE.AmbientLight( 0xbbbbbb );
     scene.add( ambientLight );
@@ -52,7 +55,7 @@ function threeSetup(doUseRaycaster){
 
 var intersects = [];
 
-function threeRender(){
+function renderScene(){
     var controls = new THREE.OrbitControls(camera, renderer.domElement);
 
     function render() {

@@ -1,0 +1,61 @@
+body {
+    margin: 0;
+    font-family:Helvetica, Arial, "Lucida Grande", sans-serif;
+    color: white;
+}
+
+.row, .col { overflow: hidden; position: absolute; }
+.row { left: 0; right: 0; }
+.col { top: 0; bottom: 0; }
+.scroll-x { overflow-x: auto; }
+.scroll-y { overflow-y: auto; }
+
+#viewer {
+    left: 0;
+    right: 0;
+}
+
+#button {
+    font-size: 15px;
+    color: white;
+    position: absolute;
+    background: green;
+    bottom: 20px;
+    padding: 10px;
+    left: 20px;
+    z-index: 2;
+}
+
+#button:hover{
+    background: grey;
+}
+
+#title {
+    text-transform: uppercase;
+    font-size: 20px;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+}
+
+#code-container {
+    padding: 20px;
+    background: rgba(0,0,0,0.75);
+    right: 0;
+    left: 0;
+}
+
+#code {
+    font-size: 10px;
+    padding: 10px;
+    margin: 10px;
+    top: 80px;
+    bottom: 0;
+    resize: none;
+    width: 650px;
+    border: 0;
+}
+
+.CodeMirror {
+  height: auto;
+}

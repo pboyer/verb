@@ -1,16 +1,31 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<script src="../build/js/verb.js"></script>
-	<script src="js/three.min.js"></script>
-	<script src="js/verbToThreeConversion.js"></script>
-	<script src="js/OrbitControls.js"></script>
-	<script src="js/threeBasic.js"></script>
-	<style> body {  margin: 0; } </style>
+    <title>Divide A Curve By Equal Arc Length</title>
+
+    <script src="../build/js/verb.js"></script>
+    <script src="js/three.min.js"></script>
+    <script src="js/verbToThreeConversion.js"></script>
+    <script src="js/OrbitControls.js"></script>
+    <script src="js/codemirror.js"></script>
+    <script src="js/javascript.js"></script>
+    <script src="js/threeBasic.js"></script>
+
+    <link rel="stylesheet" href="css/codemirror.css">
+    <link rel="stylesheet" href="css/example.css">
+    <link rel="stylesheet" href="css/colorforth.css">
 </head>
 <body>
-<script>
-	threeSetup();
+
+<div id="button">Show/Hide Code</div>
+<div id="viewer" class="col">
+    <div id="title"></div>
+</div>
+<div id="code-container" class="col scroll-y"></div>
+
+</body>
+<script id="script">
+	setupScene();
 
 	var p1 = [0,0,0], p2 = [10,0,0], p3 = [10,10,0], p4 = [0,10,0], p5 = [5, 5, 0];
 	var pts = [p1, p2, p3, p4, p5];
@@ -23,10 +38,9 @@
 
 	addPointsToScene( points );
 
-	threeRender();
-
+	renderScene();
 </script>
 
-</body>
+<script src="js/example.js"></script>
 
 </html>
