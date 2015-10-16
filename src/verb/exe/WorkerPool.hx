@@ -55,11 +55,7 @@ class WorkerPool {
 
     private function processQueue() {
 
-        trace("processQueue", _queue.length, _pool.length);
-
         while (_queue.length > 0 && _pool.length > 0) {
-
-            trace("processQueue loop");
 
             var work = _queue.shift();
             var workId = work.id;
@@ -86,8 +82,6 @@ class WorkerPool {
 
                 processQueue();
             };
-
-            trace("POSTING MESSAGE");
 
             worker.postMessage( work );
         }
