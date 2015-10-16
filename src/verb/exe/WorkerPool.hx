@@ -21,7 +21,7 @@ class WorkerPool {
     //* the number of `Worker` threads to form
     //* the filename of verb's javascript file - defaults to "verb.js". The final path is formed by concatenating `WorkerPool.basePath` and this.
 
-    public function new( numThreads : Int, fileName : String = "verb.js" ) {
+    public function new( numThreads : Int = 1, fileName : String = "verb.js" ) {
 
         for (i in 0...numThreads){
             var w : Worker;
@@ -43,10 +43,10 @@ class WorkerPool {
 
     public function addWork( className : String,
                              methodName : String,
-                             arguments : Array<Dynamic>,
+                             args : Array<Dynamic>,
                              callback : Dynamic ) : Void {
 
-        var work = new Work( className, methodName, arguments );
+        var work = new Work( className, methodName, args );
         _callbacks.set(work.id, callback);
         _queue.push( work );
 
@@ -55,7 +55,11 @@ class WorkerPool {
 
     private function processQueue() {
 
+        trace("processQueue", _queue.length, _pool.length);
+
         while (_queue.length > 0 && _pool.length > 0) {
+
+            trace("processQueue loop");
 
             var work = _queue.shift();
             var workId = work.id;
@@ -82,6 +86,8 @@ class WorkerPool {
 
                 processQueue();
             };
+
+            trace("POSTING MESSAGE");
 
             worker.postMessage( work );
         }

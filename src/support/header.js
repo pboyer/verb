@@ -24,40 +24,45 @@
 
     var verb = {};
 
-    // node.js context, but not webworker
+    // node.js context, but not WebWorker
     if ( typeof window !== 'object' && typeof require === "function"){
-    	var Worker = require('webworker-threads').Worker;
+        Worker = require('webworker-threads').Worker;
     }
 
-    // web worker or node.js context
+    // WebWorker or node.js context
     if ( typeof window !== 'object' ){
 
         var global = this;
         var window = global; // required for promhx
-        var lookup = function(className, methodName){
 
-            var obj = global;
+        // WebWorker
+        if ( typeof importScripts === "function"){
 
-            className.split(".").forEach(function(x){
-                if (obj) obj = obj[ x ];
-            });
+            var lookup = function(className, methodName){
 
-            if (!obj) return null;
+                var obj = global;
 
-            return obj[ methodName ];
-        }
+                className.split(".").forEach(function(x){
+                    if (obj) obj = obj[ x ];
+                });
 
-        onmessage = function( e ){
+                if (!obj) return null;
 
-            if (!e.data.className || !e.data.methodName) return;
-
-            var method = lookup( e.data.className, e.data.methodName );
-
-            if (!method){
-                return console.error("could not find " + e.data.className + "." + e.data.methodName)
+                return obj[ methodName ];
             }
 
-            postMessage( { result: method.apply( null, e.data.args ), id: e.data.id } );
+            onmessage = function( e ){
 
-        };
+                if (!e.data.className || !e.data.methodName) return;
+
+                var method = lookup( e.data.className, e.data.methodName );
+
+                if (!method){
+                    return console.error("could not find " + e.data.className + "." + e.data.methodName)
+                }
+
+                postMessage( { result: method.apply( null, e.data.args ), id: e.data.id } );
+
+            };
+        }
     }

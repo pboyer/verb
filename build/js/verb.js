@@ -24,42 +24,47 @@
 
     var verb = {};
 
-    // node.js context, but not webworker
+    // node.js context, but not WebWorker
     if ( typeof window !== 'object' && typeof require === "function"){
-    	var Worker = require('webworker-threads').Worker;
+        Worker = require('webworker-threads').Worker;
     }
 
-    // web worker or node.js context
+    // WebWorker or node.js context
     if ( typeof window !== 'object' ){
 
         var global = this;
         var window = global; // required for promhx
-        var lookup = function(className, methodName){
 
-            var obj = global;
+        // WebWorker
+        if ( typeof importScripts === "function"){
 
-            className.split(".").forEach(function(x){
-                if (obj) obj = obj[ x ];
-            });
+            var lookup = function(className, methodName){
 
-            if (!obj) return null;
+                var obj = global;
 
-            return obj[ methodName ];
-        }
+                className.split(".").forEach(function(x){
+                    if (obj) obj = obj[ x ];
+                });
 
-        onmessage = function( e ){
+                if (!obj) return null;
 
-            if (!e.data.className || !e.data.methodName) return;
-
-            var method = lookup( e.data.className, e.data.methodName );
-
-            if (!method){
-                return console.error("could not find " + e.data.className + "." + e.data.methodName)
+                return obj[ methodName ];
             }
 
-            postMessage( { result: method.apply( null, e.data.args ), id: e.data.id } );
+            onmessage = function( e ){
 
-        };
+                if (!e.data.className || !e.data.methodName) return;
+
+                var method = lookup( e.data.className, e.data.methodName );
+
+                if (!method){
+                    return console.error("could not find " + e.data.className + "." + e.data.methodName)
+                }
+
+                postMessage( { result: method.apply( null, e.data.args ), id: e.data.id } );
+
+            };
+        }
     }
 (function ($hx_exports) { "use strict";
 $hx_exports.geom = $hx_exports.geom || {};
@@ -126,6 +131,11 @@ Type.getClassName = function(c) {
 	return a.join(".");
 };
 var haxe = {};
+haxe.Log = function() { };
+haxe.Log.__name__ = ["haxe","Log"];
+haxe.Log.trace = function(v,infos) {
+	js.Boot.__trace(v,infos);
+};
 haxe.ds = {};
 haxe.ds.IntMap = function() {
 	this.h = { };
@@ -148,11 +158,100 @@ haxe.ds.IntMap.prototype = {
 		return true;
 	}
 };
-haxe.ds.Option = { __constructs__ : ["Some","None"] };
+haxe.ds.Option = { __ename__ : true, __constructs__ : ["Some","None"] };
 haxe.ds.Option.Some = function(v) { var $x = ["Some",0,v]; $x.__enum__ = haxe.ds.Option; $x.toString = $estr; return $x; };
 haxe.ds.Option.None = ["None",1];
 haxe.ds.Option.None.toString = $estr;
 haxe.ds.Option.None.__enum__ = haxe.ds.Option;
+var js = {};
+js.Boot = function() { };
+js.Boot.__name__ = ["js","Boot"];
+js.Boot.__unhtml = function(s) {
+	return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
+};
+js.Boot.__trace = function(v,i) {
+	var msg;
+	if(i != null) msg = i.fileName + ":" + i.lineNumber + ": "; else msg = "";
+	msg += js.Boot.__string_rec(v,"");
+	if(i != null && i.customParams != null) {
+		var _g = 0;
+		var _g1 = i.customParams;
+		while(_g < _g1.length) {
+			var v1 = _g1[_g];
+			++_g;
+			msg += "," + js.Boot.__string_rec(v1,"");
+		}
+	}
+	var d;
+	if(typeof(document) != "undefined" && (d = document.getElementById("haxe:trace")) != null) d.innerHTML += js.Boot.__unhtml(msg) + "<br/>"; else if(typeof console != "undefined" && console.log != null) console.log(msg);
+};
+js.Boot.__string_rec = function(o,s) {
+	if(o == null) return "null";
+	if(s.length >= 5) return "<...>";
+	var t = typeof(o);
+	if(t == "function" && (o.__name__ || o.__ename__)) t = "object";
+	switch(t) {
+	case "object":
+		if(o instanceof Array) {
+			if(o.__enum__) {
+				if(o.length == 2) return o[0];
+				var str = o[0] + "(";
+				s += "\t";
+				var _g1 = 2;
+				var _g = o.length;
+				while(_g1 < _g) {
+					var i = _g1++;
+					if(i != 2) str += "," + js.Boot.__string_rec(o[i],s); else str += js.Boot.__string_rec(o[i],s);
+				}
+				return str + ")";
+			}
+			var l = o.length;
+			var i1;
+			var str1 = "[";
+			s += "\t";
+			var _g2 = 0;
+			while(_g2 < l) {
+				var i2 = _g2++;
+				str1 += (i2 > 0?",":"") + js.Boot.__string_rec(o[i2],s);
+			}
+			str1 += "]";
+			return str1;
+		}
+		var tostr;
+		try {
+			tostr = o.toString;
+		} catch( e ) {
+			return "???";
+		}
+		if(tostr != null && tostr != Object.toString) {
+			var s2 = o.toString();
+			if(s2 != "[object Object]") return s2;
+		}
+		var k = null;
+		var str2 = "{\n";
+		s += "\t";
+		var hasp = o.hasOwnProperty != null;
+		for( var k in o ) {
+		if(hasp && !o.hasOwnProperty(k)) {
+			continue;
+		}
+		if(k == "prototype" || k == "__class__" || k == "__super__" || k == "__interfaces__" || k == "__properties__") {
+			continue;
+		}
+		if(str2.length != 2) str2 += ", \n";
+		str2 += s + k + " : " + js.Boot.__string_rec(o[k],s);
+		}
+		s = s.substring(1);
+		str2 += "\n" + s + "}";
+		return str2;
+	case "function":
+		return "<function>";
+	case "string":
+		return o;
+	default:
+		return String(o);
+	}
+};
 var promhx = {};
 promhx.base = {};
 promhx.base.AsyncBase = function(d) {
@@ -684,14 +783,14 @@ promhx.base.EventLoop.continueOnNextLoop = function() {
 	if(promhx.base.EventLoop.nextLoop != null) promhx.base.EventLoop.nextLoop(promhx.base.EventLoop.f); else setImmediate(promhx.base.EventLoop.f);
 };
 promhx.error = {};
-promhx.error.PromiseError = { __constructs__ : ["AlreadyResolved","DownstreamNotFullfilled"] };
+promhx.error.PromiseError = { __ename__ : true, __constructs__ : ["AlreadyResolved","DownstreamNotFullfilled"] };
 promhx.error.PromiseError.AlreadyResolved = function(message) { var $x = ["AlreadyResolved",0,message]; $x.__enum__ = promhx.error.PromiseError; $x.toString = $estr; return $x; };
 promhx.error.PromiseError.DownstreamNotFullfilled = function(message) { var $x = ["DownstreamNotFullfilled",1,message]; $x.__enum__ = promhx.error.PromiseError; $x.toString = $estr; return $x; };
 var verb = {};
 verb.Verb = function() { };
 verb.Verb.__name__ = ["verb","Verb"];
 verb.Verb.main = function() {
-	console.log("verb 2.0.0");
+	haxe.Log.trace("verb 2.0.0",{ fileName : "Verb.hx", lineNumber : 44, className : "verb.Verb", methodName : "main"});
 };
 verb.core = {};
 verb.core.ArrayExtensions = function() { };
@@ -5114,6 +5213,7 @@ verb.exe.Dispatcher.dispatchMethod = function(classType,methodName,args) {
 };
 verb.exe.WorkerPool = $hx_exports.exe.WorkerPool = function(numThreads,fileName) {
 	if(fileName == null) fileName = "verb.js";
+	if(numThreads == null) numThreads = 1;
 	this._callbacks = new haxe.ds.IntMap();
 	this._working = new haxe.ds.IntMap();
 	this._pool = [];
@@ -5132,15 +5232,17 @@ verb.exe.WorkerPool = $hx_exports.exe.WorkerPool = function(numThreads,fileName)
 };
 verb.exe.WorkerPool.__name__ = ["verb","exe","WorkerPool"];
 verb.exe.WorkerPool.prototype = {
-	addWork: function(className,methodName,$arguments,callback) {
-		var work = new verb.exe._WorkerPool.Work(className,methodName,$arguments);
+	addWork: function(className,methodName,args,callback) {
+		var work = new verb.exe._WorkerPool.Work(className,methodName,args);
 		this._callbacks.set(work.id,callback);
 		this._queue.push(work);
 		this.processQueue();
 	}
 	,processQueue: function() {
 		var _g = this;
+		haxe.Log.trace("processQueue",{ fileName : "WorkerPool.hx", lineNumber : 58, className : "verb.exe.WorkerPool", methodName : "processQueue", customParams : [this._queue.length,this._pool.length]});
 		while(this._queue.length > 0 && this._pool.length > 0) {
+			haxe.Log.trace("processQueue loop",{ fileName : "WorkerPool.hx", lineNumber : 62, className : "verb.exe.WorkerPool", methodName : "processQueue"});
 			var work = this._queue.shift();
 			var workId = [work.id];
 			var worker = [this._pool.shift()];
@@ -5155,11 +5257,12 @@ verb.exe.WorkerPool.prototype = {
 							_g._callbacks.remove(workId[0]);
 						}
 					} catch( error ) {
-						console.log(error);
+						haxe.Log.trace(error,{ fileName : "WorkerPool.hx", lineNumber : 84, className : "verb.exe.WorkerPool", methodName : "processQueue"});
 					}
 					_g.processQueue();
 				};
 			})(worker,workId);
+			haxe.Log.trace("POSTING MESSAGE",{ fileName : "WorkerPool.hx", lineNumber : 90, className : "verb.exe.WorkerPool", methodName : "processQueue"});
 			worker[0].postMessage(work);
 		}
 	}

@@ -28,7 +28,7 @@
 </body>
 <script id="script">
 
-        verb.exe.WorkerPool.basePath = "../build/js/";
+        verb.exe.WorkerPool.basePath = "js/";
 
 		setupScene();
 
@@ -46,6 +46,7 @@
 		var Vec = verb.core.Vec;
 
        	Vec.span( 0, 1.0, 0.025 ).forEach(function(u){
+       	    console.log("SEND");
             srf.isocurveAsync( u, true ).then(function(x){
                 addCurveToScene( x.toThreeGeometry() );
             });
