@@ -25,12 +25,12 @@
     var verb = {};
 
     // node.js context, but not webworker
-    if ( typeof window === 'undefined' && typeof importScripts != 'function'){
+    if ( typeof window !== 'object' && typeof require === "function"){
     	var Worker = require('webworker-threads').Worker;
     }
 
     // web worker or node.js context
-    if ( typeof window !== 'object'){
+    if ( typeof window !== 'object' ){
 
         var global = this;
         var window = global; // required for promhx
@@ -48,6 +48,8 @@
         }
 
         onmessage = function( e ){
+
+            if (!e.data.className || !e.data.methodName) return;
 
             var method = lookup( e.data.className, e.data.methodName );
 
