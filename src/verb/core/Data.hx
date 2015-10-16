@@ -105,9 +105,9 @@ class NurbsSurfaceData {
 
 }
 
-// A face of a mesh
+// A triangular face of a mesh
 
-typedef MeshFace = Array<Int>;
+typedef Tri = Array<Int>;
 
 // A `UV` is simply an array of floating point numbers.
 //
@@ -120,12 +120,12 @@ typedef UV = Array<Float>;
 @:expose("core.MeshData")
 class MeshData {
 
-    public var faces : Array<MeshFace>;
+    public var faces : Array<Tri>;
     public var points : Array<Point>;
     public var normals : Array<Point>;
     public var uvs : Array<UV>;
 
-    public function new(faces : Array<MeshFace>, points : Array<Point>, normals : Array<Point>, uvs : Array<UV> ) {
+    public function new(faces : Array<Tri>, points : Array<Point>, normals : Array<Point>, uvs : Array<UV> ) {
         this.faces = faces;
         this.points = points;
         this.normals = normals;

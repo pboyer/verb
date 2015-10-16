@@ -24,11 +24,12 @@
 
     var verb = {};
 
-    if (typeof require=="function" && require){
+    // node.js context, but not webworker
+    if ( typeof window === 'undefined' && typeof importScripts != 'function'){
     	var Worker = require('webworker-threads').Worker;
     }
 
-    // web worker / node.js context
+    // web worker or node.js context
     if ( typeof window !== 'object'){
 
         var global = this;

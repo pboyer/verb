@@ -24,12 +24,11 @@
 
     var verb = {};
 
-    // node.js context, but not webworker
-    if ( typeof window === 'undefined' && typeof importScripts != 'function'){
+    if (typeof require=="function" && require){
     	var Worker = require('webworker-threads').Worker;
     }
 
-    // web worker or node.js context
+    // web worker / node.js context
     if ( typeof window !== 'object'){
 
         var global = this;
@@ -918,18 +917,24 @@ verb.core.Ray = $hx_exports.core.Ray = function(origin,dir) {
 	this.dir = dir;
 };
 verb.core.Ray.__name__ = ["verb","core","Ray"];
-verb.core.NurbsCurveData = $hx_exports.core.NurbsCurveData = function(degree,knots,controlPoints) {
+verb.core.NurbsCurveData = $hx_exports.core.NurbsCurveData = function(degree,knots,controlPoints,closed) {
+	if(closed == null) closed = false;
 	this.degree = degree;
 	this.controlPoints = controlPoints;
 	this.knots = knots;
+	this.closed = closed;
 };
 verb.core.NurbsCurveData.__name__ = ["verb","core","NurbsCurveData"];
-verb.core.NurbsSurfaceData = $hx_exports.core.NurbsSurfaceData = function(degreeU,degreeV,knotsU,knotsV,controlPoints) {
+verb.core.NurbsSurfaceData = $hx_exports.core.NurbsSurfaceData = function(degreeU,degreeV,knotsU,knotsV,controlPoints,closedU,closedV) {
+	if(closedV == null) closedV = false;
+	if(closedU == null) closedU = false;
 	this.degreeU = degreeU;
 	this.degreeV = degreeV;
 	this.knotsU = knotsU;
 	this.knotsV = knotsV;
 	this.controlPoints = controlPoints;
+	this.closedU = closedU;
+	this.closedV = closedV;
 };
 verb.core.NurbsSurfaceData.__name__ = ["verb","core","NurbsSurfaceData"];
 verb.core.MeshData = $hx_exports.core.MeshData = function(faces,points,normals,uvs) {

@@ -8,6 +8,14 @@ import verb.core.Mat;
 
 interface ICurve {
 
+    //Provide a serialized version of the Curve
+    //
+    //**returns**
+    //
+    //* A NurbsCurveData object representing the curve
+
+//    function serialize() : String;
+
     //Provide the NURBS representation of the curve
     //
     //**returns**

@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Revolved Surface</title>
+
+    <script src="../build/js/verb.js"></script>
+    <script src="js/three.min.js"></script>
+    <script src="js/verbToThreeConversion.js"></script>
+    <script src="js/OrbitControls.js"></script>
+    <script src="js/codemirror.js"></script>
+    <script src="js/javascript.js"></script>
+    <script src="js/threeBasic.js"></script>
+
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" href="css/codemirror.css">
+    <link rel="stylesheet" href="css/example.css">
+    <link rel="stylesheet" href="css/colorforth.css">
+</head>
+<body>
+
+<div id="button">Show/Hide Code</div>
+<div id="viewer" class="col">
+    <div id="title"></div>
+</div>
+<div id="code-container" class="col scroll-y"></div>
+
+</body>
+<script id="script">
+	setupScene();
+
+    var prof = new verb.geom.BezierCurve( [[0,0,0], [5,10,0], [10,0,0], [15,20,0],] );
+
+    var srf = new verb.geom.RevolvedSurface( prof, [0,0,0], [1,0,0], 2* Math.PI);
+
+	addCurveToScene( prof.toThreeGeometry() );
+	addMeshToScene( srf.toThreeGeometry() );
+
+	renderScene();
+</script>
+
+<script src="js/example.js"></script>
+
+</html>
