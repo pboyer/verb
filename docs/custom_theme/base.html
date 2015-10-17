@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+    <head>
+        <title>{{ current_page.title }}</title>
+
+        <script src="{{ base_url }}/js/base.js"></script>
+
+        <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300' rel='stylesheet' type='text/css'>
+
+        <link rel="stylesheet" href="{{ base_url }}/css/base.css">
+    </head>
+
+    <body>
+        <div id="header" class="row">
+
+            <div id="search">
+                <input type="search" id="mkdocs-search-query" placeholder="Search">
+                <div id="mkdocs-search-results"></div>
+            </div>
+
+            <div id="nav">
+                <ul class="nav-list">
+                    {% for nav_item in nav %}
+                    {% if nav_item.children %}
+                    <li class="nav-major">{{ nav_item.title }}
+                        <ul class="nav-minor">
+                            {% for nav_item in nav_item.children %}
+                            <li class="nav-minor-minor {% if nav_item.active%}current{%endif%}">
+                                <a href="{{ nav_item.url }}">{{ nav_item.title }}</a>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </li>
+                    {% else %}
+                    <li class="nav-major {% if nav_item.active%}current{%endif%}">
+                        <a href="{{ nav_item.url }}">{{ nav_item.title }}</a>
+                    </li>
+                    {% endif %}
+
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div id="title">
+                <span>verb</span> docs
+            </div>
+        </div>
+
+        <div id="body" class="row">
+            <div id="toc" class="col scroll-y">
+                <ul>
+                    {% for toc_item in toc %}
+                    <li class="toc-major"><a href="{{ toc_item.url }}">{{ toc_item.title }}</a></li>
+                    {% for toc_item in toc_item.children %}
+                    <li><a href="{{ toc_item.url }}">{{ toc_item.title }}</a></li>
+                    {% endfor %}
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <div id="content" class="col scroll-y">
+                {{ content }}
+            </div>
+        </div>
+
+        <script>var base_url = '{{ base_url }}';</script>
+        <script data-main="{{ base_url }}/mkdocs/js/search.js" src="{{ base_url }}/mkdocs/js/require.js"></script>
+    </body>
+</html>
