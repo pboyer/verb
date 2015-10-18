@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.org/pboyer/verb.svg?branch=master)](https://travis-ci.org/pboyer/verb)
 
 #verb
+
 ###Open-source, cross-platform NURBS
 
 <strong>verb</strong> is a library for creating and manipulating NURBS surfaces and curves in many languages including JavaScript.
