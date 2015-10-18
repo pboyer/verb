@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-   - "4.0.0"
+   - "4.2.1"
 before_install:
   - sudo apt-get update                                # run update before installing anything
   - sudo apt-get install python-software-properties -y # for the next command
