@@ -8,33 +8,19 @@
 
 verb provides advanced tools like derivative evaluation, adaptive tessellation, and intersection.  Verb provides a concurrent execution runtime via WebWorkers in modern browsers and thread pools on other platforms and is suitable for use in a datacenter or in the browser.
 
-### API Status : Stable
+### Platforms
+
+verb compiles for:
+
+* JavaScript
+* C#
+* C++
+* Python
+* PHP
 
 ### Getting started
 
-Install <a href="http://haxe.org/">haxe</a> and <a href="http://haxe.org/">node.js</a>
-
-You should have installed **haxe 3.2.1** and **node.js 4.2.1**. If you're using OS X, ensure that you have installed XCode 7.
-
-Install node.js dependencies:
-
-	npm install
-
-Install haxe dependencies:
-
-	sudo haxelib install promhx
-
-Install grunt:
-
-	npm install -g grunt-cli
-
-Compile to javascript:
-
-	grunt build
-
-Run all unit tests:
-
-	grunt test
+Go to the [docs](http://verbnurbs.com/docs)
 
 ### License
 

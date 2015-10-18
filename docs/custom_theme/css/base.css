@@ -12,7 +12,7 @@ body {
 
 #header {
     overflow: visible;
-    height: 80px;
+    height: 50px;
     background: #444;
     z-index: 2;
     box-shadow: 2px 0px 10px rgba(0,0,0,0.5);
@@ -26,8 +26,8 @@ body {
 
 #title {
     position: absolute;
-    top: 20px;
-    left: 480px;
+    top: 4px;
+    left: 380px;
     right: 300px;
     font-weight: 300;
     text-align: center;
@@ -40,14 +40,29 @@ body {
     font-weight: 400;
 }
 
+#site {
+    float: right;
+    padding-top: 12px;
+}
+
+#site a {
+    text-decoration: none;
+    color: #aaa;
+    padding: 10px 12px;
+}
+
+#site a:hover {
+    color: white;
+}
+
 #search input {
-    padding: 22px;
+    padding: 15px;
     font-size: 18px;
-    width: 300px;
+    width: 200px;
     margin: 0;
     border: none;
     box-size: border-box;
-    height: 80px;
+    height: 50px;
     font-family: 'Source Sans Pro', sans-serif;
     outline-width: 0;
     background: #eee;
@@ -70,8 +85,8 @@ body {
     display: none;
     box-size: border-box;
     position: absolute;
-    top: 80px;
-    left: -100px;
+    top: 50px;
+    left: -200px;
     width: 400px;
     background: #333;
     color: white;
@@ -148,11 +163,11 @@ body {
     text-shadow: 0px 1px #000000;
     color: white;
     box-sizing: border-box;
-    height: 80px;
+    height: 50px;
     text-transform: lowercase;
     font-size: 24px;
     border: 0;
-    padding: 25px;
+    padding: 10px 15px;
     margin: 0;
     display: inline-block;
     list-style-type: none;
@@ -172,7 +187,7 @@ body {
     text-transform: none;
     position: absolute;
     z-index: 1;
-    top: 80px;
+    top: 50px;
     left: 0;
     border: 0;
     padding: 0;
@@ -202,7 +217,7 @@ body {
 }
 
 #body {
-    top: 80px;
+    top: 50px;
     bottom: 0;
 }
 

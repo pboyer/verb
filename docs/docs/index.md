@@ -1,22 +1,39 @@
 # verb 2.0.0 docs
 
-**verb is a library for manipulating NURBS geometry.** It does some other things well, but that's the main focus.
+## What is verb?
 
-**[Project website](http://www.verbnurbs.com)**
+verb is a library for creating and manipulating NURBS surfaces and curves in many languages including JavaScript.
 
-**[Repository](http://github.com/pboyer/verb)**
+verb provides advanced tools like derivative evaluation, adaptive tessellation, and intersection. Verb provides a 
+concurrent execution runtime via WebWorkers in modern browsers and thread pools on other platforms and is suitable 
+for use in a datacenter or in the browser.
 
-## Library Structure
+verb is not a graphics library. It nicely compliments web graphics libraries like three.js, but is happy to live without
+one.
+
+## How is verb organized?
 
 The library is split into four parts:
 
+* **verb.geom** - Geometric types that make it easy to work with NURBS. Includes most curve and surface types.
 * **verb.core** - Mathematical and geometric utilities that are shared throughout the library.
 * **verb.eval** - Fundamental NURBS algorithms for evaluation, intersection, analysis, and more.
 * **verb.exe** - Tools for managing multi-core evaluation on different platforms.
-* **verb.geom** - Geometric types that make it easy to work with NURBS without knowing much.
+
+**Most people should just use verb.geom.** The other parts provide more powerful features and more direct access to 
+core parts of the library.
+
+## Platforms
+
+verb compiles for:
+
+* JavaScript
+* C#
+* C++
+* Python
+* PHP
 
 ## Getting started
-
 
 Install <a href="http://haxe.org/">haxe</a> and <a href="http://haxe.org/">node.js</a>
 
@@ -34,7 +51,7 @@ Install grunt:
 
 	npm install -g grunt-cli
 
-### Compiling for JavaScript
+## Compiling for JavaScript
 
 Compile to javascript:
 
@@ -44,7 +61,7 @@ Run all unit tests:
 
 	grunt test
 
-### Compiling for C&#35;
+## Compiling for C&#35;
  
 Install [mono](http://www.mono-project.com/docs/getting-started/install/)
 
@@ -58,7 +75,7 @@ Build:
     
 Output goes to build/cs.
 
-### Compiling for C++
+## Compiling for C++
 
 Install hxcpp:
 
@@ -70,7 +87,7 @@ Build:
 
 Output goes to build/cpp. 
 
-### Compiling for Python
+## Compiling for Python
 
 Make sure python is installed.
 
@@ -80,12 +97,23 @@ Build:
     
 Output goes to build/verb.py
 
-### Compiling for PHP
+## Compiling for PHP
 
-verb does not currently compile for Java. It probably wouldn't be hard to do. [Would you like to contribute?](http://github.com/pboyer/verb)
+Build:
+
+    haxe buildphp.hxml
     
+Output goes to build/php
+
+## Compiling for other platforms
+
+Haxe compiles for other platforms, including Flash and Neko. I have not tried to compile for these platforms - [would you like to contribute?](http://github.com/pboyer/verb)
 
 ### Compiling for Java
 
-verb does not currently compile for Java. It probably wouldn't be hard to do. [Would you like to contribute?](http://github.com/pboyer/verb)
+verb does not currently compile for Java. It probably wouldn't be hard to do.
     
+## Using verb with three.js
+
+You can find good examples of using verb with three in the examples directory. There's an example code showing how
+to convert verb geometric types in to three.js Meshes and Lines [here](https://github.com/pboyer/verb/blob/master/examples/js/verbToThreeConversion.jsz).
