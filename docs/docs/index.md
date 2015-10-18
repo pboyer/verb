@@ -1,8 +1,7 @@
-# Docs
+# verb docs
 
 * [Project website](http://www.verbnurbs.com)
 * [Repository](http://github.com/pboyer/verb)
-
 
 ## verb 2.0.0
 
