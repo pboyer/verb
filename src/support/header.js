@@ -3,6 +3,7 @@
 
 (function(f){
     if(typeof exports==="object"&&typeof module!=="undefined"){
+        console.log("OK");
         module.exports=f()
     } else if(typeof define==="function"&&define.amd){
         define([],f)
@@ -26,6 +27,7 @@
 
     // node.js context, but not WebWorker
     if ( typeof window !== 'object' && typeof require === "function"){
+        console.log("making web worker");
         Worker = require('webworker-threads').Worker;
     }
 

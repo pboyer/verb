@@ -1,31 +1,34 @@
 [![Build Status](https://travis-ci.org/pboyer/verb.svg?branch=master)](https://travis-ci.org/pboyer/verb)
 
-#verb
-###A CAD Library for the Web
+# verb
+
+### Open-source, cross-platform NURBS
 
 <strong>verb</strong> is a library for creating and manipulating NURBS surfaces and curves in many languages including JavaScript.
 
-verb provides advanced tools like derivative evaluation, adaptive tessellation, and intersection.  Verb provides a concurrent execution runtime via WebWorkers in modern browsers and is suitable for use in a datacenter or in the browser.
+verb provides advanced tools like derivative evaluation, adaptive tessellation, and intersection.  Verb provides a concurrent execution runtime via WebWorkers in modern browsers and thread pools on other platforms and is suitable for use in a datacenter or in the browser.
 
-### API Status : Stabilish
+### API Status : Stable
 
-###Getting started
+### Getting started
 
 Install <a href="http://haxe.org/">haxe</a> and <a href="http://haxe.org/">node.js</a>
 
-Install haxe dependencies:
-
-	sudo haxelib install promhx
+You should have installed **haxe 3.2.1** and **node.js 4.2.1**. If you're using OS X, ensure that you have installed XCode 7.
 
 Install node.js dependencies:
 
 	npm install
 
+Install haxe dependencies:
+
+	sudo haxelib install promhx
+
 Install grunt:
 
 	npm install -g grunt-cli
 
-Build compiled as javascript:
+Compile to javascript:
 
 	grunt build
 
@@ -33,7 +36,7 @@ Run all unit tests:
 
 	grunt test
 
-###License
+### License
 
 The MIT License (MIT)
 
