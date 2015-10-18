@@ -13,6 +13,8 @@ verb provides advanced tools like derivative evaluation, adaptive tessellation, 
 
 Install <a href="http://haxe.org/">haxe</a> and <a href="http://haxe.org/">node.js</a>
 
+You should have installed **haxe 3.2.1** and **node.js 4.2.1**.
+
 Install haxe dependencies:
 
 	sudo haxelib install promhx
