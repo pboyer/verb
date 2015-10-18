@@ -1,8 +1,8 @@
 [![Build Status](https://travis-ci.org/pboyer/verb.svg?branch=master)](https://travis-ci.org/pboyer/verb)
 
-#verb
+# verb
 
-###Open-source, cross-platform NURBS
+### Open-source, cross-platform NURBS
 
 <strong>verb</strong> is a library for creating and manipulating NURBS surfaces and curves in many languages including JavaScript.
 
@@ -10,7 +10,7 @@ verb provides advanced tools like derivative evaluation, adaptive tessellation, 
 
 ### API Status : Stable
 
-###Getting started
+### Getting started
 
 Install <a href="http://haxe.org/">haxe</a> and <a href="http://haxe.org/">node.js</a>
 
@@ -36,7 +36,7 @@ Run all unit tests:
 
 	grunt test
 
-###License
+### License
 
 The MIT License (MIT)
 
