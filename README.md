@@ -10,7 +10,7 @@ verb provides advanced tools like derivative evaluation, adaptive tessellation, 
 
 ### Platforms
 
-verb compiles for:
+Using haxe, verb compiles for:
 
 * JavaScript
 * C#
@@ -21,6 +21,14 @@ verb compiles for:
 ### Getting started
 
 Go to the [docs](http://verbnurbs.com/docs)
+
+#### JavaScript Quick Start
+
+You can install verb with
+
+    npm install verb-nurbs
+    
+Pre-compiled JavaScript can be found in build/js.
 
 ### License
 

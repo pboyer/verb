@@ -51,6 +51,14 @@ Install grunt:
 
 	npm install -g grunt-cli
 
+## Using with JavaScript
+
+You can install verb with npm
+    
+    npm install verb-nurbs
+    
+You'll find many usage examples in the [examples directory](https://github.com/pboyer/verb/blob/master/examples].
+
 ## Compiling for JavaScript
 
 Compile to javascript:
