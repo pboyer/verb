@@ -1,8 +1,10 @@
+sudo: false
 language: node_js
 node_js:
    - "4.2.1"
 before_install:
-  - sudo apt-get update                                # run update before installing anything
+  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+  - sudo apt-get update -qq                             # run update before installing anything
   - sudo apt-get install python-software-properties -y # for the next command
   - sudo add-apt-repository ppa:eyecreate/haxe -y      # add the ubuntu ppa that contains haxe
   - sudo apt-get update                                # pull info from ppa
@@ -12,4 +14,7 @@ before_install:
   - haxelib setup ~/haxelib
   - haxelib install promhx
   - haxelib install nodejs
-install: npm install
+install:
+  - sudo apt-get install -qq g++-4.8
+  - export CXX="g++-4.8"
+  - npm install
