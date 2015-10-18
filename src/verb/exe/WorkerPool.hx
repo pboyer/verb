@@ -1,10 +1,12 @@
 package verb.exe;
 
+#if js
+
 import haxe.ds.IntMap;
 
 import js.html.Worker;
 
-// `WorkerPool` provides a pool of WebWorker objects for concurrent evaluation
+// `WorkerPool` provides a pool of WebWorker objects for concurrent evaluation in JavaScript
 
 @:expose("exe.WorkerPool")
 class WorkerPool {
@@ -106,4 +108,5 @@ private class Work {
     }
 }
 
+#end
 

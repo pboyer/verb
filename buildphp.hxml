@@ -1,0 +1,6 @@
+-lib promhx
+-main verb.Verb
+-cp src
+-php build/php
+-dce std
+-D dll

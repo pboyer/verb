@@ -8,7 +8,7 @@ module.exports = function(grunt) {
     concat: {
       build: {
         files: {
-          'build/js/<%= pkg.name %>.js': [ 'src/support/header.js',
+          'build/js/verb.js': [ 'src/support/header.js',
                                         'build/js/verbHaxe.js',
                                         'src/support/footer.js',]
         }
@@ -28,11 +28,11 @@ module.exports = function(grunt) {
 
     uglify: {
       options: {
-        banner: '/*! <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */\n'
+        banner: '/*! verb <%= grunt.template.today("yyyy-mm-dd") %> */\n'
       },
       build: {
         files: {
-          'build/js/<%= pkg.name %>.min.js': ['build/js/<%= pkg.name %>.js']
+          'build/js/verb.min.js': ['build/js/verb.js']
         }
       }
     },

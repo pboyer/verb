@@ -1,0 +1,6 @@
+-lib promhx
+-main verb.Verb
+-cp src
+-python build/verb.py
+-dce std
+-D dll

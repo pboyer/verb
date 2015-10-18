@@ -1,9 +1,9 @@
 package verb.exe;
 
-#if (neko || cpp)
-	import verb.exe.ThreadPool;
-#elseif js
+#if js
     import verb.exe.WorkerPool;
+#else
+    import verb.exe.ThreadPool;
 #end
 
 import promhx.Deferred;
@@ -14,10 +14,10 @@ class Dispatcher {
 
     public static var THREADS : Int = 1;
 
-    #if (neko || cpp)
-        private static var _threadPool : ThreadPool;
-    #elseif js
+    #if js
         private static var _workerPool : WorkerPool;
+    #else
+        private static var _threadPool : ThreadPool;
     #end
 
     private static var _init : Bool = false;
@@ -26,14 +26,13 @@ class Dispatcher {
 
         if (_init) return;
 
-        #if (neko || cpp)
-            _threadPool = new ThreadPool( THREADS );
-        #elseif js
+        #if js
             _workerPool = new WorkerPool( THREADS );
+        #else
+            _threadPool = new ThreadPool( THREADS );
         #end
 
         _init = true;
-
     }
 
     public static function dispatchMethod<T>( classType : Class<Dynamic>, methodName : String, args : Array<Dynamic> ) : Promise<T> {
@@ -47,14 +46,9 @@ class Dispatcher {
         };
 
         #if js
-
             _workerPool.addWork( Type.getClassName( classType ), methodName, args, callback );
-
         #else
-
-            _threadPool.addTask(function(){ return Reflect.callMethod(classType, Reflect.field(classType, methodName), args )  },
-                null, callback);
-
+            _threadPool.addTask(function(_ : Dynamic){ var r : Dynamic = Reflect.callMethod(classType, Reflect.field(classType, methodName), args ); return r; }, null, callback);
         #end
 
         return new Promise<T>( def );
