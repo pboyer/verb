@@ -57,6 +57,10 @@ You can install verb with npm
     
     npm install verb-nurbs
     
+You can use verb with require.js (AMD) or browserify (commonjs) in the browser or in node.js.
+
+Pre-compiled JavaScript can be found in [build/js](https://github.com/pboyer/verb/blob/master/build/js].
+
 You'll find many usage examples in the [examples directory](https://github.com/pboyer/verb/blob/master/examples].
 
 ## Compiling for JavaScript

@@ -18,17 +18,19 @@ Using haxe, verb compiles for:
 * Python
 * PHP
 
-### Getting started
+### Documentation
 
-Go to the [docs](http://verbnurbs.com/docs)
+**Go to the [docs](http://verbnurbs.com/docs)**
 
-#### JavaScript Quick Start
+### JavaScript Quick Start
 
 You can install verb with
 
     npm install verb-nurbs
     
-Pre-compiled JavaScript can be found in build/js.
+Pre-compiled JavaScript can be found in [build/js](https://github.com/pboyer/verb/blob/master/build/js].
+
+You'll find many usage examples in the [examples directory](https://github.com/pboyer/verb/blob/master/examples].
 
 ### License
 
