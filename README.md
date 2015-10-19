@@ -20,7 +20,7 @@ Using haxe, verb compiles for:
 
 ### Documentation
 
-**Go to the [docs](http://verbnurbs.com/docs)**
+For information on building and using verb, **go to the [docs](http://verbnurbs.com/docs)**
 
 ### JavaScript Quick Start
 
