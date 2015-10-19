@@ -128,4 +128,4 @@ verb does not currently compile for Java. It probably wouldn't be hard to do.
 ## Using verb with three.js
 
 You can find good examples of using verb with three in the examples directory. There's an example code showing how
-to convert verb geometric types in to three.js Meshes and Lines [here](https://github.com/pboyer/verb/blob/master/examples/js/verbToThreeConversion.jsz).
+to convert verb geometric types in to three.js Meshes and Lines [here](https://github.com/pboyer/verb/blob/master/examples/js/verbToThreeConversion.js).

@@ -12,7 +12,7 @@ body {
 
 #header {
     overflow: visible;
-    height: 50px;
+    height: 65px;
     background: #444;
     z-index: 2;
     box-shadow: 2px 0px 10px rgba(0,0,0,0.5);
@@ -26,7 +26,7 @@ body {
 
 #title {
     position: absolute;
-    top: 4px;
+    top: 10px;
     left: 380px;
     right: 300px;
     font-weight: 300;
@@ -42,13 +42,13 @@ body {
 
 #site {
     float: right;
-    padding-top: 12px;
+    padding-top: 20px;
 }
 
 #site a {
     text-decoration: none;
     color: #aaa;
-    padding: 10px 12px;
+    padding: 10px 22px;
 }
 
 #site a:hover {
@@ -62,7 +62,7 @@ body {
     margin: 0;
     border: none;
     box-size: border-box;
-    height: 50px;
+    height: 65px;
     font-family: 'Source Sans Pro', sans-serif;
     outline-width: 0;
     background: #eee;
@@ -85,7 +85,7 @@ body {
     display: none;
     box-size: border-box;
     position: absolute;
-    top: 50px;
+    top: 65px;
     left: -200px;
     width: 400px;
     background: #333;
@@ -163,11 +163,11 @@ body {
     text-shadow: 0px 1px #000000;
     color: white;
     box-sizing: border-box;
-    height: 50px;
+    height: 65px;
     text-transform: lowercase;
     font-size: 24px;
     border: 0;
-    padding: 10px 15px;
+    padding: 15px 15px;
     margin: 0;
     display: inline-block;
     list-style-type: none;
@@ -187,7 +187,7 @@ body {
     text-transform: none;
     position: absolute;
     z-index: 1;
-    top: 50px;
+    top: 65px;
     left: 0;
     border: 0;
     padding: 0;
@@ -217,7 +217,7 @@ body {
 }
 
 #body {
-    top: 50px;
+    top: 65px;
     bottom: 0;
 }
 
@@ -286,15 +286,20 @@ body {
 #content h1 {
     text-shadow: 0px 1px #000000;
     font-size: 60px;
-    padding-bottom: 10px;
-    margin-top: 10px;
+    padding-bottom: 0px;
+    padding-top: 20px;
+}
+
+#content h1:nth-of-type(1){
+    padding-top: 0;
+    margin-top: 0;
 }
 
 #content h2 {
     padding-top: 15px;
     font-size: 40px;
     padding-bottom: 0px;
-    margin-bottom: 0px;
+    margin-bottom: 10px;
 }
 
 code {

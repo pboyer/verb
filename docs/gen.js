@@ -75,8 +75,14 @@ function compile(srcfn, outputfn){
     var index0 = srcfn.indexOf("src/verb"); 
     var fn = srcfn.slice( index0 );
     var loc = REPO_URL + "blob/master/" + fn + "/";  // verb/Verb.hx/
-    
-    writeln(stream,TEMPLATE({ types: parsed, sourceFile: loc })); 
+
+    var sfn = fn.slice(9, -3);
+    var index1 = sfn.lastIndexOf("/");
+    var name = sfn.slice(0, index1);
+    var index2 = name.lastIndexOf("/");
+    var namespace = name.slice(0, index1);
+
+    writeln(stream,TEMPLATE({ types: parsed, sourceFile: loc, fn : fn, namespace : namespace }));
     stream.end();
 }
 
