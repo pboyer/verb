@@ -27,7 +27,6 @@
 
     // node.js context, but not WebWorker
     if ( typeof window !== 'object' && typeof require === "function"){
-        console.log("making web worker");
         Worker = require('webworker-threads').Worker;
     }
 

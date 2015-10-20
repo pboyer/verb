@@ -17,6 +17,7 @@ using verb.core.ArrayExtensions;
 
 import verb.eval.Eval;
 import verb.core.Mat;
+import verb.core.Serialization;
 
 // A NURBS surface - this class represents the base class of many of verb's surface types and provides many tools for analysis and evaluation.
 // This object is deliberately constrained to be immutable. The methods to inspect the properties of this class deliberately return copies. `asNurbs` can
@@ -27,7 +28,7 @@ import verb.core.Mat;
 // [https://github.com/jdonaldson/promhx](https://github.com/jdonaldson/promhx).
 
 @:expose("geom.NurbsSurface")
-class NurbsSurface implements ISurface {
+class NurbsSurface extends Serializable implements ISurface {
 
     //Construct a NurbsSurface by a NurbsSurfaceData object
     //

@@ -2,12 +2,13 @@ package verb.geom;
 
 import verb.core.Data;
 import verb.core.Vec;
+import verb.core.Serialization;
 
 import verb.core.Mat;
 
 // An interface representing a Surface
 
-interface ISurface {
+interface ISurface extends ISerializable {
 
     //Provide the NURBS representation of the curve
     //

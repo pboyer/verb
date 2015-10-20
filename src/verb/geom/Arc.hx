@@ -5,6 +5,9 @@ import verb.eval.Make;
 import verb.core.Vec;
 import verb.core.Data;
 
+import haxe.Serializer;
+import haxe.Unserializer;
+
 // An Arc is a three dimensional curve representing a subset of a full Circle
 
 @:expose("geom.Arc")

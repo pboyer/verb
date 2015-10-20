@@ -19,6 +19,8 @@ import verb.eval.Divide;
 import verb.eval.Analyze;
 import verb.eval.Eval;
 
+import verb.core.Serialization;
+
 // A NURBS curve - this class represents the base class of many of verb.geom's curve types and provides many tools for analysis and evaluation.
 // This object is deliberately constrained to be immutable. The methods to inspect the properties of this class deliberately return copies. `asNurbs` can
 // be used to obtain a simplified NurbsCurveData object that can be used with `verb.core` or for serialization purposes.
@@ -28,7 +30,7 @@ import verb.eval.Eval;
 // [https://github.com/jdonaldson/promhx](https://github.com/jdonaldson/promhx).
 
 @:expose("geom.NurbsCurve")
-class NurbsCurve implements ICurve {
+class NurbsCurve extends Serializable implements ICurve {
 
     //Construct a NurbsCurve by a NurbsCurveData object
     //

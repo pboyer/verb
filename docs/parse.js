@@ -452,8 +452,8 @@ function Parser( tokenStream ){
         def.line = currentToken.line; 
         def.description = getLastComment();
         
-        if ( peak().type === "implements" ){
-            def.interfaces = parseImplements();                       
+        if ( peak().type === "extends" ){
+            def.interfaces = parseExtends();
         }
         
         parseInterfaceBody( def );

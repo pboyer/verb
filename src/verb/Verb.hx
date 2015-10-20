@@ -20,6 +20,7 @@ import verb.geom.Intersect;
 
 // core
 
+import verb.core.Serialization;
 import verb.core.BoundingBox;
 import verb.core.Constants;
 import verb.core.Trig;

@@ -123,7 +123,7 @@ Haxe compiles for other platforms, including Flash and Neko. I have not tried to
 
 ### Compiling for Java
 
-verb does not currently compile for Java. It probably wouldn't be hard to do.
+verb does not currently compile for Java. It probably wouldn't be hard to do - [would you like to contribute?](http://github.com/pboyer/verb)
     
 ## Using verb with three.js
 

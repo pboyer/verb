@@ -2019,12 +2019,21 @@ describe("verb.geom.NurbsSurface.reverse",function(){
 	});
 });
 
+describe("verb.geom.Deserializer",function(){
+    it('foo', function(){
+		var rail = new verb.geom.BezierCurve( [[0,0,0], [1,0.5,1], [2,1,1]] );
+		var prof = new verb.geom.BezierCurve( [[0,0,0], [2,0,0]] );
+
+		var srf = new verb.geom.SweptSurface( prof, rail );
+    });
+});
+
 
 describe("verb.geom.SweptSurface",function(){
 
     it('provides expected result for linear profile, curved rail', function(){
 
-        var rail = new verb.geom.BezierCurve( [[0,0,0], [1,0.5,1], [2,1,1]] );
+        var rail = new verb.geom.BezierCurve( [[0,0,0], [1,0.5,1], [2,1,1], [2,1,1]] );
         var prof = new verb.geom.BezierCurve( [[0,0,0], [2,0,0]] );
 
         var srf = new verb.geom.SweptSurface( prof, rail );

@@ -3,18 +3,11 @@ package verb.geom;
 import verb.core.Data;
 import verb.core.Vec;
 import verb.core.Mat;
+import verb.core.Serialization;
 
 //An interface representing a Curve
 
-interface ICurve {
-
-    //Provide a serialized version of the Curve
-    //
-    //**returns**
-    //
-    //* A NurbsCurveData object representing the curve
-
-//    function serialize() : String;
+interface ICurve extends ISerializable {
 
     //Provide the NURBS representation of the curve
     //
