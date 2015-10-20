@@ -4549,28 +4549,6 @@ verb_eval_Eval.homogenize2d = function(controlPoints,weights) {
 var verb_eval_Intersect = $hx_exports.eval.Intersect = function() { };
 $hxClasses["verb.eval.Intersect"] = verb_eval_Intersect;
 verb_eval_Intersect.__name__ = ["verb","eval","Intersect"];
-verb_eval_Intersect.meshSlices = function(mesh,min,max,step) {
-	var bbtree = new verb_core_MeshBoundingBoxTree(mesh);
-	var bb = bbtree.boundingBox();
-	var x0 = bb.min[0];
-	var y0 = bb.min[1];
-	var x1 = bb.max[0];
-	var y1 = bb.max[1];
-	var span = verb_core_Vec.span(min,max,step);
-	var slices = [];
-	var _g = 0;
-	while(_g < span.length) {
-		var z = span[_g];
-		++_g;
-		var pts = [[x0,y0,z],[x1,y0,z],[x1,y1,z],[x0,y1,z]];
-		var uvs = [[0.0,0.0],[1.0,0.0],[1.0,1.0],[0.0,1.0]];
-		var faces = [[0,1,2],[0,2,3]];
-		var plane = new verb_core_MeshData(faces,pts,null,uvs);
-		slices.push(verb_eval_Intersect.meshes(mesh,plane,bbtree));
-		z += 1.0;
-	}
-	return slices;
-};
 verb_eval_Intersect.surfaces = function(surface0,surface1,tol) {
 	var tess1 = verb_eval_Tess.rationalSurfaceAdaptive(surface0);
 	var tess2 = verb_eval_Tess.rationalSurfaceAdaptive(surface1);
@@ -4659,6 +4637,27 @@ verb_eval_Intersect.meshes = function(mesh0,mesh1,bbtree0,bbtree1) {
 		return d1 < verb_core_Constants.EPSILON && d2 < verb_core_Constants.EPSILON || d3 < verb_core_Constants.EPSILON && d4 < verb_core_Constants.EPSILON;
 	});
 	return verb_eval_Intersect.makeMeshIntersectionPolylines(segments);
+};
+verb_eval_Intersect.meshSlices = function(mesh,min,max,step) {
+	var bbtree = new verb_core_MeshBoundingBoxTree(mesh);
+	var bb = bbtree.boundingBox();
+	var x0 = bb.min[0];
+	var y0 = bb.min[1];
+	var x1 = bb.max[0];
+	var y1 = bb.max[1];
+	var span = verb_core_Vec.span(min,max,step);
+	var slices = [];
+	var _g = 0;
+	while(_g < span.length) {
+		var z = span[_g];
+		++_g;
+		var pts = [[x0,y0,z],[x1,y0,z],[x1,y1,z],[x0,y1,z]];
+		var uvs = [[0.0,0.0],[1.0,0.0],[1.0,1.0],[0.0,1.0]];
+		var faces = [[0,1,2],[0,2,3]];
+		var plane = new verb_core_MeshData(faces,pts,null,uvs);
+		slices.push(verb_eval_Intersect.meshes(mesh,plane,bbtree));
+	}
+	return slices;
 };
 verb_eval_Intersect.makeMeshIntersectionPolylines = function(segments) {
 	if(segments.length == 0) return [];
