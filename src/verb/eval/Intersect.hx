@@ -35,43 +35,6 @@ using verb.core.ArrayExtensions;
 @:expose("eval.Intersect")
 class Intersect {
 
-    //Intersect two meshes, yielding a list of polylines
-    //
-    //**params**
-    //
-    //* MeshData for the first mesh
-    //* MeshData for the latter
-    //
-    //**returns**
-    //
-    //* array of array of MeshIntersectionPoints
-
-    public static function meshSlices( mesh : MeshData, min : Float, max : Float, step : Float ) : Array<Array<Array<MeshIntersectionPoint>>> {
-        var bbtree = new MeshBoundingBoxTree( mesh );
-        var bb = bbtree.boundingBox();
-
-        var x0 = bb.min[0];
-        var y0 = bb.min[1];
-
-        var x1 = bb.max[0];
-        var y1 = bb.max[1];
-
-        var span = Vec.span( min, max, step );
-        var slices = [];
-
-        for ( z in span ){
-            var pts = [ [x0,y0,z], [x1,y0,z], [x1,y1,z], [x0,y1,z] ];
-            var uvs = [ [0.0,0.0], [1.0,0.0], [1.0,1.0], [0.0,1.0] ];
-            var faces = [ [ 0,1,2 ],[0,2,3] ];
-            var plane = new MeshData( faces, pts, null, uvs );
-
-            slices.push( Intersect.meshes( mesh, plane, bbtree ) );
-            z += 1.0;
-        }
-
-        return slices;
-    }
-
     //Intersect two NURBS surfaces, yielding a list of curves
     //
     //**params**
@@ -244,6 +207,46 @@ class Intersect {
         });
 
         return makeMeshIntersectionPolylines( segments );
+    }
+
+    //Slice a mesh by repeated planar intersections yielding a sequence of polylines. Each plane
+    //is along the z axis, so you'll need to transform your mesh if you wish to cut in any other direction.
+    //
+    //**params**
+    //
+    //* MeshData for the mesh to be sliced
+    //* Minimum z value
+    //* Maximum z value
+    //* Step size
+    //
+    //**returns**
+    //
+    //* array of array of array of MeshIntersectionPoints - corresponding to the collection of polylines formed with
+    // each slice
+
+    public static function meshSlices( mesh : MeshData, min : Float, max : Float, step : Float ) : Array<Array<Array<MeshIntersectionPoint>>> {
+        var bbtree = new MeshBoundingBoxTree( mesh );
+        var bb = bbtree.boundingBox();
+
+        var x0 = bb.min[0];
+        var y0 = bb.min[1];
+
+        var x1 = bb.max[0];
+        var y1 = bb.max[1];
+
+        var span = Vec.span( min, max, step );
+        var slices = [];
+
+        for ( z in span ){
+            var pts = [ [x0,y0,z], [x1,y0,z], [x1,y1,z], [x0,y1,z] ];
+            var uvs = [ [0.0,0.0], [1.0,0.0], [1.0,1.0], [0.0,1.0] ];
+            var faces = [ [ 0,1,2 ],[0,2,3] ];
+            var plane = new MeshData( faces, pts, null, uvs );
+
+            slices.push( Intersect.meshes( mesh, plane, bbtree ) );
+        }
+
+        return slices;
     }
 
     //Given a list of unstructured mesh intersection segments, reconstruct into polylines

@@ -68,6 +68,14 @@ function Parser( tokenStream ){
         return tokenStream.peak();
     }
 
+    function parseExtendsList(){
+        
+        consume("extends");
+
+        return parseIdList();
+    }
+   
+
     function parseExtends(){
         
         consume("extends");
@@ -453,7 +461,7 @@ function Parser( tokenStream ){
         def.description = getLastComment();
         
         if ( peak().type === "extends" ){
-            def.interfaces = parseExtends();
+            def.interfaces = parseExtendsList();
         }
         
         parseInterfaceBody( def );
