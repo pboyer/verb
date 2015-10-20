@@ -30,7 +30,7 @@ import verb.core.Serialization;
 // [https://github.com/jdonaldson/promhx](https://github.com/jdonaldson/promhx).
 
 @:expose("geom.NurbsCurve")
-class NurbsCurve extends Serializable implements ICurve {
+class NurbsCurve extends SerializableBase implements ICurve {
 
     //Construct a NurbsCurve by a NurbsCurveData object
     //

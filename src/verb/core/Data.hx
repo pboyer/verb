@@ -1,5 +1,7 @@
 package verb.core;
 
+import verb.core.Serialization;
+
 // A `Point` in verb is represented simply by an array of floating point numbers.
 //
 // So, in JavaScript, one would write simply `[0,0,0]` to create a Point at the origin.
@@ -25,7 +27,7 @@ typedef KnotArray = Array<Float>;
 // A `Plane` is simply an origin point and normal
 
 @:expose("core.Plane")
-class Plane {
+class Plane extends SerializableBase {
 
     public var normal : Vector;
     public var origin : Point;
@@ -39,7 +41,7 @@ class Plane {
 // A `Ray` is simply an origin point and a direction
 
 @:expose("core.Ray")
-class Ray {
+class Ray extends SerializableBase {
 
     public var dir : Vector;
     public var origin : Point;
@@ -54,7 +56,7 @@ class Ray {
 // `verb.eval.Check` for that.
 
 @:expose("core.NurbsCurveData")
-class NurbsCurveData {
+class NurbsCurveData extends SerializableBase {
 
     public function new(degree, knots, controlPoints){
         this.degree = degree;
@@ -77,7 +79,7 @@ class NurbsCurveData {
 // `verb.eval.Check` for that.
 
 @:expose("core.NurbsSurfaceData")
-class NurbsSurfaceData {
+class NurbsSurfaceData extends SerializableBase {
 
     public function new(degreeU, degreeV, knotsU, knotsV, controlPoints){
         this.degreeU = degreeU;
@@ -118,7 +120,7 @@ typedef UV = Array<Float>;
 // A simple data structure representing a mesh. `MeshData` does not check for legality.
 
 @:expose("core.MeshData")
-class MeshData {
+class MeshData extends SerializableBase {
 
     public var faces : Array<Tri>;
     public var points : Array<Point>;
@@ -140,7 +142,7 @@ class MeshData {
 // A simple data structure representing a polyline. `PolylineData` is useful, for example, as the result of a curve tessellation.
 
 @:expose("core.PolylineData")
-class PolylineData {
+class PolylineData extends SerializableBase {
 
     // The points in the polyline
     public var points : Array<Point>;
@@ -158,7 +160,7 @@ class PolylineData {
 // and SurfaceData, this data structure does no legality checks.
 
 @:expose("core.VolumeData")
-class VolumeData {
+class VolumeData extends SerializableBase {
 
     public function new(degreeU, degreeV, degreeW, knotsU, knotsV, knotsW, controlPoints){
         this.degreeU = degreeU;

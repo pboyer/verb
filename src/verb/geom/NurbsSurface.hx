@@ -28,7 +28,7 @@ import verb.core.Serialization;
 // [https://github.com/jdonaldson/promhx](https://github.com/jdonaldson/promhx).
 
 @:expose("geom.NurbsSurface")
-class NurbsSurface extends Serializable implements ISurface {
+class NurbsSurface extends SerializableBase implements ISurface {
 
     //Construct a NurbsSurface by a NurbsSurfaceData object
     //

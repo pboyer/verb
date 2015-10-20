@@ -2087,24 +2087,37 @@ verb_core_BoundingBox.prototype = {
 var verb_core_Constants = $hx_exports.core.Constants = function() { };
 $hxClasses["verb.core.Constants"] = verb_core_Constants;
 verb_core_Constants.__name__ = ["verb","core","Constants"];
+var verb_core_SerializableBase = $hx_exports.core.SerializableBase = function() { };
+$hxClasses["verb.core.SerializableBase"] = verb_core_SerializableBase;
+verb_core_SerializableBase.__name__ = ["verb","core","SerializableBase"];
+verb_core_SerializableBase.prototype = {
+	serialize: function() {
+		var serializer = new haxe_Serializer();
+		serializer.serialize(this);
+		return serializer.toString();
+	}
+	,__class__: verb_core_SerializableBase
+};
 var verb_core_Plane = $hx_exports.core.Plane = function(origin,normal) {
 	this.origin = origin;
 	this.normal = normal;
 };
 $hxClasses["verb.core.Plane"] = verb_core_Plane;
 verb_core_Plane.__name__ = ["verb","core","Plane"];
-verb_core_Plane.prototype = {
+verb_core_Plane.__super__ = verb_core_SerializableBase;
+verb_core_Plane.prototype = $extend(verb_core_SerializableBase.prototype,{
 	__class__: verb_core_Plane
-};
+});
 var verb_core_Ray = $hx_exports.core.Ray = function(origin,dir) {
 	this.origin = origin;
 	this.dir = dir;
 };
 $hxClasses["verb.core.Ray"] = verb_core_Ray;
 verb_core_Ray.__name__ = ["verb","core","Ray"];
-verb_core_Ray.prototype = {
+verb_core_Ray.__super__ = verb_core_SerializableBase;
+verb_core_Ray.prototype = $extend(verb_core_SerializableBase.prototype,{
 	__class__: verb_core_Ray
-};
+});
 var verb_core_NurbsCurveData = $hx_exports.core.NurbsCurveData = function(degree,knots,controlPoints) {
 	this.degree = degree;
 	this.controlPoints = controlPoints;
@@ -2112,9 +2125,10 @@ var verb_core_NurbsCurveData = $hx_exports.core.NurbsCurveData = function(degree
 };
 $hxClasses["verb.core.NurbsCurveData"] = verb_core_NurbsCurveData;
 verb_core_NurbsCurveData.__name__ = ["verb","core","NurbsCurveData"];
-verb_core_NurbsCurveData.prototype = {
+verb_core_NurbsCurveData.__super__ = verb_core_SerializableBase;
+verb_core_NurbsCurveData.prototype = $extend(verb_core_SerializableBase.prototype,{
 	__class__: verb_core_NurbsCurveData
-};
+});
 var verb_core_NurbsSurfaceData = $hx_exports.core.NurbsSurfaceData = function(degreeU,degreeV,knotsU,knotsV,controlPoints) {
 	this.degreeU = degreeU;
 	this.degreeV = degreeV;
@@ -2124,9 +2138,10 @@ var verb_core_NurbsSurfaceData = $hx_exports.core.NurbsSurfaceData = function(de
 };
 $hxClasses["verb.core.NurbsSurfaceData"] = verb_core_NurbsSurfaceData;
 verb_core_NurbsSurfaceData.__name__ = ["verb","core","NurbsSurfaceData"];
-verb_core_NurbsSurfaceData.prototype = {
+verb_core_NurbsSurfaceData.__super__ = verb_core_SerializableBase;
+verb_core_NurbsSurfaceData.prototype = $extend(verb_core_SerializableBase.prototype,{
 	__class__: verb_core_NurbsSurfaceData
-};
+});
 var verb_core_MeshData = $hx_exports.core.MeshData = function(faces,points,normals,uvs) {
 	this.faces = faces;
 	this.points = points;
@@ -2138,18 +2153,20 @@ verb_core_MeshData.__name__ = ["verb","core","MeshData"];
 verb_core_MeshData.empty = function() {
 	return new verb_core_MeshData([],[],[],[]);
 };
-verb_core_MeshData.prototype = {
+verb_core_MeshData.__super__ = verb_core_SerializableBase;
+verb_core_MeshData.prototype = $extend(verb_core_SerializableBase.prototype,{
 	__class__: verb_core_MeshData
-};
+});
 var verb_core_PolylineData = $hx_exports.core.PolylineData = function(points,params) {
 	this.points = points;
 	this.params = params;
 };
 $hxClasses["verb.core.PolylineData"] = verb_core_PolylineData;
 verb_core_PolylineData.__name__ = ["verb","core","PolylineData"];
-verb_core_PolylineData.prototype = {
+verb_core_PolylineData.__super__ = verb_core_SerializableBase;
+verb_core_PolylineData.prototype = $extend(verb_core_SerializableBase.prototype,{
 	__class__: verb_core_PolylineData
-};
+});
 var verb_core_VolumeData = $hx_exports.core.VolumeData = function(degreeU,degreeV,degreeW,knotsU,knotsV,knotsW,controlPoints) {
 	this.degreeU = degreeU;
 	this.degreeV = degreeV;
@@ -2161,9 +2178,10 @@ var verb_core_VolumeData = $hx_exports.core.VolumeData = function(degreeU,degree
 };
 $hxClasses["verb.core.VolumeData"] = verb_core_VolumeData;
 verb_core_VolumeData.__name__ = ["verb","core","VolumeData"];
-verb_core_VolumeData.prototype = {
+verb_core_VolumeData.__super__ = verb_core_SerializableBase;
+verb_core_VolumeData.prototype = $extend(verb_core_SerializableBase.prototype,{
 	__class__: verb_core_VolumeData
-};
+});
 var verb_core_Pair = $hx_exports.core.Pair = function(item1,item2) {
 	this.item0 = item1;
 	this.item1 = item2;
@@ -3214,17 +3232,6 @@ $hxClasses["verb.core.ISerializable"] = verb_core_ISerializable;
 verb_core_ISerializable.__name__ = ["verb","core","ISerializable"];
 verb_core_ISerializable.prototype = {
 	__class__: verb_core_ISerializable
-};
-var verb_core_Serializable = $hx_exports.core.Serializable = function() { };
-$hxClasses["verb.core.Serializable"] = verb_core_Serializable;
-verb_core_Serializable.__name__ = ["verb","core","Serializable"];
-verb_core_Serializable.prototype = {
-	serialize: function() {
-		var serializer = new haxe_Serializer();
-		serializer.serialize(this);
-		return serializer.toString();
-	}
-	,__class__: verb_core_Serializable
 };
 var verb_core_Deserializer = $hx_exports.core.Deserializer = function() { };
 $hxClasses["verb.core.Deserializer"] = verb_core_Deserializer;
@@ -6531,8 +6538,8 @@ verb_geom_NurbsCurve.byPoints = function(points,degree) {
 	if(degree == null) degree = 3;
 	return new verb_geom_NurbsCurve(verb_eval_Make.rationalInterpCurve(points,degree));
 };
-verb_geom_NurbsCurve.__super__ = verb_core_Serializable;
-verb_geom_NurbsCurve.prototype = $extend(verb_core_Serializable.prototype,{
+verb_geom_NurbsCurve.__super__ = verb_core_SerializableBase;
+verb_geom_NurbsCurve.prototype = $extend(verb_core_SerializableBase.prototype,{
 	degree: function() {
 		return this._data.degree;
 	}
@@ -6738,8 +6745,8 @@ verb_geom_NurbsSurface.byLoftingCurves = function(curves,degreeV) {
 		return $r;
 	}(this)),degreeV));
 };
-verb_geom_NurbsSurface.__super__ = verb_core_Serializable;
-verb_geom_NurbsSurface.prototype = $extend(verb_core_Serializable.prototype,{
+verb_geom_NurbsSurface.__super__ = verb_core_SerializableBase;
+verb_geom_NurbsSurface.prototype = $extend(verb_core_SerializableBase.prototype,{
 	degreeU: function() {
 		return this._data.degreeU;
 	}

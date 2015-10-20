@@ -1592,6 +1592,8 @@ describe("verb.geom.CylindricalSurface.point",function(){
 
 		var srf = new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius );
 
+		console.log( srf.serialize() );
+
 		should.exist(srf);
 
 		var p = srf.point(0.5,0.5);
