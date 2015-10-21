@@ -8,7 +8,7 @@
     "url": "https://github.com/pboyer/verb.git"
   },
   "scripts": {
-    "test": "grunt test"
+    "test": "grunt -v test"
   },
   "engine": "node 4.2.1",
   "keywords": [

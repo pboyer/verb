@@ -20,8 +20,8 @@ module.exports = function(grunt) {
         src: ['build/js/verbHaxe.js'],
         overwrite: true,                 // overwrite matched source files
         replacements: [{
-          from: "{log:function(){}}, typeof window != \"undefined\" ? window : exports,",
-          to: "{log:function(){}}, verb,"
+          from: '{log:function(){}}, typeof window != "undefined" ? window : exports,',
+          to: '{log:function(){}}, verb,'
         }]
       }
     },
