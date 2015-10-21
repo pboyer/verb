@@ -30,7 +30,9 @@ You can install verb with
     
 Pre-compiled JavaScript can be found in [build/js](https://github.com/pboyer/verb/blob/master/build/js).
 
-You'll find many usage examples in the [examples directory](https://github.com/pboyer/verb/blob/master/examples).
+### Examples
+
+You'll find many usage examples in the [examples directory](https://github.com/pboyer/verb/blob/master/examples) and amongst the [tests](https://github.com/pboyer/verb/blob/master/tests).
 
 ### License
 
