@@ -26,7 +26,11 @@ function setupScene(doUseRaycaster){
     scene = new THREE.Scene();
 
     camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
-    camera.position.z = 20;
+    camera.lookAt(20,-20,0);
+    camera.position.x = 30;
+    camera.position.y = -30;
+    camera.position.z = 10;
+
     camera.up.set( 0, 0, 1 );
 
     renderer = new THREE.WebGLRenderer({ antialias: true });
