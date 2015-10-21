@@ -32,7 +32,7 @@ Pre-compiled JavaScript can be found in [build/js](https://github.com/pboyer/ver
 
 ### Examples
 
-You'll find many usage examples in the [examples directory](https://github.com/pboyer/verb/blob/master/examples).
+You'll find many usage examples in the [examples directory](https://github.com/pboyer/verb/blob/master/examples) and amongst the [tests](https://github.com/pboyer/verb/blob/master/tests).
 
 ### License
 
