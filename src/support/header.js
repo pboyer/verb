@@ -3,7 +3,6 @@
 
 (function(f){
     if(typeof exports==="object"&&typeof module!=="undefined"){
-        console.log("OK");
         module.exports=f()
     } else if(typeof define==="function"&&define.amd){
         define([],f)

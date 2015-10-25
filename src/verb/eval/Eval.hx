@@ -5,6 +5,8 @@ import verb.core.Vec;
 import verb.core.Binomial;
 import verb.core.Constants;
 
+using verb.core.ArrayExtensions;
+
 // `Eval` provides all of the core algorithms for evaluating points and derivatives on NURBS curves and surfaces. Most of the
 // time, it makes more sense to use the tools in verb.geom for this, but in some cases this will make more sense.
 //
@@ -80,20 +82,19 @@ class Eval {
                 var v = Aders[k][l];
 
                 for (j in 1...l+1){
-                    v = Vec.sub( v, Vec.mul( Binomial.get(l, j) * wders[0][j], SKL[k][l-j] ) );
+                    Vec.subMutate( v, Vec.mul( Binomial.get(l, j) * wders[0][j], SKL[k][l-j] ) );
                 }
 
                 for (i in 1...k+1){
-                    v = Vec.sub( v, Vec.mul( Binomial.get(k, i) * wders[i][0], SKL[k-i][l] ) );
+                    Vec.subMutate( v, Vec.mul( Binomial.get(k, i) * wders[i][0], SKL[k-i][l] ) );
 
                     var v2 = Vec.zeros1d(dim);
 
                     for (j in 1...l+1){
-                        v2 = Vec.add( v2, Vec.mul( Binomial.get(l, j) * wders[i][j], SKL[k-i][l-j] ) );
+                        Vec.addMutate( v2, Vec.mul( Binomial.get(l, j) * wders[i][j], SKL[k-i][l-j] ) );
                     }
 
-                    v = Vec.sub( v, Vec.mul( Binomial.get(k, i), v2) );
-
+                    Vec.subMutate( v, Vec.mul( Binomial.get(k, i), v2) );
                 }
 
                 SKL[k].push( Vec.mul(1 / wders[0][0], v )); //demogenize
@@ -149,7 +150,7 @@ class Eval {
             var v = Aders[k];
 
             for (i in 1...k+1) {
-                v = Vec.sub( v, Vec.mul( Binomial.get(k, i) * wders[i], CK[k-i] ) );
+                Vec.subMulMutate( v, Binomial.get(k, i) * wders[i], CK[k-i] );
             }
             CK.push( Vec.mul(1/wders[0], v )); //demogenize
         }
@@ -198,7 +199,7 @@ class Eval {
 
     }
 
-    //Compute the derivatives on a non-uniform, non-rational B spline surface
+    // Compute the derivatives on a non-uniform, non-rational B spline surface
     // (corresponds to algorithm 3.6 from The NURBS book, Piegl & Tiller 2nd edition)
     //
     //**params**
@@ -248,8 +249,7 @@ class Eval {
                 temp[s] = Vec.zeros1d( dim );
 
                 for (r in 0...degreeU+1){
-                    temp[s] = Vec.add( temp[s],
-                        Vec.mul( uders[k][r], controlPoints[knotSpan_index_u-degreeU+r][knotSpan_index_v-degreeV+s]) );
+                    Vec.addMulMutate( temp[s], uders[k][r], controlPoints[knotSpan_index_u-degreeU+r][knotSpan_index_v-degreeV+s]);
                 }
             }
 
@@ -260,7 +260,7 @@ class Eval {
                 SKL[k][l] = Vec.zeros1d( dim );
 
                 for (s in 0...degreeV+1){
-                    SKL[k][l] = Vec.add( SKL[k][l], Vec.mul( vders[l][s], temp[s] ) );
+                    Vec.addMulMutate( SKL[k][l], vders[l][s], temp[s] );
                 }
             }
         }
@@ -335,16 +335,385 @@ class Eval {
 
             //sample u isoline
             for (k in 0...degreeU + 1) {
-                temp = Vec.add( temp, Vec.mul( u_basis_vals[k], controlPoints[uind+k][vind]) );
+                Vec.addMulMutate( temp, u_basis_vals[k], controlPoints[uind+k][vind] );
             }
 
             //add point from u isoline
-            position = Vec.add( position, Vec.mul(v_basis_vals[l], temp) );
+            Vec.addMulMutate( position, v_basis_vals[l], temp );
         }
 
         return position;
     }
 
+    public static function curveRegularSamplePoints( crv : NurbsCurveData, divs : Int ){
+
+        // initialize the derivative set
+
+        var derivs = curveDerivatives( crv, crv.knots[0], crv.degree );
+
+        // expand the taylor series
+
+        var t = 1.0 / divs;
+        var temp = t * t;
+
+        var f = derivs[0];
+        var fd = Vec.mul(t, derivs[1] );
+        var fdd_per2 = Vec.mul( temp * 0.5, derivs[2] );
+        var fddd_per2 = Vec.mul( temp * t * 0.5, derivs[3] );
+
+        var fdd = Vec.add( fdd_per2, fdd_per2 );
+        var fddd = Vec.add( fddd_per2, fddd_per2 );
+        var fddd_per6 = Vec.mul( 1/3, fddd_per2 );
+
+        // evaluate the points
+        var pts = [];
+
+        for (i in 0...divs+1){
+
+            pts.push(dehomogenize(f));
+
+            Vec.addAllMutate([ f, fd, fdd_per2, fddd_per6 ]);
+            Vec.addAllMutate([ fd, fdd, fddd_per2 ]);
+            Vec.addAllMutate([ fdd, fddd ]);
+            Vec.addAllMutate([ fdd_per2, fddd_per2 ]);
+        }
+
+        return pts;
+
+    }
+
+    public static function curveRegularSamplePoints2( crv : NurbsCurveData, divs : Int ){
+
+        // initialize the derivative set
+
+        var derivs = curveDerivatives( crv, crv.knots[0], crv.degree );
+
+        // expand the taylor series
+
+        var t = 1.0 / divs;
+        var temp = t * t;
+
+        var f = derivs[0];
+        var fd = Vec.mul(t, derivs[1] );
+        var fdd_per2 = Vec.mul( temp * 0.5, derivs[2] );
+        var fddd_per2 = Vec.mul( temp * t * 0.5, derivs[3] );
+
+        var fdd = Vec.add( fdd_per2, fdd_per2 );
+        var fddd = Vec.add( fddd_per2, fddd_per2 );
+        var fddd_per6 = Vec.mul( 1/3, fddd_per2 );
+
+        // evaluate the points
+        var pts = [];
+
+        for (i in 0...divs+1){
+
+            pts.push(dehomogenize(f));
+
+            Vec.addAllMutate([ f, fd, fdd_per2, fddd_per6 ]);
+            Vec.addAllMutate([ fd, fdd, fddd_per2 ]);
+            Vec.addAllMutate([ fdd, fddd ]);
+            Vec.addAllMutate([ fdd_per2, fddd_per2 ]);
+        }
+
+        return pts;
+
+    }
+
+    // Compute a regularly spaced grid of derivatives on a non-uniform, rational, B spline surface. Generally, this algorithm
+    // is faster than directly evaluating these as we can pre-compute all of the basis function arrays
+    //
+    //**params**
+    //
+    //* NurbsSurfaceData object representing the surface
+    //* number of divisions in the U direction
+    //* number of divisions in the V direction
+    //* number of derivatives
+    //
+    //**returns**
+    //
+    //* a 2d array of dimension (divsU+1, divsV+1) of derivative values where each entry is similar to that returned by `rationalSurfaceDerivatives`
+
+    public static function rationalSurfaceRegularSampleDerivatives( surface : NurbsSurfaceData, divsU : Int, divsV : Int, numDerivs : Int ) {
+
+        var allders = surfaceRegularSampleDerivatives( surface, divsU, divsV, numDerivs );
+
+        var allratders = [];
+        var divsU1 = divsU+1;
+        var divsV1 = divsV+1;
+        var numDerivs1 = numDerivs+1;
+
+        for (i in 0...divsU1){
+
+            var rowders = [];
+            allratders.push(rowders);
+
+            for (j in 0...divsV1){
+
+                var ders = allders[i][j]
+                , Aders = rational2d(ders)
+                , wders = weight2d(ders)
+                , SKL = new Array<Array<Array<Float>>>()
+                , dim = Aders[0][0].length;
+
+                for (k in 0...numDerivs1){
+                    SKL.push( new Array<Array<Float>>() );
+
+                    for (l in 0...numDerivs1-k){
+                        var v = Aders[k][l];
+
+                        for (j in 1...l+1){
+                            Vec.subMulMutate( v, Binomial.get(l, j) * wders[0][j], SKL[k][l-j] );
+                        }
+
+                        for (i in 1...k+1){
+                            Vec.subMulMutate( v, Binomial.get(k, i) * wders[i][0], SKL[k-i][l] );
+
+                            var v2 = Vec.zeros1d(dim);
+
+                            for (j in 1...l+1){
+                                Vec.addMulMutate( v2, Binomial.get(l, j) * wders[i][j], SKL[k-i][l-j] );
+                            }
+
+                            Vec.subMulMutate( v, Binomial.get(k, i), v2 );
+
+                        }
+
+                        SKL[k].push( Vec.mul(1 / wders[0][0], v )); //demogenize
+                    }
+                }
+
+                rowders.push(SKL);
+            }
+        }
+
+        return allratders;
+    }
+
+    // Compute a regularly spaced grid of derivatives on a non-uniform, non-rational, B spline surface. Generally, this algorithm
+    // is faster than directly evaluating these as we can pre-compute all of the basis function arrays
+    //
+    //**params**
+    //
+    //* NurbsSurfaceData object representing the surface
+    //* number of divisions in the U direction
+    //* number of divisions in the V direction
+    //
+    //**returns**
+    //
+    //* a 2d array of dimension (divsU+1, divsV+1) of derivative values where each entry is similar to that returned by surfaceDerivatives
+
+    public static function surfaceRegularSampleDerivatives( surface : NurbsSurfaceData, divsU : Int, divsV : Int, numDerivs : Int ) {
+
+        var degreeU = surface.degreeU
+        , degreeV = surface.degreeV
+        , controlPoints = surface.controlPoints
+        , knotsU = surface.knotsU
+        , knotsV = surface.knotsV;
+
+        var dim = controlPoints[0][0].length
+        , spanU = (knotsU.last() - knotsU[0]) / divsU
+        , spanV = (knotsV.last() - knotsV[0]) / divsV
+        , knotSpansBasesU = regularlySpacedDerivativeBasisFunctions( degreeU, knotsU, divsU )
+        , knotSpansU = knotSpansBasesU.item0
+        , basesU = knotSpansBasesU.item1
+        , knotSpansBasesV = regularlySpacedDerivativeBasisFunctions( degreeV, knotsV, divsV )
+        , knotSpansV = knotSpansBasesV.item0
+        , basesV = knotSpansBasesV.item1
+        , pts = []
+        , divsU1 = divsU+1
+        , divsV1 = divsV+1;
+
+        for (i in 0...divsU1){
+            var ptsi = [];
+            pts.push( ptsi );
+
+            for (j in 0...divsV1){
+                ptsi.push( surfaceDerivativesGivenBasesKnotSpans( degreeU, degreeV, controlPoints, knotSpansU[i], knotSpansV[j], basesU[i], basesV[j], dim, numDerivs ) );
+            }
+        }
+
+        return pts;
+    }
+
+    // Compute a regularly spaced grid of points on a non-uniform, rational, B spline surface. Generally, this algorithm
+    // is faster than directly evaluating these as we can pre-compute all of the basis function arrays
+    //
+    //**params**
+    //
+    //* NurbsSurfaceData object representing the surface
+    //* number of divisions in the U direction
+    //* number of divisions in the V direction
+    //
+    //**returns**
+    //
+    //* a 2d array of dimension (divsU+1, divsV+1) of points
+
+    public static function rationalSurfaceRegularSamplePoints( surface : NurbsSurfaceData, divsU : Int, divsV : Int ) : Array<Array<Point>> {
+        return dehomogenize2d( surfaceRegularSamplePoints( surface, divsU, divsV ) );
+    }
+
+    // Compute a regularly spaced grid of points on a non-uniform, non-rational, B spline surface. Generally, this algorithm
+    // is faster than directly evaluating these as we can pre-compute all of the basis function arrays
+    //
+    //**params**
+    //
+    //* NurbsSurfaceData object representing the surface
+    //* number of divisions in the U direction
+    //* number of divisions in the V direction
+    //
+    //**returns**
+    //
+    //* a 2d array of dimension (divsU+1, divsV+1) of points
+
+    public static function surfaceRegularSamplePoints( surface : NurbsSurfaceData, divsU : Int, divsV : Int ) : Array<Array<Point>> {
+
+        var degreeU = surface.degreeU
+        , degreeV = surface.degreeV
+        , controlPoints = surface.controlPoints
+        , knotsU = surface.knotsU
+        , knotsV = surface.knotsV;
+
+        var dim = controlPoints[0][0].length
+        , spanU = (knotsU.last() - knotsU[0]) / divsU
+        , spanV = (knotsV.last() - knotsV[0]) / divsV
+        , knotSpansBasesU = regularlySpacedBasisFunctions( degreeU, knotsU, divsU )
+        , knotSpansU = knotSpansBasesU.item0
+        , basesU = knotSpansBasesU.item1
+        , knotSpansBasesV = regularlySpacedBasisFunctions( degreeV, knotsV, divsV )
+        , knotSpansV = knotSpansBasesV.item0
+        , basesV = knotSpansBasesV.item1
+        , pts = []
+        , divsU1 = divsU+1
+        , divsV1 = divsV+1;
+
+        for (i in 0...divsU1){
+            var ptsi = [];
+            pts.push( ptsi );
+
+            for (j in 0...divsV1){
+                ptsi.push( surfacePointGivenBasesKnotSpans( degreeU, degreeV, controlPoints, knotSpansU[i], knotSpansV[j], basesU[i], basesV[j], dim ) );
+            }
+        }
+
+        return pts;
+    }
+
+    private static function regularlySpacedBasisFunctions( degree : Int, knots : KnotArray, divs : Int ) : Pair<Array<Int>, Array<Array<Float>>> {
+
+        var n : Int = knots.length - degree - 2;
+        var span : Float = (knots.last() - knots[0]) / divs;
+
+        var bases = [];
+        var knotspans = [];
+        var u = knots[0];
+        var knotIndex = knotSpanGivenN( n, degree, u, knots );
+        var div1 = divs + 1;
+
+        // compute all of the basis functions in given dir
+        for (i in 0...div1){
+            while ( u >= knots[knotIndex+1] ) knotIndex++;
+            knotspans.push( knotIndex );
+            bases.push( basisFunctionsGivenKnotSpanIndex( knotIndex, u, degree, knots ) );
+            u += span;
+        }
+
+        return new Pair<Array<Int>, Array<Array<Float>>>( knotspans, bases );
+    }
+
+    private static function regularlySpacedDerivativeBasisFunctions(degree : Int, knots : KnotArray, divs : Int){
+
+        var n : Int = knots.length - degree - 2;
+        var span : Float = (knots.last() - knots[0]) / divs;
+
+        var bases = [];
+        var knotspans = [];
+        var u = knots[0];
+        var knotIndex = knotSpanGivenN( n, degree, u, knots );
+        var div1 = divs + 1;
+
+        // compute all of the basis functions in given dir
+        for (i in 0...div1){
+            while ( u >= knots[knotIndex+1] ) knotIndex++;
+            knotspans.push( knotIndex );
+            bases.push( derivativeBasisFunctionsGivenNI( knotIndex, u, degree, n, knots ) );
+            u += span;
+        }
+
+        return new Pair<Array<Int>, Array<Array<Array<Float>>>>( knotspans, bases );
+    }
+
+    private static function surfacePointGivenBasesKnotSpans( degreeU : Int,
+                                                             degreeV : Int,
+                                                             controlPoints : Array<Array<Point>>,
+                                                             knotSpanU : Int,
+                                                             knotSpanV : Int,
+                                                             basesU : Array<Float>,
+                                                             basesV : Array<Float>,
+                                                             dim : Int) : Point {
+
+        var position = Vec.zeros1d( dim )
+        , temp : Array<Float>;
+
+        // could be precomputed
+        var uind = knotSpanU - degreeU;
+        var vind = knotSpanV - degreeV;
+
+        for (l in 0...degreeV + 1){
+
+            temp = Vec.zeros1d( dim );
+
+            for (k in 0...degreeU + 1) {
+                Vec.addMulMutate( temp, basesU[k], controlPoints[uind+k][vind] );
+            }
+
+            vind++;
+
+            Vec.addMulMutate( position, basesV[l], temp );
+        }
+
+        return position;
+    }
+
+    private static function surfaceDerivativesGivenBasesKnotSpans(degreeU : Int,
+                                                                  degreeV : Int,
+                                                                  controlPoints : Array<Array<Point>>,
+                                                                  knotSpanU : Int,
+                                                                  knotSpanV : Int,
+                                                                  basesU : Array<Array<Float>>,
+                                                                  basesV : Array<Array<Float>>,
+                                                                  dim : Int,
+                                                                  numDerivs : Int ){
+
+        var dim = controlPoints[0][0].length
+        , du = numDerivs < degreeU ? numDerivs : degreeU
+        , dv = numDerivs < degreeV ? numDerivs : degreeV
+        , SKL = Vec.zeros3d( du+1, dv+1, dim )
+        , temp = Vec.zeros2d( degreeV+1, dim )
+        , dd = 0;
+
+        for (k in 0...du+1){
+            for (s in 0...degreeV+1) {
+                temp[s] = Vec.zeros1d( dim );
+
+                for (r in 0...degreeU+1){
+                    Vec.addMulMutate( temp[s], basesU[k][r], controlPoints[knotSpanU-degreeU+r][knotSpanV-degreeV+s] );
+                }
+            }
+
+            var nk = numDerivs - k;
+            dd = nk < dv ? nk : dv;
+
+            for (l in 0...dd+1){
+                SKL[k][l] = Vec.zeros1d( dim );
+
+                for (s in 0...degreeV+1){
+                    Vec.addMulMutate( SKL[k][l], basesV[l][s], temp[s] );
+                }
+            }
+        }
+
+        return SKL;
+    }
 
     //Determine the derivatives of a non-uniform, non-rational B-spline curve at a given parameter
     //
@@ -361,8 +730,7 @@ class Eval {
     public static function curveDerivatives( crv : NurbsCurveData, u : Float, numDerivs : Int ) : Array<Point> {
 
         var n = crv.knots.length - crv.degree - 2;
-        return curveDerivativesGivenN( n, crv, u, numDerivs
-        );
+        return curveDerivativesGivenN( n, crv, u, numDerivs);
 
     }
 
@@ -399,7 +767,7 @@ class Eval {
 
         for (k in 0...du+1) {
             for (j in 0...degree+1){
-                CK[k] = Vec.add( CK[k], Vec.mul( nders[k][j], controlPoints[ knotSpan_index - degree + j ] ) );
+                Vec.addMulMutate( CK[k], nders[k][j], controlPoints[ knotSpan_index - degree + j ] );
             }
         }
         return CK;
@@ -467,9 +835,7 @@ class Eval {
         var position = Vec.zeros1d( controlPoints[0].length );
 
         for (j in 0...degree+1){
-            position = Vec.add( position,
-                                Vec.mul( basis_values[j],
-                                        controlPoints[ knotSpan_index - degree + j ] ) );
+            Vec.addMulMutate( position, basis_values[j], controlPoints[ knotSpan_index - degree + j ] );
         }
 
         return position;
@@ -554,22 +920,21 @@ class Eval {
                 var vind = knotSpan_index_v  - degreeV + j;
 
                 for ( k in 0...degreeU + 1 ){
-                    temp = Vec.add( temp, Vec.mul( u_basis_vals[k], controlPoints[uind+k][vind][wind] ));
+                    Vec.addMulMutate( temp, u_basis_vals[k], controlPoints[uind+k][vind][wind] );
                 }
 
              //add weighted contribution of u isoline
-                temp2 = Vec.add( temp2, Vec.mul( v_basis_vals[j], temp ) );
+                Vec.addMulMutate( temp2, v_basis_vals[j], temp );
             }
 
             //add weighted contribution from uv isosurfaces
-            position = Vec.add( position, Vec.mul( w_basis_vals[i], temp2 ) );
+            Vec.addMulMutate( position, w_basis_vals[i], temp2 );
         }
 
         return position;
     }
 
-
-//Compute the non-vanishing basis functions and their derivatives
+    //Compute the non-vanishing basis functions and their derivatives
     //
     //**params**
     //
@@ -590,7 +955,7 @@ class Eval {
         return derivativeBasisFunctionsGivenNI( knotSpan_index, u, degree, n, knots );
     }
 
-    //Compute the non-vanishing basis functions and their derivatives
+    // Compute the non-vanishing basis functions and their derivatives
     // (corresponds to algorithm 2.3 from The NURBS book, Piegl & Tiller 2nd edition)
     //
     //**params**
@@ -605,7 +970,7 @@ class Eval {
     //
     //* 2d array of basis and derivative values of size (n+1, p+1) The nth row is the nth derivative and the first row is made up of the basis function values.
 
-    public static function derivativeBasisFunctionsGivenNI( knotSpan_index : Int, u : Float, p : Int,
+    public static function derivativeBasisFunctionsGivenNI( knotIndex : Int, u : Float, p : Int,
                                                             n : Int, knots : KnotArray ) : Array<Array<Float>>
     {
         var ndu = Vec.zeros2d( p+1, p+1 )
@@ -617,8 +982,8 @@ class Eval {
         ndu[0][0] = 1.0;
 
         for(j in 1...p+1){
-            left[j] = u - knots[knotSpan_index+1-j];
-            right[j] = knots[knotSpan_index+j] - u;
+            left[j] = u - knots[knotIndex+1-j];
+            right[j] = knots[knotIndex+j] - u;
             saved = 0.0;
 
             for (r in 0...j){
@@ -717,7 +1082,7 @@ class Eval {
     //* list of non-vanishing basis functions
     //
 
-    public static function basisFunctions( u : Float, degree : Int, knots : KnotArray)
+    public static function basisFunctions( u : Float, degree : Int, knots : KnotArray) : Array<Float>
     {
         var knotSpan_index = knotSpan(degree, u, knots);
         return basisFunctionsGivenKnotSpanIndex( knotSpan_index, u, degree, knots );
@@ -741,7 +1106,7 @@ class Eval {
     public static function basisFunctionsGivenKnotSpanIndex( knotSpan_index : Int,
                                                                   u : Float,
                                                                   degree : Int,
-                                                                  knots : KnotArray )
+                                                                  knots : KnotArray ) : Array<Float>
     {
         var basisFunctions = Vec.zeros1d( degree + 1 );
         var left = Vec.zeros1d( degree + 1 );
