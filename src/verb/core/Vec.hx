@@ -148,6 +148,32 @@ class Vec {
         return a.fold(function(x,a){ return add(a,x); }, rep(f, 0.0));
     }
 
+    public static function addAllMutate(a : Array<Array<Float>>) {
+        var f = a[0];
+        for (i in 1...a.length)
+            addMutate(f, a[i]);
+    }
+
+    public static function addMulMutate(a : Array<Float>, s : Float, b : Array<Float>) {
+        for (i in 0...a.length)
+            a[i] = a[i] + s * b[i];
+    }
+
+    public static function subMulMutate(a : Array<Float>, s : Float, b : Array<Float>) {
+        for (i in 0...a.length)
+            a[i] = a[i] - s * b[i];
+    }
+
+    public static function addMutate(a : Array<Float>, b : Array<Float>) {
+        for (i in 0...a.length)
+            a[i] = a[i] + b[i];
+    }
+
+    public static function subMutate(a : Array<Float>, b : Array<Float>) {
+        for (i in 0...a.length)
+            a[i] = a[i] - b[i];
+    }
+
     public static function norm(a : Iterable<Float> ) : Float {
         var norm2 = normSquared(a);
         return norm2 != 0.0 ? Math.sqrt( norm2 ) : norm2;
