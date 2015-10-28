@@ -345,7 +345,7 @@ class Eval {
         return position;
     }
 
-    // Compute a regularly spaced sequence of points on a non-uniform, rational, bezier curve. Generally, this algorithm
+    // Compute a regularly spaced sequence of points on a non-uniform, rational spline curve. Generally, this algorithm
     // is much faster than computing these points directly. This algorithm is based on the forward difference algorithm
     // presented in chapter 4 of
     // [T. W. Sederberg, BYU, Computer Aided Geometric Design Course Notes](http://cagd.cs.byu.edu/~557/text/cagd.pdf)
@@ -359,10 +359,41 @@ class Eval {
     //
     //* an array of (divs+1) points
 
-    public static function rationalBezierCurveRegularSamplePoints( crv : NurbsCurveData, divs : Int ) : Array<Point> {
+    public static function rationalCurveRegularSamplePoints( crv : NurbsCurveData, divs : Int ) : Array<Point> {
+
+        var range = crv.knots.last() - crv.knots[0];
+        var beziers = Modify.decomposeCurveIntoBeziers( crv );
+        var pts = [];
+        var brange, fraction;
+
+        trace(beziers.map(function(x){return x.knots;}));
+
+        for (i in 0...beziers.length){
+
+            // get the fraction of samples that should be performed in this bezier
+            brange = beziers[i].knots.last() - beziers[i].knots[0];
+
+            trace(brange, range);
+            fraction = Math.ceil( ( brange / range ) * divs );
+            trace( fraction );
+
+            rationalBezierCurveRegularSamplePointsMutate( beziers[i], fraction, pts );
+
+            if (i == beziers.length-1)
+                continue;
+
+            pts.pop(); // remove the last point in the sequence as it will be duped by the next curve
+        }
+
+        return pts;
+    }
+
+    private static function rationalBezierCurveRegularSamplePoints( crv : NurbsCurveData, divs : Int ) : Array<Point> {
+
         var pts = [];
         rationalBezierCurveRegularSamplePointsMutate( crv, divs, pts );
         return pts;
+
     }
 
     private static function rationalBezierCurveRegularSamplePointsMutate( crv : NurbsCurveData, divs : Int, pts : Array<Point> ) {
@@ -414,22 +445,6 @@ class Eval {
 
             // add the new pt
             pts.push(dehomogenize( front[0] ));
-        }
-
-        return pts;
-    }
-
-    public static function rationalCurveRegularSamplePoints( crv : NurbsCurveData, divs : Int ) : Array<Point> {
-
-        var range = crv.knots.last() - crv.knots.length;
-        var beziers = Modify.decomposeCurveIntoBeziers( crv );
-        var pts = [];
-
-        for (i in 0...beziers.length){
-            rationalBezierCurveRegularSamplePointsMutate( beziers[i], divs, pts );
-            if (i == beziers.length-1)
-                continue;
-            pts.pop();
         }
 
         return pts;

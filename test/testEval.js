@@ -20,9 +20,10 @@ function last(a){
 	return a[a.length-1];
 }
 
-describe("verb.eval.Eval.knotSpanGivenN",function(){
 
-	it('returns correct result', function(){
+describe("verb.eval.Eval.knotSpanGivenN",() => {
+
+	it('returns correct result', () => {
 
 		var n = 7
 			, degree = 2
@@ -41,9 +42,9 @@ describe("verb.eval.Eval.knotSpanGivenN",function(){
 
 });
 
-describe("verb.eval.Eval.knotSpan",function(){
+describe("verb.eval.Eval.knotSpan",() => {
 
-	it('returns correct result for degree 2 curve', function(){
+	it('returns correct result for degree 2 curve', () => {
 
 		var degree = 2
 			, knots = [0, 0, 0, 1, 2, 3, 4, 4, 5, 5, 5];
@@ -60,9 +61,9 @@ describe("verb.eval.Eval.knotSpan",function(){
 
 });
 
-describe("verb.eval.Eval.basisFunctions, basisFunctionsGivenKnotSpanIndex",function(){
+describe("verb.eval.Eval.basisFunctions, basisFunctionsGivenKnotSpanIndex",() => {
 
-	it('return correct results', function(){
+	it('return correct results', () => {
 
 		var degree = 2
 			, span = 4
@@ -84,9 +85,9 @@ describe("verb.eval.Eval.basisFunctions, basisFunctionsGivenKnotSpanIndex",funct
 
 });
 
-describe("verb.eval.Eval.curvePoint",function(){
+describe("verb.eval.Eval.curvePoint",() => {
 
-	it('returns correct result for simple curve', function(){
+	it('returns correct result for simple curve', () => {
 
 		var degree = 2
 			, n = 6
@@ -113,9 +114,9 @@ describe("verb.eval.Eval.curvePoint",function(){
 
 });
 
-describe("verb.eval.Eval.curvePointGivenN",function(){
+describe("verb.eval.Eval.curvePointGivenN",() => {
 
-	it('returns correct result for simple curve', function(){
+	it('returns correct result for simple curve', () => {
 
 		var degree = 3
 			, n = 4
@@ -138,9 +139,9 @@ describe("verb.eval.Eval.curvePointGivenN",function(){
 	});
 });
 
-describe("verb.eval.Eval.areValidRelations",function(){
+describe("verb.eval.Eval.areValidRelations",() => {
 
-	it('returns correct result for two cases', function(){
+	it('returns correct result for two cases', () => {
 
 		should.equal( false, verb.eval.Eval.areValidRelations( 0, 0, 0 ) );
 		should.equal( true, verb.eval.Eval.areValidRelations( 2, 2, 5 ) );
@@ -148,9 +149,9 @@ describe("verb.eval.Eval.areValidRelations",function(){
 	});
 });
 
-describe("verb.eval.Eval.derivativeBasisFunctionsGivenNI",function(){
+describe("verb.eval.Eval.derivativeBasisFunctionsGivenNI",() => {
 
-	it('returns correct results', function(){
+	it('returns correct results', () => {
 
 		// This needs to be tested better
 		var degree = 2
@@ -180,9 +181,9 @@ describe("verb.eval.Eval.derivativeBasisFunctionsGivenNI",function(){
 
 });
 
-describe("verb.eval.Eval.curveDerivativesGivenN",function(){
+describe("verb.eval.Eval.curveDerivativesGivenN",() => {
 
-	it('returns correct result for simple curve', function(){
+	it('returns correct result for simple curve', () => {
 
 		var degree = 3
 			, n = 3
@@ -202,9 +203,9 @@ describe("verb.eval.Eval.curveDerivativesGivenN",function(){
 
 });
 
-describe("verb.eval.Eval.curveDerivatives",function(){
+describe("verb.eval.Eval.curveDerivatives",() => {
 
-	it('returns correct result for simple curve', function(){
+	it('returns correct result for simple curve', () => {
 
 		// This needs to be tested better
 		var degree = 3
@@ -225,9 +226,9 @@ describe("verb.eval.Eval.curveDerivatives",function(){
 
 });
 
-describe("verb.eval.Eval.surfacePointGivenNM",function(){
+describe("verb.eval.Eval.surfacePointGivenNM",() => {
 
-	it('returns correct result for simple surface', function(){
+	it('returns correct result for simple surface', () => {
 
 		// This needs to be tested better
 		var degreeU = 3
@@ -258,9 +259,9 @@ describe("verb.eval.Eval.surfacePointGivenNM",function(){
 
 });
 
-describe("verb.eval.Eval.surfacePoint",function(){
+describe("verb.eval.Eval.surfacePoint",() => {
 
-	it('returns correct result for simple surface', function(){
+	it('returns correct result for simple surface', () => {
 
 		// This needs to be tested better
 		var degreeU = 3
@@ -287,7 +288,7 @@ describe("verb.eval.Eval.surfacePoint",function(){
 
 	});
 
-	it('returns correct result for another simple surface', function(){
+	it('returns correct result for another simple surface', () => {
 
 		var degreeU = 1
 			, degreeV = 3
@@ -307,9 +308,9 @@ describe("verb.eval.Eval.surfacePoint",function(){
 
 });
 
-describe("verb.eval.Eval.surfaceDerivativesGivenNM",function(){
+describe("verb.eval.Eval.surfaceDerivativesGivenNM",() => {
 
-	it('returns correct derivatives for simple surface', function(){
+	it('returns correct derivatives for simple surface', () => {
 
 		var degreeU = 3
 			, degreeV = 3
@@ -350,9 +351,9 @@ describe("verb.eval.Eval.surfaceDerivativesGivenNM",function(){
 	});
 });
 
-describe("verb.eval.Eval.surfaceDerivatives",function(){
+describe("verb.eval.Eval.surfaceDerivatives",() => {
 
-	it('returns correct derivatives for simple surface', function(){
+	it('returns correct derivatives for simple surface', () => {
 
 		var degreeU = 3
 			, degreeV = 3
@@ -394,9 +395,9 @@ describe("verb.eval.Eval.surfaceDerivatives",function(){
 
 });
 
-describe("verb.eval.Eval.homogenize1d",function(){
+describe("verb.eval.Eval.homogenize1d",() => {
 
-	it('returns correct results', function(){
+	it('returns correct results', () => {
 
 		var weights = [1, 2, 3, 4]
 			, controlPoints = [ [10, 0], [20, 10], [30, 20], [50, 50] ]
@@ -425,9 +426,9 @@ describe("verb.eval.Eval.homogenize1d",function(){
 
 });
 
-describe("verb.eval.Eval.homogenize2d",function(){
+describe("verb.eval.Eval.homogenize2d",() => {
 
-	it('homogenize2d', function(){
+	it('homogenize2d', () => {
 
 		var weights = [ 	[ 1, 	-2, 3, 	5 	],
 											[ 2, 	1, 	5, 	2 	],
@@ -455,9 +456,9 @@ describe("verb.eval.Eval.homogenize2d",function(){
 
 });
 
-describe("verb.eval.Eval.dehomogenize",function(){
+describe("verb.eval.Eval.dehomogenize",() => {
 
-	it('returns correct result', function(){
+	it('returns correct result', () => {
 
 		var weights = [ 	[ 1, 	-2, 3, 	5 	],
 											[ 2, 	1, 	5, 	2 	],
@@ -487,9 +488,9 @@ describe("verb.eval.Eval.dehomogenize",function(){
 
 });
 
-describe("verb.eval.Eval.rationalCurvePoint",function(){
+describe("verb.eval.Eval.rationalCurvePoint",() => {
 
-	it('returns correct result for quarter circle', function(){
+	it('returns correct result for quarter circle', () => {
 
 		// this represents a single quarter arc, using a rational bezier curve
 		var degree = 2
@@ -516,9 +517,9 @@ describe("verb.eval.Eval.rationalCurvePoint",function(){
 
 });
 
-describe("verb.eval.Eval.rationalSurfacePoint",function(){
+describe("verb.eval.Eval.rationalSurfacePoint",() => {
 
-	it('returns correct result for cylinder patch', function(){
+	it('returns correct result for cylinder patch', () => {
 
 		// quarter cylinder patch
 		var degreeU = 1
@@ -550,9 +551,9 @@ describe("verb.eval.Eval.rationalSurfacePoint",function(){
 	});
 });
 
-describe("verb.eval.Eval.rationalCurveDerivatives",function(){
+describe("verb.eval.Eval.rationalCurveDerivatives",() => {
 
-	it('returns expected results', function(){
+	it('returns expected results', () => {
 
 		// this represents a single quarter arc, using a rational bezier curve
 		var degree = 2
@@ -586,9 +587,9 @@ describe("verb.eval.Eval.rationalCurveDerivatives",function(){
 
 });
 
-describe("verb.eval.Eval.rationalSurfaceDerivatives",function(){
+describe("verb.eval.Eval.rationalSurfaceDerivatives",() => {
 
-	it('returns expected results', function(){
+	it('returns expected results', () => {
 
 		// quarter cylinder patch, axis aligned with x axis, radius: 1
 		var degreeU = 1
@@ -631,9 +632,9 @@ describe("verb.eval.Eval.rationalSurfaceDerivatives",function(){
 	});
 });
 
-describe("verb.eval.Eval.rationalCurvePoint",function(){
+describe("verb.eval.Eval.rationalCurvePoint",() => {
 
-	it('returns correct results for a line', function(){
+	it('returns correct results for a line', () => {
 
 		var degree = 1
 			, knots = [0, 0, 1, 1]
@@ -656,9 +657,9 @@ describe("verb.eval.Eval.rationalCurvePoint",function(){
 
 });
 
-describe("verb.eval.Modify.curveKnotInsert",function(){
+describe("verb.eval.Modify.curveKnotInsert",() => {
 
-	it('returns expected results when inserting 1 knot in the middle of a non-rational, cubic b-spline', function(){
+	it('returns expected results when inserting 1 knot in the middle of a non-rational, cubic b-spline', () => {
 
 		var degree = 3
 			, u = 2.5
@@ -691,7 +692,7 @@ describe("verb.eval.Modify.curveKnotInsert",function(){
 
 	});
 
-	it('returns expected results when inserting 3 knots at the middle of a non-rational, cubic b-spline', function(){
+	it('returns expected results when inserting 3 knots at the middle of a non-rational, cubic b-spline', () => {
 
 		var degree = 3
 			, u = 2.5
@@ -720,7 +721,7 @@ describe("verb.eval.Modify.curveKnotInsert",function(){
 
 	});
 
-	it('returns expected results when inserting 1 knots at the beginning of a non-rational, cubic b-spline', function(){
+	it('returns expected results when inserting 1 knots at the beginning of a non-rational, cubic b-spline', () => {
 
 		var degree = 3
 			, u = 0.5
@@ -748,7 +749,7 @@ describe("verb.eval.Modify.curveKnotInsert",function(){
 
 	});
 
-	it('returns expected results when inserting 1 knot at the middle of a non-rational, linear b-spline', function(){
+	it('returns expected results when inserting 1 knot at the middle of a non-rational, linear b-spline', () => {
 
 		var degree = 1
 			, u = 0.5
@@ -777,7 +778,7 @@ describe("verb.eval.Modify.curveKnotInsert",function(){
 	});
 });
 
-describe("verb.eval.Eval.curveKnotRefine",function(){
+describe("verb.eval.Eval.curveKnotRefine",() => {
 
 	function cubicInsert(u, r){
 
@@ -810,7 +811,7 @@ describe("verb.eval.Eval.curveKnotRefine",function(){
 
 	}
 
-	it('returns expected results when inserting multiple knots in the middle of a non-rational, cubic b-spline', function(){
+	it('returns expected results when inserting multiple knots in the middle of a non-rational, cubic b-spline', () => {
 
 		cubicInsert(2.5, 1);
 		cubicInsert(2.5, 2);
@@ -829,7 +830,7 @@ describe("verb.eval.Eval.curveKnotRefine",function(){
 
 });
 
-describe("verb.eval.Divide.curveSplit",function(){
+describe("verb.eval.Divide.curveSplit",() => {
 
 	function cubicSplit(u){
 
@@ -862,7 +863,7 @@ describe("verb.eval.Divide.curveSplit",function(){
 
 	}
 
-	it('returns expected results when splitting a non-rational, cubic b-spline', function(){
+	it('returns expected results when splitting a non-rational, cubic b-spline', () => {
 
 		cubicSplit( 0.5 );
 		cubicSplit( 3.5 );
@@ -871,9 +872,9 @@ describe("verb.eval.Divide.curveSplit",function(){
 
 });
 
-describe("verb.eval.Analyze.knotMultiplicities",function(){
+describe("verb.eval.Analyze.knotMultiplicities",() => {
 
-	it('is correct for a basic example', function(){
+	it('is correct for a basic example', () => {
 
 		var res = verb.eval.Analyze.knotMultiplicities( [ 0, 0, 0, 0, 1, 1, 2, 2, 2, 3, 3.3] );
 
@@ -897,50 +898,19 @@ describe("verb.eval.Analyze.knotMultiplicities",function(){
 	});
 });
 
-describe("verb.eval.Modify.decomposeCurveIntoBeziers",function(){
-
-	it('is correct for a basic example', function(){
-
-		var degree = 3
-			, knots = [ 0, 0, 0, 0, 1, 2, 3, 4, 5, 5, 5, 5 ];
-
-		var controlPoints = [];
-		for (var i = 0; i < 8; i++) {
-			controlPoints.push([i, 0, 0]);
-		}
-
-		var crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
-		var res = verb.eval.Modify.decomposeCurveIntoBeziers( crv );
-
-		res.length.should.be.equal( 5 );
-
-		res.forEach(function(x){
-
-			var u0 = x.knots[0];
-
-			var pt0 = verb.eval.Eval.curvePoint( x, u0);
-			var pt1 = verb.eval.Eval.curvePoint( crv, u0);
-
-			( verb.core.Vec.norm(verb.core.Vec.sub(pt0, pt1))).should.be.approximately(0, verb.core.Constants.TOLERANCE );
-
-		});
-
-	});
-});
-
-describe("verb.core.Mat.transpose",function(){
-	it('is correct for a basic example', function(){
+describe("verb.core.Mat.transpose",() => {
+	it('is correct for a basic example', () => {
 		var a = [ [6,5,4], [1,2,3] ];
 		verb.core.Mat.transpose(a).should.eql( [[6,1], [5,2], [4,3]])
 	});
 
 
-	it('is correct for empty array', function(){
+	it('is correct for empty array', () => {
 		verb.core.Mat.transpose([]).should.eql( [] );
 	});
 });
 
-describe("verb.eval.Modify.surfaceKnotRefine",function(){
+describe("verb.eval.Modify.surfaceKnotRefine",() => {
 
 	var degree = 3
 		, knotsV = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
@@ -953,7 +923,7 @@ describe("verb.eval.Modify.surfaceKnotRefine",function(){
 					[ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , 	[40, -40, -20],	[50, -40, 0]     ] ]
 		, surface = new verb.core.NurbsSurfaceData( degree, degree, knotsU, knotsV, controlPoints );
 
-	it('can add knots into a surface in the u direction', function(){
+	it('can add knots into a surface in the u direction', () => {
 
 		var r = 1;
 		var u = 0.2;
@@ -981,7 +951,7 @@ describe("verb.eval.Modify.surfaceKnotRefine",function(){
 
 	});
 
-	it('can add knots into a surface in the v direction', function(){
+	it('can add knots into a surface in the v direction', () => {
 
 		var r = 1;
 		var u = 0.2;
@@ -1011,7 +981,7 @@ describe("verb.eval.Modify.surfaceKnotRefine",function(){
 	});
 });
 
-describe("verb.eval.Divide.surfaceSplit", function(){
+describe("verb.eval.Divide.surfaceSplit", () => {
 
 	var degree = 3
 		, knotsV = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
@@ -1024,7 +994,7 @@ describe("verb.eval.Divide.surfaceSplit", function(){
 					[ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , 	[40, -40, -20],	[50, -40, 0]     ] ]
 		, surface = new verb.core.NurbsSurfaceData( degree, degree, knotsU, knotsV, controlPoints );
 
-	it('can split a surface in the u direction', function(){
+	it('can split a surface in the u direction', () => {
 
 		var u = 0.2;
 
@@ -1059,7 +1029,7 @@ describe("verb.eval.Divide.surfaceSplit", function(){
 
 	});
 
-	it('can split a surface in the v direction', function(){
+	it('can split a surface in the v direction', () => {
 
 		var u = 0.2;
 
@@ -1096,9 +1066,8 @@ describe("verb.eval.Divide.surfaceSplit", function(){
 
 });
 
-
-describe("verb.eval.Eval.rationalCurveRegularSample",function(){
-	it('should return 10 samples when asked to', function(){
+describe("verb.eval.Eval.rationalCurveRegularSample",() => {
+	it('should return 10 samples when asked to', () => {
 
 		var degree = 2
 			, knots = [0, 0, 0, 1, 1, 1 ]
@@ -1115,9 +1084,9 @@ describe("verb.eval.Eval.rationalCurveRegularSample",function(){
 	});
 });
 
-describe("verb.eval.Eval.threePointsAreFlat",function(){
+describe("verb.eval.Eval.threePointsAreFlat",() => {
 
-	it('should identify flat line by returning true', function(){
+	it('should identify flat line by returning true', () => {
 
 		// this represents a single quarter arc, using a rational bezier curve
 		var p1 = [0,0,0],
@@ -1130,9 +1099,9 @@ describe("verb.eval.Eval.threePointsAreFlat",function(){
 
 });
 
-describe("verb.eval.Tess.rationalCurveAdaptiveSample",function(){
+describe("verb.eval.Tess.rationalCurveAdaptiveSample",() => {
 
-	it('returns two end points for a line', function(){
+	it('returns two end points for a line', () => {
 
 		var degree = 1
 			, knots = [0, 0, 1, 1]
@@ -1148,7 +1117,7 @@ describe("verb.eval.Tess.rationalCurveAdaptiveSample",function(){
 
 	});
 
-	it('returns all the control points for a degree 1 curve', function(){
+	it('returns all the control points for a degree 1 curve', () => {
 
 		var degree = 1
 			, knots = [0, 0, 0.25, 0.5, 0.75, 1, 1]
@@ -1166,7 +1135,7 @@ describe("verb.eval.Tess.rationalCurveAdaptiveSample",function(){
 
 	});
 
-	it('makes more points for an arc', function(){
+	it('makes more points for an arc', () => {
 
 		var degree = 2
 			, knots = [0, 0, 0, 1, 1, 1 ]
@@ -1198,8 +1167,7 @@ describe("verb.eval.Tess.rationalCurveAdaptiveSample",function(){
 
 });
 
-
-describe("verb.eval.Tess.rationalSurfaceAdaptive",function(){
+describe("verb.eval.Tess.rationalSurfaceAdaptive",() => {
 
 	function getComplexSurface(){
 
@@ -1231,7 +1199,7 @@ describe("verb.eval.Tess.rationalSurfaceAdaptive",function(){
 		return srfObj;
 	}
 
-	it('produces a mesh from a divided surface', function(){
+	it('produces a mesh from a divided surface', () => {
 
 		var srf = getComplexSurface();
 
@@ -1245,9 +1213,9 @@ describe("verb.eval.Tess.rationalSurfaceAdaptive",function(){
 	});
 });
 
-describe("verb.eval.Make.ellipseArc",function(){
+describe("verb.eval.Make.ellipseArc",() => {
 
-	it('returns correct result for unit arc from 0 to 90 deg', function(){
+	it('returns correct result for unit arc from 0 to 90 deg', () => {
 
 		var center = [0,0,0]
 			, rx = 5
@@ -1283,7 +1251,7 @@ describe("verb.eval.Make.ellipseArc",function(){
 
 	});
 
-	it('returns correct result for unit arc from 0 to 90 deg', function(){
+	it('returns correct result for unit arc from 0 to 90 deg', () => {
 
 		var center = [0,0,0]
 			, rx = 5
@@ -1303,7 +1271,7 @@ describe("verb.eval.Make.ellipseArc",function(){
 
 	});
 
-	it('returns correct result for unit arc from 45 to 135 deg', function(){
+	it('returns correct result for unit arc from 45 to 135 deg', () => {
 
 		var center = [0,0,0]
 			, rx = 1
@@ -1327,7 +1295,7 @@ describe("verb.eval.Make.ellipseArc",function(){
 
 	});
 
-	it('returns correct result for complete ellipse', function(){
+	it('returns correct result for complete ellipse', () => {
 
 		var center = [0,0,0]
 			, rx = 1
@@ -1371,9 +1339,9 @@ describe("verb.eval.Make.ellipseArc",function(){
 
 });
 
-describe("verb.eval.Make.extrudedSurface",function(){
+describe("verb.eval.Make.extrudedSurface",() => {
 
-	it('can extrude a line into a plane', function(){
+	it('can extrude a line into a plane', () => {
 
 		var axis = [0,0,1]
 			, length = 5
@@ -1402,7 +1370,7 @@ describe("verb.eval.Make.extrudedSurface",function(){
 
 	});
 
-	it('can extrude a 90 deg quadratic arc bezier curve', function(){
+	it('can extrude a 90 deg quadratic arc bezier curve', () => {
 
 		var axis = [0,0,1]
 			, length = 5
@@ -1442,9 +1410,9 @@ describe("verb.eval.Make.extrudedSurface",function(){
 
 });
 
-describe("verb.eval.Make.arc",function(){
+describe("verb.eval.Make.arc",() => {
 
-	it('returns correct result for unit arc from 0 to 90 deg', function(){
+	it('returns correct result for unit arc from 0 to 90 deg', () => {
 
 		var center = [0,0,0]
 			, x = [1,0,0]
@@ -1463,7 +1431,7 @@ describe("verb.eval.Make.arc",function(){
 
 	});
 
-	it('returns correct result for unit arc from 0 to 45 deg', function(){
+	it('returns correct result for unit arc from 0 to 45 deg', () => {
 
 		var center = [0,0,0]
 			, x = [1,0,0]
@@ -1482,7 +1450,7 @@ describe("verb.eval.Make.arc",function(){
 
 	});
 
-	it('returns correct result for unit arc from 45 to 135 deg', function(){
+	it('returns correct result for unit arc from 45 to 135 deg', () => {
 
 		var center = [0,0,0]
 			, x = [1,0,0]
@@ -1501,7 +1469,7 @@ describe("verb.eval.Make.arc",function(){
 
 	});
 
-	it('returns correct result for unit circle', function(){
+	it('returns correct result for unit circle', () => {
 
 		var center = [0,0,0]
 			, x = [1,0,0]
@@ -1520,7 +1488,7 @@ describe("verb.eval.Make.arc",function(){
 
 	});
 
-	it('returns correct result for unit circle', function(){
+	it('returns correct result for unit circle', () => {
 
 		var center = [0,0,0]
 			, x = [1,0,0]
@@ -1541,9 +1509,9 @@ describe("verb.eval.Make.arc",function(){
 
 });
 
-describe("verb.eval.Make.polyline",function(){
+describe("verb.eval.Make.polyline",() => {
 
-	it('can create a polyline with correct structure', function(){
+	it('can create a polyline with correct structure', () => {
 
 		var degree = 1
 			, knots = [0, 0, 0.25, 0.5, 0.75, 1, 1]
@@ -1564,9 +1532,9 @@ describe("verb.eval.Make.polyline",function(){
 
 });
 
-describe("verb.eval.Make.cylindricalSurface",function(){
+describe("verb.eval.Make.cylindricalSurface",() => {
 
-	it('can create a cylinder', function(){
+	it('can create a cylinder', () => {
 
 		var axis = [0,0,1]
 			, xaxis = [1,0,0]
@@ -1614,9 +1582,9 @@ describe("verb.eval.Make.cylindricalSurface",function(){
 
 });
 
-describe("verb.eval.Make.revolvedSurface",function(){
+describe("verb.eval.Make.revolvedSurface",() => {
 
-	it('creates a 90 degree cone with the given line for a profile', function(){
+	it('creates a 90 degree cone with the given line for a profile', () => {
 
 		var axis = [0,0,1]
 			, center = [0,0,0]
@@ -1649,7 +1617,7 @@ describe("verb.eval.Make.revolvedSurface",function(){
 
 	});
 
-	it('creates a 180 degree cone with the given line for a profile', function(){
+	it('creates a 180 degree cone with the given line for a profile', () => {
 
 		var axis = [0,0,1]
 			, center = [0,0,0]
@@ -1683,7 +1651,7 @@ describe("verb.eval.Make.revolvedSurface",function(){
 	});
 
 
-	it('creates a 360 degree cone with the given line for a profile', function(){
+	it('creates a 360 degree cone with the given line for a profile', () => {
 
 		var axis = [0,0,1]
 			, center = [0,0,0]
@@ -1718,9 +1686,9 @@ describe("verb.eval.Make.revolvedSurface",function(){
 
 });
 
-describe("verb.core.Trig.rayClosestPoint",function(){
+describe("verb.core.Trig.rayClosestPoint",() => {
 
-	it('returns correct result for xaxis and 3d pt', function(){
+	it('returns correct result for xaxis and 3d pt', () => {
 
 		var r = [1,0,0]
 			, o = [0,0,0]
@@ -1736,9 +1704,9 @@ describe("verb.core.Trig.rayClosestPoint",function(){
 
 });
 
-describe("verb.core.Trig.distToRay",function(){
+describe("verb.core.Trig.distToRay",() => {
 
-	it('returns correct result for xaxis and 3d pt', function(){
+	it('returns correct result for xaxis and 3d pt', () => {
 
 		var r = [1,0,0]
 			, o = [0,0,0]
@@ -1752,9 +1720,9 @@ describe("verb.core.Trig.distToRay",function(){
 
 });
 
-describe("verb.eval.Make.conicalSurface",function(){
+describe("verb.eval.Make.conicalSurface",() => {
 
-	it('can create a cone', function(){
+	it('can create a cone', () => {
 
 		var axis = [0,0,1]
 			, xaxis = [1,0,0]
@@ -1803,9 +1771,9 @@ describe("verb.eval.Make.conicalSurface",function(){
 
 });
 
-describe("verb.eval.Make.sphericalSurface",function(){
+describe("verb.eval.Make.sphericalSurface",() => {
 
-	it('can create a unit sphere', function(){
+	it('can create a unit sphere', () => {
 
 		var center = [0,0,0]
 			, axis = [0,0,1]
@@ -1831,9 +1799,9 @@ describe("verb.eval.Make.sphericalSurface",function(){
 });
 
 
-describe("verb.eval.Analyze.rationalBezierCurveArcLength",function(){
+describe("verb.eval.Analyze.rationalBezierCurveArcLength",() => {
 
-	it('can compute entire arc length of straight cubic bezier parameterized from 0 to 1', function(){
+	it('can compute entire arc length of straight cubic bezier parameterized from 0 to 1', () => {
 
 		var degree = 3
 			, knots = [0,0,0,0,1,1,1,1]
@@ -1846,7 +1814,7 @@ describe("verb.eval.Analyze.rationalBezierCurveArcLength",function(){
 
 	});
 
-	it('can compute entire arc length of straight cubic bezier parameterized from 1 to 4', function(){
+	it('can compute entire arc length of straight cubic bezier parameterized from 1 to 4', () => {
 
 		var degree = 3
 			, knots = [1,1,1,1,4,4,4,4]
@@ -1861,9 +1829,9 @@ describe("verb.eval.Analyze.rationalBezierCurveArcLength",function(){
 
 });
 
-describe("verb.eval.Analyze.rationalCurveArcLength",function(){
+describe("verb.eval.Analyze.rationalCurveArcLength",() => {
 
-	it('can compute entire arc length of straight nurbs curve parameterized from 0 to 2', function(){
+	it('can compute entire arc length of straight nurbs curve parameterized from 0 to 2', () => {
 
 		var degree = 3
 			, knots = [0,0,0,0,0.5,2,2,2,2]
@@ -1883,7 +1851,7 @@ describe("verb.eval.Analyze.rationalCurveArcLength",function(){
 		}
 	});
 
-	it('can compute entire arc length of curved nurbs curve parameterized from 0 to 1', function(){
+	it('can compute entire arc length of curved nurbs curve parameterized from 0 to 1', () => {
 
 		var degree = 3
 			, knots = [0,0,0,0,0.5,1,1,1,1]
@@ -1903,7 +1871,7 @@ describe("verb.eval.Analyze.rationalCurveArcLength",function(){
 
 	});
 
-	it('can compute entire arc length of straight nurbs curve parameterized from 0 to 2', function(){
+	it('can compute entire arc length of straight nurbs curve parameterized from 0 to 2', () => {
 
 		var degree = 3
 			, knots = [0,0,0,0,0.5,2,2,2,2]
@@ -1927,9 +1895,9 @@ describe("verb.eval.Analyze.rationalCurveArcLength",function(){
 
 });
 
-describe("verb.eval.Analyze.rationalBezierCurveParamAtArcLength",function(){
+describe("verb.eval.Analyze.rationalBezierCurveParamAtArcLength",() => {
 
-	it('can compute parameter at arc length of straight bezier curve', function(){
+	it('can compute parameter at arc length of straight bezier curve', () => {
 
 		var degree = 3
 			, knots = [0,0,0,0,1,1,1,1]
@@ -1953,7 +1921,7 @@ describe("verb.eval.Analyze.rationalBezierCurveParamAtArcLength",function(){
 
 	});
 
-	it('can compute parameter at arc length of curved bezier curve', function(){
+	it('can compute parameter at arc length of curved bezier curve', () => {
 
 		var degree = 3
 			, knots = [0,0,0,0,1,1,1,1]
@@ -1979,9 +1947,9 @@ describe("verb.eval.Analyze.rationalBezierCurveParamAtArcLength",function(){
 
 });
 
-describe("verb.eval.Analyze.rationalCurveParamAtArcLength",function(){
+describe("verb.eval.Analyze.rationalCurveParamAtArcLength",() => {
 
-	it('can compute parameter at arc length of straight NURBS curve', function(){
+	it('can compute parameter at arc length of straight NURBS curve', () => {
 
 		var degree = 3
 			, knots = [0,0,0,0,0.5,1,1,1,1]
@@ -2007,7 +1975,7 @@ describe("verb.eval.Analyze.rationalCurveParamAtArcLength",function(){
 
 	});
 
-	it('can compute parameter at arc length of curved NURBS curve', function(){
+	it('can compute parameter at arc length of curved NURBS curve', () => {
 
 		var degree = 3
 			, knots = [0,0,0,0,0.5,1,1,1,1]
@@ -2033,9 +2001,9 @@ describe("verb.eval.Analyze.rationalCurveParamAtArcLength",function(){
 
 });
 
-describe("verb.eval.Divide.rationalCurveByArcLength",function(){
+describe("verb.eval.Divide.rationalCurveByArcLength",() => {
 
-	it('can divide a straight NURBS curve', function(){
+	it('can divide a straight NURBS curve', () => {
 
 		var degree = 3
 			, knots = [0,0,0,0,0.5,1,1,1,1]
@@ -2059,9 +2027,9 @@ describe("verb.eval.Divide.rationalCurveByArcLength",function(){
 
 });
 
-describe("verb.eval.Divide.rationalCurveByEqualArcLength",function(){
+describe("verb.eval.Divide.rationalCurveByEqualArcLength",() => {
 
-	it('can divide a straight NURBS curve', function(){
+	it('can divide a straight NURBS curve', () => {
 
 		var degree = 3
 			, knots = [0,0,0,0,0.5,1,1,1,1]
@@ -2086,9 +2054,9 @@ describe("verb.eval.Divide.rationalCurveByEqualArcLength",function(){
 
 });
 
-describe("verb.eval.Analyze.rationalCurveClosestParam",function(){
+describe("verb.eval.Analyze.rationalCurveClosestParam",() => {
 
-	it('can get closest point to a straight curve', function(){
+	it('can get closest point to a straight curve', () => {
 
 		var degree = 3
 			, knots = [0,0,0,0,0.5,1,1,1,1]
@@ -2122,9 +2090,9 @@ describe("verb.eval.Analyze.rationalCurveClosestParam",function(){
 
 });
 
-describe("verb.eval.Analyze.rationalSurfaceClosestParam",function(){
+describe("verb.eval.Analyze.rationalSurfaceClosestParam",() => {
 
-	it('can get closest point to flat bezier patch', function(){
+	it('can get closest point to flat bezier patch', () => {
 
 		var degreeU = 3
 			, degreeV = 3
@@ -2146,9 +2114,9 @@ describe("verb.eval.Analyze.rationalSurfaceClosestParam",function(){
 
 });
 
-describe("verb.eval.Intersect.segmentWithTriangle",function(){
+describe("verb.eval.Intersect.segmentWithTriangle",() => {
 
-	it('gives correct result for intersecting axis aligned segment and triangle ', function(){
+	it('gives correct result for intersecting axis aligned segment and triangle ', () => {
 
 		// line from [5,5,5] to [5,5,-5]
 		var p0 = [ 5,5,5 ]
@@ -2172,7 +2140,7 @@ describe("verb.eval.Intersect.segmentWithTriangle",function(){
 
 	});
 
-	it('gives correct result for intersecting axis aligned segment and planar triangle ', function(){
+	it('gives correct result for intersecting axis aligned segment and planar triangle ', () => {
 
 		// line from [5,5,5] to [5,5,-5]
 		var p0 = [ 5,5,5 ]
@@ -2194,7 +2162,7 @@ describe("verb.eval.Intersect.segmentWithTriangle",function(){
 
 	});
 
-	it('gives null for non-intersecting segment and triangle', function(){
+	it('gives null for non-intersecting segment and triangle', () => {
 
 		// line from [5,5,5] to [5,5,-5]
 		var p0 = [ 5,5,5 ]
@@ -2213,9 +2181,9 @@ describe("verb.eval.Intersect.segmentWithTriangle",function(){
 });
 
 
-describe("verb.eval.Make.fourPointSurface",function(){
+describe("verb.eval.Make.fourPointSurface",() => {
 
-	it('can create an inclined plane', function(){
+	it('can create an inclined plane', () => {
 
 		var p1 = [0,0,0]
 			, p2 = [1,0,0]
@@ -2238,7 +2206,7 @@ describe("verb.eval.Make.fourPointSurface",function(){
 
 	});
 
-	it('can create a hypar', function(){
+	it('can create a hypar', () => {
 
 		var p1 = [0,0,1]
 			, p2 = [1,0,0]
@@ -2281,9 +2249,9 @@ describe("verb.eval.Make.fourPointSurface",function(){
 
 });
 
-describe("verb.eval.Intersect.polylines",function(){
+describe("verb.eval.Intersect.polylines",() => {
 
-	it('can intersect two simple lines', function(){
+	it('can intersect two simple lines', () => {
 
 		var p1 = [0,0,0]
 			, p2 = [0,1,0]
@@ -2303,7 +2271,7 @@ describe("verb.eval.Intersect.polylines",function(){
 
 	});
 
-	it('can intersect a length 2 polyline and line', function(){
+	it('can intersect a length 2 polyline and line', () => {
 
 		var p1 = [0,0.5,0]
 			, p2 = [2,0.5,0]
@@ -2325,7 +2293,7 @@ describe("verb.eval.Intersect.polylines",function(){
 
 	});
 
-	it('can intersect two length 2 polylines', function(){
+	it('can intersect two length 2 polylines', () => {
 
 		var p1 = [0.5,-0.5,0]
 			, p2 = [0.5,0.5,0]
@@ -2354,7 +2322,7 @@ describe("verb.eval.Intersect.polylines",function(){
 
 	});
 
-	it('correctly misses when two lines do not intersect', function(){
+	it('correctly misses when two lines do not intersect', () => {
 
 		var p1 = [0,0,0.5]
 			, p2 = [0,1,0.5]
@@ -2370,9 +2338,9 @@ describe("verb.eval.Intersect.polylines",function(){
 	});
 });
 
-describe("verb.eval.Intersect.threePlanes",function(){
+describe("verb.eval.Intersect.threePlanes",() => {
 
-	it('is correct for intersection of 3 basis planes', function(){
+	it('is correct for intersection of 3 basis planes', () => {
 
 		var d1 = 0;
 		var n1 = [1,0,0];
@@ -2386,7 +2354,7 @@ describe("verb.eval.Intersect.threePlanes",function(){
 
 	});
 
-	it('is correct for intersection of shifted basis planes', function(){
+	it('is correct for intersection of shifted basis planes', () => {
 
 		var n1 = [1,0,0];
 		var n2 = [0,1,0];
@@ -2409,7 +2377,7 @@ describe("verb.eval.Intersect.threePlanes",function(){
 
 	});
 
-	it('is null for repeat planes', function(){
+	it('is null for repeat planes', () => {
 
 		var d1 = 10;
 		var n1 = [0,1,0];
@@ -2425,9 +2393,9 @@ describe("verb.eval.Intersect.threePlanes",function(){
 
 });
 
-describe("verb.eval.Intersect.planes",function(){
+describe("verb.eval.Intersect.planes",() => {
 
-	it('is correct for intersection of xz and yz planes', function(){
+	it('is correct for intersection of xz and yz planes', () => {
 
 		var o1 = [0,0,0];
 		var n1 = [1,0,0];
@@ -2441,7 +2409,7 @@ describe("verb.eval.Intersect.planes",function(){
 
 	});
 
-	it('is correct for intersection of xz and shifted yz plane', function(){
+	it('is correct for intersection of xz and shifted yz plane', () => {
 
 		var o1 = [20,0,0];
 		var n1 = [1,0,0];
@@ -2455,7 +2423,7 @@ describe("verb.eval.Intersect.planes",function(){
 
 	});
 
-	it('is correct for intersection of shifted xz and yz plane', function(){
+	it('is correct for intersection of shifted xz and yz plane', () => {
 
 		var o1 = [0,0,0];
 		var n1 = [1,0,0];
@@ -2472,9 +2440,9 @@ describe("verb.eval.Intersect.planes",function(){
 
 });
 
-describe("verb.eval.Intersect.clipRayInCoplanarTriangle",function(){
+describe("verb.eval.Intersect.clipRayInCoplanarTriangle",() => {
 
-	it('is correct for a basic example 1', function(){
+	it('is correct for a basic example 1', () => {
 
 		var o = [0,1,0];
 		var d = [1,0,0];
@@ -2499,7 +2467,7 @@ describe("verb.eval.Intersect.clipRayInCoplanarTriangle",function(){
 
 	});
 
-	it('is correct for a basic example 2', function(){
+	it('is correct for a basic example 2', () => {
 
 		var o = [0.5,-0.5,0];
 		var d = [0,1,0];
@@ -2522,7 +2490,7 @@ describe("verb.eval.Intersect.clipRayInCoplanarTriangle",function(){
 
 	});
 
-	it('is correct for a basic example 3', function(){
+	it('is correct for a basic example 3', () => {
 
 		var o = [0.5,-0.5,0];
 		var d = [Math.sqrt(2)/2,Math.sqrt(2)/2,0];
@@ -2545,7 +2513,7 @@ describe("verb.eval.Intersect.clipRayInCoplanarTriangle",function(){
 
 	});
 
-	it('is correct for a basic example 4', function(){
+	it('is correct for a basic example 4', () => {
 
 		var o = [0, 2,0];
 		var d = [Math.sqrt(2)/2,-Math.sqrt(2)/2,0];
@@ -2568,7 +2536,7 @@ describe("verb.eval.Intersect.clipRayInCoplanarTriangle",function(){
 
 	});
 
-	it('is correct for a basic example 5', function(){
+	it('is correct for a basic example 5', () => {
 
 		var o = [1,1,0];
 		var d = [Math.sqrt(2)/2,-Math.sqrt(2)/2,0];
@@ -2591,7 +2559,7 @@ describe("verb.eval.Intersect.clipRayInCoplanarTriangle",function(){
 
 	});
 
-	it('is correct for a basic example 6', function(){
+	it('is correct for a basic example 6', () => {
 
 		var o = [3,1,0];
 		var d = [-1,0,0];
@@ -2616,9 +2584,9 @@ describe("verb.eval.Intersect.clipRayInCoplanarTriangle",function(){
 
 });
 
-describe("verb.eval.Intersect.mergeTriangleClipIntervals",function(){
+describe("verb.eval.Intersect.mergeTriangleClipIntervals",() => {
 
-	it('is correct for a basic example', function(){
+	it('is correct for a basic example', () => {
 
 		var o = [1,0,0];
 		var d = [0,1,0];
@@ -2649,7 +2617,7 @@ describe("verb.eval.Intersect.mergeTriangleClipIntervals",function(){
 
 	});
 
-	it('is correct for triangles sharing an edge', function(){
+	it('is correct for triangles sharing an edge', () => {
 
 		var o = [2,-1,0];
 		var d = [0,1,0];
@@ -2682,9 +2650,9 @@ describe("verb.eval.Intersect.mergeTriangleClipIntervals",function(){
 
 });
 
-describe("verb.eval.Intersect.triangles",function(){
+describe("verb.eval.Intersect.triangles",() => {
 
-	it('is correct for a basic example', function(){
+	it('is correct for a basic example', () => {
 
 		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
 		var tri1 = [[ 0, 1, 2 ]];
@@ -2708,7 +2676,7 @@ describe("verb.eval.Intersect.triangles",function(){
 
 	});
 
-	it('is correct for triangles sharing an edge', function(){
+	it('is correct for triangles sharing an edge', () => {
 
 		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
 		var tri1 = [[ 0, 1, 2 ]];
@@ -2735,9 +2703,9 @@ describe("verb.eval.Intersect.triangles",function(){
 
 });
 
-describe("verb.eval.Intersect.curves",function(){
+describe("verb.eval.Intersect.curves",() => {
 
-	it('gives valid result for two planar lines', function(){
+	it('gives valid result for two planar lines', () => {
 
 		var degree1 = 1,
 				knots1 = [0,0,1,1],
@@ -2757,7 +2725,7 @@ describe("verb.eval.Intersect.curves",function(){
 
 	});
 
-	it('gives valid result for planar degree 2 bezier and planar line', function(){
+	it('gives valid result for planar degree 2 bezier and planar line', () => {
 
 		var degree1 = 1,
 				knots1 = [0,0,1,1],
@@ -2777,7 +2745,7 @@ describe("verb.eval.Intersect.curves",function(){
 
 	});
 
-	it('gives valid result for planar line and planar degree 2 bezier as second arg', function(){
+	it('gives valid result for planar line and planar degree 2 bezier as second arg', () => {
 
 		var degree1 = 1,
 				knots1 = [0,0,1,1],
@@ -2797,7 +2765,7 @@ describe("verb.eval.Intersect.curves",function(){
 
 	});
 
-	it('gives valid result for 2 planar degree 2 beziers', function(){
+	it('gives valid result for 2 planar degree 2 beziers', () => {
 
 		var degree1 = 2,
 				knots1 = [0,0,0,1,1,1],
@@ -2818,9 +2786,9 @@ describe("verb.eval.Intersect.curves",function(){
 
 });
 
-describe("verb.eval.Intersect.curveAndSurface",function(){
+describe("verb.eval.Intersect.curveAndSurface",() => {
 
-	it('gives valid result for planar surface and line', function(){
+	it('gives valid result for planar surface and line', () => {
 
 		// build planar surface in the xy plane
 		var homo_controlPoints_srf = [ [ [0,0,0,1], [20,0,0,1] ], [[0,10,0,1], [20,10,0,1] ] ]
@@ -2846,7 +2814,7 @@ describe("verb.eval.Intersect.curveAndSurface",function(){
 
 	});
 
-	it('gives valid result for planar surface and degree 1 nurbs', function(){
+	it('gives valid result for planar surface and degree 1 nurbs', () => {
 
 		// build planar surface in the xy plane
 		var homo_controlPoints_srf = [ [ [0,0,0,1], [20,0,0,1] ], [[0,10,0,1], [20,10,0,1] ] ]
@@ -2871,7 +2839,7 @@ describe("verb.eval.Intersect.curveAndSurface",function(){
 
 	});
 
-	it('gives valid result for planar surface and degree 2 bezier', function(){
+	it('gives valid result for planar surface and degree 2 bezier', () => {
 
 		// build planar surface in the xy plane
 		var homo_controlPoints_srf = [ [ [0,0,0,1], [0,10,0,1] ], [[20,0,0,1], [20,10,0,1] ] ]
@@ -2896,7 +2864,7 @@ describe("verb.eval.Intersect.curveAndSurface",function(){
 
 	});
 
-	it('gives valid result for non-intersecting planar surface and line', function(){
+	it('gives valid result for non-intersecting planar surface and line', () => {
 
 		// build planar surface in the xy plane
 		var homo_controlPoints_srf = [ [ [0,0,0,1], [20,0,0,1] ], [[0,10,0,1], [20,10,0,1] ] ]
@@ -2919,9 +2887,9 @@ describe("verb.eval.Intersect.curveAndSurface",function(){
 
 });
 
-describe("verb.eval.Intersect.curveAndSurfaceWithEstimate",function(){
+describe("verb.eval.Intersect.curveAndSurfaceWithEstimate",() => {
 
-	it('gives valid result for planar surface and degree 2 bezier', function(){
+	it('gives valid result for planar surface and degree 2 bezier', () => {
 
 		var homo_controlPoints_srf = [ [ [0,0,0,1], [0,10,0,1] ], [[20,0,0,1], [20,10,0,1] ] ]
 			, degreeU  = 1
@@ -2948,7 +2916,7 @@ describe("verb.eval.Intersect.curveAndSurfaceWithEstimate",function(){
 });
 
 
-describe("verb.eval.Intersect.lookupAdjacentSegment",function(){
+describe("verb.eval.Intersect.lookupAdjacentSegment",() => {
 
 	var segs = [
 		new verb.core.Interval(
@@ -2961,7 +2929,7 @@ describe("verb.eval.Intersect.lookupAdjacentSegment",function(){
 			new verb.core.MeshIntersectionPoint([0,0], [0,0], [3,2,3], 0, 0 ),
 			new verb.core.MeshIntersectionPoint([0,0], [0,0], [7,6,7], 0, 0 ))  ];
 
-	it('returns null when only nearest is argument itself', function(){
+	it('returns null when only nearest is argument itself', () => {
 
 		var end = segs[0].min;
 
@@ -2972,7 +2940,7 @@ describe("verb.eval.Intersect.lookupAdjacentSegment",function(){
 
 	});
 
-	it('is correct for a basic example', function(){
+	it('is correct for a basic example', () => {
 
 		var end = new verb.core.MeshIntersectionPoint([0,0], [0,0], [1,2,3], 0, 0 ); // same pos, but different object
 
@@ -2985,9 +2953,9 @@ describe("verb.eval.Intersect.lookupAdjacentSegment",function(){
 
 });
 
-describe("verb.eval.Intersect.makeMeshIntersectionPolylines ",function(){
+describe("verb.eval.Intersect.makeMeshIntersectionPolylines ",() => {
 
-	it('is correct for a basic example', function(){
+	it('is correct for a basic example', () => {
 
 		var segs = [
 			new verb.core.Interval(
@@ -3014,9 +2982,9 @@ describe("verb.eval.Intersect.makeMeshIntersectionPolylines ",function(){
 
 });
 
-describe("verb.eval.Intersect.kdTreeFromSegments",function(){
+describe("verb.eval.Intersect.kdTreeFromSegments",() => {
 
-	it('is correct for a basic example', function(){
+	it('is correct for a basic example', () => {
 
 		var segs = [
 			new verb.core.Interval(
@@ -3037,9 +3005,9 @@ describe("verb.eval.Intersect.kdTreeFromSegments",function(){
 
 });
 
-describe("verb.eval.Intersect.meshes",function(){
+describe("verb.eval.Intersect.meshes",() => {
 
-	it('is correct for two intersecting triangles', function(){
+	it('is correct for two intersecting triangles', () => {
 
 		var pts1 = [ [0,0,0], [2,0,0], [2, 2,0] ];
 		var tris1 = [[ 0, 1, 2 ]];
@@ -3058,7 +3026,7 @@ describe("verb.eval.Intersect.meshes",function(){
 
 	});
 
-	it('is correct for two non-intersecting triangles', function(){
+	it('is correct for two non-intersecting triangles', () => {
 
 		var pts1 = [ [10,10,10], [2,10,10], [2, 2,10] ];
 		var tris1 = [[ 0, 1, 2 ]];
@@ -3076,7 +3044,7 @@ describe("verb.eval.Intersect.meshes",function(){
 
 	});
 
-	it('is correct for two intersecting four point surfaces', function(){
+	it('is correct for two intersecting four point surfaces', () => {
 
 		var p1 = [0,0,0]
 			, p2 = [1,0,0]
@@ -3103,9 +3071,9 @@ describe("verb.eval.Intersect.meshes",function(){
 });
 
 
-describe("verb.eval.Eval.volumePoint",function(){
+describe("verb.eval.Eval.volumePoint",() => {
 
-	it('gives valid result for uniform 3x3x3 cube', function(){
+	it('gives valid result for uniform 3x3x3 cube', () => {
 
 		var degreeU = 1
 			, knotsU = [ 0,0,0.5,1,1 ]
@@ -3174,7 +3142,7 @@ function sameCurve( crvd0, crvd1 ){
 	}
 }
 
-describe("verb.eval.Modify.curveElevateDegree",function(){
+describe("verb.eval.Modify.curveElevateDegree",() => {
 
 	// line from [5,5,5] to [5,5,-5]
 	var degree_crv = 2
@@ -3184,21 +3152,21 @@ describe("verb.eval.Modify.curveElevateDegree",function(){
 
 	var lineCurveData = new verb.core.NurbsCurveData( 1, [0,0,1,1], [[7,3,-10,1], [5,4,3,1]] );
 
-	it('can elevate degree 2 bezier to degree 3', function(){
+	it('can elevate degree 2 bezier to degree 3', () => {
 		var curveData = verb.eval.Modify.curveElevateDegree( bezierCurveData, 3 );
 
 		curveData.degree.should.be.equal( 3 );
 		sameCurve( bezierCurveData, curveData );
 	});
 
-	it('can elevate degree 2 bezier to degree 4', function(){
+	it('can elevate degree 2 bezier to degree 4', () => {
 		var curveData = verb.eval.Modify.curveElevateDegree( bezierCurveData, 4 );
 
 		curveData.degree.should.be.equal( 4 );
 		sameCurve( bezierCurveData, curveData );
 	});
 
-	it('can elevate degree 1 line to degree 3', function(){
+	it('can elevate degree 1 line to degree 3', () => {
 		var curveData = verb.eval.Modify.curveElevateDegree( lineCurveData, 3 );
 
 		curveData.degree.should.be.equal( 3 );
@@ -3207,13 +3175,13 @@ describe("verb.eval.Modify.curveElevateDegree",function(){
 });
 
 
-describe("verb.eval.Modify.unifyCurveKnotVectors",function(){
+describe("verb.eval.Modify.unifyCurveKnotVectors",() => {
 
 	var c0 = new verb.core.NurbsCurveData( 2, [0,0,0,1,1,1], [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
 	var c1 = new verb.core.NurbsCurveData( 3, [0,0,0,0,1,1,1,1], [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1] ] );
 	var c2 = new verb.core.NurbsCurveData( 3, [0,0,0,0,0.5,1,1,1,1], [ [0,0,0,1], [1,0,0,1], [2,0,0,1], [3,0,0,1], [4,0,0,1] ] );
 
-	it('can handle straight beziers', function(){
+	it('can handle straight beziers', () => {
 
 		var curves = [c0, c1, c2]
 		var res = verb.eval.Modify.unifyCurveKnotVectors(curves);
@@ -3226,13 +3194,13 @@ describe("verb.eval.Modify.unifyCurveKnotVectors",function(){
 	});
 });
 
-describe("verb.eval.Make.loftedSurface",function(){
+describe("verb.eval.Make.loftedSurface",() => {
 
 	var c0 = new verb.core.NurbsCurveData( 2, [0,0,0,1,1,1], [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
 	var c1 = new verb.core.NurbsCurveData( 3, [0,0,0,0,1,1,1,1], [ [0,0,1,1], [1,0,1,1], [2,0,1,1], [3,0,1,1] ] );
 	var c2 = new verb.core.NurbsCurveData( 3, [0,0,0,0,0.5,1,1,1,1], [ [0,0,2,1], [1,0,2,1], [2,0,2,1], [3,0,2,1], [4,0,2,1] ] );
 
-	it('can handle straight beziers', function(){
+	it('can handle straight beziers', () => {
 
 		var curves = [c0, c1, c2];
 		var surface = verb.eval.Make.loftedSurface( curves );
@@ -3263,9 +3231,9 @@ describe("verb.eval.Make.loftedSurface",function(){
 
 	});
 });
-describe("verb.eval.Check.isValidNurbsCurveData",function(){
+describe("verb.eval.Check.isValidNurbsCurveData",() => {
 
-	it('is correct for basic case', function(){
+	it('is correct for basic case', () => {
 		var c = new verb.core.NurbsCurveData( 2, [0,0,0,1,1,1], [ [0,0,0,1], [1,0,0,1], [2,0,0,1] ] );
 		verb.eval.Check.isValidNurbsCurveData(c);
 	});
@@ -3312,7 +3280,7 @@ describe("verb.eval.Check.isValidNurbsCurveData",function(){
 
 });
 
-describe("verb.eval.Check.isValidNurbsSurfaceData",function(){
+describe("verb.eval.Check.isValidNurbsSurfaceData",() => {
 
 
 	var degreeU = 3
@@ -3324,7 +3292,7 @@ describe("verb.eval.Check.isValidNurbsSurfaceData",function(){
 													[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] 	],
 													[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[30, -30, 0] 	] ];
 
-	it('is correct for basic case', function(){
+	it('is correct for basic case', () => {
 		var c = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
 		verb.eval.Check.isValidNurbsSurfaceData(c);
 	});
@@ -3406,35 +3374,35 @@ describe("verb.eval.Check.isValidNurbsSurfaceData",function(){
 
 });
 
-describe("verb.eval.Check.isValidKnotVector",function(){
+describe("verb.eval.Check.isValidKnotVector",() => {
 
-	it('detects correct knot vector', function(){
+	it('detects correct knot vector', () => {
 		verb.eval.Check.isValidKnotVector( [0,0,0,1,1,1], 2 ).should.be.equal(true);
 		verb.eval.Check.isValidKnotVector( [0,0,0,0.5,1,1,1], 2 ).should.be.equal(true);
 	});
 
-	it('detects incorrect knot vector 0', function(){
+	it('detects incorrect knot vector 0', () => {
 		verb.eval.Check.isValidKnotVector( [0,0,1,1,1], 2 ).should.be.equal(false);
 	});
 
-	it('detects incorrect knot vector 1', function(){
+	it('detects incorrect knot vector 1', () => {
 		verb.eval.Check.isValidKnotVector( [0,0,0.5,1,1,1], 2 ).should.be.equal(false);
 	});
 
-	it('detects incorrect knot vector 2', function(){
+	it('detects incorrect knot vector 2', () => {
 		verb.eval.Check.isValidKnotVector( [0,0,0,1,1,2], 2 ).should.be.equal(false);
 	});
 
-	it('detects incorrect knot vector 3', function(){
+	it('detects incorrect knot vector 3', () => {
 		verb.eval.Check.isValidKnotVector( [0,0,0,0.5,1,1,2], 2 ).should.be.equal(false);
 	});
 
-	it('detects incorrect knot vector 4', function(){
+	it('detects incorrect knot vector 4', () => {
 		verb.eval.Check.isValidKnotVector( [0,0,0,0.5,0.25,1,1,1], 2 ).should.be.equal(false);
 	});
 });
 
-describe("verb.eval.Intersect.meshes",function(){
+describe("verb.eval.Intersect.meshes",() => {
 
 	function glancingPlaneCylindricalSurface(){
 
@@ -3499,21 +3467,21 @@ describe("verb.eval.Intersect.meshes",function(){
 		return [srf1,srf2];
 	}
 
-	it('detects all 4 polylines in nurbs surface plane intersection', function(){
+	it('detects all 4 polylines in nurbs surface plane intersection', () => {
 		var srfs = nurbsSurfacePlane();
 		var res = verb.eval.Intersect.meshes( srfs[0].tessellate(), srfs[1].tessellate() );
 
 		res.length.should.be.equal( 4 );
 	});
 
-	it('detects all 8 intersection lines in torus cylinder intersection', function(){
+	it('detects all 8 intersection lines in torus cylinder intersection', () => {
 		var srfs = torusCylindricalSurface();
 		var res = verb.eval.Intersect.meshes( srfs[0].tessellate(), srfs[1].tessellate() );
 
 		res.length.should.be.equal( 8 );
 	});
 
-	it('detects glancing intersection between cylinder and plane', function(){
+	it('detects glancing intersection between cylinder and plane', () => {
 		var srfs = glancingPlaneCylindricalSurface();
 		var res = verb.eval.Intersect.meshes( srfs[0].tessellate(), srfs[1].tessellate() );
 
@@ -3522,14 +3490,14 @@ describe("verb.eval.Intersect.meshes",function(){
 
 });
 
-describe("verb.eval.Modify.knotsReverse",function(){
- 	it('can reverse basic knot array', function(){
+describe("verb.eval.Modify.knotsReverse",() => {
+ 	it('can reverse basic knot array', () => {
 		verb.eval.Modify.knotsReverse( [0,1,3,5] ).should.be.eql( [0,2,4,5] );
  	});
  });
 
-describe("verb.eval.Modify.curveReverse",function(){
-	it('can reverse curve with uneven parameterization', function(){
+describe("verb.eval.Modify.curveReverse",() => {
+	it('can reverse curve with uneven parameterization', () => {
 		var c = new verb.core.NurbsCurveData( 2, [0,0,0,0.24,1,1,1], [ [0,0,0,1], [1,0,0,1], [0.5,1,0,1], [2,0,0,1] ] );
 		var cr = verb.eval.Modify.curveReverse( c );
 		var crr = verb.eval.Modify.curveReverse( cr );
@@ -3543,7 +3511,7 @@ describe("verb.eval.Modify.curveReverse",function(){
 	});
 });
 
-describe("verb.eval.Modify.surfaceReverse",function(){
+describe("verb.eval.Modify.surfaceReverse",() => {
 
 	var degreeU = 3
 		, degreeV = 3
@@ -3556,7 +3524,7 @@ describe("verb.eval.Modify.surfaceReverse",function(){
 								[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, 0], 	[25, -30, 0], 	[30, -30, 0] 	] ]
 		, s = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
 
-	it('is correct for u direction', function(){
+	it('is correct for u direction', () => {
 
 		var sr = verb.eval.Modify.surfaceReverse( s, true );
 
@@ -3577,7 +3545,7 @@ describe("verb.eval.Modify.surfaceReverse",function(){
 
 	});
 
-	it('is correct for v direction', function(){
+	it('is correct for v direction', () => {
 
 		var sr = verb.eval.Modify.surfaceReverse( s, false );
 
@@ -3599,9 +3567,9 @@ describe("verb.eval.Modify.surfaceReverse",function(){
 	});
 });
 
-describe("verb.eval.Intersect.sliceMeshes",function(){
+describe("verb.eval.Intersect.sliceMeshes",() => {
 
-	it('is correct for basic example', function(){
+	it('is correct for basic example', () => {
 
 		var srf = verb.geom.NurbsSurface.byCorners( [0,1,0], [10,0,0], [10,10,10], [0,10,10] );
 		var mesh = srf.tessellate();
@@ -3614,9 +3582,9 @@ describe("verb.eval.Intersect.sliceMeshes",function(){
 });
 
 
-describe("verb.eval.Make.rationalTranslationalSurface",function(){
+describe("verb.eval.Make.rationalTranslationalSurface",() => {
 
-	it('provides expected result for linear rail and profile', function(){
+	it('provides expected result for linear rail and profile', () => {
 
 		var rail = verb.eval.Make.rationalBezierCurve( [[0,0,0], [1,1,1]] );
         var prof = verb.eval.Make.rationalBezierCurve( [[0,0,0], [1,0,0]] );
@@ -3630,7 +3598,7 @@ describe("verb.eval.Make.rationalTranslationalSurface",function(){
 
 	});
 
-    it('provides expected result for linear profile, curved rail', function(){
+    it('provides expected result for linear profile, curved rail', () => {
 
         var rail = verb.eval.Make.rationalBezierCurve( [[0,0,0], [1,0.5,1], [2,1,1]] );
         var prof = verb.eval.Make.rationalBezierCurve( [[0,0,0], [2,0,0]] );
@@ -3646,7 +3614,7 @@ describe("verb.eval.Make.rationalTranslationalSurface",function(){
 
 });
 
-describe("verb.eval.Make.surfaceIsocurve",function(){
+describe("verb.eval.Make.surfaceIsocurve",() => {
 
 	var degreeU = 3
 		, degreeV = 3
@@ -3659,7 +3627,7 @@ describe("verb.eval.Make.surfaceIsocurve",function(){
 		, bezier = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
 
 
-    it('provides boundary isocurves at extremes of domain', function(){
+    it('provides boundary isocurves at extremes of domain', () => {
 
         var res = verb.eval.Make.surfaceIsocurve( bezier, 0, false );
 
@@ -3673,7 +3641,7 @@ describe("verb.eval.Make.surfaceIsocurve",function(){
 
     });
 
-	it('provides isocurves at expected location in v direction', function(){
+	it('provides isocurves at expected location in v direction', () => {
 
 		for (var i = 0; i <= 1.0; i += 0.1 ){
 
@@ -3692,9 +3660,9 @@ describe("verb.eval.Make.surfaceIsocurve",function(){
 	});
 
 });
-describe("verb.eval.Make.surfaceBoundaryCurves",function(){
+describe("verb.eval.Make.surfaceBoundaryCurves",() => {
 
-    it('provides expected result for planar surface', function(){
+    it('provides expected result for planar surface', () => {
 
         var a = [0,0,0];
         var b = [1,0,0];
@@ -3726,8 +3694,8 @@ describe("verb.eval.Make.surfaceBoundaryCurves",function(){
 
 });
 
-describe("verb.eval.Intersect.segmentAndPlane",function(){
-	it('works for simple cases', function(){
+describe("verb.eval.Intersect.segmentAndPlane",() => {
+	it('works for simple cases', () => {
 		verb.eval.Intersect.segmentAndPlane( [0,0,0], [0,0,1], [0,0,0.5], [0,0,1] ).p.should.be.approximately( 0.5, verb.core.Constants.EPSILON );
 		verb.eval.Intersect.segmentAndPlane( [0,0,0], [0,0,1], [0,0,0.1], [0,0,1] ).p.should.be.approximately( 0.1, verb.core.Constants.EPSILON );
 		verb.eval.Intersect.segmentAndPlane( [0,0,0], [0,0,1], [0,0,0.9], [0,0,1] ).p.should.be.approximately( 0.9, verb.core.Constants.EPSILON );
@@ -3737,7 +3705,7 @@ describe("verb.eval.Intersect.segmentAndPlane",function(){
 });
 
 
-describe("verb.eval.Make.rationalInterpCurve",function(){
+describe("verb.eval.Make.rationalInterpCurve",() => {
 
 	function shouldInterpPointsWithTangents(pts, degree, isHomo, start_tangent, end_tangent){
 
@@ -3789,7 +3757,7 @@ describe("verb.eval.Make.rationalInterpCurve",function(){
 		return crv;
 	}
 
-	it('can compute valid cubic interpolating curve for 4 points', function(){
+	it('can compute valid cubic interpolating curve for 4 points', () => {
 
 		var pts = [ [0, 0, 1], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ];
 
@@ -3798,7 +3766,7 @@ describe("verb.eval.Make.rationalInterpCurve",function(){
 	});
 
 
-	it('can compute valid degree 4 interpolating curve for 4 points', function(){
+	it('can compute valid degree 4 interpolating curve for 4 points', () => {
 
 		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ];
 
@@ -3806,7 +3774,7 @@ describe("verb.eval.Make.rationalInterpCurve",function(){
 
 	});
 
-	it('can compute valid quadratic interpolating curve for 4 points', function(){
+	it('can compute valid quadratic interpolating curve for 4 points', () => {
 
 		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ];
 
@@ -3814,7 +3782,7 @@ describe("verb.eval.Make.rationalInterpCurve",function(){
 
 	});
 
-	it('can compute valid cubic interpolating curve for 100 points', function(){
+	it('can compute valid cubic interpolating curve for 100 points', () => {
 
 		var pts = [];
 		for (var i = 0; i < 100; i++){
@@ -3829,7 +3797,7 @@ describe("verb.eval.Make.rationalInterpCurve",function(){
 
 	});
 
-	it('can compute valid cubic interpolating points and tangents', function(){
+	it('can compute valid cubic interpolating points and tangents', () => {
 
 		var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ];
 
@@ -3838,7 +3806,7 @@ describe("verb.eval.Make.rationalInterpCurve",function(){
 	});
 
 	// this fails occasionally - don't know why
-	// it('can compute valid quadratic curve interpolating points and tangents', function(){
+	// it('can compute valid quadratic curve interpolating points and tangents', () => {
 
 	// 	var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ];
 
@@ -3846,7 +3814,7 @@ describe("verb.eval.Make.rationalInterpCurve",function(){
 
 	// });
 
-	// it('can compute valid quadratic curve interpolating points and tangents', function(){
+	// it('can compute valid quadratic curve interpolating points and tangents', () => {
 
 	// 	var pts = [ [0, 0, 0], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ];
 
@@ -3858,7 +3826,7 @@ describe("verb.eval.Make.rationalInterpCurve",function(){
 
 
 
-describe("verb.eval.Eval.surfaceRegularSamplePoints",function(){
+describe("verb.eval.Eval.surfaceRegularSamplePoints",() => {
 
     function getComplexSurface(){
 
@@ -3892,7 +3860,7 @@ describe("verb.eval.Eval.surfaceRegularSamplePoints",function(){
 
     var complexSurface = getComplexSurface();
 
-	it('returns correct result for complex surface', function(){
+	it('returns correct result for complex surface', () => {
 
 		var p = verb.eval.Eval.surfaceRegularSamplePoints( complexSurface, 10, 10 );
 
@@ -3922,12 +3890,68 @@ describe("verb.eval.Eval.surfaceRegularSamplePoints",function(){
 	});
 });
 
-describe("verb.eval.Eval.rationalBezierCurveRegularSample",function(){
-	it('returns correct result for basic bezier curve', function(){
-		var crv = verb.eval.Make.rationalBezierCurve( [[0,0,0], [1,1,1], [2,1,1], [3,1,0]] );
+
+describe("verb.eval.Modify.decomposeCurveIntoBeziers",() => {
+
+	it('is correct for a degree 3 spline curve with 5 internal knot spans', () => {
+
+		var degree = 3
+			, knots = [ 0, 0, 0, 0, 1, 2, 3, 4, 5, 5, 5, 5 ];
+
+		var controlPoints = [];
+		for (var i = 0; i < 8; i++) {
+			controlPoints.push([i, 0, 0]);
+		}
+
+		var crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
+
+		var res = verb.eval.Modify.decomposeCurveIntoBeziers( crv );
+
+		res.length.should.be.equal( 5 );
+
+		res.forEach(function(x){
+
+			var u0 = x.knots[0];
+
+			var pt0 = verb.eval.Eval.curvePoint( x, u0);
+			var pt1 = verb.eval.Eval.curvePoint( crv, u0);
+
+			( verb.core.Vec.norm(verb.core.Vec.sub(pt0, pt1))).should.be.approximately(0, verb.core.Constants.TOLERANCE );
+
+		});
+	});
+
+    it('is correct for a degree 3 spline curve with 2 internal knot spans', () => {
+
+        var degree = 3
+            , knots = [0, 0, 0, 0, 0.3, 0.666, 1, 1, 1, 1 ]
+            , controlPoints = [ [1,0,1], [1,2,1], [1,1,1], [0,1,2], [0,2,2], [0,2,2] ]
+            , crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
+
+        var res = verb.eval.Modify.decomposeCurveIntoBeziers( crv );
+
+        res.length.should.be.equal( 3 );
+
+        res.forEach(function(x){
+
+            var u0 = x.knots[0];
+
+            var pt0 = verb.eval.Eval.curvePoint( x, u0);
+            var pt1 = verb.eval.Eval.curvePoint( crv, u0);
+
+            ( verb.core.Vec.norm(verb.core.Vec.sub(pt0, pt1))).should.be.approximately(0, verb.core.Constants.TOLERANCE );
+
+        });
+
+    });
+});
+
+describe("verb.eval.Eval.rationalCurveRegularSamplePoints",() => {
+
+    function evalAndCompare(crv){
 
 		var divs = 200;
-		var p = verb.eval.Eval.rationalBezierCurveRegularSamplePoints( crv, divs );
+		var p = verb.eval.Eval.rationalCurveRegularSamplePoints( crv, divs );
 
         var p2 = [];
         var sp = 1 / divs;
@@ -3936,10 +3960,41 @@ describe("verb.eval.Eval.rationalBezierCurveRegularSample",function(){
             p2.push( verb.eval.Eval.rationalCurvePoint( crv, i*sp ) )
         }
 
-        p.length.should.equal(p2.length);
+        p.length.should.equal( p2.length );
 
         for (var i = 0; i < p.length; i++){
             vecShouldBe( p[i], p2[i] );
         }
+    }
+
+	it('returns correct result for basic bezier curve', () => {
+
+		var crv = verb.eval.Make.rationalBezierCurve( [[0,0,0], [1,1,1], [2,1,1], [3,1,0]] );
+        evalAndCompare(crv);
+
 	});
+//
+//	it('returns correct result for degree 2 b spline curve with 2 internal knot spans', () => {
+//
+//        var degree = 2
+//            , knots = [0, 0, 0, 0.3, 1, 1, 1 ]
+//            , controlPoints = [ [1,0,1], [1,2,1], [1,1,1], [0,2,2] ]
+//            , crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
+//
+//		evalAndCompare(crv);
+//
+//	});
+//
+//	it('returns correct result for degree 2 b spline curve with 3 internal knot spans', () => {
+//
+//        var degree = 2
+//            , knots = [0, 0, 0, 0.3, 0.666, 1, 1, 1 ]
+//            , controlPoints = [ [1,0,1], [1,2,1], [1,1,1], [0,1,2], [0,2,2] ]
+//            , crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
+//
+//		evalAndCompare(crv);
+//
+//	});
+
 });
+

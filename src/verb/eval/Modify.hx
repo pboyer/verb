@@ -455,7 +455,7 @@ class Modify {
         var reqMult = degree + 1;
 
         //insert the knots
-        for (knotmult in knotmults) { // (var i = 0; i < mults.length; i++){
+        for (knotmult in knotmults) {
             if ( knotmult.mult < reqMult ){
 
                 var knotsInsert = Vec.rep( reqMult - knotmult.mult, knotmult.knot );

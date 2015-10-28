@@ -255,6 +255,12 @@ haxe__$Int64__$_$_$Int64.__name__ = ["haxe","_Int64","___Int64"];
 haxe__$Int64__$_$_$Int64.prototype = {
 	__class__: haxe__$Int64__$_$_$Int64
 };
+var haxe_Log = function() { };
+$hxClasses["haxe.Log"] = haxe_Log;
+haxe_Log.__name__ = ["haxe","Log"];
+haxe_Log.trace = function(v,infos) {
+	js_Boot.__trace(v,infos);
+};
 var haxe_Serializer = function() {
 	this.buf = new StringBuf();
 	this.cache = [];
@@ -989,6 +995,25 @@ js__$Boot_HaxeError.prototype = $extend(Error.prototype,{
 var js_Boot = function() { };
 $hxClasses["js.Boot"] = js_Boot;
 js_Boot.__name__ = ["js","Boot"];
+js_Boot.__unhtml = function(s) {
+	return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
+};
+js_Boot.__trace = function(v,i) {
+	var msg;
+	if(i != null) msg = i.fileName + ":" + i.lineNumber + ": "; else msg = "";
+	msg += js_Boot.__string_rec(v,"");
+	if(i != null && i.customParams != null) {
+		var _g = 0;
+		var _g1 = i.customParams;
+		while(_g < _g1.length) {
+			var v1 = _g1[_g];
+			++_g;
+			msg += "," + js_Boot.__string_rec(v1,"");
+		}
+	}
+	var d;
+	if(typeof(document) != "undefined" && (d = document.getElementById("haxe:trace")) != null) d.innerHTML += js_Boot.__unhtml(msg) + "<br/>"; else if(typeof console != "undefined" && console.log != null) console.log(msg);
+};
 js_Boot.getClass = function(o) {
 	if((o instanceof Array) && o.__enum__ == null) return Array; else {
 		var cl = o.__class__;
@@ -1864,7 +1889,7 @@ var verb_Verb = function() { };
 $hxClasses["verb.Verb"] = verb_Verb;
 verb_Verb.__name__ = ["verb","Verb"];
 verb_Verb.main = function() {
-	console.log("verb 2.0.0");
+	haxe_Log.trace("verb 2.0.0",{ fileName : "Verb.hx", lineNumber : 45, className : "verb.Verb", methodName : "main"});
 };
 var verb_core_ArrayExtensions = function() { };
 $hxClasses["verb.core.ArrayExtensions"] = verb_core_ArrayExtensions;
@@ -4190,13 +4215,36 @@ verb_eval_Eval.surfacePointGivenNM = function(n,m,surface,u,v) {
 	}
 	return position;
 };
+verb_eval_Eval.rationalCurveRegularSamplePoints = function(crv,divs) {
+	var range = verb_core_ArrayExtensions.last(crv.knots) - crv.knots[0];
+	var beziers = verb_eval_Modify.decomposeCurveIntoBeziers(crv);
+	var pts = [];
+	var brange;
+	var fraction;
+	haxe_Log.trace(beziers.map(function(x) {
+		return x.knots;
+	}),{ fileName : "Eval.hx", lineNumber : 369, className : "verb.eval.Eval", methodName : "rationalCurveRegularSamplePoints"});
+	var _g1 = 0;
+	var _g = beziers.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		brange = verb_core_ArrayExtensions.last(beziers[i].knots) - beziers[i].knots[0];
+		haxe_Log.trace(brange,{ fileName : "Eval.hx", lineNumber : 376, className : "verb.eval.Eval", methodName : "rationalCurveRegularSamplePoints", customParams : [range]});
+		fraction = Math.ceil(brange / range * divs);
+		haxe_Log.trace(fraction,{ fileName : "Eval.hx", lineNumber : 378, className : "verb.eval.Eval", methodName : "rationalCurveRegularSamplePoints"});
+		verb_eval_Eval.rationalBezierCurveRegularSamplePointsMutate(beziers[i],fraction,pts);
+		if(i == beziers.length - 1) continue;
+		pts.pop();
+	}
+	return pts;
+};
 verb_eval_Eval.rationalBezierCurveRegularSamplePoints = function(crv,divs) {
 	var pts = [];
 	verb_eval_Eval.rationalBezierCurveRegularSamplePointsMutate(crv,divs,pts);
 	return pts;
 };
 verb_eval_Eval.rationalBezierCurveRegularSamplePointsMutate = function(crv,divs,pts) {
-	var t = 1.0 / divs;
+	var t = (verb_core_ArrayExtensions.last(crv.knots) - crv.knots[0]) / divs;
 	var its = [];
 	var ts = [its];
 	var u = crv.knots[0];
@@ -4250,19 +4298,6 @@ verb_eval_Eval.rationalBezierCurveRegularSamplePointsMutate = function(crv,divs,
 			verb_core_Vec.addMutate(front[k],front[k + 1]);
 		}
 		pts.push(verb_eval_Eval.dehomogenize(front[0]));
-	}
-	return pts;
-};
-verb_eval_Eval.rationalCurveRegularSamplePoints = function(crv,divs) {
-	var beziers = verb_eval_Modify.decomposeCurveIntoBeziers(crv);
-	var pts = [];
-	var _g1 = 0;
-	var _g = beziers.length;
-	while(_g1 < _g) {
-		var i = _g1++;
-		verb_eval_Eval.rationalBezierCurveRegularSamplePointsMutate(beziers[i],divs,pts);
-		if(i == beziers.length - 1) continue;
-		pts.pop();
 	}
 	return pts;
 };
@@ -6833,7 +6868,7 @@ verb_exe_WorkerPool.prototype = {
 						}
 					} catch( error ) {
 						if (error instanceof js__$Boot_HaxeError) error = error.val;
-						console.log(error);
+						haxe_Log.trace(error,{ fileName : "WorkerPool.hx", lineNumber : 82, className : "verb.exe.WorkerPool", methodName : "processQueue"});
 					}
 					_g.processQueue();
 				};

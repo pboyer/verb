@@ -43,8 +43,8 @@ module.exports = function(grunt) {
           reporter: 'spec',
           quiet: false // Optionally suppress output to standard out (defaults to false)
         },
-//        src: ['test/testCore.js', 'test/testEval.js', 'test/testGeom.js']
-        src: ['test/testEval.js']
+        src: ['test/testCore.js', 'test/testEval.js', 'test/testGeom.js']
+        //src: ['test/testEval.js']
       }
     },
 

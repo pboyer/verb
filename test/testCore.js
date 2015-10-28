@@ -25,9 +25,9 @@ function last(a){
 	return a[a.length-1];
 }
 
-describe("verb.core.BoundingBox.init",function(){
+describe("verb.core.BoundingBox.init", () => {
 
-	it('should allow array of point arguments', function(){
+	it('should allow array of point arguments', () => {
 
 		var bb1 = new verb.core.BoundingBox([[5,5,5], [10,10,10]]);
 
@@ -43,9 +43,9 @@ describe("verb.core.BoundingBox.init",function(){
 
 });
 
-describe("verb.core.BoundingBox.intersects",function(){
+describe("verb.core.BoundingBox.intersects", () => {
 
-	it('returns expected results', function(){
+	it('returns expected results', () => {
 
 		var bb1 = new verb.core.BoundingBox([ [5,5,5], [10,10,10] ])
 			, bb2 = new verb.core.BoundingBox([ [0,0,0], [10,10,10] ])
@@ -59,9 +59,9 @@ describe("verb.core.BoundingBox.intersects",function(){
 
 });
 
-describe("verb.core.BoundingBox.intersect",function(){
+describe("verb.core.BoundingBox.intersect", () => {
 
-	it('returns expected results', function(){
+	it('returns expected results', () => {
 
 		// initialize a bounding box
 		var bb1 = new verb.core.BoundingBox([ [5,5,5], [10,10,10] ])
@@ -87,9 +87,9 @@ describe("verb.core.BoundingBox.intersect",function(){
 
 });
 
-describe("verb.core.BoundingBox.intervalsOverlap",function(){
+describe("verb.core.BoundingBox.intervalsOverlap", () => {
 
-	it('returns expected results', function(){
+	it('returns expected results', () => {
 
 		should.equal( verb.core.BoundingBox.intervalsOverlap( 0, 1, 0, 10 ), true );
 		should.equal( verb.core.BoundingBox.intervalsOverlap( 0, 1, 1, 10 ), true );
@@ -100,9 +100,9 @@ describe("verb.core.BoundingBox.intervalsOverlap",function(){
 
 });
 
-describe("verb.core.BoundingBox.contains",function(){
+describe("verb.core.BoundingBox.contains", () => {
 
-	it('returns expected results', function(){
+	it('returns expected results', () => {
 
 		var bb4 = new verb.core.BoundingBox([ [0,0,0], [1,1,1] ])
 			, bb5 = new verb.core.BoundingBox();
@@ -117,9 +117,9 @@ describe("verb.core.BoundingBox.contains",function(){
 
 });
 
-describe("verb.core.BoundingBox.contains",function(){
+describe("verb.core.BoundingBox.contains", () => {
 
-	it('BoundingBox.clear', function(){
+	it('BoundingBox.clear', () => {
 
 		var bb1 = new verb.core.BoundingBox([ [5,5,5], [10,10,10] ]);
 		bb1.clear();
@@ -128,9 +128,9 @@ describe("verb.core.BoundingBox.contains",function(){
 	});
 });
 
-describe("verb.core.BoundingBox.getAxisLength",function(){
+describe("verb.core.BoundingBox.getAxisLength", () => {
 
-	it('should return correct value', function(){
+	it('should return correct value', () => {
 
 		var bb1 = new verb.core.BoundingBox([ [-1,2,3], [10,10,10] ]);
 		should.equal( bb1.getAxisLength(0), 11 );
@@ -141,9 +141,9 @@ describe("verb.core.BoundingBox.getAxisLength",function(){
 
 });
 
-describe("verb.core.BoundingBox.getLongestAxis",function(){
+describe("verb.core.BoundingBox.getLongestAxis", () => {
 
-	it('should return correct value', function(){
+	it('should return correct value', () => {
 
 		var bb1 = new verb.core.BoundingBox([ [-1,2,3], [10,10,10] ]);
 		should.equal( bb1.getLongestAxis(0), 0 );
@@ -152,23 +152,9 @@ describe("verb.core.BoundingBox.getLongestAxis",function(){
 
 });
 
-describe("verb.core.BoundingBox.getAxisLength",function(){
+describe("verb.core.BoundingBox.getAxisLength", () => {
 
-	it('should return 0 when given out of bounds index', function(){
-
-		var bb1 = new verb.core.BoundingBox([ [-1,2,3], [10,10,10] ]);
-		should.equal( bb1.getAxisLength(8), 0 );
-		should.equal( bb1.getAxisLength(-1), 0 );
-		should.equal( bb1.getAxisLength(4), 0 );
-		should.equal( bb1.getAxisLength(3), 0 );
-
-	});
-
-});
-
-describe("verb.core.BoundingBox.getAxisLength",function(){
-
-	it('should return 0 when given out of bounds index', function(){
+	it('should return 0 when given out of bounds index', () => {
 
 		var bb1 = new verb.core.BoundingBox([ [-1,2,3], [10,10,10] ]);
 		should.equal( bb1.getAxisLength(8), 0 );
@@ -180,9 +166,23 @@ describe("verb.core.BoundingBox.getAxisLength",function(){
 
 });
 
-describe("verb.core.BoundingBox.clear",function(){
+describe("verb.core.BoundingBox.getAxisLength", () => {
 
-	it('should set initialized to false', function(){
+	it('should return 0 when given out of bounds index', () => {
+
+		var bb1 = new verb.core.BoundingBox([ [-1,2,3], [10,10,10] ]);
+		should.equal( bb1.getAxisLength(8), 0 );
+		should.equal( bb1.getAxisLength(-1), 0 );
+		should.equal( bb1.getAxisLength(4), 0 );
+		should.equal( bb1.getAxisLength(3), 0 );
+
+	});
+
+});
+
+describe("verb.core.BoundingBox.clear", () => {
+
+	it('should set initialized to false', () => {
 
 		var bb1 = new verb.core.BoundingBox([ [5,5,5], [10,10,10] ]);
 		bb1.clear();
@@ -220,9 +220,9 @@ function getFlatSurface(){
 
 }
 
-describe("verb.core.AdaptiveRefinementNode.constructor",function(){
+describe("verb.core.AdaptiveRefinementNode.constructor", () => {
 
-	it('can be instantiated', function(){
+	it('can be instantiated', () => {
 
 		var f = new verb.core.AdaptiveRefinementNode( getFlatSurface() );
 
@@ -238,9 +238,9 @@ describe("verb.core.AdaptiveRefinementNode.constructor",function(){
 
 function extractUv(x){ return x.uv; }
 
-describe("verb.core.AdaptiveRefinementNode.getEdgeCorners",function(){
+describe("verb.core.AdaptiveRefinementNode.getEdgeCorners", () => {
 
-	it('returns expected result for node without children', function(){
+	it('returns expected result for node without children', () => {
 
 		var f = new verb.core.AdaptiveRefinementNode(getFlatSurface());
 
@@ -251,7 +251,7 @@ describe("verb.core.AdaptiveRefinementNode.getEdgeCorners",function(){
 
 	});
 
-	it('returns expected result for node with children', function(){
+	it('returns expected result for node with children', () => {
 
 		var f = new verb.core.AdaptiveRefinementNode(getFlatSurface());
 
@@ -267,7 +267,7 @@ describe("verb.core.AdaptiveRefinementNode.getEdgeCorners",function(){
 
 	});
 
-	it('returns expected result for node with nested children', function(){
+	it('returns expected result for node with nested children', () => {
 
 		var f = new verb.core.AdaptiveRefinementNode(getFlatSurface());
 
@@ -285,9 +285,9 @@ describe("verb.core.AdaptiveRefinementNode.getEdgeCorners",function(){
 
 });
 
-describe("verb.core.AdaptiveRefinementNode.getAllCorners",function(){
+describe("verb.core.AdaptiveRefinementNode.getAllCorners", () => {
 
-	it('returns expected result for edge with more vertices on opposite side', function(){
+	it('returns expected result for edge with more vertices on opposite side', () => {
 
 		var f = new verb.core.AdaptiveRefinementNode(getFlatSurface());
 
@@ -302,7 +302,7 @@ describe("verb.core.AdaptiveRefinementNode.getAllCorners",function(){
 
 	});
 
-	it('returns expected result for edge with neighbors that has with lesser number of vertices on opposite side', function(){
+	it('returns expected result for edge with neighbors that has with lesser number of vertices on opposite side', () => {
 
 		var f = new verb.core.AdaptiveRefinementNode(getFlatSurface());
 
@@ -318,25 +318,25 @@ describe("verb.core.AdaptiveRefinementNode.getAllCorners",function(){
 
 });
 
-describe("verb.core.Vec.signedAngleBetween",function(){
-    it('computes correct area for triangular prism', function(){
+describe("verb.core.Vec.signedAngleBetween", () => {
+    it('computes correct area for triangular prism', () => {
         verb.core.Vec.signedAngleBetween( [1,0,0], [0,1,0], [0,0,1] ).should.be.approximately( Math.PI / 2, verb.core.Constants.EPSILON );
         verb.core.Vec.signedAngleBetween( [1,0,0], [-1,0,0], [0,0,1] ).should.be.approximately( Math.PI, verb.core.Constants.EPSILON );
         verb.core.Vec.signedAngleBetween( [1,0,0], [0,-1,0], [0,0,1] ).should.be.approximately( 3 * Math.PI / 2, verb.core.Constants.EPSILON );
     });
 });
 
-describe("verb.core.Trig.isPointInPlane",function(){
-    it('works for a few basic cases', function(){
+describe("verb.core.Trig.isPointInPlane", () => {
+    it('works for a few basic cases', () => {
         verb.core.Trig.isPointInPlane( [0,0,0], new verb.core.Plane( [0,0,0], [1,0,0] ), verb.core.Constants.EPSILON  ).should.be.equal( true );
         verb.core.Trig.isPointInPlane( [0,0,1], new verb.core.Plane( [0,0,0], [1,0,0] ), verb.core.Constants.EPSILON  ).should.be.equal( true );
         verb.core.Trig.isPointInPlane( [1,0,1], new verb.core.Plane( [0,0,0], [1,0,0] ), verb.core.Constants.EPSILON  ).should.be.equal( false );
     });
 });
 
-describe("verb.core.AdaptiveRefinementNode.divide",function(){
+describe("verb.core.AdaptiveRefinementNode.divide", () => {
 
-	it('can be called with options.minDepth', function(){
+	it('can be called with options.minDepth', () => {
 
 		var f = new verb.core.AdaptiveRefinementNode(getFlatSurface());
 
@@ -347,7 +347,7 @@ describe("verb.core.AdaptiveRefinementNode.divide",function(){
 
 	});
 
-	it('can be called with no options provided', function(){
+	it('can be called with no options provided', () => {
 
 		var f = new verb.core.AdaptiveRefinementNode(getFlatSurface());
 
@@ -360,9 +360,9 @@ describe("verb.core.AdaptiveRefinementNode.divide",function(){
 
 });
 
-describe("verb.core.Trig.distToSegment",function(){
+describe("verb.core.Trig.distToSegment", () => {
 
-	it('works for simple case', function(){
+	it('works for simple case', () => {
 
 		verb.core.Trig.distToSegment([ -10,0,0], [3,3,0], [5,0,0] ).should.be.equal( 3 );
 
@@ -370,9 +370,9 @@ describe("verb.core.Trig.distToSegment",function(){
 
 });
 
-describe("verb.core.AdaptiveRefinementNode.evalSrf",function(){
+describe("verb.core.AdaptiveRefinementNode.evalSrf", () => {
 
-	it('works as expected', function(){
+	it('works as expected', () => {
 
 		var f = new verb.core.AdaptiveRefinementNode(getFlatSurface());
 
@@ -395,7 +395,7 @@ describe("verb.core.AdaptiveRefinementNode.evalSrf",function(){
 
 });
 
-describe("verb.core.AdaptiveRefinementNode.triangulate",function(){
+describe("verb.core.AdaptiveRefinementNode.triangulate", () => {
 
 	function getWarpedSurface(){
 
@@ -424,7 +424,7 @@ describe("verb.core.AdaptiveRefinementNode.triangulate",function(){
 
 	}
 
-	it('can triangulate a square, planar surface with no options defined', function(){
+	it('can triangulate a square, planar surface with no options defined', () => {
 
 		var srf = getFlatSurface();
 
@@ -439,7 +439,7 @@ describe("verb.core.AdaptiveRefinementNode.triangulate",function(){
 
 	});
 
-	it('can triangulate a warped surface with no options defined', function(){
+	it('can triangulate a warped surface with no options defined', () => {
 
 		var srf = getWarpedSurface();
 
@@ -456,7 +456,7 @@ describe("verb.core.AdaptiveRefinementNode.triangulate",function(){
 
 	});
 
-	it('can triangulate a node with children', function(){
+	it('can triangulate a node with children', () => {
 
 		var srf = getFlatSurface();
 
@@ -473,7 +473,7 @@ describe("verb.core.AdaptiveRefinementNode.triangulate",function(){
 
 	});
 
-	it('can triangulate a node with children and un-nested neighbors', function(){
+	it('can triangulate a node with children and un-nested neighbors', () => {
 
 		var srf = getFlatSurface();
 
@@ -492,7 +492,7 @@ describe("verb.core.AdaptiveRefinementNode.triangulate",function(){
 
 	});
 
-	it('can triangulate a node with children and equally nested neighbors', function(){
+	it('can triangulate a node with children and equally nested neighbors', () => {
 
 		var srf = getFlatSurface();
 
@@ -510,7 +510,7 @@ describe("verb.core.AdaptiveRefinementNode.triangulate",function(){
 
 	});
 
-	it('can triangulate a node with children and more nested neighbors', function(){
+	it('can triangulate a node with children and more nested neighbors', () => {
 
 		var srf = getFlatSurface();
 
@@ -530,9 +530,9 @@ describe("verb.core.AdaptiveRefinementNode.triangulate",function(){
 
 });
 
-describe("verb.core.Mat.solve",function(){
+describe("verb.core.Mat.solve", () => {
 
-	it('can solve simple case', function(){
+	it('can solve simple case', () => {
 
 		var A = [[1,0.4], [-0.2,1]];
 		var At = verb.core.Mat.transpose(A);
@@ -571,7 +571,7 @@ describe("verb.core.Mat.solve",function(){
 
 	}
 
-	it('can solve complex case', function(){
+	it('can solve complex case', () => {
 
 		var n = 5;
 		var A = rand2d(n);
@@ -590,9 +590,9 @@ describe("verb.core.Mat.solve",function(){
 });
 
 
-describe("verb.core.Mesh.makeMeshAabb",function(){
+describe("verb.core.Mesh.makeMeshAabb", () => {
 
-	it('should return correct result for planar mesh', function(){
+	it('should return correct result for planar mesh', () => {
 
 		//
 		//  0  - 1
@@ -617,7 +617,7 @@ describe("verb.core.Mesh.makeMeshAabb",function(){
 
 	});
 
-	it('makeMeshAabb should return correct result for non-planar mesh', function(){
+	it('makeMeshAabb should return correct result for non-planar mesh', () => {
 
 		//
 		//  0  - 1
@@ -644,9 +644,9 @@ describe("verb.core.Mesh.makeMeshAabb",function(){
 
 });
 
-describe("verb.core.Mesh.getTriangleCentroid",function(){
+describe("verb.core.Mesh.getTriangleCentroid", () => {
 
-	it('should return origin for zeroed triangle', function(){
+	it('should return origin for zeroed triangle', () => {
 
 		var points = [[0,0,0],[0,0,0],[0,0,0]]
 			, tri = [0,1,2]
@@ -658,7 +658,7 @@ describe("verb.core.Mesh.getTriangleCentroid",function(){
 
 	});
 
-	it('should return correct value', function(){
+	it('should return correct value', () => {
 
 		var points = [[5,10,2],[3,-4,5],[-10,-3, 10]]
 			, tri = [0,1,2]
@@ -672,9 +672,9 @@ describe("verb.core.Mesh.getTriangleCentroid",function(){
 
 });
 
-describe("verb.eval.Eval.getMinCoordOnAxis",function(){
+describe("verb.eval.Eval.getMinCoordOnAxis", () => {
 
-	it('should return correct value', function(){
+	it('should return correct value', () => {
 
 		var points = [[5,10,2],[3,-4,5],[-10,-3, 10]]
 			, tri = [0,1,2]
@@ -689,9 +689,9 @@ describe("verb.eval.Eval.getMinCoordOnAxis",function(){
 	});
 });
 
-describe("verb.core.Mesh.sortTrianglesOnLongestAxis",function(){
+describe("verb.core.Mesh.sortTrianglesOnLongestAxis", () => {
 
-	it('should return correct result with y axis regular array', function(){
+	it('should return correct result with y axis regular array', () => {
 
 		//
 		//  0  -  1
@@ -712,7 +712,7 @@ describe("verb.core.Mesh.sortTrianglesOnLongestAxis",function(){
 
 	});
 
-	it('should return correct result', function(){
+	it('should return correct result', () => {
 
 		var points = [ [0,10,0], [0,5,0], [0, 0, 0 ], [0, -5, 0], [0, -2, 0], [1, -2.2, 0]]
 			, tris = [[0,1,4], [2,3,4], [1,2,4]]
@@ -726,7 +726,7 @@ describe("verb.core.Mesh.sortTrianglesOnLongestAxis",function(){
 
 });
 
-describe("verb.core.KdTree",function(){
+describe("verb.core.KdTree", () => {
 
 	var pts = [
 		new verb.core.KdPoint( [0,1,1], "a" ),
@@ -734,7 +734,7 @@ describe("verb.core.KdTree",function(){
 		new verb.core.KdPoint( [2,2,1], "c" )
 	];
 
-	it('gives correct results when requesting a single node', function(){
+	it('gives correct results when requesting a single node', () => {
 
 		var tree = new verb.core.KdTree(pts, verb.core.Vec.distSquared );
 		var res = tree.nearest( [0,2.1,1], 1, 1.0 );
@@ -743,7 +743,7 @@ describe("verb.core.KdTree",function(){
 
 	});
 
-	it('gives correct results for multiple nodes', function(){
+	it('gives correct results for multiple nodes', () => {
 
 		var tree = new verb.core.KdTree(pts, verb.core.Vec.distSquared );
 		var res1 = tree.nearest( [0,1.1,1], 2, 1.0 );
@@ -755,9 +755,9 @@ describe("verb.core.KdTree",function(){
 
 });
 
-describe("verb.core.Mesh.triangleUVFromPoint",function(){
+describe("verb.core.Mesh.triangleUVFromPoint", () => {
 
-	it('is correct for a basic example', function(){
+	it('is correct for a basic example', () => {
 
 		var uvs = [ [0,0], [1,0], [1,1] ];
 		var pts = [ [0,0,0], [1,0,0], [1,1,0] ];
@@ -773,21 +773,21 @@ describe("verb.core.Mesh.triangleUVFromPoint",function(){
 	});
 });
 
-describe("verb.core.Vec.sortedSetUnion",function(){
- 	it('can merge two empty arrays', function(){
+describe("verb.core.Vec.sortedSetUnion", () => {
+ 	it('can merge two empty arrays', () => {
 		verb.core.Vec.sortedSetUnion([],[]).should.be.eql([]);
  	});
 
-	it('can merge array and empty array', function(){
+	it('can merge array and empty array', () => {
 		verb.core.Vec.sortedSetUnion([],[1,2]).should.be.eql([1,2]);
 		verb.core.Vec.sortedSetUnion([1.3, 2],[]).should.be.eql([1.3,2]);
 	});
 
-	it('can merge two identical arrays', function(){
+	it('can merge two identical arrays', () => {
 		verb.core.Vec.sortedSetUnion([1,2],[1,2]).should.be.eql([1,2]);
 	});
 
-	it('can merge two differing arrays', function(){
+	it('can merge two differing arrays', () => {
 		verb.core.Vec.sortedSetUnion([1,2,3],[1,2,5,6]).should.be.eql([1,2,3,5,6]);
 		verb.core.Vec.sortedSetUnion([1,3],[1,2,5,6]).should.be.eql([1,2,3,5,6]);
 		verb.core.Vec.sortedSetUnion([1,27],[1,2,5,6]).should.be.eql([1,2,5,6,27]);
@@ -795,21 +795,21 @@ describe("verb.core.Vec.sortedSetUnion",function(){
 	});
  });
 
-describe("verb.core.Vec.sortedSetSub",function(){
+describe("verb.core.Vec.sortedSetSub", () => {
 
-  	it('can handle two empty arrays', function(){
+  	it('can handle two empty arrays', () => {
  		verb.core.Vec.sortedSetSub([],[]).should.be.eql([]);
   	});
 
- 	it('can subtract empty array from non-empty array', function(){
+ 	it('can subtract empty array from non-empty array', () => {
  		verb.core.Vec.sortedSetSub([1,2],[]).should.be.eql([1,2]);
  	});
 
- 	it('can subtract two identical arrays', function(){
+ 	it('can subtract two identical arrays', () => {
 		verb.core.Vec.sortedSetSub([1,2],[1,2]).should.be.eql([]);
  	});
 
- 	it('can subtract two non-equal arrays', function(){
+ 	it('can subtract two non-equal arrays', () => {
 		verb.core.Vec.sortedSetSub([1,2],[1]).should.be.eql([2]);
 		verb.core.Vec.sortedSetSub([1,2,3],[1,3]).should.be.eql([2]);
 		verb.core.Vec.sortedSetSub([-1,1,2,3],[1,3]).should.be.eql([-1,2]);
@@ -819,8 +819,8 @@ describe("verb.core.Vec.sortedSetSub",function(){
   });
 
 
-describe("verb.core.Mat.mult",function(){
-    it('works for a few basic cases', function(){
+describe("verb.core.Mat.mult", () => {
+    it('works for a few basic cases', () => {
         var mat = [[1,2], [2,3]];
 
         verb.core.Mat.mult( verb.core.Mat.identity(2), mat ).should.eql( mat );
