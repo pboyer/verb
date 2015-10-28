@@ -44,7 +44,6 @@ module.exports = function(grunt) {
           quiet: false // Optionally suppress output to standard out (defaults to false)
         },
         src: ['test/testCore.js', 'test/testEval.js', 'test/testGeom.js']
-        //src: ['test/testEval.js']
       }
     },
 
