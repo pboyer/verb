@@ -20,8 +20,6 @@ function last(a){
 	return a[a.length-1];
 }
 
-
-
 describe("verb.eval.Eval.knotSpanGivenN",function(){
 
 	it('returns correct result', function(){
@@ -3862,78 +3860,86 @@ describe("verb.eval.Make.rationalInterpCurve",function(){
 
 describe("verb.eval.Eval.surfaceRegularSamplePoints",function(){
 
-	function getComplexSurface(){
+    function getComplexSurface(){
 
-		var degree = 3
-			, knots = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
-			, pts = [ 	[ [0, 0, -10], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] , 	[40, 0, 0], [50, 0, 0] ],
-						[ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] , [40, -10, 0], [50, -10, 0]	],
-						[ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] , [40, -20, -2], [50, -20, 0] 	],
-						[ [0, -30, 0], 	[10, -30, 0], 	[20, -30, -23], 	[30, -30, 0] , [40, -30, 0], [50, -30, 0]     ],
-						[ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , [40, -40, -20], [50, -40, 0]     ],
-						[ [0, -50, 12], [10, -50, 0], 	[20, -50, 0], 	[30, -50, 0] , [50, -50, 0], [50, -50, -15]     ],     ]
-			, wts = [ 	[ 1, 1, 1, 1, 1, 1],
-						[ 1, 1, 1, 1, 1, 1],
-						[ 1, 1, 1, 1, 1, 1],
-						[ 1, 1, 1, 1, 1, 1],
-						[ 1, 1, 1, 1, 1, 1],
-						[ 1, 1, 1, 1, 1, 1] ];
+        var degree = 3
+            , knots = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
+            , pts = [ 	[ [0, 0, -10], 	[10, 0, 0], 	[20, 0, 0], 	[30, 0, 0] , 	[40, 0, 0], [50, 0, 0] ],
+                        [ [0, -10, 0], 	[10, -10, 10], 	[20, -10, 10], 	[30, -10, 0] , [40, -10, 0], [50, -10, 0]	],
+                        [ [0, -20, 0], 	[10, -20, 10], 	[20, -20, 10], 	[30, -20, 0] , [40, -20, -2], [50, -20, 0] 	],
+                        [ [0, -30, 0], 	[10, -30, 0], 	[20, -30, -23], 	[30, -30, 0] , [40, -30, 0], [50, -30, 0]     ],
+                        [ [0, -40, 0], 	[10, -40, 0], 	[20, -40, 0], 	[30, -40, 4] , [40, -40, -20], [50, -40, 0]     ],
+                        [ [0, -50, 12], [10, -50, 0], 	[20, -50, 0], 	[30, -50, 0] , [50, -50, 0], [50, -50, -15]     ],     ]
+            , wts = [ 	[ 1, 1, 1, 1, 1, 1],
+                        [ 1, 1, 1, 1, 1, 1],
+                        [ 1, 1, 1, 1, 1, 1],
+                        [ 1, 1, 1, 1, 1, 1],
+                        [ 1, 1, 1, 1, 1, 1],
+                        [ 1, 1, 1, 1, 1, 1] ];
 
-		pts = verb.eval.Eval.homogenize2d(pts, wts);
+        pts = verb.eval.Eval.homogenize2d(pts, wts);
 
-		var srfObj = {
-			degreeU : degree,
-			degreeV : degree,
-			knotsU : knots,
-			knotsV : knots,
-			controlPoints : pts
-		};
+        var srfObj = {
+            degreeU : degree,
+            degreeV : degree,
+            knotsU : knots,
+            knotsV : knots,
+            controlPoints : pts
+        };
 
-		return srfObj;
-	}
+        return srfObj;
+    }
 
-	it('returns correct result for simple surface', function(){
+    var complexSurface = getComplexSurface();
 
-		t0 = process.hrtime();
+	it('returns correct result for complex surface', function(){
 
-		var p = verb.eval.Eval.surfaceRegularSamplePoints( getComplexSurface(), 10, 10 );
+		var p = verb.eval.Eval.surfaceRegularSamplePoints( complexSurface, 10, 10 );
 
-		t1 =  process.hrtime(t0);
+        var ar = [];
+		var sp = 1 / 10;
 
-		console.info("Execution time (hr): %ds %dms", t1[0], t1[1]/1000000);
+		var i, j;
 
-		console.log( JSON.stringify( p[0].slice(0,5) ))
-
-
-
-	});
-});
-
-describe("verb.eval.Eval.curveRegularSample",function(){
-
-	it('returns correct result for simple surface', function(){
-
-		var crv = verb.eval.Make.rationalBezierCurve( [[0,0,0], [1,1,1], [2,1,1], [3,1,0]] );
-
-		var divs = 10;
-		var p = verb.eval.Eval.curveRegularSamplePoints( crv, divs );
-
-		console.log(p);
-
-		console.log("++++++++++++");
-
-		var sp = 1.0 / divs;
-		var pts = [];
-
-		for (var i = 0; i < divs+1; i++){
-
-			pts.push( verb.eval.Eval.rationalCurvePoint(crv, i * sp) )
-
+		for (i = 0; i < 11; i++){
+			var ari = [];
+			ar.push(ari);
+			for (var j = 0; j < 11; j++){
+				ari.push( verb.eval.Eval.surfacePoint( complexSurface, i*sp, j*sp ) )
+			}
 		}
 
-		console.log(pts);
+        p.length.should.equal(ar.length);
 
+        for (i = 0; i < ar.length; i++){
 
+            p[i].length.should.equal(ar[i].length);
+
+            for (j = 0; j < ar[i].length; j++){
+                vecShouldBe( p[i][j], ar[i][j] );
+            }
+        }
 	});
 });
 
+describe("verb.eval.Eval.rationalBezierCurveRegularSample",function(){
+	it('returns correct result for basic bezier curve', function(){
+		var crv = verb.eval.Make.rationalBezierCurve( [[0,0,0], [1,1,1], [2,1,1], [3,1,0]] );
+
+		var divs = 200;
+		var p = verb.eval.Eval.rationalBezierCurveRegularSamplePoints( crv, divs );
+
+        var p2 = [];
+        var sp = 1 / divs;
+
+        for (var i = 0; i < divs+1; i++){
+            p2.push( verb.eval.Eval.rationalCurvePoint( crv, i*sp ) )
+        }
+
+        p.length.should.equal(p2.length);
+
+        for (var i = 0; i < p.length; i++){
+            vecShouldBe( p[i], p2[i] );
+        }
+	});
+});

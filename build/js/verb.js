@@ -4259,51 +4259,79 @@ verb_eval_Eval.surfacePointGivenNM = function(n,m,surface,u,v) {
 	}
 	return position;
 };
-verb_eval_Eval.curveRegularSamplePoints = function(crv,divs) {
-	var derivs = verb_eval_Eval.curveDerivatives(crv,crv.knots[0],crv.degree);
-	var t = 1.0 / divs;
-	var temp = t * t;
-	var f = derivs[0];
-	var fd = verb_core_Vec.mul(t,derivs[1]);
-	var fdd_per2 = verb_core_Vec.mul(temp * 0.5,derivs[2]);
-	var fddd_per2 = verb_core_Vec.mul(temp * t * 0.5,derivs[3]);
-	var fdd = verb_core_Vec.add(fdd_per2,fdd_per2);
-	var fddd = verb_core_Vec.add(fddd_per2,fddd_per2);
-	var fddd_per6 = verb_core_Vec.mul(0.333333333333333315,fddd_per2);
+verb_eval_Eval.rationalBezierCurveRegularSamplePoints = function(crv,divs) {
 	var pts = [];
-	var _g1 = 0;
-	var _g = divs + 1;
-	while(_g1 < _g) {
-		var i = _g1++;
-		pts.push(verb_eval_Eval.dehomogenize(f));
-		verb_core_Vec.addAllMutate([f,fd,fdd_per2,fddd_per6]);
-		verb_core_Vec.addAllMutate([fd,fdd,fddd_per2]);
-		verb_core_Vec.addAllMutate([fdd,fddd]);
-		verb_core_Vec.addAllMutate([fdd_per2,fddd_per2]);
+	verb_eval_Eval.rationalBezierCurveRegularSamplePointsMutate(crv,divs,pts);
+	return pts;
+};
+verb_eval_Eval.rationalBezierCurveRegularSamplePointsMutate = function(crv,divs,pts) {
+	var t = 1.0 / divs;
+	var its = [];
+	var ts = [its];
+	var u = crv.knots[0];
+	var degree1 = crv.degree + 1;
+	var _g = 0;
+	while(_g < degree1) {
+		var i = _g++;
+		its.push(verb_eval_Eval.curvePoint(crv,u));
+		u += t;
+	}
+	var prev;
+	var _g1 = 1;
+	while(_g1 < degree1) {
+		var i1 = _g1++;
+		its = [];
+		ts.push(its);
+		prev = ts[i1 - 1];
+		var _g2 = 1;
+		var _g11 = prev.length;
+		while(_g2 < _g11) {
+			var j = _g2++;
+			its.push(verb_core_Vec.sub(prev[j],prev[j - 1]));
+		}
+	}
+	var _g3 = 0;
+	var _g12 = ts[0];
+	while(_g3 < _g12.length) {
+		var pt = _g12[_g3];
+		++_g3;
+		pts.push(verb_eval_Eval.dehomogenize(pt));
+	}
+	var front;
+	var _g4 = [];
+	var _g13 = 0;
+	while(_g13 < ts.length) {
+		var r = ts[_g13];
+		++_g13;
+		_g4.push(verb_core_ArrayExtensions.last(r));
+	}
+	front = _g4;
+	var k;
+	var _g21 = 0;
+	var _g14 = divs + 1 - degree1;
+	while(_g21 < _g14) {
+		var i2 = _g21++;
+		var _g41 = 0;
+		var _g31 = front.length - 1;
+		while(_g41 < _g31) {
+			var j1 = _g41++;
+			k = front.length - 2 - j1;
+			verb_core_Vec.addMutate(front[k],front[k + 1]);
+		}
+		pts.push(verb_eval_Eval.dehomogenize(front[0]));
 	}
 	return pts;
 };
-verb_eval_Eval.curveRegularSamplePoints2 = function(crv,divs) {
-	var derivs = verb_eval_Eval.curveDerivatives(crv,crv.knots[0],crv.degree);
-	var t = 1.0 / divs;
-	var temp = t * t;
-	var f = derivs[0];
-	var fd = verb_core_Vec.mul(t,derivs[1]);
-	var fdd_per2 = verb_core_Vec.mul(temp * 0.5,derivs[2]);
-	var fddd_per2 = verb_core_Vec.mul(temp * t * 0.5,derivs[3]);
-	var fdd = verb_core_Vec.add(fdd_per2,fdd_per2);
-	var fddd = verb_core_Vec.add(fddd_per2,fddd_per2);
-	var fddd_per6 = verb_core_Vec.mul(0.333333333333333315,fddd_per2);
+verb_eval_Eval.rationalCurveRegularSamplePoints = function(crv,divs) {
+	var beziers = verb_eval_Modify.decomposeCurveIntoBeziers(crv);
 	var pts = [];
 	var _g1 = 0;
-	var _g = divs + 1;
+	var _g = beziers.length;
 	while(_g1 < _g) {
 		var i = _g1++;
-		pts.push(verb_eval_Eval.dehomogenize(f));
-		verb_core_Vec.addAllMutate([f,fd,fdd_per2,fddd_per6]);
-		verb_core_Vec.addAllMutate([fd,fdd,fddd_per2]);
-		verb_core_Vec.addAllMutate([fdd,fddd]);
-		verb_core_Vec.addAllMutate([fdd_per2,fddd_per2]);
+		verb_eval_Eval.rationalBezierCurveRegularSamplePointsMutate(beziers[i],divs,pts);
+		if(i == beziers.length - 1) continue;
+		pts.pop();
 	}
 	return pts;
 };
@@ -6347,7 +6375,7 @@ verb_eval_Modify.curveKnotInsert = function(curve,u,r) {
 		while(_g31 < _g21) {
 			var i7 = _g31++;
 			alpha = (u - knots[L + i7]) / (knots[i7 + k + 1] - knots[L + i7]);
-			controlPoints_temp[i7] = verb_core_Vec.add(verb_core_Vec.mul(alpha,controlPoints_temp[i7 + 1]),verb_core_Vec.mul(1.0 - alpha,controlPoints_temp[i7]));
+			controlPoints_temp[i7] = verb_core_Vec.add(verb_core_Vec.mul(1.0 - alpha,controlPoints_temp[i7]),verb_core_Vec.mul(alpha,controlPoints_temp[i7 + 1]));
 		}
 		controlPoints_post[L] = controlPoints_temp[0];
 		controlPoints_post[k + r - j - s] = controlPoints_temp[degree - j - s];

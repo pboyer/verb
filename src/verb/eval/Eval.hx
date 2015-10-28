@@ -289,7 +289,7 @@ class Eval {
 
     }
 
-    //Compute a point on a non-uniform, non-rational B spline surface
+    // Compute a point on a non-uniform, non-rational B spline surface
     // (corresponds to algorithm 3.5 from The NURBS book, Piegl & Tiller 2nd edition)
     //
     //**params**
@@ -345,78 +345,94 @@ class Eval {
         return position;
     }
 
-    public static function curveRegularSamplePoints( crv : NurbsCurveData, divs : Int ){
+    // Compute a regularly spaced sequence of points on a non-uniform, rational, bezier curve. Generally, this algorithm
+    // is much faster than computing these points directly. This algorithm is based on the forward difference algorithm
+    // presented in chapter 4 of
+    // [T. W. Sederberg, BYU, Computer Aided Geometric Design Course Notes](http://cagd.cs.byu.edu/~557/text/cagd.pdf)
+    //
+    //**params**
+    //
+    //* NurbsCurveData object representing the curve
+    //* number of divisions
+    //
+    //**returns**
+    //
+    //* an array of (divs+1) points
 
-        // initialize the derivative set
-
-        var derivs = curveDerivatives( crv, crv.knots[0], crv.degree );
-
-        // expand the taylor series
-
-        var t = 1.0 / divs;
-        var temp = t * t;
-
-        var f = derivs[0];
-        var fd = Vec.mul(t, derivs[1] );
-        var fdd_per2 = Vec.mul( temp * 0.5, derivs[2] );
-        var fddd_per2 = Vec.mul( temp * t * 0.5, derivs[3] );
-
-        var fdd = Vec.add( fdd_per2, fdd_per2 );
-        var fddd = Vec.add( fddd_per2, fddd_per2 );
-        var fddd_per6 = Vec.mul( 1/3, fddd_per2 );
-
-        // evaluate the points
+    public static function rationalBezierCurveRegularSamplePoints( crv : NurbsCurveData, divs : Int ) : Array<Point> {
         var pts = [];
-
-        for (i in 0...divs+1){
-
-            pts.push(dehomogenize(f));
-
-            Vec.addAllMutate([ f, fd, fdd_per2, fddd_per6 ]);
-            Vec.addAllMutate([ fd, fdd, fddd_per2 ]);
-            Vec.addAllMutate([ fdd, fddd ]);
-            Vec.addAllMutate([ fdd_per2, fddd_per2 ]);
-        }
-
+        rationalBezierCurveRegularSamplePointsMutate( crv, divs, pts );
         return pts;
-
     }
 
-    public static function curveRegularSamplePoints2( crv : NurbsCurveData, divs : Int ){
+    private static function rationalBezierCurveRegularSamplePointsMutate( crv : NurbsCurveData, divs : Int, pts : Array<Point> ) {
 
-        // initialize the derivative set
+        // get the step size
 
-        var derivs = curveDerivatives( crv, crv.knots[0], crv.degree );
+        var t = ( crv.knots.last() - crv.knots[0] ) / divs;
 
-        // expand the taylor series
+        // initialize forward differencing
 
-        var t = 1.0 / divs;
-        var temp = t * t;
+        var its = [], ts = [its], u = crv.knots[0], degree1 = crv.degree+1;
 
-        var f = derivs[0];
-        var fd = Vec.mul(t, derivs[1] );
-        var fdd_per2 = Vec.mul( temp * 0.5, derivs[2] );
-        var fddd_per2 = Vec.mul( temp * t * 0.5, derivs[3] );
+        for (i in 0...degree1){
+            its.push( curvePoint( crv, u ) );
+            u += t;
+        }
 
-        var fdd = Vec.add( fdd_per2, fdd_per2 );
-        var fddd = Vec.add( fddd_per2, fddd_per2 );
-        var fddd_per6 = Vec.mul( 1/3, fddd_per2 );
+        // compute the differences
+
+        var prev;
+
+        for (i in 1...degree1){
+            its = [];
+            ts.push(its);
+            prev = ts[i-1];
+            for (j in 1...prev.length){
+                its.push( Vec.sub( prev[j], prev[j-1] ) );
+            }
+        }
 
         // evaluate the points
-        var pts = [];
 
-        for (i in 0...divs+1){
+        for (pt in ts[0]){
+            pts.push( dehomogenize(pt) );
+        }
 
-            pts.push(dehomogenize(f));
+        var front = [ for (r in ts) r.last() ], k;
 
-            Vec.addAllMutate([ f, fd, fdd_per2, fddd_per6 ]);
-            Vec.addAllMutate([ fd, fdd, fddd_per2 ]);
-            Vec.addAllMutate([ fdd, fddd ]);
-            Vec.addAllMutate([ fdd_per2, fddd_per2 ]);
+        for (i in 0...divs+1-degree1){
+
+            // Rright = R + Rdown
+
+            // compute the new forward difference front
+
+            for (j in 0...front.length-1){
+                k = front.length - 2 - j; // invert
+                Vec.addMutate(front[k], front[k+1]);
+            }
+
+            // add the new pt
+            pts.push(dehomogenize( front[0] ));
         }
 
         return pts;
+    }
 
+    public static function rationalCurveRegularSamplePoints( crv : NurbsCurveData, divs : Int ) : Array<Point> {
+
+        var range = crv.knots.last() - crv.knots.length;
+        var beziers = Modify.decomposeCurveIntoBeziers( crv );
+        var pts = [];
+
+        for (i in 0...beziers.length){
+            rationalBezierCurveRegularSamplePointsMutate( beziers[i], divs, pts );
+            if (i == beziers.length-1)
+                continue;
+            pts.pop();
+        }
+
+        return pts;
     }
 
     // Compute a regularly spaced grid of derivatives on a non-uniform, rational, B spline surface. Generally, this algorithm

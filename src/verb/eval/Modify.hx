@@ -664,8 +664,8 @@ class Modify {
                 alpha = ( u - knots[L+i] ) / ( knots[i+k+1] - knots[L+i] );
 
                 controlPoints_temp[i] = Vec.add(
-                        Vec.mul( alpha, controlPoints_temp[i+1] ),
-                        Vec.mul( (1.0 - alpha), controlPoints_temp[i])
+                        Vec.mul( (1.0 - alpha), controlPoints_temp[i]),
+                        Vec.mul( alpha, controlPoints_temp[i+1] )
                     );
             }
 
