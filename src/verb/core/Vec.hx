@@ -174,6 +174,11 @@ class Vec {
             a[i] = a[i] - b[i];
     }
 
+    public static function mulMutate(a : Float, b : Array<Float>) {
+        for (i in 0...b.length)
+            b[i] = b[i] * a;
+    }
+
     public static function norm(a : Iterable<Float> ) : Float {
         var norm2 = normSquared(a);
         return norm2 != 0.0 ? Math.sqrt( norm2 ) : norm2;

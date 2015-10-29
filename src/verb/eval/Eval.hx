@@ -82,22 +82,23 @@ class Eval {
                 var v = Aders[k][l];
 
                 for (j in 1...l+1){
-                    Vec.subMutate( v, Vec.mul( Binomial.get(l, j) * wders[0][j], SKL[k][l-j] ) );
+                    Vec.subMulMutate( v, Binomial.get(l, j) * wders[0][j], SKL[k][l-j] );
                 }
 
                 for (i in 1...k+1){
-                    Vec.subMutate( v, Vec.mul( Binomial.get(k, i) * wders[i][0], SKL[k-i][l] ) );
+                    Vec.subMulMutate( v, Binomial.get(k, i) * wders[i][0], SKL[k-i][l] );
 
                     var v2 = Vec.zeros1d(dim);
 
                     for (j in 1...l+1){
-                        Vec.addMutate( v2, Vec.mul( Binomial.get(l, j) * wders[i][j], SKL[k-i][l-j] ) );
+                        Vec.addMulMutate( v2, Binomial.get(l, j) * wders[i][j], SKL[k-i][l-j] );
                     }
 
-                    Vec.subMutate( v, Vec.mul( Binomial.get(k, i), v2) );
+                    Vec.subMulMutate( v, Binomial.get(k, i), v2 );
                 }
 
-                SKL[k].push( Vec.mul(1 / wders[0][0], v )); //demogenize
+                Vec.mulMutate(1 / wders[0][0], v );
+                SKL[k].push( v ); //demogenize
             }
         }
 
@@ -152,7 +153,9 @@ class Eval {
             for (i in 1...k+1) {
                 Vec.subMulMutate( v, Binomial.get(k, i) * wders[i], CK[k-i] );
             }
-            CK.push( Vec.mul(1/wders[0], v )); //demogenize
+            
+            Vec.mulMutate( 1/wders[0], v );
+            CK.push( v ); //demogenize
         }
 
         return CK;
@@ -361,8 +364,6 @@ class Eval {
 
     public static function rationalCurveRegularSamplePoints( crv : NurbsCurveData, divs : Int ) : Array<Point> {
 
-        // TODO if the number of steps is less than the degree+1, just evaluate and return as forward differencing won't work
-
         var range = crv.knots.last() - crv.knots[0];
         var beziers = Modify.decomposeCurveIntoBeziers( crv );
         var pts = [];
@@ -453,8 +454,6 @@ class Eval {
             // add the new pt
             pts.push(dehomogenize( front[0] ));
         }
-
-
     }
 
     // Compute a regularly spaced grid of derivatives on a non-uniform, rational, B spline surface. Generally, this algorithm
@@ -515,8 +514,9 @@ class Eval {
                             Vec.subMulMutate( v, Binomial.get(k, i), v2 );
 
                         }
-
-                        SKL[k].push( Vec.mul(1 / wders[0][0], v )); //demogenize
+                            
+                        Vec.mulMutate(1 / wders[0][0], v );
+                        SKL[k].push( v ); //demogenize
                     }
                 }
 
