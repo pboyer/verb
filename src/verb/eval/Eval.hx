@@ -636,6 +636,23 @@ class Eval {
         return pts;
     }
 
+    public static function surfaceRegularSamplePoints2( surface : NurbsSurfaceData, divsU : Int, divsV : Int ) : Array<Array<Point>> {
+        
+        var pts = [];
+   
+        // TODO dir is prob wrong
+        var u = surface.knotsU[0];
+        var t = (surface.knotsU.last() - surface.knotsU[0]) / divsU;
+
+        for (i in 0...divsU){
+            var iso = Make.surfaceIsocurve( surface, u, true );
+            pts.push( rationalCurveRegularSamplePoints( iso, divsV ) );
+            u += t;
+        }
+    
+        return pts;
+    }
+
     private static function regularlySpacedBasisFunctions( degree : Int, knots : KnotArray, divs : Int ) : Pair<Array<Int>, Array<Array<Float>>> {
 
         var n : Int = knots.length - degree - 2;

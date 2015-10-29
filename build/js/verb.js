@@ -4484,6 +4484,19 @@ verb_eval_Eval.surfaceRegularSamplePoints = function(surface,divsU,divsV) {
 	}
 	return pts;
 };
+verb_eval_Eval.surfaceRegularSamplePoints2 = function(surface,divsU,divsV) {
+	var pts = [];
+	var u = surface.knotsU[0];
+	var t = (verb_core_ArrayExtensions.last(surface.knotsU) - surface.knotsU[0]) / divsU;
+	var _g = 0;
+	while(_g < divsU) {
+		var i = _g++;
+		var iso = verb_eval_Make.surfaceIsocurve(surface,u,true);
+		pts.push(verb_eval_Eval.rationalCurveRegularSamplePoints(iso,divsV));
+		u += t;
+	}
+	return pts;
+};
 verb_eval_Eval.regularlySpacedBasisFunctions = function(degree,knots,divs) {
 	var n = knots.length - degree - 2;
 	var span = (verb_core_ArrayExtensions.last(knots) - knots[0]) / divs;
