@@ -3443,6 +3443,14 @@ verb_core_Vec.subMutate = function(a,b) {
 		a[i] = a[i] - b[i];
 	}
 };
+verb_core_Vec.mulMutate = function(a,b) {
+	var _g1 = 0;
+	var _g = b.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		b[i] = b[i] * a;
+	}
+};
 verb_core_Vec.norm = function(a) {
 	var norm2 = verb_core_Vec.normSquared(a);
 	if(norm2 != 0.0) return Math.sqrt(norm2); else return norm2;
@@ -4050,23 +4058,24 @@ verb_eval_Eval.rationalSurfaceDerivatives = function(surface,u,v,numDerivs) {
 			var _g4 = l + 1;
 			while(_g5 < _g4) {
 				var j = _g5++;
-				verb_core_Vec.subMutate(v1,verb_core_Vec.mul(verb_core_Binomial.get(l,j) * wders[0][j],SKL[k][l - j]));
+				verb_core_Vec.subMulMutate(v1,verb_core_Binomial.get(l,j) * wders[0][j],SKL[k][l - j]);
 			}
 			var _g51 = 1;
 			var _g41 = k + 1;
 			while(_g51 < _g41) {
 				var i = _g51++;
-				verb_core_Vec.subMutate(v1,verb_core_Vec.mul(verb_core_Binomial.get(k,i) * wders[i][0],SKL[k - i][l]));
+				verb_core_Vec.subMulMutate(v1,verb_core_Binomial.get(k,i) * wders[i][0],SKL[k - i][l]);
 				var v2 = verb_core_Vec.zeros1d(dim);
 				var _g7 = 1;
 				var _g6 = l + 1;
 				while(_g7 < _g6) {
 					var j1 = _g7++;
-					verb_core_Vec.addMutate(v2,verb_core_Vec.mul(verb_core_Binomial.get(l,j1) * wders[i][j1],SKL[k - i][l - j1]));
+					verb_core_Vec.addMulMutate(v2,verb_core_Binomial.get(l,j1) * wders[i][j1],SKL[k - i][l - j1]);
 				}
-				verb_core_Vec.subMutate(v1,verb_core_Vec.mul(verb_core_Binomial.get(k,i),v2));
+				verb_core_Vec.subMulMutate(v1,verb_core_Binomial.get(k,i),v2);
 			}
-			SKL[k].push(verb_core_Vec.mul(1 / wders[0][0],v1));
+			verb_core_Vec.mulMutate(1 / wders[0][0],v1);
+			SKL[k].push(v1);
 		}
 	}
 	return SKL;
@@ -4093,7 +4102,8 @@ verb_eval_Eval.rationalCurveDerivatives = function(curve,u,numDerivs) {
 			var i1 = _g3++;
 			verb_core_Vec.subMulMutate(v,verb_core_Binomial.get(k1,i1) * wders[i1],CK[k1 - i1]);
 		}
-		CK.push(verb_core_Vec.mul(1 / wders[0],v));
+		verb_core_Vec.mulMutate(1 / wders[0],v);
+		CK.push(v);
 	}
 	return CK;
 };
@@ -4290,7 +4300,8 @@ verb_eval_Eval.rationalSurfaceRegularSampleDerivatives = function(surface,divsU,
 						}
 						verb_core_Vec.subMulMutate(v,verb_core_Binomial.get(k,i1),v2);
 					}
-					SKL[k].push(verb_core_Vec.mul(1 / wders[0][0],v));
+					verb_core_Vec.mulMutate(1 / wders[0][0],v);
+					SKL[k].push(v);
 				}
 			}
 			rowders.push(SKL);

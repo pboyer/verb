@@ -82,22 +82,23 @@ class Eval {
                 var v = Aders[k][l];
 
                 for (j in 1...l+1){
-                    Vec.subMutate( v, Vec.mul( Binomial.get(l, j) * wders[0][j], SKL[k][l-j] ) );
+                    Vec.subMulMutate( v, Binomial.get(l, j) * wders[0][j], SKL[k][l-j] );
                 }
 
                 for (i in 1...k+1){
-                    Vec.subMutate( v, Vec.mul( Binomial.get(k, i) * wders[i][0], SKL[k-i][l] ) );
+                    Vec.subMulMutate( v, Binomial.get(k, i) * wders[i][0], SKL[k-i][l] );
 
                     var v2 = Vec.zeros1d(dim);
 
                     for (j in 1...l+1){
-                        Vec.addMutate( v2, Vec.mul( Binomial.get(l, j) * wders[i][j], SKL[k-i][l-j] ) );
+                        Vec.addMulMutate( v2, Binomial.get(l, j) * wders[i][j], SKL[k-i][l-j] );
                     }
 
-                    Vec.subMutate( v, Vec.mul( Binomial.get(k, i), v2) );
+                    Vec.subMulMutate( v, Binomial.get(k, i), v2 );
                 }
 
-                SKL[k].push( Vec.mul(1 / wders[0][0], v )); //demogenize
+                Vec.mulMutate(1 / wders[0][0], v );
+                SKL[k].push( v ); //demogenize
             }
         }
 
@@ -152,7 +153,9 @@ class Eval {
             for (i in 1...k+1) {
                 Vec.subMulMutate( v, Binomial.get(k, i) * wders[i], CK[k-i] );
             }
-            CK.push( Vec.mul(1/wders[0], v )); //demogenize
+            
+            Vec.mulMutate( 1/wders[0], v );
+            CK.push( v ); //demogenize
         }
 
         return CK;
@@ -348,7 +351,6 @@ class Eval {
     public static function curveRegularSamplePoints( crv : NurbsCurveData, divs : Int ){
 
         // initialize the derivative set
-
         var derivs = curveDerivatives( crv, crv.knots[0], crv.degree );
 
         // expand the taylor series
@@ -385,7 +387,6 @@ class Eval {
     public static function curveRegularSamplePoints2( crv : NurbsCurveData, divs : Int ){
 
         // initialize the derivative set
-
         var derivs = curveDerivatives( crv, crv.knots[0], crv.degree );
 
         // expand the taylor series
@@ -406,7 +407,6 @@ class Eval {
         var pts = [];
 
         for (i in 0...divs+1){
-
             pts.push(dehomogenize(f));
 
             Vec.addAllMutate([ f, fd, fdd_per2, fddd_per6 ]);
@@ -416,7 +416,6 @@ class Eval {
         }
 
         return pts;
-
     }
 
     // Compute a regularly spaced grid of derivatives on a non-uniform, rational, B spline surface. Generally, this algorithm
@@ -477,8 +476,9 @@ class Eval {
                             Vec.subMulMutate( v, Binomial.get(k, i), v2 );
 
                         }
-
-                        SKL[k].push( Vec.mul(1 / wders[0][0], v )); //demogenize
+                            
+                        Vec.mulMutate(1 / wders[0][0], v );
+                        SKL[k].push( v ); //demogenize
                     }
                 }
 
