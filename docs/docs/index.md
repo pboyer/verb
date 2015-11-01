@@ -35,7 +35,7 @@ verb compiles for:
 
 ## Getting started
 
-Install <a href="http://haxe.org/">haxe</a> and <a href="http://haxe.org/">node.js</a>
+Install <a href="http://haxe.org/">haxe</a> and <a href="http://nodejs.org/">node.js</a>
 
 You should have installed **haxe 3.2.1** and **node.js 4.2.1**. If you're using OS X, ensure that you have installed XCode 7.
 
@@ -59,9 +59,9 @@ You can install verb with npm
     
 You can use verb with require.js (AMD) or browserify (commonjs) in the browser or in node.js.
 
-Pre-compiled JavaScript can be found in [build/js](https://github.com/pboyer/verb/blob/master/build/js].
+Pre-compiled JavaScript can be found in [build/js](https://github.com/pboyer/verb/blob/master/build/js).
 
-You'll find many usage examples in the [examples directory](https://github.com/pboyer/verb/blob/master/examples].
+You'll find many usage examples in the [examples directory](https://github.com/pboyer/verb/blob/master/examples).
 
 ## Compiling for JavaScript
 
@@ -128,4 +128,4 @@ verb does not currently compile for Java. It probably wouldn't be hard to do - [
 ## Using verb with three.js
 
 You can find good examples of using verb with three in the examples directory. There's an example code showing how
-to convert verb geometric types in to three.js Meshes and Lines [here](https://github.com/pboyer/verb/blob/master/examples/js/verbToThreeConversion.js).
+to convert verb geometric types in to three.js Meshes and Lines [in the verb examples](https://github.com/pboyer/verb/blob/master/examples/js/verbToThreeConversion.js).

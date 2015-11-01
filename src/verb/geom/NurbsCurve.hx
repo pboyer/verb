@@ -26,8 +26,9 @@ import verb.core.Serialization;
 // be used to obtain a simplified NurbsCurveData object that can be used with `verb.core` or for serialization purposes.
 //
 // Under the hood, this type takes advantage of verb's asynchronous runtime using the _Async methods. Calling one of these
-// methods returns a `Promise` that respect the  You can find further documentation for this type at
-// [https://github.com/jdonaldson/promhx](https://github.com/jdonaldson/promhx).
+// methods returns a `Promise` instead of the value. This allows you to run the computation in a background thread and obtain the value asynchronously.
+//
+// You can find further documentation for using `Promise`'s at [https://github.com/jdonaldson/promhx](https://github.com/jdonaldson/promhx).
 
 @:expose("geom.NurbsCurve")
 class NurbsCurve extends SerializableBase implements ICurve {
