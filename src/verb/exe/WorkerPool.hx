@@ -23,17 +23,17 @@ class WorkerPool {
     //* the number of `Worker` threads to form
     //* the filename of verb's javascript file - defaults to "verb.js". The final path is formed by concatenating `WorkerPool.basePath` and this.
 
-    public function new(numThreads : Int = 1, fileName : String = "verb.js") {
+    public function new( numThreads : Int = 1, fileName : String = "verb.js" ) {
 
-        for (i in 0...numThreads) {
+        for ( i in 0...numThreads ) {
             var w : Worker;
             try {
                 w = new Worker( basePath + fileName );
-            } catch (e : Dynamic) {
-                w = new Worker( basePath + fileName.substring(0, -3) + ".min.js" );
+            } catch ( e : Dynamic ) {
+                w = new Worker( basePath + fileName.substring( 0, -3 ) + ".min.js" );
             }
 
-            _pool.push(w);
+            _pool.push( w );
         }
     }
 
@@ -43,48 +43,48 @@ class WorkerPool {
 
     // Add work to perform to the queue
 
-    public function addWork(className : String,
-                            methodName : String,
-                            args : Array<Dynamic>,
-                            callback : Dynamic) : Void {
+    public function addWork( className : String,
+                             methodName : String,
+                             args : Array<Dynamic>,
+                             callback : Dynamic ) : Void {
 
         var work = new Work( className, methodName, args );
-        _callbacks.set(work.id, callback);
-        _queue.push(work);
+        _callbacks.set( work.id, callback );
+        _queue.push( work );
 
-        processQueue();
+        processQueue( );
     }
 
-    private function processQueue() {
+    private function processQueue( ) {
 
-        while (_queue.length > 0 && _pool.length > 0) {
+        while ( _queue.length > 0 && _pool.length > 0 ) {
 
-            var work = _queue.shift();
+            var work = _queue.shift( );
             var workId = work.id;
 
-            var worker = _pool.shift();
+            var worker = _pool.shift( );
 
-            _working.set(workId, worker);
+            _working.set( workId, worker );
 
             //upon completing your task...
-            worker.onmessage = function(e) {
+            worker.onmessage = function( e ) {
 
-                _working.remove(workId);
-                _pool.push(worker);
+                _working.remove( workId );
+                _pool.push( worker );
 
                 try {
-                    if (_callbacks.exists(workId)) {
-                        _callbacks.get(workId)(e.data.result);
-                        _callbacks.remove(workId);
+                    if ( _callbacks.exists( workId ) ) {
+                        _callbacks.get( workId )( e.data.result );
+                        _callbacks.remove( workId );
                     }
-                } catch (error : Dynamic) {
-                    trace(error);
+                } catch ( error : Dynamic ) {
+                    trace( error );
                 }
 
-                processQueue();
+                processQueue( );
             };
 
-            worker.postMessage(work);
+            worker.postMessage( work );
         }
     }
 
@@ -99,7 +99,7 @@ private class Work {
     public var args : Array<Dynamic>;
     public var id : Int;
 
-    public function new(className, methodName, args) {
+    public function new( className, methodName, args ) {
         this.className = className;
         this.methodName = methodName;
         this.args = args;

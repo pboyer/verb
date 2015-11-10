@@ -17,7 +17,7 @@ class BezierCurve extends NurbsCurve {
     //* Array of control points
     //* Array of control point weights (optional)
 
-    public function new(points : Array<Point>, weights : Array<Float> = null) {
-        super(Make.rationalBezierCurve(points, weights));
+    public function new( points : Array<Point>, weights : Array<Float> = null ) {
+        super( Make.rationalBezierCurve( points, weights ) );
     }
 }

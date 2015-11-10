@@ -28,14 +28,14 @@ class Intersect {
     //
     //* a possibly empty array of CurveCurveIntersection objects
 
-    public static function curves(first : ICurve, second : ICurve, tol : Float = 1e-3) : Array<CurveCurveIntersection> {
-        return verb.eval.Intersect.curves(first.asNurbs(), second.asNurbs(), tol);
+    public static function curves( first : ICurve, second : ICurve, tol : Float = 1e-3 ) : Array<CurveCurveIntersection> {
+        return verb.eval.Intersect.curves( first.asNurbs( ), second.asNurbs( ), tol );
     }
 
     // The async version of `curves`
 
-    public static function curvesAsync(first : ICurve, second : ICurve, tol : Float = 1e-3) : Promise<Array<CurveCurveIntersection>> {
-        return Dispatcher.dispatchMethod(verb.eval.Intersect, "curves", [first.asNurbs(), second.asNurbs(), tol ]);
+    public static function curvesAsync( first : ICurve, second : ICurve, tol : Float = 1e-3 ) : Promise<Array<CurveCurveIntersection>> {
+        return Dispatcher.dispatchMethod( verb.eval.Intersect, "curves", [first.asNurbs( ), second.asNurbs( ), tol ] );
     }
 
     //Determine the intersection of a curve and a surface
@@ -50,14 +50,14 @@ class Intersect {
     //
     //* array of CurveSurfaceIntersection objects
 
-    public static function curveAndSurface(curve : ICurve, surface : ISurface, tol : Float = 1e-3) : Array<CurveSurfaceIntersection> {
-        return verb.eval.Intersect.curveAndSurface(curve.asNurbs(), surface.asNurbs(), tol);
+    public static function curveAndSurface( curve : ICurve, surface : ISurface, tol : Float = 1e-3 ) : Array<CurveSurfaceIntersection> {
+        return verb.eval.Intersect.curveAndSurface( curve.asNurbs( ), surface.asNurbs( ), tol );
     }
 
     // The async version of `curveAndSurface`
 
-    public static function curveAndSurfaceAsync(curve : ICurve, surface : ISurface, tol : Float = 1e-3) : Promise<Array<CurveSurfaceIntersection>> {
-        return Dispatcher.dispatchMethod(verb.eval.Intersect, "curveAndSurface", [curve.asNurbs(), surface.asNurbs(), tol ]);
+    public static function curveAndSurfaceAsync( curve : ICurve, surface : ISurface, tol : Float = 1e-3 ) : Promise<Array<CurveSurfaceIntersection>> {
+        return Dispatcher.dispatchMethod( verb.eval.Intersect, "curveAndSurface", [curve.asNurbs( ), surface.asNurbs( ), tol ] );
     }
 
     //Determine the intersection of two surfaces
@@ -71,17 +71,17 @@ class Intersect {
     //
     //* array of NurbsCurveData objects
 
-    public static function surfaces(first : ISurface, second : ISurface, tol : Float = 1e-3) : Array<NurbsCurve> {
-        return verb.eval.Intersect.surfaces(first.asNurbs(), second.asNurbs(), tol)
-        .map(function(cd) { return new NurbsCurve(cd); });
+    public static function surfaces( first : ISurface, second : ISurface, tol : Float = 1e-3 ) : Array<NurbsCurve> {
+        return verb.eval.Intersect.surfaces( first.asNurbs( ), second.asNurbs( ), tol )
+        .map( function( cd ) { return new NurbsCurve(cd); } );
     }
 
     // The async version of `surfaces`
 
-    public static function surfacesAsync(first : ISurface, second : ISurface, tol : Float = 1e-3) : Promise<Array<NurbsCurve>> {
-        return Dispatcher.dispatchMethod(verb.eval.Intersect, "surfaces", [first.asNurbs(), second.asNurbs(), tol])
-        .then(function(cds) {
-            return cds.map(function(cd) { return new NurbsCurve(cd); });
-        });
+    public static function surfacesAsync( first : ISurface, second : ISurface, tol : Float = 1e-3 ) : Promise<Array<NurbsCurve>> {
+        return Dispatcher.dispatchMethod( verb.eval.Intersect, "surfaces", [first.asNurbs( ), second.asNurbs( ), tol] )
+        .then( function( cds ) {
+            return cds.map( function( cd ) { return new NurbsCurve(cd); } );
+        } );
     }
 }

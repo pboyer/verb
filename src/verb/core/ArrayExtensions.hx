@@ -13,10 +13,10 @@ class ArrayExtensions {
     //
     //* nothing, just mutates the given array
 
-    public static function alloc<T>(a : Array<T>, n : Int) {
-        if (n < 0) return;
-        while (a.length < n) {
-            a.push(null);
+    public static function alloc<T>( a : Array<T>, n : Int ) {
+        if ( n < 0 ) return;
+        while ( a.length < n ) {
+            a.push( null );
         }
     }
 
@@ -30,9 +30,9 @@ class ArrayExtensions {
     //
     //* a reversed copy of the array
 
-    public static function reversed<T>(a : Array<T>) : Array<T> {
-        var ac = a.copy();
-        ac.reverse();
+    public static function reversed<T>( a : Array<T> ) : Array<T> {
+        var ac = a.copy( );
+        ac.reverse( );
         return ac;
     }
 
@@ -46,7 +46,7 @@ class ArrayExtensions {
     //
     //* the last element of the array
 
-    public static function last<T>(a : Array<T>) : T {
+    public static function last<T>( a : Array<T> ) : T {
         return a[a.length - 1];
     }
 
@@ -60,13 +60,13 @@ class ArrayExtensions {
     //
     //* the last element of the array
 
-    public static function first<T>(a : Array<T>) : T {
+    public static function first<T>( a : Array<T> ) : T {
         return a[0];
     }
 
-    public static function spliceAndInsert<T>(a : Array<T>, start : Int, end : Int, ele : T) : Void {
-        a.splice(start, end);
-        a.insert(start, ele);
+    public static function spliceAndInsert<T>( a : Array<T>, start : Int, end : Int, ele : T ) : Void {
+        a.splice( start, end );
+        a.insert( start, ele );
     }
 
     //Get the first half of an array including the pivot
@@ -79,10 +79,10 @@ class ArrayExtensions {
     //
     //* the left half
 
-    public static function left<T>(arr : Array<T>) : Array<T> {
-        if (arr.length == 0) return [];
-        var len = Math.ceil(arr.length / 2);
-        return arr.slice(0, len);
+    public static function left<T>( arr : Array<T> ) : Array<T> {
+        if ( arr.length == 0 ) return [];
+        var len = Math.ceil( arr.length / 2 );
+        return arr.slice( 0, len );
     }
 
     //Get the second half of an array, not including the pivot
@@ -95,10 +95,10 @@ class ArrayExtensions {
     //
     //* the right half
 
-    public static function right<T>(arr : Array<T>) : Array<T> {
-        if (arr.length == 0) return [];
-        var len = Math.ceil(arr.length / 2);
-        return arr.slice(len);
+    public static function right<T>( arr : Array<T> ) : Array<T> {
+        if ( arr.length == 0 ) return [];
+        var len = Math.ceil( arr.length / 2 );
+        return arr.slice( len );
     }
 
     //Get the second half of an array including the pivot
@@ -111,10 +111,10 @@ class ArrayExtensions {
     //
     //* the right half
 
-    public static function rightWithPivot<T>(arr : Array<T>) : Array<T> {
-        if (arr.length == 0) return [];
-        var len = Math.ceil(arr.length / 2);
-        return arr.slice(len - 1);
+    public static function rightWithPivot<T>( arr : Array<T> ) : Array<T> {
+        if ( arr.length == 0 ) return [];
+        var len = Math.ceil( arr.length / 2 );
+        return arr.slice( len - 1 );
     }
 
     //Obtain the unique set of elements in an array
@@ -129,26 +129,26 @@ class ArrayExtensions {
     //
     //* array of unique elements
 
-    public static function unique<T>(arr : Array<T>, comp : T -> T -> Bool) {
+    public static function unique<T>( arr : Array<T>, comp : T -> T -> Bool ) {
 
-        if (arr.length == 0) return [];
+        if ( arr.length == 0 ) return [];
 
-        var uniques = [ arr.pop() ];
+        var uniques = [ arr.pop( ) ];
 
-        while (arr.length > 0) {
+        while ( arr.length > 0 ) {
 
-            var ele = arr.pop();
+            var ele = arr.pop( );
             var isUnique = true;
 
-            for (unique in uniques) {
-                if (comp(ele, unique)) {
+            for ( unique in uniques ) {
+                if ( comp( ele, unique ) ) {
                     isUnique = false;
                     break;
                 }
             }
 
-            if (isUnique) {
-                uniques.push(ele);
+            if ( isUnique ) {
+                uniques.push( ele );
             }
         }
 

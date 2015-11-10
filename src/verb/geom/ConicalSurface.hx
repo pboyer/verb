@@ -19,8 +19,8 @@ class ConicalSurface extends NurbsSurface {
     //* Height of the cone
     //* Radius of the cone
 
-    public function new(axis : Vector, xaxis : Vector, base : Point, height : Float, radius : Float) {
-        super(Make.conicalSurface(axis, xaxis, base, height, radius));
+    public function new( axis : Vector, xaxis : Vector, base : Point, height : Float, radius : Float ) {
+        super( Make.conicalSurface( axis, xaxis, base, height, radius ) );
 
         _axis = axis;
         _xaxis = xaxis;
@@ -37,22 +37,22 @@ class ConicalSurface extends NurbsSurface {
 
     //Length 3 array representing the axis of the cone
 
-    public function axis() { return _axis; }
+    public function axis( ) { return _axis; }
 
     //Length 3 array representing the x axis, perpendicular to the axis
 
-    public function xaxis() { return _xaxis; }
+    public function xaxis( ) { return _xaxis; }
 
     //Length 3 array representing the base of the cone
 
-    public function base() { return _base; }
+    public function base( ) { return _base; }
 
     //Height of the cone
 
-    public function height() { return _height; }
+    public function height( ) { return _height; }
 
     //Radius of the cone
 
-    public function radius() { return _radius; }
+    public function radius( ) { return _radius; }
 
 }

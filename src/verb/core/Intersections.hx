@@ -17,7 +17,7 @@ class CurveCurveIntersection {
     //the parameter on the second curve
     public var u1 : Float;
 
-    public function new(point0, point1, u0, u1) {
+    public function new( point0, point1, u0, u1 ) {
         this.point0 = point0;
         this.point1 = point1;
         this.u0 = u0;
@@ -33,7 +33,7 @@ class CurveSurfaceIntersection {
     public var curvePoint : Point;
     public var surfacePoint : Point;
 
-    public function new(u, uv, curvePoint, surfacePoint) {
+    public function new( u, uv, curvePoint, surfacePoint ) {
         this.u = u;
         this.uv = uv;
         this.curvePoint = curvePoint;
@@ -56,7 +56,7 @@ class MeshIntersectionPoint {
     public var adj : MeshIntersectionPoint = null;
     public var visited : Bool = false;
 
-    public function new(uv0, uv1, point, faceIndex0, faceIndex1) {
+    public function new( uv0, uv1, point, faceIndex0, faceIndex1 ) {
         this.uv0 = uv0;
         this.uv1 = uv1;
         this.point = point;
@@ -74,7 +74,7 @@ class PolylineMeshIntersection {
     public var polylineIndex : Int;
     public var faceIndex : Int;
 
-    public function new(point, u, uv, polylineIndex, faceIndex) {
+    public function new( point, u, uv, polylineIndex, faceIndex ) {
         this.point = point;
         this.u = u;
         this.uv = uv;
@@ -91,7 +91,7 @@ class SurfaceSurfaceIntersectionPoint {
     public var point : Point;
     public var dist : Float;
 
-    public function new(uv0, uv1, point, dist) {
+    public function new( uv0, uv1, point, dist ) {
         this.uv0 = uv0;
         this.uv1 = uv1;
         this.point = point;
@@ -114,7 +114,7 @@ class TriSegmentIntersection {
     //the parameter along the segment
     public var p : Float;
 
-    public function new(point, s, t, r) {
+    public function new( point, s, t, r ) {
         this.point = point;
         this.s = s;
         this.t = t;
@@ -128,7 +128,7 @@ class CurveTriPoint {
     public var uv : UV;
     public var point : Point;
 
-    public function new(u : Float, point : Point, uv : UV) {
+    public function new( u : Float, point : Point, uv : UV ) {
         this.u = u;
         this.point = point;
         this.uv = uv;
@@ -143,7 +143,7 @@ class SurfacePoint {
     public var id : Int;
     public var degen : Bool;
 
-    public function new(point : Point, normal : Point, uv : UV, id : Int = -1, degen : Bool = false) {
+    public function new( point : Point, normal : Point, uv : UV, id : Int = -1, degen : Bool = false ) {
         this.uv = uv;
         this.point = point;
         this.normal = normal;
@@ -151,7 +151,7 @@ class SurfacePoint {
         this.degen = degen;
     }
 
-    public static function fromUv(u, v) {
+    public static function fromUv( u, v ) {
         return new SurfacePoint(null, null, [u, v] );
     }
 }
@@ -161,7 +161,7 @@ class CurvePoint {
     public var u : Float;
     public var pt : Point;
 
-    public function new(u, pt) {
+    public function new( u, pt ) {
         this.u = u;
         this.pt = pt;
     }

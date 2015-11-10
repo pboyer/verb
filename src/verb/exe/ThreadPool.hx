@@ -17,41 +17,41 @@ private class PoolThread {
     private var _done : Bool;
     public var done(get, never) : Bool;
 
-    private function get_done() : Bool {
-        mutex.acquire();
+    private function get_done( ) : Bool {
+        mutex.acquire( );
         var d : Bool = _done;
-        mutex.release();
+        mutex.release( );
         return d;
     }
     private var _result : Dynamic;
     public var result(get, never) : Dynamic;
 
-    private function get_result() : Dynamic {
-        mutex.acquire();
+    private function get_result( ) : Dynamic {
+        mutex.acquire( );
         var r : Dynamic = _result;
-        mutex.release();
+        mutex.release( );
         return r;
     }
 
-    public function new() {
+    public function new( ) {
         mutex = new Mutex();
     }
 
-    public function start(task : Dynamic -> Dynamic, arg : Dynamic) : Void {
+    public function start( task : Dynamic -> Dynamic, arg : Dynamic ) : Void {
         this.task = task;
         started = true;
         _done = false;
-        thread = Thread.create(doWork);
-        thread.sendMessage(arg);
+        thread = Thread.create( doWork );
+        thread.sendMessage( arg );
     }
 
-    private function doWork() : Void {
-        var arg : Dynamic = Thread.readMessage(true);
-        var ret : Dynamic = task(arg);
-        mutex.acquire();
+    private function doWork( ) : Void {
+        var arg : Dynamic = Thread.readMessage( true );
+        var ret : Dynamic = task( arg );
+        mutex.acquire( );
         _result = ret;
         _done = true;
-        mutex.release();
+        mutex.release( );
     }
 }
 #end
@@ -80,24 +80,24 @@ class ThreadPool {
     private var tasks : Array<Task>;
     private var nextID : Int = 0;
 
-    public function new(numThreads : Int) {
+    public function new( numThreads : Int ) {
         tasks = new Array <Task> ();
         #if (neko || cpp)
         this.numThreads = numThreads;
         threads = new Array<PoolThread>();
-        for (i in 0...this.numThreads) {
-            threads.push(new PoolThread());
+        for ( i in 0...this.numThreads ) {
+            threads.push( new PoolThread() );
         }
         #end
     }
 
-    public function addTask(task : Dynamic -> Dynamic, arg : Dynamic, onFinish : Dynamic -> Void) : Void {
-        tasks.push({ id: nextID, task: task, done: false, arg: arg, #if (neko || cpp) thread: null, #end onFinish: onFinish } );
+    public function addTask( task : Dynamic -> Dynamic, arg : Dynamic, onFinish : Dynamic -> Void ) : Void {
+        tasks.push( { id: nextID, task: task, done: false, arg: arg, #if (neko || cpp) thread: null, #end onFinish: onFinish } );
             nextID++;
         }
 
             #if (neko || cpp)
-        private function allTasksAreDone():Bool
+        private function allTasksAreDone( ):Bool
         {
         for (task in tasks)
         if (!task.done)

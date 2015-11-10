@@ -15,8 +15,8 @@ class ExtrudedSurface extends NurbsSurface {
     //* The profile curve
     //* The direction and magnitude of the extrusion
 
-    public function new(profile : ICurve, direction : Vector) {
-        super(Make.extrudedSurface(Vec.normalized(direction), Vec.norm(direction), profile.asNurbs()));
+    public function new( profile : ICurve, direction : Vector ) {
+        super( Make.extrudedSurface( Vec.normalized( direction ), Vec.norm( direction ), profile.asNurbs( ) ) );
 
         _profile = profile;
         _direction = direction;
@@ -27,10 +27,10 @@ class ExtrudedSurface extends NurbsSurface {
 
     //The profile curve
 
-    public function profile() : ICurve { return _profile; }
+    public function profile( ) : ICurve { return _profile; }
 
     //The direction and magnitude of the extrusion
 
-    public function direction() : Vector { return _direction; }
+    public function direction( ) : Vector { return _direction; }
 
 }

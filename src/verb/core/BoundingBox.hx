@@ -21,9 +21,9 @@ class BoundingBox {
     //
     //* Points to add, if desired.  Otherwise, will not be initialized until add is called.
 
-    public function new(pts : Array<Point> = null) {
-        if (pts != null) {
-            this.addRange(pts);
+    public function new( pts : Array<Point> = null ) {
+        if ( pts != null ) {
+            this.addRange( pts );
         }
     }
 
@@ -43,7 +43,7 @@ class BoundingBox {
     //
     //* This BoundingBox for chaining
 
-    public function fromPoint(pt) {
+    public function fromPoint( pt ) {
         return new BoundingBox( [ pt ] );
     }
 
@@ -58,19 +58,19 @@ class BoundingBox {
     //
     //* This BoundingBox for chaining
 
-    public function add(point : Point) : BoundingBox {
-        if (!this.initialized) {
+    public function add( point : Point ) : BoundingBox {
+        if ( !this.initialized ) {
             this.dim = point.length;
-            this.min = point.slice(0);
-            this.max = point.slice(0);
+            this.min = point.slice( 0 );
+            this.max = point.slice( 0 );
             this.initialized = true;
 
             return this;
         }
 
-        for (i in 0...this.dim) {
-            if (point[i] > this.max[i]) this.max[i] = point[i];
-            if (point[i] < this.min[i]) this.min[i] = point[i];
+        for ( i in 0...this.dim ) {
+            if ( point[i] > this.max[i] ) this.max[i] = point[i];
+            if ( point[i] < this.min[i] ) this.min[i] = point[i];
         }
 
         return this;
@@ -87,11 +87,11 @@ class BoundingBox {
     //
     //* this BoundingBox for chaining
 
-    public function addRange(points : Array<Point>) : BoundingBox {
+    public function addRange( points : Array<Point> ) : BoundingBox {
         var l = points.length;
 
-        for (i in 0...l) {
-            this.add(points[i]);
+        for ( i in 0...l ) {
+            this.add( points[i] );
         }
 
         return this;
@@ -108,13 +108,13 @@ class BoundingBox {
     //
     //* true if the two intervals overlap, otherwise false
 
-    public function contains(point : Point, tol : Float = -1) : Bool {
+    public function contains( point : Point, tol : Float = -1 ) : Bool {
 
-        if (!this.initialized) {
+        if ( !this.initialized ) {
             return false;
         }
 
-        return this.intersects(new BoundingBox([point]), tol);
+        return this.intersects( new BoundingBox([point]), tol );
     }
 
     //Determines if two intervals on the real number line intersect
@@ -130,13 +130,13 @@ class BoundingBox {
     //
     //* true if the two intervals overlap, otherwise false
 
-    public static function intervalsOverlap(a1 : Float, a2 : Float, b1 : Float, b2 : Float, tol : Float = -1) : Bool {
+    public static function intervalsOverlap( a1 : Float, a2 : Float, b1 : Float, b2 : Float, tol : Float = -1 ) : Bool {
 
         var tol = tol < -0.5 ? Constants.TOLERANCE : tol
-        , x1 = Math.min(a1, a2) - tol
-        , x2 = Math.max(a1, a2) + tol
-        , y1 = Math.min(b1, b2) - tol
-        , y2 = Math.max(b1, b2) + tol;
+        , x1 = Math.min( a1, a2 ) - tol
+        , x2 = Math.max( a1, a2 ) + tol
+        , y1 = Math.min( b1, b2 ) - tol
+        , y2 = Math.max( b1, b2 ) + tol;
 
         return (x1 >= y1 && x1 <= y2) || (x2 >= y1 && x2 <= y2) || (y1 >= x1 && y1 <= x2) || (y2 >= x1 && y2 <= x2) ;
     }
@@ -151,17 +151,17 @@ class BoundingBox {
     //
     //*  true if the two bounding boxes intersect, otherwise false
 
-    public function intersects(bb : BoundingBox, tol : Float = -1) : Bool {
+    public function intersects( bb : BoundingBox, tol : Float = -1 ) : Bool {
 
-        if (!this.initialized || !bb.initialized) return false;
+        if ( !this.initialized || !bb.initialized ) return false;
 
         var a1 = min
         , a2 = max
         , b1 = bb.min
         , b2 = bb.max;
 
-        for (i in 0...dim) {
-            if (!intervalsOverlap(a1[i], a2[i], b1[i], b2[i], tol)) return false;
+        for ( i in 0...dim ) {
+            if ( !intervalsOverlap( a1[i], a2[i], b1[i], b2[i], tol ) ) return false;
         }
 
         return true;
@@ -174,7 +174,7 @@ class BoundingBox {
     //
     //* this BoundingBox for chaining
 
-    public function clear() : BoundingBox {
+    public function clear( ) : BoundingBox {
         this.initialized = false;
         return this;
     }
@@ -185,14 +185,14 @@ class BoundingBox {
     //
     //* Index of longest axis
 
-    public function getLongestAxis() : Int {
+    public function getLongestAxis( ) : Int {
 
         var max = 0.0;
         var id = 0;
 
-        for (i in 0...dim) {
-            var l = this.getAxisLength(i);
-            if (l > max) {
+        for ( i in 0...dim ) {
+            var l = this.getAxisLength( i );
+            if ( l > max ) {
                 max = l;
                 id = i;
             }
@@ -211,9 +211,9 @@ class BoundingBox {
     //
     //* Length of the given axis.  If axis is out of bounds, returns 0.
 
-    public function getAxisLength(i : Int) : Float {
-        if (i < 0 || i > this.dim - 1) return 0.0;
-        return Math.abs(this.min[i] - this.max[i]);
+    public function getAxisLength( i : Int ) : Float {
+        if ( i < 0 || i > this.dim - 1 ) return 0.0;
+        return Math.abs( this.min[i] - this.max[i] );
     }
 
     //Compute the boolean intersection of this with another axis-aligned bounding box.  If the two
@@ -227,23 +227,23 @@ class BoundingBox {
     //
     //* The bounding box formed by the intersection or null if there is no intersection.
 
-    public function intersect(bb : BoundingBox, tol : Float) : BoundingBox {
+    public function intersect( bb : BoundingBox, tol : Float ) : BoundingBox {
 
-        if (!this.initialized) return null;
+        if ( !this.initialized ) return null;
 
         var a1 = min
         , a2 = max
         , b1 = bb.min
         , b2 = bb.max;
 
-        if (!this.intersects(bb, tol)) return null;
+        if ( !this.intersects( bb, tol ) ) return null;
 
         var maxbb = []
         , minbb = [];
 
-        for (i in 0...dim) {
-            maxbb.push(Math.min(a2[i], b2[i]));
-            minbb.push(Math.max(a1[i], b1[i]));
+        for ( i in 0...dim ) {
+            maxbb.push( Math.min( a2[i], b2[i] ) );
+            minbb.push( Math.max( a1[i], b1[i] ) );
         }
 
         return new BoundingBox([minbb, maxbb]);

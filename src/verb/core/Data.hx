@@ -32,7 +32,7 @@ class Plane extends SerializableBase {
     public var normal : Vector;
     public var origin : Point;
 
-    public function new(origin, normal) {
+    public function new( origin, normal ) {
         this.origin = origin;
         this.normal = normal;
     }
@@ -46,7 +46,7 @@ class Ray extends SerializableBase {
     public var dir : Vector;
     public var origin : Point;
 
-    public function new(origin, dir) {
+    public function new( origin, dir ) {
         this.origin = origin;
         this.dir = dir;
     }
@@ -58,7 +58,7 @@ class Ray extends SerializableBase {
 @:expose("core.NurbsCurveData")
 class NurbsCurveData extends SerializableBase {
 
-    public function new(degree, knots, controlPoints) {
+    public function new( degree, knots, controlPoints ) {
         this.degree = degree;
         this.controlPoints = controlPoints;
         this.knots = knots;
@@ -81,7 +81,7 @@ class NurbsCurveData extends SerializableBase {
 @:expose("core.NurbsSurfaceData")
 class NurbsSurfaceData extends SerializableBase {
 
-    public function new(degreeU, degreeV, knotsU, knotsV, controlPoints) {
+    public function new( degreeU, degreeV, knotsU, knotsV, controlPoints ) {
         this.degreeU = degreeU;
         this.degreeV = degreeV;
         this.knotsU = knotsU;
@@ -127,14 +127,14 @@ class MeshData extends SerializableBase {
     public var normals : Array<Point>;
     public var uvs : Array<UV>;
 
-    public function new(faces : Array<Tri>, points : Array<Point>, normals : Array<Point>, uvs : Array<UV>) {
+    public function new( faces : Array<Tri>, points : Array<Point>, normals : Array<Point>, uvs : Array<UV> ) {
         this.faces = faces;
         this.points = points;
         this.normals = normals;
         this.uvs = uvs;
     }
 
-    public static function empty() : MeshData {
+    public static function empty( ) : MeshData {
         return new MeshData([], [], [], []);
     }
 }
@@ -150,7 +150,7 @@ class PolylineData extends SerializableBase {
     // The parameters of the individual points
     public var params : Array<Float>;
 
-    public function new(points, params) {
+    public function new( points, params ) {
         this.points = points;
         this.params = params;
     }
@@ -162,7 +162,7 @@ class PolylineData extends SerializableBase {
 @:expose("core.VolumeData")
 class VolumeData extends SerializableBase {
 
-    public function new(degreeU, degreeV, degreeW, knotsU, knotsV, knotsW, controlPoints) {
+    public function new( degreeU, degreeV, degreeW, knotsU, knotsV, knotsW, controlPoints ) {
         this.degreeU = degreeU;
         this.degreeV = degreeV;
         this.degreeW = degreeW;
@@ -203,7 +203,7 @@ class Pair<T1, T2> {
     public var item0 : T1;
     public var item1 : T2;
 
-    public function new(item1 : T1, item2 : T2) {
+    public function new( item1 : T1, item2 : T2 ) {
         this.item0 = item1;
         this.item1 = item2;
     }
@@ -216,7 +216,7 @@ class Interval<T> {
     public var min : T;
     public var max : T;
 
-    public function new(min, max) {
+    public function new( min, max ) {
         this.min = min;
         this.max = max;
     }

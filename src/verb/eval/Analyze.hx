@@ -36,18 +36,18 @@ class Analyze {
     //
     //* Array of KnotMultiplicity objects
 
-    public static function knotMultiplicities(knots : KnotArray) : Array<KnotMultiplicity> {
+    public static function knotMultiplicities( knots : KnotArray ) : Array<KnotMultiplicity> {
 
         var mults = [ new KnotMultiplicity( knots[0], 0 ) ];
         var curr : KnotMultiplicity = mults[0];
 
-        for (knot in knots) {
-            if ((Math.abs(knot - curr.knot)) > Constants.EPSILON) {
+        for ( knot in knots ) {
+            if ( (Math.abs( knot - curr.knot )) > Constants.EPSILON ) {
                 curr = new KnotMultiplicity(knot, 0);
-                mults.push(curr);
+                mults.push( curr );
             }
 
-            curr.inc();
+            curr.inc( );
         }
 
         return mults;
@@ -65,13 +65,13 @@ class Analyze {
     //
     //* Whether the surface is continuous or not in the supplied direction.
 
-    public static function isRationalSurfaceClosed(surface : NurbsSurfaceData, uDir : Bool = true) : Bool {
+    public static function isRationalSurfaceClosed( surface : NurbsSurfaceData, uDir : Bool = true ) : Bool {
 
-        var cpts = if (uDir) surface.controlPoints else surface.controlPoints.transpose();
+        var cpts = if ( uDir ) surface.controlPoints else surface.controlPoints.transpose( );
 
-        for (i in 0...cpts[0].length) {
-            var test = Vec.dist(cpts.first()[i], cpts.last()[i]) < Constants.EPSILON;
-            if (!test) return false;
+        for ( i in 0...cpts[0].length ) {
+            var test = Vec.dist( cpts.first( )[i], cpts.last( )[i] ) < Constants.EPSILON;
+            if ( !test ) return false;
         }
 
         return true;
@@ -88,9 +88,9 @@ class Analyze {
     //
     //* The closest point on the surface, bounded by the parametric range of the surface
 
-    public static function rationalSurfaceClosestPoint(surface : NurbsSurfaceData, p : Point) : Point {
-        var uv = Analyze.rationalSurfaceClosestParam(surface, p);
-        return Eval.rationalSurfacePoint(surface, uv[0], uv[1]);
+    public static function rationalSurfaceClosestPoint( surface : NurbsSurfaceData, p : Point ) : Point {
+        var uv = Analyze.rationalSurfaceClosestParam( surface, p );
+        return Eval.rationalSurfacePoint( surface, uv[0], uv[1] );
     }
 
     //Determine the closest parameters on a NURBS surface to a given point. *This is an experimental method and not hightly reliable.*
@@ -104,7 +104,7 @@ class Analyze {
     //
     //* The closest parameters on the surface, bounded by the parametric domain of the surface
 
-    public static function rationalSurfaceClosestParam(surface : NurbsSurfaceData, p : Point) : UV {
+    public static function rationalSurfaceClosestParam( surface : NurbsSurfaceData, p : Point ) : UV {
 
         //for surfaces, we try to minimize the following:
         //
@@ -155,35 +155,35 @@ class Analyze {
         , eps2 = 0.0005
         , dif
         , minu = surface.knotsU[0]
-        , maxu = surface.knotsU.last()
+        , maxu = surface.knotsU.last( )
         , minv = surface.knotsV[0]
-        , maxv = surface.knotsV.last()
-        , closedu = isRationalSurfaceClosed(surface)
-        , closedv = isRationalSurfaceClosed(surface, false)
+        , maxv = surface.knotsV.last( )
+        , closedu = isRationalSurfaceClosed( surface )
+        , closedv = isRationalSurfaceClosed( surface, false )
         , cuv;
 
         //todo: divide surface instead of a full on tessellation
 
         //approximate closest point with tessellation
-        var tess = Tess.rationalSurfaceAdaptive(surface, new AdaptiveRefinementOptions());
+        var tess = Tess.rationalSurfaceAdaptive( surface, new AdaptiveRefinementOptions() );
 
         var dmin = Math.POSITIVE_INFINITY;
 
-        for (i in 0...tess.points.length) {
+        for ( i in 0...tess.points.length ) {
             var x = tess.points[i];
-            var d = Vec.normSquared(Vec.sub(p, x));
+            var d = Vec.normSquared( Vec.sub( p, x ) );
 
-            if (d < dmin) {
+            if ( d < dmin ) {
                 dmin = d;
                 cuv = tess.uvs[i];
             }
         }
 
-        function f(uv : UV) : Array<Array<Point>> {
-            return Eval.rationalSurfaceDerivatives(surface, uv[0], uv[1], 2);
+        function f( uv : UV ) : Array<Array<Point>> {
+            return Eval.rationalSurfaceDerivatives( surface, uv[0], uv[1], 2 );
         }
 
-        function n(uv : UV, e : Array<Array<Point>>, r : Array<Float>) : UV {
+        function n( uv : UV, e : Array<Array<Point>>, r : Array<Float> ) : UV {
 
             //f = Su(u,v) * r = 0
             //g = Sv(u,v) * r = 0
@@ -197,15 +197,15 @@ class Analyze {
             var Suv = e[1][1];
             var Svu = e[1][1];
 
-            var f = Vec.dot(Su, r);
-            var g = Vec.dot(Sv, r);
+            var f = Vec.dot( Su, r );
+            var g = Vec.dot( Sv, r );
 
             var k = [-f, -g];
 
-            var J00 = Vec.dot(Su, Su) + Vec.dot(Suu, r);
-            var J01 = Vec.dot(Su, Sv) + Vec.dot(Suv, r);
-            var J10 = Vec.dot(Su, Sv) + Vec.dot(Svu, r);
-            var J11 = Vec.dot(Sv, Sv) + Vec.dot(Svv, r);
+            var J00 = Vec.dot( Su, Su ) + Vec.dot( Suu, r );
+            var J01 = Vec.dot( Su, Sv ) + Vec.dot( Suv, r );
+            var J10 = Vec.dot( Su, Sv ) + Vec.dot( Svu, r );
+            var J11 = Vec.dot( Sv, Sv ) + Vec.dot( Svv, r );
 
             var J = [ [ J00, J01 ], [ J10, J11 ] ];
 
@@ -216,21 +216,21 @@ class Analyze {
             //		     Su*Sv   +  Svu * r      |Sv|^2  +  Svv * r
             //
 
-            var d = Mat.solve(J, k);
+            var d = Mat.solve( J, k );
 
-            return Vec.add(d, uv);
+            return Vec.add( d, uv );
 
         }
 
-        while (i < maxits) {
+        while ( i < maxits ) {
 
-            e = f(cuv);
-            dif = Vec.sub(e[0][0], p);
+            e = f( cuv );
+            dif = Vec.sub( e[0][0], p );
 
             //  point coincidence
             //
             //		|S(u,v) - p| < e1
-            var c1v = Vec.norm(dif);
+            var c1v = Vec.norm( dif );
 
             //
             //  cosine
@@ -243,11 +243,11 @@ class Analyze {
             //   ----------------------  < e2
             //   |Sv(u,v)| |S(u,v) - P|
             //
-            var c2an = Vec.dot(e[1][0], dif);
-            var c2ad = Vec.norm(e[1][0]) * c1v;
+            var c2an = Vec.dot( e[1][0], dif );
+            var c2ad = Vec.norm( e[1][0] ) * c1v;
 
-            var c2bn = Vec.dot(e[0][1], dif);
-            var c2bd = Vec.norm(e[0][1]) * c1v;
+            var c2bn = Vec.dot( e[0][1], dif );
+            var c2bd = Vec.norm( e[0][1] ) * c1v;
 
             var c2av = c2an / c2ad;
             var c2bv = c2bn / c2bd;
@@ -257,31 +257,31 @@ class Analyze {
             var c2b = c2bv < eps2;
 
             //if all of the tolerance are met, we're done
-            if (c1 && c2a && c2b) {
+            if ( c1 && c2a && c2b ) {
                 return cuv;
             }
 
             //otherwise, take a step
-            var ct = n(cuv, e, dif);
+            var ct = n( cuv, e, dif );
 
             //correct for exceeding bounds
-            if (ct[0] < minu) {
+            if ( ct[0] < minu ) {
                 ct = closedu ? [ maxu - ( ct[0] - minu ), ct[1] ] : [ minu + Constants.EPSILON, ct[1] ];
-            } else if (ct[0] > maxu) {
+            } else if ( ct[0] > maxu ) {
                 ct = closedu ? [ minu + ( ct[0] - maxu ), ct[1] ] : [ maxu - Constants.EPSILON, ct[1] ];
             }
 
-            if (ct[1] < minv) {
+            if ( ct[1] < minv ) {
                 ct = closedv ? [ ct[0], maxv - ( ct[1] - minv ) ] : [ ct[0], minv + Constants.EPSILON ];
-            } else if (ct[1] > maxv) {
+            } else if ( ct[1] > maxv ) {
                 ct = closedv ? [ ct[0], minv + ( ct[0] - maxv ) ] : [ ct[0], maxv - Constants.EPSILON ];
             }
 
             //if |(u* - u) C'(u)| < e1, halt
-            var c3v0 = Vec.norm(Vec.mul(ct[0] - cuv[0], e[1][0]));
-            var c3v1 = Vec.norm(Vec.mul(ct[1] - cuv[1], e[0][1]));
+            var c3v0 = Vec.norm( Vec.mul( ct[0] - cuv[0], e[1][0] ) );
+            var c3v1 = Vec.norm( Vec.mul( ct[1] - cuv[1], e[0][1] ) );
 
-            if (c3v0 + c3v1 < eps1) {
+            if ( c3v0 + c3v1 < eps1 ) {
                 return cuv;
             }
 
@@ -305,8 +305,8 @@ class Analyze {
     //
     //* The closest point on the surface, bounded by the parametric domain of the surface
 
-    public static function rationalCurveClosestPoint(curve : NurbsCurveData, p : Point) : Point {
-        return Eval.rationalCurvePoint(curve, rationalCurveClosestParam(curve, p));
+    public static function rationalCurveClosestPoint( curve : NurbsCurveData, p : Point ) : Point {
+        return Eval.rationalCurvePoint( curve, rationalCurveClosestParam( curve, p ) );
     }
 
     //Determine the closest parameters on a NURBS curve to a given point.
@@ -320,7 +320,7 @@ class Analyze {
     //
     //* The closest parameter on the curve, bounded by the parametric domain of the curve
 
-    public static function rationalCurveClosestParam(curve : NurbsCurveData, p : Point) : Float {
+    public static function rationalCurveClosestParam( curve : NurbsCurveData, p : Point ) : Float {
 
         //  We want to solve:
         //
@@ -355,20 +355,20 @@ class Analyze {
         var min = Math.POSITIVE_INFINITY;
         var u = 0.0;
 
-        var pts = Tess.rationalCurveRegularSample(curve, curve.controlPoints.length * curve.degree, true);
+        var pts = Tess.rationalCurveRegularSample( curve, curve.controlPoints.length * curve.degree, true );
 
-        for (i in 0...pts.length - 1) {
+        for ( i in 0...pts.length - 1 ) {
 
             var u0 = pts[i][0];
             var u1 = pts[i + 1][0];
 
-            var p0 = pts[i].slice(1);
-            var p1 = pts[i + 1].slice(1);
+            var p0 = pts[i].slice( 1 );
+            var p1 = pts[i + 1].slice( 1 );
 
-            var proj = Trig.segmentClosestPoint(p, p0, p1, u0, u1);
-            var d = Vec.norm(Vec.sub(p, proj.pt));
+            var proj = Trig.segmentClosestPoint( p, p0, p1, u0, u1 );
+            var d = Vec.norm( Vec.sub( p, proj.pt ) );
 
-            if (d < min) {
+            if ( d < min ) {
                 min = d;
                 u = proj.u;
             }
@@ -381,63 +381,63 @@ class Analyze {
         , eps2 = 0.0005
         , dif
         , minu = curve.knots[0]
-        , maxu = curve.knots.last()
-        , closed = Vec.normSquared(Vec.sub(curve.controlPoints[0], curve.controlPoints.last())) < Constants.EPSILON
+        , maxu = curve.knots.last( )
+        , closed = Vec.normSquared( Vec.sub( curve.controlPoints[0], curve.controlPoints.last( ) ) ) < Constants.EPSILON
         , cu = u;
 
-        function f(u : Float) : Array<Point> {
-            return Eval.rationalCurveDerivatives(curve, u, 2);
+        function f( u : Float ) : Array<Point> {
+            return Eval.rationalCurveDerivatives( curve, u, 2 );
         }
 
-        function n(u : Float, e : Array<Point>, d : Array<Float>) : Float {
+        function n( u : Float, e : Array<Point>, d : Array<Float> ) : Float {
             //   C'(u) * ( C(u) - P ) = 0 = f(u)
-            var f = Vec.dot(e[1], d);
+            var f = Vec.dot( e[1], d );
 
             //	f' = C"(u) * ( C(u) - p ) + C'(u) * C'(u)
-            var s0 = Vec.dot(e[2], d)
-            , s1 = Vec.dot(e[1], e[1])
+            var s0 = Vec.dot( e[2], d )
+            , s1 = Vec.dot( e[1], e[1] )
             , df = s0 + s1;
 
             return u - f / df;
         }
 
-        while (i < maxits) {
+        while ( i < maxits ) {
 
-            e = f(cu);
-            dif = Vec.sub(e[0], p);
+            e = f( cu );
+            dif = Vec.sub( e[0], p );
 
             // |C(u) - p| < e1
-            var c1v = Vec.norm(dif);
+            var c1v = Vec.norm( dif );
 
             //C'(u) * (C(u) - P)
             // ------------------ < e2
             // |C'(u)| |C(u) - P|
-            var c2n = Vec.dot(e[1], dif);
-            var c2d = Vec.norm(e[1]) * c1v;
+            var c2n = Vec.dot( e[1], dif );
+            var c2d = Vec.norm( e[1] ) * c1v;
 
             var c2v = c2n / c2d;
 
             var c1 = c1v < eps1;
-            var c2 = Math.abs(c2v) < eps2;
+            var c2 = Math.abs( c2v ) < eps2;
 
             //if both tolerances are met
-            if (c1 && c2) {
+            if ( c1 && c2 ) {
                 return cu;
             }
 
-            var ct = n(cu, e, dif);
+            var ct = n( cu, e, dif );
 
             //are we outside of the bounds of the curve?
-            if (ct < minu) {
+            if ( ct < minu ) {
                 ct = closed ? maxu - ( ct - minu ) : minu;
-            } else if (ct > maxu) {
+            } else if ( ct > maxu ) {
                 ct = closed ? minu + ( ct - maxu ) : maxu;
             }
 
             //will our next step force us out of the curve?
-            var c3v = Vec.norm(Vec.mul(ct - cu, e[1]));
+            var c3v = Vec.norm( Vec.mul( ct - cu, e[1] ) );
 
-            if (c3v < eps1) {
+            if ( c3v < eps1 ) {
                 return cu;
             }
 
@@ -464,29 +464,29 @@ class Analyze {
     //
     //* The parameter
 
-    public static function rationalCurveParamAtArcLength(curve : NurbsCurveData,
-                                                         len : Float,
-                                                         tol : Float = 1e-3,
-                                                         beziers : Array<NurbsCurveData> = null,
-                                                         bezierLengths : Array<Float> = null) : Float {
+    public static function rationalCurveParamAtArcLength( curve : NurbsCurveData,
+                                                          len : Float,
+                                                          tol : Float = 1e-3,
+                                                          beziers : Array<NurbsCurveData> = null,
+                                                          bezierLengths : Array<Float> = null ) : Float {
 
-        if (len < Constants.EPSILON) return curve.knots[0];
+        if ( len < Constants.EPSILON ) return curve.knots[0];
 
-        var crvs = if (beziers != null) beziers else Modify.decomposeCurveIntoBeziers(curve)
+        var crvs = if ( beziers != null ) beziers else Modify.decomposeCurveIntoBeziers( curve )
         , i = 0
         , cc = crvs[i]
         , cl = -Constants.EPSILON
-        , bezier_lengths = if (bezierLengths != null) bezierLengths else [];
+        , bezier_lengths = if ( bezierLengths != null ) bezierLengths else [];
 
         //iterate through the curves consuming the bezier's, summing their length along the way
-        while (cl < len && i < crvs.length) {
+        while ( cl < len && i < crvs.length ) {
 
-            bezier_lengths[i] = i < bezier_lengths.length ? bezier_lengths[i] : rationalBezierCurveArcLength(curve);
+            bezier_lengths[i] = i < bezier_lengths.length ? bezier_lengths[i] : rationalBezierCurveArcLength( curve );
 
             cl += bezier_lengths[i];
 
-            if (len < cl + Constants.EPSILON) {
-                return rationalBezierCurveParamAtArcLength(curve, len, tol, bezier_lengths[i]);
+            if ( len < cl + Constants.EPSILON ) {
+                return rationalBezierCurveParamAtArcLength( curve, len, tol, bezier_lengths[i] );
             }
 
             i++;
@@ -508,30 +508,30 @@ class Analyze {
     //
     //* the parameter
 
-    public static function rationalBezierCurveParamAtArcLength(curve : NurbsCurveData,
-                                                               len : Float,
-                                                               tol : Float = null,
-                                                               totalLength : Float = null) : Float {
-        if (len < 0) return curve.knots[0];
+    public static function rationalBezierCurveParamAtArcLength( curve : NurbsCurveData,
+                                                                len : Float,
+                                                                tol : Float = null,
+                                                                totalLength : Float = null ) : Float {
+        if ( len < 0 ) return curve.knots[0];
 
         //we compute the whole length.  if desired length is outside of that, give up
-        var totalLen = totalLength != null ? totalLength : rationalBezierCurveArcLength(curve);
+        var totalLen = totalLength != null ? totalLength : rationalBezierCurveArcLength( curve );
 
-        if (len > totalLen) return curve.knots.last();
+        if ( len > totalLen ) return curve.knots.last( );
 
         //divide & conquer
         //TODO: can we use derivative?
         var start = { p : curve.knots[0], l : 0.0 }
-        , end = { p : curve.knots.last(), l : totalLen }
+        , end = { p : curve.knots.last( ), l : totalLen }
         , mid = { p : 0.0, l : 0.0 }
-        , tol = if (tol != null) tol else Constants.TOLERANCE * 2;
+        , tol = if ( tol != null ) tol else Constants.TOLERANCE * 2;
 
-        while ((end.l - start.l) > tol) {
+        while ( (end.l - start.l) > tol ) {
 
             mid.p = (start.p + end.p) / 2;
-            mid.l = rationalBezierCurveArcLength(curve, mid.p);
+            mid.l = rationalBezierCurveArcLength( curve, mid.p );
 
-            if (mid.l > len) {
+            if ( mid.l > len ) {
                 end.p = mid.p;
                 end.l = mid.l;
             } else {
@@ -556,17 +556,17 @@ class Analyze {
     //
     //* the approximate length
 
-    public static function rationalCurveArcLength(curve : NurbsCurveData, u : Float = null, gaussDegIncrease : Int = 16) {
-        u = (u == null) ? curve.knots.last() : u;
+    public static function rationalCurveArcLength( curve : NurbsCurveData, u : Float = null, gaussDegIncrease : Int = 16 ) {
+        u = (u == null) ? curve.knots.last( ) : u;
 
-        var crvs = Modify.decomposeCurveIntoBeziers(curve)
+        var crvs = Modify.decomposeCurveIntoBeziers( curve )
         , i = 0
         , cc = crvs[0]
         , sum = 0.0;
 
-        while (i < crvs.length && cc.knots[0] + Constants.EPSILON < u) {
-            var param = Math.min(cc.knots.last(), u);
-            sum += rationalBezierCurveArcLength(cc, param, gaussDegIncrease);
+        while ( i < crvs.length && cc.knots[0] + Constants.EPSILON < u ) {
+            var param = Math.min( cc.knots.last( ), u );
+            sum += rationalBezierCurveArcLength( cc, param, gaussDegIncrease );
             cc = crvs[++i];
         }
 
@@ -585,21 +585,21 @@ class Analyze {
     //
     //* the approximate length
 
-    public static function rationalBezierCurveArcLength(curve : NurbsCurveData, u : Float = null, gaussDegIncrease : Int = 16) : Float {
+    public static function rationalBezierCurveArcLength( curve : NurbsCurveData, u : Float = null, gaussDegIncrease : Int = 16 ) : Float {
 
-        var u = u == null ? curve.knots.last() : u
+        var u = u == null ? curve.knots.last( ) : u
         , z = (u - curve.knots[0]) / 2
         , sum = 0.0
         , gaussDeg = curve.degree + gaussDegIncrease
         , cu
         , tan;
 
-        for (i in 0...gaussDeg) {
+        for ( i in 0...gaussDeg ) {
 
             cu = z * Tvalues[gaussDeg][i] + z + curve.knots[0];
-            tan = Eval.rationalCurveDerivatives(curve, cu, 1);
+            tan = Eval.rationalCurveDerivatives( curve, cu, 1 );
 
-            sum += Cvalues[gaussDeg][i] * Vec.norm(tan[1]);
+            sum += Cvalues[gaussDeg][i] * Vec.norm( tan[1] );
 
         }
 
@@ -680,14 +680,14 @@ class KnotMultiplicity {
     //* The knot position
     //* The multiplicity of the knot
 
-    public function new(knot : Float, mult : Int) {
+    public function new( knot : Float, mult : Int ) {
         this.knot = knot;
         this.mult = mult;
     }
 
     // Increments the multiplicity of the knot
 
-    public function inc() {
+    public function inc( ) {
         mult++;
     }
 }
