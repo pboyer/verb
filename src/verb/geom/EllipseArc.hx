@@ -20,12 +20,12 @@ class EllipseArc extends NurbsCurve {
     //* Minimum angle of the EllipseArc
     //* Maximum angle of the EllipseArc
 
-    public function new(   center : Point,
-                           xaxis : Vector,
-                           yaxis : Vector,
-                           minAngle : Float,
-                           maxAngle : Float ) {
-        super( Make.ellipseArc(center, xaxis, yaxis, minAngle, maxAngle) );
+    public function new(center:Point,
+                        xaxis:Vector,
+                        yaxis:Vector,
+                        minAngle:Float,
+                        maxAngle:Float) {
+        super(Make.ellipseArc(center, xaxis, yaxis, minAngle, maxAngle));
 
         _center = center;
         _xaxis = xaxis;
@@ -34,26 +34,31 @@ class EllipseArc extends NurbsCurve {
         _maxAngle = maxAngle;
     }
 
-    private var _center : Point;
-    private var _xaxis : Vector;
-    private var _yaxis : Vector;
-    private var _minAngle : Float;
-    private var _maxAngle : Float;
+    private var _center:Point;
+    private var _xaxis:Vector;
+    private var _yaxis:Vector;
+    private var _minAngle:Float;
+    private var _maxAngle:Float;
 
     //Length 3 array representing the center of the arc
-    public function center(){ return _center; }
+
+    public function center() { return _center; }
 
     //Length 3 array representing the xaxis
-    public function xaxis(){ return _xaxis; }
+
+    public function xaxis() { return _xaxis; }
 
     //Length 3 array representing the perpendicular yaxis
-    public function yaxis(){ return _yaxis; }
+
+    public function yaxis() { return _yaxis; }
 
     //Minimum angle of the EllipseArc
-    public function minAngle(){ return _minAngle; }
+
+    public function minAngle() { return _minAngle; }
 
     //Maximum angle of the EllipseArc
-    public function maxAngle(){ return _maxAngle; }
+
+    public function maxAngle() { return _maxAngle; }
 
 
 }

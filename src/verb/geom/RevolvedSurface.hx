@@ -18,8 +18,8 @@ class RevolvedSurface extends NurbsSurface {
     //* The direction of the axis of revolution
     //* The angle to revolve around.  2 * Math.PI corresponds to a complete revolution
 
-    public function new( profile : NurbsCurve, center : Point, axis : Vector, angle : Float )  {
-        super( Make.revolvedSurface( profile.asNurbs(), center, axis, angle ) );
+    public function new(profile:NurbsCurve, center:Point, axis:Vector, angle:Float) {
+        super(Make.revolvedSurface(profile.asNurbs(), center, axis, angle));
 
         _profile = profile;
         _center = center;
@@ -27,25 +27,25 @@ class RevolvedSurface extends NurbsSurface {
         _angle = angle;
     }
 
-    private var _profile : ICurve;
-    private var _center : Point;
-    private var _axis : Vector;
-    private var _angle : Float;
+    private var _profile:ICurve;
+    private var _center:Point;
+    private var _axis:Vector;
+    private var _angle:Float;
 
     //The profile curve
 
-    public function profile() : ICurve { return _profile; }
+    public function profile():ICurve { return _profile; }
 
     //A point on the axis of revolution
 
-    public function center() : Point { return _center; }
+    public function center():Point { return _center; }
 
     //The direction of the axis of revolution
 
-    public function axis() : Vector { return _center; }
+    public function axis():Vector { return _center; }
 
     //The angle to revolve around.  2 * Math.PI corresponds to a complete revolution
 
-    public function angle() : Float { return _angle; }
+    public function angle():Float { return _angle; }
 
 }

@@ -10,21 +10,21 @@ import verb.eval.Intersect;
 
 class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
 
-    var _surface : NurbsSurfaceData;
-    var _boundingBox : BoundingBox = null;
-    var _splitV : Bool;
-    var _knotTolU : Float;
-    var _knotTolV : Float;
+    var _surface:NurbsSurfaceData;
+    var _boundingBox:BoundingBox = null;
+    var _splitV:Bool;
+    var _knotTolU:Float;
+    var _knotTolV:Float;
 
-    public function new(surface, splitV = false, knotTolU = null, knotTolV = null){
+    public function new(surface, splitV = false, knotTolU = null, knotTolV = null) {
         _surface = surface;
         _splitV = splitV;
 
-        if (knotTolU == null){
+        if (knotTolU == null) {
             knotTolU = (surface.knotsU.domain()) / 16;
         }
 
-        if (knotTolV == null){
+        if (knotTolV == null) {
             knotTolV = (surface.knotsV.domain()) / 16;
         }
 
@@ -32,11 +32,11 @@ class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
         _knotTolV = knotTolV;
     }
 
-    public function split() : Pair<IBoundingBoxTree<NurbsSurfaceData>, IBoundingBoxTree<NurbsSurfaceData>> {
-        var min : Float;
-        var max : Float;
+    public function split():Pair<IBoundingBoxTree<NurbsSurfaceData>, IBoundingBoxTree<NurbsSurfaceData>> {
+        var min:Float;
+        var max:Float;
 
-        if (_splitV){
+        if (_splitV) {
             min = _surface.knotsV.first();
             max = _surface.knotsV.last();
         } else {
@@ -47,32 +47,32 @@ class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
         var dom = max - min;
         var pivot = (min + max) / 2.0; //* dom * 0.01 * Math.random();
 
-        var srfs = Divide.surfaceSplit( _surface, pivot, _splitV );
+        var srfs = Divide.surfaceSplit(_surface, pivot, _splitV);
 
         return new Pair<IBoundingBoxTree<NurbsSurfaceData>, IBoundingBoxTree<NurbsSurfaceData>>(
-            new LazySurfaceBoundingBoxTree( srfs[0], !_splitV, _knotTolU, _knotTolV ),
-            new LazySurfaceBoundingBoxTree( srfs[1], !_splitV, _knotTolU, _knotTolV ));
+        new LazySurfaceBoundingBoxTree( srfs[0], !_splitV, _knotTolU, _knotTolV ),
+        new LazySurfaceBoundingBoxTree( srfs[1], !_splitV, _knotTolU, _knotTolV ));
     }
 
-    public function boundingBox(){
-        if (_boundingBox == null){
+    public function boundingBox() {
+        if (_boundingBox == null) {
             _boundingBox = new BoundingBox();
-            for (row in _surface.controlPoints){
-                _boundingBox.addRange( Eval.dehomogenize1d(row) );
+            for (row in _surface.controlPoints) {
+                _boundingBox.addRange(Eval.dehomogenize1d(row));
             }
         }
         return _boundingBox;
     }
 
-    public function yield(){
+    public function yield() {
         return _surface;
     }
 
-    public function indivisible( tolerance : Float ){
+    public function indivisible(tolerance:Float) {
         return _surface.knotsV.domain() < _knotTolV && _surface.knotsU.domain() < _knotTolU;
     }
 
-    public function empty(){
+    public function empty() {
         return false;
     }
 }

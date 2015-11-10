@@ -16,7 +16,7 @@ interface ISurface extends ISerializable {
     //
     //* A NurbsCurveData object representing the curve
 
-    function asNurbs() : NurbsSurfaceData;
+    function asNurbs():NurbsSurfaceData;
 
     //Provide the domain of the surface in the U direction
     //
@@ -24,7 +24,7 @@ interface ISurface extends ISerializable {
     //
     //* An interval object with min and max properties
 
-    function domainU() : Interval<Float>;
+    function domainU():Interval<Float>;
 
     //Provide the domain of the surface in the V direction
     //
@@ -32,7 +32,7 @@ interface ISurface extends ISerializable {
     //
     //* An interval object with min and max properties
 
-    function domainV() : Interval<Float>;
+    function domainV():Interval<Float>;
 
     //Obtain a point on the surface at the given parameter
     //
@@ -45,7 +45,7 @@ interface ISurface extends ISerializable {
     //
     //* A point on the surface
 
-    function point(u : Float, v : Float) : Point;
+    function point(u:Float, v:Float):Point;
 
     //Obtain the derivatives of the NurbsSurface.  Returns a two dimensional array
     //containing the derivative vectors.  Increasing U partial derivatives are increasing
@@ -63,6 +63,6 @@ interface ISurface extends ISerializable {
     //
     //* A two dimensional array of vectors
 
-    function derivatives(u : Float, v : Float, numDerivs : Int = 1) : Array<Array<Vector>>;
+    function derivatives(u:Float, v:Float, numDerivs:Int = 1):Array<Array<Vector>>;
 
 }

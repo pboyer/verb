@@ -19,10 +19,10 @@ class Circle extends Arc {
     //* Length 3 array representing the perpendicular yaxis
     //* Radius of the circle
 
-    public function new(   center : Point,
-                            xaxis : Vector,
-                            yaxis : Vector,
-                            radius : Float ) {
-        super( center, xaxis, yaxis, radius, 0, Math.PI * 2 );
+    public function new(center:Point,
+                        xaxis:Vector,
+                        yaxis:Vector,
+                        radius:Float) {
+        super(center, xaxis, yaxis, radius, 0, Math.PI * 2);
     }
 }

@@ -20,7 +20,9 @@ function last(a){
     return a[a.length-1];
 }
 
-describe("verb.eval.Eval.knotSpanGivenN",() => {
+/*
+
+describe("verb.eval.Eval.knotSpanGivenN",function(){
 
     it('returns correct result', () => {
 
@@ -3889,6 +3891,7 @@ describe("verb.eval.Eval.surfaceRegularSamplePoints",() => {
     });
 });
 
+*/
 
 describe("verb.eval.Modify.decomposeCurveIntoBeziers",() => {
 
@@ -3995,5 +3998,17 @@ describe("verb.eval.Eval.rationalCurveRegularSamplePoints",() => {
 
     });
 
+});
+
+describe("verb.eval.Eval.rationalBezierCurveStepLength",() => {
+	it('works for simple cases', () => {
+
+		var pts = [ [0, 0, 0], [1, 2, 0], [2, 0, 0], [3, 0, 0] ];
+		var crv = verb.eval.Make.rationalInterpCurve( pts, 3, false );
+		var l = verb.eval.Tess.rationalBezierCurveStepLength( crv, 0.001 );
+
+		console.log( l );
+
+	});
 });
 
