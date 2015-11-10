@@ -36,10 +36,10 @@ class Analyze {
     //
     //* Array of KnotMultiplicity objects
 
-    public static function knotMultiplicities(knots:KnotArray):Array<KnotMultiplicity> {
+    public static function knotMultiplicities(knots : KnotArray) : Array<KnotMultiplicity> {
 
         var mults = [ new KnotMultiplicity( knots[0], 0 ) ];
-        var curr:KnotMultiplicity = mults[0];
+        var curr : KnotMultiplicity = mults[0];
 
         for (knot in knots) {
             if ((Math.abs(knot - curr.knot)) > Constants.EPSILON) {
@@ -65,7 +65,7 @@ class Analyze {
     //
     //* Whether the surface is continuous or not in the supplied direction.
 
-    public static function isRationalSurfaceClosed(surface:NurbsSurfaceData, uDir:Bool = true):Bool {
+    public static function isRationalSurfaceClosed(surface : NurbsSurfaceData, uDir : Bool = true) : Bool {
 
         var cpts = if (uDir) surface.controlPoints else surface.controlPoints.transpose();
 
@@ -88,7 +88,7 @@ class Analyze {
     //
     //* The closest point on the surface, bounded by the parametric range of the surface
 
-    public static function rationalSurfaceClosestPoint(surface:NurbsSurfaceData, p:Point):Point {
+    public static function rationalSurfaceClosestPoint(surface : NurbsSurfaceData, p : Point) : Point {
         var uv = Analyze.rationalSurfaceClosestParam(surface, p);
         return Eval.rationalSurfacePoint(surface, uv[0], uv[1]);
     }
@@ -104,7 +104,7 @@ class Analyze {
     //
     //* The closest parameters on the surface, bounded by the parametric domain of the surface
 
-    public static function rationalSurfaceClosestParam(surface:NurbsSurfaceData, p:Point):UV {
+    public static function rationalSurfaceClosestParam(surface : NurbsSurfaceData, p : Point) : UV {
 
         //for surfaces, we try to minimize the following:
         //
@@ -179,11 +179,11 @@ class Analyze {
             }
         }
 
-        function f(uv:UV):Array<Array<Point>> {
+        function f(uv : UV) : Array<Array<Point>> {
             return Eval.rationalSurfaceDerivatives(surface, uv[0], uv[1], 2);
         }
 
-        function n(uv:UV, e:Array<Array<Point>>, r:Array<Float>):UV {
+        function n(uv : UV, e : Array<Array<Point>>, r : Array<Float>) : UV {
 
             //f = Su(u,v) * r = 0
             //g = Sv(u,v) * r = 0
@@ -305,7 +305,7 @@ class Analyze {
     //
     //* The closest point on the surface, bounded by the parametric domain of the surface
 
-    public static function rationalCurveClosestPoint(curve:NurbsCurveData, p:Point):Point {
+    public static function rationalCurveClosestPoint(curve : NurbsCurveData, p : Point) : Point {
         return Eval.rationalCurvePoint(curve, rationalCurveClosestParam(curve, p));
     }
 
@@ -320,7 +320,7 @@ class Analyze {
     //
     //* The closest parameter on the curve, bounded by the parametric domain of the curve
 
-    public static function rationalCurveClosestParam(curve:NurbsCurveData, p:Point):Float {
+    public static function rationalCurveClosestParam(curve : NurbsCurveData, p : Point) : Float {
 
         //  We want to solve:
         //
@@ -385,11 +385,11 @@ class Analyze {
         , closed = Vec.normSquared(Vec.sub(curve.controlPoints[0], curve.controlPoints.last())) < Constants.EPSILON
         , cu = u;
 
-        function f(u:Float):Array<Point> {
+        function f(u : Float) : Array<Point> {
             return Eval.rationalCurveDerivatives(curve, u, 2);
         }
 
-        function n(u:Float, e:Array<Point>, d:Array<Float>):Float {
+        function n(u : Float, e : Array<Point>, d : Array<Float>) : Float {
             //   C'(u) * ( C(u) - P ) = 0 = f(u)
             var f = Vec.dot(e[1], d);
 
@@ -464,11 +464,11 @@ class Analyze {
     //
     //* The parameter
 
-    public static function rationalCurveParamAtArcLength(curve:NurbsCurveData,
-                                                         len:Float,
-                                                         tol:Float = 1e-3,
-                                                         beziers:Array<NurbsCurveData> = null,
-                                                         bezierLengths:Array<Float> = null):Float {
+    public static function rationalCurveParamAtArcLength(curve : NurbsCurveData,
+                                                         len : Float,
+                                                         tol : Float = 1e-3,
+                                                         beziers : Array<NurbsCurveData> = null,
+                                                         bezierLengths : Array<Float> = null) : Float {
 
         if (len < Constants.EPSILON) return curve.knots[0];
 
@@ -508,10 +508,10 @@ class Analyze {
     //
     //* the parameter
 
-    public static function rationalBezierCurveParamAtArcLength(curve:NurbsCurveData,
-                                                               len:Float,
-                                                               tol:Float = null,
-                                                               totalLength:Float = null):Float {
+    public static function rationalBezierCurveParamAtArcLength(curve : NurbsCurveData,
+                                                               len : Float,
+                                                               tol : Float = null,
+                                                               totalLength : Float = null) : Float {
         if (len < 0) return curve.knots[0];
 
         //we compute the whole length.  if desired length is outside of that, give up
@@ -556,7 +556,7 @@ class Analyze {
     //
     //* the approximate length
 
-    public static function rationalCurveArcLength(curve:NurbsCurveData, u:Float = null, gaussDegIncrease:Int = 16) {
+    public static function rationalCurveArcLength(curve : NurbsCurveData, u : Float = null, gaussDegIncrease : Int = 16) {
         u = (u == null) ? curve.knots.last() : u;
 
         var crvs = Modify.decomposeCurveIntoBeziers(curve)
@@ -585,7 +585,7 @@ class Analyze {
     //
     //* the approximate length
 
-    public static function rationalBezierCurveArcLength(curve:NurbsCurveData, u:Float = null, gaussDegIncrease:Int = 16):Float {
+    public static function rationalBezierCurveArcLength(curve : NurbsCurveData, u : Float = null, gaussDegIncrease : Int = 16) : Float {
 
         var u = u == null ? curve.knots.last() : u
         , z = (u - curve.knots[0]) / 2
@@ -607,7 +607,7 @@ class Analyze {
     }
 
     //Legendre-Gauss abscissae (xi values, defined at i=n as the roots of the nth order Legendre polynomial Pn(x))
-    static var Tvalues:Array<Array<Float>> = [
+    static var Tvalues : Array<Array<Float>> = [
         [], [],
         [ -0.5773502691896257645091487805019574556476, 0.5773502691896257645091487805019574556476],
         [0, -0.7745966692414833770358530799564799221665, 0.7745966692414833770358530799564799221665],
@@ -635,7 +635,7 @@ class Analyze {
     ];
 
     //Legendre-Gauss weights
-    static var Cvalues:Array<Array<Float>> = [
+    static var Cvalues : Array<Array<Float>> = [
         [], [],
         [1.0, 1.0],
         [0.8888888888888888888888888888888888888888, 0.5555555555555555555555555555555555555555, 0.5555555555555555555555555555555555555555],
@@ -669,10 +669,10 @@ class Analyze {
 class KnotMultiplicity {
 
     // The parameter of the knot
-    public var knot:Float;
+    public var knot : Float;
 
     // The multiplicity (i.e. the number of repeated occurrences) of the given knot in a knot vector
-    public var mult:Int;
+    public var mult : Int;
 
     // Create a new KnotMultiplicity object
     //**params**
@@ -680,7 +680,7 @@ class KnotMultiplicity {
     //* The knot position
     //* The multiplicity of the knot
 
-    public function new(knot:Float, mult:Int) {
+    public function new(knot : Float, mult : Int) {
         this.knot = knot;
         this.mult = mult;
     }

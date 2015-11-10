@@ -10,11 +10,11 @@ using verb.core.Vec;
 @:expose("core.Trig")
 class Trig {
 
-    public static function isPointInPlane(pt:Point, p:Plane, tol:Float):Bool {
+    public static function isPointInPlane(pt : Point, p : Plane, tol : Float) : Bool {
         return Math.abs(pt.sub(p.origin).dot(p.normal)) < tol;
     }
 
-    public static function distToSegment(a:Point, b:Point, c:Point) {
+    public static function distToSegment(a : Point, b : Point, c : Point) {
         var res = segmentClosestPoint(b, a, c, 0.0, 1.0);
         return Vec.dist(b, res.pt);
     }
@@ -107,7 +107,7 @@ class Trig {
     //
     //* *Object* with u and pt properties
 
-    public static function segmentClosestPoint(pt:Point, segpt0:Point, segpt1:Point, u0:Float, u1:Float) {
+    public static function segmentClosestPoint(pt : Point, segpt0 : Point, segpt1 : Point, u0 : Float, u1 : Float) {
 
         var dif = Vec.sub(segpt1, segpt0)
         , l = Vec.norm(dif);

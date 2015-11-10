@@ -4025,79 +4025,6 @@ verb_eval_CurveLengthSample.prototype = {
 var verb_eval_Eval = $hx_exports.eval.Eval = function() { };
 $hxClasses["verb.eval.Eval"] = verb_eval_Eval;
 verb_eval_Eval.__name__ = ["verb","eval","Eval"];
-verb_eval_Eval.rationalBezierCurveStepLength = function(curve,tol) {
-	var dehomo = verb_eval_Eval.dehomogenize1d(curve.controlPoints);
-	var bb = new verb_core_BoundingBox(dehomo);
-	var avgPt = verb_core_Vec.mul(0.5,verb_core_Vec.add(bb.min,bb.max));
-	var m = verb_core_Mat.identity(4);
-	m[0][3] = -avgPt[0];
-	m[1][3] = -avgPt[1];
-	m[2][3] = -avgPt[2];
-	var tc = verb_eval_Modify.rationalCurveTransform(curve,m);
-	dehomo = verb_eval_Eval.dehomogenize1d(tc.controlPoints);
-	var r = 0.0;
-	var n;
-	var _g1 = 0;
-	var _g = dehomo.length;
-	while(_g1 < _g) {
-		var i = _g1++;
-		n = verb_core_Vec.norm(dehomo[i]);
-		if(n > r) r = n;
-	}
-	var wts = verb_eval_Eval.weight1d(curve.controlPoints);
-	var w = verb_core_Vec.min(wts);
-	var domain = verb_core_ArrayExtensions.last(curve.knots) - curve.knots[0];
-	if(tol < r) {
-		var numer = 8 * w * tol;
-		var ws = verb_eval_Eval.secondForwardDiff(wts);
-		var pts = verb_eval_Eval.secondForwardDiff2(dehomo);
-		var fs;
-		var _g2 = [];
-		var _g21 = 0;
-		var _g11 = pts.length;
-		while(_g21 < _g11) {
-			var i1 = _g21++;
-			_g2.push(verb_core_Vec.norm(pts[i1]) + (r - tol) * ws[i1]);
-		}
-		fs = _g2;
-		var f = verb_core_Vec.max(fs);
-		var denom = curve.degree * (curve.degree - 1.0) * f;
-		return domain * Math.sqrt(numer / denom);
-	} else if(r >= tol && tol < 2.0 * r) {
-		var numer1 = 8 * w * tol;
-		var pts1 = verb_eval_Eval.secondForwardDiff2(dehomo);
-		var fs1;
-		var _g3 = [];
-		var _g22 = 0;
-		var _g12 = pts1.length;
-		while(_g22 < _g12) {
-			var i2 = _g22++;
-			_g3.push(verb_core_Vec.norm(pts1[i2]));
-		}
-		fs1 = _g3;
-		var f1 = verb_core_Vec.max(fs1);
-		var denom1 = curve.degree * (curve.degree - 1.0) * f1;
-		return domain * Math.sqrt(numer1 / denom1);
-	} else return domain;
-};
-verb_eval_Eval.secondForwardDiff = function(array) {
-	var i = 0;
-	var res = [];
-	while(i < array.length - 2) {
-		res.push(array[i + 2] - 2.0 * array[i + 1] + array[i]);
-		i++;
-	}
-	return res;
-};
-verb_eval_Eval.secondForwardDiff2 = function(array) {
-	var i = 0;
-	var res = [];
-	while(i < array.length - 2) {
-		res.push(verb_core_Vec.add(array[i + 2],verb_core_Vec.add(verb_core_Vec.mul(-2.0,array[i + 1]),array[i])));
-		i++;
-	}
-	return res;
-};
 verb_eval_Eval.rationalCurveTangent = function(curve,u) {
 	var derivs = verb_eval_Eval.rationalCurveDerivatives(curve,u,1);
 	return derivs[1];
@@ -6436,6 +6363,79 @@ verb_eval_Modify.curveKnotInsert = function(curve,u,r) {
 var verb_eval_Tess = $hx_exports.eval.Tess = function() { };
 $hxClasses["verb.eval.Tess"] = verb_eval_Tess;
 verb_eval_Tess.__name__ = ["verb","eval","Tess"];
+verb_eval_Tess.rationalBezierCurveStepLength = function(curve,tol) {
+	var dehomo = verb_eval_Eval.dehomogenize1d(curve.controlPoints);
+	var bb = new verb_core_BoundingBox(dehomo);
+	var avgPt = verb_core_Vec.mul(0.5,verb_core_Vec.add(bb.min,bb.max));
+	var m = verb_core_Mat.identity(4);
+	m[0][3] = -avgPt[0];
+	m[1][3] = -avgPt[1];
+	m[2][3] = -avgPt[2];
+	var tc = verb_eval_Modify.rationalCurveTransform(curve,m);
+	dehomo = verb_eval_Eval.dehomogenize1d(tc.controlPoints);
+	var r = 0.0;
+	var n;
+	var _g1 = 0;
+	var _g = dehomo.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		n = verb_core_Vec.norm(dehomo[i]);
+		if(n > r) r = n;
+	}
+	var wts = verb_eval_Eval.weight1d(curve.controlPoints);
+	var w = verb_core_Vec.min(wts);
+	var domain = verb_core_ArrayExtensions.last(curve.knots) - curve.knots[0];
+	if(tol < r) {
+		var numer = 8 * w * tol;
+		var ws = verb_eval_Tess.secondForwardDiff(wts);
+		var pts = verb_eval_Tess.secondForwardDiff2(dehomo);
+		var fs;
+		var _g2 = [];
+		var _g21 = 0;
+		var _g11 = pts.length;
+		while(_g21 < _g11) {
+			var i1 = _g21++;
+			_g2.push(verb_core_Vec.norm(pts[i1]) + (r - tol) * ws[i1]);
+		}
+		fs = _g2;
+		var f = verb_core_Vec.max(fs);
+		var denom = curve.degree * (curve.degree - 1.0) * f;
+		return domain * Math.sqrt(numer / denom);
+	} else if(r >= tol && tol < 2.0 * r) {
+		var numer1 = 8 * w * tol;
+		var pts1 = verb_eval_Tess.secondForwardDiff2(dehomo);
+		var fs1;
+		var _g3 = [];
+		var _g22 = 0;
+		var _g12 = pts1.length;
+		while(_g22 < _g12) {
+			var i2 = _g22++;
+			_g3.push(verb_core_Vec.norm(pts1[i2]));
+		}
+		fs1 = _g3;
+		var f1 = verb_core_Vec.max(fs1);
+		var denom1 = curve.degree * (curve.degree - 1.0) * f1;
+		return domain * Math.sqrt(numer1 / denom1);
+	} else return domain;
+};
+verb_eval_Tess.secondForwardDiff = function(array) {
+	var i = 0;
+	var res = [];
+	while(i < array.length - 2) {
+		res.push(array[i + 2] - 2.0 * array[i + 1] + array[i]);
+		i++;
+	}
+	return res;
+};
+verb_eval_Tess.secondForwardDiff2 = function(array) {
+	var i = 0;
+	var res = [];
+	while(i < array.length - 2) {
+		res.push(verb_core_Vec.add(array[i + 2],verb_core_Vec.add(verb_core_Vec.mul(-2.0,array[i + 1]),array[i])));
+		i++;
+	}
+	return res;
+};
 verb_eval_Tess.rationalCurveRegularSample = function(curve,numSamples,includeU) {
 	return verb_eval_Tess.rationalCurveRegularSampleRange(curve,curve.knots[0],verb_core_ArrayExtensions.last(curve.knots),numSamples,includeU);
 };

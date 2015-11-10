@@ -7,12 +7,12 @@ import verb.eval.Intersect;
 
 class MeshBoundingBoxTree implements IBoundingBoxTree<Int> {
 
-    var _children:Pair<IBoundingBoxTree<Int>, IBoundingBoxTree<Int>>;
-    var _boundingBox:BoundingBox;
-    var _face:Int = -1;
-    var _empty:Bool = false;
+    var _children : Pair<IBoundingBoxTree<Int>, IBoundingBoxTree<Int>>;
+    var _boundingBox : BoundingBox;
+    var _face : Int = -1;
+    var _empty : Bool = false;
 
-    public function new(mesh:MeshData, faceIndices:Array<Int> = null) {
+    public function new(mesh : MeshData, faceIndices : Array<Int> = null) {
 
         if (faceIndices == null) {
             faceIndices = [ for (i in 0...mesh.faces.length) i ];
@@ -38,7 +38,7 @@ class MeshBoundingBoxTree implements IBoundingBoxTree<Int> {
         );
     }
 
-    public function split():Pair<IBoundingBoxTree<Int>, IBoundingBoxTree<Int>> {
+    public function split() : Pair<IBoundingBoxTree<Int>, IBoundingBoxTree<Int>> {
         return _children;
     }
 
@@ -50,7 +50,7 @@ class MeshBoundingBoxTree implements IBoundingBoxTree<Int> {
         return _face;
     }
 
-    public function indivisible(tolerance:Float) {
+    public function indivisible(tolerance : Float) {
         return _children == null;
     }
 

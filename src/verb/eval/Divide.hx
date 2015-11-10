@@ -24,7 +24,7 @@ class Divide {
     //
     //* A length two array of new surfaces
 
-    public static function surfaceSplit(surface:NurbsSurfaceData, u:Float, useV:Bool = false):Array<NurbsSurfaceData> {
+    public static function surfaceSplit(surface : NurbsSurfaceData, u : Float, useV : Bool = false) : Array<NurbsSurfaceData> {
 
         var knots
         , degree
@@ -46,7 +46,7 @@ class Divide {
         , newpts1 = new Array<Array<Point>>();
 
         var s = Eval.knotSpan(degree, u, knots);
-        var res:NurbsCurveData = null;
+        var res : NurbsCurveData = null;
 
         for (cps in controlPoints) {
             res = Modify.curveKnotRefine(new NurbsCurveData(degree, knots, cps), knots_to_insert);
@@ -82,7 +82,7 @@ class Divide {
     //
     //* *Array* two new curves, defined by degree, knots, and control points
 
-    public static function curveSplit(curve:NurbsCurveData, u:Float):Array<NurbsCurveData> {
+    public static function curveSplit(curve : NurbsCurveData, u : Float) : Array<NurbsCurveData> {
 
         var degree = curve.degree
         , controlPoints = curve.controlPoints
@@ -119,7 +119,7 @@ class Divide {
     //
     //* An array of `CurveLengthSample` objects
 
-    public static function rationalCurveByEqualArcLength(curve:NurbsCurveData, num:Int):Array<CurveLengthSample> {
+    public static function rationalCurveByEqualArcLength(curve : NurbsCurveData, num : Int) : Array<CurveLengthSample> {
 
         var tlen = Analyze.rationalCurveArcLength(curve);
         var inc = tlen / num;
@@ -139,7 +139,7 @@ class Divide {
     //
     //* A sequence of `CurveLengthSample` objects
 
-    public static function rationalCurveByArcLength(curve:NurbsCurveData, l:Float):Array<CurveLengthSample> {
+    public static function rationalCurveByArcLength(curve : NurbsCurveData, l : Float) : Array<CurveLengthSample> {
 
         var crvs = Modify.decomposeCurveIntoBeziers(curve)
         , crvlens = crvs.map(function(x) { return Analyze.rationalBezierCurveArcLength(x); })
@@ -183,8 +183,8 @@ class Divide {
 
 @:expose("eval.CurveLengthSample")
 class CurveLengthSample {
-    public var u:Float;
-    public var len:Float;
+    public var u : Float;
+    public var len : Float;
 
     public function new(u, len) {
         this.u = u;

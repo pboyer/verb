@@ -19,7 +19,7 @@ class ConicalSurface extends NurbsSurface {
     //* Height of the cone
     //* Radius of the cone
 
-    public function new(axis:Vector, xaxis:Vector, base:Point, height:Float, radius:Float) {
+    public function new(axis : Vector, xaxis : Vector, base : Point, height : Float, radius : Float) {
         super(Make.conicalSurface(axis, xaxis, base, height, radius));
 
         _axis = axis;
@@ -29,11 +29,11 @@ class ConicalSurface extends NurbsSurface {
         _radius = radius;
     }
 
-    private var _axis:Vector;
-    private var _xaxis:Vector;
-    private var _base:Point;
-    private var _height:Float;
-    private var _radius:Float;
+    private var _axis : Vector;
+    private var _xaxis : Vector;
+    private var _base : Point;
+    private var _height : Float;
+    private var _radius : Float;
 
     //Length 3 array representing the axis of the cone
 

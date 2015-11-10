@@ -46,7 +46,7 @@ class Intersect {
     //
     //* array of NurbsCurveData objects
 
-    public static function surfaces(surface0:NurbsSurfaceData, surface1:NurbsSurfaceData, tol:Float):Array<NurbsCurveData> {
+    public static function surfaces(surface0 : NurbsSurfaceData, surface1 : NurbsSurfaceData, tol : Float) : Array<NurbsCurveData> {
 
         // 1) tessellate the two surfaces
         var tess1 = Tess.rationalSurfaceAdaptive(surface0);
@@ -57,7 +57,7 @@ class Intersect {
 
         // 3) refine the intersection points so that they lie on both surfaces to tolerance
         var exactPls = resApprox.map(function(pl) {
-            return pl.map(function(inter:MeshIntersectionPoint) {
+            return pl.map(function(inter : MeshIntersectionPoint) {
                 return Intersect.surfacesAtPointWithEstimate(surface0, surface1, inter.uv0, inter.uv1, tol);
             });
         });
@@ -82,11 +82,11 @@ class Intersect {
     //
     //* a SurfaceSurfaceIntersectionPoint object
 
-    public static function surfacesAtPointWithEstimate(surface0:NurbsSurfaceData,
-                                                       surface1:NurbsSurfaceData,
-                                                       uv1:UV,
-                                                       uv2:UV,
-                                                       tol:Float):SurfaceSurfaceIntersectionPoint {
+    public static function surfacesAtPointWithEstimate(surface0 : NurbsSurfaceData,
+                                                       surface1 : NurbsSurfaceData,
+                                                       uv1 : UV,
+                                                       uv2 : UV,
+                                                       tol : Float) : SurfaceSurfaceIntersectionPoint {
 
         var pds, p, pn, pu, pv, pd, qds, q, qn, qu, qv, qd, dist;
         var maxits = 5;
@@ -166,10 +166,10 @@ class Intersect {
     //
     //* array of array of MeshIntersectionPoints
 
-    public static function meshes(mesh0:MeshData,
-                                  mesh1:MeshData,
-                                  bbtree0:IBoundingBoxTree<Int> = null,
-                                  bbtree1:IBoundingBoxTree<Int> = null):Array<Array<MeshIntersectionPoint>> {
+    public static function meshes(mesh0 : MeshData,
+                                  mesh1 : MeshData,
+                                  bbtree0 : IBoundingBoxTree<Int> = null,
+                                  bbtree1 : IBoundingBoxTree<Int> = null) : Array<Array<MeshIntersectionPoint>> {
 
         if (bbtree0 == null) bbtree0 = new LazyMeshBoundingBoxTree( mesh0 );
         if (bbtree1 == null) bbtree1 = new LazyMeshBoundingBoxTree( mesh1 );
@@ -178,7 +178,7 @@ class Intersect {
         var bbints = Intersect.boundingBoxTrees(bbtree0, bbtree1, 0);
 
         //get the segments of the intersection crv with uvs
-        var segments = bbints.map(function(ids:Pair<Int, Int>) {
+        var segments = bbints.map(function(ids : Pair<Int, Int>) {
             return Intersect.triangles(mesh0, ids.item0, mesh1, ids.item1);
         }).filter(function(x) {
             return x != null;
@@ -224,7 +224,7 @@ class Intersect {
     //* array of array of array of MeshIntersectionPoints - corresponding to the collection of polylines formed with
     // each slice
 
-    public static function meshSlices(mesh:MeshData, min:Float, max:Float, step:Float):Array<Array<Array<MeshIntersectionPoint>>> {
+    public static function meshSlices(mesh : MeshData, min : Float, max : Float, step : Float) : Array<Array<Array<MeshIntersectionPoint>>> {
         var bbtree = new MeshBoundingBoxTree( mesh );
         var bb = bbtree.boundingBox();
 
@@ -259,7 +259,7 @@ class Intersect {
     //
     //* array of array of MeshIntersectionPoint
 
-    public static function makeMeshIntersectionPolylines(segments:Array<Interval<MeshIntersectionPoint>>):Array<Array<MeshIntersectionPoint>> {
+    public static function makeMeshIntersectionPolylines(segments : Array<Interval<MeshIntersectionPoint>>) : Array<Array<MeshIntersectionPoint>> {
 
         if (segments.length == 0) return [];
 
@@ -273,7 +273,7 @@ class Intersect {
         var tree = kdTreeFromSegments(segments);
 
         //flatten everything, we no longer need the segments
-        var ends:Array<MeshIntersectionPoint> = [];
+        var ends : Array<MeshIntersectionPoint> = [];
 
         for (seg in segments) {
             ends.push(seg.min);
@@ -364,7 +364,7 @@ class Intersect {
     //
     //* array of array of MeshIntersectionPoint
 
-    private static function kdTreeFromSegments(segments:Array<Interval<MeshIntersectionPoint>>):KdTree<MeshIntersectionPoint> {
+    private static function kdTreeFromSegments(segments : Array<Interval<MeshIntersectionPoint>>) : KdTree<MeshIntersectionPoint> {
 
         var treePoints = [];
 
@@ -388,7 +388,7 @@ class Intersect {
     //
     //* array of array of MeshIntersectionPoint
 
-    public static function lookupAdjacentSegment(segEnd:MeshIntersectionPoint, tree:KdTree<MeshIntersectionPoint>, numResults:Int) {
+    public static function lookupAdjacentSegment(segEnd : MeshIntersectionPoint, tree : KdTree<MeshIntersectionPoint>, numResults : Int) {
 
         //we look up 3 elements because we need to find the unique adj ele
         //we expect one result to be self, one to be neighbor and no more
@@ -414,11 +414,11 @@ class Intersect {
     //
     //* array of CurveSurfaceIntersection objects
 
-    public static function curveAndSurface(curve:NurbsCurveData,
-                                           surface:NurbsSurfaceData,
-                                           tol:Float = 1e-3,
-                                           crvBbTree:IBoundingBoxTree<NurbsCurveData> = null,
-                                           srfBbTree:IBoundingBoxTree<NurbsSurfaceData> = null):Array<CurveSurfaceIntersection> {
+    public static function curveAndSurface(curve : NurbsCurveData,
+                                           surface : NurbsSurfaceData,
+                                           tol : Float = 1e-3,
+                                           crvBbTree : IBoundingBoxTree<NurbsCurveData> = null,
+                                           srfBbTree : IBoundingBoxTree<NurbsSurfaceData> = null) : Array<CurveSurfaceIntersection> {
 
         crvBbTree = crvBbTree != null ? crvBbTree : new LazyCurveBoundingBoxTree( curve );
         srfBbTree = srfBbTree != null ? srfBbTree : new LazySurfaceBoundingBoxTree( surface );
@@ -466,10 +466,10 @@ class Intersect {
     //
     //* a CurveSurfaceIntersection object
 
-    public static function curveAndSurfaceWithEstimate(curve:NurbsCurveData,
-                                                       surface:NurbsSurfaceData,
-                                                       start_params:Array<Float>,
-                                                       tol:Float = 1e-3):CurveSurfaceIntersection {
+    public static function curveAndSurfaceWithEstimate(curve : NurbsCurveData,
+                                                       surface : NurbsSurfaceData,
+                                                       start_params : Array<Float>,
+                                                       tol : Float = 1e-3) : CurveSurfaceIntersection {
 
         var objective = function(x) {
             var p1 = Eval.rationalCurvePoint(curve, x[0])
@@ -532,9 +532,9 @@ class Intersect {
     //
     //* an array of PolylineMeshIntersection object
 
-    public static function polylineAndMesh(polyline:PolylineData,
-                                           mesh:MeshData,
-                                           tol:Float):Array<PolylineMeshIntersection> {
+    public static function polylineAndMesh(polyline : PolylineData,
+                                           mesh : MeshData,
+                                           tol : Float) : Array<PolylineMeshIntersection> {
 
         var res = Intersect.boundingBoxTrees(
             new LazyPolylineBoundingBoxTree( polyline ),
@@ -574,8 +574,8 @@ class Intersect {
     //
     //* an array of Pair objects extracted from the yield method of IBoundingBoxTree
 
-    private static function boundingBoxTrees<T1, T2>(ai:IBoundingBoxTree<T1>, bi:IBoundingBoxTree<T2>, tol:Float = 1e-9)
-    :Array<Pair<T1, T2>> {
+    private static function boundingBoxTrees<T1, T2>(ai : IBoundingBoxTree<T1>, bi : IBoundingBoxTree<T2>, tol : Float = 1e-9)
+    : Array<Pair<T1, T2>> {
 
         var atrees = [];
         var btrees = [];
@@ -652,13 +652,13 @@ class Intersect {
     //
     //* the intersections
 
-    public static function curves(curve1:NurbsCurveData, curve2:NurbsCurveData, tolerance:Float):Array<CurveCurveIntersection> {
+    public static function curves(curve1 : NurbsCurveData, curve2 : NurbsCurveData, tolerance : Float) : Array<CurveCurveIntersection> {
 
         var ints = Intersect.boundingBoxTrees(
             new LazyCurveBoundingBoxTree( curve1 ),
             new LazyCurveBoundingBoxTree( curve2 ), 0);
 
-        return ints.map(function(x:Pair<NurbsCurveData, NurbsCurveData>):CurveCurveIntersection {
+        return ints.map(function(x : Pair<NurbsCurveData, NurbsCurveData>) : CurveCurveIntersection {
             return Intersect.curvesWithEstimate(curve1, curve2, x.item0.knots.first(), x.item1.knots.first(), tolerance);
         }).filter(function(x) {
             return Vec.distSquared(x.point0, x.point1) < tolerance;
@@ -682,12 +682,12 @@ class Intersect {
     //
     //* array of CurveCurveIntersection objects
 
-    private static function curvesWithEstimate(curve0:NurbsCurveData,
-                                               curve1:NurbsCurveData,
-                                               u0:Float,
-                                               u1:Float,
-                                               tolerance:Float):CurveCurveIntersection {
-        var objective = function(x:Vector):Float {
+    private static function curvesWithEstimate(curve0 : NurbsCurveData,
+                                               curve1 : NurbsCurveData,
+                                               u0 : Float,
+                                               u1 : Float,
+                                               tolerance : Float) : CurveCurveIntersection {
+        var objective = function(x : Vector) : Float {
             var p1 = Eval.rationalCurvePoint(curve0, x[0])
             , p2 = Eval.rationalCurvePoint(curve1, x[1])
             , p1_p2 = Vec.sub(p1, p2);
@@ -745,7 +745,7 @@ class Intersect {
     //
     //* a point represented by an array of length (dim)
 
-    public static function triangles(mesh0:MeshData, faceIndex0:Int, mesh1:MeshData, faceIndex1:Int):Interval<MeshIntersectionPoint> {
+    public static function triangles(mesh0 : MeshData, faceIndex0 : Int, mesh1 : MeshData, faceIndex1 : Int) : Interval<MeshIntersectionPoint> {
 
         var tri0 = mesh0.faces[faceIndex0];
         var tri1 = mesh1.faces[faceIndex1];
@@ -778,7 +778,7 @@ class Intersect {
 
     }
 
-    public static function clipRayInCoplanarTriangle(ray:Ray, mesh:MeshData, faceIndex:Int):Interval<CurveTriPoint> {
+    public static function clipRayInCoplanarTriangle(ray : Ray, mesh : MeshData, faceIndex : Int) : Interval<CurveTriPoint> {
 
         // 0) construct rays for each edge of the triangle
         var tri = mesh.faces[faceIndex]
@@ -790,8 +790,8 @@ class Intersect {
         , l = s.map(Vec.norm);
 
         // 1) for each tri ray, if intersects and in segment interval, store minU, maxU
-        var minU:CurveTriPoint = null;
-        var maxU:CurveTriPoint = null;
+        var minU : CurveTriPoint = null;
+        var maxU : CurveTriPoint = null;
 
         //need to clip in order to maximize the width of the intervals
         for (i in 0...3) {
@@ -829,8 +829,8 @@ class Intersect {
 
     }
 
-    public static function mergeTriangleClipIntervals(clip1:Interval<CurveTriPoint>, clip2:Interval<CurveTriPoint>,
-                                                      mesh1:MeshData, faceIndex1:Int, mesh2:MeshData, faceIndex2:Int):Interval<MeshIntersectionPoint> {
+    public static function mergeTriangleClipIntervals(clip1 : Interval<CurveTriPoint>, clip2 : Interval<CurveTriPoint>,
+                                                      mesh1 : MeshData, faceIndex1 : Int, mesh2 : MeshData, faceIndex2 : Int) : Interval<MeshIntersectionPoint> {
 
         //if the intervals dont overlap, fail
         if (clip2.min.u > clip1.max.u + Constants.EPSILON
@@ -878,7 +878,7 @@ class Intersect {
     //
     //* a point represented by an array of length (dim)
 
-    public static function planes(origin0:Point, normal0:Vector, origin1:Point, normal1:Vector):Ray {
+    public static function planes(origin0 : Point, normal0 : Vector, origin1 : Point, normal1 : Vector) : Ray {
 
         var d = Vec.cross(normal0, normal1);
 
@@ -956,7 +956,7 @@ class Intersect {
     //
     //* the point representing the intersection
 
-    public static function threePlanes(n0:Point, d0:Float, n1:Point, d1:Float, n2:Point, d2:Float):Point {
+    public static function threePlanes(n0 : Point, d0 : Float, n1 : Point, d1 : Float, n2 : Point, d2 : Float) : Point {
 
         var u = Vec.cross(n1, n2);
         var den = Vec.dot(n0, u);
@@ -982,8 +982,8 @@ class Intersect {
     //
     //* array of parameter pairs representing the intersection of the two parameteric polylines
 
-    public static function polylines(polyline0:PolylineData, polyline1:PolylineData, tol:Float)
-    :Array<CurveCurveIntersection> {
+    public static function polylines(polyline0 : PolylineData, polyline1 : PolylineData, tol : Float)
+    : Array<CurveCurveIntersection> {
 
         var res = Intersect.boundingBoxTrees(
             new LazyPolylineBoundingBoxTree( polyline0 ),
@@ -1024,7 +1024,7 @@ class Intersect {
     //
     //* a CurveCurveIntersection object
 
-    public static function segments(a0:Point, a1:Point, b0:Point, b1:Point, tol:Float):CurveCurveIntersection {
+    public static function segments(a0 : Point, a1 : Point, b0 : Point, b1 : Point, tol : Float) : CurveCurveIntersection {
 
         var a1ma0 = Vec.sub(a1, a0),
         aN = Math.sqrt(Vec.dot(a1ma0, a1ma0)),
@@ -1063,7 +1063,7 @@ class Intersect {
     //
     //* a CurveCurveIntersection object
 
-    public static function rays(a0:Point, a:Point, b0:Point, b:Point):CurveCurveIntersection {
+    public static function rays(a0 : Point, a : Point, b0 : Point, b : Point) : CurveCurveIntersection {
 
         var dab = Vec.dot(a, b),
         dab0 = Vec.dot(a, b0),
@@ -1102,7 +1102,7 @@ class Intersect {
     //
     //* a TriangleSegmentIntersection or null if failed
 
-    public static function segmentWithTriangle(p0:Point, p1:Point, points:Array<Point>, tri:Tri):TriSegmentIntersection {
+    public static function segmentWithTriangle(p0 : Point, p1 : Point, points : Array<Point>, tri : Tri) : TriSegmentIntersection {
 
         var v0 = points[ tri[0] ]
         , v1 = points[ tri[1] ]
@@ -1170,7 +1170,7 @@ class Intersect {
     //**returns**
     //null or an object with a p property representing the param on the segment
 
-    public static function segmentAndPlane(p0:Point, p1:Point, v0:Point, n:Point) {
+    public static function segmentAndPlane(p0 : Point, p1 : Point, v0 : Point, n : Point) {
 
         //the length of the segment
         var denom = Vec.dot(n, Vec.sub(p1, p0));
@@ -1193,9 +1193,9 @@ class Intersect {
 }
 
 interface IBoundingBoxTree<T> {
-    public function boundingBox():BoundingBox;
-    public function split():Pair<IBoundingBoxTree<T>, IBoundingBoxTree<T>>;
-    public function yield():T;
-    public function indivisible(tolerance:Float):Bool;
-    public function empty():Bool;
+    public function boundingBox() : BoundingBox;
+    public function split() : Pair<IBoundingBoxTree<T>, IBoundingBoxTree<T>>;
+    public function yield() : T;
+    public function indivisible(tolerance : Float) : Bool;
+    public function empty() : Bool;
 }

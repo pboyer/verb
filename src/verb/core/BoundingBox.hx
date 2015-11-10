@@ -12,8 +12,8 @@ using Lambda;
 @:expose("core.BoundingBox")
 class BoundingBox {
 
-    var initialized:Bool = false;
-    var dim:Int = 3;
+    var initialized : Bool = false;
+    var dim : Int = 3;
 
     //BoundingBox Constructor
     //
@@ -21,17 +21,17 @@ class BoundingBox {
     //
     //* Points to add, if desired.  Otherwise, will not be initialized until add is called.
 
-    public function new(pts:Array<Point> = null) {
+    public function new(pts : Array<Point> = null) {
         if (pts != null) {
             this.addRange(pts);
         }
     }
 
     // The minimum point of the BoundingBox - the coordinates of this point are always <= max.
-    public var min:Point = null;
+    public var min : Point = null;
 
     // The maximum point of the BoundingBox. The coordinates of this point are always >= min.
-    public var max:Point = null;
+    public var max : Point = null;
 
     //Create a bounding box initialized with a single element
     //
@@ -58,7 +58,7 @@ class BoundingBox {
     //
     //* This BoundingBox for chaining
 
-    public function add(point:Point):BoundingBox {
+    public function add(point : Point) : BoundingBox {
         if (!this.initialized) {
             this.dim = point.length;
             this.min = point.slice(0);
@@ -87,7 +87,7 @@ class BoundingBox {
     //
     //* this BoundingBox for chaining
 
-    public function addRange(points:Array<Point>):BoundingBox {
+    public function addRange(points : Array<Point>) : BoundingBox {
         var l = points.length;
 
         for (i in 0...l) {
@@ -108,7 +108,7 @@ class BoundingBox {
     //
     //* true if the two intervals overlap, otherwise false
 
-    public function contains(point:Point, tol:Float = -1):Bool {
+    public function contains(point : Point, tol : Float = -1) : Bool {
 
         if (!this.initialized) {
             return false;
@@ -130,7 +130,7 @@ class BoundingBox {
     //
     //* true if the two intervals overlap, otherwise false
 
-    public static function intervalsOverlap(a1:Float, a2:Float, b1:Float, b2:Float, tol:Float = -1):Bool {
+    public static function intervalsOverlap(a1 : Float, a2 : Float, b1 : Float, b2 : Float, tol : Float = -1) : Bool {
 
         var tol = tol < -0.5 ? Constants.TOLERANCE : tol
         , x1 = Math.min(a1, a2) - tol
@@ -151,7 +151,7 @@ class BoundingBox {
     //
     //*  true if the two bounding boxes intersect, otherwise false
 
-    public function intersects(bb:BoundingBox, tol:Float = -1):Bool {
+    public function intersects(bb : BoundingBox, tol : Float = -1) : Bool {
 
         if (!this.initialized || !bb.initialized) return false;
 
@@ -174,7 +174,7 @@ class BoundingBox {
     //
     //* this BoundingBox for chaining
 
-    public function clear():BoundingBox {
+    public function clear() : BoundingBox {
         this.initialized = false;
         return this;
     }
@@ -185,7 +185,7 @@ class BoundingBox {
     //
     //* Index of longest axis
 
-    public function getLongestAxis():Int {
+    public function getLongestAxis() : Int {
 
         var max = 0.0;
         var id = 0;
@@ -211,7 +211,7 @@ class BoundingBox {
     //
     //* Length of the given axis.  If axis is out of bounds, returns 0.
 
-    public function getAxisLength(i:Int):Float {
+    public function getAxisLength(i : Int) : Float {
         if (i < 0 || i > this.dim - 1) return 0.0;
         return Math.abs(this.min[i] - this.max[i]);
     }
@@ -227,7 +227,7 @@ class BoundingBox {
     //
     //* The bounding box formed by the intersection or null if there is no intersection.
 
-    public function intersect(bb:BoundingBox, tol:Float):BoundingBox {
+    public function intersect(bb : BoundingBox, tol : Float) : BoundingBox {
 
         if (!this.initialized) return null;
 

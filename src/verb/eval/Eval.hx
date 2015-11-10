@@ -33,7 +33,7 @@ class Eval {
     //
     //* a Vector represented by an array of length (dim)
 
-    public static function rationalCurveTangent(curve:NurbsCurveData, u:Float):Array<Float> {
+    public static function rationalCurveTangent(curve : NurbsCurveData, u : Float) : Array<Float> {
         var derivs = rationalCurveDerivatives(curve, u, 1);
         return derivs[1];
     }
@@ -50,7 +50,7 @@ class Eval {
     //
     //* a Vector represented by an array of length (dim)
 
-    public static function rationalSurfaceNormal(surface:NurbsSurfaceData, u:Float, v:Float):Array<Float> {
+    public static function rationalSurfaceNormal(surface : NurbsSurfaceData, u : Float, v : Float) : Array<Float> {
         var derivs = rationalSurfaceDerivatives(surface, u, v, 1);
         return Vec.cross(derivs[1][0], derivs[0][1]);
     }
@@ -68,10 +68,10 @@ class Eval {
     //
     //* a point represented by an array of length (dim)
 
-    public static function rationalSurfaceDerivatives(surface:NurbsSurfaceData,
-                                                      u:Float,
-                                                      v:Float,
-                                                      numDerivs:Int = 1):Array<Array<Array<Float>>> {
+    public static function rationalSurfaceDerivatives(surface : NurbsSurfaceData,
+                                                      u : Float,
+                                                      v : Float,
+                                                      numDerivs : Int = 1) : Array<Array<Array<Float>>> {
 
         var ders = surfaceDerivatives(surface, u, v, numDerivs)
         , Aders = rational2d(ders)
@@ -126,7 +126,7 @@ class Eval {
     //
     //* a point represented by an array of length (dim)
 
-    public static function rationalSurfacePoint(surface:NurbsSurfaceData, u:Float, v:Float):Point {
+    public static function rationalSurfacePoint(surface : NurbsSurfaceData, u : Float, v : Float) : Point {
         return dehomogenize(surfacePoint(surface, u, v));
     }
 
@@ -142,7 +142,7 @@ class Eval {
     //
     //* a point represented by an array of length (dim)
 
-    public static function rationalCurveDerivatives(curve:NurbsCurveData, u:Float, numDerivs:Int = 1):Array<Point> {
+    public static function rationalCurveDerivatives(curve : NurbsCurveData, u : Float, numDerivs : Int = 1) : Array<Point> {
 
         var ders = curveDerivatives(curve, u, numDerivs)
         , Aders = rational1d(ders)
@@ -180,7 +180,7 @@ class Eval {
     //
     //* a point represented by an array of length (dim)
 
-    public static function rationalCurvePoint(curve:NurbsCurveData, u:Float):Point {
+    public static function rationalCurvePoint(curve : NurbsCurveData, u : Float) : Point {
         return dehomogenize(curvePoint(curve, u));
     }
 
@@ -197,7 +197,7 @@ class Eval {
     //
     //* a 2d jagged array representing the derivatives - u derivatives increase by row, v by column
 
-    public static function surfaceDerivatives(surface:NurbsSurfaceData, u:Float, v:Float, numDerivs:Int):Array<Array<Point>> {
+    public static function surfaceDerivatives(surface : NurbsSurfaceData, u : Float, v : Float, numDerivs : Int) : Array<Array<Point>> {
 
         var n = surface.knotsU.length - surface.degreeU - 2
         , m = surface.knotsV.length - surface.degreeV - 2;
@@ -221,12 +221,12 @@ class Eval {
     //
     //* a 2d jagged array representing the derivatives - u derivatives increase by row, v by column
 
-    public static function surfaceDerivativesGivenNM(n:Int,
-                                                     m:Int,
-                                                     surface:NurbsSurfaceData,
-                                                     u:Float,
-                                                     v:Float,
-                                                     numDerivs:Int):Array<Array<Point>> {
+    public static function surfaceDerivativesGivenNM(n : Int,
+                                                     m : Int,
+                                                     surface : NurbsSurfaceData,
+                                                     u : Float,
+                                                     v : Float,
+                                                     numDerivs : Int) : Array<Array<Point>> {
 
         var degreeU = surface.degreeU
         , degreeV = surface.degreeV
@@ -287,7 +287,7 @@ class Eval {
     //
     //* a point represented by an array of length (dim)
 
-    public static function surfacePoint(surface:NurbsSurfaceData, u:Float, v:Float):Point {
+    public static function surfacePoint(surface : NurbsSurfaceData, u : Float, v : Float) : Point {
 
         var n = surface.knotsU.length - surface.degreeU - 2
         , m = surface.knotsV.length - surface.degreeV - 2;
@@ -311,7 +311,7 @@ class Eval {
     //
     //* a point represented by an array of length (dim)
 
-    public static function surfacePointGivenNM(n:Int, m:Int, surface:NurbsSurfaceData, u:Float, v:Float):Point {
+    public static function surfacePointGivenNM(n : Int, m : Int, surface : NurbsSurfaceData, u : Float, v : Float) : Point {
 
         var degreeU = surface.degreeU
         , degreeV = surface.degreeV
@@ -352,114 +352,6 @@ class Eval {
         return position;
     }
 
-    // Compute a regularly spaced sequence of points on a non-uniform, rational spline curve. Generally, this algorithm
-    // is much faster than computing these points directly. This algorithm is based on the forward difference algorithm
-    // presented in chapter 4 of
-    // [T. W. Sederberg, BYU, Computer Aided Geometric Design Course Notes](http://cagd.cs.byu.edu/~557/text/cagd.pdf)
-    //
-    //**params**
-    //
-    //* NurbsCurveData object representing the curve
-    //* number of divisions
-    //
-    //**returns**
-    //
-    //* an array of (divs+1) points
-
-    public static function rationalCurveRegularSamplePoints(crv:NurbsCurveData, divs:Int):Array<Point> {
-
-        var range = crv.knots.last() - crv.knots[0];
-        var beziers = Modify.decomposeCurveIntoBeziers(crv);
-        var pts = [];
-        var brange, fraction;
-
-        var currentU = crv.knots[0];
-        var step = range / divs;
-        var brange, bsteps, nextU;
-
-        for (i in 0...beziers.length) {
-
-            brange = beziers[i].knots.last() - currentU;
-            bsteps = Math.ceil(brange / step); //
-            nextU = currentU + bsteps * step;
-
-            if (nextU > beziers[i].knots.last() + Constants.TOLERANCE) {
-                nextU -= step;
-                bsteps--;
-            }
-
-            rationalBezierCurveRegularSamplePointsMutate(beziers[i], pts, currentU, step, bsteps + 1);
-
-            currentU = nextU + step;
-        }
-
-        return pts;
-    }
-
-    private static function rationalBezierCurveRegularSamplePointsMutate(crv:NurbsCurveData,
-                                                                         pts:Array<Point>,
-                                                                         startU:Float,
-                                                                         step:Float,
-                                                                         numSteps:Int) {
-
-        var its = [], ts = [ its ], u = startU, degree1 = crv.degree + 1;
-
-        if (numSteps <= crv.degree + 1) {
-            for (i in 0...numSteps) {
-                pts.push(rationalCurvePoint(crv, u));
-                u += step;
-            }
-            return;
-        }
-
-        // initialize forward differencing
-
-        for (i in 0...degree1) {
-            its.push(curvePoint(crv, u));
-            u += step;
-        }
-
-        // compute the differences
-
-        var prev;
-
-        for (i in 1...degree1) {
-            its = [];
-            ts.push(its);
-            prev = ts[i - 1];
-
-            for (j in 1...prev.length) {
-                its.push(Vec.sub(prev[j], prev[j - 1]));
-            }
-        }
-
-        // evaluate the intial points
-
-        for (pt in ts[0]) {
-            pts.push(dehomogenize(pt));
-        }
-
-        // evaluate the rest of the points
-
-        var front = [ for (r in ts) r.last() ], k;
-        var frlen2 = front.length - 2;
-
-        for (i in 0...numSteps - degree1) {
-
-            // Rright = R + Rdown
-
-            // compute the new forward difference front
-
-            for (j in 0...front.length - 1) {
-                k = frlen2 - j; // invert
-                Vec.addMutate(front[k], front[k + 1]);
-            }
-
-            // add the new pt
-            pts.push(dehomogenize(front[0]));
-        }
-    }
-
     // Compute a regularly spaced grid of derivatives on a non-uniform, rational, B spline surface. Generally, this algorithm
     // is faster than directly evaluating these as we can pre-compute all of the basis function arrays
     //
@@ -474,7 +366,7 @@ class Eval {
     //
     //* a 2d array of dimension (divsU+1, divsV+1) of derivative values where each entry is similar to that returned by `rationalSurfaceDerivatives`
 
-    public static function rationalSurfaceRegularSampleDerivatives(surface:NurbsSurfaceData, divsU:Int, divsV:Int, numDerivs:Int) {
+    public static function rationalSurfaceRegularSampleDerivatives(surface : NurbsSurfaceData, divsU : Int, divsV : Int, numDerivs : Int) {
 
         var allders = surfaceRegularSampleDerivatives(surface, divsU, divsV, numDerivs);
 
@@ -544,7 +436,7 @@ class Eval {
     //
     //* a 2d array of dimension (divsU+1, divsV+1) of derivative values where each entry is similar to that returned by surfaceDerivatives
 
-    public static function surfaceRegularSampleDerivatives(surface:NurbsSurfaceData, divsU:Int, divsV:Int, numDerivs:Int) {
+    public static function surfaceRegularSampleDerivatives(surface : NurbsSurfaceData, divsU : Int, divsV : Int, numDerivs : Int) {
 
         var degreeU = surface.degreeU
         , degreeV = surface.degreeV
@@ -590,7 +482,7 @@ class Eval {
     //
     //* a 2d array of dimension (divsU+1, divsV+1) of points
 
-    public static function rationalSurfaceRegularSamplePoints(surface:NurbsSurfaceData, divsU:Int, divsV:Int):Array<Array<Point>> {
+    public static function rationalSurfaceRegularSamplePoints(surface : NurbsSurfaceData, divsU : Int, divsV : Int) : Array<Array<Point>> {
         return dehomogenize2d(surfaceRegularSamplePoints(surface, divsU, divsV));
     }
 
@@ -607,7 +499,7 @@ class Eval {
     //
     //* a 2d array of dimension (divsU+1, divsV+1) of points
 
-    public static function surfaceRegularSamplePoints(surface:NurbsSurfaceData, divsU:Int, divsV:Int):Array<Array<Point>> {
+    public static function surfaceRegularSamplePoints(surface : NurbsSurfaceData, divsU : Int, divsV : Int) : Array<Array<Point>> {
 
         var degreeU = surface.degreeU
         , degreeV = surface.degreeV
@@ -640,7 +532,7 @@ class Eval {
         return pts;
     }
 
-    public static function surfaceRegularSamplePoints2(surface:NurbsSurfaceData, divsU:Int, divsV:Int):Array<Array<Point>> {
+    public static function surfaceRegularSamplePoints2(surface : NurbsSurfaceData, divsU : Int, divsV : Int) : Array<Array<Point>> {
 
         var pts = [];
 
@@ -657,10 +549,10 @@ class Eval {
         return pts;
     }
 
-    private static function regularlySpacedBasisFunctions(degree:Int, knots:KnotArray, divs:Int):Pair<Array<Int>, Array<Array<Float>>> {
+    private static function regularlySpacedBasisFunctions(degree : Int, knots : KnotArray, divs : Int) : Pair<Array<Int>, Array<Array<Float>>> {
 
-        var n:Int = knots.length - degree - 2;
-        var span:Float = (knots.last() - knots[0]) / divs;
+        var n : Int = knots.length - degree - 2;
+        var span : Float = (knots.last() - knots[0]) / divs;
 
         var bases = [];
         var knotspans = [];
@@ -679,10 +571,10 @@ class Eval {
         return new Pair<Array<Int>, Array<Array<Float>>>( knotspans, bases );
     }
 
-    private static function regularlySpacedDerivativeBasisFunctions(degree:Int, knots:KnotArray, divs:Int) {
+    private static function regularlySpacedDerivativeBasisFunctions(degree : Int, knots : KnotArray, divs : Int) {
 
-        var n:Int = knots.length - degree - 2;
-        var span:Float = (knots.last() - knots[0]) / divs;
+        var n : Int = knots.length - degree - 2;
+        var span : Float = (knots.last() - knots[0]) / divs;
 
         var bases = [];
         var knotspans = [];
@@ -701,17 +593,17 @@ class Eval {
         return new Pair<Array<Int>, Array<Array<Array<Float>>>>( knotspans, bases );
     }
 
-    private static function surfacePointGivenBasesKnotSpans(degreeU:Int,
-                                                            degreeV:Int,
-                                                            controlPoints:Array<Array<Point>>,
-                                                            knotSpanU:Int,
-                                                            knotSpanV:Int,
-                                                            basesU:Array<Float>,
-                                                            basesV:Array<Float>,
-                                                            dim:Int):Point {
+    private static function surfacePointGivenBasesKnotSpans(degreeU : Int,
+                                                            degreeV : Int,
+                                                            controlPoints : Array<Array<Point>>,
+                                                            knotSpanU : Int,
+                                                            knotSpanV : Int,
+                                                            basesU : Array<Float>,
+                                                            basesV : Array<Float>,
+                                                            dim : Int) : Point {
 
         var position = Vec.zeros1d(dim)
-        , temp:Array<Float>;
+        , temp : Array<Float>;
 
         // could be precomputed
         var uind = knotSpanU - degreeU;
@@ -733,15 +625,15 @@ class Eval {
         return position;
     }
 
-    private static function surfaceDerivativesGivenBasesKnotSpans(degreeU:Int,
-                                                                  degreeV:Int,
-                                                                  controlPoints:Array<Array<Point>>,
-                                                                  knotSpanU:Int,
-                                                                  knotSpanV:Int,
-                                                                  basesU:Array<Array<Float>>,
-                                                                  basesV:Array<Array<Float>>,
-                                                                  dim:Int,
-                                                                  numDerivs:Int) {
+    private static function surfaceDerivativesGivenBasesKnotSpans(degreeU : Int,
+                                                                  degreeV : Int,
+                                                                  controlPoints : Array<Array<Point>>,
+                                                                  knotSpanU : Int,
+                                                                  knotSpanV : Int,
+                                                                  basesU : Array<Array<Float>>,
+                                                                  basesV : Array<Array<Float>>,
+                                                                  dim : Int,
+                                                                  numDerivs : Int) {
 
         var dim = controlPoints[0][0].length
         , du = numDerivs < degreeU ? numDerivs : degreeU
@@ -786,7 +678,7 @@ class Eval {
     //
     //* a point represented by an array of length (dim)
 
-    public static function curveDerivatives(crv:NurbsCurveData, u:Float, numDerivs:Int):Array<Point> {
+    public static function curveDerivatives(crv : NurbsCurveData, u : Float, numDerivs : Int) : Array<Point> {
 
         var n = crv.knots.length - crv.degree - 2;
         return curveDerivativesGivenN(n, crv, u, numDerivs);
@@ -806,7 +698,7 @@ class Eval {
     //
     //* a point represented by an array of length (dim)
 
-    public static function curveDerivativesGivenN(n:Int, curve:NurbsCurveData, u:Float, numDerivs:Int):Array<Point> {
+    public static function curveDerivativesGivenN(n : Int, curve : NurbsCurveData, u : Float, numDerivs : Int) : Array<Point> {
 
         var degree = curve.degree
         , controlPoints = curve.controlPoints
@@ -843,7 +735,7 @@ class Eval {
     //
     //* a point represented by an array of length (dim)
 
-    public static function curvePoint(curve:NurbsCurveData, u:Float) {
+    public static function curvePoint(curve : NurbsCurveData, u : Float) {
         var n = curve.knots.length - curve.degree - 2;
         return curvePointGivenN(n, curve, u);
     }
@@ -861,7 +753,7 @@ class Eval {
     //
     //* whether the values are correct
 
-    public static function areValidRelations(degree:Int, num_controlPoints:Int, knots_length:Int):Bool {
+    public static function areValidRelations(degree : Int, num_controlPoints : Int, knots_length : Int) : Bool {
         return num_controlPoints + degree + 1 - knots_length == 0;
     }
 
@@ -878,7 +770,7 @@ class Eval {
     //
     //* a point represented by an array of length (dim)
 
-    public static function curvePointGivenN(n:Int, curve:NurbsCurveData, u:Float):Point {
+    public static function curvePointGivenN(n : Int, curve : NurbsCurveData, u : Float) : Point {
 
         var degree = curve.degree
         , controlPoints = curve.controlPoints
@@ -913,7 +805,7 @@ class Eval {
     //
     //* a point represented by an array of length (dim)
 
-    public static function volumePoint(volume:VolumeData, u:Float, v:Float, w:Float):Point {
+    public static function volumePoint(volume : VolumeData, u : Float, v : Float, w : Float) : Point {
         var n = volume.knotsU.length - volume.degreeU - 2
         , m = volume.knotsV.length - volume.degreeV - 2
         , l = volume.knotsW.length - volume.degreeW - 2;
@@ -934,13 +826,13 @@ class Eval {
     //
     //* a point represented by an array of length (dim)
 
-    public static function volumePointGivenNML(volume:VolumeData,
-                                               n:Int,
-                                               m:Int,
-                                               l:Int,
-                                               u:Float,
-                                               v:Float,
-                                               w:Float):Point {
+    public static function volumePointGivenNML(volume : VolumeData,
+                                               n : Int,
+                                               m : Int,
+                                               l : Int,
+                                               u : Float,
+                                               v : Float,
+                                               w : Float) : Point {
 
         if (!areValidRelations(volume.degreeU, volume.controlPoints.length, volume.knotsU.length) ||
         !areValidRelations(volume.degreeV, volume.controlPoints[0].length, volume.knotsV.length) ||
@@ -1005,7 +897,7 @@ class Eval {
     //
     //* 2d array of basis and derivative values of size (n+1, p+1) The nth row is the nth derivative and the first row is made up of the basis function values.
 
-    public static function derivativeBasisFunctions(u:Float, degree:Int, knots:KnotArray):Array<Array<Float>> {
+    public static function derivativeBasisFunctions(u : Float, degree : Int, knots : KnotArray) : Array<Array<Float>> {
         var knotSpan_index = knotSpan(degree, u, knots)
         , m = knots.length - 1
         , n = m - degree - 1;
@@ -1028,8 +920,8 @@ class Eval {
     //
     //* 2d array of basis and derivative values of size (n+1, p+1) The nth row is the nth derivative and the first row is made up of the basis function values.
 
-    public static function derivativeBasisFunctionsGivenNI(knotIndex:Int, u:Float, p:Int,
-                                                           n:Int, knots:KnotArray):Array<Array<Float>> {
+    public static function derivativeBasisFunctionsGivenNI(knotIndex : Int, u : Float, p : Int,
+                                                           n : Int, knots : KnotArray) : Array<Array<Float>> {
         var ndu = Vec.zeros2d(p + 1, p + 1)
         , left = Vec.zeros1d(p + 1)
         , right = Vec.zeros1d(p + 1)
@@ -1056,13 +948,13 @@ class Eval {
 
         var ders = Vec.zeros2d(n + 1, p + 1)
         , a = Vec.zeros2d(2, p + 1)
-        , s1:Int = 0
-        , s2:Int = 1
-        , d:Float = 0.0
-        , rk:Int = 0
-        , pk:Int = 0
-        , j1:Int = 0
-        , j2:Int = 0;
+        , s1 : Int = 0
+        , s2 : Int = 1
+        , d : Float = 0.0
+        , rk : Int = 0
+        , pk : Int = 0
+        , j1 : Int = 0
+        , j2 : Int = 0;
 
         for (j in 0...p + 1) {
             ders[0][j] = ndu[j][p];
@@ -1138,7 +1030,7 @@ class Eval {
     //* list of non-vanishing basis functions
     //
 
-    public static function basisFunctions(u:Float, degree:Int, knots:KnotArray):Array<Float> {
+    public static function basisFunctions(u : Float, degree : Int, knots : KnotArray) : Array<Float> {
         var knotSpan_index = knotSpan(degree, u, knots);
         return basisFunctionsGivenKnotSpanIndex(knotSpan_index, u, degree, knots);
     }
@@ -1158,15 +1050,15 @@ class Eval {
     //* list of non-vanishing basis functions
     //
 
-    public static function basisFunctionsGivenKnotSpanIndex(knotSpan_index:Int,
-                                                            u:Float,
-                                                            degree:Int,
-                                                            knots:KnotArray):Array<Float> {
+    public static function basisFunctionsGivenKnotSpanIndex(knotSpan_index : Int,
+                                                            u : Float,
+                                                            degree : Int,
+                                                            knots : KnotArray) : Array<Float> {
         var basisFunctions = Vec.zeros1d(degree + 1);
         var left = Vec.zeros1d(degree + 1);
         var right = Vec.zeros1d(degree + 1);
-        var saved:Float = 0;
-        var temp:Float = 0;
+        var saved : Float = 0;
+        var temp : Float = 0;
 
         basisFunctions[0] = 1.0;
 
@@ -1200,7 +1092,7 @@ class Eval {
     //* the index of the knot span
     //
 
-    public static function knotSpan(degree:Int, u:Float, knots:Array<Float>):Int {
+    public static function knotSpan(degree : Int, u : Float, knots : Array<Float>) : Int {
         return knotSpanGivenN(knots.length - degree - 2, degree, u, knots);
     }
 
@@ -1219,7 +1111,7 @@ class Eval {
     //* the index of the knot span
     //
 
-    public static function knotSpanGivenN(n:Int, degree:Int, u:Float, knots:Array<Float>):Int {
+    public static function knotSpanGivenN(n : Int, degree : Int, u : Float, knots : Array<Float>) : Int {
         if (u > knots[n + 1] - Constants.EPSILON) {
             return n;
         }
@@ -1255,7 +1147,7 @@ class Eval {
     //
     //* a point represented by an array pi with length (dim)
 
-    public static function dehomogenize(homoPoint:Point):Point {
+    public static function dehomogenize(homoPoint : Point) : Point {
 
         var dim = homoPoint.length
         , point = []
@@ -1280,9 +1172,9 @@ class Eval {
     //
     //* array of points represented by an array (wi*pi) with length (dim)
 
-    public static function rational1d(homoPoints:Array<Point>):Array<Point> {
+    public static function rational1d(homoPoints : Array<Point>) : Array<Point> {
         var dim = homoPoints[0].length - 1;
-        return homoPoints.map(function(x:Point) { return x.slice(0, dim); });
+        return homoPoints.map(function(x : Point) { return x.slice(0, dim); });
     }
 
     //Obtain the weight from a collection of points in homogeneous space, assuming all
@@ -1296,7 +1188,7 @@ class Eval {
     //
     //*  array of arrays of points, each represented by an array pi with length (dim)
 
-    public static function rational2d(homoPoints:Array<Array<Point>>):Array<Array<Point>> {
+    public static function rational2d(homoPoints : Array<Array<Point>>) : Array<Array<Point>> {
         return homoPoints.map(rational1d);
     }
 
@@ -1311,7 +1203,7 @@ class Eval {
     //
     //* a point represented by an array pi with length (dim)
 
-    public static function weight1d(homoPoints:Array<Point>):Array<Float> {
+    public static function weight1d(homoPoints : Array<Point>) : Array<Float> {
         var dim = homoPoints[0].length - 1;
         return homoPoints.map(function(x) { return x[dim]; });
     }
@@ -1327,7 +1219,7 @@ class Eval {
     //
     //*  array of arrays of points, each represented by an array pi with length (dim)
 
-    public static function weight2d(homoPoints:Array<Array<Point>>):Array<Array<Float>> {
+    public static function weight2d(homoPoints : Array<Array<Point>>) : Array<Array<Float>> {
         return homoPoints.map(weight1d);
     }
 
@@ -1341,7 +1233,7 @@ class Eval {
     //
     //* an array of points, each of length dim
 
-    public static function dehomogenize1d(homoPoints:Array<Point>):Array<Point> {
+    public static function dehomogenize1d(homoPoints : Array<Point>) : Array<Point> {
         return homoPoints.map(dehomogenize);
     }
 
@@ -1355,7 +1247,7 @@ class Eval {
     //
     //* array of arrays of points, each of length dim
 
-    public static function dehomogenize2d(homoPoints:Array<Array<Point>>):Array<Array<Point>> {
+    public static function dehomogenize2d(homoPoints : Array<Array<Point>>) : Array<Array<Point>> {
         return homoPoints.map(dehomogenize1d);
     }
 
@@ -1372,12 +1264,12 @@ class Eval {
     //i the ith control point weight and pi is the ith control point,
     //hence the dimension of the point is dim + 1
 
-    public static function homogenize1d(controlPoints:Array<Point>, weights:Array<Float> = null):Array<Point> {
+    public static function homogenize1d(controlPoints : Array<Point>, weights : Array<Float> = null) : Array<Point> {
 
         var rows = controlPoints.length
         , dim = controlPoints[0].length
         , homo_controlPoints = new Array<Point>()
-        , wt:Float = 0.0
+        , wt : Float = 0.0
         , ref_pt = new Point()
         , weights = weights != null ? weights : Vec.rep(controlPoints.length, 1.0);
 
@@ -1412,8 +1304,8 @@ class Eval {
     //i the ith control point weight and pi is the ith control point, the size is
     // (m x n x dim+1)
 
-    public static function homogenize2d(controlPoints:Array<Array<Point>>,
-                                        weights:Array<Array<Float>> = null):Array<Array<Point>> {
+    public static function homogenize2d(controlPoints : Array<Array<Point>>,
+                                        weights : Array<Array<Float>> = null) : Array<Array<Point>> {
         var rows = controlPoints.length
         , homo_controlPoints = new Array<Array<Point>>()
         , weights = weights != null ? weights : [ for (i in 0...rows) Vec.rep(controlPoints[0].length, 1.0) ];

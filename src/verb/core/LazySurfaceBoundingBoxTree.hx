@@ -10,11 +10,11 @@ import verb.eval.Intersect;
 
 class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
 
-    var _surface:NurbsSurfaceData;
-    var _boundingBox:BoundingBox = null;
-    var _splitV:Bool;
-    var _knotTolU:Float;
-    var _knotTolV:Float;
+    var _surface : NurbsSurfaceData;
+    var _boundingBox : BoundingBox = null;
+    var _splitV : Bool;
+    var _knotTolU : Float;
+    var _knotTolV : Float;
 
     public function new(surface, splitV = false, knotTolU = null, knotTolV = null) {
         _surface = surface;
@@ -32,9 +32,9 @@ class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
         _knotTolV = knotTolV;
     }
 
-    public function split():Pair<IBoundingBoxTree<NurbsSurfaceData>, IBoundingBoxTree<NurbsSurfaceData>> {
-        var min:Float;
-        var max:Float;
+    public function split() : Pair<IBoundingBoxTree<NurbsSurfaceData>, IBoundingBoxTree<NurbsSurfaceData>> {
+        var min : Float;
+        var max : Float;
 
         if (_splitV) {
             min = _surface.knotsV.first();
@@ -68,7 +68,7 @@ class LazySurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
         return _surface;
     }
 
-    public function indivisible(tolerance:Float) {
+    public function indivisible(tolerance : Float) {
         return _surface.knotsV.domain() < _knotTolV && _surface.knotsU.domain() < _knotTolU;
     }
 

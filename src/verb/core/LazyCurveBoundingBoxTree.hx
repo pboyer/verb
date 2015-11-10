@@ -10,11 +10,11 @@ import verb.eval.Intersect;
 
 class LazyCurveBoundingBoxTree implements IBoundingBoxTree<NurbsCurveData> {
 
-    var _curve:NurbsCurveData;
-    var _boundingBox:BoundingBox = null;
-    var _knotTol:Float;
+    var _curve : NurbsCurveData;
+    var _boundingBox : BoundingBox = null;
+    var _knotTol : Float;
 
-    public function new(curve, knotTol:Float = null) {
+    public function new(curve, knotTol : Float = null) {
         _curve = curve;
         if (knotTol == null) {
             knotTol = _curve.knots.domain() / 64;
@@ -22,7 +22,7 @@ class LazyCurveBoundingBoxTree implements IBoundingBoxTree<NurbsCurveData> {
         _knotTol = knotTol;
     }
 
-    public function split():Pair<IBoundingBoxTree<NurbsCurveData>, IBoundingBoxTree<NurbsCurveData>> {
+    public function split() : Pair<IBoundingBoxTree<NurbsCurveData>, IBoundingBoxTree<NurbsCurveData>> {
         var min = _curve.knots.first();
         var max = _curve.knots.last();
         var dom = max - min;
@@ -45,7 +45,7 @@ class LazyCurveBoundingBoxTree implements IBoundingBoxTree<NurbsCurveData> {
         return _curve;
     }
 
-    public function indivisible(tolerance:Float) {
+    public function indivisible(tolerance : Float) {
         return _curve.knots.domain() < _knotTol;
     }
 

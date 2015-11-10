@@ -6,7 +6,7 @@ class Binomial {
 
     static var memo = new IntMap<IntMap<Float>>();
 
-    public static function get(n:Int, k:Int):Float {
+    public static function get(n : Int, k : Int) : Float {
         if (k == 0.0) {
             return 1.0;
         }
@@ -23,7 +23,7 @@ class Binomial {
             return get_memo(n, k);
         }
 
-        var r:Float = 1,
+        var r : Float = 1,
         n_o = n;
 
         for (d in 1...k + 1) {
@@ -44,7 +44,7 @@ class Binomial {
         return r;
     }
 
-    public static function get_no_memo(n:Int, k:Int):Float {
+    public static function get_no_memo(n : Int, k : Int) : Float {
         if (k == 0) {
             return 1;
         }
@@ -57,7 +57,7 @@ class Binomial {
             k = n - k;
         }
 
-        var r:Float = 1,
+        var r : Float = 1,
         n_o = n;
 
         for (d in 1...k + 1) {
@@ -68,11 +68,11 @@ class Binomial {
         return r;
     }
 
-    private static function memo_exists(n:Int, k:Int):Bool {
+    private static function memo_exists(n : Int, k : Int) : Bool {
         return ( memo.exists(n) && memo.get(n).exists(k) );
     }
 
-    private static function get_memo(n:Int, k:Int):Float {
+    private static function get_memo(n : Int, k : Int) : Float {
         return memo.get(n).get(k);
     }
 

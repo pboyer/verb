@@ -40,7 +40,7 @@ class Make {
     //
     //* NurbsSurfaceData object
 
-    public static function rationalTranslationalSurface(profile:NurbsCurveData, rail:NurbsCurveData):NurbsSurfaceData {
+    public static function rationalTranslationalSurface(profile : NurbsCurveData, rail : NurbsCurveData) : NurbsSurfaceData {
 
         var pt0 = Eval.rationalCurvePoint(rail, rail.knots.first())
         , startu = rail.knots.first()
@@ -68,7 +68,7 @@ class Make {
     //
     //* an array containing 4 elements, first 2 curves in the V direction, then 2 curves in the U direction
 
-    public static function surfaceBoundaryCurves(surface:NurbsSurfaceData):Array<NurbsCurveData> {
+    public static function surfaceBoundaryCurves(surface : NurbsSurfaceData) : Array<NurbsCurveData> {
         var crvs = [];
 
         var c0 = Make.surfaceIsocurve(surface, surface.knotsU.first(), false);
@@ -80,7 +80,7 @@ class Make {
     }
 
 
-    public static function surfaceIsocurve(surface:NurbsSurfaceData, u:Float, useV:Bool = false):NurbsCurveData {
+    public static function surfaceIsocurve(surface : NurbsSurfaceData, u : Float, useV : Bool = false) : NurbsCurveData {
 
         var knots = useV ? surface.knotsV : surface.knotsU;
         var degree = useV ? surface.degreeV : surface.degreeU;
@@ -88,7 +88,7 @@ class Make {
         var knotMults = Analyze.knotMultiplicities(knots);
 
         //if the knot already exists in the array, don't make duplicates
-        var reqKnotIndex:Int = -1;
+        var reqKnotIndex : Int = -1;
         for (i in 0...knotMults.length) {
             if (Math.abs(u - knotMults[i].knot) < Constants.EPSILON) {
                 reqKnotIndex = i;
@@ -120,7 +120,7 @@ class Make {
         return new NurbsCurveData( newSrf.degreeV, newSrf.knotsV, newSrf.controlPoints[span] );
     }
 
-    public static function loftedSurface(curves:Array<NurbsCurveData>, degreeV:Int = null):NurbsSurfaceData {
+    public static function loftedSurface(curves : Array<NurbsCurveData>, degreeV : Int = null) : NurbsSurfaceData {
 
         curves = Modify.unifyCurveKnotVectors(curves);
 
@@ -152,7 +152,7 @@ class Make {
         return new NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
     }
 
-    public static function clonedCurve(curve:NurbsCurveData):NurbsCurveData {
+    public static function clonedCurve(curve : NurbsCurveData) : NurbsCurveData {
         return new NurbsCurveData( curve.degree, curve.knots.copy(), curve.controlPoints.map(function(x) { return x.copy(); }) );
     }
 
@@ -169,7 +169,7 @@ class Make {
     //
     //* NurbsSurfaceData object
 
-    public static function rationalBezierCurve(controlPoints:Array<Point>, weights:Array<Float> = null):NurbsCurveData {
+    public static function rationalBezierCurve(controlPoints : Array<Point>, weights : Array<Float> = null) : NurbsCurveData {
 
         var degree = controlPoints.length - 1;
 
@@ -196,9 +196,9 @@ class Make {
     //
     //* NurbsSurfaceData object
 
-    public static function fourPointSurface(p1:Point, p2:Point, p3:Point, p4:Point, degree:Int = 3):NurbsSurfaceData {
+    public static function fourPointSurface(p1 : Point, p2 : Point, p3 : Point, p4 : Point, degree : Int = 3) : NurbsSurfaceData {
 
-        var degreeFloat:Float = degree;
+        var degreeFloat : Float = degree;
 
         var pts = [];
         for (i in 0...degree + 1) {
@@ -240,7 +240,7 @@ class Make {
     //
     //* a NurbsCurveData object representing a NURBS curve
 
-    public static function ellipseArc(center:Point, xaxis:Point, yaxis:Point, startAngle:Float, endAngle:Float):NurbsCurveData {
+    public static function ellipseArc(center : Point, xaxis : Point, yaxis : Point, startAngle : Float, endAngle : Float) : NurbsCurveData {
 
         var xradius = Vec.norm(xaxis);
         var yradius = Vec.norm(yaxis);
@@ -345,8 +345,8 @@ class Make {
     //
     //* a NurbsCurveData object representing a NURBS curve
 
-    public static function arc(center:Point, xaxis:Vector, yaxis:Vector, radius:Float, startAngle:Float,
-                               endAngle:Float):NurbsCurveData {
+    public static function arc(center : Point, xaxis : Vector, yaxis : Vector, radius : Float, startAngle : Float,
+                               endAngle : Float) : NurbsCurveData {
         return ellipseArc(center, Vec.mul(radius, Vec.normalized(xaxis)), Vec.mul(radius, Vec.normalized(yaxis)), startAngle, endAngle);
     }
 
@@ -360,7 +360,7 @@ class Make {
     //
     //* a NurbsCurveData object representing a NURBS curve
 
-    public static function polyline(pts:Array<Point>):NurbsCurveData {
+    public static function polyline(pts : Array<Point>) : NurbsCurveData {
 
         var knots = [0.0, 0.0];
         var lsum = 0.0;
@@ -392,7 +392,7 @@ class Make {
     //
     //* an object with the following properties: controlPoints, weights, knots, degree
 
-    public static function extrudedSurface(axis:Point, length:Float, profile:NurbsCurveData):NurbsSurfaceData {
+    public static function extrudedSurface(axis : Point, length : Float, profile : NurbsCurveData) : NurbsSurfaceData {
 
         var controlPoints = [[], [], []]
         , weights = [[], [], []];
@@ -432,7 +432,7 @@ class Make {
     //
     //* an object with the following properties: controlPoints, weights, knotsU, knotsV, degreeU, degreeV
 
-    public static function cylindricalSurface(axis:Point, xaxis:Point, base:Point, height:Float, radius:Float):NurbsSurfaceData {
+    public static function cylindricalSurface(axis : Point, xaxis : Point, base : Point, height : Float, radius : Float) : NurbsSurfaceData {
 
         var yaxis = Vec.cross(axis, xaxis)
         , angle = 2.0 * Math.PI
@@ -458,7 +458,7 @@ class Make {
     //
     //* an object with the following properties: controlPoints, weights, knots, degree
 
-    public static function revolvedSurface(profile:NurbsCurveData, center:Point, axis:Point, theta:Float):NurbsSurfaceData {
+    public static function revolvedSurface(profile : NurbsCurveData, center : Point, axis : Point, theta : Float) : NurbsSurfaceData {
 
         var prof_controlPoints = Eval.dehomogenize1d(profile.controlPoints)
         , prof_weights = Eval.weight1d(profile.controlPoints);
@@ -594,7 +594,7 @@ class Make {
     //* an object with the following properties: controlPoints, weights, knotsU, knotsV, degreeU, degreeV
     //
 
-    public static function sphericalSurface(center:Point, axis:Point, xaxis:Point, radius:Float) {
+    public static function sphericalSurface(center : Point, axis : Point, xaxis : Point, radius : Float) {
 
         var arc = arc(center, Vec.mul(-1.0, axis), xaxis, radius, 0.0, Math.PI);
         return revolvedSurface(arc, center, axis, 2 * Math.PI);
@@ -615,7 +615,7 @@ class Make {
     //* an object with the following properties: controlPoints, weights, knots, degree
     //
 
-    public static function conicalSurface(axis:Point, xaxis:Point, base:Point, height:Float, radius:Float):NurbsSurfaceData {
+    public static function conicalSurface(axis : Point, xaxis : Point, base : Point, height : Float, radius : Float) : NurbsSurfaceData {
 
         var angle = 2 * Math.PI
         , prof_degree = 1
@@ -628,11 +628,11 @@ class Make {
 
     }
 
-    public static function rationalInterpCurve(points:Array<Array<Float>>,
-                                               degree:Int = 3,
-                                               homogeneousPoints:Bool = false,
-                                               start_tangent:Point = null,
-                                               end_tangent:Point = null):NurbsCurveData {
+    public static function rationalInterpCurve(points : Array<Array<Float>>,
+                                               degree : Int = 3,
+                                               homogeneousPoints : Bool = false,
+                                               start_tangent : Point = null,
+                                               end_tangent : Point = null) : NurbsCurveData {
 
         // 0) build knot vector for curve by normalized chord length
         // 1) construct effective basis function in square matrix (W)
@@ -716,7 +716,7 @@ class Make {
         var mult0 = knots[degree + 1] / degree;
 
         for (i in 0...dim) {
-            var b:Array<Float>;
+            var b : Array<Float>;
 
             if (!hasTangents) {
                 b = points.map(function(x) { return x[i]; });

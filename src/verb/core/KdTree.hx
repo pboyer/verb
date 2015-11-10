@@ -16,10 +16,10 @@ import verb.core.Data;
 @:expose("core.KdTree")
 class KdTree<T> {
 
-    private var points:Array<KdPoint<T>>;
-    private var distanceFunction:Point -> Point -> Float;
-    private var dim:Int = 3;
-    private var root:KdNode<T>;
+    private var points : Array<KdPoint<T>>;
+    private var distanceFunction : Point -> Point -> Float;
+    private var dim : Int = 3;
+    private var root : KdNode<T>;
 
     public function new(points, distanceFunction) {
         this.points = points;
@@ -29,7 +29,7 @@ class KdTree<T> {
         this.root = buildTree(points, 0, null);
     }
 
-    private function buildTree(points:Array<KdPoint<T>>, depth:Int, parent:KdNode<T>):KdNode<T> {
+    private function buildTree(points : Array<KdPoint<T>>, depth : Int, parent : KdNode<T>) : KdNode<T> {
         var dim = depth % dim,
         median,
         node;
@@ -37,7 +37,7 @@ class KdTree<T> {
         if (points.length == 0) return null;
         if (points.length == 1) return new KdNode<T>(points[0], dim, parent);
 
-        points.sort(function(a:KdPoint<T>, b:KdPoint<T>) {
+        points.sort(function(a : KdPoint<T>, b : KdPoint<T>) {
             var diff = a.point[dim] - b.point[dim];
             if (diff == 0.0) {
                 return 0;
@@ -58,13 +58,13 @@ class KdTree<T> {
         return node;
     }
 
-    public function nearest(point:Point, maxNodes:Int, maxDistance:Float):Array<Pair<KdPoint<T>, Float>> {
+    public function nearest(point : Point, maxNodes : Int, maxDistance : Float) : Array<Pair<KdPoint<T>, Float>> {
 
         var bestNodes = new BinaryHeap<KdNode<T>>(
-        function(e:Pair<KdNode<T>, Float>) { return -e.item1; }
+        function(e : Pair<KdNode<T>, Float>) { return -e.item1; }
         );
 
-        function nearestSearch(node:KdNode<T>) {
+        function nearestSearch(node : KdNode<T>) {
 
             var bestChild,
             dimension = node.dimension,
@@ -74,7 +74,7 @@ class KdTree<T> {
             otherChild,
             i;
 
-            function saveNode(node:KdNode<T>, distance:Float):Void {
+            function saveNode(node : KdNode<T>, distance : Float) : Void {
                 bestNodes.push(new Pair(node, distance));
                 if (bestNodes.size() > maxNodes) {
                     bestNodes.pop();
@@ -151,22 +151,22 @@ class KdTree<T> {
 
 class BinaryHeap<T> {
 
-    public var content:Array<Pair<T, Float>>;
-    private var scoreFunction:Pair<T, Float> -> Float;
+    public var content : Array<Pair<T, Float>>;
+    private var scoreFunction : Pair<T, Float> -> Float;
 
     public function new(scoreFunction) {
         this.content = [];
         this.scoreFunction = scoreFunction;
     }
 
-    public function push(element:Pair<T, Float>):Void {
+    public function push(element : Pair<T, Float>) : Void {
         //Add the new element to the end of the array.
         this.content.push(element);
         //Allow it to bubble up.
         this.bubbleUp(this.content.length - 1);
     }
 
-    public function pop():Pair<T, Float> {
+    public function pop() : Pair<T, Float> {
         //Store the first element so we can return it later.
         var result = this.content[0];
         //Get the element at the end of the array.
@@ -180,11 +180,11 @@ class BinaryHeap<T> {
         return result;
     }
 
-    public function peek():Pair<T, Float> {
+    public function peek() : Pair<T, Float> {
         return this.content[0];
     }
 
-    public function remove(node:Pair<T, Float>):Void {
+    public function remove(node : Pair<T, Float>) : Void {
         var len = this.content.length;
         //To remove a value, we must search through the array to find
         //it.
@@ -206,11 +206,11 @@ class BinaryHeap<T> {
         throw "Node not found.";
     }
 
-    public function size():Int {
+    public function size() : Int {
         return this.content.length;
     }
 
-    private function bubbleUp(n:Int):Void {
+    private function bubbleUp(n : Int) : Void {
         //Fetch the element that has to be moved.
         var element = this.content[n];
         //When at 0, an element can not go up any further.
@@ -232,7 +232,7 @@ class BinaryHeap<T> {
         }
     }
 
-    private function sinkDown(n:Int):Void {
+    private function sinkDown(n : Int) : Void {
         //Look up the target element and its score.
         var length = this.content.length,
         element = this.content[n],
@@ -245,7 +245,7 @@ class BinaryHeap<T> {
             //This is used to store the new position of the element,
             //if any.
             var swap = -1;
-            var child1Score:Float = 0.0;
+            var child1Score : Float = 0.0;
 
             //If the first child exists (is inside the array)...
             if (child1N < length) {
@@ -284,10 +284,10 @@ class BinaryHeap<T> {
 class KdPoint<T> {
 
     // The point
-    public var point:Point;
+    public var point : Point;
 
     // An arbitrary object to attach
-    public var obj:T;
+    public var obj : T;
 
     public function new(point, obj) {
         this.point = point;
@@ -300,21 +300,21 @@ class KdPoint<T> {
 class KdNode<T> {
 
     // The point itself
-    public var kdPoint:KdPoint<T>;
+    public var kdPoint : KdPoint<T>;
 
     // The left child
-    public var left:KdNode<T>;
+    public var left : KdNode<T>;
 
     // The right child
-    public var right:KdNode<T>;
+    public var right : KdNode<T>;
 
     // The parent of the node
-    public var parent:KdNode<T>;
+    public var parent : KdNode<T>;
 
     // The dimensionality of the point
-    public var dimension:Int;
+    public var dimension : Int;
 
-    public function new(kdPoint:KdPoint<T>, dimension:Int, parent:KdNode<T>) {
+    public function new(kdPoint : KdPoint<T>, dimension : Int, parent : KdNode<T>) {
         this.kdPoint = kdPoint;
         this.left = null;
         this.right = null;

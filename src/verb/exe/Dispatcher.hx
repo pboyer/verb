@@ -12,17 +12,17 @@ import promhx.Promise;
 @:expose("exe.Dispatcher")
 class Dispatcher {
 
-    public static var THREADS:Int = 1;
+    public static var THREADS : Int = 1;
 
     #if js
-    private static var _workerPool:WorkerPool;
+    private static var _workerPool : WorkerPool;
     #else
-    private static var _threadPool:ThreadPool;
+    private static var _threadPool : ThreadPool;
     #end
 
-    private static var _init:Bool = false;
+    private static var _init : Bool = false;
 
-    private static function init():Void {
+    private static function init() : Void {
 
         if (_init) return;
 
@@ -35,7 +35,7 @@ class Dispatcher {
         _init = true;
     }
 
-    public static function dispatchMethod<T>(classType:Class<Dynamic>, methodName:String, args:Array<Dynamic>):Promise<T> {
+    public static function dispatchMethod<T>(classType : Class<Dynamic>, methodName : String, args : Array<Dynamic>) : Promise<T> {
 
         init();
 
@@ -48,7 +48,7 @@ class Dispatcher {
         #if js
         _workerPool.addWork(Type.getClassName(classType), methodName, args, callback);
         #else
-        _threadPool.addTask(function(_:Dynamic) { var r:Dynamic = Reflect.callMethod(classType, Reflect.field(classType, methodName), args); return r; }, null, callback);
+        _threadPool.addTask(function(_ : Dynamic) { var r : Dynamic = Reflect.callMethod(classType, Reflect.field(classType, methodName), args); return r; }, null, callback);
         #end
 
         return new Promise<T>( def );

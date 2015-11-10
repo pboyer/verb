@@ -9,9 +9,9 @@ import verb.eval.Intersect;
 
 class SurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
 
-    var _children:Pair<IBoundingBoxTree<NurbsSurfaceData>, IBoundingBoxTree<NurbsSurfaceData>>;
-    var _surface:NurbsSurfaceData;
-    var _boundingBox:BoundingBox = null;
+    var _children : Pair<IBoundingBoxTree<NurbsSurfaceData>, IBoundingBoxTree<NurbsSurfaceData>>;
+    var _surface : NurbsSurfaceData;
+    var _boundingBox : BoundingBox = null;
 
     public function new(surface, splitV = false, knotTolU = null, knotTolV = null) {
         _surface = surface;
@@ -34,8 +34,8 @@ class SurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
 
         if (!divisible) return;
 
-        var min:Float;
-        var max:Float;
+        var min : Float;
+        var max : Float;
 
         if (splitV) {
             min = _surface.knotsV.first();
@@ -56,7 +56,7 @@ class SurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
 
     }
 
-    public function split():Pair<IBoundingBoxTree<NurbsSurfaceData>, IBoundingBoxTree<NurbsSurfaceData>> {
+    public function split() : Pair<IBoundingBoxTree<NurbsSurfaceData>, IBoundingBoxTree<NurbsSurfaceData>> {
         return _children;
     }
 
@@ -74,7 +74,7 @@ class SurfaceBoundingBoxTree implements IBoundingBoxTree<NurbsSurfaceData> {
         return _surface;
     }
 
-    public function indivisible(tolerance:Float) {
+    public function indivisible(tolerance : Float) {
         return _children == null;
     }
 

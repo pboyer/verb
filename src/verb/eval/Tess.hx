@@ -3,6 +3,10 @@ package verb.eval;
 import verb.core.ArrayExtensions;
 using verb.core.ArrayExtensions;
 
+import verb.eval.Eval;
+
+import verb.core.Mat;
+import verb.core.BoundingBox;
 import verb.core.Intersections;
 import verb.core.Data;
 import verb.core.Vec;
@@ -20,6 +24,146 @@ import verb.core.Trig;
 @:expose("eval.Tess")
 class Tess {
 
+    // Compute a regularly spaced sequence of points on a non-uniform, rational spline curve. Generally, this algorithm
+    // is much faster than computing these points directly. This algorithm is based on the forward difference algorithm
+    // presented in chapter 4 of
+    // [T. W. Sederberg, BYU, Computer Aided Geometric Design Course Notes](http://cagd.cs.byu.edu/~557/text/cagd.pdf)
+    //
+    //**params**
+    //
+    //* NurbsCurveData object representing the curve
+    //* number of divisions
+    //
+    //**returns**
+    //
+    //* an array of (divs+1) points
+
+    public static function rationalCurveRegularSamplePoints2(crv : NurbsCurveData, tol : Float) : Array<Point> {
+
+        var range = crv.knots.last() - crv.knots[0];
+        var beziers = Modify.decomposeCurveIntoBeziers(crv);
+        var pts = [], step;
+
+        for (i in 0...beziers.length) {
+
+            step = rationalBezierCurveStepLength(beziers[i], tol)
+
+            rationalBezierCurveRegularSamplePointsMutate(beziers[i], pts, currentU, step, bsteps + 1);
+
+            currentU = nextU + step;
+        }
+
+        return pts;
+    }
+
+    // Compute a regularly spaced sequence of points on a non-uniform, rational spline curve. Generally, this algorithm
+    // is much faster than computing these points directly. This algorithm is based on the forward difference algorithm
+    // presented in chapter 4 of
+    // [T. W. Sederberg, BYU, Computer Aided Geometric Design Course Notes](http://cagd.cs.byu.edu/~557/text/cagd.pdf)
+    //
+    //**params**
+    //
+    //* NurbsCurveData object representing the curve
+    //* number of divisions
+    //
+    //**returns**
+    //
+    //* an array of (divs+1) points
+
+    public static function rationalCurveRegularSamplePoints(crv : NurbsCurveData, divs : Int) : Array<Point> {
+
+        var range = crv.knots.last() - crv.knots[0];
+        var beziers = Modify.decomposeCurveIntoBeziers(crv);
+        var pts = [];
+        var brange, fraction;
+
+        var currentU = crv.knots[0];
+        var step = range / divs;
+        var brange, bsteps, nextU;
+
+        for (i in 0...beziers.length) {
+
+            brange = beziers[i].knots.last() - currentU;
+            bsteps = Math.ceil(brange / step); //
+            nextU = currentU + bsteps * step;
+
+            if (nextU > beziers[i].knots.last() + Constants.TOLERANCE) {
+                nextU -= step;
+                bsteps--;
+            }
+
+            rationalBezierCurveRegularSamplePointsMutate(beziers[i], pts, currentU, step, bsteps + 1);
+
+            currentU = nextU + step;
+        }
+
+        return pts;
+    }
+
+    private static function rationalBezierCurveRegularSamplePointsMutate(crv : NurbsCurveData,
+                                                                         pts : Array<Point>,
+                                                                         startU : Float,
+                                                                         step : Float,
+                                                                         numSteps : Int) {
+
+        var its = [], ts = [ its ], u = startU, degree1 = crv.degree + 1;
+
+        if (numSteps <= crv.degree + 1) {
+            for (i in 0...numSteps) {
+                pts.push(rationalCurvePoint(crv, u));
+                u += step;
+            }
+            return;
+        }
+
+        // initialize forward differencing
+
+        for (i in 0...degree1) {
+            its.push(curvePoint(crv, u));
+            u += step;
+        }
+
+        // compute the differences
+
+        var prev;
+
+        for (i in 1...degree1) {
+            its = [];
+            ts.push(its);
+            prev = ts[i - 1];
+
+            for (j in 1...prev.length) {
+                its.push(Vec.sub(prev[j], prev[j - 1]));
+            }
+        }
+
+        // evaluate the intial points
+
+        for (pt in ts[0]) {
+            pts.push(dehomogenize(pt));
+        }
+
+        // evaluate the rest of the points
+
+        var front = [ for (r in ts) r.last() ], k;
+        var frlen2 = front.length - 2;
+
+        for (i in 0...numSteps - degree1) {
+
+            // Rright = R + Rdown
+
+            // compute the new forward difference front
+
+            for (j in 0...front.length - 1) {
+                k = frlen2 - j; // invert
+                Vec.addMutate(front[k], front[k + 1]);
+            }
+
+            // add the new pt
+            pts.push(dehomogenize(front[0]));
+        }
+    }
+
     //Compute the regular tessellation step length necessary to approximate a rational Bezier curve to the specified tolerance.
     //
     //**params**
@@ -31,11 +175,11 @@ class Tess {
     //
     //* The step length - domain / step length yields the number of steps to take within the curve
 
-    public static function rationalBezierCurveStepLength(curve:NurbsCurveData, tol:Float):Float {
+    public static function rationalBezierCurveStepLength(curve : NurbsCurveData, tol : Float) : Float {
 
         // get average pt
 
-        var dehomo = dehomogenize1d(curve.controlPoints);
+        var dehomo = Eval.dehomogenize1d(curve.controlPoints);
 
         var bb = new BoundingBox( dehomo );
         var avgPt = Vec.mul(0.5, Vec.add(bb.min, bb.max));
@@ -47,7 +191,7 @@ class Tess {
         m[2][3] = -avgPt[2];
 
         var tc = Modify.rationalCurveTransform(curve, m); // todo util methods for translation
-        dehomo = dehomogenize1d(tc.controlPoints);
+        dehomo = Eval.dehomogenize1d(tc.controlPoints);
 
         // compute r = max( || Pi || )
 
@@ -59,7 +203,7 @@ class Tess {
 
         // compute w = min( wi )
 
-        var wts = weight1d(curve.controlPoints);
+        var wts = Eval.weight1d(curve.controlPoints);
         var w = Vec.min(wts);
         var domain = curve.knots.last() - curve.knots[0];
 
@@ -90,7 +234,7 @@ class Tess {
         }
     }
 
-    private static function secondForwardDiff(array:Array<Float>) {
+    private static function secondForwardDiff(array : Array<Float>) {
         var i = 0, res = [];
         while (i < array.length - 2) {
             res.push(array[i + 2] - 2.0 * array[i + 1] + array[i]);
@@ -100,7 +244,7 @@ class Tess {
         return res;
     }
 
-    private static function secondForwardDiff2(array:Array<Point>) {
+    private static function secondForwardDiff2(array : Array<Point>) {
         var i = 0, res = [];
         while (i < array.length - 2) {
             res.push(Vec.add(array[i + 2], Vec.add(Vec.mul(-2.0, array[i + 1]), array[i])));
@@ -122,7 +266,7 @@ class Tess {
     //
     //* an array of points, prepended by the point param if required
 
-    public static function rationalCurveRegularSample(curve:NurbsCurveData, numSamples:Int, includeU:Bool):Array<Point> {
+    public static function rationalCurveRegularSample(curve : NurbsCurveData, numSamples : Int, includeU : Bool) : Array<Point> {
         return rationalCurveRegularSampleRange(curve, curve.knots[0], curve.knots.last(), numSamples, includeU);
     }
 
@@ -140,16 +284,16 @@ class Tess {
     //
     //* an dictionary of parameter - point pairs
 
-    public static function rationalCurveRegularSampleRange(curve:NurbsCurveData, start:Float, end:Float,
-                                                           numSamples:Int, includeU:Bool):Array<Point> {
+    public static function rationalCurveRegularSampleRange(curve : NurbsCurveData, start : Float, end : Float,
+                                                           numSamples : Int, includeU : Bool) : Array<Point> {
 
         if (numSamples < 1) {
             numSamples = 2;
         }
 
         var p = [];
-        var span:Float = (end - start) / (numSamples - 1);
-        var u:Float = 0;
+        var span : Float = (end - start) / (numSamples - 1);
+        var u : Float = 0;
 
         for (i in 0...numSamples) {
 
@@ -179,7 +323,7 @@ class Tess {
     //
     //* an array of dim + 1 length where the first element is the param where it was sampled and the remaining the pt
 
-    public static function rationalCurveAdaptiveSample(curve:NurbsCurveData, tol:Float = 1e-6, includeU:Bool = false):Array<Point> {
+    public static function rationalCurveAdaptiveSample(curve : NurbsCurveData, tol : Float = 1e-6, includeU : Bool = false) : Array<Point> {
 
         //if degree is 1, just return the dehomogenized control points
         if (curve.degree == 1) {
@@ -208,7 +352,7 @@ class Tess {
     //
     //* an array of dim + 1 length where the first element is the param where it was sampled and the remaining the pt
 
-    public static function rationalCurveAdaptiveSampleRange(curve:NurbsCurveData, start, end, tol, includeU):Array<Point> {
+    public static function rationalCurveAdaptiveSampleRange(curve : NurbsCurveData, start, end, tol, includeU) : Array<Point> {
 
         //sample curve at three pts
         var p1 = Eval.rationalCurvePoint(curve, start),
@@ -255,7 +399,7 @@ class Tess {
     //
     //* MeshData object
 
-    public static function rationalSurfaceNaive(surface:NurbsSurfaceData, divs_u:Int, divs_v:Int):MeshData {
+    public static function rationalSurfaceNaive(surface : NurbsSurfaceData, divs_u : Int, divs_v : Int) : MeshData {
 
         if (divs_u < 1) { divs_u = 1; }
         if (divs_v < 1) { divs_v = 1; }
@@ -325,7 +469,7 @@ class Tess {
     //
     //* MeshData object
 
-    public static function divideRationalSurfaceAdaptive(surface:NurbsSurfaceData, options:AdaptiveRefinementOptions = null):Array<AdaptiveRefinementNode> {
+    public static function divideRationalSurfaceAdaptive(surface : NurbsSurfaceData, options : AdaptiveRefinementOptions = null) : Array<AdaptiveRefinementNode> {
 
         if (options == null) options = new AdaptiveRefinementOptions();
 
@@ -422,7 +566,7 @@ class Tess {
         return divs[ index - 1 ];
     }
 
-    private static function triangulateAdaptiveRefinementNodeTree(arrTree:Array<AdaptiveRefinementNode>):MeshData {
+    private static function triangulateAdaptiveRefinementNodeTree(arrTree : Array<AdaptiveRefinementNode>) : MeshData {
 
         //triangulate all of the nodes of the tree
         var mesh = MeshData.empty();
@@ -431,7 +575,7 @@ class Tess {
 
     }
 
-    public static function rationalSurfaceAdaptive(surface:NurbsSurfaceData, options:AdaptiveRefinementOptions = null):MeshData {
+    public static function rationalSurfaceAdaptive(surface : NurbsSurfaceData, options : AdaptiveRefinementOptions = null) : MeshData {
 
         options = options != null ? options : new AdaptiveRefinementOptions();
 
@@ -446,12 +590,12 @@ class Tess {
 
 @:expose("core.AdaptiveRefinementOptions")
 class AdaptiveRefinementOptions {
-    public var normTol:Float = 2.5e-2;
-    public var minDepth:Int = 0;
-    public var maxDepth:Int = 10;
-    public var refine:Bool = true;
-    public var minDivsU:Int = 1;
-    public var minDivsV:Int = 1;
+    public var normTol : Float = 2.5e-2;
+    public var minDepth : Int = 0;
+    public var maxDepth : Int = 10;
+    public var refine : Bool = true;
+    public var minDivsU : Int = 1;
+    public var minDivsV : Int = 1;
 
     public function new() {}
 
@@ -484,19 +628,19 @@ class AdaptiveRefinementOptions {
 @:expose("core.AdaptiveRefinementNode")
 class AdaptiveRefinementNode {
 
-    var srf:NurbsSurfaceData;
-    public var neighbors:Array<AdaptiveRefinementNode>;
-    var children:Array<AdaptiveRefinementNode>;
-    var corners:Array<SurfacePoint>;
-    var midPoints:Array<SurfacePoint>;
-    var centerPoint:SurfacePoint;
-    var splitVert:Bool;
-    var splitHoriz:Bool;
-    var horizontal:Bool;
-    var u05:Float;
-    var v05:Float;
+    var srf : NurbsSurfaceData;
+    public var neighbors : Array<AdaptiveRefinementNode>;
+    var children : Array<AdaptiveRefinementNode>;
+    var corners : Array<SurfacePoint>;
+    var midPoints : Array<SurfacePoint>;
+    var centerPoint : SurfacePoint;
+    var splitVert : Bool;
+    var splitHoriz : Bool;
+    var horizontal : Bool;
+    var u05 : Float;
+    var v05 : Float;
 
-    public function new(srf:NurbsSurfaceData, corners:Array<SurfacePoint>, neighbors:Array<AdaptiveRefinementNode> = null) {
+    public function new(srf : NurbsSurfaceData, corners : Array<SurfacePoint>, neighbors : Array<AdaptiveRefinementNode> = null) {
 
 
         this.srf = srf;
@@ -506,10 +650,10 @@ class AdaptiveRefinementNode {
 
         //if no corners, we need to construct initial corners from the surface
         if (this.corners == null) {
-            var u0:Float = srf.knotsU[0];
-            var u1:Float = srf.knotsU.last();
-            var v0:Float = srf.knotsV[0];
-            var v1:Float = srf.knotsV.last();
+            var u0 : Float = srf.knotsU[0];
+            var u1 : Float = srf.knotsU.last();
+            var v0 : Float = srf.knotsV[0];
+            var v1 : Float = srf.knotsV.last();
 
             this.corners = [
                 SurfacePoint.fromUv(u0, v0),
@@ -545,7 +689,7 @@ class AdaptiveRefinementNode {
         }
     }
 
-    public function evalSrf(u:Float, v:Float, srfPt:SurfacePoint = null):SurfacePoint {
+    public function evalSrf(u : Float, v : Float, srfPt : SurfacePoint = null) : SurfacePoint {
 
         var derivs = Eval.rationalSurfaceDerivatives(this.srf, u, v, 1);
         var pt = derivs[0][0];
@@ -564,7 +708,7 @@ class AdaptiveRefinementNode {
         }
     }
 
-    public function getEdgeCorners(edgeIndex:Int):Array<SurfacePoint> {
+    public function getEdgeCorners(edgeIndex : Int) : Array<SurfacePoint> {
 
         //if its a leaf, there are no children to obtain uvs from
         if (this.isLeaf()) return [ this.corners[ edgeIndex ] ];
@@ -599,7 +743,7 @@ class AdaptiveRefinementNode {
         return null;
     }
 
-    public function getAllCorners(edgeIndex:Int):Array<SurfacePoint> {
+    public function getAllCorners(edgeIndex : Int) : Array<SurfacePoint> {
 
         var baseArr = [ this.corners[edgeIndex] ];
 
@@ -648,11 +792,11 @@ class AdaptiveRefinementNode {
 
     }
 
-    public function hasBadNormals():Bool {
+    public function hasBadNormals() : Bool {
         return this.corners[0].degen || this.corners[1].degen || this.corners[2].degen || this.corners[3].degen;
     }
 
-    public function fixNormals():Void {
+    public function fixNormals() : Void {
         var l = this.corners.length;
 
         for (i in 0...l) {
@@ -669,7 +813,7 @@ class AdaptiveRefinementNode {
         }
     }
 
-    public function shouldDivide(options:AdaptiveRefinementOptions, currentDepth:Int) {
+    public function shouldDivide(options : AdaptiveRefinementOptions, currentDepth : Int) {
 
         if (currentDepth < options.minDepth) return true;
         if (currentDepth >= options.maxDepth) return false;
@@ -696,7 +840,7 @@ class AdaptiveRefinementNode {
         Vec.normSquared(Vec.sub(center.normal, this.corners[3].normal)) > options.normTol;
     }
 
-    public function divide(options:AdaptiveRefinementOptions = null):Void {
+    public function divide(options : AdaptiveRefinementOptions = null) : Void {
         if (options == null) options = new AdaptiveRefinementOptions();
         #if (!cpp && !cs && !java)
         if (options.normTol == null) options.normTol = 8.5e-2;
@@ -707,7 +851,7 @@ class AdaptiveRefinementNode {
         this._divide(options, 0, true);
     }
 
-    private function _divide(options:AdaptiveRefinementOptions, currentDepth:Int, horiz:Bool):Void {
+    private function _divide(options : AdaptiveRefinementOptions, currentDepth : Int, horiz : Bool) : Void {
 
         this.evalCorners();
 
@@ -756,7 +900,7 @@ class AdaptiveRefinementNode {
 
     }
 
-    public function triangulate(mesh:MeshData = null):MeshData {
+    public function triangulate(mesh : MeshData = null) : MeshData {
 
         if (mesh == null) mesh = MeshData.empty();
 
@@ -771,7 +915,7 @@ class AdaptiveRefinementNode {
         return mesh;
     }
 
-    public function triangulateLeaf(mesh:MeshData):MeshData {
+    public function triangulateLeaf(mesh : MeshData) : MeshData {
 
         var baseIndex = mesh.points.length
         , uvs = []

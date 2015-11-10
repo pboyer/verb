@@ -10,14 +10,14 @@ import haxe.Unserializer;
 // [http://haxe.org/manual/std-serialization.html](http://haxe.org/manual/std-serialization.html) for details.
 
 interface ISerializable {
-    function serialize():String;
+    function serialize() : String;
 }
 
 // Forms a base class for serializable data types
 
 @:expose("core.SerializableBase")
 class SerializableBase {
-    public function serialize():String {
+    public function serialize() : String {
         var serializer = new Serializer();
         serializer.serialize(this);
         return serializer.toString();
@@ -40,9 +40,9 @@ class Deserializer {
     //
     //* A new T from the string
 
-    public static function deserialize<T>(s:String):T {
+    public static function deserialize<T>(s : String) : T {
         var unserializer = new Unserializer(s);
-        var r:T = unserializer.unserialize();
+        var r : T = unserializer.unserialize();
         return r;
     }
 }

@@ -35,7 +35,7 @@ class Modify {
     //
     //* A new NURBS curve with a reversed parameterization
 
-    public static function curveReverse(curve:NurbsCurveData):NurbsCurveData {
+    public static function curveReverse(curve : NurbsCurveData) : NurbsCurveData {
         return new NurbsCurveData( curve.degree, knotsReverse(curve.knots), curve.controlPoints.reversed() );
     }
 
@@ -50,7 +50,7 @@ class Modify {
     //
     //* A new NURBS surface with a reversed parameterization in the given direction
 
-    public static function surfaceReverse(surface:NurbsSurfaceData, useV:Bool = false):NurbsSurfaceData {
+    public static function surfaceReverse(surface : NurbsSurfaceData, useV : Bool = false) : NurbsSurfaceData {
         if (useV) {
             return new NurbsSurfaceData( surface.degreeU, surface.degreeV, surface.knotsU, knotsReverse(surface.knotsV),
             [for (row in surface.controlPoints) row.reversed() ]);
@@ -71,7 +71,7 @@ class Modify {
     //
     //* The reversed array of knots
 
-    public static function knotsReverse(knots:KnotArray):KnotArray {
+    public static function knotsReverse(knots : KnotArray) : KnotArray {
         var min = knots.first();
         var max = knots.last();
 
@@ -94,7 +94,7 @@ class Modify {
     //
     //* A collection of NURBS curves, all with the same knot vector
 
-    public static function unifyCurveKnotVectors(curves:Array<NurbsCurveData>):Array<NurbsCurveData> {
+    public static function unifyCurveKnotVectors(curves : Array<NurbsCurveData>) : Array<NurbsCurveData> {
         curves = curves.map(Make.clonedCurve);
 
         var maxDegree = curves.fold(function(x, a) { return Modify.imax(x.degree, a); }, 0);
@@ -139,11 +139,11 @@ class Modify {
         return curves;
     }
 
-    private static function imin(a:Int, b:Int):Int {
+    private static function imin(a : Int, b : Int) : Int {
         return a < b ? a : b;
     }
 
-    private static function imax(a:Int, b:Int):Int {
+    private static function imax(a : Int, b : Int) : Int {
         return a > b ? a : b;
     }
 
@@ -158,7 +158,7 @@ class Modify {
     //
     //* The NURBS curve after degree elevation - if the supplied degree is <= the curve is returned unmodified
 
-    public static function curveElevateDegree(curve:NurbsCurveData, finalDegree:Int):NurbsCurveData {
+    public static function curveElevateDegree(curve : NurbsCurveData, finalDegree : Int) : NurbsCurveData {
 
         if (finalDegree <= curve.degree) return curve;
 
@@ -334,7 +334,7 @@ class Modify {
     //
     //* A new NURBS surface after transformation
 
-    public static function rationalSurfaceTransform(surface:NurbsSurfaceData, mat:Matrix):NurbsSurfaceData {
+    public static function rationalSurfaceTransform(surface : NurbsSurfaceData, mat : Matrix) : NurbsSurfaceData {
 
         var pts = Eval.dehomogenize2d(surface.controlPoints);
 
@@ -361,7 +361,7 @@ class Modify {
     //
     //* A new NURBS surface after transformation
 
-    public static function rationalCurveTransform(curve:NurbsCurveData, mat:Matrix):NurbsCurveData {
+    public static function rationalCurveTransform(curve : NurbsCurveData, mat : Matrix) : NurbsCurveData {
 
         var pts = Eval.dehomogenize1d(curve.controlPoints);
 
@@ -389,7 +389,7 @@ class Modify {
     //
     //* A new NURBS surface with the knots inserted
 
-    public static function surfaceKnotRefine(surface:NurbsSurfaceData, knotsToInsert:Array<Float>, useV:Bool):NurbsSurfaceData {
+    public static function surfaceKnotRefine(surface : NurbsSurfaceData, knotsToInsert : Array<Float>, useV : Bool) : NurbsSurfaceData {
 
         //TODO: make this faster by taking advantage of repeat computations in every row
         // 			 i.e. no reason to recompute the knot vectors on every row
@@ -412,7 +412,7 @@ class Modify {
         }
 
         //do knot refinement on every row
-        var c:NurbsCurveData = null;
+        var c : NurbsCurveData = null;
         for (cptrow in ctrlPts) {
             c = curveKnotRefine(new NurbsCurveData(degree, knots, cptrow), knotsToInsert);
             newPts.push(c.controlPoints);
@@ -442,7 +442,7 @@ class Modify {
     //
     //* *Array* of NurbsCurveData objects, defined by degree, knots, and control points
 
-    public static function decomposeCurveIntoBeziers(curve:NurbsCurveData):Array<NurbsCurveData> {
+    public static function decomposeCurveIntoBeziers(curve : NurbsCurveData) : Array<NurbsCurveData> {
 
         var degree = curve.degree
         , controlPoints = curve.controlPoints
@@ -499,7 +499,7 @@ class Modify {
     //*  NurbsCurveData object representing the curve
     //
 
-    public static function curveKnotRefine(curve:NurbsCurveData, knotsToInsert:Array<Float>):NurbsCurveData {
+    public static function curveKnotRefine(curve : NurbsCurveData, knotsToInsert : Array<Float>) : NurbsCurveData {
 
         if (knotsToInsert.length == 0) return Make.clonedCurve(curve);
 
@@ -595,7 +595,7 @@ class Modify {
     //* *Object* the new curve, defined by knots and controlPoints
     //
 
-    public static function curveKnotInsert(curve:NurbsCurveData, u:Float, r:Int):NurbsCurveData {
+    public static function curveKnotInsert(curve : NurbsCurveData, u : Float, r : Int) : NurbsCurveData {
 
         var degree = curve.degree
         , controlPoints = curve.controlPoints
@@ -651,8 +651,8 @@ class Modify {
             controlPoints_temp[i] = controlPoints[k - degree + i];
         }
 
-        var L:Int = 0
-        , alpha:Float = 0;
+        var L : Int = 0
+        , alpha : Float = 0;
 
         //insert knot r times
         for (j in 1...r + 1) {

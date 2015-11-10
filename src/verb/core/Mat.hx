@@ -10,7 +10,7 @@ class Mat {
 
     // Multiply a `Matrix` by a constant
 
-    public static function mul(a:Float, b:Matrix):Matrix {
+    public static function mul(a : Float, b : Matrix) : Matrix {
         return [ for (i in 0...b.length) Vec.mul(a, b[i]) ];
     }
 
@@ -18,7 +18,7 @@ class Mat {
     //
     // Based on the numeric.js routine - `numeric.dotMMsmall`
 
-    public static function mult(x:Matrix, y:Matrix):Matrix {
+    public static function mult(x : Matrix, y : Matrix) : Matrix {
 
         var p, q, r, ret, foo, bar, woo, i0, k0, p0, r0;
 
@@ -55,31 +55,31 @@ class Mat {
 
     // Add two matrices
 
-    public static function add(a:Matrix, b:Matrix):Matrix {
+    public static function add(a : Matrix, b : Matrix) : Matrix {
         return [ for (i in 0...a.length) Vec.add(a[i], b[i]) ];
     }
 
     // Divide each of entry of a Matrix by a constant
 
-    public static function div(a:Matrix, b:Float):Matrix {
+    public static function div(a : Matrix, b : Float) : Matrix {
         return [ for (i in 0...a.length) Vec.div(a[i], b) ];
     }
 
     // Subtract two matrices
 
-    public static function sub(a:Matrix, b:Matrix):Matrix {
+    public static function sub(a : Matrix, b : Matrix) : Matrix {
         return [ for (i in 0...a.length) Vec.sub(a[i], b[i]) ];
     }
 
     // Multiply a `Matrix` by a `Vector`
 
-    public static function dot(a:Matrix, b:Vector):Vector {
+    public static function dot(a : Matrix, b : Vector) : Vector {
         return [ for (i in 0...a.length) Vec.dot(a[i], b) ];
     }
 
     // Build an identity matrix of a given size
 
-    public static function identity(n:Int):Matrix {
+    public static function identity(n : Int) : Matrix {
         var zeros = Vec.zeros2d(n, n);
         for (i in 0...n) { zeros[i][i] = 1.0; }
         return zeros;
@@ -87,20 +87,20 @@ class Mat {
 
     // Transpose a matrix
 
-    public static function transpose<T>(a:Array<Array<T>>):Array<Array<T>> {
+    public static function transpose<T>(a : Array<Array<T>>) : Array<Array<T>> {
         if (a.length == 0) return [];
         return [ for (i in 0...a[0].length) [for (j in 0...a.length) a[j][i] ] ];
     }
 
     // Solve a system of equations
 
-    public static function solve(A:Matrix, b:Vector):Vector {
+    public static function solve(A : Matrix, b : Vector) : Vector {
         return LUsolve(LU(A), b);
     }
 
     // Based on methods from numeric.js
 
-    private static function LUsolve(LUP:LUDecomp, b:Vector):Vector {
+    private static function LUsolve(LUP : LUDecomp, b : Vector) : Vector {
         var i, j;
         var LU = LUP.LU;
         var n = LU.length;
@@ -150,7 +150,7 @@ class Mat {
 
     // Based on methods from numeric.js
 
-    private static function LU(A:Matrix):LUDecomp {
+    private static function LU(A : Matrix) : LUDecomp {
 
         var abs = Math.abs;
         var i, j, k, absAjk, Akk, Ak, Pk, Ai;
@@ -217,10 +217,10 @@ class Mat {
 
 private class LUDecomp {
 
-    public var LU:Matrix;
-    public var P:Array<Int>;
+    public var LU : Matrix;
+    public var P : Array<Int>;
 
-    public function new(lu:Matrix, p:Array<Int>) {
+    public function new(lu : Matrix, p : Array<Int>) {
         this.LU = lu;
         this.P = p;
     }

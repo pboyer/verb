@@ -22,7 +22,7 @@ class Mesh {
     //* a normal vector represented by an array of length 3
     //
 
-    public static function getTriangleNorm(points:Array<Point>, tri:Tri):Point {
+    public static function getTriangleNorm(points : Array<Point>, tri : Tri) : Point {
 
         var v0 = points[ tri[0] ]
         , v1 = points[ tri[1] ]
@@ -47,7 +47,7 @@ class Mesh {
     //* a BoundingBox containing the mesh
     //
 
-    public static function makeMeshAabb(mesh:MeshData, faceIndices:Array<Int>):BoundingBox {
+    public static function makeMeshAabb(mesh : MeshData, faceIndices : Array<Int>) : BoundingBox {
 
         var bb = new verb.core.BoundingBox();
 
@@ -73,7 +73,7 @@ class Mesh {
     //* a point represented by an array of length (dim)
     //
 
-    public static function sortTrianglesOnLongestAxis(bb:BoundingBox, mesh:MeshData, faceIndices:Array<Int>):Array<Int> {
+    public static function sortTrianglesOnLongestAxis(bb : BoundingBox, mesh : MeshData, faceIndices : Array<Int>) : Array<Int> {
 
         var longAxis = bb.getLongestAxis();
 
@@ -83,7 +83,7 @@ class Mesh {
             minCoordFaceMap.push(new Pair<Float, Int>(tri_min, faceIndex));
         }
 
-        minCoordFaceMap.sort(function(a:Pair<Float, Int>, b:Pair<Float, Int>):Int {
+        minCoordFaceMap.sort(function(a : Pair<Float, Int>, b : Pair<Float, Int>) : Int {
             var a0 = a.item0;
             var b0 = b.item0;
 
@@ -110,7 +110,7 @@ class Mesh {
     //
     //* the minimum coordinate
 
-    private static function getMinCoordOnAxis(points:Array<Point>, tri:Tri, axis:Int):Float {
+    private static function getMinCoordOnAxis(points : Array<Point>, tri : Tri, axis : Int) : Float {
 
         var min = Math.POSITIVE_INFINITY;
 
@@ -134,7 +134,7 @@ class Mesh {
     //* a point represented by an array of length 3
     //
 
-    public static function getTriangleCentroid(points:Array<Point>, tri:Tri):Point {
+    public static function getTriangleCentroid(points : Array<Point>, tri : Tri) : Point {
 
         var centroid = [0.0, 0.0, 0.0];
 
@@ -163,7 +163,7 @@ class Mesh {
     //
     //* the UV on the face
 
-    public static function triangleUVFromPoint(mesh:MeshData, faceIndex:Int, f:Point):UV {
+    public static function triangleUVFromPoint(mesh : MeshData, faceIndex : Int, f : Point) : UV {
 
         var tri = mesh.faces[faceIndex];
 

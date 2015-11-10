@@ -17,24 +17,24 @@ class SphericalSurface extends NurbsSurface {
     //* Length 3 array representing the center of the circle
     //* Radius of the circle
 
-    public function new(center:Point,
-                        radius:Float) {
+    public function new(center : Point,
+                        radius : Float) {
         super(Make.sphericalSurface(center, [0, 0, 1], [1, 0, 0], radius));
 
         _center = center;
         _radius = radius;
     }
 
-    private var _center:Point;
-    private var _radius:Float;
+    private var _center : Point;
+    private var _radius : Float;
 
     //Length 3 array representing the center of the circle
 
-    public function center():Point { return _center; }
+    public function center() : Point { return _center; }
 
     //Radius of the circle
 
-    public function radius():Float { return _radius; }
+    public function radius() : Float { return _radius; }
 
 
 }

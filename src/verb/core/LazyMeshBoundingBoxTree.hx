@@ -6,9 +6,9 @@ import verb.eval.Intersect;
 using verb.core.ArrayExtensions;
 
 class LazyMeshBoundingBoxTree implements IBoundingBoxTree<Int> {
-    var _mesh:MeshData;
-    var _faceIndices:Array<Int>;
-    var _boundingBox:BoundingBox = null;
+    var _mesh : MeshData;
+    var _faceIndices : Array<Int>;
+    var _boundingBox : BoundingBox = null;
 
     public function new(mesh, faceIndices = null) {
         _mesh = mesh;
@@ -18,7 +18,7 @@ class LazyMeshBoundingBoxTree implements IBoundingBoxTree<Int> {
         _faceIndices = faceIndices;
     }
 
-    public function split():Pair<IBoundingBoxTree<Int>, IBoundingBoxTree<Int>> {
+    public function split() : Pair<IBoundingBoxTree<Int>, IBoundingBoxTree<Int>> {
         var as = Mesh.sortTrianglesOnLongestAxis(boundingBox(), _mesh, _faceIndices)
         , l = as.left()
         , r = as.right();
@@ -39,7 +39,7 @@ class LazyMeshBoundingBoxTree implements IBoundingBoxTree<Int> {
         return _faceIndices[0];
     }
 
-    public function indivisible(tolerance:Float) {
+    public function indivisible(tolerance : Float) {
         return _faceIndices.length == 1;
     }
 

@@ -5,9 +5,9 @@ import verb.eval.Intersect;
 
 class LazyPolylineBoundingBoxTree implements IBoundingBoxTree<Int> {
 
-    var _interval:Interval<Int>;
-    var _polyline:PolylineData;
-    var _boundingBox:BoundingBox = null;
+    var _interval : Interval<Int>;
+    var _polyline : PolylineData;
+    var _boundingBox : BoundingBox = null;
 
     public function new(polyline, interval = null) {
         _polyline = polyline;
@@ -18,7 +18,7 @@ class LazyPolylineBoundingBoxTree implements IBoundingBoxTree<Int> {
         _interval = interval;
     }
 
-    public function split():Pair<IBoundingBoxTree<Int>, IBoundingBoxTree<Int>> {
+    public function split() : Pair<IBoundingBoxTree<Int>, IBoundingBoxTree<Int>> {
         var min = _interval.min;
         var max = _interval.max;
 
@@ -45,7 +45,7 @@ class LazyPolylineBoundingBoxTree implements IBoundingBoxTree<Int> {
         return _interval.min;
     }
 
-    public function indivisible(tolerance:Float) {
+    public function indivisible(tolerance : Float) {
         return _interval.max - _interval.min == 1;
     }
 

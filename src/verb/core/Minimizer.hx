@@ -7,7 +7,7 @@ import verb.core.Data;
 @:expose("core.Minimizer")
 class Minimizer {
 
-    public static function uncmin(f:Vector -> Float, x0:Vector, tol:Float = null, gradient:Vector -> Vector = null, maxit:Int = null):MinimizationResult {
+    public static function uncmin(f : Vector -> Float, x0 : Vector, tol : Float = null, gradient : Vector -> Vector = null, maxit : Int = null) : MinimizationResult {
 
         if (tol == null) { tol = 1e-8; }
         if (gradient == null) { gradient = function(x) { return numericalGradient(f, x); }; }
@@ -72,7 +72,7 @@ class Minimizer {
         return new MinimizationResult( x0, f0, g0, H1, it, msg);
     }
 
-    private static function numericalGradient(f:Vector -> Float, x:Vector):Vector {
+    private static function numericalGradient(f : Vector -> Float, x : Vector) : Vector {
 
         var n = x.length;
         var f0 = f(x);
@@ -116,7 +116,7 @@ class Minimizer {
         return J;
     }
 
-    private static function tensor(x:Vector, y:Vector):Matrix {
+    private static function tensor(x : Vector, y : Vector) : Matrix {
 
         var m = x.length, n = y.length, A = [], Ai, xi;
 
@@ -146,12 +146,12 @@ class Minimizer {
 
 class MinimizationResult {
 
-    public var solution:Vector;
-    public var value:Float;
-    public var gradient:Vector;
-    public var invHessian:Matrix;
-    public var iterations:Int;
-    public var message:String;
+    public var solution : Vector;
+    public var value : Float;
+    public var gradient : Vector;
+    public var invHessian : Matrix;
+    public var iterations : Int;
+    public var message : String;
 
     public function new(solution, value, gradient, invHessian, iterations, message) {
         this.solution = solution;
