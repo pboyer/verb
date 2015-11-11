@@ -359,11 +359,11 @@ class Analyze {
 
         for ( i in 0...pts.length - 1 ) {
 
-            var u0 = pts[i][0];
-            var u1 = pts[i + 1][0];
+            var u0 = pts[i].pop();
+            var u1 = pts[i + 1].pop();
 
-            var p0 = pts[i].slice( 1 );
-            var p1 = pts[i + 1].slice( 1 );
+            var p0 = pts[i];
+            var p1 = pts[i + 1];
 
             var proj = Trig.segmentClosestPoint( p, p0, p1, u0, u1 );
             var d = Vec.norm( Vec.sub( p, proj.pt ) );

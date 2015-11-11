@@ -394,19 +394,19 @@ class NurbsCurve extends SerializableBase implements ICurve {
     //
     //**params**
     //
-    //* The tolerance at which to sample the curve
+    //* The tolerance at which to sample the curve, the chord making up the tessellation will not deviate from the curve more than this value
     //
     //**returns**
     //
     //* A point represented as an array
 
-    public function tessellate( tolerance : Float = null ) : Array<Point> {
+    public function tessellate( tolerance : Float = 1e-3 ) : Array<Point> {
         return Tess.rationalCurveAdaptiveSample( _data, tolerance, false );
     }
 
     // The async version of `tessellate`
 
-    public function tessellateAsync( tolerance : Float = null ) : Promise<Array<Point>> {
+    public function tessellateAsync( tolerance : Float = 1e-3 ) : Promise<Array<Point>> {
         return Dispatcher.dispatchMethod( Tess, 'rationalCurveAdaptiveSample', [ _data, tolerance, false ] );
     }
 

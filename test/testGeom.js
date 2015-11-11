@@ -1227,7 +1227,7 @@ describe("verb.geom.NurbsCurve.byPoints", () => {
 	function shouldInterpPoints(curve, pts){
 
 		// // the internal points are interped
-		var tess = curve.tessellate( 1e-8  );
+		var tess = curve.tessellate( 1e-3  );
 
 		for (var j = 0; j < pts.length; j++){
 

@@ -20,7 +20,6 @@ function last(a){
     return a[a.length-1];
 }
 
-/*
 
 describe("verb.eval.Eval.knotSpanGivenN",function(){
 
@@ -1068,7 +1067,7 @@ describe("verb.eval.Divide.surfaceSplit", () => {
 });
 
 describe("verb.eval.Eval.rationalCurveRegularSample",() => {
-    it('should return 10 samples when asked to', () => {
+    it('should return 11 samples when asked to', () => {
 
         var degree = 2
             , knots = [0, 0, 0, 1, 1, 1 ]
@@ -1078,7 +1077,7 @@ describe("verb.eval.Eval.rationalCurveRegularSample",() => {
 
         var p = verb.eval.Tess.rationalCurveRegularSample( curve, numSamples);
 
-        should.equal(p.length, 10);
+        should.equal(p.length, 11);
 
         p.map( function(e){  e.length.should.be.equal(3); });
 
@@ -1149,17 +1148,17 @@ describe("verb.eval.Tess.rationalCurveAdaptiveSample",() => {
 
         var prev = - 1e-8;
         for (var i = 0; i < p.length; i++){
-            p[i][0].should.be.above(prev);
-            p[i][0].should.be.within(-1e-8, 1 + 1e-8);
-            prev = p[i][0];
+            p[i][3].should.be.above(prev);
+            p[i][3].should.be.within(-1e-8, 1 + 1e-8);
+            prev = p[i][3];
         }
 
         p.should.be.instanceof(Array).and.not.have.lengthOf(0);
         p2.should.be.instanceof(Array).and.not.have.lengthOf(0);
         p.should.be.instanceof(Array).and.not.have.lengthOf(p2.length);
 
-        should.equal(p[p.length-1][0], 1.0);
-        should.equal(p2[p2.length-1][0], 1.0);
+        p[p.length-1][3].should.be.approximately(1.0, 1e-6);
+        p2[p2.length-1][3].should.be.approximately(1.0, 1e-6);
 
         p.map( function(e){  e.length.should.be.equal(4); });
         p2.map( function(e){  e.length.should.be.equal(4); });
@@ -1862,7 +1861,7 @@ describe("verb.eval.Analyze.rationalCurveArcLength",() => {
         var gaussLen = verb.eval.Analyze.rationalCurveArcLength( curve );
 
         // sample the curve with 10,000 pts
-        var samples = verb.eval.Tess.rationalCurveRegularSampleRange( curve, 0, 1, 10000 );
+        var samples = verb.eval.Tess.rationalCurveRegularSample( curve, 10000 );
 
         var red = samples.reduce(function(acc, v){
             return { pt: v, l : acc.l + verb.core.Vec.norm( verb.core.Vec.sub( acc.pt, v ) ) };
@@ -3732,8 +3731,8 @@ describe("verb.eval.Make.rationalInterpCurve",() => {
         last(crv.controlPoints)[0].should.be.approximately(last(pts)[0], verb.core.Constants.TOLERANCE);
         last(crv.controlPoints)[1].should.be.approximately(last(pts)[1], verb.core.Constants.TOLERANCE);
 
-        // // the internal points are interped (TODO: do this more efficiently)
-        var tess = verb.eval.Tess.rationalCurveAdaptiveSample( crv, 1e-8  );
+        // // the internal points are interped
+        var tess = verb.eval.Tess.rationalCurveAdaptiveSample( crv, 1e-3  );
 
         for (var j = 0; j < pts.length; j++){
 
@@ -3749,7 +3748,6 @@ describe("verb.eval.Make.rationalInterpCurve",() => {
                 if (dist < min) {
                     min = dist;
                 }
-
             }
 
             min.should.be.lessThan( 1e-3 );
@@ -3760,12 +3758,11 @@ describe("verb.eval.Make.rationalInterpCurve",() => {
 
     it('can compute valid cubic interpolating curve for 4 points', () => {
 
-        var pts = [ [0, 0, 1], [3,4, 0], [-1,4, 0], [-4,0, 0], [-4,-3, 0] ];
+        var pts = [ [0, 0, 1], [3,4, 0], [-1,4, 0], [-4,0, 0] ];
 
         shouldInterpPoints( pts, 3 );
 
     });
-
 
     it('can compute valid degree 4 interpolating curve for 4 points', () => {
 
@@ -3827,7 +3824,7 @@ describe("verb.eval.Make.rationalInterpCurve",() => {
 
 
 
-describe("verb.eval.Eval.surfaceRegularSamplePoints",() => {
+describe("verb.eval.Tess.surfaceRegularSamplePoints",() => {
 
     function getComplexSurface(){
 
@@ -3863,7 +3860,7 @@ describe("verb.eval.Eval.surfaceRegularSamplePoints",() => {
 
     it('returns correct result for complex surface', () => {
 
-        var p = verb.eval.Eval.surfaceRegularSamplePoints( complexSurface, 10, 10 );
+        var p = verb.eval.Tess.surfaceRegularSamplePoints( complexSurface, 10, 10 );
 
         var ar = [];
         var sp = 1 / 10;
@@ -3891,7 +3888,6 @@ describe("verb.eval.Eval.surfaceRegularSamplePoints",() => {
     });
 });
 
-*/
 
 describe("verb.eval.Modify.decomposeCurveIntoBeziers",() => {
 

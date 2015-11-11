@@ -44,10 +44,10 @@
 
     function tessellateRegular( crv, tol ){
 
-        var pts = verb.eval.Tess.rationalCurveTolerantSample( crv, tol );
+        var pts = verb.eval.Tess.rationalCurveRegularSample( crv, 20 );
         console.log( pts.length );
 
-        return asGeometry( asVector3(  verb.eval.Tess.rationalCurveTolerantSample( crv, tol ) ) );
+        return asGeometry( asVector3(  verb.eval.Tess.rationalCurveRegularSample( crv, 20 ) ) );
     }
 
     var pts = [ [0, 0, 0], [10, 20, 0], [20, 0, 0], [30, 0, 0], [60,20,0] ];

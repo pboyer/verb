@@ -3790,10 +3790,10 @@ verb_eval_Analyze.rationalCurveClosestParam = function(curve,p) {
 	var _g = pts.length - 1;
 	while(_g1 < _g) {
 		var i1 = _g1++;
-		var u0 = pts[i1][0];
-		var u11 = pts[i1 + 1][0];
-		var p0 = pts[i1].slice(1);
-		var p1 = pts[i1 + 1].slice(1);
+		var u0 = pts[i1].pop();
+		var u11 = pts[i1 + 1].pop();
+		var p0 = pts[i1];
+		var p1 = pts[i1 + 1];
 		var proj = verb_core_Trig.segmentClosestPoint(p,p0,p1,u0,u11);
 		var d1 = verb_core_Vec.norm(verb_core_Vec.sub(p,proj.pt));
 		if(d1 < min) {
@@ -6292,7 +6292,35 @@ verb_eval_Modify.curveKnotInsert = function(curve,u,r) {
 var verb_eval_Tess = $hx_exports.eval.Tess = function() { };
 $hxClasses["verb.eval.Tess"] = verb_eval_Tess;
 verb_eval_Tess.__name__ = ["verb","eval","Tess"];
-verb_eval_Tess.rationalCurveTolerantSample = function(crv,tol,includeU) {
+verb_eval_Tess.rationalCurveRegularSample = function(crv,divs,includeU) {
+	if(includeU == null) includeU = false;
+	var range = verb_core_ArrayExtensions.last(crv.knots) - crv.knots[0];
+	var beziers = verb_eval_Modify.decomposeCurveIntoBeziers(crv);
+	var pts = [];
+	var brange;
+	var fraction;
+	var currentU = crv.knots[0];
+	var step = range / divs;
+	var brange1;
+	var bsteps;
+	var nextU;
+	var _g1 = 0;
+	var _g = beziers.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		brange1 = verb_core_ArrayExtensions.last(beziers[i].knots) - currentU;
+		bsteps = Math.ceil(brange1 / step);
+		nextU = currentU + bsteps * step;
+		if(nextU > verb_core_ArrayExtensions.last(beziers[i].knots) + verb_core_Constants.TOLERANCE) {
+			nextU -= step;
+			bsteps--;
+		}
+		verb_eval_Tess.rationalBezierCurveRegularSamplePointsMutate(beziers[i],pts,currentU,step,bsteps + 1,includeU);
+		currentU = nextU + step;
+	}
+	return pts;
+};
+verb_eval_Tess.rationalCurveAdaptiveSample = function(crv,tol,includeU) {
 	if(includeU == null) includeU = false;
 	if(crv.degree == 1) {
 		var pts1 = [];
@@ -6325,7 +6353,7 @@ verb_eval_Tess.rationalCurveTolerantSample = function(crv,tol,includeU) {
 		len = verb_eval_Tess.rationalBezierCurveStepLength(beziers[i2],tol);
 		steps = Math.ceil(domain / len);
 		len = domain / steps;
-		verb_eval_Tess.rationalBezierCurveRegularSamplePointsMutate(beziers[i2],pts,beziers[i2].knots[0],len,steps + 1);
+		verb_eval_Tess.rationalBezierCurveRegularSamplePointsMutate(beziers[i2],pts,beziers[i2].knots[0],len,steps + 1,includeU);
 		if(i2 == beziers.length - 1) break;
 		pts.pop();
 	}
@@ -6480,54 +6508,6 @@ verb_eval_Tess.secondForwardDiff2 = function(array) {
 		i++;
 	}
 	return res;
-};
-verb_eval_Tess.rationalCurveRegularSample = function(curve,numSamples,includeU) {
-	return verb_eval_Tess.rationalCurveRegularSampleRange(curve,curve.knots[0],verb_core_ArrayExtensions.last(curve.knots),numSamples,includeU);
-};
-verb_eval_Tess.rationalCurveRegularSampleRange = function(curve,start,end,numSamples,includeU) {
-	if(numSamples < 1) numSamples = 2;
-	var p = [];
-	var span = (end - start) / (numSamples - 1);
-	var u = 0;
-	var _g = 0;
-	while(_g < numSamples) {
-		var i = _g++;
-		u = start + span * i;
-		if(includeU) p.push([u].concat(verb_eval_Eval.rationalCurvePoint(curve,u))); else p.push(verb_eval_Eval.rationalCurvePoint(curve,u));
-	}
-	return p;
-};
-verb_eval_Tess.rationalCurveAdaptiveSample = function(curve,tol,includeU) {
-	if(includeU == null) includeU = false;
-	if(tol == null) tol = 1e-6;
-	if(curve.degree == 1) {
-		if(!includeU) return curve.controlPoints.map(verb_eval_Eval.dehomogenize); else {
-			var _g = [];
-			var _g2 = 0;
-			var _g1 = curve.controlPoints.length;
-			while(_g2 < _g1) {
-				var i = _g2++;
-				_g.push([curve.knots[i + 1]].concat(verb_eval_Eval.dehomogenize(curve.controlPoints[i])));
-			}
-			return _g;
-		}
-	}
-	return verb_eval_Tess.rationalCurveAdaptiveSampleRange(curve,curve.knots[0],verb_core_ArrayExtensions.last(curve.knots),tol,includeU);
-};
-verb_eval_Tess.rationalCurveAdaptiveSampleRange = function(curve,start,end,tol,includeU) {
-	var p1 = verb_eval_Eval.rationalCurvePoint(curve,start);
-	var p3 = verb_eval_Eval.rationalCurvePoint(curve,end);
-	var t = 0.5 + 0.2 * Math.random();
-	var mid = start + (end - start) * t;
-	var p2 = verb_eval_Eval.rationalCurvePoint(curve,mid);
-	var diff = verb_core_Vec.sub(p1,p3);
-	var diff2 = verb_core_Vec.sub(p1,p2);
-	if(verb_core_Vec.dot(diff,diff) < tol && verb_core_Vec.dot(diff2,diff2) > tol || !verb_core_Trig.threePointsAreFlat(p1,p2,p3,tol)) {
-		var exact_mid = start + (end - start) * 0.5;
-		var left_pts = verb_eval_Tess.rationalCurveAdaptiveSampleRange(curve,start,exact_mid,tol,includeU);
-		var right_pts = verb_eval_Tess.rationalCurveAdaptiveSampleRange(curve,exact_mid,end,tol,includeU);
-		return left_pts.slice(0,-1).concat(right_pts);
-	} else if(includeU) return [[start].concat(p1),[end].concat(p3)]; else return [p1,p3];
 };
 verb_eval_Tess.rationalSurfaceNaive = function(surface,divs_u,divs_v) {
 	if(divs_u < 1) divs_u = 1;
@@ -6718,7 +6698,7 @@ verb_eval_Tess.surfaceRegularSamplePoints2 = function(surface,divsU,divsV) {
 	while(_g < divsU) {
 		var i = _g++;
 		var iso = verb_eval_Make.surfaceIsocurve(surface,u,true);
-		pts.push(verb_eval_Tess.rationalCurveTolerantSample(iso,divsV));
+		pts.push(verb_eval_Tess.rationalCurveRegularSample(iso,divsV));
 		u += t;
 	}
 	return pts;
@@ -7194,9 +7174,11 @@ verb_geom_NurbsCurve.prototype = $extend(verb_core_SerializableBase.prototype,{
 		});
 	}
 	,tessellate: function(tolerance) {
+		if(tolerance == null) tolerance = 1e-3;
 		return verb_eval_Tess.rationalCurveAdaptiveSample(this._data,tolerance,false);
 	}
 	,tessellateAsync: function(tolerance) {
+		if(tolerance == null) tolerance = 1e-3;
 		return verb_exe_Dispatcher.dispatchMethod(verb_eval_Tess,"rationalCurveAdaptiveSample",[this._data,tolerance,false]);
 	}
 	,__class__: verb_geom_NurbsCurve
