@@ -3824,7 +3824,7 @@ describe("verb.eval.Make.rationalInterpCurve",() => {
 
 
 
-describe("verb.eval.Tess.surfaceRegularSamplePoints",() => {
+describe("verb.eval.Tess.surfaceRegularSample",() => {
 
     function getComplexSurface(){
 
@@ -3860,7 +3860,7 @@ describe("verb.eval.Tess.surfaceRegularSamplePoints",() => {
 
     it('returns correct result for complex surface', () => {
 
-        var p = verb.eval.Tess.surfaceRegularSamplePoints( complexSurface, 10, 10 );
+        var p = verb.eval.Tess.surfaceRegularSample( complexSurface, 10, 10 );
 
         var ar = [];
         var sp = 1 / 10;

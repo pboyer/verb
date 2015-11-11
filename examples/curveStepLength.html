@@ -43,22 +43,18 @@
     }
 
     function tessellateRegular( crv, tol ){
-
-        var pts = verb.eval.Tess.rationalCurveRegularSample( crv, 20 );
-        console.log( pts.length );
-
-        return asGeometry( asVector3(  verb.eval.Tess.rationalCurveRegularSample( crv, 20 ) ) );
+        return asGeometry( asVector3(  verb.eval.Tess.rationalCurveAdaptiveSample( crv, tol ) ) );
     }
 
     var pts = [ [0, 0, 0], [10, 20, 0], [20, 0, 0], [30, 0, 0], [60,20,0] ];
     var crv = verb.eval.Make.rationalInterpCurve( pts, 3, false );
 
-    var tol = 0.01;
+    var tol = 2;
 	addCurveToScene( tessellateRegular(crv, tol ) );
 
     var nc = new verb.geom.NurbsCurve( crv );
 
-	var lineMat2 = new THREE.LineBasicMaterial({ linewidth: 0.1, color: 0xaaaa00});
+	var lineMat2 = new THREE.LineBasicMaterial({ linewidth: 1, color: 0xaaaa00});
 	addCurveToScene( nc.toThreeGeometry(), lineMat2 );
 
 	// display the tolerance length

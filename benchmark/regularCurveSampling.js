@@ -6,8 +6,8 @@ var crv = verb.eval.Make.rationalBezierCurve( [[0,0,0], [1,1,1], [2,1,1], [3,1,0
 module.exports = {
   name: 'Regular curve sampling',
   tests: {
-    'rationalCurveRegularSamplePoints (6560)': function() {
-        var p = verb.eval.Eval.rationalCurveRegularSamplePoints( crv, 6560 );
+    'rationalCurveRegularSample (6560)': function() {
+        var p = verb.eval.Tess.rationalCurveRegularSample( crv, 6560 );
     },
     'direct evaluation (6560)': function() {
         var p = [];

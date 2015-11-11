@@ -6587,10 +6587,10 @@ verb_eval_Tess.rationalSurfaceAdaptive = function(surface,options) {
 	var arrTrees = verb_eval_Tess.divideRationalSurfaceAdaptive(surface,options);
 	return verb_eval_Tess.triangulateAdaptiveRefinementNodeTree(arrTrees);
 };
-verb_eval_Tess.rationalSurfaceRegularSamplePoints = function(surface,divsU,divsV) {
-	return verb_eval_Eval.dehomogenize2d(verb_eval_Tess.surfaceRegularSamplePoints(surface,divsU,divsV));
+verb_eval_Tess.rationalSurfaceRegularSample = function(surface,divsU,divsV) {
+	return verb_eval_Eval.dehomogenize2d(verb_eval_Tess.surfaceRegularSample(surface,divsU,divsV));
 };
-verb_eval_Tess.surfaceRegularSamplePoints = function(surface,divsU,divsV) {
+verb_eval_Tess.surfaceRegularSample = function(surface,divsU,divsV) {
 	var degreeU = surface.degreeU;
 	var degreeV = surface.degreeV;
 	var controlPoints = surface.controlPoints;
@@ -6621,7 +6621,7 @@ verb_eval_Tess.surfaceRegularSamplePoints = function(surface,divsU,divsV) {
 	}
 	return pts;
 };
-verb_eval_Tess.surfaceRegularSamplePoints2 = function(surface,divsU,divsV) {
+verb_eval_Tess.surfaceRegularSample2 = function(surface,divsU,divsV) {
 	var pts = [];
 	var u = surface.knotsU[0];
 	var t = (verb_core_ArrayExtensions.last(surface.knotsU) - surface.knotsU[0]) / divsU;

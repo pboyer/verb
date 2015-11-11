@@ -36,11 +36,11 @@ var complexSurface = getComplexSurface();
 module.exports = {
   name: 'Regular surface sampling',
   tests: {
-    'surfaceRegularSamplePoints2 (80 x 80)': function() {
-        verb.eval.Eval.surfaceRegularSamplePoints2( complexSurface, 80, 80 );
+    'surfaceRegularSample2 (80 x 80)': function() {
+        verb.eval.Tess.surfaceRegularSample2( complexSurface, 80, 80 );
     },
-    'surfaceRegularSamplePoints (80 x 80)': function() {
-        verb.eval.Eval.surfaceRegularSamplePoints( complexSurface, 80, 80 );
+    'surfaceRegularSample (80 x 80)': function() {
+        verb.eval.Tess.surfaceRegularSample( complexSurface, 80, 80 );
     },
     'direct evaluation (80 x 80)': function() {
         var ar = [];

@@ -482,8 +482,8 @@ class Tess {
     //
     //* a 2d array of dimension (divsU+1, divsV+1) of points
 
-    public static function rationalSurfaceRegularSamplePoints( surface : NurbsSurfaceData, divsU : Int, divsV : Int ) : Array<Array<Point>> {
-        return Eval.dehomogenize2d( surfaceRegularSamplePoints( surface, divsU, divsV ) );
+    public static function rationalSurfaceRegularSample( surface : NurbsSurfaceData, divsU : Int, divsV : Int ) : Array<Array<Point>> {
+        return Eval.dehomogenize2d( surfaceRegularSample( surface, divsU, divsV ) );
     }
 
     // Compute a regularly spaced grid of points on a non-uniform, non-rational, B spline surface. Generally, this algorithm
@@ -499,7 +499,7 @@ class Tess {
     //
     //* a 2d array of dimension (divsU+1, divsV+1) of points
 
-    public static function surfaceRegularSamplePoints( surface : NurbsSurfaceData, divsU : Int, divsV : Int ) : Array<Array<Point>> {
+    public static function surfaceRegularSample( surface : NurbsSurfaceData, divsU : Int, divsV : Int ) : Array<Array<Point>> {
 
         var degreeU = surface.degreeU
         , degreeV = surface.degreeV
@@ -532,7 +532,7 @@ class Tess {
         return pts;
     }
 
-    public static function surfaceRegularSamplePoints2( surface : NurbsSurfaceData, divsU : Int, divsV : Int ) : Array<Array<Point>> {
+    public static function surfaceRegularSample2( surface : NurbsSurfaceData, divsU : Int, divsV : Int ) : Array<Array<Point>> {
 
         var pts = [];
 
