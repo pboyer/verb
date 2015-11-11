@@ -469,87 +469,7 @@ class Eval {
         return pts;
     }
 
-    // Compute a regularly spaced grid of points on a non-uniform, rational, B spline surface. Generally, this algorithm
-    // is faster than directly evaluating these as we can pre-compute all of the basis function arrays
-    //
-    //**params**
-    //
-    //* NurbsSurfaceData object representing the surface
-    //* number of divisions in the U direction
-    //* number of divisions in the V direction
-    //
-    //**returns**
-    //
-    //* a 2d array of dimension (divsU+1, divsV+1) of points
-
-    public static function rationalSurfaceRegularSamplePoints( surface : NurbsSurfaceData, divsU : Int, divsV : Int ) : Array<Array<Point>> {
-        return dehomogenize2d( surfaceRegularSamplePoints( surface, divsU, divsV ) );
-    }
-
-    // Compute a regularly spaced grid of points on a non-uniform, non-rational, B spline surface. Generally, this algorithm
-    // is faster than directly evaluating these as we can pre-compute all of the basis function arrays
-    //
-    //**params**
-    //
-    //* NurbsSurfaceData object representing the surface
-    //* number of divisions in the U direction
-    //* number of divisions in the V direction
-    //
-    //**returns**
-    //
-    //* a 2d array of dimension (divsU+1, divsV+1) of points
-
-    public static function surfaceRegularSamplePoints( surface : NurbsSurfaceData, divsU : Int, divsV : Int ) : Array<Array<Point>> {
-
-        var degreeU = surface.degreeU
-        , degreeV = surface.degreeV
-        , controlPoints = surface.controlPoints
-        , knotsU = surface.knotsU
-        , knotsV = surface.knotsV;
-
-        var dim = controlPoints[0][0].length
-        , spanU = (knotsU.last( ) - knotsU[0]) / divsU
-        , spanV = (knotsV.last( ) - knotsV[0]) / divsV
-        , knotSpansBasesU = regularlySpacedBasisFunctions( degreeU, knotsU, divsU )
-        , knotSpansU = knotSpansBasesU.item0
-        , basesU = knotSpansBasesU.item1
-        , knotSpansBasesV = regularlySpacedBasisFunctions( degreeV, knotsV, divsV )
-        , knotSpansV = knotSpansBasesV.item0
-        , basesV = knotSpansBasesV.item1
-        , pts = []
-        , divsU1 = divsU + 1
-        , divsV1 = divsV + 1;
-
-        for ( i in 0...divsU1 ) {
-            var ptsi = [];
-            pts.push( ptsi );
-
-            for ( j in 0...divsV1 ) {
-                ptsi.push( surfacePointGivenBasesKnotSpans( degreeU, degreeV, controlPoints, knotSpansU[i], knotSpansV[j], basesU[i], basesV[j], dim ) );
-            }
-        }
-
-        return pts;
-    }
-
-    public static function surfaceRegularSamplePoints2( surface : NurbsSurfaceData, divsU : Int, divsV : Int ) : Array<Array<Point>> {
-
-        var pts = [];
-
-        // TODO dir is prob wrong
-        var u = surface.knotsU[0];
-        var t = (surface.knotsU.last( ) - surface.knotsU[0]) / divsU;
-
-        for ( i in 0...divsU ) {
-            var iso = Make.surfaceIsocurve( surface, u, true );
-            pts.push( rationalCurveRegularSamplePoints( iso, divsV ) );
-            u += t;
-        }
-
-        return pts;
-    }
-
-    private static function regularlySpacedBasisFunctions( degree : Int, knots : KnotArray, divs : Int ) : Pair<Array<Int>, Array<Array<Float>>> {
+    public static function regularlySpacedBasisFunctions( degree : Int, knots : KnotArray, divs : Int ) : Pair<Array<Int>, Array<Array<Float>>> {
 
         var n : Int = knots.length - degree - 2;
         var span : Float = (knots.last( ) - knots[0]) / divs;
@@ -593,7 +513,7 @@ class Eval {
         return new Pair<Array<Int>, Array<Array<Array<Float>>>>( knotspans, bases );
     }
 
-    private static function surfacePointGivenBasesKnotSpans( degreeU : Int,
+    public static function surfacePointGivenBasesKnotSpans( degreeU : Int,
                                                              degreeV : Int,
                                                              controlPoints : Array<Array<Point>>,
                                                              knotSpanU : Int,

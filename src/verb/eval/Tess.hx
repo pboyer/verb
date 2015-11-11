@@ -24,21 +24,36 @@ import verb.core.Trig;
 @:expose("eval.Tess")
 class Tess {
 
-    public static function rationalCurveRegularSample2( crv : NurbsCurveData, tol : Float ) : Array<Point> {
+    public static function rationalCurveTolerantSample( crv : NurbsCurveData, tol : Float, includeU : Bool = false ) : Array<Point> {
+
+        //if degree is 1, just return the dehomogenized control points
+        if ( crv.degree == 1 ) {
+            var pts = [];
+            for (i in 0...crv.controlPoints.length){
+                pts.push( Eval.dehomogenize( crv.controlPoints[i] ));
+            }
+            if ( includeU ) {
+                for (i in 0...crv.controlPoints.length){
+                    pts[i].push( crv.knots[i + 1] );
+                }
+            }
+            return pts;
+        }
 
         var beziers = Modify.decomposeCurveIntoBeziers( crv );
 
-        var pts = [], steps, domain;
+        var pts = [], steps, domain, len;
 
         for ( i in 0...beziers.length ) {
 
             domain = beziers[i].knots.last( ) - beziers[i].knots[0];
+            len = rationalBezierCurveStepLength( beziers[i], tol );
+            steps = Math.ceil( domain / len );
+            len = domain / steps;
 
-            steps = Math.ceil( domain / rationalBezierCurveStepLength( beziers[i], tol ) );
+            rationalBezierCurveRegularSamplePointsMutate( beziers[i], pts, beziers[i].knots[0], len, steps+1 );
 
-            rationalBezierCurveRegularSamplePointsMutate( beziers[i], pts, steps );
-
-            if ( i != beziers.length - 1 ) break;
+            if ( i == beziers.length - 1 ) break;
             pts.pop( );
         }
 
@@ -47,13 +62,16 @@ class Tess {
 
     private static function rationalBezierCurveRegularSamplePointsMutate( crv : NurbsCurveData,
                                                                           pts : Array<Point>,
-                                                                          numSteps : Int ) {
+                                                                          startU : Float,
+                                                                          step : Float,
+                                                                          numSteps : Int,
+                                                                          includeU : Bool = false) : Void {
 
         var its = [], ts = [ its ], u = startU, degree1 = crv.degree + 1;
 
         if ( numSteps <= crv.degree + 1 ) {
             for ( i in 0...numSteps ) {
-                pts.push( rationalCurvePoint( crv, u ) );
+                pts.push( Eval.rationalCurvePoint( crv, u ) );
                 u += step;
             }
             return;
@@ -62,7 +80,7 @@ class Tess {
         // initialize forward differencing
 
         for ( i in 0...degree1 ) {
-            its.push( curvePoint( crv, u ) );
+            its.push( Eval.curvePoint( crv, u ) );
             u += step;
         }
 
@@ -83,7 +101,7 @@ class Tess {
         // evaluate the intial points
 
         for ( pt in ts[0] ) {
-            pts.push( dehomogenize( pt ) );
+            pts.push( Eval.dehomogenize( pt ) );
         }
 
         // evaluate the rest of the points
@@ -103,7 +121,17 @@ class Tess {
             }
 
             // add the new pt
-            pts.push( dehomogenize( front[0] ) );
+            pts.push( Eval.dehomogenize( front[0] ) );
+        }
+
+        // add the parameters if required
+
+        u = startU;
+        if (includeU){
+            for (pt in pts){
+                pt.push(u);
+                u += step;
+            }
         }
     }
 
@@ -529,6 +557,87 @@ class Tess {
         return triangulateAdaptiveRefinementNodeTree( arrTrees );
     }
 
+    // Compute a regularly spaced grid of points on a non-uniform, rational, B spline surface. Generally, this algorithm
+    // is faster than directly evaluating these as we can pre-compute all of the basis function arrays
+    //
+    //**params**
+    //
+    //* NurbsSurfaceData object representing the surface
+    //* number of divisions in the U direction
+    //* number of divisions in the V direction
+    //
+    //**returns**
+    //
+    //* a 2d array of dimension (divsU+1, divsV+1) of points
+
+    public static function rationalSurfaceRegularSamplePoints( surface : NurbsSurfaceData, divsU : Int, divsV : Int ) : Array<Array<Point>> {
+        return Eval.dehomogenize2d( surfaceRegularSamplePoints( surface, divsU, divsV ) );
+    }
+
+    // Compute a regularly spaced grid of points on a non-uniform, non-rational, B spline surface. Generally, this algorithm
+    // is faster than directly evaluating these as we can pre-compute all of the basis function arrays
+    //
+    //**params**
+    //
+    //* NurbsSurfaceData object representing the surface
+    //* number of divisions in the U direction
+    //* number of divisions in the V direction
+    //
+    //**returns**
+    //
+    //* a 2d array of dimension (divsU+1, divsV+1) of points
+
+    public static function surfaceRegularSamplePoints( surface : NurbsSurfaceData, divsU : Int, divsV : Int ) : Array<Array<Point>> {
+
+        var degreeU = surface.degreeU
+        , degreeV = surface.degreeV
+        , controlPoints = surface.controlPoints
+        , knotsU = surface.knotsU
+        , knotsV = surface.knotsV;
+
+        var dim = controlPoints[0][0].length
+        , spanU = (knotsU.last( ) - knotsU[0]) / divsU
+        , spanV = (knotsV.last( ) - knotsV[0]) / divsV
+        , knotSpansBasesU = Eval.regularlySpacedBasisFunctions( degreeU, knotsU, divsU )
+        , knotSpansU = knotSpansBasesU.item0
+        , basesU = knotSpansBasesU.item1
+        , knotSpansBasesV = Eval.regularlySpacedBasisFunctions( degreeV, knotsV, divsV )
+        , knotSpansV = knotSpansBasesV.item0
+        , basesV = knotSpansBasesV.item1
+        , pts = []
+        , divsU1 = divsU + 1
+        , divsV1 = divsV + 1;
+
+        for ( i in 0...divsU1 ) {
+            var ptsi = [];
+            pts.push( ptsi );
+
+            for ( j in 0...divsV1 ) {
+                ptsi.push( Eval.surfacePointGivenBasesKnotSpans( degreeU, degreeV, controlPoints, knotSpansU[i], knotSpansV[j], basesU[i], basesV[j], dim ) );
+            }
+        }
+
+        return pts;
+    }
+
+    public static function surfaceRegularSamplePoints2( surface : NurbsSurfaceData, divsU : Int, divsV : Int ) : Array<Array<Point>> {
+
+        var pts = [];
+
+        // TODO dir is prob wrong
+        var u = surface.knotsU[0];
+        var t = (surface.knotsU.last( ) - surface.knotsU[0]) / divsU;
+
+        for ( i in 0...divsU ) {
+            var iso = Make.surfaceIsocurve( surface, u, true );
+            pts.push( rationalCurveTolerantSample( iso, divsV ) );
+            u += t;
+        }
+
+        return pts;
+    }
+
+
 }
 
 @:expose("core.AdaptiveRefinementOptions")
@@ -942,3 +1051,5 @@ class AdaptiveRefinementNode {
 
     }
 }
+
+

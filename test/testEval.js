@@ -3948,12 +3948,12 @@ describe("verb.eval.Modify.decomposeCurveIntoBeziers",() => {
     });
 });
 
-describe("verb.eval.Eval.rationalCurveRegularSamplePoints",() => {
+describe("verb.eval.Tess.rationalCurveRegularSample",() => {
 
     function evalAndCompare(crv){
 
         var divs = 100;
-        var p = verb.eval.Eval.rationalCurveRegularSamplePoints( crv, divs );
+        var p = verb.eval.Tess.rationalCurveRegularSample( crv, divs );
 
         var p2 = [];
         var sp = 1 / divs;
@@ -4000,7 +4000,7 @@ describe("verb.eval.Eval.rationalCurveRegularSamplePoints",() => {
 
 });
 
-describe("verb.eval.Eval.rationalBezierCurveStepLength",() => {
+describe("verb.eval.Tess.rationalBezierCurveStepLength",() => {
 	it('works for simple cases', () => {
 
 		var pts = [ [0, 0, 0], [1, 2, 0], [2, 0, 0], [3, 0, 0] ];

@@ -42,26 +42,27 @@
         return geometry;
     }
 
-    function tessellateRegular( crv, c ){
-        return asGeometry( asVector3(  verb.eval.Eval.rationalCurveRegularSamplePoints( crv, c ) ) );
+    function tessellateRegular( crv, tol ){
+
+        var pts = verb.eval.Tess.rationalCurveTolerantSample( crv, tol );
+        console.log( pts.length );
+
+        return asGeometry( asVector3(  verb.eval.Tess.rationalCurveTolerantSample( crv, tol ) ) );
     }
 
-    var pts = [ [0, 0, 0], [10, 20, 0], [20, 0, 0], [30, 0, 0] ];
+    var pts = [ [0, 0, 0], [10, 20, 0], [20, 0, 0], [30, 0, 0], [60,20,0] ];
     var crv = verb.eval.Make.rationalInterpCurve( pts, 3, false );
 
-    var tol = 1;
-
-    var l = verb.eval.Tess.rationalBezierCurveStepLength( crv, tol );
-
-	addCurveToScene( tessellateRegular(crv, Math.ceil(1 / l)) );
+    var tol = 0.01;
+	addCurveToScene( tessellateRegular(crv, tol ) );
 
     var nc = new verb.geom.NurbsCurve( crv );
 
-	var lineMat2 = new THREE.LineBasicMaterial({ linewidth: 1, color: 0xaaaa00});
+	var lineMat2 = new THREE.LineBasicMaterial({ linewidth: 0.1, color: 0xaaaa00});
 	addCurveToScene( nc.toThreeGeometry(), lineMat2 );
 
 	// display the tolerance length
-	var pts = [ [-5, 0, 0], [-5, tol, 0 ] ];
+	var pts = [ [50, 0, 0], [50, tol, 0 ] ];
 	var tolcrv = verb.geom.NurbsCurve.byPoints( pts, 1 );
     addCurveToScene( tolcrv.toThreeGeometry() );
 
