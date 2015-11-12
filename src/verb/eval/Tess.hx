@@ -25,6 +25,142 @@ import verb.core.Trig;
 @:expose("eval.Tess")
 class Tess {
 
+
+    public static function rationalSurfaceAdaptiveSample(surface:NurbsSurfaceData, divs:Int, includeU : Bool = false ) : MeshData {
+
+        return null;
+
+    }
+
+    public static function rationalBezierSurfaceStepLength( surface : NurbsSurfaceData, tol : Float ) : Pair<Float, Float> {
+
+        // center the control pts at the origin
+
+        var dehomo = Eval.dehomogenize2d( surface.controlPoints );
+
+        var bb = new BoundingBox();
+        for (row in dehomo){
+            bb.addRange( row );
+        }
+        var avgPt = Vec.mul( 0.5, Vec.add( bb.min, bb.max ) );
+
+        // clone and translate all control pts
+
+        var m = Mat.identity( 4 );
+        m[0][3] = -avgPt[0];
+        m[1][3] = -avgPt[1];
+        m[2][3] = -avgPt[2];
+
+        var ts = Modify.rationalSurfaceTransform( surface, m ); // todo util methods for translation
+        dehomo = Eval.dehomogenize2d( ts.controlPoints );
+
+        // compute r = max( || Pi || )
+
+        var r = 0.0, n;
+        for ( i in 0...dehomo.length ) {
+            for ( j in 0...dehomo[i].length ) {
+                n = Vec.norm( dehomo[i][j] );
+                if ( n > r ) r = n;
+            }
+        }
+
+        // compute Duu
+
+        var duu = Math.NEGATIVE_INFINITY, iduu;
+
+        for (i in 0...surface.controlPoints.length-2){
+            for (j in 0...surface.controlPoints[i].length){
+
+                iduu =
+                    Vec.norm( Vec.add( dehomo[i+2][j], Vec.add( Vec.mul( -2.0, dehomo[i+1][j]), dehomo[i][j]))) -
+                    (r - tol) * ( ts.controlPoints[i+2][j].last() - 2 * ts.controlPoints[i+1][j].last() +  ts.controlPoints[i][j].last());
+
+                if (iduu > duu) duu = iduu;
+
+            }
+        }
+
+        // compute Dvv
+
+        var dvv = Math.NEGATIVE_INFINITY, idvv;
+
+        for (i in 0...surface.controlPoints.length){
+            for (j in 0...surface.controlPoints[i].length-2){
+
+                idvv =
+                    Vec.norm( Vec.add( dehomo[i][j+2], Vec.add( Vec.mul( -2.0, dehomo[i][j+1]), dehomo[i][j]))) -
+                    (r - tol) * ( ts.controlPoints[i][j+2].last() - 2 * ts.controlPoints[i][j+1].last() + ts.controlPoints[i][j].last());
+
+                if (idvv > dvv) dvv = idvv;
+            }
+        }
+
+        // compute Duv
+
+        var duv = Math.NEGATIVE_INFINITY, iduv;
+
+        for (i in 0...surface.controlPoints.length-1){
+            for (j in 0...surface.controlPoints[i].length-1){
+                iduv =
+                    Vec.norm( Vec.addAll( [ dehomo[i+1][j+1],
+                                            Vec.mul( -1.0, dehomo[i][j+1] ),
+                                            Vec.mul( -1.0, dehomo[i+1][j] ),
+                                            dehomo[i][j] ])) -
+                    (r - tol) * ( ts.controlPoints[i+1][j+1].last() - ts.controlPoints[i][j+1].last() - ts.controlPoints[i+1][j].last() + ts.controlPoints[i][j].last());
+
+                if (iduv > duv) duv = iduv;
+            }
+        }
+
+        duu *= surface.degreeU * (surface.degreeU - 1);
+        dvv *= surface.degreeV * (surface.degreeV - 1);
+        duv *= surface.degreeU * surface.degreeV;
+
+        var minw = Math.POSITIVE_INFINITY;
+        var w;
+
+        for (i in 0...surface.controlPoints.length){
+            for (j in 0...surface.controlPoints[i].length){
+                w = surface.controlPoints[i][j].last();
+                if ( w < minw ) minw = w;
+            }
+        }
+
+        var stepu, stepv;
+
+        if ( Math.abs(duu) < Constants.TOLERANCE ){
+
+            stepu = 1.0;
+
+            if ( Math.abs(dvv) < Constants.TOLERANCE ) {
+                stepv = 1.0;
+                return new Pair<Float,Float>( stepu, stepv );
+            }
+
+            stepv = ( Math.sqrt( duv * duv + 8 * dvv * tol * minw ) - duv ) / dvv;
+        }
+
+        if ( Math.abs(dvv) < Constants.TOLERANCE ){
+
+            stepv = 1.0;
+            stepu = ( Math.sqrt( duv * duv + 8 * duu * tol * minw ) - duv ) / duu;
+
+            return new Pair<Float,Float>( stepu, stepv );
+        }
+
+        var unum, vnum, denom;
+
+        unum = 4 * dvv * tol * minw;
+        denom = duu * dvv + duv * Math.sqrt( duu * dvv );
+        stepu = Math.sqrt( unum / denom );
+
+        vnum = 4 * duu * tol * minw;
+        stepv = Math.sqrt( vnum / denom );
+
+        return new Pair<Float,Float>( stepu, stepv );
+    }
+
+
     // Compute a regularly spaced sequence of points on a non-uniform, rational spline curve. Generally, this algorithm
     // is much faster than computing these points directly. This algorithm is based on the forward difference algorithm
     // presented in chapter 4 of

@@ -20,6 +20,7 @@ function last(a){
     return a[a.length-1];
 }
 
+/*
 
 describe("verb.eval.Eval.knotSpanGivenN",function(){
 
@@ -4007,4 +4008,45 @@ describe("verb.eval.Tess.rationalBezierCurveStepLength",() => {
 
 	});
 });
+
+*/
+
+describe("verb.eval.Tess.rationalBezierSurfaceStepLength",() => {
+
+    function getComplexSurface(){
+
+        var degree = 3
+            , knots = [0, 0, 0, 0, 1, 1, 1, 1]
+            , pts = [   [ [0, 0, -1],  [10, 0, 0],     [20, 0, 0], [30, 0, 0] ],
+                        [ [0, -10, 0],  [10, -10, 0],  [20, -10, 0], [30, -10, 0]   ],
+                        [ [0, -20, 0],  [10, -20, 0],  [20, -20, -2], [30, -20, 0]  ],
+                        [ [0, -30, 0],  [10, -30, 0],   [20, -30, 0], [30, -30, 0]     ]  ]
+            , wts = [   [ 1, 1, 1, 1, 1, 1],
+                        [ 1, 1, 1, 1, 1, 1],
+                        [ 1, 1, 1, 1, 1, 1],
+                        [ 1, 1, 1, 1, 1, 1],
+                        [ 1, 1, 1, 1, 1, 1],
+                        [ 1, 1, 1, 1, 1, 1] ];
+
+        pts = verb.eval.Eval.homogenize2d(pts, wts);
+
+        return {
+            degreeU : degree,
+            degreeV : degree,
+            knotsU : knots,
+            knotsV : knots,
+            controlPoints : pts
+        };
+    }
+
+	it('works for simple cases', () => {
+
+		var l = verb.eval.Tess.rationalBezierSurfaceStepLength( getComplexSurface(), 0.001 );
+
+		console.log( l );
+
+	});
+});
+
+
 

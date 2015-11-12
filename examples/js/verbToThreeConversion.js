@@ -28,7 +28,7 @@
 
     function tessellateSurface(srf) {
 
-        var tess = srf.tessellate();
+        var tess = srf.tessellate({ normTol : 0.0001 });
 
         var geometry = new THREE.Geometry();
         var threePts = asVector3( tess.points );
