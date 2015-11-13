@@ -400,15 +400,14 @@ class Modify {
         , ctrlPts;
 
         //u dir
-        if ( !useV ) {
-            ctrlPts = Mat.transpose( surface.controlPoints );
-            knots = surface.knotsU;
-            degree = surface.degreeU;
-            //v dir
-        } else {
+        if ( useV ) {
             ctrlPts = surface.controlPoints;
             knots = surface.knotsV;
             degree = surface.degreeV;
+        } else {
+            ctrlPts = Mat.transpose( surface.controlPoints );
+            knots = surface.knotsU;
+            degree = surface.degreeU;
         }
 
         //do knot refinement on every row
@@ -420,14 +419,150 @@ class Modify {
 
         var newknots = c.knots;
 
-        //u dir
-        if ( !useV ) {
+        if ( useV ) {
+            return new NurbsSurfaceData( surface.degreeU, surface.degreeV, surface.knotsU.copy( ), newknots, newPts );
+        } else {
             newPts = Mat.transpose( newPts );
             return new NurbsSurfaceData( surface.degreeU, surface.degreeV, newknots, surface.knotsV.copy( ), newPts );
-            //v dir
-        } else {
-            return new NurbsSurfaceData( surface.degreeU, surface.degreeV, surface.knotsU.copy( ), newknots, newPts );
         }
+    }
+
+    public static function surfaceKnotRefine2( surface : NurbsSurfaceData, knotsToInsert : Array<Float>, useV : Bool ) : NurbsSurfaceData {
+
+//        if ( knotsToInsert.length == 0 ) return Make.clonedCurve( curve );
+
+        var degree, controlPoints = surface.controlPoints, knots;
+
+        if (useV){
+            degree = surface.degreeV;
+            knots = surface.knotsV;
+        } else {
+            degree = surface.degreeU;
+            knots = surface.knotsU;
+        }
+
+        var n = useV ? controlPoints[0].length - 1 : controlPoints.length - 1
+        , m = n + degree + 1
+        , r = knotsToInsert.length - 1
+        , a = Eval.knotSpan( degree, knotsToInsert[0], knots )
+        , b = Eval.knotSpan( degree, knotsToInsert[r], knots )
+        , controlPoints_post = new Array<Array<Point>>()
+        , knots_post = new KnotArray();
+
+        //new control pts
+
+        if (useV){
+            for (i in 0...n+r){
+                controlPoints_post.push([]);
+            }
+
+            for ( i in 0...a - degree + 1 ) {
+                for ( j in 0...controlPoints.length){
+                    controlPoints_post[j][i] = controlPoints[j][i];
+                }
+            }
+
+            for ( i in b - 1...n + 1 ) {
+                var l = i + r + 1;
+                for ( j in 0...controlPoints.length){
+                    controlPoints_post[j][l] = controlPoints[j][i];
+                }
+            }
+        } else {
+            for ( i in 0...a - degree + 1 ) {
+                controlPoints_post[i] = controlPoints[i].slice(0);
+            }
+
+            for ( i in b - 1...n + 1 ) {
+                controlPoints_post[i + r + 1] = controlPoints[i].slice(0);
+            }
+        }
+
+        //new knot vector
+
+        for ( i in 0...a + 1 ) {
+            knots_post[i] = knots[i];
+        }
+
+        for ( i in b + degree...m + 1 ) {
+            knots_post[i + r + 1] = knots[i];
+        }
+
+        var i = b + degree - 1;
+        var k = b + degree + r;
+        var j = r;
+        var ci;
+
+        while ( j >= 0 ) {
+            while ( knotsToInsert[j] <= knots[i] && i > a ) {
+                var wi = k - degree - 1;
+                var xi = i - degree - 1;
+
+                if (useV){
+                    for (ci in 0...controlPoints.length){
+                        controlPoints_post[ci][wi] = controlPoints[ci][xi];
+                    }
+                } else {
+                    controlPoints_post[wi] = controlPoints[xi].slice(0);
+                }
+
+                knots_post[k] = knots[i];
+                k--;
+                i--;
+            }
+
+            if (useV){
+                for (ci in 0...controlPoints.length){
+                    controlPoints_post[ci][k - degree - 1] = controlPoints_post[ci][k - degree];
+                }
+            } else {
+                controlPoints_post[k - degree - 1] = controlPoints_post[k - degree].slice(0);
+            }
+
+            for ( l in 1...degree + 1 ) {
+
+                var ind = k - degree + l;
+                var alfa = knots_post[k + l] - knotsToInsert[j];
+
+                if ( Math.abs( alfa ) < Constants.EPSILON ) {
+                    if (useV){
+                        for (ci in 0...controlPoints.length){
+                            controlPoints_post[ci][ind - 1] = controlPoints_post[ci][ind];
+                        }
+                    } else {
+                        controlPoints_post[ind - 1] = controlPoints_post[ind];
+                    }
+                } else {
+                    alfa = alfa / (knots_post[k + l] - knots[i - degree + l]);
+
+                    if (useV){
+                        for (wi in 0...controlPoints.length){
+                            controlPoints_post[wi][ind - 1] =
+                                Vec.lerp( alfa, controlPoints_post[wi][ind - 1], controlPoints_post[wi][ind] );
+                        }
+                    } else {
+                        for (wi in 0...controlPoints_post[ind - 1].length){
+                            controlPoints_post[ind - 1][wi] = Vec.lerp( alfa, controlPoints_post[ind - 1][wi], controlPoints_post[ind][wi] );
+                        }
+                    }
+                }
+            }
+
+            knots_post[k] = knotsToInsert[j];
+            k = k - 1;
+
+            j--;
+        }
+
+        if ( useV ) {
+            return new NurbsSurfaceData( surface.degreeU, surface.degreeV, surface.knotsU.copy(), knots_post, controlPoints_post );
+        } else {
+            return new NurbsSurfaceData( surface.degreeU, surface.degreeV, knots_post, surface.knotsV.copy(), controlPoints_post );
+        }
+    }
+
+    public static function decomposeSurfaceIntoBeziers( surface : NurbsSurfaceData ) : Array<Array<NurbsSurfaceData>> {
+        return null;
     }
 
     //Decompose a NURBS curve into a collection of bezier's.  Useful
@@ -558,9 +693,7 @@ class Modify {
                 } else {
                     alfa = alfa / (knots_post[k + l] - knots[i - degree + l]);
 
-                    controlPoints_post[ind - 1] = Vec.add(
-                        Vec.mul( alfa, controlPoints_post[ind - 1] ),
-                        Vec.mul( (1.0 - alfa), controlPoints_post[ind] ) );
+                    controlPoints_post[ind - 1] = Vec.lerp( alfa, controlPoints_post[ind - 1], controlPoints_post[ind] );
                 }
 
             }

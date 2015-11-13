@@ -779,57 +779,6 @@ describe("verb.eval.Modify.curveKnotInsert",() => {
     });
 });
 
-describe("verb.eval.Eval.curveKnotRefine",() => {
-
-    function cubicInsert(u, r){
-
-        var degree = 3
-            , knots = [ 0, 0, 0, 0, 1, 2, 3, 4, 5, 5, 5, 5 ]
-            , new_knots = [];
-
-        for (var i = 0; i < r; i++){
-            new_knots.push(u);
-        }
-
-        var controlPoints = [];
-        for (var i = 0; i < 8; i++) controlPoints.push([i, 0, 0]);
-
-        var crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
-        var after = verb.eval.Modify.curveKnotRefine( crv, new_knots );
-
-        after.controlPoints.forEach(function(cp){ should.exist(cp); });
-        after.knots.forEach(function(cp){ should.exist(cp); });
-
-        should.equal(knots.length + r, after.knots.length);
-        should.equal(controlPoints.length + r, after.controlPoints.length);
-
-        var p0 = verb.eval.Eval.curvePoint( crv, 2.5);
-        var p1 = verb.eval.Eval.curvePoint( after, 2.5);
-
-        p0[0].should.be.approximately(p1[0], verb.core.Constants.TOLERANCE);
-        p0[1].should.be.approximately(p1[1], verb.core.Constants.TOLERANCE);
-        p0[2].should.be.approximately(p1[2], verb.core.Constants.TOLERANCE);
-
-    }
-
-    it('returns expected results when inserting multiple knots in the middle of a non-rational, cubic b-spline', () => {
-
-        cubicInsert(2.5, 1);
-        cubicInsert(2.5, 2);
-        cubicInsert(2.5, 3);
-        cubicInsert(2.5, 4);
-
-        cubicInsert(0.5, 1);
-        cubicInsert(0.5, 2);
-        cubicInsert(0.5, 3);
-        cubicInsert(0.5, 4);
-
-        cubicInsert(3, 1);
-        cubicInsert(3, 2);
-
-    });
-
-});
 
 describe("verb.eval.Divide.curveSplit",() => {
 
@@ -911,76 +860,6 @@ describe("verb.core.Mat.transpose",() => {
     });
 });
 
-describe("verb.eval.Modify.surfaceKnotRefine",() => {
-
-    var degree = 3
-        , knotsV = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
-        , knotsU = [0, 0, 0, 0, 0.5, 1, 1, 1, 1]
-        , controlPoints = [
-                    [ [0, 0, -10],  [10, 0, 0],     [20, 0, 0],     [30, 0, 0] ,    [40, 0, 0],     [50, 0, 0] ],
-                    [ [0, -10, 0],  [10, -10, 10],  [20, -10, 10],  [30, -10, 0] ,  [40, -10, 0],   [50, -10, 0]    ],
-                    [ [0, -20, 0],  [10, -20, 10],  [20, -20, 10],  [30, -20, 0] ,  [40, -20, -2],  [50, -20, 0]    ],
-                    [ [0, -30, 0],  [10, -30, 0],   [20, -30, -23], [30, -30, 0] ,  [40, -30, 0],   [50, -30, 0]     ],
-                    [ [0, -40, 0],  [10, -40, 0],   [20, -40, 0],   [30, -40, 4] ,  [40, -40, -20], [50, -40, 0]     ] ]
-        , surface = new verb.core.NurbsSurfaceData( degree, degree, knotsU, knotsV, controlPoints );
-
-    it('can add knots into a surface in the u direction', () => {
-
-        var r = 1;
-        var u = 0.2;
-        var new_knots = [];
-
-        for (var i = 0; i < r; i++){
-            new_knots.push(u);
-        }
-
-        var res = verb.eval.Modify.surfaceKnotRefine( surface, new_knots, false );
-
-        res.controlPoints.forEach(function(cp){ should.exist(cp); });
-        res.knotsU.forEach(function(cp){ should.exist(cp); });
-        res.knotsV.forEach(function(cp){ should.exist(cp); });
-
-        should.equal(knotsU.length + r, res.knotsU.length);
-        should.equal(controlPoints.length + r, res.controlPoints.length);
-
-        var p0 = verb.eval.Eval.surfacePoint( surface, 0.5, 0.25 );
-        var p1 = verb.eval.Eval.surfacePoint( res, 0.5, 0.25);
-
-        p0[0].should.be.approximately(p1[0], verb.core.Constants.TOLERANCE);
-        p0[1].should.be.approximately(p1[1], verb.core.Constants.TOLERANCE);
-        p0[2].should.be.approximately(p1[2], verb.core.Constants.TOLERANCE);
-
-    });
-
-    it('can add knots into a surface in the v direction', () => {
-
-        var r = 1;
-        var u = 0.2;
-        var new_knots = [];
-
-        for (var i = 0; i < r; i++){
-            new_knots.push(u);
-        }
-
-        var res = verb.eval.Modify.surfaceKnotRefine( surface, new_knots, true );
-
-        res.controlPoints.forEach(function(cp){ should.exist(cp); });
-        res.knotsU.forEach(function(cp){ should.exist(cp); });
-        res.knotsV.forEach(function(cp){ should.exist(cp); });
-
-        should.equal(knotsV.length + r, res.knotsV.length);
-        should.equal(controlPoints[0].length + r, res.controlPoints[0].length);
-
-        var p0 = verb.eval.Eval.surfacePoint( surface, 0.5, 0.25 );
-        var p1 = verb.eval.Eval.surfacePoint( res, 0.5, 0.25);
-
-        p0[0].should.be.approximately(p1[0], verb.core.Constants.TOLERANCE);
-        p0[1].should.be.approximately(p1[1], verb.core.Constants.TOLERANCE);
-        p0[2].should.be.approximately(p1[2], verb.core.Constants.TOLERANCE);
-
-
-    });
-});
 
 describe("verb.eval.Divide.surfaceSplit", () => {
 
@@ -4050,3 +3929,257 @@ describe("verb.eval.Tess.rationalBezierSurfaceStepLength",() => {
 
 
 
+describe("verb.eval.Eval.curveKnotRefine",() => {
+
+    function cubicInsert(u, r){
+
+        var degree = 3
+            , knots = [ 0, 0, 0, 0, 1, 2, 3, 4, 5, 5, 5, 5 ]
+            , new_knots = [];
+
+        for (var i = 0; i < r; i++){
+            new_knots.push(u);
+        }
+
+        var controlPoints = [];
+        for (var i = 0; i < 8; i++) controlPoints.push([i, 0, 0]);
+
+        var crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
+        var after = verb.eval.Modify.curveKnotRefine( crv, new_knots );
+
+        after.controlPoints.forEach(function(cp){ should.exist(cp); });
+        after.knots.forEach(function(cp){ should.exist(cp); });
+
+        should.equal(knots.length + r, after.knots.length);
+        should.equal(controlPoints.length + r, after.controlPoints.length);
+
+        var p0 = verb.eval.Eval.curvePoint( crv, 2.5);
+        var p1 = verb.eval.Eval.curvePoint( after, 2.5);
+
+        p0[0].should.be.approximately(p1[0], verb.core.Constants.TOLERANCE);
+        p0[1].should.be.approximately(p1[1], verb.core.Constants.TOLERANCE);
+        p0[2].should.be.approximately(p1[2], verb.core.Constants.TOLERANCE);
+
+    }
+
+    it('returns expected results when inserting multiple knots in the middle of a non-rational, cubic b-spline', () => {
+
+        cubicInsert(2.5, 1);
+        cubicInsert(2.5, 2);
+        cubicInsert(2.5, 3);
+        cubicInsert(2.5, 4);
+
+        cubicInsert(0.5, 1);
+        cubicInsert(0.5, 2);
+        cubicInsert(0.5, 3);
+        cubicInsert(0.5, 4);
+
+        cubicInsert(3, 1);
+        cubicInsert(3, 2);
+
+    });
+
+});
+
+
+describe("verb.eval.Modify.surfaceKnotRefine",() => {
+
+    var degree = 3
+        , knotsV = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
+        , knotsU = [0, 0, 0, 0, 0.5, 1, 1, 1, 1]
+        , controlPoints = [
+                    [ [0, 0, -10],  [10, 0, 0],     [20, 0, 0],     [30, 0, 0] ,    [40, 0, 0],     [50, 0, 0] ],
+                    [ [0, -10, 0],  [10, -10, 10],  [20, -10, 10],  [30, -10, 0] ,  [40, -10, 0],   [50, -10, 0]    ],
+                    [ [0, -20, 0],  [10, -20, 10],  [20, -20, 10],  [30, -20, 0] ,  [40, -20, -2],  [50, -20, 0]    ],
+                    [ [0, -30, 0],  [10, -30, 0],   [20, -30, -23], [30, -30, 0] ,  [40, -30, 0],   [50, -30, 0]     ],
+                    [ [0, -40, 0],  [10, -40, 0],   [20, -40, 0],   [30, -40, 4] ,  [40, -40, -20], [50, -40, 0]     ] ]
+        , surface = new verb.core.NurbsSurfaceData( degree, degree, knotsU, knotsV, controlPoints );
+
+    it('can add knots into a surface in the u direction', () => {
+
+        var r = 3;
+        var u = 0.2;
+        var new_knots = [];
+
+        for (var i = 0; i < r; i++){
+            new_knots.push(u);
+        }
+
+        var res = verb.eval.Modify.surfaceKnotRefine( surface, new_knots, false );
+
+        console.log( res.controlPoints[0].length, res.controlPoints.length );
+
+        res.controlPoints.forEach(function(cp){ should.exist(cp); });
+        res.knotsU.forEach(function(cp){ should.exist(cp); });
+        res.knotsV.forEach(function(cp){ should.exist(cp); });
+
+        should.equal(knotsU.length + r, res.knotsU.length);
+        should.equal(controlPoints.length + r, res.controlPoints.length);
+
+        var p0 = verb.eval.Eval.surfacePoint( surface, 0.5, 0.25 );
+        var p1 = verb.eval.Eval.surfacePoint( res, 0.5, 0.25);
+
+        p0[0].should.be.approximately(p1[0], verb.core.Constants.TOLERANCE);
+        p0[1].should.be.approximately(p1[1], verb.core.Constants.TOLERANCE);
+        p0[2].should.be.approximately(p1[2], verb.core.Constants.TOLERANCE);
+
+    });
+
+    it('can add knots into a surface in the v direction', () => {
+
+        var r = 3;
+        var u = 0.2;
+        var new_knots = [];
+
+        for (var i = 0; i < r; i++){
+            new_knots.push(u);
+        }
+
+        var res = verb.eval.Modify.surfaceKnotRefine( surface, new_knots, true );
+
+        res.controlPoints.forEach(function(cp){ should.exist(cp); });
+        res.knotsU.forEach(function(cp){ should.exist(cp); });
+        res.knotsV.forEach(function(cp){ should.exist(cp); });
+
+        should.equal(knotsV.length + r, res.knotsV.length);
+        should.equal(controlPoints[0].length + r, res.controlPoints[0].length);
+
+        var p0 = verb.eval.Eval.surfacePoint( surface, 0.5, 0.25 );
+        var p1 = verb.eval.Eval.surfacePoint( res, 0.5, 0.25);
+
+        p0[0].should.be.approximately(p1[0], verb.core.Constants.TOLERANCE);
+        p0[1].should.be.approximately(p1[1], verb.core.Constants.TOLERANCE);
+        p0[2].should.be.approximately(p1[2], verb.core.Constants.TOLERANCE);
+
+    });
+});
+
+
+describe("verb.eval.Modify.surfaceKnotRefine2",() => {
+
+    var degree = 3
+        , knotsV = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
+        , knotsU = [0, 0, 0, 0, 0.5, 1, 1, 1, 1]
+        , controlPoints = [
+                    [ [0, 0, -10],  [10, 0, 0],     [20, 0, 0],     [30, 0, 0] ,    [40, 0, 0],     [50, 0, 0] ],
+                    [ [0, -10, 0],  [10, -10, 10],  [20, -10, 10],  [30, -10, 0] ,  [40, -10, 0],   [50, -10, 0]    ],
+                    [ [0, -20, 0],  [10, -20, 10],  [20, -20, 10],  [30, -20, 0] ,  [40, -20, -2],  [50, -20, 0]    ],
+                    [ [0, -30, 0],  [10, -30, 0],   [20, -30, -23], [30, -30, 0] ,  [40, -30, 0],   [50, -30, 0]     ],
+                    [ [0, -40, 0],  [10, -40, 0],   [20, -40, 0],   [30, -40, 4] ,  [40, -40, -20], [50, -40, 0]     ] ]
+        , surface = new verb.core.NurbsSurfaceData( degree, degree, knotsU, knotsV, controlPoints );
+
+    it('can add knots into a surface in the u direction', () => {
+
+        var r = 1;
+        var u = 0.2;
+        var new_knots = [];
+
+        for (var i = 0; i < r; i++){
+            new_knots.push(u);
+        }
+
+        var res = verb.eval.Modify.surfaceKnotRefine2( surface, new_knots, false );
+        console.log( res.controlPoints[0].length, res.controlPoints.length );
+
+        res.controlPoints.forEach(function(cp){ should.exist(cp); });
+        res.knotsU.forEach(function(cp){ should.exist(cp); });
+        res.knotsV.forEach(function(cp){ should.exist(cp); });
+
+        should.equal(knotsU.length + r, res.knotsU.length);
+        should.equal(controlPoints.length + r, res.controlPoints.length);
+
+        var p0 = verb.eval.Eval.surfacePoint( surface, 0.5, 0.25 );
+        var p1 = verb.eval.Eval.surfacePoint( res, 0.5, 0.25);
+
+        p0[0].should.be.approximately(p1[0], verb.core.Constants.TOLERANCE);
+        p0[1].should.be.approximately(p1[1], verb.core.Constants.TOLERANCE);
+        p0[2].should.be.approximately(p1[2], verb.core.Constants.TOLERANCE);
+
+    });
+
+    it('can add multiple knots into a surface in the u direction', () => {
+
+        var r = 2;
+        var u = 0.2;
+        var new_knots = [];
+
+        for (var i = 0; i < r; i++){
+            new_knots.push(u);
+        }
+
+        var res = verb.eval.Modify.surfaceKnotRefine2( surface, new_knots, false );
+        console.log( res.controlPoints[0].length, res.controlPoints.length );
+
+        res.controlPoints.forEach(function(cp){ should.exist(cp); });
+        res.knotsU.forEach(function(cp){ should.exist(cp); });
+        res.knotsV.forEach(function(cp){ should.exist(cp); });
+
+        should.equal(knotsU.length + r, res.knotsU.length);
+        should.equal(controlPoints.length + r, res.controlPoints.length);
+
+        var p0 = verb.eval.Eval.surfacePoint( surface, 0.5, 0.25 );
+        var p1 = verb.eval.Eval.surfacePoint( res, 0.5, 0.25);
+
+        p0[0].should.be.approximately(p1[0], verb.core.Constants.TOLERANCE);
+        p0[1].should.be.approximately(p1[1], verb.core.Constants.TOLERANCE);
+        p0[2].should.be.approximately(p1[2], verb.core.Constants.TOLERANCE);
+
+    });
+
+    it('can add knots into a surface in the v direction', () => {
+
+        var r = 1;
+        var u = 0.2;
+        var new_knots = [];
+
+        for (var i = 0; i < r; i++){
+            new_knots.push(u);
+        }
+
+        var res = verb.eval.Modify.surfaceKnotRefine2( surface, new_knots, true );
+
+        res.controlPoints.forEach(function(cp){ should.exist(cp); });
+        res.knotsU.forEach(function(cp){ should.exist(cp); });
+        res.knotsV.forEach(function(cp){ should.exist(cp); });
+
+        should.equal(knotsV.length + r, res.knotsV.length);
+        should.equal(controlPoints[0].length + r, res.controlPoints[0].length);
+
+        var p0 = verb.eval.Eval.surfacePoint( surface, 0.5, 0.25 );
+        var p1 = verb.eval.Eval.surfacePoint( res, 0.5, 0.25);
+
+        p0[0].should.be.approximately(p1[0], verb.core.Constants.TOLERANCE);
+        p0[1].should.be.approximately(p1[1], verb.core.Constants.TOLERANCE);
+        p0[2].should.be.approximately(p1[2], verb.core.Constants.TOLERANCE);
+
+
+    });
+
+    it('can add multiple duplicate knots into a surface in the v direction', () => {
+
+        var r = 2;
+        var u = 0.2;
+        var new_knots = [];
+
+        for (var i = 0; i < r; i++){
+            new_knots.push(u);
+        }
+
+        var res = verb.eval.Modify.surfaceKnotRefine2( surface, new_knots, true );
+
+        res.controlPoints.forEach(function(cp){ should.exist(cp); });
+        res.knotsU.forEach(function(cp){ should.exist(cp); });
+        res.knotsV.forEach(function(cp){ should.exist(cp); });
+
+        should.equal(knotsV.length + r, res.knotsV.length);
+        should.equal(controlPoints[0].length + r, res.controlPoints[0].length);
+
+        var p0 = verb.eval.Eval.surfacePoint( surface, 0.5, 0.25 );
+        var p1 = verb.eval.Eval.surfacePoint( res, 0.5, 0.25);
+
+        p0[0].should.be.approximately(p1[0], verb.core.Constants.TOLERANCE);
+        p0[1].should.be.approximately(p1[1], verb.core.Constants.TOLERANCE);
+        p0[2].should.be.approximately(p1[2], verb.core.Constants.TOLERANCE);
+
+    });
+});

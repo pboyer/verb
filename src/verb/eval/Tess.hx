@@ -25,8 +25,13 @@ import verb.core.Trig;
 @:expose("eval.Tess")
 class Tess {
 
+    public static function rationalSurfaceAdaptiveSample(surface:NurbsSurfaceData, tol : Float ) : MeshData {
 
-    public static function rationalSurfaceAdaptiveSample(surface:NurbsSurfaceData, divs:Int, includeU : Bool = false ) : MeshData {
+        // split into bezier patches
+
+        // get step lengths for patches
+
+        // tessellate patches, merging into a single mesh
 
         return null;
 
@@ -159,7 +164,6 @@ class Tess {
 
         return new Pair<Float,Float>( stepu, stepv );
     }
-
 
     // Compute a regularly spaced sequence of points on a non-uniform, rational spline curve. Generally, this algorithm
     // is much faster than computing these points directly. This algorithm is based on the forward difference algorithm
