@@ -3724,8 +3724,9 @@ verb_eval_Analyze.rationalCurveClosestParam = function(curve,p) {
 		var u0 = pts[i1].pop();
 		var u11 = pts[i1 + 1].pop();
 		var p0 = pts[i1];
+		var p01 = pts[i1];
 		var p1 = pts[i1 + 1];
-		var proj = verb_core_Trig.segmentClosestPoint(p,p0,p1,u0,u11);
+		var proj = verb_core_Trig.segmentClosestPoint(p,p01,p1,u0,u11);
 		var d1 = verb_core_Vec.norm(verb_core_Vec.sub(p,proj.pt));
 		if(d1 < min) {
 			min = d1;
@@ -6074,61 +6075,62 @@ verb_eval_Modify.surfaceKnotRefine2 = function(surface,knotsToInsert,useV) {
 	var b = verb_eval_Eval.knotSpan(degree,knotsToInsert[r],knots);
 	var controlPoints_post = [];
 	var knots_post = [];
+	var _g1 = 0;
+	var _g = a + 1;
+	while(_g1 < _g) {
+		var i1 = _g1++;
+		knots_post[i1] = knots[i1];
+	}
+	var _g11 = b + degree;
+	var _g2 = m + 1;
+	while(_g11 < _g2) {
+		var i2 = _g11++;
+		knots_post[i2 + r + 1] = knots[i2];
+	}
 	if(useV) {
-		var _g1 = 0;
-		var _g = n + r;
-		while(_g1 < _g) {
-			var i1 = _g1++;
+		var km = verb_eval_Analyze.knotMultiplicities(knotsToInsert);
+		var _g12 = 0;
+		var _g3 = n + km.length - 1;
+		while(_g12 < _g3) {
+			var i3 = _g12++;
 			controlPoints_post.push([]);
 		}
-		var _g11 = 0;
-		var _g2 = a - degree + 1;
-		while(_g11 < _g2) {
-			var i2 = _g11++;
-			var _g3 = 0;
+		var _g13 = 0;
+		var _g4 = a - degree + 1;
+		while(_g13 < _g4) {
+			var i4 = _g13++;
+			var _g31 = 0;
 			var _g21 = controlPoints.length;
-			while(_g3 < _g21) {
-				var j1 = _g3++;
-				controlPoints_post[j1][i2] = controlPoints[j1][i2];
+			while(_g31 < _g21) {
+				var j1 = _g31++;
+				controlPoints_post[j1][i4] = controlPoints[j1][i4];
 			}
 		}
-		var _g12 = b - 1;
-		var _g4 = n + 1;
-		while(_g12 < _g4) {
-			var i3 = _g12++;
-			var l = i3 + r + 1;
-			var _g31 = 0;
+		var _g14 = b - 1;
+		var _g5 = n + 1;
+		while(_g14 < _g5) {
+			var i5 = _g14++;
+			var l = i5 + r + 1;
+			var _g32 = 0;
 			var _g22 = controlPoints.length;
-			while(_g31 < _g22) {
-				var j2 = _g31++;
-				controlPoints_post[j2][l] = controlPoints[j2][i3];
+			while(_g32 < _g22) {
+				var j2 = _g32++;
+				controlPoints_post[j2][l] = controlPoints[j2][i5];
 			}
 		}
 	} else {
-		var _g13 = 0;
-		var _g5 = a - degree + 1;
-		while(_g13 < _g5) {
-			var i4 = _g13++;
-			controlPoints_post[i4] = controlPoints[i4].slice(0);
+		var _g15 = 0;
+		var _g6 = a - degree + 1;
+		while(_g15 < _g6) {
+			var i6 = _g15++;
+			controlPoints_post[i6] = controlPoints[i6].slice(0);
 		}
-		var _g14 = b - 1;
-		var _g6 = n + 1;
-		while(_g14 < _g6) {
-			var i5 = _g14++;
-			controlPoints_post[i5 + r + 1] = controlPoints[i5].slice(0);
+		var _g16 = b - 1;
+		var _g7 = n + 1;
+		while(_g16 < _g7) {
+			var i7 = _g16++;
+			controlPoints_post[i7 + r + 1] = controlPoints[i7].slice(0);
 		}
-	}
-	var _g15 = 0;
-	var _g7 = a + 1;
-	while(_g15 < _g7) {
-		var i6 = _g15++;
-		knots_post[i6] = knots[i6];
-	}
-	var _g16 = b + degree;
-	var _g8 = m + 1;
-	while(_g16 < _g8) {
-		var i7 = _g16++;
-		knots_post[i7 + r + 1] = knots[i7];
 	}
 	var i = b + degree - 1;
 	var k = b + degree + r;
@@ -6140,8 +6142,8 @@ verb_eval_Modify.surfaceKnotRefine2 = function(surface,knotsToInsert,useV) {
 			var xi = i - degree - 1;
 			if(useV) {
 				var _g17 = 0;
-				var _g9 = controlPoints.length;
-				while(_g17 < _g9) {
+				var _g8 = controlPoints_post.length;
+				while(_g17 < _g8) {
 					var ci1 = _g17++;
 					controlPoints_post[ci1][wi] = controlPoints[ci1][xi];
 				}
@@ -6152,41 +6154,41 @@ verb_eval_Modify.surfaceKnotRefine2 = function(surface,knotsToInsert,useV) {
 		}
 		if(useV) {
 			var _g18 = 0;
-			var _g10 = controlPoints.length;
-			while(_g18 < _g10) {
+			var _g9 = controlPoints_post.length;
+			while(_g18 < _g9) {
 				var ci2 = _g18++;
 				controlPoints_post[ci2][k - degree - 1] = controlPoints_post[ci2][k - degree];
 			}
 		} else controlPoints_post[k - degree - 1] = controlPoints_post[k - degree].slice(0);
 		var _g19 = 1;
-		var _g20 = degree + 1;
-		while(_g19 < _g20) {
+		var _g10 = degree + 1;
+		while(_g19 < _g10) {
 			var l1 = _g19++;
 			var ind = k - degree + l1;
 			var alfa = knots_post[k + l1] - knotsToInsert[j];
 			if(Math.abs(alfa) < verb_core_Constants.EPSILON) {
 				if(useV) {
-					var _g32 = 0;
-					var _g23 = controlPoints.length;
-					while(_g32 < _g23) {
-						var ci3 = _g32++;
+					var _g33 = 0;
+					var _g23 = controlPoints_post.length;
+					while(_g33 < _g23) {
+						var ci3 = _g33++;
 						controlPoints_post[ci3][ind - 1] = controlPoints_post[ci3][ind];
 					}
 				} else controlPoints_post[ind - 1] = controlPoints_post[ind];
 			} else {
 				alfa = alfa / (knots_post[k + l1] - knots[i - degree + l1]);
 				if(useV) {
-					var _g33 = 0;
-					var _g24 = controlPoints.length;
-					while(_g33 < _g24) {
-						var wi1 = _g33++;
+					var _g34 = 0;
+					var _g24 = controlPoints_post.length;
+					while(_g34 < _g24) {
+						var wi1 = _g34++;
 						controlPoints_post[wi1][ind - 1] = verb_core_Vec.lerp(alfa,controlPoints_post[wi1][ind - 1],controlPoints_post[wi1][ind]);
 					}
 				} else {
-					var _g34 = 0;
+					var _g35 = 0;
 					var _g25 = controlPoints_post[ind - 1].length;
-					while(_g34 < _g25) {
-						var wi2 = _g34++;
+					while(_g35 < _g25) {
+						var wi2 = _g35++;
 						controlPoints_post[ind - 1][wi2] = verb_core_Vec.lerp(alfa,controlPoints_post[ind - 1][wi2],controlPoints_post[ind][wi2]);
 					}
 				}

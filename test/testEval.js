@@ -4007,8 +4007,6 @@ describe("verb.eval.Modify.surfaceKnotRefine",() => {
 
         var res = verb.eval.Modify.surfaceKnotRefine( surface, new_knots, false );
 
-        console.log( res.controlPoints[0].length, res.controlPoints.length );
-
         res.controlPoints.forEach(function(cp){ should.exist(cp); });
         res.knotsU.forEach(function(cp){ should.exist(cp); });
         res.knotsV.forEach(function(cp){ should.exist(cp); });
@@ -4079,7 +4077,6 @@ describe("verb.eval.Modify.surfaceKnotRefine2",() => {
         }
 
         var res = verb.eval.Modify.surfaceKnotRefine2( surface, new_knots, false );
-        console.log( res.controlPoints[0].length, res.controlPoints.length );
 
         res.controlPoints.forEach(function(cp){ should.exist(cp); });
         res.knotsU.forEach(function(cp){ should.exist(cp); });
@@ -4099,7 +4096,7 @@ describe("verb.eval.Modify.surfaceKnotRefine2",() => {
 
     it('can add multiple knots into a surface in the u direction', () => {
 
-        var r = 2;
+        var r = 3;
         var u = 0.2;
         var new_knots = [];
 
@@ -4108,7 +4105,6 @@ describe("verb.eval.Modify.surfaceKnotRefine2",() => {
         }
 
         var res = verb.eval.Modify.surfaceKnotRefine2( surface, new_knots, false );
-        console.log( res.controlPoints[0].length, res.controlPoints.length );
 
         res.controlPoints.forEach(function(cp){ should.exist(cp); });
         res.knotsU.forEach(function(cp){ should.exist(cp); });
@@ -4157,7 +4153,7 @@ describe("verb.eval.Modify.surfaceKnotRefine2",() => {
 
     it('can add multiple duplicate knots into a surface in the v direction', () => {
 
-        var r = 2;
+        var r = 4;
         var u = 0.2;
         var new_knots = [];
 

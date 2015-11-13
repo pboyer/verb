@@ -363,6 +363,7 @@ class Analyze {
             var u1 = pts[i + 1].pop();
 
             var p0 = pts[i];
+            var p0 = pts[i];
             var p1 = pts[i + 1];
 
             var proj = Trig.segmentClosestPoint( p, p0, p1, u0, u1 );

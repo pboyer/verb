@@ -429,7 +429,7 @@ class Modify {
 
     public static function surfaceKnotRefine2( surface : NurbsSurfaceData, knotsToInsert : Array<Float>, useV : Bool ) : NurbsSurfaceData {
 
-//        if ( knotsToInsert.length == 0 ) return Make.clonedCurve( curve );
+//        if ( knotsToInsert.length == 0 ) return Make.clonedSurface( surface );
 
         var degree, controlPoints = surface.controlPoints, knots;
 
@@ -449,10 +449,25 @@ class Modify {
         , controlPoints_post = new Array<Array<Point>>()
         , knots_post = new KnotArray();
 
+        //new knot vector
+
+        for ( i in 0...a + 1 ) {
+            knots_post[i] = knots[i];
+        }
+
+        for ( i in b + degree...m + 1 ) {
+            knots_post[i + r + 1] = knots[i];
+        }
+
         //new control pts
 
         if (useV){
-            for (i in 0...n+r){
+
+            // count unique elements in knot collection
+
+            var km = Analyze.knotMultiplicities( knotsToInsert );
+
+            for (i in 0...n + km.length - 1 ){
                 controlPoints_post.push([]);
             }
 
@@ -478,16 +493,6 @@ class Modify {
             }
         }
 
-        //new knot vector
-
-        for ( i in 0...a + 1 ) {
-            knots_post[i] = knots[i];
-        }
-
-        for ( i in b + degree...m + 1 ) {
-            knots_post[i + r + 1] = knots[i];
-        }
-
         var i = b + degree - 1;
         var k = b + degree + r;
         var j = r;
@@ -499,7 +504,7 @@ class Modify {
                 var xi = i - degree - 1;
 
                 if (useV){
-                    for (ci in 0...controlPoints.length){
+                    for (ci in 0...controlPoints_post.length){
                         controlPoints_post[ci][wi] = controlPoints[ci][xi];
                     }
                 } else {
@@ -512,7 +517,7 @@ class Modify {
             }
 
             if (useV){
-                for (ci in 0...controlPoints.length){
+                for (ci in 0...controlPoints_post.length){
                     controlPoints_post[ci][k - degree - 1] = controlPoints_post[ci][k - degree];
                 }
             } else {
@@ -526,7 +531,7 @@ class Modify {
 
                 if ( Math.abs( alfa ) < Constants.EPSILON ) {
                     if (useV){
-                        for (ci in 0...controlPoints.length){
+                        for (ci in 0...controlPoints_post.length){
                             controlPoints_post[ci][ind - 1] = controlPoints_post[ci][ind];
                         }
                     } else {
@@ -536,7 +541,7 @@ class Modify {
                     alfa = alfa / (knots_post[k + l] - knots[i - degree + l]);
 
                     if (useV){
-                        for (wi in 0...controlPoints.length){
+                        for (wi in 0...controlPoints_post.length){
                             controlPoints_post[wi][ind - 1] =
                                 Vec.lerp( alfa, controlPoints_post[wi][ind - 1], controlPoints_post[wi][ind] );
                         }
