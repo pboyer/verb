@@ -5419,6 +5419,25 @@ verb_eval_Make.clonedCurve = function(curve) {
 		return x.slice();
 	}));
 };
+verb_eval_Make.clonedSurface = function(surface) {
+	var newpts = [];
+	var newrow;
+	var _g = 0;
+	var _g1 = surface.controlPoints;
+	while(_g < _g1.length) {
+		var row = _g1[_g];
+		++_g;
+		newrow = [];
+		newpts.push(newrow);
+		var _g2 = 0;
+		while(_g2 < row.length) {
+			var pt = row[_g2];
+			++_g2;
+			newrow.push(pt.slice());
+		}
+	}
+	return new verb_core_NurbsSurfaceData(surface.degreeU,surface.degreeV,surface.knotsU.slice(),surface.knotsV.slice(),newpts);
+};
 verb_eval_Make.rationalBezierCurve = function(controlPoints,weights) {
 	var degree = controlPoints.length - 1;
 	var knots = [];
@@ -6098,34 +6117,7 @@ verb_eval_Modify.rationalCurveTransform = function(curve,mat) {
 	return new verb_core_NurbsCurveData(curve.degree,curve.knots.slice(),verb_eval_Eval.homogenize1d(pts,verb_eval_Eval.weight1d(curve.controlPoints)));
 };
 verb_eval_Modify.surfaceKnotRefine = function(surface,knotsToInsert,useV) {
-	var newPts = [];
-	var knots;
-	var degree;
-	var ctrlPts;
-	if(useV) {
-		ctrlPts = surface.controlPoints;
-		knots = surface.knotsV;
-		degree = surface.degreeV;
-	} else {
-		ctrlPts = verb_core_Mat.transpose(surface.controlPoints);
-		knots = surface.knotsU;
-		degree = surface.degreeU;
-	}
-	var c = null;
-	var _g = 0;
-	while(_g < ctrlPts.length) {
-		var cptrow = ctrlPts[_g];
-		++_g;
-		c = verb_eval_Modify.curveKnotRefine(new verb_core_NurbsCurveData(degree,knots,cptrow),knotsToInsert);
-		newPts.push(c.controlPoints);
-	}
-	var newknots = c.knots;
-	if(useV) return new verb_core_NurbsSurfaceData(surface.degreeU,surface.degreeV,surface.knotsU.slice(),newknots,newPts); else {
-		newPts = verb_core_Mat.transpose(newPts);
-		return new verb_core_NurbsSurfaceData(surface.degreeU,surface.degreeV,newknots,surface.knotsV.slice(),newPts);
-	}
-};
-verb_eval_Modify.surfaceKnotRefine2 = function(surface,knotsToInsert,useV) {
+	if(knotsToInsert.length == 0) return verb_eval_Make.clonedSurface(surface);
 	var degree;
 	var controlPoints = surface.controlPoints;
 	var knots;
@@ -6159,7 +6151,7 @@ verb_eval_Modify.surfaceKnotRefine2 = function(surface,knotsToInsert,useV) {
 	if(useV) {
 		var km = verb_eval_Analyze.knotMultiplicities(knotsToInsert);
 		var _g12 = 0;
-		var _g3 = n + km.length - 1;
+		var _g3 = controlPoints.length + km.length - 1;
 		while(_g12 < _g3) {
 			var i3 = _g12++;
 			controlPoints_post.push([]);

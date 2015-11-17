@@ -156,6 +156,23 @@ class Make {
         return new NurbsCurveData( curve.degree, curve.knots.copy( ), curve.controlPoints.map( function( x ) { return x.copy( ); } ) );
     }
 
+    public static function clonedSurface( surface : NurbsSurfaceData ) : NurbsSurfaceData {
+
+        var newpts = new Array<Array<Point>>();
+        var newrow;
+        for (row in surface.controlPoints){
+            newrow = [];
+            newpts.push( newrow );
+
+            for (pt in row){
+                newrow.push(pt.copy());
+            }
+        }
+
+        return new NurbsSurfaceData( surface.degreeU, surface.degreeV, surface.knotsU.copy( ), surface.knotsV.copy( ), newpts );
+    }
+
+
     //Generate the control points, weights, and knots for a bezier curve of any degree
     //
     //**params**

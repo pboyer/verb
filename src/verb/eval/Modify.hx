@@ -389,47 +389,47 @@ class Modify {
     //
     //* A new NURBS surface with the knots inserted
 
+//    public static function surfaceKnotRefine( surface : NurbsSurfaceData, knotsToInsert : Array<Float>, useV : Bool ) : NurbsSurfaceData {
+//
+//        //TODO: make this faster by taking advantage of repeat computations in every row
+//        // 			 i.e. no reason to recompute the knot vectors on every row
+//
+//        var newPts = []
+//        , knots
+//        , degree
+//        , ctrlPts;
+//
+//        //u dir
+//        if ( useV ) {
+//            ctrlPts = surface.controlPoints;
+//            knots = surface.knotsV;
+//            degree = surface.degreeV;
+//        } else {
+//            ctrlPts = Mat.transpose( surface.controlPoints );
+//            knots = surface.knotsU;
+//            degree = surface.degreeU;
+//        }
+//
+//        //do knot refinement on every row
+//        var c : NurbsCurveData = null;
+//        for ( cptrow in ctrlPts ) {
+//            c = curveKnotRefine( new NurbsCurveData(degree, knots, cptrow), knotsToInsert );
+//            newPts.push( c.controlPoints );
+//        }
+//
+//        var newknots = c.knots;
+//
+//        if ( useV ) {
+//            return new NurbsSurfaceData( surface.degreeU, surface.degreeV, surface.knotsU.copy( ), newknots, newPts );
+//        } else {
+//            newPts = Mat.transpose( newPts );
+//            return new NurbsSurfaceData( surface.degreeU, surface.degreeV, newknots, surface.knotsV.copy( ), newPts );
+//        }
+//    }
+
     public static function surfaceKnotRefine( surface : NurbsSurfaceData, knotsToInsert : Array<Float>, useV : Bool ) : NurbsSurfaceData {
 
-        //TODO: make this faster by taking advantage of repeat computations in every row
-        // 			 i.e. no reason to recompute the knot vectors on every row
-
-        var newPts = []
-        , knots
-        , degree
-        , ctrlPts;
-
-        //u dir
-        if ( useV ) {
-            ctrlPts = surface.controlPoints;
-            knots = surface.knotsV;
-            degree = surface.degreeV;
-        } else {
-            ctrlPts = Mat.transpose( surface.controlPoints );
-            knots = surface.knotsU;
-            degree = surface.degreeU;
-        }
-
-        //do knot refinement on every row
-        var c : NurbsCurveData = null;
-        for ( cptrow in ctrlPts ) {
-            c = curveKnotRefine( new NurbsCurveData(degree, knots, cptrow), knotsToInsert );
-            newPts.push( c.controlPoints );
-        }
-
-        var newknots = c.knots;
-
-        if ( useV ) {
-            return new NurbsSurfaceData( surface.degreeU, surface.degreeV, surface.knotsU.copy( ), newknots, newPts );
-        } else {
-            newPts = Mat.transpose( newPts );
-            return new NurbsSurfaceData( surface.degreeU, surface.degreeV, newknots, surface.knotsV.copy( ), newPts );
-        }
-    }
-
-    public static function surfaceKnotRefine2( surface : NurbsSurfaceData, knotsToInsert : Array<Float>, useV : Bool ) : NurbsSurfaceData {
-
-//        if ( knotsToInsert.length == 0 ) return Make.clonedSurface( surface );
+        if ( knotsToInsert.length == 0 ) return Make.clonedSurface( surface );
 
         var degree, controlPoints = surface.controlPoints, knots;
 
@@ -467,7 +467,7 @@ class Modify {
 
             var km = Analyze.knotMultiplicities( knotsToInsert );
 
-            for (i in 0...n + km.length - 1 ){
+            for (i in 0...controlPoints.length + km.length - 1 ){
                 controlPoints_post.push([]);
             }
 

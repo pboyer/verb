@@ -20,8 +20,6 @@ function last(a){
     return a[a.length-1];
 }
 
-/*
-
 describe("verb.eval.Eval.knotSpanGivenN",function(){
 
     it('returns correct result', () => {
@@ -3888,7 +3886,7 @@ describe("verb.eval.Tess.rationalBezierCurveStepLength",() => {
 	});
 });
 
-*/
+
 
 describe("verb.eval.Tess.rationalBezierSurfaceStepLength",() => {
 
@@ -4053,7 +4051,7 @@ describe("verb.eval.Modify.surfaceKnotRefine",() => {
 });
 
 
-describe("verb.eval.Modify.surfaceKnotRefine2",() => {
+describe("verb.eval.Modify.surfaceKnotRefine",() => {
 
     var degree = 3
         , knotsV = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
@@ -4076,7 +4074,7 @@ describe("verb.eval.Modify.surfaceKnotRefine2",() => {
             new_knots.push(u);
         }
 
-        var res = verb.eval.Modify.surfaceKnotRefine2( surface, new_knots, false );
+        var res = verb.eval.Modify.surfaceKnotRefine( surface, new_knots, false );
 
         res.controlPoints.forEach(function(cp){ should.exist(cp); });
         res.knotsU.forEach(function(cp){ should.exist(cp); });
@@ -4104,7 +4102,7 @@ describe("verb.eval.Modify.surfaceKnotRefine2",() => {
             new_knots.push(u);
         }
 
-        var res = verb.eval.Modify.surfaceKnotRefine2( surface, new_knots, false );
+        var res = verb.eval.Modify.surfaceKnotRefine( surface, new_knots, false );
 
         res.controlPoints.forEach(function(cp){ should.exist(cp); });
         res.knotsU.forEach(function(cp){ should.exist(cp); });
@@ -4132,7 +4130,7 @@ describe("verb.eval.Modify.surfaceKnotRefine2",() => {
             new_knots.push(u);
         }
 
-        var res = verb.eval.Modify.surfaceKnotRefine2( surface, new_knots, true );
+        var res = verb.eval.Modify.surfaceKnotRefine( surface, new_knots, true );
 
         res.controlPoints.forEach(function(cp){ should.exist(cp); });
         res.knotsU.forEach(function(cp){ should.exist(cp); });
@@ -4161,7 +4159,7 @@ describe("verb.eval.Modify.surfaceKnotRefine2",() => {
             new_knots.push(u);
         }
 
-        var res = verb.eval.Modify.surfaceKnotRefine2( surface, new_knots, true );
+        var res = verb.eval.Modify.surfaceKnotRefine( surface, new_knots, true );
 
         res.controlPoints.forEach(function(cp){ should.exist(cp); });
         res.knotsU.forEach(function(cp){ should.exist(cp); });
@@ -4178,4 +4176,81 @@ describe("verb.eval.Modify.surfaceKnotRefine2",() => {
         p0[2].should.be.approximately(p1[2], verb.core.Constants.TOLERANCE);
 
     });
+
+   it('can add multiple duplicate knots into a bezier patch in the u direction', () => {
+
+        var degreeU = 3
+        , degreeV = 3
+        , knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
+        , knotsV =  [0, 0, 0, 0, 1, 1, 1, 1]
+        , controlPoints = [     [ [0, 0, 0],    [10, 0, 0],     [20, 0, 0],     [30, 0, 0]      ],
+                                [ [0, -10, 0],  [10, -10, 0],   [20, -10, 0],   [30, -10, 0]    ],
+                                [ [0, -20, 0],  [10, -20, 0],   [20, -20, 0],   [30, -20, 0]    ],
+                                [ [0, -30, 0],  [10, -30, 0],   [20, -30, 0],   [30, -30, 0]    ] ]
+        , bezier = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
+
+        var r = 4;
+        var u = 0.2;
+        var new_knots = [];
+
+        for (var i = 0; i < r; i++){
+            new_knots.push(u);
+        }
+
+        var res = verb.eval.Modify.surfaceKnotRefine( bezier, new_knots, false );
+
+        res.controlPoints.forEach(function(cp){ should.exist(cp); });
+        res.knotsU.forEach(function(cp){ should.exist(cp); });
+        res.knotsV.forEach(function(cp){ should.exist(cp); });
+
+        should.equal(knotsU.length + r, res.knotsU.length);
+        should.equal(controlPoints.length + r, res.controlPoints.length);
+
+        var p0 = verb.eval.Eval.surfacePoint( bezier, 0.5, 0.25 );
+        var p1 = verb.eval.Eval.surfacePoint( res, 0.5, 0.25);
+
+        p0[0].should.be.approximately(p1[0], verb.core.Constants.TOLERANCE);
+        p0[1].should.be.approximately(p1[1], verb.core.Constants.TOLERANCE);
+        p0[2].should.be.approximately(p1[2], verb.core.Constants.TOLERANCE);
+
+    });
+
+   it('can add multiple duplicate knots into a bezier patch in the v direction', () => {
+
+        var degreeU = 3
+        , degreeV = 3
+        , knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
+        , knotsV =  [0, 0, 0, 0, 1, 1, 1, 1]
+        , controlPoints = [     [ [0, 0, 0],    [10, 0, 0],     [20, 0, 0],     [30, 0, 0]      ],
+                                [ [0, -10, 0],  [10, -10, 0],   [20, -10, 0],   [30, -10, 0]    ],
+                                [ [0, -20, 0],  [10, -20, 0],   [20, -20, 0],   [30, -20, 0]    ],
+                                [ [0, -30, 0],  [10, -30, 0],   [20, -30, 0],   [30, -30, 0]    ] ]
+        , bezier = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
+
+        var r = 4;
+        var u = 0.2;
+        var new_knots = [];
+
+        for (var i = 0; i < r; i++){
+            new_knots.push(u);
+        }
+
+        var res = verb.eval.Modify.surfaceKnotRefine( bezier, new_knots, true );
+
+        res.controlPoints.forEach(function(cp){ should.exist(cp); });
+        res.knotsU.forEach(function(cp){ should.exist(cp); });
+        res.knotsV.forEach(function(cp){ should.exist(cp); });
+
+        should.equal(knotsV.length + r, res.knotsV.length);
+        should.equal(controlPoints[0].length + r, res.controlPoints[0].length);
+
+        var p0 = verb.eval.Eval.surfacePoint( bezier, 0.5, 0.25 );
+        var p1 = verb.eval.Eval.surfacePoint( res, 0.5, 0.25);
+
+        p0[0].should.be.approximately(p1[0], verb.core.Constants.TOLERANCE);
+        p0[1].should.be.approximately(p1[1], verb.core.Constants.TOLERANCE);
+        p0[2].should.be.approximately(p1[2], verb.core.Constants.TOLERANCE);
+
+    });
+
 });
