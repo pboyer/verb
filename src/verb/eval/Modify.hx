@@ -411,16 +411,6 @@ class Modify {
         , controlPoints_post = new Array<Array<Point>>()
         , knots_post = new KnotArray();
 
-        //new knot vector
-
-        for ( i in 0...a + 1 ) {
-            knots_post[i] = knots[i];
-        }
-
-        for ( i in b + degree...m + 1 ) {
-            knots_post[i + r + 1] = knots[i];
-        }
-
         //new control pts
 
         if (useV){
@@ -455,32 +445,43 @@ class Modify {
             }
         }
 
+        //new knot vector
+
+        for ( i in 0...a + 1 ) {
+            knots_post[i] = knots[i];
+        }
+
+        for ( i in b + degree...m + 1 ) {
+            knots_post[i + r + 1] = knots[i];
+        }
+
         var i = b + degree - 1;
         var k = b + degree + r;
         var j = r;
         var ci;
 
         while ( j >= 0 ) {
+
             while ( knotsToInsert[j] <= knots[i] && i > a ) {
                 var wi = k - degree - 1;
                 var xi = i - degree - 1;
 
                 if (useV){
                     for (ci in 0...controlPoints_post.length){
-                        controlPoints_post[ci][wi] = controlPoints[ci][xi];
+                        controlPoints_post[ci][wi] = controlPoints[ci][xi].slice(0);
                     }
                 } else {
                     controlPoints_post[wi] = controlPoints[xi].slice(0);
                 }
 
                 knots_post[k] = knots[i];
-                k--;
-                i--;
+                k = k - 1;
+                i = i - 1;
             }
 
             if (useV){
                 for (ci in 0...controlPoints_post.length){
-                    controlPoints_post[ci][k - degree - 1] = controlPoints_post[ci][k - degree];
+                    controlPoints_post[ci][k - degree - 1] = controlPoints_post[ci][k - degree].slice(0);
                 }
             } else {
                 controlPoints_post[k - degree - 1] = controlPoints_post[k - degree].slice(0);
@@ -492,12 +493,13 @@ class Modify {
                 var alfa = knots_post[k + l] - knotsToInsert[j];
 
                 if ( Math.abs( alfa ) < Constants.EPSILON ) {
+
                     if (useV){
                         for (ci in 0...controlPoints_post.length){
                             controlPoints_post[ci][ind - 1] = controlPoints_post[ci][ind];
                         }
                     } else {
-                        controlPoints_post[ind - 1] = controlPoints_post[ind];
+                        controlPoints_post[ind - 1] = controlPoints_post[ind].slice(0);
                     }
                 } else {
                     alfa = alfa / (knots_post[k + l] - knots[i - degree + l]);
@@ -508,7 +510,7 @@ class Modify {
                                 Vec.lerp( alfa, controlPoints_post[wi][ind - 1], controlPoints_post[wi][ind] );
                         }
                     } else {
-                        for (wi in 0...controlPoints_post[ind - 1].length){
+                        for (wi in 0...controlPoints_post[ind].length){
                             controlPoints_post[ind - 1][wi] = Vec.lerp( alfa, controlPoints_post[ind - 1][wi], controlPoints_post[ind][wi] );
                         }
                     }
@@ -529,8 +531,82 @@ class Modify {
     }
 
     public static function decomposeSurfaceIntoBeziers( surface : NurbsSurfaceData ) : Array<Array<NurbsSurfaceData>> {
-        return null;
+
+        //find all of the unique knot values and their multiplicity
+        //for each, increase their multiplicity to degree + 1
+
+        var knotmultsU = Analyze.knotMultiplicities( surface.knotsU );
+        var reqMultU = surface.degreeU + 1;
+
+        //insert the knots
+
+        for ( knotmult in knotmultsU ) {
+            if ( knotmult.mult < reqMultU ) {
+                var knotsInsert = Vec.rep( reqMultU - knotmult.mult, knotmult.knot );
+                if (knotsInsert.length == 0) continue;
+                surface = surfaceKnotRefine( surface, knotsInsert, false );
+            }
+        }
+
+        var knotmultsV = Analyze.knotMultiplicities( surface.knotsV );
+        var reqMultV = surface.degreeV + 1;
+
+        for ( knotmult in knotmultsV ) {
+            if ( knotmult.mult < reqMultV ) {
+                var knotsInsert = Vec.rep( reqMultV - knotmult.mult, knotmult.knot );
+                if (knotsInsert.length == 0) continue;
+                surface = surfaceKnotRefine( surface, knotsInsert, true );
+            }
+        }
+
+        // extract sub control point matrices
+
+        var numU = surface.knotsU.length / reqMultU - 1;
+        var numV = surface.knotsV.length / reqMultV - 1;
+
+        var knotLengthU = reqMultU * 2;
+        var knotLengthV = reqMultV * 2;
+
+        var subSurfaces : Array<Array<NurbsSurfaceData>> = [];
+
+        var i = 0;
+        while ( i < surface.controlPoints.length ) {
+
+            var row = [];
+            subSurfaces.push( row );
+
+            var ktsU = surface.knotsU.slice( i, i + knotLengthU );
+
+            var j = 0;
+            while ( j < surface.controlPoints[i].length ) {
+
+                var ktsV = surface.knotsV.slice( j, j + knotLengthV );
+                var pts = submatrix( surface.controlPoints, i, j, reqMultV, reqMultU );
+
+                row.push( new NurbsSurfaceData( surface.degreeU, surface.degreeV, ktsU, ktsV, pts ) );
+
+                j += reqMultV;
+            }
+
+            i += reqMultU;
+        }
+
+        return subSurfaces;
     }
+
+
+    private static function submatrix<T>( mat : Array<Array<T>>, startRow : Int, startCol : Int, rows : Int, cols : Int ) : Array<Array<T>> {
+
+        var newmat = [];
+
+        for ( i in startRow...startRow+rows ){
+            newmat.push( mat[i].slice(startCol, startCol+cols ));
+        }
+
+        return newmat;
+
+    }
+
 
     //Decompose a NURBS curve into a collection of bezier's.  Useful
     //as each bezier fits into it's convex hull.  This is a useful starting
@@ -561,6 +637,8 @@ class Modify {
             if ( knotmult.mult < reqMult ) {
 
                 var knotsInsert = Vec.rep( reqMult - knotmult.mult, knotmult.knot );
+                if (knotsInsert.length == 0) continue;
+
                 var res = curveKnotRefine( new NurbsCurveData(degree, knots, controlPoints), knotsInsert );
 
                 knots = res.knots;

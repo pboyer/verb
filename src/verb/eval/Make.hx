@@ -143,7 +143,7 @@ class Make {
                 return x.controlPoints[i];
             } );
 
-            //construct an interpolating curve using this list
+            //construct an interpolating curve using this list`
             var c = Make.rationalInterpCurve( points, degreeV, true );
             controlPoints.push( c.controlPoints );
             knotsV = c.knots; //redundant computation

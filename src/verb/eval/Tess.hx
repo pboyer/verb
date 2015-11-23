@@ -22,20 +22,361 @@ import verb.core.Trig;
 // increased computational cost. For example, it is sometimes necessarily to compute higher order derivatives in order to
 // obtain these more economical results. Your usage of these algorithms should consider these tradeoffs.
 
+// TODO
+class NewMeshData {
+    var points : Array<Float>;
+    var faces : Array<Int>;
+    var uvs : Array<Float>;
+}
+
+class BezierEdgeIndices {
+    public var n : Pair<Int,Int>;
+    public var s : Pair<Int,Int>;
+    public var e : Pair<Int,Int>;
+    public var w : Pair<Int,Int>;
+    public function new(){}
+}
+
+enum EdgeSide {
+    North; South; East; West;
+}
+
 @:expose("eval.Tess")
 class Tess {
 
-    public static function rationalSurfaceAdaptiveSample(surface:NurbsSurfaceData, tol : Float ) : MeshData {
+    public static function rationalBezierSurfaceRegularSample( surface : NurbsSurfaceData, divsU : Int, divsV : Int ) : Array<Point> {
+
+        var pts = [];
+
+        // TODO dir is prob wrong
+        var u = surface.knotsU[0];
+        var t = (surface.knotsU.last( ) - surface.knotsU[0]) / divsU;
+
+        for ( i in 0...divsU ) {
+            var iso = Make.surfaceIsocurve( surface, u, true );
+            var v = (iso.knots.last( ) - iso.knots[0]) / divsV;
+            rationalBezierCurveRegularSamplePointsMutate( iso, pts, iso.knots[0], t, divsV, false );
+            u += t;
+        }
+
+        return pts;
+    }
+
+    private static function northIndex<T>( i, j, divs : Array<Array<T>> ) {
+        if ( i <= 0 ) return null;
+        return divs[ i - 1 ][ j ];
+    }
+
+    private static function southIndex<T>( i, j, divs : Array<Array<T>> ) {
+        if ( i >= divs.length - 1 ) return null;
+        return divs[ i + 1 ][j];
+    }
+
+    private static function eastIndex<T>( i, j, divs : Array<Array<T>> ) {
+        if ( j >= divs[i].length - 1 ) return null;
+        return divs[ i ][j + 1];
+    }
+
+    private static function westIndex<T>( i, j, divs : Array<Array<T>> ) {
+        if ( j <= 0 ) return null;
+        return divs[ i ][j - 1];
+    }
+
+    public static function rationalSurfaceAdaptiveSample( surface : NurbsSurfaceData, tol : Float ) : MeshData {
 
         // split into bezier patches
 
+        var beziers = Modify.decomposeSurfaceIntoBeziers( surface );
+
+        trace(beziers.length, beziers[0].length);
+
         // get step lengths for patches
+
+        var stepLengths : Array<Array<Pair<Float, Float>>> = []
+        , stepLengthRow;
+
+        for ( bezierrow in beziers ) {
+            stepLengthRow = [];
+            stepLengths.push( stepLengthRow );
+
+            for ( bezier in bezierrow ) {
+                stepLengthRow.push( rationalBezierSurfaceStepLength( bezier, tol ) );
+            }
+        }
+
+        var pts = [],
+        edgeRow, n, s, e, w,
+        empty = new Pair<Float, Float>(Math.POSITIVE_INFINITY, Math.POSITIVE_INFINITY),
+        beis : Array<Array<BezierEdgeIndices>> = [],
+        beir : Array<BezierEdgeIndices>,
+        bei : BezierEdgeIndices,
+        e0 : Int,
+        e1 : Int,
+        srf;
+
+        // should be ( beziers.length + 1, beziers[0].length + 1 )
+
+        for (i in 0...beziers.length){
+
+            beir = [];
+            beis.push( beir );
+
+            for (j in 0...beziers[i].length){
+
+                srf = beziers[i][j];
+
+                // store the indices of the edge vertices in the pt array
+
+                bei = new BezierEdgeIndices();
+                beir.push(bei);
+
+                // obtain the step lengths used to tessellate the south and east edge of the bezier
+
+                s = southIndex( i, j, stepLengths );
+                if (s == null) s = empty;
+
+                e = eastIndex( i, j, stepLengths );
+                if (e == null) e = empty;
+
+                // if i = 0, tessellate the north edge using the stepLengths for this bezier
+
+                if (i == 0){
+
+                    var ne = Make.surfaceIsocurve( srf, srf.knotsU.first( ), false );
+
+                    e0 = pts.length;
+
+                    rationalBezierCurveRegularSamplePointsMutate2( ne, pts, stepLengths[i][j].item1 );
+
+                    e1 = pts.length;
+
+                    bei.n = new Pair<Int,Int>(e0, e1);
+
+                } else {
+                    bei.n = beis[i - 1][j].s;
+                }
+
+                // if j = 0, tessellate the west edge using the stepLengths for this bezier
+
+                if (j == 0) {
+
+                    e0 = pts.length;
+
+                    var we = Make.surfaceIsocurve( srf, srf.knotsV.first( ), true );
+                    rationalBezierCurveRegularSamplePointsMutate2( we, pts, stepLengths[i][j].item0 );
+
+                    e1 = pts.length;
+
+                    bei.w = new Pair<Int,Int>(e0, e1);
+                } else {
+                    bei.w = beis[i][j-1].e;
+                }
+
+                // tessellate the south edge and record vertex positions
+
+                e0 = pts.length;
+
+                var se = Make.surfaceIsocurve( srf, srf.knotsU.last( ), false );
+                rationalBezierCurveRegularSamplePointsMutate2( se, pts, Math.min( s.item1, stepLengths[i][j].item1) );
+
+                e1 = pts.length;
+
+                bei.s = new Pair<Int,Int>(e0, e1);
+
+                // tessellate the east edge and record vertex positions
+
+                e0 = pts.length;
+
+                var ee = Make.surfaceIsocurve( srf, srf.knotsV.last( ), true );
+                rationalBezierCurveRegularSamplePointsMutate2( ee, pts, Math.min( e.item0, stepLengths[i][j].item0) );
+
+                e1 = pts.length;
+
+                bei.e = new Pair<Int,Int>(e0, e1);
+            }
+        }
+
+//        pts = [];
 
         // tessellate patches, merging into a single mesh
 
-        return null;
+        var faces = [], p0;
+
+        for ( i in 0...beziers.length ) {
+            for ( j in 0...beziers[i].length ) {
+
+                // tessellate just the interior of the surface
+
+                // keep track of the position in the pts array
+
+                p0 = pts.length;
+
+                var bezier = beziers[i][j];
+
+                var divsU = Math.ceil( 1.0 / stepLengths[i][j].item0 );
+
+                var domainV = bezier.knotsV.last( ) - bezier.knotsV[0];
+                var domainU = bezier.knotsU.last( ) - bezier.knotsU[0];
+
+                var divsV = Math.ceil( 1.0 / stepLengths[i][j].item1 );
+
+                var tessStepV = domainV / divsV;
+                var tessStepU = domainU / divsU;
+
+                var u = bezier.knotsU[0] + tessStepU;
+
+                for ( k in 0...divsU-1 ) {
+
+                    var iso = Make.surfaceIsocurve( bezier, u, false );
+                    rationalBezierCurveRegularSamplePointsMutate( iso, pts, iso.knots[0] + tessStepV, tessStepV, divsV - 1, false );
+
+                    u += tessStepU;
+                }
+
+                // we don't include the start and end points of every row, so we must adjust these values here
+
+                divsU = divsU - 2;
+                divsV = divsV - 2;
+
+                // triangulate the interior of the face
+
+                for ( k in 0...divsU ) {
+                    for ( l in 0...divsV ) {
+
+                        var a_k = p0 + k * (divsV + 1) + l,
+                        b_k = p0 + (k + 1) * (divsV + 1) + l,
+                        c_k = b_k + 1,
+                        d_k = a_k + 1,
+                        abc = [a_k, b_k, c_k],
+                        acd = [a_k, c_k, d_k];
+
+                        faces.push( abc );
+                        faces.push( acd );
+                    }
+                }
+
+                // triangulate the edges, joining the interior pts with the edge pts
+
+                bei = beis[i][j]; // we'll need the edge indices for completing this
+
+                // complete north edge
+                stitchMesh( bezier, faces, bei, divsU, divsV, domainV, p0, tessStepV, EdgeSide.North );
+                stitchMesh( bezier, faces, bei, divsU, divsV, domainV, p0, tessStepV, EdgeSide.South );
+                stitchMesh( bezier, faces, bei, divsU, divsV, domainU, p0, tessStepU, EdgeSide.East );
+                stitchMesh( bezier, faces, bei, divsU, divsV, domainU, p0, tessStepU, EdgeSide.West );
+
+            }
+        }
+
+        return new MeshData( faces, pts, null, null );
+    }
+
+    private static function stitchMesh( bezier : NurbsSurfaceData, faces : Array<Tri>, bei : BezierEdgeIndices,
+                                        divsU : Int, divsV : Int, domain : Float, p0 : Int, tessStep : Float, edgeSide : EdgeSide ){
+
+        var edgeIndices;
+        var knots;
+        var reverseFace = false;
+        var tessIStep = 1;
+
+
+        switch (edgeSide) {
+            case EdgeSide.North:
+                edgeIndices = bei.n;
+                knots = bezier.knotsV;
+            case EdgeSide.South:
+                edgeIndices = bei.s;
+                knots = bezier.knotsV;
+                p0 += divsU * (divsV+1);
+                reverseFace = true;
+            case EdgeSide.East:
+                edgeIndices = bei.e;
+                knots = bezier.knotsU;
+                tessIStep = divsV+1;
+                p0 += divsV;
+            case EdgeSide.West:
+                edgeIndices = bei.w;
+                knots = bezier.knotsU;
+                tessIStep = divsV+1;
+                reverseFace = true;
+        }
+
+        // how many indices in the north edge?
+
+        var edgeCount = edgeIndices.item1 - edgeIndices.item0 - 1;
+
+        // what is the north edge's step length
+
+        var edgeStep = domain / edgeCount;
+
+        var edgeU = knots.first();
+        var tessU = knots.first() + (3/2) * tessStep;
+
+        var edgeI = 0;
+        var tessI = 0;
+
+        trace("edgeCount", edgeCount);
+        trace("divsU", divsU);
+        trace("divsV", divsV);
+
+        trace("edgeU", edgeU);
+        trace("edgeStep", edgeStep);
+        trace("tessStep", tessStep);
+
+        trace("tessU", tessU);
+        trace("edgeU", edgeU);
+
+        trace("tessI", tessI);
+        trace("tessIStep", tessIStep);
+
+        // triangulate the northwest corner
+
+        while ( edgeI < edgeCount ){
+
+            while ( edgeU < tessU - Constants.EPSILON && edgeI < edgeCount ){
+
+                var ei = edgeIndices.item0 + edgeI,
+                ei2 = ei + 1;
+
+                if (reverseFace){
+                    faces.push( [ ei, ei2, p0 + tessI ] );
+                } else {
+                    faces.push( [ ei, p0 + tessI, ei2 ] );
+                }
+
+                edgeI++;
+                edgeU += edgeStep;
+            }
+
+            if (edgeI < edgeCount){
+                var ei = edgeIndices.item0 + edgeI;
+
+                if (reverseFace){
+                    faces.push( [ p0 + tessI, ei, p0 + tessI + tessIStep ] );
+                } else {
+                    faces.push( [ p0 + tessI, p0 + tessI + tessIStep, ei ] );
+                }
+            }
+
+            tessI += tessIStep;
+            tessU += tessStep;
+        }
+    }
+
+
+    private static function rationalBezierCurveRegularSamplePointsMutate2(  crv : NurbsCurveData,
+                                                                            pts : Array<Point>,
+                                                                            step : Float,
+                                                                            includeU : Bool = false ) : Void {
+
+        var domain = crv.knots.last( ) - crv.knots[0];
+        var steps = Math.ceil( 1.0 / step );
+        var len = domain / steps;
+
+        rationalBezierCurveRegularSamplePointsMutate( crv, pts, crv.knots[0], len, steps + 1, false );
 
     }
+
 
     public static function rationalBezierSurfaceStepLength( surface : NurbsSurfaceData, tol : Float ) : Pair<Float, Float> {
 
@@ -44,7 +385,7 @@ class Tess {
         var dehomo = Eval.dehomogenize2d( surface.controlPoints );
 
         var bb = new BoundingBox();
-        for (row in dehomo){
+        for ( row in dehomo ) {
             bb.addRange( row );
         }
         var avgPt = Vec.mul( 0.5, Vec.add( bb.min, bb.max ) );
@@ -73,14 +414,14 @@ class Tess {
 
         var duu = Math.NEGATIVE_INFINITY, iduu;
 
-        for (i in 0...surface.controlPoints.length-2){
-            for (j in 0...surface.controlPoints[i].length){
+        for ( i in 0...surface.controlPoints.length - 2 ) {
+            for ( j in 0...surface.controlPoints[i].length ) {
 
                 iduu =
-                    Vec.norm( Vec.add( dehomo[i+2][j], Vec.add( Vec.mul( -2.0, dehomo[i+1][j]), dehomo[i][j]))) -
-                    (r - tol) * ( ts.controlPoints[i+2][j].last() - 2 * ts.controlPoints[i+1][j].last() +  ts.controlPoints[i][j].last());
+                Vec.norm( Vec.add( dehomo[i + 2][j], Vec.add( Vec.mul( -2.0, dehomo[i + 1][j] ), dehomo[i][j] ) ) ) -
+                (r - tol) * ( ts.controlPoints[i + 2][j].last( ) - 2 * ts.controlPoints[i + 1][j].last( ) + ts.controlPoints[i][j].last( ));
 
-                if (iduu > duu) duu = iduu;
+                if ( iduu > duu ) duu = iduu;
 
             }
         }
@@ -89,14 +430,14 @@ class Tess {
 
         var dvv = Math.NEGATIVE_INFINITY, idvv;
 
-        for (i in 0...surface.controlPoints.length){
-            for (j in 0...surface.controlPoints[i].length-2){
+        for ( i in 0...surface.controlPoints.length ) {
+            for ( j in 0...surface.controlPoints[i].length - 2 ) {
 
                 idvv =
-                    Vec.norm( Vec.add( dehomo[i][j+2], Vec.add( Vec.mul( -2.0, dehomo[i][j+1]), dehomo[i][j]))) -
-                    (r - tol) * ( ts.controlPoints[i][j+2].last() - 2 * ts.controlPoints[i][j+1].last() + ts.controlPoints[i][j].last());
+                Vec.norm( Vec.add( dehomo[i][j + 2], Vec.add( Vec.mul( -2.0, dehomo[i][j + 1] ), dehomo[i][j] ) ) ) -
+                (r - tol) * ( ts.controlPoints[i][j + 2].last( ) - 2 * ts.controlPoints[i][j + 1].last( ) + ts.controlPoints[i][j].last( ));
 
-                if (idvv > dvv) dvv = idvv;
+                if ( idvv > dvv ) dvv = idvv;
             }
         }
 
@@ -104,16 +445,16 @@ class Tess {
 
         var duv = Math.NEGATIVE_INFINITY, iduv;
 
-        for (i in 0...surface.controlPoints.length-1){
-            for (j in 0...surface.controlPoints[i].length-1){
+        for ( i in 0...surface.controlPoints.length - 1 ) {
+            for ( j in 0...surface.controlPoints[i].length - 1 ) {
                 iduv =
-                    Vec.norm( Vec.addAll( [ dehomo[i+1][j+1],
-                                            Vec.mul( -1.0, dehomo[i][j+1] ),
-                                            Vec.mul( -1.0, dehomo[i+1][j] ),
-                                            dehomo[i][j] ])) -
-                    (r - tol) * ( ts.controlPoints[i+1][j+1].last() - ts.controlPoints[i][j+1].last() - ts.controlPoints[i+1][j].last() + ts.controlPoints[i][j].last());
+                Vec.norm( Vec.addAll( [ dehomo[i + 1][j + 1],
+                Vec.mul( -1.0, dehomo[i][j + 1] ),
+                Vec.mul( -1.0, dehomo[i + 1][j] ),
+                dehomo[i][j] ] ) ) -
+                (r - tol) * ( ts.controlPoints[i + 1][j + 1].last( ) - ts.controlPoints[i][j + 1].last( ) - ts.controlPoints[i + 1][j].last( ) + ts.controlPoints[i][j].last( ));
 
-                if (iduv > duv) duv = iduv;
+                if ( iduv > duv ) duv = iduv;
             }
         }
 
@@ -124,33 +465,33 @@ class Tess {
         var minw = Math.POSITIVE_INFINITY;
         var w;
 
-        for (i in 0...surface.controlPoints.length){
-            for (j in 0...surface.controlPoints[i].length){
-                w = surface.controlPoints[i][j].last();
+        for ( i in 0...surface.controlPoints.length ) {
+            for ( j in 0...surface.controlPoints[i].length ) {
+                w = surface.controlPoints[i][j].last( );
                 if ( w < minw ) minw = w;
             }
         }
 
         var stepu, stepv;
 
-        if ( Math.abs(duu) < Constants.TOLERANCE ){
+        if ( Math.abs( duu ) < Constants.TOLERANCE ) {
 
             stepu = 1.0;
 
-            if ( Math.abs(dvv) < Constants.TOLERANCE ) {
+            if ( Math.abs( dvv ) < Constants.TOLERANCE ) {
                 stepv = 1.0;
-                return new Pair<Float,Float>( stepu, stepv );
+                return new Pair<Float, Float>( stepu, stepv );
             }
 
             stepv = ( Math.sqrt( duv * duv + 8 * dvv * tol * minw ) - duv ) / dvv;
         }
 
-        if ( Math.abs(dvv) < Constants.TOLERANCE ){
+        if ( Math.abs( dvv ) < Constants.TOLERANCE ) {
 
             stepv = 1.0;
             stepu = ( Math.sqrt( duv * duv + 8 * duu * tol * minw ) - duv ) / duu;
 
-            return new Pair<Float,Float>( stepu, stepv );
+            return new Pair<Float, Float>( stepu, stepv );
         }
 
         var unum, vnum, denom;
@@ -162,7 +503,7 @@ class Tess {
         vnum = 4 * duu * tol * minw;
         stepv = Math.sqrt( vnum / denom );
 
-        return new Pair<Float,Float>( stepu, stepv );
+        return new Pair<Float, Float>( stepu, stepv );
     }
 
     // Compute a regularly spaced sequence of points on a non-uniform, rational spline curve. Generally, this algorithm
@@ -179,10 +520,24 @@ class Tess {
     //
     //* an array of (divs+1) points
 
-    public static function rationalCurveRegularSample(crv:NurbsCurveData, divs:Int, includeU : Bool = false ):Array<Point> {
+    public static function rationalCurveRegularSample( crv : NurbsCurveData, divs : Int, includeU : Bool = false ) : Array<Point> {
 
-        var range = crv.knots.last() - crv.knots[0];
-        var beziers = Modify.decomposeCurveIntoBeziers(crv);
+        //if degree is 1, just return the dehomogenized control points
+        if ( crv.degree == 1 ) {
+            var pts = [];
+            for ( i in 0...crv.controlPoints.length ) {
+                pts.push( Eval.dehomogenize( crv.controlPoints[i] ) );
+            }
+            if ( includeU ) {
+                for ( i in 0...crv.controlPoints.length ) {
+                    pts[i].push( crv.knots[i + 1] );
+                }
+            }
+            return pts;
+        }
+
+        var range = crv.knots.last( ) - crv.knots[0];
+        var beziers = crv.knots.length == (crv.degree + 1) * 2 ? [ crv ] : Modify.decomposeCurveIntoBeziers( crv );
         var pts = [];
         var brange, fraction;
 
@@ -190,18 +545,18 @@ class Tess {
         var step = range / divs;
         var brange, bsteps, nextU;
 
-        for (i in 0...beziers.length) {
+        for ( i in 0...beziers.length ) {
 
-            brange = beziers[i].knots.last() - currentU;
-            bsteps = Math.ceil(brange / step);
+            brange = beziers[i].knots.last( ) - currentU;
+            bsteps = Math.ceil( brange / step );
             nextU = currentU + bsteps * step;
 
-            if (nextU > beziers[i].knots.last() + Constants.TOLERANCE) {
+            if ( nextU > beziers[i].knots.last( ) + Constants.TOLERANCE ) {
                 nextU -= step;
                 bsteps--;
             }
 
-            rationalBezierCurveRegularSamplePointsMutate(beziers[i], pts, currentU, step, bsteps + 1, includeU);
+            rationalBezierCurveRegularSamplePointsMutate( beziers[i], pts, currentU, step, bsteps + 1, includeU );
 
             currentU = nextU + step;
         }
@@ -214,19 +569,18 @@ class Tess {
         //if degree is 1, just return the dehomogenized control points
         if ( crv.degree == 1 ) {
             var pts = [];
-            for (i in 0...crv.controlPoints.length){
-                pts.push( Eval.dehomogenize( crv.controlPoints[i] ));
+            for ( i in 0...crv.controlPoints.length ) {
+                pts.push( Eval.dehomogenize( crv.controlPoints[i] ) );
             }
             if ( includeU ) {
-                for (i in 0...crv.controlPoints.length){
+                for ( i in 0...crv.controlPoints.length ) {
                     pts[i].push( crv.knots[i + 1] );
                 }
             }
             return pts;
         }
 
-        var beziers = Modify.decomposeCurveIntoBeziers( crv );
-
+        var beziers = crv.knots.length == (crv.degree + 1) * 2 ? [ crv ] : Modify.decomposeCurveIntoBeziers( crv );
         var pts = [], steps, domain, len;
 
         for ( i in 0...beziers.length ) {
@@ -236,7 +590,7 @@ class Tess {
             steps = Math.ceil( domain / len );
             len = domain / steps;
 
-            rationalBezierCurveRegularSamplePointsMutate( beziers[i], pts, beziers[i].knots[0], len, steps+1, includeU );
+            rationalBezierCurveRegularSamplePointsMutate( beziers[i], pts, beziers[i].knots[0], len, steps + 1, includeU );
 
             if ( i == beziers.length - 1 ) break;
             pts.pop( );
@@ -250,7 +604,7 @@ class Tess {
                                                                           startU : Float,
                                                                           step : Float,
                                                                           numSteps : Int,
-                                                                          includeU : Bool = false) : Void {
+                                                                          includeU : Bool = false ) : Void {
 
         var its = [], ts = [ its ], u = startU, degree1 = crv.degree + 1;
 
@@ -312,9 +666,9 @@ class Tess {
         // add the parameters if required
 
         u = startU;
-        if (includeU){
-            for (pt in pts){
-                pt.push(u);
+        if ( includeU ) {
+            for ( pt in pts ) {
+                pt.push( u );
                 u += step;
             }
         }
@@ -446,8 +800,8 @@ class Tess {
         for ( i in 0...divs_u + 1 ) {
             for ( j in 0...divs_v + 1 ) {
 
-                var pt_u = i * span_u,
-                pt_v = j * span_v;
+                var pt_u = knotsU[0] + i * span_u,
+                pt_v = knotsV[0] + j * span_v;
 
                 uvs.push( [pt_u, pt_v] );
 
@@ -688,8 +1042,6 @@ class Tess {
 
         return pts;
     }
-
-
 }
 
 @:expose("core.AdaptiveRefinementOptions")

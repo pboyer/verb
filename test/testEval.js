@@ -20,6 +20,8 @@ function last(a){
     return a[a.length-1];
 }
 
+/*
+
 describe("verb.eval.Eval.knotSpanGivenN",function(){
 
     it('returns correct result', () => {
@@ -4051,6 +4053,8 @@ describe("verb.eval.Modify.surfaceKnotRefine",() => {
 });
 
 
+*/
+
 describe("verb.eval.Modify.surfaceKnotRefine",() => {
 
     var degree = 3
@@ -4199,6 +4203,34 @@ describe("verb.eval.Modify.surfaceKnotRefine",() => {
 
         var res = verb.eval.Modify.surfaceKnotRefine( bezier, new_knots, false );
 
+        var d = 20;
+
+        var u0 = u = res.knotsU[0];
+        var v0 = v = res.knotsV[0];
+
+        var ur = res.knotsU[res.knotsU.length-1] - res.knotsV[0];
+        var vr = res.knotsV[res.knotsV.length-1] - res.knotsV[0];
+
+        var us = ur / (d-1);
+        var vs = vr / (d-1);
+
+        for (var i = 0; i < d; i++){
+
+             v = v0;
+
+             for (var j= 0; j < d; j++){
+                var p0 = verb.eval.Eval.surfacePoint( bezier, u, v);
+                var p1 = verb.eval.Eval.surfacePoint( res, u, v);
+
+                vecShouldBe(p0, p1);
+
+                u += us;
+             }
+
+             v += vs;
+        }
+
+
         res.controlPoints.forEach(function(cp){ should.exist(cp); });
         res.knotsU.forEach(function(cp){ should.exist(cp); });
         res.knotsV.forEach(function(cp){ should.exist(cp); });
@@ -4237,6 +4269,33 @@ describe("verb.eval.Modify.surfaceKnotRefine",() => {
 
         var res = verb.eval.Modify.surfaceKnotRefine( bezier, new_knots, true );
 
+        var d = 20;
+
+        var u0 = u = res.knotsU[0];
+        var v0 = v = res.knotsV[0];
+
+        var ur = res.knotsU[res.knotsU.length-1] - res.knotsV[0];
+        var vr = res.knotsV[res.knotsV.length-1] - res.knotsV[0];
+
+        var us = ur / (d-1);
+        var vs = vr / (d-1);
+
+        for (var i = 0; i < d; i++){
+
+             v = v0;
+
+             for (var j= 0; j < d; j++){
+                var p0 = verb.eval.Eval.surfacePoint( bezier, u, v);
+                var p1 = verb.eval.Eval.surfacePoint( res, u, v);
+
+                vecShouldBe(p0, p1);
+
+                u += us;
+             }
+
+             v += vs;
+        }
+
         res.controlPoints.forEach(function(cp){ should.exist(cp); });
         res.knotsU.forEach(function(cp){ should.exist(cp); });
         res.knotsV.forEach(function(cp){ should.exist(cp); });
@@ -4253,4 +4312,71 @@ describe("verb.eval.Modify.surfaceKnotRefine",() => {
 
     });
 
+});
+
+
+describe("verb.eval.Modify.decomposeSurfaceIntoBeziers",() => {
+
+    var degree = 3
+        , knotsV = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
+        , knotsU = [0, 0, 0, 0, 0.5, 1, 1, 1, 1]
+        , controlPoints = [
+                    [ [0, 0, 0],    [10, 0, 0],     [20, 0, 0],     [30, 0, 0] ,    [40, 0, 0],     [50, 0, 0] ],
+                    [ [0, -10, 0],  [10, -10, 0],  [20, -10, 0],  [30, -10, 0] ,  [40, -10, 0],   [50, -10, 0]    ],
+                    [ [0, -20, 0],  [10, -20, 0],  [20, -20, 0],  [30, -20, 0] ,  [40, -20, 0],  [50, -20, 0]    ],
+                    [ [0, -30, 0],  [10, -30, 0],   [20, -30, 0], [30, -30, 0] ,  [40, -30, 0],   [50, -30, 0]     ],
+                    [ [0, -40, 0],  [10, -40, 0],   [20, -40, 0],   [30, -40, 0] ,  [40, -40, -20], [50, -40, 0]     ] ]
+        , surface = new verb.core.NurbsSurfaceData( degree, degree, knotsU, knotsV, controlPoints );
+
+    it('can add knots into a surface in the u direction', () => {
+
+        var res = verb.eval.Modify.decomposeSurfaceIntoBeziers( surface );
+
+        var d = 10;
+
+        res.forEach((x,k) => {
+            x.forEach((y, l) => {
+
+                var u0 = u = y.knotsU[0];
+                var v0 = v = y.knotsV[0];
+
+                var ur = y.knotsU[y.knotsU.length-1] - y.knotsV[0];
+                var vr = y.knotsV[y.knotsV.length-1] - y.knotsV[0];
+
+                var us = ur / (d-1);
+                var vs = vr / (d-1);
+
+                for (var i = 0; i < d; i++){
+
+                     v = v0;
+
+                     for (var j= 0; j < d; j++){
+                        var p0 = verb.eval.Eval.surfacePoint( surface, u, v);
+                        var p1 = verb.eval.Eval.surfacePoint( y, u, v);
+
+                        vecShouldBe(p0, p1);
+
+                        u += us;
+                     }
+
+                     v += vs;
+                }
+            });
+        });
+
+//        res.controlPoints.forEach(function(cp){ should.exist(cp); });
+//        res.knotsU.forEach(function(cp){ should.exist(cp); });
+//        res.knotsV.forEach(function(cp){ should.exist(cp); });
+//
+//        should.equal(knotsU.length + r, res.knotsU.length);
+//        should.equal(controlPoints.length + r, res.controlPoints.length);
+//
+//        var p0 = verb.eval.Eval.surfacePoint( surface, 0.5, 0.25 );
+//        var p1 = verb.eval.Eval.surfacePoint( res, 0.5, 0.25);
+//
+//        p0[0].should.be.approximately(p1[0], verb.core.Constants.TOLERANCE);
+//        p0[1].should.be.approximately(p1[1], verb.core.Constants.TOLERANCE);
+//        p0[2].should.be.approximately(p1[2], verb.core.Constants.TOLERANCE);
+
+    });
 });
