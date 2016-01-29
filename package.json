@@ -18,7 +18,7 @@
     "cad"
   ],
   "dependencies": {
-      "webworker-threads": "0.6.2",
+      "webworker-threads": "0.6.2"
   },
   "devDependencies": {
     "benchmark": "^1.0.0",
