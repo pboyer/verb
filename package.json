@@ -11,6 +11,7 @@
     "test": "grunt -v test"
   },
   "engine": "node 4.2.1",
+  "main": "build/js/verb.js",
   "keywords": [
     "NURBS",
     "geometry",
