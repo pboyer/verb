@@ -11,11 +11,15 @@
     "test": "grunt -v test"
   },
   "engine": "node 4.2.1",
+  "main": "build/js/verb.js",
   "keywords": [
     "NURBS",
     "geometry",
     "cad"
   ],
+  "dependencies": {
+      "webworker-threads": "0.6.2"
+  },
   "devDependencies": {
     "benchmark": "^1.0.0",
     "grunt": "0.4.5",
@@ -28,7 +32,6 @@
     "grunt-text-replace": "^0.4.0",
     "mocha": "^2.2.4",
     "should": "6.0.1",
-    "webworker-threads": "0.6.2",
     "tess2": "^1.0.0"
   },
   "license": "MIT"
