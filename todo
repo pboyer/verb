@@ -1,11 +1,15 @@
-Documentation generation - docco no longer works, always sucked anyways
-Update website
+Complete forward differencing algorithm
+
+    - degenerate cases (e.g. no interior points, cylinder)
+    - provide UVs
+    - approximate normals
+    - exact normals
+    - tests (spheres, circles)
 
 Split
     Holes are not recognized
 
 SweptSurface
-More efficient representation for surface tessellation, don't use 2d arrays
 More exact srf-srf intersection
 Marching surface-Surface intersection
 SurfaceClosestPoint occasionally fails when point is far from surface - need to check for wild derivatives

@@ -31,28 +31,16 @@ function getComplexSurface(){
     return srfObj;
 }
 
-var complexSurface = getComplexSurface();
+var surface = getComplexSurface();
 
 module.exports = {
-  name: 'Regular surface sampling',
+  name: 'rationalSurfaceAdaptiveSample',
   tests: {
-    'surfaceRegularSample2 (80 x 80)': function() {
-        verb.eval.Tess.surfaceRegularSample2( complexSurface, 80, 80 );
+    'rationalSurfaceAdaptiveSample (tol 0.2)': function() {
+        var mesh = verb.eval.Tess.rationalSurfaceAdaptiveSample( surface, 0.1 );
     },
-    'surfaceRegularSample (80 x 80)': function() {
-        verb.eval.Tess.surfaceRegularSample( complexSurface, 80, 80 );
-    },
-    'direct evaluation (80 x 80)': function() {
-        var ar = [];
-        var sp = 1 / 80;
-
-        for (var i = 0; i < 81; i++){
-            var ari = [];
-            ar.push(ari);
-            for (var j = 0; j < 81; j++){
-                ari.push( verb.eval.Eval.surfacePoint( complexSurface, i*sp, j*sp ) )
-            }
-        }
+    'rationalSurfaceAdaptive (default)': function() {
+        var mesh = verb.eval.Tess.rationalSurfaceAdaptive( surface );
     }
   }
 };

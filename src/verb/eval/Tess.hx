@@ -88,8 +88,6 @@ class Tess {
 
         var beziers = Modify.decomposeSurfaceIntoBeziers( surface );
 
-        trace(beziers.length, beziers[0].length);
-
         // get step lengths for patches
 
         var stepLengths : Array<Array<Pair<Float, Float>>> = []
@@ -168,6 +166,7 @@ class Tess {
                     e1 = pts.length;
 
                     bei.w = new Pair<Int,Int>(e0, e1);
+
                 } else {
                     bei.w = beis[i][j-1].e;
                 }
@@ -196,9 +195,7 @@ class Tess {
             }
         }
 
-//        pts = [];
-
-        // tessellate patches, merging into a single mesh
+        // tessellate patches, merging into a single mesh by reusing the edge points
 
         var faces = [], p0;
 
@@ -264,7 +261,6 @@ class Tess {
                 stitchMesh( bezier, faces, bei, divsU, divsV, domainV, p0, tessStepV, EdgeSide.South );
                 stitchMesh( bezier, faces, bei, divsU, divsV, domainU, p0, tessStepU, EdgeSide.East );
                 stitchMesh( bezier, faces, bei, divsU, divsV, domainU, p0, tessStepU, EdgeSide.West );
-
             }
         }
 
@@ -278,7 +274,6 @@ class Tess {
         var knots;
         var reverseFace = false;
         var tessIStep = 1;
-
 
         switch (edgeSide) {
             case EdgeSide.North:
@@ -314,20 +309,6 @@ class Tess {
 
         var edgeI = 0;
         var tessI = 0;
-
-        trace("edgeCount", edgeCount);
-        trace("divsU", divsU);
-        trace("divsV", divsV);
-
-        trace("edgeU", edgeU);
-        trace("edgeStep", edgeStep);
-        trace("tessStep", tessStep);
-
-        trace("tessU", tessU);
-        trace("edgeU", edgeU);
-
-        trace("tessI", tessI);
-        trace("tessIStep", tessIStep);
 
         // triangulate the northwest corner
 

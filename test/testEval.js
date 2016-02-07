@@ -4317,24 +4317,48 @@ describe("verb.eval.Modify.surfaceKnotRefine",() => {
 
 describe("verb.eval.Modify.decomposeSurfaceIntoBeziers",() => {
 
-    var degree = 3
-        , knotsV = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
-        , knotsU = [0, 0, 0, 0, 0.5, 1, 1, 1, 1]
-        , controlPoints = [
-                    [ [0, 0, 0],    [10, 0, 0],     [20, 0, 0],     [30, 0, 0] ,    [40, 0, 0],     [50, 0, 0] ],
-                    [ [0, -10, 0],  [10, -10, 0],  [20, -10, 0],  [30, -10, 0] ,  [40, -10, 0],   [50, -10, 0]    ],
-                    [ [0, -20, 0],  [10, -20, 0],  [20, -20, 0],  [30, -20, 0] ,  [40, -20, 0],  [50, -20, 0]    ],
-                    [ [0, -30, 0],  [10, -30, 0],   [20, -30, 0], [30, -30, 0] ,  [40, -30, 0],   [50, -30, 0]     ],
-                    [ [0, -40, 0],  [10, -40, 0],   [20, -40, 0],   [30, -40, 0] ,  [40, -40, -20], [50, -40, 0]     ] ]
-        , surface = new verb.core.NurbsSurfaceData( degree, degree, knotsU, knotsV, controlPoints );
+    var getSurface11 = () => {
 
-    it('can add knots into a surface in the u direction', () => {
+        var degreeU = 3
+            , degreeV = 3
+            , knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
+            , knotsV =  [0, 0, 0, 0, 1, 1, 1, 1]
+            , controlPoints = [     [ [0, 0, 0],    [10, 0, 0],     [20, 0, 0],     [30, 0, 0]      ],
+                                    [ [0, -10, 0],  [10, -10, 0],   [20, -10, 0],   [30, -10, 0]    ],
+                                    [ [0, -20, 0],  [10, -20, 0],   [20, -20, 0],   [30, -20, 0]    ],
+                                    [ [0, -30, 0],  [10, -30, 0],   [20, -30, 0],   [30, -30, 0]    ] ]
+            , bezier = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
 
-        var res = verb.eval.Modify.decomposeSurfaceIntoBeziers( surface );
+        return bezier;
+    };
+
+    var getSurface23 = () => {
+
+        var degree = 3
+            , knotsV = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
+            , knotsU = [0, 0, 0, 0, 0.5, 1, 1, 1, 1]
+            , controlPoints = [
+                        [ [0, 0, 0],    [10, 0, 0],     [20, 0, 0],     [30, 0, 0] ,    [40, 0, 0],     [50, 0, 0] ],
+                        [ [0, -10, 0],  [10, -10, 0],  [20, -10, 0],  [30, -10, 0] ,  [40, -10, 0],   [50, -10, 0]    ],
+                        [ [0, -20, 0],  [10, -20, 0],  [20, -20, 0],  [30, -20, 0] ,  [40, -20, 0],  [50, -20, 0]    ],
+                        [ [0, -30, 0],  [10, -30, 0],   [20, -30, 0], [30, -30, 0] ,  [40, -30, 0],   [50, -30, 0]     ],
+                        [ [0, -40, 0],  [10, -40, 0],   [20, -40, 0],   [30, -40, 0] ,  [40, -40, -20], [50, -40, 0]     ] ]
+            , surface23 = new verb.core.NurbsSurfaceData( degree, degree, knotsU, knotsV, controlPoints );
+
+        return surface23;
+    };
+
+    var checkSurfaceDecomposition = (surface, decomp, divsU, divsV) => {
+
+        should.equal( divsU, decomp.length );
+
+        for (var i = 0; i < divsU; i++){
+            should.equal( divsV, decomp[i].length );
+        }
 
         var d = 10;
 
-        res.forEach((x,k) => {
+        decomp.forEach((x,k) => {
             x.forEach((y, l) => {
 
                 var u0 = u = y.knotsU[0];
@@ -4364,19 +4388,23 @@ describe("verb.eval.Modify.decomposeSurfaceIntoBeziers",() => {
             });
         });
 
-//        res.controlPoints.forEach(function(cp){ should.exist(cp); });
-//        res.knotsU.forEach(function(cp){ should.exist(cp); });
-//        res.knotsV.forEach(function(cp){ should.exist(cp); });
-//
-//        should.equal(knotsU.length + r, res.knotsU.length);
-//        should.equal(controlPoints.length + r, res.controlPoints.length);
-//
-//        var p0 = verb.eval.Eval.surfacePoint( surface, 0.5, 0.25 );
-//        var p1 = verb.eval.Eval.surfacePoint( res, 0.5, 0.25);
-//
-//        p0[0].should.be.approximately(p1[0], verb.core.Constants.TOLERANCE);
-//        p0[1].should.be.approximately(p1[1], verb.core.Constants.TOLERANCE);
-//        p0[2].should.be.approximately(p1[2], verb.core.Constants.TOLERANCE);
+    };
+
+    it('can decompose into 2 x 3 set of bezier patches with no distortion', () => {
+
+        var surface23 = getSurface23();
+        var res = verb.eval.Modify.decomposeSurfaceIntoBeziers( surface23 );
+
+        checkSurfaceDecomposition( surface23, res, 2, 3 );
+
+     });
+
+    it('can decompose into 2 x 3 set of bezier patches with no distortion', () => {
+
+        var surface11 = getSurface11();
+        var res = verb.eval.Modify.decomposeSurfaceIntoBeziers( surface11 );
+
+        checkSurfaceDecomposition( surface11, res, 1, 1 );
 
     });
 });

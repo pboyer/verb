@@ -132,9 +132,10 @@
 
     // surface = getBezier();
 
-    var tol = 0.3;
+    var tol = 0.1;
 
     var mat2 = new THREE.MeshBasicMaterial( { color: 0x000000, side: THREE.DoubleSide, wireframe: true });
+    var mat3 = new THREE.MeshBasicMaterial( { color: 0xff0000, side: THREE.DoubleSide, wireframe: true });
     var l = verb.eval.Tess.rationalBezierSurfaceStepLength( surface, tol );
     var res = verb.eval.Modify.decomposeSurfaceIntoBeziers( surface );
 
@@ -153,9 +154,12 @@
     // add the edge points to the scene
 
     var mesh = verb.eval.Tess.rationalSurfaceAdaptiveSample( surface, tol );
+    var mesh2 = verb.eval.Tess.rationalSurfaceAdaptive( surface );
 
     addMeshToScene( getThreeMesh( mesh ) );
-    addMeshToScene( getThreeMesh( mesh ), mat2 );
+    //addMeshToScene( getThreeMesh( mesh2 ), mat3 );
+    // addMeshToScene( getThreeMesh( mesh ), mat2 );
+
     // addPointsToScene( mesh.points );
 
 	renderScene();
