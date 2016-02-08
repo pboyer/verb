@@ -1933,7 +1933,7 @@ var verb_Verb = function() { };
 $hxClasses["verb.Verb"] = verb_Verb;
 verb_Verb.__name__ = ["verb","Verb"];
 verb_Verb.main = function() {
-	console.log("verb 2.0.0");
+	console.log("verb 2.1.0");
 };
 var verb_core_ArrayExtensions = function() { };
 $hxClasses["verb.core.ArrayExtensions"] = verb_core_ArrayExtensions;
@@ -6556,7 +6556,10 @@ verb_eval_Tess.rationalSurfaceAdaptiveSample = function(surface,tol) {
 		while(_g1 < bezierrow.length) {
 			var bezier = bezierrow[_g1];
 			++_g1;
-			stepLengthRow.push(verb_eval_Tess.rationalBezierSurfaceStepLength(bezier,tol));
+			var ls = verb_eval_Tess.rationalBezierSurfaceStepLength(bezier,tol);
+			ls.item0 = Math.min(ls.item0,(verb_core_ArrayExtensions.last(bezier.knotsU) - verb_core_ArrayExtensions.first(bezier.knotsU)) / 2);
+			ls.item1 = Math.min(ls.item1,(verb_core_ArrayExtensions.last(bezier.knotsV) - verb_core_ArrayExtensions.first(bezier.knotsV)) / 2);
+			stepLengthRow.push(ls);
 		}
 	}
 	var pts = [];

@@ -98,7 +98,12 @@ class Tess {
             stepLengths.push( stepLengthRow );
 
             for ( bezier in bezierrow ) {
-                stepLengthRow.push( rationalBezierSurfaceStepLength( bezier, tol ) );
+				var ls = rationalBezierSurfaceStepLength( bezier, tol );
+
+				ls.item0 = Math.min(ls.item0, (bezier.knotsU.last() - bezier.knotsU.first()) / 2);
+				ls.item1 = Math.min(ls.item1, (bezier.knotsV.last() - bezier.knotsV.first()) / 2);
+
+				stepLengthRow.push( ls );
             }
         }
 
@@ -112,7 +117,7 @@ class Tess {
         e1 : Int,
         srf;
 
-        // should be ( beziers.length + 1, beziers[0].length + 1 )
+        // tessellate the edges of the bezier patches
 
         for (i in 0...beziers.length){
 
@@ -195,7 +200,7 @@ class Tess {
             }
         }
 
-        // tessellate patches, merging into a single mesh by reusing the edge points
+        // tessellate the patch interior and join to the polyline interiors together
 
         var faces = [], p0;
 
@@ -204,7 +209,7 @@ class Tess {
 
                 // tessellate just the interior of the surface
 
-                // keep track of the position in the pts array
+				// keep track of the position in the pts array
 
                 p0 = pts.length;
 
@@ -222,6 +227,8 @@ class Tess {
 
                 var u = bezier.knotsU[0] + tessStepU;
 
+				// evaluate all points on the interior of the face
+
                 for ( k in 0...divsU-1 ) {
 
                     var iso = Make.surfaceIsocurve( bezier, u, false );
@@ -235,7 +242,7 @@ class Tess {
                 divsU = divsU - 2;
                 divsV = divsV - 2;
 
-                // triangulate the interior of the face
+                // triangulate the interior of the face after having computed the points
 
                 for ( k in 0...divsU ) {
                     for ( l in 0...divsV ) {
@@ -256,7 +263,6 @@ class Tess {
 
                 bei = beis[i][j]; // we'll need the edge indices for completing this
 
-                // complete north edge
                 stitchMesh( bezier, faces, bei, divsU, divsV, domainV, p0, tessStepV, EdgeSide.North );
                 stitchMesh( bezier, faces, bei, divsU, divsV, domainV, p0, tessStepV, EdgeSide.South );
                 stitchMesh( bezier, faces, bei, divsU, divsV, domainU, p0, tessStepU, EdgeSide.East );

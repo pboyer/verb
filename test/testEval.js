@@ -4399,7 +4399,7 @@ describe("verb.eval.Modify.decomposeSurfaceIntoBeziers",() => {
 
      });
 
-    it('can decompose into 2 x 3 set of bezier patches with no distortion', () => {
+    it('can decompose into 1 x 1 set of bezier patches with no distortion', () => {
 
         var surface11 = getSurface11();
         var res = verb.eval.Modify.decomposeSurfaceIntoBeziers( surface11 );
@@ -4407,4 +4407,72 @@ describe("verb.eval.Modify.decomposeSurfaceIntoBeziers",() => {
         checkSurfaceDecomposition( surface11, res, 1, 1 );
 
     });
+});
+
+
+describe("verb.eval.Tess.rationalSurfaceAdaptiveSample",() => {
+
+    var getSurface11 = () => {
+
+        var degreeU = 3
+            , degreeV = 3
+            , knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
+            , knotsV =  [0, 0, 0, 0, 1, 1, 1, 1]
+            , pts = [     [ [0, 0, 0],    [10, 0, 0],     [20, 0, 0],     [30, 0, 0]      ],
+                                    [ [0, -10, 0],  [10, -10, 0],   [20, -10, 0],   [30, -10, 0]    ],
+                                    [ [0, -20, 0],  [10, -20, 0],   [20, -20, 0],   [30, -20, 0]    ],
+                                    [ [0, -30, 0],  [10, -30, 0],   [20, -30, 0],   [30, -30, 0]    ] ]
+			, wts = [   [ 1, 1, 1, 1],
+						[ 1, 1, 1, 1],
+						[ 1, 1, 1, 1],
+						[ 1, 1, 1, 1],
+						[ 1, 1, 1, 1],
+						[ 1, 1, 1, 1] ]
+            , bezier = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, verb.eval.Eval.homogenize2d(pts, wts) );
+
+        return bezier;
+    };
+
+    var getSurface23 = () => {
+
+        var degree = 3
+            , knotsV = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
+            , knotsU = [0, 0, 0, 0, 0.5, 1, 1, 1, 1]
+            , pts = [ [ [0, 0, 0],    [10, 0, 0],     [20, 0, 0],     [30, 0, 0],    [40, 0, 0],     [50, 0, 0] ],
+                        [ [0, -10, 0],  [10, -10, 0],  [20, -10, 0],  [30, -10, 0],  [40, -10, 0],   [50, -10, 0]    ],
+                        [ [0, -20, 0],  [10, -20, 0],  [20, -20, 0],  [30, -20, 0],  [40, -20, 0],  [50, -20, 0]    ],
+                        [ [0, -30, 0],  [10, -30, 0],   [20, -30, 0], [30, -30, 0],  [40, -30, 0],   [50, -30, 0]     ],
+                        [ [0, -40, 0],  [10, -40, 0],   [20, -40, 0],   [30, -40, 0],  [40, -40, 0], [50, -40, 0]     ] ]
+			, wts = [   [ 1, 1, 1, 1, 1, 1],
+						[ 1, 1, 1, 1, 1, 1],
+						[ 1, 1, 1, 1, 1, 1],
+						[ 1, 1, 1, 1, 1, 1],
+						[ 1, 1, 1, 1, 1, 1] ]
+            , surface23 = new verb.core.NurbsSurfaceData( degree, degree, knotsU, knotsV, verb.eval.Eval.homogenize2d(pts, wts) );
+
+        return surface23;
+    };
+
+	it('can tessellate rational flat patch 1x1', () => {
+
+		var surface11 = getSurface11();
+		var res = verb.eval.Tess.rationalSurfaceAdaptiveSample( surface11, 0.1 );
+
+		// should return 2 faces!
+
+		should.equal( 2, res.faces.length );
+
+		console.log(res);
+	});
+
+	it('can tessellate 2 x 3 rational flat patch', () => {
+
+		var surface23 = getSurface23();
+		var res = verb.eval.Tess.rationalSurfaceAdaptiveSample( surface23, 0.1 );
+
+		// should return 12 faces
+		should.equal( 6, res.faces.length );
+
+	});
+
 });

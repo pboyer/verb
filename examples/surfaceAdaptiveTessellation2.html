@@ -88,12 +88,13 @@
     var degree = 3
         , knotsV = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
         , knotsU = [0, 0, 0, 0, 0.5, 1, 1, 1, 1]
+
         , controlPoints = [
-                    [ [0, 0, -10],  [10, 0, 0],     [20, 0, 0],     [30, 0, 0] ,    [40, 0, 0],     [50, 0, 0] ],
-                    [ [0, -10, 0],  [10, -10, 1],  [20, -10, 1],  [30, -10, 0] ,  [40, -10, 0],   [50, -10, 0]    ],
-                    [ [0, -20, 0],  [10, -20, 20],  [20, -20, 1],  [30, -20, 0] ,  [40, -20, -2],  [50, -20, 0]    ],
-                    [ [0, -30, 0],  [10, -30, 0],   [20, -30, 0], [30, -30, 30] ,  [40, -30, 0],   [50, -30, 0]     ],
-                    [ [0, -40, 0],  [10, -40, 0],   [20, -40, 0],   [30, -40, 4] ,  [40, -40, 0], [50, -40, 0]     ] ]
+                    [ [0, 0, 0],  [10, 0, 0],     [20, 0, 0],     [30, 0, 0] ,    [40, 0, 0],     [50, 0, 0] ],
+                    [ [0, -10, 0],  [10, -10, 0],  [20, -10, 0],  [30, -10, 0] ,  [40, -10, 0],   [50, -10, 0]    ],
+                    [ [0, -20, 0],  [10, -20, 0],  [20, -20, 0],  [30, -20, 0] ,  [40, -20, 0],  [50, -20, 0]    ],
+                    [ [0, -30, 0],  [10, -30, 0],   [20, -30, 0], [30, -30, 0] ,  [40, -30, 0],   [50, -30, 0]     ],
+                    [ [0, -40, 0],  [10, -40, 0],   [20, -40, 0],   [30, -40, 0] ,  [40, -40, 0], [50, -40, 0]     ] ]
         , surface = new verb.core.NurbsSurfaceData( degree, degree, knotsU, knotsV, controlPoints );
 
 
@@ -101,36 +102,42 @@
 
         var degree = 3
             , knots = [0, 0, 0, 0, 1, 1, 1, 1]
-            , pts = [   [ [0, 0, 0],  [10, 0, 10],     [20, 0, 0], [30, 0, 0] ],
+            , pts = [   [ [0, 0, 0],  [10, 0, 0],     [20, 0, 0], [30, 0, 0] ],
                         [ [0, -10, 0],  [10, -10, 0],  [20, -10, 0], [30, -10, 0]   ],
                         [ [0, -20, 0],  [10, -20, 0],  [20, -20, 0], [30, -20, 0]  ],
-                        [ [0, -30, 10],  [10, -30, 10],   [20, -30, 10], [30, -30, 10]     ]  ]
-            , wts = [   [ 1, 1, 1, 1, 1, 1],
-                        [ 1, 1, 1, 1, 1, 1],
-                        [ 1, 1, 1, 1, 1, 1],
-                        [ 1, 1, 1, 1, 1, 1],
-                        [ 1, 1, 1, 1, 1, 1],
-                        [ 1, 1, 1, 1, 1, 1] ];
+                        [ [0, -30, 0],  [10, -30, 0],   [20, -30, 0], [30, -30, 0]     ]  ]
+            , wts = [   [ 1, 1, 1, 1 ],
+                        [ 1, 1, 1, 1 ],
+                        [ 1, 1, 1, 1 ],
+                        [ 1, 1, 1, 1 ] ];
 
-        pts = verb.eval.Eval.homogenize2d(pts, wts);
-
-        return {
-            degreeU : degree,
-            degreeV : degree,
-            knotsU : knots,
-            knotsV : knots,
-            controlPoints : pts
-        };
+        return new verb.core.NurbsSurfaceData( degree, degree, knots, knots, verb.eval.Eval.homogenize2d(pts, wts)  );
     }
-    // homogenize the pts
 
-    controlPoints.forEach((x) => {
-        x.forEach((y) => {
-            y.push(1.0);
-        });
-    });
+    var getSurface23 = () => {
 
-    // surface = getBezier();
+        var degree = 3
+            , knotsV = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
+            , knotsU = [0, 0, 0, 0, 0.5, 1, 1, 1, 1]
+            , pts = [ [ [0, 0, 0],    [10, 0, 0],     [20, 0, 0],     [30, 0, 0],    [40, 0, 0],     [50, 0, 0] ],
+                        [ [0, -10, 0],  [10, -10, 0],  [20, -10, 0],  [30, -10, 0],  [40, -10, 0],   [50, -10, 0]    ],
+                        [ [0, -20, 0],  [10, -20, 0],  [20, -20, 0],  [30, -20, 0],  [40, -20, 0],  [50, -20, 0]    ],
+                        [ [0, -30, 0],  [10, -30, 0],   [20, -30, 0], [30, -30, 0],  [40, -30, 0],   [50, -30, 0]     ],
+                        [ [0, -40, 0],  [10, -40, 5],   [20, -40, 0],   [30, -40, 0],  [40, -40, -10], [50, -40, 0]     ] ]
+			, wts = [   [ 1, 1, 1, 1, 1, 1],
+						[ 1, 1, 1, 1, 1, 1],
+						[ 1, 1, 1, 1, 1, 1],
+						[ 1, 1, 1, 1, 1, 1],
+						[ 1, 1, 1, 1, 1, 1] ]
+            , surface23 = new verb.core.NurbsSurfaceData( degree, degree, knotsU, knotsV, verb.eval.Eval.homogenize2d(pts, wts) );
+
+        return surface23;
+    };
+
+
+    console.log(getBezier())
+
+    surface = getBezier();
 
     var tol = 0.1;
 
@@ -154,10 +161,9 @@
     // add the edge points to the scene
 
     var mesh = verb.eval.Tess.rationalSurfaceAdaptiveSample( surface, tol );
-    var mesh2 = verb.eval.Tess.rationalSurfaceAdaptive( surface );
 
     addMeshToScene( getThreeMesh( mesh ) );
-    //addMeshToScene( getThreeMesh( mesh2 ), mat3 );
+    addMeshToScene( getThreeMesh( mesh ), mat3 );
     // addMeshToScene( getThreeMesh( mesh ), mat2 );
 
     // addPointsToScene( mesh.points );

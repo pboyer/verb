@@ -1,17 +1,19 @@
 Complete forward differencing algorithm
 
     - degenerate cases (e.g. no interior points, cylinder)
-    - provide UVs
+    - make UVS
     - approximate normals
     - exact normals
     - tests (spheres, circles)
 
-Split
+BRep Split
     Holes are not recognized
+
+BRep Bool
+	Not complete
 
 SweptSurface
 More exact srf-srf intersection
-Marching surface-Surface intersection
 SurfaceClosestPoint occasionally fails when point is far from surface - need to check for wild derivatives
 Curve interpolation with sparse matrices
 Curve approximation
