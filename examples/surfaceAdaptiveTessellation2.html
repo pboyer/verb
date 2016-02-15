@@ -115,7 +115,6 @@
     }
 
     var getSurface23 = () => {
-
         var degree = 3
             , knotsV = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
             , knotsU = [0, 0, 0, 0, 0.5, 1, 1, 1, 1]
@@ -154,7 +153,7 @@
 
             var srf = res[i][j];
             var l = verb.eval.Tess.rationalBezierSurfaceStepLength( srf, tol );
-            // addMeshToScene( tessellateSurface( srf, Math.ceil( 1 / l.item0 ), Math.ceil( 1 / l.item1) ), mat );
+            //=addMeshToScene( tessellateSurface( srf, Math.ceil( 1 / l.item0 ), Math.ceil( 1 / l.item1) ), mat );
         }
     }
 

@@ -6677,28 +6677,33 @@ verb_eval_Tess.stitchMesh = function(bezier,faces,bei,divsU,divsV,domain,p0,tess
 	var knots;
 	var reverseFace = false;
 	var tessIStep = 1;
+	var tessDivCount = 1;
 	switch(edgeSide[1]) {
 	case 0:
 		edgeIndices = bei.n;
 		knots = bezier.knotsV;
+		tessDivCount = divsV;
 		break;
 	case 1:
 		edgeIndices = bei.s;
 		knots = bezier.knotsV;
 		p0 += divsU * (divsV + 1);
 		reverseFace = true;
+		tessDivCount = divsV;
 		break;
 	case 2:
 		edgeIndices = bei.e;
 		knots = bezier.knotsU;
 		tessIStep = divsV + 1;
 		p0 += divsV;
+		tessDivCount = divsU;
 		break;
 	case 3:
 		edgeIndices = bei.w;
 		knots = bezier.knotsU;
 		tessIStep = divsV + 1;
 		reverseFace = true;
+		tessDivCount = divsU;
 		break;
 	}
 	var edgeCount = edgeIndices.item1 - edgeIndices.item0 - 1;
@@ -6707,8 +6712,9 @@ verb_eval_Tess.stitchMesh = function(bezier,faces,bei,divsU,divsV,domain,p0,tess
 	var tessU = verb_core_ArrayExtensions.first(knots) + 1.5 * tessStep;
 	var edgeI = 0;
 	var tessI = 0;
+	var tessDivI = 1;
 	while(edgeI < edgeCount) {
-		while(edgeU < tessU - verb_core_Constants.EPSILON && edgeI < edgeCount) {
+		while(edgeU < tessU && edgeI < edgeCount || edgeI < edgeCount && tessDivI > tessDivCount) {
 			var ei = edgeIndices.item0 + edgeI;
 			var ei2 = ei + 1;
 			if(reverseFace) faces.push([ei,ei2,p0 + tessI]); else faces.push([ei,p0 + tessI,ei2]);
@@ -6719,6 +6725,7 @@ verb_eval_Tess.stitchMesh = function(bezier,faces,bei,divsU,divsV,domain,p0,tess
 			var ei1 = edgeIndices.item0 + edgeI;
 			if(reverseFace) faces.push([p0 + tessI,ei1,p0 + tessI + tessIStep]); else faces.push([p0 + tessI,p0 + tessI + tessIStep,ei1]);
 		}
+		tessDivI++;
 		tessI += tessIStep;
 		tessU += tessStep;
 	}

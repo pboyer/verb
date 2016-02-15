@@ -98,12 +98,12 @@ class Tess {
             stepLengths.push( stepLengthRow );
 
             for ( bezier in bezierrow ) {
-				var ls = rationalBezierSurfaceStepLength( bezier, tol );
+                var ls = rationalBezierSurfaceStepLength( bezier, tol );
 
-				ls.item0 = Math.min(ls.item0, (bezier.knotsU.last() - bezier.knotsU.first()) / 2);
-				ls.item1 = Math.min(ls.item1, (bezier.knotsV.last() - bezier.knotsV.first()) / 2);
+                ls.item0 = Math.min(ls.item0, (bezier.knotsU.last() - bezier.knotsU.first()) / 2);
+                ls.item1 = Math.min(ls.item1, (bezier.knotsV.last() - bezier.knotsV.first()) / 2);
 
-				stepLengthRow.push( ls );
+                stepLengthRow.push( ls );
             }
         }
 
@@ -209,7 +209,7 @@ class Tess {
 
                 // tessellate just the interior of the surface
 
-				// keep track of the position in the pts array
+                // keep track of the position in the pts array
 
                 p0 = pts.length;
 
@@ -227,7 +227,7 @@ class Tess {
 
                 var u = bezier.knotsU[0] + tessStepU;
 
-				// evaluate all points on the interior of the face
+                // evaluate all points on the interior of the face
 
                 for ( k in 0...divsU-1 ) {
 
@@ -280,26 +280,31 @@ class Tess {
         var knots;
         var reverseFace = false;
         var tessIStep = 1;
+        var tessDivCount = 1;
 
         switch (edgeSide) {
             case EdgeSide.North:
                 edgeIndices = bei.n;
                 knots = bezier.knotsV;
+                tessDivCount = divsV;
             case EdgeSide.South:
                 edgeIndices = bei.s;
                 knots = bezier.knotsV;
                 p0 += divsU * (divsV+1);
                 reverseFace = true;
+                tessDivCount = divsV;
             case EdgeSide.East:
                 edgeIndices = bei.e;
                 knots = bezier.knotsU;
                 tessIStep = divsV+1;
                 p0 += divsV;
+                tessDivCount = divsU;
             case EdgeSide.West:
                 edgeIndices = bei.w;
                 knots = bezier.knotsU;
                 tessIStep = divsV+1;
                 reverseFace = true;
+                tessDivCount = divsU;
         }
 
         // how many indices in the north edge?
@@ -316,12 +321,12 @@ class Tess {
         var edgeI = 0;
         var tessI = 0;
 
+        var tessDivI = 1; // number of division steps - not indexs into the mesh
+
         // triangulate the northwest corner
 
         while ( edgeI < edgeCount ){
-
-            while ( edgeU < tessU - Constants.EPSILON && edgeI < edgeCount ){
-
+            while ( edgeU < tessU && edgeI < edgeCount || (edgeI < edgeCount && tessDivI > tessDivCount) ){
                 var ei = edgeIndices.item0 + edgeI,
                 ei2 = ei + 1;
 
@@ -345,11 +350,11 @@ class Tess {
                 }
             }
 
+            tessDivI++;
             tessI += tessIStep;
             tessU += tessStep;
         }
     }
-
 
     private static function rationalBezierCurveRegularSamplePointsMutate2(  crv : NurbsCurveData,
                                                                             pts : Array<Point>,
