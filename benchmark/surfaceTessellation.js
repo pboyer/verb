@@ -1,5 +1,6 @@
 var Benchmark = require('benchmark')
-    , verb = require('../build/js/verb.js');
+    , verb = require('../build/js/verb.js')
+    , verbOld = require('../build/js/verbOld.js');
 
 function getComplexSurface(){
 

@@ -71,13 +71,21 @@
 
         geometry.vertices.push.apply( geometry.vertices, threePts );
 
-
-
         var threeFaces = tess.faces.map(function(faceIndices){
             return new THREE.Face3(faceIndices[0],faceIndices[1],faceIndices[2]);
         });
 
         geometry.faces.push.apply(geometry.faces, threeFaces);
+
+        geometry.faceVertexUvs[0] = [];
+
+        tess.faces.forEach(function(f){
+            geometry.faceVertexUvs[0].push([
+                new THREE.Vector2( tess.uvs[f[0]][0], tess.uvs[f[0]][1] ),
+                new THREE.Vector2( tess.uvs[f[1]][0], tess.uvs[f[1]][1] ),
+                new THREE.Vector2( tess.uvs[f[2]][0], tess.uvs[f[2]][1] ),
+            ]);
+        });
 
         geometry.computeFaceNormals();
         geometry.computeVertexNormals();
@@ -133,15 +141,15 @@
         return surface23;
     };
 
-
-    console.log(getBezier())
-
     surface = getBezier();
 
     var tol = 0.1;
 
     var mat2 = new THREE.MeshBasicMaterial( { color: 0x000000, side: THREE.DoubleSide, wireframe: true });
     var mat3 = new THREE.MeshBasicMaterial( { color: 0xff0000, side: THREE.DoubleSide, wireframe: true });
+
+    var mat2 = new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture('images/stone-wall.jpg') } );
+
     var l = verb.eval.Tess.rationalBezierSurfaceStepLength( surface, tol );
     var res = verb.eval.Modify.decomposeSurfaceIntoBeziers( surface );
 
@@ -161,8 +169,10 @@
 
     var mesh = verb.eval.Tess.rationalSurfaceAdaptiveSample( surface, tol );
 
-    addMeshToScene( getThreeMesh( mesh ) );
-    addMeshToScene( getThreeMesh( mesh ), mat3 );
+   // console.log( JSON.stringify( mesh.uvs ) )
+
+    //addMeshToScene( getThreeMesh( mesh ) );
+    addMeshToScene( getThreeMesh( mesh ), mat2 );
     // addMeshToScene( getThreeMesh( mesh ), mat2 );
 
     // addPointsToScene( mesh.points );

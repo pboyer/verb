@@ -108,6 +108,7 @@ class Tess {
         }
 
         var pts = [],
+        uvs = [],
         edgeRow, n, s, e, w,
         empty = new Pair<Float, Float>(Math.POSITIVE_INFINITY, Math.POSITIVE_INFINITY),
         beis : Array<Array<BezierEdgeIndices>> = [],
@@ -145,13 +146,15 @@ class Tess {
 
                 if (i == 0){
 
-                    var ne = Make.surfaceIsocurve( srf, srf.knotsU.first( ), false );
+                    var ne = Make.surfaceIsocurve( srf, srf.knotsU.first( ), false ); // uconstant
 
                     e0 = pts.length;
 
                     rationalBezierCurveRegularSamplePointsMutate2( ne, pts, stepLengths[i][j].item1 );
 
                     e1 = pts.length;
+
+					regularUvsMutate( e1-e0, ne.knots.first(), stepLengths[i][j].item1, uvs, srf.knotsU.first( ), true );
 
                     bei.n = new Pair<Int,Int>(e0, e1);
 
@@ -170,6 +173,8 @@ class Tess {
 
                     e1 = pts.length;
 
+					regularUvsMutate( e1-e0, we.knots.first(), stepLengths[i][j].item0, uvs, srf.knotsV.first( ), false );
+
                     bei.w = new Pair<Int,Int>(e0, e1);
 
                 } else {
@@ -185,6 +190,8 @@ class Tess {
 
                 e1 = pts.length;
 
+				regularUvsMutate( e1-e0, se.knots.first(), Math.min( s.item1, stepLengths[i][j].item1), uvs, srf.knotsU.last( ), true );
+
                 bei.s = new Pair<Int,Int>(e0, e1);
 
                 // tessellate the east edge and record vertex positions
@@ -195,6 +202,8 @@ class Tess {
                 rationalBezierCurveRegularSamplePointsMutate2( ee, pts, Math.min( e.item0, stepLengths[i][j].item0) );
 
                 e1 = pts.length;
+
+				regularUvsMutate( e1-e0, ee.knots.first(), Math.min( e.item0, stepLengths[i][j].item0), uvs, srf.knotsV.last( ), false );
 
                 bei.e = new Pair<Int,Int>(e0, e1);
             }
@@ -233,6 +242,15 @@ class Tess {
 
                     var iso = Make.surfaceIsocurve( bezier, u, false );
                     rationalBezierCurveRegularSamplePointsMutate( iso, pts, iso.knots[0] + tessStepV, tessStepV, divsV - 1, false );
+//
+//					private static function rationalBezierCurveRegularSamplePointsMutate( crv : NurbsCurveData,
+//					pts : Array<Point>,
+//					startU : Float,
+//					step : Float,
+//					numSteps : Int,
+//					includeU : Bool = false ) : Void {
+
+					regularUvsMutate( divsV - 1, iso.knots[0] + tessStepV, tessStepV, uvs, u, true );
 
                     u += tessStepU;
                 }
@@ -270,8 +288,26 @@ class Tess {
             }
         }
 
-        return new MeshData( faces, pts, null, null );
+        return new MeshData( faces, pts, null, uvs );
     }
+
+	private static function regularUvsMutate( count : Int, start : Float, step : Float, uvs : Array<UV>, constant : Float, uConstant : Bool ){
+		var i = 0;
+		var u = start;
+		if (uConstant){
+			while ( i < count ){
+				uvs.push([constant, u]);
+				u += step;
+				i++;
+			}
+		} else {
+			while ( i < count ){
+				uvs.push([u, constant]);
+				u += step;
+				i++;
+			}
+		}
+	}
 
     private static function stitchMesh( bezier : NurbsSurfaceData, faces : Array<Tri>, bei : BezierEdgeIndices,
                                         divsU : Int, divsV : Int, domain : Float, p0 : Int, tessStep : Float, edgeSide : EdgeSide ){

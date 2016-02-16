@@ -45,6 +45,7 @@
         });
 
         geometry.faces.push.apply(geometry.faces, threeFaces);
+
         return geometry;
     }
 
