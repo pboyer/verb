@@ -551,14 +551,13 @@ describe("verb.eval.Eval.rationalSurfacePoint",function(){
 });
 
 describe("verb.eval.Eval.rationalCurveDerivatives",function(){
+	// this represents a single quarter arc, using a rational bezier curve
+	var degree = 2
+		, knots = [0, 0, 0, 1, 1, 1 ]
+		, controlPoints = [ [1,0,1], [1,1,1], [0,2,2] ]
+		, crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
-	it('returns expected results', function(){
-
-		// this represents a single quarter arc, using a rational bezier curve
-		var degree = 2
-			, knots = [0, 0, 0, 1, 1, 1 ]
-			, controlPoints = [ [1,0,1], [1,1,1], [0,2,2] ]
-			, crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
+	it('returns expected results with 2 derivatives', function(){
 
 		var p = verb.eval.Eval.rationalCurveDerivatives( crv, 0, 2);
 
