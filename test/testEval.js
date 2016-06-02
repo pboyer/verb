@@ -558,8 +558,9 @@ describe("verb.eval.Eval.rationalCurveDerivatives",function(){
 		, crv = new verb.core.NurbsCurveData( degree, knots, controlPoints );
 
 	it('returns expected results with 2 derivatives', function(){
+		var num_derivatives = 2;
 
-		var p = verb.eval.Eval.rationalCurveDerivatives( crv, 0, 2);
+		var p = verb.eval.Eval.rationalCurveDerivatives( crv, 0, num_derivatives);
 
 		should.equal( p[0][0], 1 );
 		should.equal( p[0][1], 0 );
@@ -570,7 +571,7 @@ describe("verb.eval.Eval.rationalCurveDerivatives",function(){
 		should.equal( p[2][0], -4 );
 		should.equal( p[2][1], 0 );
 
-		p = verb.eval.Eval.rationalCurveDerivatives( crv, 1, 2);
+		p = verb.eval.Eval.rationalCurveDerivatives( crv, 1, num_derivatives);
 
 		should.equal( p[0][0], 0 );
 		should.equal( p[0][1], 1 );
@@ -583,21 +584,35 @@ describe("verb.eval.Eval.rationalCurveDerivatives",function(){
 
 	});
 
+	it('returns expected results with 3 derivatives', function(){
+		var num_derivatives = 3;
+
+		var p = verb.eval.Eval.rationalCurveDerivatives( crv, 0, num_derivatives);
+
+		should.equal( p[3][0], 0 );
+		should.equal( p[3][1], -12 );
+
+		p = verb.eval.Eval.rationalCurveDerivatives( crv, 1, num_derivatives);
+
+		should.equal( p[3][0], 0 );
+		should.equal( p[3][1], 3 );
+
+	});
+
 });
 
 describe("verb.eval.Eval.rationalSurfaceDerivatives",function(){
+	// quarter cylinder patch, axis aligned with x axis, radius: 1
+	var degreeU = 1
+		, degreeV = 2
+		, knotsU = [0, 0, 1, 1 ]
+		, knotsV = [0, 0, 0, 1, 1, 1 ]
+		, controlPoints = [ [ [1, 1, 0, 1], 	[1, 1, 1, 1], [2, 0, 2, 2] ],
+		[ [-1, 1, 0, 1], 	[-1, 1, 1, 1], [-2, 0, 2, 2] ] ]
+		, surface = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
 
-	it('returns expected results', function(){
-
-		// quarter cylinder patch, axis aligned with x axis, radius: 1
-		var degreeU = 1
-			, degreeV = 2
-			, knotsU = [0, 0, 1, 1 ]
-			, knotsV = [0, 0, 0, 1, 1, 1 ]
-			, controlPoints = [ [ [1, 1, 0, 1], 	[1, 1, 1, 1], [2, 0, 2, 2] ],
-							    [ [-1, 1, 0, 1], 	[-1, 1, 1, 1], [-2, 0, 2, 2] ] ]
-			, num_derivatives = 1
-			, surface = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, controlPoints );
+	it('returns expected results with 1 derivative', function(){
+		var num_derivatives = 1;
 
 		var p = verb.eval.Eval.rationalSurfaceDerivatives( surface, 0, 0, num_derivatives );
 
@@ -626,6 +641,39 @@ describe("verb.eval.Eval.rationalSurfaceDerivatives",function(){
 		should.equal( p[1][0][0], -2 );
 		should.equal( p[1][0][1], 0 );
 		should.equal( p[1][0][2], 0 );
+
+	});
+
+	it('returns expected results with 2 derivatives', function(){
+		var num_derivatives = 2;
+
+		var p = verb.eval.Eval.rationalSurfaceDerivatives( surface, 0, 0, num_derivatives );
+
+		should.equal( p[0][2][0], 0 );
+		should.equal( p[0][2][1], -4 );
+		should.equal( p[0][2][2], 0 );
+
+		should.equal( p[1][1][0], 0 );
+		should.equal( p[1][1][1], 0 );
+		should.equal( p[1][1][2], 0 );
+
+		should.equal( p[2][0][0], 0 );
+		should.equal( p[2][0][1], 0 );
+		should.equal( p[2][0][2], 0 );
+
+		p = verb.eval.Eval.rationalSurfaceDerivatives( surface, 1, 1, num_derivatives);
+
+		should.equal( p[0][2][0], 0 );
+		should.equal( p[0][2][1], 1 );
+		should.equal( p[0][2][2], -1 );
+
+		should.equal( p[1][1][0], 0 );
+		should.equal( p[1][1][1], 0 );
+		should.equal( p[1][1][2], 0 );
+
+		should.equal( p[2][0][0], 0 );
+		should.equal( p[2][0][1], 0 );
+		should.equal( p[2][0][2], 0 );
 
 	});
 });
