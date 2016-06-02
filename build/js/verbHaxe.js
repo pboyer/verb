@@ -4072,7 +4072,7 @@ verb_eval_Eval.surfaceDerivativesGivenNM = function(n,m,surface,u,v,numDerivs) {
 	if(numDerivs < degreeU) du = numDerivs; else du = degreeU;
 	var dv;
 	if(numDerivs < degreeV) dv = numDerivs; else dv = degreeV;
-	var SKL = verb_core_Vec.zeros3d(du + 1,dv + 1,dim);
+	var SKL = verb_core_Vec.zeros3d(numDerivs + 1,numDerivs + 1,dim);
 	var knotSpan_index_u = verb_eval_Eval.knotSpanGivenN(n,degreeU,u,knotsU);
 	var knotSpan_index_v = verb_eval_Eval.knotSpanGivenN(m,degreeV,v,knotsV);
 	var uders = verb_eval_Eval.derivativeBasisFunctionsGivenNI(knotSpan_index_u,u,degreeU,n,knotsU);
@@ -4161,7 +4161,7 @@ verb_eval_Eval.curveDerivativesGivenN = function(n,curve,u,numDerivs) {
 	var dim = controlPoints[0].length;
 	var du;
 	if(numDerivs < degree) du = numDerivs; else du = degree;
-	var CK = verb_core_Vec.zeros2d(du + 1,dim);
+	var CK = verb_core_Vec.zeros2d(numDerivs + 1,dim);
 	var knotSpan_index = verb_eval_Eval.knotSpanGivenN(n,degree,u,knots);
 	var nders = verb_eval_Eval.derivativeBasisFunctionsGivenNI(knotSpan_index,u,degree,du,knots);
 	var k = 0;

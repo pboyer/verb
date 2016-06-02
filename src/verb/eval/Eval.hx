@@ -235,7 +235,7 @@ class Eval {
         var dim = controlPoints[0][0].length
         , du = numDerivs < degreeU ? numDerivs : degreeU
         , dv = numDerivs < degreeV ? numDerivs : degreeV
-        , SKL = Vec.zeros3d( du+1, dv+1, dim )
+        , SKL = Vec.zeros3d( numDerivs+1, numDerivs+1, dim )
         , knotSpan_index_u = knotSpanGivenN( n, degreeU, u, knotsU )
         , knotSpan_index_v = knotSpanGivenN( m, degreeV, v, knotsV )
         , uders = derivativeBasisFunctionsGivenNI( knotSpan_index_u, u, degreeU, n, knotsU )
@@ -391,7 +391,7 @@ class Eval {
 
         var dim = controlPoints[0].length
         , du = numDerivs < degree ? numDerivs : degree
-        , CK = Vec.zeros2d( du+1, dim )
+        , CK = Vec.zeros2d( numDerivs+1, dim )
         , knotSpan_index = knotSpanGivenN( n, degree, u, knots )
         , nders = derivativeBasisFunctionsGivenNI( knotSpan_index, u, degree, du, knots )
         , k = 0
