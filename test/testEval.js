@@ -4462,12 +4462,12 @@ describe("verb.eval.Tess.rationalSurfaceAdaptiveSample",() => {
 
 //		should.equal( 2, res.faces.length );
 
+		console.log("faces", res.faces.length);
 		console.log(res.uvs.length);
 		console.log(res.points.length);
 	});
 
 	it('can tessellate 2 x 3 rational flat patch', () => {
-
 		var surface23 = getSurface23();
 		var res = verb.eval.Tess.rationalSurfaceAdaptiveSample( surface23, 0.1 );
 

@@ -106,6 +106,27 @@
         , surface = new verb.core.NurbsSurfaceData( degree, degree, knotsU, knotsV, controlPoints );
 
 
+    var getSurface11 = () => {
+
+        var degreeU = 3
+            , degreeV = 3
+            , knotsU = [0, 0, 0, 0, 1, 1, 1, 1]
+            , knotsV =  [0, 0, 0, 0, 1, 1, 1, 1]
+            , pts = [     [ [0, 0, 0],    [10, 0, 0],     [20, 0, 0],     [30, 0, 0]      ],
+                                    [ [0, -10, 0],  [10, -10, 5],   [20, -10, 0],   [30, -10, 0]    ],
+                                    [ [0, -20, 0],  [10, -20, 0],   [20, -20, 0],   [30, -20, 0]    ],
+                                    [ [0, -30, 0],  [10, -30, 0],   [20, -30, 0],   [30, -30, 0]    ] ]
+			, wts = [   [ 1, 1, 1, 1],
+						[ 1, 1, 1, 1],
+						[ 1, 1, 1, 1],
+						[ 1, 1, 1, 1],
+						[ 1, 1, 1, 1],
+						[ 1, 1, 1, 1] ]
+            , bezier = new verb.core.NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, verb.eval.Eval.homogenize2d(pts, wts) );
+
+        return bezier;
+    };
+
     function getBezier(){
 
         var degree = 3
@@ -130,7 +151,7 @@
                         [ [0, -10, 0],  [10, -10, 0],  [20, -10, 0],  [30, -10, 0],  [40, -10, 0],   [50, -10, 0]    ],
                         [ [0, -20, 0],  [10, -20, 0],  [20, -20, 0],  [30, -20, 0],  [40, -20, 0],  [50, -20, 0]    ],
                         [ [0, -30, 0],  [10, -30, 0],   [20, -30, 0], [30, -30, 0],  [40, -30, 0],   [50, -30, 0]     ],
-                        [ [0, -40, 0],  [10, -40, 5],   [20, -40, 0],   [30, -40, 0],  [40, -40, -10], [50, -40, 0]     ] ]
+                        [ [0, -40, 0],  [10, -40, 0],   [20, -40, 0],   [30, -40, 0],  [40, -40, 0], [50, -40, 0]     ] ]
 			, wts = [   [ 1, 1, 1, 1, 1, 1],
 						[ 1, 1, 1, 1, 1, 1],
 						[ 1, 1, 1, 1, 1, 1],
@@ -141,41 +162,43 @@
         return surface23;
     };
 
-    surface = getBezier();
+    surface = getSurface23();
 
-    var tol = 0.1;
+    var tol = 0.01;
 
     var mat2 = new THREE.MeshBasicMaterial( { color: 0x000000, side: THREE.DoubleSide, wireframe: true });
-    var mat3 = new THREE.MeshBasicMaterial( { color: 0xff0000, side: THREE.DoubleSide, wireframe: true });
+    var mat2 = new THREE.MeshBasicMaterial( { color: 0xff0000, side: THREE.DoubleSide, wireframe: true });
 
-    var mat2 = new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture('images/stone-wall.jpg') } );
+    // var mat2 = new THREE.MeshPhongMaterial( { map: THREE.ImageUtils.loadTexture('images/stone-wall.jpg') } );
 
     var l = verb.eval.Tess.rationalBezierSurfaceStepLength( surface, tol );
     var res = verb.eval.Modify.decomposeSurfaceIntoBeziers( surface );
 
     for (var i = 0; i < res.length; i++){
         for (var j = 0; j < res[i].length; j++){
-
             var color = '#'+Math.floor(Math.random()*16777215).toString(16);
             var mat = new THREE.MeshBasicMaterial( { color: color, side: THREE.DoubleSide, wireframe: true });
 
             var srf = res[i][j];
             var l = verb.eval.Tess.rationalBezierSurfaceStepLength( srf, tol );
-            //=addMeshToScene( tessellateSurface( srf, Math.ceil( 1 / l.item0 ), Math.ceil( 1 / l.item1) ), mat );
+            //addMeshToScene( tessellateSurface( srf, Math.ceil( 1 / l.item0 ), Math.ceil( 1 / l.item1) ), mat );
         }
     }
 
     // add the edge points to the scene
 
     var mesh = verb.eval.Tess.rationalSurfaceAdaptiveSample( surface, tol );
+    console.log("numfaces", mesh.faces.length);
+    console.log("numpts", mesh.points.length);
 
-   // console.log( JSON.stringify( mesh.uvs ) )
+    console.log( JSON.stringify( mesh.faces ) )
+    console.log( JSON.stringify( mesh.points ) )
 
     //addMeshToScene( getThreeMesh( mesh ) );
     addMeshToScene( getThreeMesh( mesh ), mat2 );
     // addMeshToScene( getThreeMesh( mesh ), mat2 );
 
-    // addPointsToScene( mesh.points );
+    addPointsToScene( mesh.points );
 
 	renderScene();
 

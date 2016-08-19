@@ -107,6 +107,9 @@ class Tess {
             }
         }
 
+        trace("YO");
+        trace(stepLengths);
+
         var pts = [],
         uvs = [],
         edgeRow, n, s, e, w,
@@ -209,6 +212,9 @@ class Tess {
             }
         }
 
+		trace(beziers.length);
+		trace(beziers[0].length);
+
         // tessellate the patch interior and join to the polyline interiors together
 
         var faces = [], p0;
@@ -239,16 +245,8 @@ class Tess {
                 // evaluate all points on the interior of the face
 
                 for ( k in 0...divsU-1 ) {
-
                     var iso = Make.surfaceIsocurve( bezier, u, false );
                     rationalBezierCurveRegularSamplePointsMutate( iso, pts, iso.knots[0] + tessStepV, tessStepV, divsV - 1, false );
-//
-//					private static function rationalBezierCurveRegularSamplePointsMutate( crv : NurbsCurveData,
-//					pts : Array<Point>,
-//					startU : Float,
-//					step : Float,
-//					numSteps : Int,
-//					includeU : Bool = false ) : Void {
 
 					regularUvsMutate( divsV - 1, iso.knots[0] + tessStepV, tessStepV, uvs, u, true );
 
@@ -260,11 +258,12 @@ class Tess {
                 divsU = divsU - 2;
                 divsV = divsV - 2;
 
+				trace(divsU, divsV);
+
                 // triangulate the interior of the face after having computed the points
 
                 for ( k in 0...divsU ) {
                     for ( l in 0...divsV ) {
-
                         var a_k = p0 + k * (divsV + 1) + l,
                         b_k = p0 + (k + 1) * (divsV + 1) + l,
                         c_k = b_k + 1,
@@ -593,7 +592,6 @@ class Tess {
     }
 
     public static function rationalCurveAdaptiveSample( crv : NurbsCurveData, tol : Float, includeU : Bool = false ) : Array<Point> {
-
         //if degree is 1, just return the dehomogenized control points
         if ( crv.degree == 1 ) {
             var pts = [];

@@ -324,6 +324,12 @@ haxe__$Int64__$_$_$Int64.__name__ = ["haxe","_Int64","___Int64"];
 haxe__$Int64__$_$_$Int64.prototype = {
 	__class__: haxe__$Int64__$_$_$Int64
 };
+var haxe_Log = function() { };
+$hxClasses["haxe.Log"] = haxe_Log;
+haxe_Log.__name__ = ["haxe","Log"];
+haxe_Log.trace = function(v,infos) {
+	js_Boot.__trace(v,infos);
+};
 var haxe_Serializer = function() {
 	this.buf = new StringBuf();
 	this.cache = [];
@@ -1058,6 +1064,25 @@ js__$Boot_HaxeError.prototype = $extend(Error.prototype,{
 var js_Boot = function() { };
 $hxClasses["js.Boot"] = js_Boot;
 js_Boot.__name__ = ["js","Boot"];
+js_Boot.__unhtml = function(s) {
+	return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
+};
+js_Boot.__trace = function(v,i) {
+	var msg;
+	if(i != null) msg = i.fileName + ":" + i.lineNumber + ": "; else msg = "";
+	msg += js_Boot.__string_rec(v,"");
+	if(i != null && i.customParams != null) {
+		var _g = 0;
+		var _g1 = i.customParams;
+		while(_g < _g1.length) {
+			var v1 = _g1[_g];
+			++_g;
+			msg += "," + js_Boot.__string_rec(v1,"");
+		}
+	}
+	var d;
+	if(typeof(document) != "undefined" && (d = document.getElementById("haxe:trace")) != null) d.innerHTML += js_Boot.__unhtml(msg) + "<br/>"; else if(typeof console != "undefined" && console.log != null) console.log(msg);
+};
 js_Boot.getClass = function(o) {
 	if((o instanceof Array) && o.__enum__ == null) return Array; else {
 		var cl = o.__class__;
@@ -1933,7 +1958,7 @@ var verb_Verb = function() { };
 $hxClasses["verb.Verb"] = verb_Verb;
 verb_Verb.__name__ = ["verb","Verb"];
 verb_Verb.main = function() {
-	console.log("verb 2.1.0");
+	haxe_Log.trace("verb 2.1.0",{ fileName : "Verb.hx", lineNumber : 45, className : "verb.Verb", methodName : "main"});
 };
 var verb_core_ArrayExtensions = function() { };
 $hxClasses["verb.core.ArrayExtensions"] = verb_core_ArrayExtensions;
@@ -6562,6 +6587,8 @@ verb_eval_Tess.rationalSurfaceAdaptiveSample = function(surface,tol) {
 			stepLengthRow.push(ls);
 		}
 	}
+	haxe_Log.trace("YO",{ fileName : "Tess.hx", lineNumber : 110, className : "verb.eval.Tess", methodName : "rationalSurfaceAdaptiveSample"});
+	haxe_Log.trace(stepLengths,{ fileName : "Tess.hx", lineNumber : 111, className : "verb.eval.Tess", methodName : "rationalSurfaceAdaptiveSample"});
 	var pts = [];
 	var uvs = [];
 	var edgeRow;
@@ -6623,6 +6650,8 @@ verb_eval_Tess.rationalSurfaceAdaptiveSample = function(surface,tol) {
 			bei.e = new verb_core_Pair(e0,e1);
 		}
 	}
+	haxe_Log.trace(beziers.length,{ fileName : "Tess.hx", lineNumber : 215, className : "verb.eval.Tess", methodName : "rationalSurfaceAdaptiveSample"});
+	haxe_Log.trace(beziers[0].length,{ fileName : "Tess.hx", lineNumber : 216, className : "verb.eval.Tess", methodName : "rationalSurfaceAdaptiveSample"});
 	var faces = [];
 	var p0;
 	var _g12 = 0;
@@ -6653,6 +6682,7 @@ verb_eval_Tess.rationalSurfaceAdaptiveSample = function(surface,tol) {
 			}
 			divsU = divsU - 2;
 			divsV = divsV - 2;
+			haxe_Log.trace(divsU,{ fileName : "Tess.hx", lineNumber : 262, className : "verb.eval.Tess", methodName : "rationalSurfaceAdaptiveSample", customParams : [divsV]});
 			var _g42 = 0;
 			while(_g42 < divsU) {
 				var k1 = _g42++;
@@ -7617,7 +7647,7 @@ verb_exe_WorkerPool.prototype = {
 						}
 					} catch( error ) {
 						if (error instanceof js__$Boot_HaxeError) error = error.val;
-						console.log(error);
+						haxe_Log.trace(error,{ fileName : "WorkerPool.hx", lineNumber : 81, className : "verb.exe.WorkerPool", methodName : "processQueue"});
 					}
 					_g.processQueue();
 				};
