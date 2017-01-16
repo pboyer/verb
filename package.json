@@ -10,12 +10,16 @@
   "scripts": {
     "test": "grunt -v test"
   },
-  "engine": "node 4.2.1",
+  "engine": "node 5.10.1",
   "main": "build/js/verb.js",
   "keywords": [
     "NURBS",
     "geometry",
-    "cad"
+    "cad",
+    "surface",
+    "curve", 
+    "spline",
+    "mesh"
   ],
   "dependencies": {
       "webworker-threads": "0.7.8"

@@ -1,10 +1,6 @@
 var should = require('should')
 	, verb = require('../build/js/verb.js');
 
-var fs = require('fs');
-var f = fs.readFileSync(process.cwd() + '/build/js/verb.js', 'utf8');
-console.log( f.slice(-300, -1) );
-
 // necessary for multi-threading
 verb.exe.WorkerPool.basePath = process.cwd() + "/build/js/";
 

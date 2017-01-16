@@ -1519,7 +1519,7 @@ promhx_base_AsyncBase.prototype = {
 		}
 	}
 	,then: function(f) {
-		var ret = new promhx_base_AsyncBase();
+		var ret = new promhx_base_AsyncBase(null);
 		promhx_base_AsyncBase.link(this,ret,f);
 		return ret;
 	}
@@ -1576,7 +1576,7 @@ var promhx_Promise = $hx_exports.promhx.Promise = function(d) {
 $hxClasses["promhx.Promise"] = promhx_Promise;
 promhx_Promise.__name__ = ["promhx","Promise"];
 promhx_Promise.whenAll = function(itb) {
-	var ret = new promhx_Promise();
+	var ret = new promhx_Promise(null);
 	promhx_base_AsyncBase.linkAll(itb,ret);
 	return ret;
 };
@@ -1602,7 +1602,7 @@ promhx_Promise.prototype = $extend(promhx_base_AsyncBase.prototype,{
 		this._resolve(val);
 	}
 	,then: function(f) {
-		var ret = new promhx_Promise();
+		var ret = new promhx_Promise(null);
 		promhx_base_AsyncBase.link(this,ret,f);
 		return ret;
 	}
@@ -1623,7 +1623,7 @@ promhx_Promise.prototype = $extend(promhx_base_AsyncBase.prototype,{
 		this._handleError(error);
 	}
 	,pipe: function(f) {
-		var ret = new promhx_Promise();
+		var ret = new promhx_Promise(null);
 		promhx_base_AsyncBase.pipeLink(this,ret,f);
 		return ret;
 	}
@@ -1640,13 +1640,12 @@ promhx_Promise.prototype = $extend(promhx_base_AsyncBase.prototype,{
 });
 var promhx_Stream = $hx_exports.promhx.Stream = function(d) {
 	promhx_base_AsyncBase.call(this,d);
-	this._end_deferred = new promhx_Deferred();
-	this._end_promise = this._end_deferred.promise();
+	this._end_promise = new promhx_Promise();
 };
 $hxClasses["promhx.Stream"] = promhx_Stream;
 promhx_Stream.__name__ = ["promhx","Stream"];
 promhx_Stream.foreach = function(itb) {
-	var s = new promhx_Stream();
+	var s = new promhx_Stream(null);
 	var $it0 = $iterator(itb)();
 	while( $it0.hasNext() ) {
 		var i = $it0.next();
@@ -1656,12 +1655,12 @@ promhx_Stream.foreach = function(itb) {
 	return s;
 };
 promhx_Stream.wheneverAll = function(itb) {
-	var ret = new promhx_Stream();
+	var ret = new promhx_Stream(null);
 	promhx_base_AsyncBase.linkAll(itb,ret);
 	return ret;
 };
 promhx_Stream.concatAll = function(itb) {
-	var ret = new promhx_Stream();
+	var ret = new promhx_Stream(null);
 	var $it0 = $iterator(itb)();
 	while( $it0.hasNext() ) {
 		var i = $it0.next();
@@ -1670,7 +1669,7 @@ promhx_Stream.concatAll = function(itb) {
 	return ret;
 };
 promhx_Stream.mergeAll = function(itb) {
-	var ret = new promhx_Stream();
+	var ret = new promhx_Stream(null);
 	var $it0 = $iterator(itb)();
 	while( $it0.hasNext() ) {
 		var i = $it0.next();
@@ -1679,18 +1678,18 @@ promhx_Stream.mergeAll = function(itb) {
 	return ret;
 };
 promhx_Stream.stream = function(_val) {
-	var ret = new promhx_Stream();
+	var ret = new promhx_Stream(null);
 	ret.handleResolve(_val);
 	return ret;
 };
 promhx_Stream.__super__ = promhx_base_AsyncBase;
 promhx_Stream.prototype = $extend(promhx_base_AsyncBase.prototype,{
 	then: function(f) {
-		var ret = new promhx_Stream();
+		var ret = new promhx_Stream(null);
 		promhx_base_AsyncBase.link(this,ret,f);
-		this._end_promise.then(function(x) {
+		this._end_promise._update.push({ async : ret._end_promise, linkf : function(x) {
 			ret.end();
-		});
+		}});
 		return ret;
 	}
 	,detachStream: function(str) {
@@ -1701,13 +1700,18 @@ promhx_Stream.prototype = $extend(promhx_base_AsyncBase.prototype,{
 		while(_g < _g1.length) {
 			var u = _g1[_g];
 			++_g;
-			if(u.async == str) removed = true; else filtered.push(u);
+			if(u.async == str) {
+				this._end_promise._update = this._end_promise._update.filter(function(x) {
+					return x.async != str._end_promise;
+				});
+				removed = true;
+			} else filtered.push(u);
 		}
 		this._update = filtered;
 		return removed;
 	}
 	,first: function() {
-		var s = new promhx_Promise();
+		var s = new promhx_Promise(null);
 		this.then(function(x) {
 			if(!s._resolved) s.handleResolve(x);
 		});
@@ -1721,7 +1725,7 @@ promhx_Stream.prototype = $extend(promhx_base_AsyncBase.prototype,{
 		this._pause = set;
 	}
 	,pipe: function(f) {
-		var ret = new promhx_Stream();
+		var ret = new promhx_Stream(null);
 		promhx_base_AsyncBase.pipeLink(this,ret,f);
 		this._end_promise.then(function(x) {
 			ret.end();
@@ -1729,7 +1733,7 @@ promhx_Stream.prototype = $extend(promhx_base_AsyncBase.prototype,{
 		return ret;
 	}
 	,errorPipe: function(f) {
-		var ret = new promhx_Stream();
+		var ret = new promhx_Stream(null);
 		this.catchError(function(e) {
 			var piped = f(e);
 			piped.then($bind(ret,ret._resolve));
@@ -1763,7 +1767,7 @@ promhx_Stream.prototype = $extend(promhx_base_AsyncBase.prototype,{
 		return this._end_promise.then(f);
 	}
 	,filter: function(f) {
-		var ret = new promhx_Stream();
+		var ret = new promhx_Stream(null);
 		this._update.push({ async : ret, linkf : function(x) {
 			if(f(x)) ret.handleResolve(x);
 		}});
@@ -1773,7 +1777,7 @@ promhx_Stream.prototype = $extend(promhx_base_AsyncBase.prototype,{
 		return ret;
 	}
 	,concat: function(s) {
-		var ret = new promhx_Stream();
+		var ret = new promhx_Stream(null);
 		this._update.push({ async : ret, linkf : $bind(ret,ret.handleResolve)});
 		promhx_base_AsyncBase.immediateLinkUpdate(this,ret,function(x) {
 			return x;
@@ -1790,7 +1794,7 @@ promhx_Stream.prototype = $extend(promhx_base_AsyncBase.prototype,{
 		return ret;
 	}
 	,merge: function(s) {
-		var ret = new promhx_Stream();
+		var ret = new promhx_Stream(null);
 		this._update.push({ async : ret, linkf : $bind(ret,ret.handleResolve)});
 		s._update.push({ async : ret, linkf : $bind(ret,ret.handleResolve)});
 		promhx_base_AsyncBase.immediateLinkUpdate(this,ret,function(x) {
@@ -1809,7 +1813,7 @@ var promhx_PublicStream = $hx_exports.promhx.PublicStream = function(def) {
 $hxClasses["promhx.PublicStream"] = promhx_PublicStream;
 promhx_PublicStream.__name__ = ["promhx","PublicStream"];
 promhx_PublicStream.publicstream = function(val) {
-	var ps = new promhx_PublicStream();
+	var ps = new promhx_PublicStream(null);
 	ps.handleResolve(val);
 	return ps;
 };
