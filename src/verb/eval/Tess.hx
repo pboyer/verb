@@ -84,12 +84,13 @@ class Tess {
 
     public static function rationalSurfaceAdaptiveSample( surface : NurbsSurfaceData, tol : Float ) : MeshData {
 
-        // split into bezier patches
+		// TODO check for planarity
+		// TODO cache bezier decomposition
 
+        // split into bezier patches
         var beziers = Modify.decomposeSurfaceIntoBeziers( surface );
 
         // get step lengths for patches
-
         var stepLengths : Array<Array<Pair<Float, Float>>> = []
         , stepLengthRow;
 
@@ -107,9 +108,6 @@ class Tess {
             }
         }
 
-        trace("YO");
-        trace(stepLengths);
-
         var pts = [],
         uvs = [],
         edgeRow, n, s, e, w,
@@ -122,7 +120,6 @@ class Tess {
         srf;
 
         // tessellate the edges of the bezier patches
-
         for (i in 0...beziers.length){
 
             beir = [];
@@ -212,11 +209,7 @@ class Tess {
             }
         }
 
-		trace(beziers.length);
-		trace(beziers[0].length);
-
         // tessellate the patch interior and join to the polyline interiors together
-
         var faces = [], p0;
 
         for ( i in 0...beziers.length ) {
@@ -257,8 +250,6 @@ class Tess {
 
                 divsU = divsU - 2;
                 divsV = divsV - 2;
-
-				trace(divsU, divsV);
 
                 // triangulate the interior of the face after having computed the points
 
@@ -403,6 +394,7 @@ class Tess {
         rationalBezierCurveRegularSamplePointsMutate( crv, pts, crv.knots[0], len, steps + 1, false );
 
     }
+
 
 
     public static function rationalBezierSurfaceStepLength( surface : NurbsSurfaceData, tol : Float ) : Pair<Float, Float> {

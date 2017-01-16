@@ -5,6 +5,11 @@ Complete forward differencing algorithm
     - approximate normals
     - exact normals
     - tests (spheres, circles)
+	- rationalBezierSurfaceStepLength
+	 	* supports degree2?
+	 	*
+
+
 
 BRep Split
     Holes are not recognized
