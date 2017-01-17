@@ -57,16 +57,6 @@ module.exports = function(grunt) {
         hxml: {
             hxml: 'buildjs.hxml'
         }
-    },
-
-    // docs
-    docco: {
-      debug: {
-        src: ['build/js/verb.js'],
-        options: {
-          output: 'docs/'
-        }
-      }
     }
 
   });
@@ -76,7 +66,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-mocha-test');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-docco');
   grunt.loadNpmTasks('grunt-benchmark');
 
   var build_steps = [ 'haxe', 'replace', 'concat', 'uglify' ];
