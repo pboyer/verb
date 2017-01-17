@@ -573,7 +573,7 @@ describe("verb.eval.Eval.rationalCurveDerivatives",() => {
         should.equal( p[2][0], -4 );
         should.equal( p[2][1], 0 );
 
-        p = verb.eval.Eval.rationalCurveDerivatives( crv, 1, 2);
+		p = verb.eval.Eval.rationalCurveDerivatives( crv, 1, num_derivatives);
 
         should.equal( p[0][0], 0 );
         should.equal( p[0][1], 1 );
@@ -586,7 +586,8 @@ describe("verb.eval.Eval.rationalCurveDerivatives",() => {
 
     });
 
-});
+	it('returns expected results with 3 derivatives', function(){
+		var num_derivatives = 3;
 
 describe("verb.eval.Eval.rationalSurfaceDerivatives",() => {
 
@@ -631,6 +632,40 @@ describe("verb.eval.Eval.rationalSurfaceDerivatives",() => {
         should.equal( p[1][0][2], 0 );
 
     });
+
+	it('returns expected results with 2 derivatives', function(){
+		var num_derivatives = 2;
+
+		var p = verb.eval.Eval.rationalSurfaceDerivatives( surface, 0, 0, num_derivatives );
+
+		should.equal( p[0][2][0], 0 );
+		should.equal( p[0][2][1], -4 );
+		should.equal( p[0][2][2], 0 );
+
+		should.equal( p[1][1][0], 0 );
+		should.equal( p[1][1][1], 0 );
+		should.equal( p[1][1][2], 0 );
+
+		should.equal( p[2][0][0], 0 );
+		should.equal( p[2][0][1], 0 );
+		should.equal( p[2][0][2], 0 );
+
+		p = verb.eval.Eval.rationalSurfaceDerivatives( surface, 1, 1, num_derivatives);
+
+		should.equal( p[0][2][0], 0 );
+		should.equal( p[0][2][1], 1 );
+		should.equal( p[0][2][2], -1 );
+
+		should.equal( p[1][1][0], 0 );
+		should.equal( p[1][1][1], 0 );
+		should.equal( p[1][1][2], 0 );
+
+		should.equal( p[2][0][0], 0 );
+		should.equal( p[2][0][1], 0 );
+		should.equal( p[2][0][2], 0 );
+
+	});
+
 });
 
 describe("verb.eval.Eval.rationalCurvePoint",() => {

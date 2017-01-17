@@ -13,3 +13,5 @@ lib-cov
 *.swp
 *.swo
 node_modules/
+*.VC.db
+*.VC.db-wal

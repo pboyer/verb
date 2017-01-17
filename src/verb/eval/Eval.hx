@@ -630,7 +630,7 @@ class Eval {
 
         var dim = controlPoints[0].length
         , du = numDerivs < degree ? numDerivs : degree
-        , CK = Vec.zeros2d( du + 1, dim )
+        , CK = Vec.zeros2d( numDerivs+1, dim )
         , knotSpan_index = knotSpanGivenN( n, degree, u, knots )
         , nders = derivativeBasisFunctionsGivenNI( knotSpan_index, u, degree, du, knots )
         , k = 0

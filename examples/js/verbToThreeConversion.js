@@ -16,14 +16,10 @@
         });
     }
 
-    function asGeometry(threePts){
-        var geometry = new THREE.Geometry();
-        geometry.vertices.push.apply( geometry.vertices, threePts );
-        return geometry;
-    }
-
     function tessellateCurve( curve ){
-        return asGeometry( asVector3(  curve.tessellate() ) );
+        var geometry = new THREE.Geometry();
+        geometry.vertices = asVector3( curve.tessellate() );
+        return geometry;
     }
 
     function tessellateSurface(srf) {
@@ -31,11 +27,10 @@
         var tess = srf.tessellate({ normTol : 0.0001 });
 
         var geometry = new THREE.Geometry();
-        var threePts = asVector3( tess.points );
 
-        geometry.vertices.push.apply( geometry.vertices, threePts );
+        geometry.vertices = asVector3( tess.points );
 
-        var threeFaces = tess.faces.map(function(faceIndices){
+        geometry.faces = tess.faces.map(function(faceIndices){
             var normals = faceIndices.map(function(x){
                 var vn = tess.normals[x];
                 return new THREE.Vector3( vn[0], vn[1], vn[2] );

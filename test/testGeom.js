@@ -287,6 +287,21 @@ describe("verb.geom.NurbsCurve.closestParam", () => {
 
 	});
 
+	it('can get point on straight curve of degree 1', function() {
+
+		var degree = 1
+			, knots = [0, 0, 1, 1]
+			, controlPoints = [[0,0,0], [10,0,0]]
+			, weights = [1, 1];
+
+		var crv = verb.geom.NurbsCurve.byKnotsControlPointsWeights(degree, knots, controlPoints, weights);
+
+		var pt = [5,0,0];
+		var res = crv.closestParam( pt );
+		var p = crv.point( res );
+
+		vecShouldBe([5,0,0], p, 1e-3);
+	});
 });
 
 describe("verb.geom.NurbsCurve.split", () => {
@@ -1044,6 +1059,36 @@ describe("verb.geom.NurbsSurface.closestParam", () => {
 			vecShouldBe( [0.5, 0.5], d );
 			done();
 		});
+	});
+
+	it('is correct for basic case of degree 1 in both directions', function() {
+		var degreeU = 1
+			, degreeV = 1
+			, knotsU = [0, 0, 1, 1]
+			, knotsV =	[0, 0, 1, 1]
+			, controlPoints = [ 	[ [0, 0, 0], 	[10, 0, 0] 	],
+									[ [0, 20, 0], 	[10, 20, 0]	] ]
+			, weights = [ 	[ 1, 1 ],
+							[ 1, 1 ] ]
+			, surface = verb.geom.NurbsSurface.byKnotsControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
+
+		var d = surface.closestParam( [ 5, 10, 1] );
+		vecShouldBe( [0.5, 0.5], d );
+	});
+
+	it('is correct for basic case of degree 1 in one direction', function() {
+		var degreeU = 1
+			, degreeV = 2
+			, knotsU = [0, 0, 1, 1]
+			, knotsV =	[0, 0, 0, 1, 1, 1]
+			, controlPoints = [ 	[ [0, 0, 0], 	[5, 0, 0],	[10, 0, 0] 	],
+									[ [0, 20, 0], 	[5, 20, 0],	[10, 20, 0]	] ]
+			, weights = [ 	[ 1, 1, 1],
+							[ 1, 1, 1 ] ]
+			, surface = verb.geom.NurbsSurface.byKnotsControlPointsWeights( degreeU, degreeV, knotsU, knotsV, controlPoints, weights );
+
+		var d = surface.closestParam( [ 5, 10, 1] );
+		vecShouldBe( [0.5, 0.5], d );
 	});
 });
 

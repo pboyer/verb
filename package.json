@@ -1,6 +1,6 @@
 {
   "name": "verb-nurbs",
-  "version": "2.0.0",
+  "version": "2.0.2",
   "author": "pboyer <peter.b.boyer@gmail.com>",
   "description": "A CAD library for the web",
   "repository": {
@@ -11,24 +11,30 @@
     "test": "grunt -v test"
   },
   "engine": "node 4.2.1",
+  "main": "build/js/verb.js",
   "keywords": [
     "NURBS",
     "geometry",
-    "cad"
+    "cad",
+    "surface",
+    "curve", 
+    "spline",
+    "mesh"
   ],
+  "dependencies": {
+      "webworker-threads": "0.7.8"
+  },
   "devDependencies": {
     "benchmark": "^1.0.0",
     "grunt": "0.4.5",
     "grunt-benchmark": "^0.3.0",
     "grunt-contrib-concat": "0.5.1",
     "grunt-contrib-uglify": "0.9.1",
-    "grunt-docco": "0.3.3",
     "grunt-haxe": "^0.1.13",
     "grunt-mocha-test": "^0.12.7",
     "grunt-text-replace": "^0.4.0",
     "mocha": "^2.2.4",
     "should": "6.0.1",
-    "webworker-threads": "0.6.2",
     "tess2": "^1.0.0"
   },
   "license": "MIT"

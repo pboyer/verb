@@ -3,9 +3,9 @@ node_js:
    - "4.2.1"
 before_install:
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
-  - sudo apt-get update -qq                             # run update before installing anything
+  - sudo apt-get update -qq                            # run update before installing anything
   - sudo apt-get install python-software-properties -y # for the next command
-  - sudo add-apt-repository ppa:eyecreate/haxe -y      # add the ubuntu ppa that contains haxe
+  - sudo add-apt-repository ppa:haxe/releases -y       # add the ubuntu ppa that contains haxe
   - sudo apt-get update                                # pull info from ppa
   - sudo apt-get install haxe -y                       # install haxe (and neko)
   - npm install -g grunt-cli

@@ -4404,7 +4404,7 @@ verb_eval_Eval.curveDerivativesGivenN = function(n,curve,u,numDerivs) {
 	var dim = controlPoints[0].length;
 	var du;
 	if(numDerivs < degree) du = numDerivs; else du = degree;
-	var CK = verb_core_Vec.zeros2d(du + 1,dim);
+	var CK = verb_core_Vec.zeros2d(numDerivs + 1,dim);
 	var knotSpan_index = verb_eval_Eval.knotSpanGivenN(n,degree,u,knots);
 	var nders = verb_eval_Eval.derivativeBasisFunctionsGivenNI(knotSpan_index,u,degree,du,knots);
 	var k = 0;

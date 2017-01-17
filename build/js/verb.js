@@ -21,22 +21,27 @@
         g.verb = f()
     }
 })(function(){
-
     var verb = {};
 
+    var global = this;
+
+    var isBrowser = new Function("try {return this===window;}catch(e){ return false;}");
+    var isNode=new Function("try {return this===global;}catch(e){return false;}");
+    var isWebworker=new Function("try {return typeof importScripts === 'function';}catch(e){return false;}");
+
     // node.js context, but not WebWorker
-    if ( typeof window !== 'object' && typeof require === "function"){
+    if ( isNode() && !isWebworker() ){
+        console.log(typeof window);
         Worker = require('webworker-threads').Worker;
     }
 
     // WebWorker or node.js context
-    if ( typeof window !== 'object' ){
+    if ( isNode() || isWebworker() ){
 
-        var global = this;
         var window = global; // required for promhx
 
         // WebWorker
-        if ( typeof importScripts === "function"){
+        if ( isWebworker() ){
 
             var lookup = function(className, methodName){
 
@@ -4473,7 +4478,7 @@ verb_eval_Eval.curveDerivativesGivenN = function(n,curve,u,numDerivs) {
 	var dim = controlPoints[0].length;
 	var du;
 	if(numDerivs < degree) du = numDerivs; else du = degree;
-	var CK = verb_core_Vec.zeros2d(du + 1,dim);
+	var CK = verb_core_Vec.zeros2d(numDerivs + 1,dim);
 	var knotSpan_index = verb_eval_Eval.knotSpanGivenN(n,degree,u,knots);
 	var nders = verb_eval_Eval.derivativeBasisFunctionsGivenNI(knotSpan_index,u,degree,du,knots);
 	var k = 0;
