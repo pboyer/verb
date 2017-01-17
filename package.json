@@ -1,6 +1,6 @@
 {
   "name": "verb-nurbs",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "author": "pboyer <peter.b.boyer@gmail.com>",
   "description": "A CAD library for the web",
   "repository": {
@@ -15,10 +15,14 @@
   "keywords": [
     "NURBS",
     "geometry",
-    "cad"
+    "cad",
+    "surface",
+    "curve", 
+    "spline",
+    "mesh"
   ],
   "dependencies": {
-      "webworker-threads": "0.6.2"
+      "webworker-threads": "0.7.8"
   },
   "devDependencies": {
     "benchmark": "^1.0.0",
@@ -26,7 +30,6 @@
     "grunt-benchmark": "^0.3.0",
     "grunt-contrib-concat": "0.5.1",
     "grunt-contrib-uglify": "0.9.1",
-    "grunt-docco": "0.3.3",
     "grunt-haxe": "^0.1.13",
     "grunt-mocha-test": "^0.12.7",
     "grunt-text-replace": "^0.4.0",
