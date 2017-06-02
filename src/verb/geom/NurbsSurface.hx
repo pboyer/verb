@@ -41,7 +41,7 @@ class NurbsSurface extends SerializableBase implements ISurface {
     //* A new NurbsSurface
 
     public function new( data : NurbsSurfaceData ) {
-        _data = Check.isValidNurbsSurfaceData(data);
+        _data = Check.isValidNurbsSurfaceData( data );
     }
 
 
@@ -60,13 +60,13 @@ class NurbsSurface extends SerializableBase implements ISurface {
     //
     //* A new NurbsSurface
 
-    public static function byKnotsControlPointsWeights(degreeU : Int,
-                                                       degreeV : Int,
-                                                       knotsU : KnotArray,
-                                                       knotsV : KnotArray,
-                                                       controlPoints : Array<Array<Point>>,
-                                                       weights : Array<Array<Float>> = null ) : NurbsSurface {
-        return new NurbsSurface( new NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, Eval.homogenize2d(controlPoints, weights) ) );
+    public static function byKnotsControlPointsWeights( degreeU : Int,
+                                                        degreeV : Int,
+                                                        knotsU : KnotArray,
+                                                        knotsV : KnotArray,
+                                                        controlPoints : Array<Array<Point>>,
+                                                        weights : Array<Array<Float>> = null ) : NurbsSurface {
+        return new NurbsSurface( new NurbsSurfaceData( degreeU, degreeV, knotsU, knotsV, Eval.homogenize2d( controlPoints, weights ) ) );
     }
 
     //Construct a NurbsSurface from four perimeter points in counter-clockwise order
@@ -97,7 +97,7 @@ class NurbsSurface extends SerializableBase implements ISurface {
     //* A new NurbsSurface
 
     public static function byLoftingCurves( curves : Array<ICurve>, degreeV : Int = null ) : NurbsSurface {
-        return new NurbsSurface( Make.loftedSurface([for (c in curves) c.asNurbs() ], degreeV ));
+        return new NurbsSurface( Make.loftedSurface( [for ( c in curves ) c.asNurbs( ) ], degreeV ));
     }
 
     //underlying serializable, data object
@@ -107,27 +107,27 @@ class NurbsSurface extends SerializableBase implements ISurface {
 
     //The degree in the U direction
 
-    public function degreeU() : Int { return _data.degreeU; }
+    public function degreeU( ) : Int { return _data.degreeU; }
 
     //The degree in the V direction
 
-    public function degreeV() : Int { return _data.degreeV; }
+    public function degreeV( ) : Int { return _data.degreeV; }
 
     //The knot array in the U direction
 
-    public function knotsU() : Array<Float> { return _data.knotsU.slice(0); }
+    public function knotsU( ) : Array<Float> { return _data.knotsU.slice( 0 ); }
 
     //The knot array in the V direction
 
-    public function knotsV() : Array<Float> { return _data.knotsV.slice(0); }
+    public function knotsV( ) : Array<Float> { return _data.knotsV.slice( 0 ); }
 
     //Two dimensional array of points
 
-    public function controlPoints() : Array<Array<Point>> { return Eval.dehomogenize2d(_data.controlPoints); }
+    public function controlPoints( ) : Array<Array<Point>> { return Eval.dehomogenize2d( _data.controlPoints ); }
 
     //Two dimensional array of weight values
 
-    public function weights() : Array<Point> { return Eval.weight2d(_data.controlPoints); }
+    public function weights( ) : Array<Point> { return Eval.weight2d( _data.controlPoints ); }
 
     //Obtain a copy of the underlying data structure for the Surface. Used with verb.core.
     //
@@ -135,8 +135,8 @@ class NurbsSurface extends SerializableBase implements ISurface {
     //
     //* A new NurbsSurfaceData object
 
-    public function asNurbs() : NurbsSurfaceData {
-        return new NurbsSurfaceData( degreeU(), degreeV(), knotsU(), knotsV(), Eval.homogenize2d( controlPoints(), weights() ));
+    public function asNurbs( ) : NurbsSurfaceData {
+        return new NurbsSurfaceData( degreeU( ), degreeV( ), knotsU( ), knotsV( ), Eval.homogenize2d( controlPoints( ), weights( ) ));
     }
 
     //Obtain a copy of the Surface
@@ -145,8 +145,8 @@ class NurbsSurface extends SerializableBase implements ISurface {
     //
     //* A new NurbsSurface
 
-    public function clone() : NurbsSurface {
-        return new NurbsSurface( asNurbs() );
+    public function clone( ) : NurbsSurface {
+        return new NurbsSurface( asNurbs( ) );
     }
 
     //The parametric domain in the U direction
@@ -155,8 +155,8 @@ class NurbsSurface extends SerializableBase implements ISurface {
     //
     //* An Interval object with min and max property
 
-    public function domainU() : Interval<Float> {
-        return new Interval( _data.knotsU.first(), _data.knotsU.last());
+    public function domainU( ) : Interval<Float> {
+        return new Interval( _data.knotsU.first( ), _data.knotsU.last( ));
     }
 
     //The parametric domain in the V direction
@@ -165,8 +165,8 @@ class NurbsSurface extends SerializableBase implements ISurface {
     //
     //* An Interval object with min and max property
 
-    public function domainV() : Interval<Float> {
-        return new Interval( _data.knotsV.first(), _data.knotsV.last());
+    public function domainV( ) : Interval<Float> {
+        return new Interval( _data.knotsV.first( ), _data.knotsV.last( ));
     }
 
     //Obtain a point on the surface at the given parameter
@@ -291,16 +291,16 @@ class NurbsSurface extends SerializableBase implements ISurface {
 
     public function split( u : Float, useV : Bool = false ) : Array<NurbsSurface> {
         return Divide.surfaceSplit( _data, u, useV )
-            .map(function(x){ return new NurbsSurface(x); });
+        .map( function( x ) { return new NurbsSurface(x); } );
     }
 
     //The async version of `split`
 
     public function splitAsync( u : Float, useV : Bool = false ) : Promise<Array<NurbsSurface>> {
         return Dispatcher.dispatchMethod( Divide, 'surfaceSplit', [ _data, u, useV ] )
-            .then(function(s){
-                return s.map(function(x){ return new NurbsSurface(x); });
-            });
+        .then( function( s ) {
+            return s.map( function( x ) { return new NurbsSurface(x); } );
+        } );
     }
 
     //Reverse the parameterization of the curve
@@ -320,8 +320,8 @@ class NurbsSurface extends SerializableBase implements ISurface {
     //The async version of `reverse`
 
     public function reverseAsync( useV : Bool = false ) : Promise<NurbsSurface> {
-        return Dispatcher.dispatchMethod( Modify, 'surfaceReverse', [ _data, useV ])
-            .then(function(c){ return new NurbsSurface(c); });
+        return Dispatcher.dispatchMethod( Modify, 'surfaceReverse', [ _data, useV ] )
+        .then( function( c ) { return new NurbsSurface(c); } );
     }
 
     //Extract an isocurve from a surface
@@ -343,7 +343,7 @@ class NurbsSurface extends SerializableBase implements ISurface {
 
     public function isocurveAsync( u : Float, useV : Bool = false ) : Promise<NurbsCurve> {
         return Dispatcher.dispatchMethod( Make, 'surfaceIsocurve', [ _data, u, useV ] )
-            .then(function(x){ return new NurbsCurve(x); });
+        .then( function( x ) { return new NurbsCurve(x); } );
     }
 
     //Extract the boundary curves from a surface
@@ -352,17 +352,17 @@ class NurbsSurface extends SerializableBase implements ISurface {
     //
     //* an array containing 4 elements, first 2 curves in the V direction, then 2 curves in the U direction
 
-    public function boundaries( options : AdaptiveRefinementOptions = null) : Array<NurbsCurve> {
-        return Make.surfaceBoundaryCurves( _data ).map(function(x){ return new NurbsCurve(x); });
+    public function boundaries( options : AdaptiveRefinementOptions = null ) : Array<NurbsCurve> {
+        return Make.surfaceBoundaryCurves( _data ).map( function( x ) { return new NurbsCurve(x); } );
     }
 
     //The async version of `boundaries`
 
     public function boundariesAsync( options : AdaptiveRefinementOptions = null ) : Promise<Array<NurbsCurve>> {
         return Dispatcher.dispatchMethod( Make, 'surfaceBoundaryCurves', [ _data ] )
-            .then(function(cs : Array<NurbsCurveData>){
-                return cs.map(function(x){ return new NurbsCurve(x); });
-            });
+        .then( function( cs : Array<NurbsCurveData> ) {
+            return cs.map( function( x ) { return new NurbsCurve(x); } );
+        } );
 
     }
 
@@ -376,14 +376,14 @@ class NurbsSurface extends SerializableBase implements ISurface {
     //
     //* A MeshData object
 
-    public function tessellate( options : AdaptiveRefinementOptions = null) : MeshData {
+    public function tessellate( options : AdaptiveRefinementOptions = null ) : MeshData {
         return Tess.rationalSurfaceAdaptive( _data, options );
     }
 
     //The async version of `boundaries`
 
     public function tessellateAsync( options : AdaptiveRefinementOptions = null ) : Promise<MeshData> {
-        return Dispatcher.dispatchMethod( Tess, 'rationalSurfaceAdaptive', [ _data,  options ] );
+        return Dispatcher.dispatchMethod( Tess, 'rationalSurfaceAdaptive', [ _data, options ] );
     }
 
     //Transform a Surface with the given matrix.
@@ -403,7 +403,7 @@ class NurbsSurface extends SerializableBase implements ISurface {
     //The async version of `transform`
 
     public function transformAsync( mat : Matrix ) : Promise<NurbsSurface> {
-        return Dispatcher.dispatchMethod( Modify, 'rationalSurfaceTransform', [ _data,  mat ] )
-            .then(function(x){ return new NurbsSurface(x); });
+        return Dispatcher.dispatchMethod( Modify, 'rationalSurfaceTransform', [ _data, mat ] )
+        .then( function( x ) { return new NurbsSurface(x); } );
     }
 }

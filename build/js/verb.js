@@ -1942,7 +1942,7 @@ var verb_Verb = function() { };
 $hxClasses["verb.Verb"] = verb_Verb;
 verb_Verb.__name__ = ["verb","Verb"];
 verb_Verb.main = function() {
-	console.log("verb 2.0.0");
+	console.log("verb 2.1.0");
 };
 var verb_core_ArrayExtensions = function() { };
 $hxClasses["verb.core.ArrayExtensions"] = verb_core_ArrayExtensions;
@@ -3476,6 +3476,55 @@ verb_core_Vec.addAll = function(a) {
 		return verb_core_Vec.add(a1,x);
 	},verb_core_Vec.rep(f,0.0));
 };
+verb_core_Vec.addAllMutate = function(a) {
+	var f = a[0];
+	var _g1 = 1;
+	var _g = a.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		verb_core_Vec.addMutate(f,a[i]);
+	}
+};
+verb_core_Vec.addMulMutate = function(a,s,b) {
+	var _g1 = 0;
+	var _g = a.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		a[i] = a[i] + s * b[i];
+	}
+};
+verb_core_Vec.subMulMutate = function(a,s,b) {
+	var _g1 = 0;
+	var _g = a.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		a[i] = a[i] - s * b[i];
+	}
+};
+verb_core_Vec.addMutate = function(a,b) {
+	var _g1 = 0;
+	var _g = a.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		a[i] = a[i] + b[i];
+	}
+};
+verb_core_Vec.subMutate = function(a,b) {
+	var _g1 = 0;
+	var _g = a.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		a[i] = a[i] - b[i];
+	}
+};
+verb_core_Vec.mulMutate = function(a,b) {
+	var _g1 = 0;
+	var _g = b.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		b[i] = b[i] * a;
+	}
+};
 verb_core_Vec.norm = function(a) {
 	var norm2 = verb_core_Vec.normSquared(a);
 	if(norm2 != 0.0) return Math.sqrt(norm2); else return norm2;
@@ -3750,11 +3799,12 @@ verb_eval_Analyze.rationalCurveClosestParam = function(curve,p) {
 	var _g = pts.length - 1;
 	while(_g1 < _g) {
 		var i1 = _g1++;
-		var u0 = pts[i1][0];
-		var u11 = pts[i1 + 1][0];
-		var p0 = pts[i1].slice(1);
-		var p1 = pts[i1 + 1].slice(1);
-		var proj = verb_core_Trig.segmentClosestPoint(p,p0,p1,u0,u11);
+		var u0 = pts[i1].pop();
+		var u11 = pts[i1 + 1].pop();
+		var p0 = pts[i1];
+		var p01 = pts[i1];
+		var p1 = pts[i1 + 1];
+		var proj = verb_core_Trig.segmentClosestPoint(p,p01,p1,u0,u11);
 		var d1 = verb_core_Vec.norm(verb_core_Vec.sub(p,proj.pt));
 		if(d1 < min) {
 			min = d1;
@@ -4083,23 +4133,24 @@ verb_eval_Eval.rationalSurfaceDerivatives = function(surface,u,v,numDerivs) {
 			var _g4 = l + 1;
 			while(_g5 < _g4) {
 				var j = _g5++;
-				v1 = verb_core_Vec.sub(v1,verb_core_Vec.mul(verb_core_Binomial.get(l,j) * wders[0][j],SKL[k][l - j]));
+				verb_core_Vec.subMulMutate(v1,verb_core_Binomial.get(l,j) * wders[0][j],SKL[k][l - j]);
 			}
 			var _g51 = 1;
 			var _g41 = k + 1;
 			while(_g51 < _g41) {
 				var i = _g51++;
-				v1 = verb_core_Vec.sub(v1,verb_core_Vec.mul(verb_core_Binomial.get(k,i) * wders[i][0],SKL[k - i][l]));
+				verb_core_Vec.subMulMutate(v1,verb_core_Binomial.get(k,i) * wders[i][0],SKL[k - i][l]);
 				var v2 = verb_core_Vec.zeros1d(dim);
 				var _g7 = 1;
 				var _g6 = l + 1;
 				while(_g7 < _g6) {
 					var j1 = _g7++;
-					v2 = verb_core_Vec.add(v2,verb_core_Vec.mul(verb_core_Binomial.get(l,j1) * wders[i][j1],SKL[k - i][l - j1]));
+					verb_core_Vec.addMulMutate(v2,verb_core_Binomial.get(l,j1) * wders[i][j1],SKL[k - i][l - j1]);
 				}
-				v1 = verb_core_Vec.sub(v1,verb_core_Vec.mul(verb_core_Binomial.get(k,i),v2));
+				verb_core_Vec.subMulMutate(v1,verb_core_Binomial.get(k,i),v2);
 			}
-			SKL[k].push(verb_core_Vec.mul(1 / wders[0][0],v1));
+			verb_core_Vec.mulMutate(1 / wders[0][0],v1);
+			SKL[k].push(v1);
 		}
 	}
 	return SKL;
@@ -4124,9 +4175,10 @@ verb_eval_Eval.rationalCurveDerivatives = function(curve,u,numDerivs) {
 		var _g2 = k1 + 1;
 		while(_g3 < _g2) {
 			var i1 = _g3++;
-			v = verb_core_Vec.sub(v,verb_core_Vec.mul(verb_core_Binomial.get(k1,i1) * wders[i1],CK[k1 - i1]));
+			verb_core_Vec.subMulMutate(v,verb_core_Binomial.get(k1,i1) * wders[i1],CK[k1 - i1]);
 		}
-		CK.push(verb_core_Vec.mul(1 / wders[0],v));
+		verb_core_Vec.mulMutate(1 / wders[0],v);
+		CK.push(v);
 	}
 	return CK;
 };
@@ -4150,7 +4202,7 @@ verb_eval_Eval.surfaceDerivativesGivenNM = function(n,m,surface,u,v,numDerivs) {
 	if(numDerivs < degreeU) du = numDerivs; else du = degreeU;
 	var dv;
 	if(numDerivs < degreeV) dv = numDerivs; else dv = degreeV;
-	var SKL = verb_core_Vec.zeros3d(numDerivs + 1,numDerivs + 1,dim);
+	var SKL = verb_core_Vec.zeros3d(du + 1,dv + 1,dim);
 	var knotSpan_index_u = verb_eval_Eval.knotSpanGivenN(n,degreeU,u,knotsU);
 	var knotSpan_index_v = verb_eval_Eval.knotSpanGivenN(m,degreeV,v,knotsV);
 	var uders = verb_eval_Eval.derivativeBasisFunctionsGivenNI(knotSpan_index_u,u,degreeU,n,knotsU);
@@ -4170,7 +4222,7 @@ verb_eval_Eval.surfaceDerivativesGivenNM = function(n,m,surface,u,v,numDerivs) {
 			var _g4 = degreeU + 1;
 			while(_g5 < _g4) {
 				var r = _g5++;
-				temp[s] = verb_core_Vec.add(temp[s],verb_core_Vec.mul(uders[k][r],controlPoints[knotSpan_index_u - degreeU + r][knotSpan_index_v - degreeV + s]));
+				verb_core_Vec.addMulMutate(temp[s],uders[k][r],controlPoints[knotSpan_index_u - degreeU + r][knotSpan_index_v - degreeV + s]);
 			}
 		}
 		var nk = numDerivs - k;
@@ -4184,7 +4236,7 @@ verb_eval_Eval.surfaceDerivativesGivenNM = function(n,m,surface,u,v,numDerivs) {
 			var _g41 = degreeV + 1;
 			while(_g51 < _g41) {
 				var s1 = _g51++;
-				SKL[k][l] = verb_core_Vec.add(SKL[k][l],verb_core_Vec.mul(vders[l][s1],temp[s1]));
+				verb_core_Vec.addMulMutate(SKL[k][l],vders[l][s1],temp[s1]);
 			}
 		}
 	}
@@ -4221,11 +4273,198 @@ verb_eval_Eval.surfacePointGivenNM = function(n,m,surface,u,v) {
 		var _g2 = degreeU + 1;
 		while(_g3 < _g2) {
 			var k = _g3++;
-			temp = verb_core_Vec.add(temp,verb_core_Vec.mul(u_basis_vals[k],controlPoints[uind + k][vind]));
+			verb_core_Vec.addMulMutate(temp,u_basis_vals[k],controlPoints[uind + k][vind]);
 		}
-		position = verb_core_Vec.add(position,verb_core_Vec.mul(v_basis_vals[l],temp));
+		verb_core_Vec.addMulMutate(position,v_basis_vals[l],temp);
 	}
 	return position;
+};
+verb_eval_Eval.rationalSurfaceRegularSampleDerivatives = function(surface,divsU,divsV,numDerivs) {
+	var allders = verb_eval_Eval.surfaceRegularSampleDerivatives(surface,divsU,divsV,numDerivs);
+	var allratders = [];
+	var divsU1 = divsU + 1;
+	var divsV1 = divsV + 1;
+	var numDerivs1 = numDerivs + 1;
+	var _g = 0;
+	while(_g < divsU1) {
+		var i = _g++;
+		var rowders = [];
+		allratders.push(rowders);
+		var _g1 = 0;
+		while(_g1 < divsV1) {
+			var j = _g1++;
+			var ders = allders[i][j];
+			var Aders = verb_eval_Eval.rational2d(ders);
+			var wders = verb_eval_Eval.weight2d(ders);
+			var SKL = [];
+			var dim = Aders[0][0].length;
+			var _g2 = 0;
+			while(_g2 < numDerivs1) {
+				var k = _g2++;
+				SKL.push([]);
+				var _g4 = 0;
+				var _g3 = numDerivs1 - k;
+				while(_g4 < _g3) {
+					var l = _g4++;
+					var v = Aders[k][l];
+					var _g6 = 1;
+					var _g5 = l + 1;
+					while(_g6 < _g5) {
+						var j1 = _g6++;
+						verb_core_Vec.subMulMutate(v,verb_core_Binomial.get(l,j1) * wders[0][j1],SKL[k][l - j1]);
+					}
+					var _g61 = 1;
+					var _g51 = k + 1;
+					while(_g61 < _g51) {
+						var i1 = _g61++;
+						verb_core_Vec.subMulMutate(v,verb_core_Binomial.get(k,i1) * wders[i1][0],SKL[k - i1][l]);
+						var v2 = verb_core_Vec.zeros1d(dim);
+						var _g8 = 1;
+						var _g7 = l + 1;
+						while(_g8 < _g7) {
+							var j2 = _g8++;
+							verb_core_Vec.addMulMutate(v2,verb_core_Binomial.get(l,j2) * wders[i1][j2],SKL[k - i1][l - j2]);
+						}
+						verb_core_Vec.subMulMutate(v,verb_core_Binomial.get(k,i1),v2);
+					}
+					verb_core_Vec.mulMutate(1 / wders[0][0],v);
+					SKL[k].push(v);
+				}
+			}
+			rowders.push(SKL);
+		}
+	}
+	return allratders;
+};
+verb_eval_Eval.surfaceRegularSampleDerivatives = function(surface,divsU,divsV,numDerivs) {
+	var degreeU = surface.degreeU;
+	var degreeV = surface.degreeV;
+	var controlPoints = surface.controlPoints;
+	var knotsU = surface.knotsU;
+	var knotsV = surface.knotsV;
+	var dim = controlPoints[0][0].length;
+	var spanU = (verb_core_ArrayExtensions.last(knotsU) - knotsU[0]) / divsU;
+	var spanV = (verb_core_ArrayExtensions.last(knotsV) - knotsV[0]) / divsV;
+	var knotSpansBasesU = verb_eval_Eval.regularlySpacedDerivativeBasisFunctions(degreeU,knotsU,divsU);
+	var knotSpansU = knotSpansBasesU.item0;
+	var basesU = knotSpansBasesU.item1;
+	var knotSpansBasesV = verb_eval_Eval.regularlySpacedDerivativeBasisFunctions(degreeV,knotsV,divsV);
+	var knotSpansV = knotSpansBasesV.item0;
+	var basesV = knotSpansBasesV.item1;
+	var pts = [];
+	var divsU1 = divsU + 1;
+	var divsV1 = divsV + 1;
+	var _g = 0;
+	while(_g < divsU1) {
+		var i = _g++;
+		var ptsi = [];
+		pts.push(ptsi);
+		var _g1 = 0;
+		while(_g1 < divsV1) {
+			var j = _g1++;
+			ptsi.push(verb_eval_Eval.surfaceDerivativesGivenBasesKnotSpans(degreeU,degreeV,controlPoints,knotSpansU[i],knotSpansV[j],basesU[i],basesV[j],dim,numDerivs));
+		}
+	}
+	return pts;
+};
+verb_eval_Eval.regularlySpacedBasisFunctions = function(degree,knots,divs) {
+	var n = knots.length - degree - 2;
+	var span = (verb_core_ArrayExtensions.last(knots) - knots[0]) / divs;
+	var bases = [];
+	var knotspans = [];
+	var u = knots[0];
+	var knotIndex = verb_eval_Eval.knotSpanGivenN(n,degree,u,knots);
+	var div1 = divs + 1;
+	var _g = 0;
+	while(_g < div1) {
+		var i = _g++;
+		while(u >= knots[knotIndex + 1]) knotIndex++;
+		knotspans.push(knotIndex);
+		bases.push(verb_eval_Eval.basisFunctionsGivenKnotSpanIndex(knotIndex,u,degree,knots));
+		u += span;
+	}
+	return new verb_core_Pair(knotspans,bases);
+};
+verb_eval_Eval.regularlySpacedDerivativeBasisFunctions = function(degree,knots,divs) {
+	var n = knots.length - degree - 2;
+	var span = (verb_core_ArrayExtensions.last(knots) - knots[0]) / divs;
+	var bases = [];
+	var knotspans = [];
+	var u = knots[0];
+	var knotIndex = verb_eval_Eval.knotSpanGivenN(n,degree,u,knots);
+	var div1 = divs + 1;
+	var _g = 0;
+	while(_g < div1) {
+		var i = _g++;
+		while(u >= knots[knotIndex + 1]) knotIndex++;
+		knotspans.push(knotIndex);
+		bases.push(verb_eval_Eval.derivativeBasisFunctionsGivenNI(knotIndex,u,degree,n,knots));
+		u += span;
+	}
+	return new verb_core_Pair(knotspans,bases);
+};
+verb_eval_Eval.surfacePointGivenBasesKnotSpans = function(degreeU,degreeV,controlPoints,knotSpanU,knotSpanV,basesU,basesV,dim) {
+	var position = verb_core_Vec.zeros1d(dim);
+	var temp;
+	var uind = knotSpanU - degreeU;
+	var vind = knotSpanV - degreeV;
+	var _g1 = 0;
+	var _g = degreeV + 1;
+	while(_g1 < _g) {
+		var l = _g1++;
+		temp = verb_core_Vec.zeros1d(dim);
+		var _g3 = 0;
+		var _g2 = degreeU + 1;
+		while(_g3 < _g2) {
+			var k = _g3++;
+			verb_core_Vec.addMulMutate(temp,basesU[k],controlPoints[uind + k][vind]);
+		}
+		vind++;
+		verb_core_Vec.addMulMutate(position,basesV[l],temp);
+	}
+	return position;
+};
+verb_eval_Eval.surfaceDerivativesGivenBasesKnotSpans = function(degreeU,degreeV,controlPoints,knotSpanU,knotSpanV,basesU,basesV,dim,numDerivs) {
+	var dim1 = controlPoints[0][0].length;
+	var du;
+	if(numDerivs < degreeU) du = numDerivs; else du = degreeU;
+	var dv;
+	if(numDerivs < degreeV) dv = numDerivs; else dv = degreeV;
+	var SKL = verb_core_Vec.zeros3d(du + 1,dv + 1,dim1);
+	var temp = verb_core_Vec.zeros2d(degreeV + 1,dim1);
+	var dd = 0;
+	var _g1 = 0;
+	var _g = du + 1;
+	while(_g1 < _g) {
+		var k = _g1++;
+		var _g3 = 0;
+		var _g2 = degreeV + 1;
+		while(_g3 < _g2) {
+			var s = _g3++;
+			temp[s] = verb_core_Vec.zeros1d(dim1);
+			var _g5 = 0;
+			var _g4 = degreeU + 1;
+			while(_g5 < _g4) {
+				var r = _g5++;
+				verb_core_Vec.addMulMutate(temp[s],basesU[k][r],controlPoints[knotSpanU - degreeU + r][knotSpanV - degreeV + s]);
+			}
+		}
+		var nk = numDerivs - k;
+		if(nk < dv) dd = nk; else dd = dv;
+		var _g31 = 0;
+		var _g21 = dd + 1;
+		while(_g31 < _g21) {
+			var l = _g31++;
+			SKL[k][l] = verb_core_Vec.zeros1d(dim1);
+			var _g51 = 0;
+			var _g41 = degreeV + 1;
+			while(_g51 < _g41) {
+				var s1 = _g51++;
+				verb_core_Vec.addMulMutate(SKL[k][l],basesV[l][s1],temp[s1]);
+			}
+		}
+	}
+	return SKL;
 };
 verb_eval_Eval.curveDerivatives = function(crv,u,numDerivs) {
 	var n = crv.knots.length - crv.degree - 2;
@@ -4252,7 +4491,7 @@ verb_eval_Eval.curveDerivativesGivenN = function(n,curve,u,numDerivs) {
 		var _g2 = degree + 1;
 		while(_g3 < _g2) {
 			var j1 = _g3++;
-			CK[k1] = verb_core_Vec.add(CK[k1],verb_core_Vec.mul(nders[k1][j1],controlPoints[knotSpan_index - degree + j1]));
+			verb_core_Vec.addMulMutate(CK[k1],nders[k1][j1],controlPoints[knotSpan_index - degree + j1]);
 		}
 	}
 	return CK;
@@ -4279,7 +4518,7 @@ verb_eval_Eval.curvePointGivenN = function(n,curve,u) {
 	var _g = degree + 1;
 	while(_g1 < _g) {
 		var j = _g1++;
-		position = verb_core_Vec.add(position,verb_core_Vec.mul(basis_values[j],controlPoints[knotSpan_index - degree + j]));
+		verb_core_Vec.addMulMutate(position,basis_values[j],controlPoints[knotSpan_index - degree + j]);
 	}
 	return position;
 };
@@ -4325,11 +4564,11 @@ verb_eval_Eval.volumePointGivenNML = function(volume,n,m,l,u,v,w) {
 			var _g4 = degreeU + 1;
 			while(_g5 < _g4) {
 				var k = _g5++;
-				temp = verb_core_Vec.add(temp,verb_core_Vec.mul(u_basis_vals[k],controlPoints[uind + k][vind][wind]));
+				verb_core_Vec.addMulMutate(temp,u_basis_vals[k],controlPoints[uind + k][vind][wind]);
 			}
-			temp2 = verb_core_Vec.add(temp2,verb_core_Vec.mul(v_basis_vals[j],temp));
+			verb_core_Vec.addMulMutate(temp2,v_basis_vals[j],temp);
 		}
-		position = verb_core_Vec.add(position,verb_core_Vec.mul(w_basis_vals[i],temp2));
+		verb_core_Vec.addMulMutate(position,w_basis_vals[i],temp2);
 	}
 	return position;
 };
@@ -4339,7 +4578,7 @@ verb_eval_Eval.derivativeBasisFunctions = function(u,degree,knots) {
 	var n = m - degree - 1;
 	return verb_eval_Eval.derivativeBasisFunctionsGivenNI(knotSpan_index,u,degree,n,knots);
 };
-verb_eval_Eval.derivativeBasisFunctionsGivenNI = function(knotSpan_index,u,p,n,knots) {
+verb_eval_Eval.derivativeBasisFunctionsGivenNI = function(knotIndex,u,p,n,knots) {
 	var ndu = verb_core_Vec.zeros2d(p + 1,p + 1);
 	var left = verb_core_Vec.zeros1d(p + 1);
 	var right = verb_core_Vec.zeros1d(p + 1);
@@ -4350,8 +4589,8 @@ verb_eval_Eval.derivativeBasisFunctionsGivenNI = function(knotSpan_index,u,p,n,k
 	var _g = p + 1;
 	while(_g1 < _g) {
 		var j = _g1++;
-		left[j] = u - knots[knotSpan_index + 1 - j];
-		right[j] = knots[knotSpan_index + j] - u;
+		left[j] = u - knots[knotIndex + 1 - j];
+		right[j] = knots[knotIndex + j] - u;
 		saved = 0.0;
 		var _g2 = 0;
 		while(_g2 < j) {
@@ -5189,6 +5428,25 @@ verb_eval_Make.clonedCurve = function(curve) {
 		return x.slice();
 	}));
 };
+verb_eval_Make.clonedSurface = function(surface) {
+	var newpts = [];
+	var newrow;
+	var _g = 0;
+	var _g1 = surface.controlPoints;
+	while(_g < _g1.length) {
+		var row = _g1[_g];
+		++_g;
+		newrow = [];
+		newpts.push(newrow);
+		var _g2 = 0;
+		while(_g2 < row.length) {
+			var pt = row[_g2];
+			++_g2;
+			newrow.push(pt.slice());
+		}
+	}
+	return new verb_core_NurbsSurfaceData(surface.degreeU,surface.degreeV,surface.knotsU.slice(),surface.knotsV.slice(),newpts);
+};
 verb_eval_Make.rationalBezierCurve = function(controlPoints,weights) {
 	var degree = controlPoints.length - 1;
 	var knots = [];
@@ -5868,32 +6126,205 @@ verb_eval_Modify.rationalCurveTransform = function(curve,mat) {
 	return new verb_core_NurbsCurveData(curve.degree,curve.knots.slice(),verb_eval_Eval.homogenize1d(pts,verb_eval_Eval.weight1d(curve.controlPoints)));
 };
 verb_eval_Modify.surfaceKnotRefine = function(surface,knotsToInsert,useV) {
-	var newPts = [];
-	var knots;
+	if(knotsToInsert.length == 0) return verb_eval_Make.clonedSurface(surface);
 	var degree;
-	var ctrlPts;
-	if(!useV) {
-		ctrlPts = verb_core_Mat.transpose(surface.controlPoints);
-		knots = surface.knotsU;
-		degree = surface.degreeU;
-	} else {
-		ctrlPts = surface.controlPoints;
-		knots = surface.knotsV;
+	var controlPoints = surface.controlPoints;
+	var knots;
+	if(useV) {
 		degree = surface.degreeV;
+		knots = surface.knotsV;
+	} else {
+		degree = surface.degreeU;
+		knots = surface.knotsU;
 	}
-	var c = null;
+	var n;
+	if(useV) n = controlPoints[0].length - 1; else n = controlPoints.length - 1;
+	var m = n + degree + 1;
+	var r = knotsToInsert.length - 1;
+	var a = verb_eval_Eval.knotSpan(degree,knotsToInsert[0],knots);
+	var b = verb_eval_Eval.knotSpan(degree,knotsToInsert[r],knots);
+	var controlPoints_post = [];
+	var knots_post = [];
+	if(useV) {
+		var km = verb_eval_Analyze.knotMultiplicities(knotsToInsert);
+		var _g1 = 0;
+		var _g = controlPoints.length + km.length - 1;
+		while(_g1 < _g) {
+			var i1 = _g1++;
+			controlPoints_post.push([]);
+		}
+		var _g11 = 0;
+		var _g2 = a - degree + 1;
+		while(_g11 < _g2) {
+			var i2 = _g11++;
+			var _g3 = 0;
+			var _g21 = controlPoints.length;
+			while(_g3 < _g21) {
+				var j1 = _g3++;
+				controlPoints_post[j1][i2] = controlPoints[j1][i2];
+			}
+		}
+		var _g12 = b - 1;
+		var _g4 = n + 1;
+		while(_g12 < _g4) {
+			var i3 = _g12++;
+			var l = i3 + r + 1;
+			var _g31 = 0;
+			var _g22 = controlPoints.length;
+			while(_g31 < _g22) {
+				var j2 = _g31++;
+				controlPoints_post[j2][l] = controlPoints[j2][i3];
+			}
+		}
+	} else {
+		var _g13 = 0;
+		var _g5 = a - degree + 1;
+		while(_g13 < _g5) {
+			var i4 = _g13++;
+			controlPoints_post[i4] = controlPoints[i4].slice(0);
+		}
+		var _g14 = b - 1;
+		var _g6 = n + 1;
+		while(_g14 < _g6) {
+			var i5 = _g14++;
+			controlPoints_post[i5 + r + 1] = controlPoints[i5].slice(0);
+		}
+	}
+	var _g15 = 0;
+	var _g7 = a + 1;
+	while(_g15 < _g7) {
+		var i6 = _g15++;
+		knots_post[i6] = knots[i6];
+	}
+	var _g16 = b + degree;
+	var _g8 = m + 1;
+	while(_g16 < _g8) {
+		var i7 = _g16++;
+		knots_post[i7 + r + 1] = knots[i7];
+	}
+	var i = b + degree - 1;
+	var k = b + degree + r;
+	var j = r;
+	var ci;
+	while(j >= 0) {
+		while(knotsToInsert[j] <= knots[i] && i > a) {
+			var wi = k - degree - 1;
+			var xi = i - degree - 1;
+			if(useV) {
+				var _g17 = 0;
+				var _g9 = controlPoints_post.length;
+				while(_g17 < _g9) {
+					var ci1 = _g17++;
+					controlPoints_post[ci1][wi] = controlPoints[ci1][xi].slice(0);
+				}
+			} else controlPoints_post[wi] = controlPoints[xi].slice(0);
+			knots_post[k] = knots[i];
+			k = k - 1;
+			i = i - 1;
+		}
+		if(useV) {
+			var _g18 = 0;
+			var _g10 = controlPoints_post.length;
+			while(_g18 < _g10) {
+				var ci2 = _g18++;
+				controlPoints_post[ci2][k - degree - 1] = controlPoints_post[ci2][k - degree].slice(0);
+			}
+		} else controlPoints_post[k - degree - 1] = controlPoints_post[k - degree].slice(0);
+		var _g19 = 1;
+		var _g20 = degree + 1;
+		while(_g19 < _g20) {
+			var l1 = _g19++;
+			var ind = k - degree + l1;
+			var alfa = knots_post[k + l1] - knotsToInsert[j];
+			if(Math.abs(alfa) < verb_core_Constants.EPSILON) {
+				if(useV) {
+					var _g32 = 0;
+					var _g23 = controlPoints_post.length;
+					while(_g32 < _g23) {
+						var ci3 = _g32++;
+						controlPoints_post[ci3][ind - 1] = controlPoints_post[ci3][ind];
+					}
+				} else controlPoints_post[ind - 1] = controlPoints_post[ind].slice(0);
+			} else {
+				alfa = alfa / (knots_post[k + l1] - knots[i - degree + l1]);
+				if(useV) {
+					var _g33 = 0;
+					var _g24 = controlPoints_post.length;
+					while(_g33 < _g24) {
+						var wi1 = _g33++;
+						controlPoints_post[wi1][ind - 1] = verb_core_Vec.lerp(alfa,controlPoints_post[wi1][ind - 1],controlPoints_post[wi1][ind]);
+					}
+				} else {
+					var _g34 = 0;
+					var _g25 = controlPoints_post[ind].length;
+					while(_g34 < _g25) {
+						var wi2 = _g34++;
+						controlPoints_post[ind - 1][wi2] = verb_core_Vec.lerp(alfa,controlPoints_post[ind - 1][wi2],controlPoints_post[ind][wi2]);
+					}
+				}
+			}
+		}
+		knots_post[k] = knotsToInsert[j];
+		k = k - 1;
+		j--;
+	}
+	if(useV) return new verb_core_NurbsSurfaceData(surface.degreeU,surface.degreeV,surface.knotsU.slice(),knots_post,controlPoints_post); else return new verb_core_NurbsSurfaceData(surface.degreeU,surface.degreeV,knots_post,surface.knotsV.slice(),controlPoints_post);
+};
+verb_eval_Modify.decomposeSurfaceIntoBeziers = function(surface) {
+	var knotmultsU = verb_eval_Analyze.knotMultiplicities(surface.knotsU);
+	var reqMultU = surface.degreeU + 1;
 	var _g = 0;
-	while(_g < ctrlPts.length) {
-		var cptrow = ctrlPts[_g];
+	while(_g < knotmultsU.length) {
+		var knotmult = knotmultsU[_g];
 		++_g;
-		c = verb_eval_Modify.curveKnotRefine(new verb_core_NurbsCurveData(degree,knots,cptrow),knotsToInsert);
-		newPts.push(c.controlPoints);
+		if(knotmult.mult < reqMultU) {
+			var knotsInsert = verb_core_Vec.rep(reqMultU - knotmult.mult,knotmult.knot);
+			if(knotsInsert.length == 0) continue;
+			surface = verb_eval_Modify.surfaceKnotRefine(surface,knotsInsert,false);
+		}
 	}
-	var newknots = c.knots;
-	if(!useV) {
-		newPts = verb_core_Mat.transpose(newPts);
-		return new verb_core_NurbsSurfaceData(surface.degreeU,surface.degreeV,newknots,surface.knotsV.slice(),newPts);
-	} else return new verb_core_NurbsSurfaceData(surface.degreeU,surface.degreeV,surface.knotsU.slice(),newknots,newPts);
+	var knotmultsV = verb_eval_Analyze.knotMultiplicities(surface.knotsV);
+	var reqMultV = surface.degreeV + 1;
+	var _g1 = 0;
+	while(_g1 < knotmultsV.length) {
+		var knotmult1 = knotmultsV[_g1];
+		++_g1;
+		if(knotmult1.mult < reqMultV) {
+			var knotsInsert1 = verb_core_Vec.rep(reqMultV - knotmult1.mult,knotmult1.knot);
+			if(knotsInsert1.length == 0) continue;
+			surface = verb_eval_Modify.surfaceKnotRefine(surface,knotsInsert1,true);
+		}
+	}
+	var numU = surface.knotsU.length / reqMultU - 1;
+	var numV = surface.knotsV.length / reqMultV - 1;
+	var knotLengthU = reqMultU * 2;
+	var knotLengthV = reqMultV * 2;
+	var subSurfaces = [];
+	var i = 0;
+	while(i < surface.controlPoints.length) {
+		var row = [];
+		subSurfaces.push(row);
+		var ktsU = surface.knotsU.slice(i,i + knotLengthU);
+		var j = 0;
+		while(j < surface.controlPoints[i].length) {
+			var ktsV = surface.knotsV.slice(j,j + knotLengthV);
+			var pts = verb_eval_Modify.submatrix(surface.controlPoints,i,j,reqMultV,reqMultU);
+			row.push(new verb_core_NurbsSurfaceData(surface.degreeU,surface.degreeV,ktsU,ktsV,pts));
+			j += reqMultV;
+		}
+		i += reqMultU;
+	}
+	return subSurfaces;
+};
+verb_eval_Modify.submatrix = function(mat,startRow,startCol,rows,cols) {
+	var newmat = [];
+	var _g1 = startRow;
+	var _g = startRow + rows;
+	while(_g1 < _g) {
+		var i = _g1++;
+		newmat.push(mat[i].slice(startCol,startCol + cols));
+	}
+	return newmat;
 };
 verb_eval_Modify.decomposeCurveIntoBeziers = function(curve) {
 	var degree = curve.degree;
@@ -5907,6 +6338,7 @@ verb_eval_Modify.decomposeCurveIntoBeziers = function(curve) {
 		++_g;
 		if(knotmult.mult < reqMult) {
 			var knotsInsert = verb_core_Vec.rep(reqMult - knotmult.mult,knotmult.knot);
+			if(knotsInsert.length == 0) continue;
 			var res = verb_eval_Modify.curveKnotRefine(new verb_core_NurbsCurveData(degree,knots,controlPoints),knotsInsert);
 			knots = res.knots;
 			controlPoints = res.controlPoints;
@@ -5979,7 +6411,7 @@ verb_eval_Modify.curveKnotRefine = function(curve,knotsToInsert) {
 			var alfa = knots_post[k + l] - knotsToInsert[j];
 			if(Math.abs(alfa) < verb_core_Constants.EPSILON) controlPoints_post[ind - 1] = controlPoints_post[ind]; else {
 				alfa = alfa / (knots_post[k + l] - knots[i - degree + l]);
-				controlPoints_post[ind - 1] = verb_core_Vec.add(verb_core_Vec.mul(alfa,controlPoints_post[ind - 1]),verb_core_Vec.mul(1.0 - alfa,controlPoints_post[ind]));
+				controlPoints_post[ind - 1] = verb_core_Vec.lerp(alfa,controlPoints_post[ind - 1],controlPoints_post[ind]);
 			}
 		}
 		knots_post[k] = knotsToInsert[j];
@@ -6047,7 +6479,7 @@ verb_eval_Modify.curveKnotInsert = function(curve,u,r) {
 		while(_g31 < _g21) {
 			var i7 = _g31++;
 			alpha = (u - knots[L + i7]) / (knots[i7 + k + 1] - knots[L + i7]);
-			controlPoints_temp[i7] = verb_core_Vec.add(verb_core_Vec.mul(alpha,controlPoints_temp[i7 + 1]),verb_core_Vec.mul(1.0 - alpha,controlPoints_temp[i7]));
+			controlPoints_temp[i7] = verb_core_Vec.add(verb_core_Vec.mul(1.0 - alpha,controlPoints_temp[i7]),verb_core_Vec.mul(alpha,controlPoints_temp[i7 + 1]));
 		}
 		controlPoints_post[L] = controlPoints_temp[0];
 		controlPoints_post[k + r - j - s] = controlPoints_temp[degree - j - s];
@@ -6060,56 +6492,629 @@ verb_eval_Modify.curveKnotInsert = function(curve,u,r) {
 	}
 	return new verb_core_NurbsCurveData(degree,knots_post,controlPoints_post);
 };
+var verb_eval_NewMeshData = function() { };
+$hxClasses["verb.eval.NewMeshData"] = verb_eval_NewMeshData;
+verb_eval_NewMeshData.__name__ = ["verb","eval","NewMeshData"];
+verb_eval_NewMeshData.prototype = {
+	__class__: verb_eval_NewMeshData
+};
+var verb_eval_BezierEdgeIndices = function() {
+};
+$hxClasses["verb.eval.BezierEdgeIndices"] = verb_eval_BezierEdgeIndices;
+verb_eval_BezierEdgeIndices.__name__ = ["verb","eval","BezierEdgeIndices"];
+verb_eval_BezierEdgeIndices.prototype = {
+	__class__: verb_eval_BezierEdgeIndices
+};
+var verb_eval_EdgeSide = $hxClasses["verb.eval.EdgeSide"] = { __ename__ : ["verb","eval","EdgeSide"], __constructs__ : ["North","South","East","West"] };
+verb_eval_EdgeSide.North = ["North",0];
+verb_eval_EdgeSide.North.toString = $estr;
+verb_eval_EdgeSide.North.__enum__ = verb_eval_EdgeSide;
+verb_eval_EdgeSide.South = ["South",1];
+verb_eval_EdgeSide.South.toString = $estr;
+verb_eval_EdgeSide.South.__enum__ = verb_eval_EdgeSide;
+verb_eval_EdgeSide.East = ["East",2];
+verb_eval_EdgeSide.East.toString = $estr;
+verb_eval_EdgeSide.East.__enum__ = verb_eval_EdgeSide;
+verb_eval_EdgeSide.West = ["West",3];
+verb_eval_EdgeSide.West.toString = $estr;
+verb_eval_EdgeSide.West.__enum__ = verb_eval_EdgeSide;
 var verb_eval_Tess = $hx_exports.eval.Tess = function() { };
 $hxClasses["verb.eval.Tess"] = verb_eval_Tess;
 verb_eval_Tess.__name__ = ["verb","eval","Tess"];
-verb_eval_Tess.rationalCurveRegularSample = function(curve,numSamples,includeU) {
-	return verb_eval_Tess.rationalCurveRegularSampleRange(curve,curve.knots[0],verb_core_ArrayExtensions.last(curve.knots),numSamples,includeU);
-};
-verb_eval_Tess.rationalCurveRegularSampleRange = function(curve,start,end,numSamples,includeU) {
-	if(numSamples < 1) numSamples = 2;
-	var p = [];
-	var span = (end - start) / (numSamples - 1);
-	var u = 0;
+verb_eval_Tess.rationalBezierSurfaceRegularSample = function(surface,divsU,divsV) {
+	var pts = [];
+	var u = surface.knotsU[0];
+	var t = (verb_core_ArrayExtensions.last(surface.knotsU) - surface.knotsU[0]) / divsU;
 	var _g = 0;
-	while(_g < numSamples) {
+	while(_g < divsU) {
 		var i = _g++;
-		u = start + span * i;
-		if(includeU) p.push([u].concat(verb_eval_Eval.rationalCurvePoint(curve,u))); else p.push(verb_eval_Eval.rationalCurvePoint(curve,u));
+		var iso = verb_eval_Make.surfaceIsocurve(surface,u,true);
+		var v = (verb_core_ArrayExtensions.last(iso.knots) - iso.knots[0]) / divsV;
+		verb_eval_Tess.rationalBezierCurveRegularSamplePointsMutate(iso,pts,iso.knots[0],t,divsV,false);
+		u += t;
 	}
-	return p;
+	return pts;
 };
-verb_eval_Tess.rationalCurveAdaptiveSample = function(curve,tol,includeU) {
-	if(includeU == null) includeU = false;
-	if(tol == null) tol = 1e-6;
-	if(curve.degree == 1) {
-		if(!includeU) return curve.controlPoints.map(verb_eval_Eval.dehomogenize); else {
-			var _g = [];
-			var _g2 = 0;
-			var _g1 = curve.controlPoints.length;
-			while(_g2 < _g1) {
-				var i = _g2++;
-				_g.push([curve.knots[i + 1]].concat(verb_eval_Eval.dehomogenize(curve.controlPoints[i])));
-			}
-			return _g;
+verb_eval_Tess.northIndex = function(i,j,divs) {
+	if(i <= 0) return null;
+	return divs[i - 1][j];
+};
+verb_eval_Tess.southIndex = function(i,j,divs) {
+	if(i >= divs.length - 1) return null;
+	return divs[i + 1][j];
+};
+verb_eval_Tess.eastIndex = function(i,j,divs) {
+	if(j >= divs[i].length - 1) return null;
+	return divs[i][j + 1];
+};
+verb_eval_Tess.westIndex = function(i,j,divs) {
+	if(j <= 0) return null;
+	return divs[i][j - 1];
+};
+verb_eval_Tess.rationalSurfaceAdaptiveSample = function(surface,tol) {
+	var beziers = verb_eval_Modify.decomposeSurfaceIntoBeziers(surface);
+	var stepLengths = [];
+	var stepLengthRow;
+	var _g = 0;
+	while(_g < beziers.length) {
+		var bezierrow = beziers[_g];
+		++_g;
+		stepLengthRow = [];
+		stepLengths.push(stepLengthRow);
+		var _g1 = 0;
+		while(_g1 < bezierrow.length) {
+			var bezier = bezierrow[_g1];
+			++_g1;
+			var ls = verb_eval_Tess.rationalBezierSurfaceStepLength(bezier,tol);
+			ls.item0 = Math.min(ls.item0,(verb_core_ArrayExtensions.last(bezier.knotsU) - verb_core_ArrayExtensions.first(bezier.knotsU)) / 2);
+			ls.item1 = Math.min(ls.item1,(verb_core_ArrayExtensions.last(bezier.knotsV) - verb_core_ArrayExtensions.first(bezier.knotsV)) / 2);
+			stepLengthRow.push(ls);
 		}
 	}
-	return verb_eval_Tess.rationalCurveAdaptiveSampleRange(curve,curve.knots[0],verb_core_ArrayExtensions.last(curve.knots),tol,includeU);
+	var pts = [];
+	var uvs = [];
+	var edgeRow;
+	var n;
+	var s;
+	var e;
+	var w;
+	var empty = new verb_core_Pair(Infinity,Infinity);
+	var beis = [];
+	var beir;
+	var bei;
+	var e0;
+	var e1;
+	var srf;
+	var _g11 = 0;
+	var _g2 = beziers.length;
+	while(_g11 < _g2) {
+		var i = _g11++;
+		beir = [];
+		beis.push(beir);
+		var _g3 = 0;
+		var _g21 = beziers[i].length;
+		while(_g3 < _g21) {
+			var j = _g3++;
+			srf = beziers[i][j];
+			bei = new verb_eval_BezierEdgeIndices();
+			beir.push(bei);
+			s = verb_eval_Tess.southIndex(i,j,stepLengths);
+			if(s == null) s = empty;
+			e = verb_eval_Tess.eastIndex(i,j,stepLengths);
+			if(e == null) e = empty;
+			if(i == 0) {
+				var ne = verb_eval_Make.surfaceIsocurve(srf,verb_core_ArrayExtensions.first(srf.knotsU),false);
+				e0 = pts.length;
+				verb_eval_Tess.rationalBezierCurveRegularSamplePointsMutate2(ne,pts,stepLengths[i][j].item1);
+				e1 = pts.length;
+				verb_eval_Tess.regularUvsMutate(e1 - e0,verb_core_ArrayExtensions.first(ne.knots),stepLengths[i][j].item1,uvs,verb_core_ArrayExtensions.first(srf.knotsU),true);
+				bei.n = new verb_core_Pair(e0,e1);
+			} else bei.n = beis[i - 1][j].s;
+			if(j == 0) {
+				e0 = pts.length;
+				var we = verb_eval_Make.surfaceIsocurve(srf,verb_core_ArrayExtensions.first(srf.knotsV),true);
+				verb_eval_Tess.rationalBezierCurveRegularSamplePointsMutate2(we,pts,stepLengths[i][j].item0);
+				e1 = pts.length;
+				verb_eval_Tess.regularUvsMutate(e1 - e0,verb_core_ArrayExtensions.first(we.knots),stepLengths[i][j].item0,uvs,verb_core_ArrayExtensions.first(srf.knotsV),false);
+				bei.w = new verb_core_Pair(e0,e1);
+			} else bei.w = beis[i][j - 1].e;
+			e0 = pts.length;
+			var se = verb_eval_Make.surfaceIsocurve(srf,verb_core_ArrayExtensions.last(srf.knotsU),false);
+			verb_eval_Tess.rationalBezierCurveRegularSamplePointsMutate2(se,pts,Math.min(s.item1,stepLengths[i][j].item1));
+			e1 = pts.length;
+			verb_eval_Tess.regularUvsMutate(e1 - e0,verb_core_ArrayExtensions.first(se.knots),Math.min(s.item1,stepLengths[i][j].item1),uvs,verb_core_ArrayExtensions.last(srf.knotsU),true);
+			bei.s = new verb_core_Pair(e0,e1);
+			e0 = pts.length;
+			var ee = verb_eval_Make.surfaceIsocurve(srf,verb_core_ArrayExtensions.last(srf.knotsV),true);
+			verb_eval_Tess.rationalBezierCurveRegularSamplePointsMutate2(ee,pts,Math.min(e.item0,stepLengths[i][j].item0));
+			e1 = pts.length;
+			verb_eval_Tess.regularUvsMutate(e1 - e0,verb_core_ArrayExtensions.first(ee.knots),Math.min(e.item0,stepLengths[i][j].item0),uvs,verb_core_ArrayExtensions.last(srf.knotsV),false);
+			bei.e = new verb_core_Pair(e0,e1);
+		}
+	}
+	var faces = [];
+	var p0;
+	var _g12 = 0;
+	var _g4 = beziers.length;
+	while(_g12 < _g4) {
+		var i1 = _g12++;
+		var _g31 = 0;
+		var _g22 = beziers[i1].length;
+		while(_g31 < _g22) {
+			var j1 = _g31++;
+			p0 = pts.length;
+			var bezier1 = beziers[i1][j1];
+			var divsU = Math.ceil(1.0 / stepLengths[i1][j1].item0);
+			var domainV = verb_core_ArrayExtensions.last(bezier1.knotsV) - bezier1.knotsV[0];
+			var domainU = verb_core_ArrayExtensions.last(bezier1.knotsU) - bezier1.knotsU[0];
+			var divsV = Math.ceil(1.0 / stepLengths[i1][j1].item1);
+			var tessStepV = domainV / divsV;
+			var tessStepU = domainU / divsU;
+			var u = bezier1.knotsU[0] + tessStepU;
+			var _g5 = 0;
+			var _g41 = divsU - 1;
+			while(_g5 < _g41) {
+				var k = _g5++;
+				var iso = verb_eval_Make.surfaceIsocurve(bezier1,u,false);
+				verb_eval_Tess.rationalBezierCurveRegularSamplePointsMutate(iso,pts,iso.knots[0] + tessStepV,tessStepV,divsV - 1,false);
+				verb_eval_Tess.regularUvsMutate(divsV - 1,iso.knots[0] + tessStepV,tessStepV,uvs,u,true);
+				u += tessStepU;
+			}
+			divsU = divsU - 2;
+			divsV = divsV - 2;
+			var _g42 = 0;
+			while(_g42 < divsU) {
+				var k1 = _g42++;
+				var _g51 = 0;
+				while(_g51 < divsV) {
+					var l = _g51++;
+					var a_k = p0 + k1 * (divsV + 1) + l;
+					var b_k = p0 + (k1 + 1) * (divsV + 1) + l;
+					var c_k = b_k + 1;
+					var d_k = a_k + 1;
+					var abc = [a_k,b_k,c_k];
+					var acd = [a_k,c_k,d_k];
+					faces.push(abc);
+					faces.push(acd);
+				}
+			}
+			bei = beis[i1][j1];
+			verb_eval_Tess.stitchMesh(bezier1,faces,bei,divsU,divsV,domainV,p0,tessStepV,verb_eval_EdgeSide.North);
+			verb_eval_Tess.stitchMesh(bezier1,faces,bei,divsU,divsV,domainV,p0,tessStepV,verb_eval_EdgeSide.South);
+			verb_eval_Tess.stitchMesh(bezier1,faces,bei,divsU,divsV,domainU,p0,tessStepU,verb_eval_EdgeSide.East);
+			verb_eval_Tess.stitchMesh(bezier1,faces,bei,divsU,divsV,domainU,p0,tessStepU,verb_eval_EdgeSide.West);
+		}
+	}
+	return new verb_core_MeshData(faces,pts,null,uvs);
 };
-verb_eval_Tess.rationalCurveAdaptiveSampleRange = function(curve,start,end,tol,includeU) {
-	var p1 = verb_eval_Eval.rationalCurvePoint(curve,start);
-	var p3 = verb_eval_Eval.rationalCurvePoint(curve,end);
-	var t = 0.5 + 0.2 * Math.random();
-	var mid = start + (end - start) * t;
-	var p2 = verb_eval_Eval.rationalCurvePoint(curve,mid);
-	var diff = verb_core_Vec.sub(p1,p3);
-	var diff2 = verb_core_Vec.sub(p1,p2);
-	if(verb_core_Vec.dot(diff,diff) < tol && verb_core_Vec.dot(diff2,diff2) > tol || !verb_core_Trig.threePointsAreFlat(p1,p2,p3,tol)) {
-		var exact_mid = start + (end - start) * 0.5;
-		var left_pts = verb_eval_Tess.rationalCurveAdaptiveSampleRange(curve,start,exact_mid,tol,includeU);
-		var right_pts = verb_eval_Tess.rationalCurveAdaptiveSampleRange(curve,exact_mid,end,tol,includeU);
-		return left_pts.slice(0,-1).concat(right_pts);
-	} else if(includeU) return [[start].concat(p1),[end].concat(p3)]; else return [p1,p3];
+verb_eval_Tess.regularUvsMutate = function(count,start,step,uvs,constant,uConstant) {
+	var i = 0;
+	var u = start;
+	if(uConstant) while(i < count) {
+		uvs.push([constant,u]);
+		u += step;
+		i++;
+	} else while(i < count) {
+		uvs.push([u,constant]);
+		u += step;
+		i++;
+	}
+};
+verb_eval_Tess.stitchMesh = function(bezier,faces,bei,divsU,divsV,domain,p0,tessStep,edgeSide) {
+	var edgeIndices;
+	var knots;
+	var reverseFace = false;
+	var tessIStep = 1;
+	var tessDivCount = 1;
+	switch(edgeSide[1]) {
+	case 0:
+		edgeIndices = bei.n;
+		knots = bezier.knotsV;
+		tessDivCount = divsV;
+		break;
+	case 1:
+		edgeIndices = bei.s;
+		knots = bezier.knotsV;
+		p0 += divsU * (divsV + 1);
+		reverseFace = true;
+		tessDivCount = divsV;
+		break;
+	case 2:
+		edgeIndices = bei.e;
+		knots = bezier.knotsU;
+		tessIStep = divsV + 1;
+		p0 += divsV;
+		tessDivCount = divsU;
+		break;
+	case 3:
+		edgeIndices = bei.w;
+		knots = bezier.knotsU;
+		tessIStep = divsV + 1;
+		reverseFace = true;
+		tessDivCount = divsU;
+		break;
+	}
+	var edgeCount = edgeIndices.item1 - edgeIndices.item0 - 1;
+	var edgeStep = domain / edgeCount;
+	var edgeU = verb_core_ArrayExtensions.first(knots);
+	var tessU = verb_core_ArrayExtensions.first(knots) + 1.5 * tessStep;
+	var edgeI = 0;
+	var tessI = 0;
+	var tessDivI = 1;
+	while(edgeI < edgeCount) {
+		while(edgeU < tessU && edgeI < edgeCount || edgeI < edgeCount && tessDivI > tessDivCount) {
+			var ei = edgeIndices.item0 + edgeI;
+			var ei2 = ei + 1;
+			if(reverseFace) faces.push([ei,ei2,p0 + tessI]); else faces.push([ei,p0 + tessI,ei2]);
+			edgeI++;
+			edgeU += edgeStep;
+		}
+		if(edgeI < edgeCount) {
+			var ei1 = edgeIndices.item0 + edgeI;
+			if(reverseFace) faces.push([p0 + tessI,ei1,p0 + tessI + tessIStep]); else faces.push([p0 + tessI,p0 + tessI + tessIStep,ei1]);
+		}
+		tessDivI++;
+		tessI += tessIStep;
+		tessU += tessStep;
+	}
+};
+verb_eval_Tess.rationalBezierCurveRegularSamplePointsMutate2 = function(crv,pts,step,includeU) {
+	if(includeU == null) includeU = false;
+	var domain = verb_core_ArrayExtensions.last(crv.knots) - crv.knots[0];
+	var steps = Math.ceil(1.0 / step);
+	var len = domain / steps;
+	verb_eval_Tess.rationalBezierCurveRegularSamplePointsMutate(crv,pts,crv.knots[0],len,steps + 1,false);
+};
+verb_eval_Tess.rationalBezierSurfaceStepLength = function(surface,tol) {
+	var dehomo = verb_eval_Eval.dehomogenize2d(surface.controlPoints);
+	var bb = new verb_core_BoundingBox();
+	var _g = 0;
+	while(_g < dehomo.length) {
+		var row = dehomo[_g];
+		++_g;
+		bb.addRange(row);
+	}
+	var avgPt = verb_core_Vec.mul(0.5,verb_core_Vec.add(bb.min,bb.max));
+	var m = verb_core_Mat.identity(4);
+	m[0][3] = -avgPt[0];
+	m[1][3] = -avgPt[1];
+	m[2][3] = -avgPt[2];
+	var ts = verb_eval_Modify.rationalSurfaceTransform(surface,m);
+	dehomo = verb_eval_Eval.dehomogenize2d(ts.controlPoints);
+	var r = 0.0;
+	var n;
+	var _g1 = 0;
+	var _g2 = dehomo.length;
+	while(_g1 < _g2) {
+		var i = _g1++;
+		var _g3 = 0;
+		var _g21 = dehomo[i].length;
+		while(_g3 < _g21) {
+			var j = _g3++;
+			n = verb_core_Vec.norm(dehomo[i][j]);
+			if(n > r) r = n;
+		}
+	}
+	var duu = -Infinity;
+	var iduu;
+	var _g11 = 0;
+	var _g4 = surface.controlPoints.length - 2;
+	while(_g11 < _g4) {
+		var i1 = _g11++;
+		var _g31 = 0;
+		var _g22 = surface.controlPoints[i1].length;
+		while(_g31 < _g22) {
+			var j1 = _g31++;
+			iduu = verb_core_Vec.norm(verb_core_Vec.add(dehomo[i1 + 2][j1],verb_core_Vec.add(verb_core_Vec.mul(-2.0,dehomo[i1 + 1][j1]),dehomo[i1][j1]))) - (r - tol) * (verb_core_ArrayExtensions.last(ts.controlPoints[i1 + 2][j1]) - 2 * verb_core_ArrayExtensions.last(ts.controlPoints[i1 + 1][j1]) + verb_core_ArrayExtensions.last(ts.controlPoints[i1][j1]));
+			if(iduu > duu) duu = iduu;
+		}
+	}
+	var dvv = -Infinity;
+	var idvv;
+	var _g12 = 0;
+	var _g5 = surface.controlPoints.length;
+	while(_g12 < _g5) {
+		var i2 = _g12++;
+		var _g32 = 0;
+		var _g23 = surface.controlPoints[i2].length - 2;
+		while(_g32 < _g23) {
+			var j2 = _g32++;
+			idvv = verb_core_Vec.norm(verb_core_Vec.add(dehomo[i2][j2 + 2],verb_core_Vec.add(verb_core_Vec.mul(-2.0,dehomo[i2][j2 + 1]),dehomo[i2][j2]))) - (r - tol) * (verb_core_ArrayExtensions.last(ts.controlPoints[i2][j2 + 2]) - 2 * verb_core_ArrayExtensions.last(ts.controlPoints[i2][j2 + 1]) + verb_core_ArrayExtensions.last(ts.controlPoints[i2][j2]));
+			if(idvv > dvv) dvv = idvv;
+		}
+	}
+	var duv = -Infinity;
+	var iduv;
+	var _g13 = 0;
+	var _g6 = surface.controlPoints.length - 1;
+	while(_g13 < _g6) {
+		var i3 = _g13++;
+		var _g33 = 0;
+		var _g24 = surface.controlPoints[i3].length - 1;
+		while(_g33 < _g24) {
+			var j3 = _g33++;
+			iduv = verb_core_Vec.norm(verb_core_Vec.addAll([dehomo[i3 + 1][j3 + 1],verb_core_Vec.mul(-1.0,dehomo[i3][j3 + 1]),verb_core_Vec.mul(-1.0,dehomo[i3 + 1][j3]),dehomo[i3][j3]])) - (r - tol) * (verb_core_ArrayExtensions.last(ts.controlPoints[i3 + 1][j3 + 1]) - verb_core_ArrayExtensions.last(ts.controlPoints[i3][j3 + 1]) - verb_core_ArrayExtensions.last(ts.controlPoints[i3 + 1][j3]) + verb_core_ArrayExtensions.last(ts.controlPoints[i3][j3]));
+			if(iduv > duv) duv = iduv;
+		}
+	}
+	duu *= surface.degreeU * (surface.degreeU - 1);
+	dvv *= surface.degreeV * (surface.degreeV - 1);
+	duv *= surface.degreeU * surface.degreeV;
+	var minw = Infinity;
+	var w;
+	var _g14 = 0;
+	var _g7 = surface.controlPoints.length;
+	while(_g14 < _g7) {
+		var i4 = _g14++;
+		var _g34 = 0;
+		var _g25 = surface.controlPoints[i4].length;
+		while(_g34 < _g25) {
+			var j4 = _g34++;
+			w = verb_core_ArrayExtensions.last(surface.controlPoints[i4][j4]);
+			if(w < minw) minw = w;
+		}
+	}
+	var stepu;
+	var stepv;
+	if(Math.abs(duu) < verb_core_Constants.TOLERANCE) {
+		stepu = 1.0;
+		if(Math.abs(dvv) < verb_core_Constants.TOLERANCE) {
+			stepv = 1.0;
+			return new verb_core_Pair(stepu,stepv);
+		}
+		stepv = (Math.sqrt(duv * duv + 8 * dvv * tol * minw) - duv) / dvv;
+	}
+	if(Math.abs(dvv) < verb_core_Constants.TOLERANCE) {
+		stepv = 1.0;
+		stepu = (Math.sqrt(duv * duv + 8 * duu * tol * minw) - duv) / duu;
+		return new verb_core_Pair(stepu,stepv);
+	}
+	var unum;
+	var vnum;
+	var denom;
+	unum = 4 * dvv * tol * minw;
+	denom = duu * dvv + duv * Math.sqrt(duu * dvv);
+	stepu = Math.sqrt(unum / denom);
+	vnum = 4 * duu * tol * minw;
+	stepv = Math.sqrt(vnum / denom);
+	return new verb_core_Pair(stepu,stepv);
+};
+verb_eval_Tess.rationalCurveRegularSample = function(crv,divs,includeU) {
+	if(includeU == null) includeU = false;
+	if(crv.degree == 1) {
+		var pts1 = [];
+		var _g1 = 0;
+		var _g = crv.controlPoints.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			pts1.push(verb_eval_Eval.dehomogenize(crv.controlPoints[i]));
+		}
+		if(includeU) {
+			var _g11 = 0;
+			var _g2 = crv.controlPoints.length;
+			while(_g11 < _g2) {
+				var i1 = _g11++;
+				pts1[i1].push(crv.knots[i1 + 1]);
+			}
+		}
+		return pts1;
+	}
+	var range = verb_core_ArrayExtensions.last(crv.knots) - crv.knots[0];
+	var beziers;
+	if(crv.knots.length == (crv.degree + 1) * 2) beziers = [crv]; else beziers = verb_eval_Modify.decomposeCurveIntoBeziers(crv);
+	var pts = [];
+	var brange;
+	var fraction;
+	var currentU = crv.knots[0];
+	var step = range / divs;
+	var brange1;
+	var bsteps;
+	var nextU;
+	var _g12 = 0;
+	var _g3 = beziers.length;
+	while(_g12 < _g3) {
+		var i2 = _g12++;
+		brange1 = verb_core_ArrayExtensions.last(beziers[i2].knots) - currentU;
+		bsteps = Math.ceil(brange1 / step);
+		nextU = currentU + bsteps * step;
+		if(nextU > verb_core_ArrayExtensions.last(beziers[i2].knots) + verb_core_Constants.TOLERANCE) {
+			nextU -= step;
+			bsteps--;
+		}
+		verb_eval_Tess.rationalBezierCurveRegularSamplePointsMutate(beziers[i2],pts,currentU,step,bsteps + 1,includeU);
+		currentU = nextU + step;
+	}
+	return pts;
+};
+verb_eval_Tess.rationalCurveAdaptiveSample = function(crv,tol,includeU) {
+	if(includeU == null) includeU = false;
+	if(crv.degree == 1) {
+		var pts1 = [];
+		var _g1 = 0;
+		var _g = crv.controlPoints.length;
+		while(_g1 < _g) {
+			var i = _g1++;
+			pts1.push(verb_eval_Eval.dehomogenize(crv.controlPoints[i]));
+		}
+		if(includeU) {
+			var _g11 = 0;
+			var _g2 = crv.controlPoints.length;
+			while(_g11 < _g2) {
+				var i1 = _g11++;
+				pts1[i1].push(crv.knots[i1 + 1]);
+			}
+		}
+		return pts1;
+	}
+	var beziers;
+	if(crv.knots.length == (crv.degree + 1) * 2) beziers = [crv]; else beziers = verb_eval_Modify.decomposeCurveIntoBeziers(crv);
+	var pts = [];
+	var steps;
+	var domain;
+	var len;
+	var _g12 = 0;
+	var _g3 = beziers.length;
+	while(_g12 < _g3) {
+		var i2 = _g12++;
+		domain = verb_core_ArrayExtensions.last(beziers[i2].knots) - beziers[i2].knots[0];
+		len = verb_eval_Tess.rationalBezierCurveStepLength(beziers[i2],tol);
+		steps = Math.ceil(domain / len);
+		len = domain / steps;
+		verb_eval_Tess.rationalBezierCurveRegularSamplePointsMutate(beziers[i2],pts,beziers[i2].knots[0],len,steps + 1,includeU);
+		if(i2 == beziers.length - 1) break;
+		pts.pop();
+	}
+	return pts;
+};
+verb_eval_Tess.rationalBezierCurveRegularSamplePointsMutate = function(crv,pts,startU,step,numSteps,includeU) {
+	if(includeU == null) includeU = false;
+	var its = [];
+	var ts = [its];
+	var u = startU;
+	var degree1 = crv.degree + 1;
+	if(numSteps <= crv.degree + 1) {
+		var _g = 0;
+		while(_g < numSteps) {
+			var i = _g++;
+			pts.push(verb_eval_Eval.rationalCurvePoint(crv,u));
+			u += step;
+		}
+		return;
+	}
+	var _g1 = 0;
+	while(_g1 < degree1) {
+		var i1 = _g1++;
+		its.push(verb_eval_Eval.curvePoint(crv,u));
+		u += step;
+	}
+	var prev;
+	var _g2 = 1;
+	while(_g2 < degree1) {
+		var i2 = _g2++;
+		its = [];
+		ts.push(its);
+		prev = ts[i2 - 1];
+		var _g21 = 1;
+		var _g11 = prev.length;
+		while(_g21 < _g11) {
+			var j = _g21++;
+			its.push(verb_core_Vec.sub(prev[j],prev[j - 1]));
+		}
+	}
+	var _g3 = 0;
+	var _g12 = ts[0];
+	while(_g3 < _g12.length) {
+		var pt = _g12[_g3];
+		++_g3;
+		pts.push(verb_eval_Eval.dehomogenize(pt));
+	}
+	var front;
+	var _g4 = [];
+	var _g13 = 0;
+	while(_g13 < ts.length) {
+		var r = ts[_g13];
+		++_g13;
+		_g4.push(verb_core_ArrayExtensions.last(r));
+	}
+	front = _g4;
+	var k;
+	var frlen2 = front.length - 2;
+	var _g22 = 0;
+	var _g14 = numSteps - degree1;
+	while(_g22 < _g14) {
+		var i3 = _g22++;
+		var _g41 = 0;
+		var _g31 = front.length - 1;
+		while(_g41 < _g31) {
+			var j1 = _g41++;
+			k = frlen2 - j1;
+			verb_core_Vec.addMutate(front[k],front[k + 1]);
+		}
+		pts.push(verb_eval_Eval.dehomogenize(front[0]));
+	}
+	u = startU;
+	if(includeU) {
+		var _g15 = 0;
+		while(_g15 < pts.length) {
+			var pt1 = pts[_g15];
+			++_g15;
+			pt1.push(u);
+			u += step;
+		}
+	}
+};
+verb_eval_Tess.rationalBezierCurveStepLength = function(curve,tol) {
+	var dehomo = verb_eval_Eval.dehomogenize1d(curve.controlPoints);
+	var bb = new verb_core_BoundingBox(dehomo);
+	var avgPt = verb_core_Vec.mul(0.5,verb_core_Vec.add(bb.min,bb.max));
+	var m = verb_core_Mat.identity(4);
+	m[0][3] = -avgPt[0];
+	m[1][3] = -avgPt[1];
+	m[2][3] = -avgPt[2];
+	var tc = verb_eval_Modify.rationalCurveTransform(curve,m);
+	dehomo = verb_eval_Eval.dehomogenize1d(tc.controlPoints);
+	var r = 0.0;
+	var n;
+	var _g1 = 0;
+	var _g = dehomo.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		n = verb_core_Vec.norm(dehomo[i]);
+		if(n > r) r = n;
+	}
+	var wts = verb_eval_Eval.weight1d(curve.controlPoints);
+	var w = verb_core_Vec.min(wts);
+	var domain = verb_core_ArrayExtensions.last(curve.knots) - curve.knots[0];
+	if(tol < r) {
+		var numer = 8 * w * tol;
+		var ws = verb_eval_Tess.secondForwardDiff(wts);
+		var pts = verb_eval_Tess.secondForwardDiff2(dehomo);
+		var fs;
+		var _g2 = [];
+		var _g21 = 0;
+		var _g11 = pts.length;
+		while(_g21 < _g11) {
+			var i1 = _g21++;
+			_g2.push(verb_core_Vec.norm(pts[i1]) + (r - tol) * ws[i1]);
+		}
+		fs = _g2;
+		var f = verb_core_Vec.max(fs);
+		var denom = curve.degree * (curve.degree - 1.0) * f;
+		return domain * Math.sqrt(numer / denom);
+	} else if(r >= tol && tol < 2.0 * r) {
+		var numer1 = 8 * w * tol;
+		var pts1 = verb_eval_Tess.secondForwardDiff2(dehomo);
+		var fs1;
+		var _g3 = [];
+		var _g22 = 0;
+		var _g12 = pts1.length;
+		while(_g22 < _g12) {
+			var i2 = _g22++;
+			_g3.push(verb_core_Vec.norm(pts1[i2]));
+		}
+		fs1 = _g3;
+		var f1 = verb_core_Vec.max(fs1);
+		var denom1 = curve.degree * (curve.degree - 1.0) * f1;
+		return domain * Math.sqrt(numer1 / denom1);
+	} else return domain;
+};
+verb_eval_Tess.secondForwardDiff = function(array) {
+	var i = 0;
+	var res = [];
+	while(i < array.length - 2) {
+		res.push(array[i + 2] - 2.0 * array[i + 1] + array[i]);
+		i++;
+	}
+	return res;
+};
+verb_eval_Tess.secondForwardDiff2 = function(array) {
+	var i = 0;
+	var res = [];
+	while(i < array.length - 2) {
+		res.push(verb_core_Vec.add(array[i + 2],verb_core_Vec.add(verb_core_Vec.mul(-2.0,array[i + 1]),array[i])));
+		i++;
+	}
+	return res;
 };
 verb_eval_Tess.rationalSurfaceNaive = function(surface,divs_u,divs_v) {
 	if(divs_u < 1) divs_u = 1;
@@ -6134,8 +7139,8 @@ verb_eval_Tess.rationalSurfaceNaive = function(surface,divs_u,divs_v) {
 		var _g2 = divs_v + 1;
 		while(_g3 < _g2) {
 			var j = _g3++;
-			var pt_u = i * span_u;
-			var pt_v = j * span_v;
+			var pt_u = knotsU[0] + i * span_u;
+			var pt_v = knotsV[0] + j * span_v;
 			uvs.push([pt_u,pt_v]);
 			var derivs = verb_eval_Eval.rationalSurfaceDerivatives(surface,pt_u,pt_v,1);
 			var pt = derivs[0][0];
@@ -6257,6 +7262,53 @@ verb_eval_Tess.rationalSurfaceAdaptive = function(surface,options) {
 	if(options != null) options = options; else options = new verb_eval_AdaptiveRefinementOptions();
 	var arrTrees = verb_eval_Tess.divideRationalSurfaceAdaptive(surface,options);
 	return verb_eval_Tess.triangulateAdaptiveRefinementNodeTree(arrTrees);
+};
+verb_eval_Tess.rationalSurfaceRegularSample = function(surface,divsU,divsV) {
+	return verb_eval_Eval.dehomogenize2d(verb_eval_Tess.surfaceRegularSample(surface,divsU,divsV));
+};
+verb_eval_Tess.surfaceRegularSample = function(surface,divsU,divsV) {
+	var degreeU = surface.degreeU;
+	var degreeV = surface.degreeV;
+	var controlPoints = surface.controlPoints;
+	var knotsU = surface.knotsU;
+	var knotsV = surface.knotsV;
+	var dim = controlPoints[0][0].length;
+	var spanU = (verb_core_ArrayExtensions.last(knotsU) - knotsU[0]) / divsU;
+	var spanV = (verb_core_ArrayExtensions.last(knotsV) - knotsV[0]) / divsV;
+	var knotSpansBasesU = verb_eval_Eval.regularlySpacedBasisFunctions(degreeU,knotsU,divsU);
+	var knotSpansU = knotSpansBasesU.item0;
+	var basesU = knotSpansBasesU.item1;
+	var knotSpansBasesV = verb_eval_Eval.regularlySpacedBasisFunctions(degreeV,knotsV,divsV);
+	var knotSpansV = knotSpansBasesV.item0;
+	var basesV = knotSpansBasesV.item1;
+	var pts = [];
+	var divsU1 = divsU + 1;
+	var divsV1 = divsV + 1;
+	var _g = 0;
+	while(_g < divsU1) {
+		var i = _g++;
+		var ptsi = [];
+		pts.push(ptsi);
+		var _g1 = 0;
+		while(_g1 < divsV1) {
+			var j = _g1++;
+			ptsi.push(verb_eval_Eval.surfacePointGivenBasesKnotSpans(degreeU,degreeV,controlPoints,knotSpansU[i],knotSpansV[j],basesU[i],basesV[j],dim));
+		}
+	}
+	return pts;
+};
+verb_eval_Tess.surfaceRegularSample2 = function(surface,divsU,divsV) {
+	var pts = [];
+	var u = surface.knotsU[0];
+	var t = (verb_core_ArrayExtensions.last(surface.knotsU) - surface.knotsU[0]) / divsU;
+	var _g = 0;
+	while(_g < divsU) {
+		var i = _g++;
+		var iso = verb_eval_Make.surfaceIsocurve(surface,u,true);
+		pts.push(verb_eval_Tess.rationalCurveRegularSample(iso,divsV));
+		u += t;
+	}
+	return pts;
 };
 var verb_eval_AdaptiveRefinementOptions = $hx_exports.core.AdaptiveRefinementOptions = function() {
 	this.minDivsV = 1;
@@ -6729,9 +7781,11 @@ verb_geom_NurbsCurve.prototype = $extend(verb_core_SerializableBase.prototype,{
 		});
 	}
 	,tessellate: function(tolerance) {
+		if(tolerance == null) tolerance = 1e-3;
 		return verb_eval_Tess.rationalCurveAdaptiveSample(this._data,tolerance,false);
 	}
 	,tessellateAsync: function(tolerance) {
+		if(tolerance == null) tolerance = 1e-3;
 		return verb_exe_Dispatcher.dispatchMethod(verb_eval_Tess,"rationalCurveAdaptiveSample",[this._data,tolerance,false]);
 	}
 	,__class__: verb_geom_NurbsCurve

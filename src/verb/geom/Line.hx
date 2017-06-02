@@ -28,9 +28,11 @@ class Line extends NurbsCurve {
     private var _end : Point;
 
     //Length 3 array representing the start point
-    public function start(){ return _start; }
+
+    public function start( ) { return _start; }
 
     //Length 3 array representing the end point
-    public function end(){ return _end; }
+
+    public function end( ) { return _end; }
 
 }

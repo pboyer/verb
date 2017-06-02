@@ -24,7 +24,7 @@
 
     function tessellateSurface(srf) {
 
-        var tess = srf.tessellate();
+        var tess = srf.tessellate({ normTol : 0.0001 });
 
         var geometry = new THREE.Geometry();
 
@@ -38,6 +38,8 @@
 
             return new THREE.Face3(faceIndices[0],faceIndices[1],faceIndices[2], normals);
         });
+
+        geometry.faces.push.apply(geometry.faces, threeFaces);
 
         return geometry;
     }

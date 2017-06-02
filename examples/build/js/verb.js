@@ -1,3 +1,72 @@
+// Header for verb for JavaScript
+// Borrowed from browserify, this header supports AMD (define) and common js (require) style modules
+
+(function(f){
+    if(typeof exports==="object"&&typeof module!=="undefined"){
+        module.exports=f()
+    } else if(typeof define==="function"&&define.amd){
+        define([],f)
+    } else {
+        var g;
+        if(typeof window!=="undefined"){
+            g=window
+        } else if(typeof global!=="undefined"){
+            g=global
+        } else if(typeof self!=="undefined"){
+            g=self
+        } else{
+            g=this
+        }
+
+        g.verb = f()
+    }
+})(function(){
+
+    var verb = {};
+
+    // node.js context, but not WebWorker
+    if ( typeof window !== 'object' && typeof require === "function"){
+        Worker = require('webworker-threads').Worker;
+    }
+
+    // WebWorker or node.js context
+    if ( typeof window !== 'object' ){
+
+        var global = this;
+        var window = global; // required for promhx
+
+        // WebWorker
+        if ( typeof importScripts === "function"){
+
+            var lookup = function(className, methodName){
+
+                var obj = global;
+
+                className.split(".").forEach(function(x){
+                    if (obj) obj = obj[ x ];
+                });
+
+                if (!obj) return null;
+
+                return obj[ methodName ];
+            }
+
+            onmessage = function( e ){
+
+                if (!e.data.className || !e.data.methodName) return;
+
+                var method = lookup( e.data.className, e.data.methodName );
+
+                if (!method){
+                    return console.error("could not find " + e.data.className + "." + e.data.methodName)
+                }
+
+                postMessage( { result: method.apply( null, e.data.args ), id: e.data.id } );
+
+            };
+        }
+    }
+
 (function (console, $hx_exports, $global) { "use strict";
 $hx_exports.geom = $hx_exports.geom || {};
 $hx_exports.exe = $hx_exports.exe || {};
@@ -1519,7 +1588,7 @@ promhx_base_AsyncBase.prototype = {
 		}
 	}
 	,then: function(f) {
-		var ret = new promhx_base_AsyncBase(null);
+		var ret = new promhx_base_AsyncBase();
 		promhx_base_AsyncBase.link(this,ret,f);
 		return ret;
 	}
@@ -1576,7 +1645,7 @@ var promhx_Promise = $hx_exports.promhx.Promise = function(d) {
 $hxClasses["promhx.Promise"] = promhx_Promise;
 promhx_Promise.__name__ = ["promhx","Promise"];
 promhx_Promise.whenAll = function(itb) {
-	var ret = new promhx_Promise(null);
+	var ret = new promhx_Promise();
 	promhx_base_AsyncBase.linkAll(itb,ret);
 	return ret;
 };
@@ -1602,7 +1671,7 @@ promhx_Promise.prototype = $extend(promhx_base_AsyncBase.prototype,{
 		this._resolve(val);
 	}
 	,then: function(f) {
-		var ret = new promhx_Promise(null);
+		var ret = new promhx_Promise();
 		promhx_base_AsyncBase.link(this,ret,f);
 		return ret;
 	}
@@ -1623,7 +1692,7 @@ promhx_Promise.prototype = $extend(promhx_base_AsyncBase.prototype,{
 		this._handleError(error);
 	}
 	,pipe: function(f) {
-		var ret = new promhx_Promise(null);
+		var ret = new promhx_Promise();
 		promhx_base_AsyncBase.pipeLink(this,ret,f);
 		return ret;
 	}
@@ -1640,12 +1709,13 @@ promhx_Promise.prototype = $extend(promhx_base_AsyncBase.prototype,{
 });
 var promhx_Stream = $hx_exports.promhx.Stream = function(d) {
 	promhx_base_AsyncBase.call(this,d);
-	this._end_promise = new promhx_Promise();
+	this._end_deferred = new promhx_Deferred();
+	this._end_promise = this._end_deferred.promise();
 };
 $hxClasses["promhx.Stream"] = promhx_Stream;
 promhx_Stream.__name__ = ["promhx","Stream"];
 promhx_Stream.foreach = function(itb) {
-	var s = new promhx_Stream(null);
+	var s = new promhx_Stream();
 	var $it0 = $iterator(itb)();
 	while( $it0.hasNext() ) {
 		var i = $it0.next();
@@ -1655,12 +1725,12 @@ promhx_Stream.foreach = function(itb) {
 	return s;
 };
 promhx_Stream.wheneverAll = function(itb) {
-	var ret = new promhx_Stream(null);
+	var ret = new promhx_Stream();
 	promhx_base_AsyncBase.linkAll(itb,ret);
 	return ret;
 };
 promhx_Stream.concatAll = function(itb) {
-	var ret = new promhx_Stream(null);
+	var ret = new promhx_Stream();
 	var $it0 = $iterator(itb)();
 	while( $it0.hasNext() ) {
 		var i = $it0.next();
@@ -1669,7 +1739,7 @@ promhx_Stream.concatAll = function(itb) {
 	return ret;
 };
 promhx_Stream.mergeAll = function(itb) {
-	var ret = new promhx_Stream(null);
+	var ret = new promhx_Stream();
 	var $it0 = $iterator(itb)();
 	while( $it0.hasNext() ) {
 		var i = $it0.next();
@@ -1678,18 +1748,18 @@ promhx_Stream.mergeAll = function(itb) {
 	return ret;
 };
 promhx_Stream.stream = function(_val) {
-	var ret = new promhx_Stream(null);
+	var ret = new promhx_Stream();
 	ret.handleResolve(_val);
 	return ret;
 };
 promhx_Stream.__super__ = promhx_base_AsyncBase;
 promhx_Stream.prototype = $extend(promhx_base_AsyncBase.prototype,{
 	then: function(f) {
-		var ret = new promhx_Stream(null);
+		var ret = new promhx_Stream();
 		promhx_base_AsyncBase.link(this,ret,f);
-		this._end_promise._update.push({ async : ret._end_promise, linkf : function(x) {
+		this._end_promise.then(function(x) {
 			ret.end();
-		}});
+		});
 		return ret;
 	}
 	,detachStream: function(str) {
@@ -1700,18 +1770,13 @@ promhx_Stream.prototype = $extend(promhx_base_AsyncBase.prototype,{
 		while(_g < _g1.length) {
 			var u = _g1[_g];
 			++_g;
-			if(u.async == str) {
-				this._end_promise._update = this._end_promise._update.filter(function(x) {
-					return x.async != str._end_promise;
-				});
-				removed = true;
-			} else filtered.push(u);
+			if(u.async == str) removed = true; else filtered.push(u);
 		}
 		this._update = filtered;
 		return removed;
 	}
 	,first: function() {
-		var s = new promhx_Promise(null);
+		var s = new promhx_Promise();
 		this.then(function(x) {
 			if(!s._resolved) s.handleResolve(x);
 		});
@@ -1725,7 +1790,7 @@ promhx_Stream.prototype = $extend(promhx_base_AsyncBase.prototype,{
 		this._pause = set;
 	}
 	,pipe: function(f) {
-		var ret = new promhx_Stream(null);
+		var ret = new promhx_Stream();
 		promhx_base_AsyncBase.pipeLink(this,ret,f);
 		this._end_promise.then(function(x) {
 			ret.end();
@@ -1733,7 +1798,7 @@ promhx_Stream.prototype = $extend(promhx_base_AsyncBase.prototype,{
 		return ret;
 	}
 	,errorPipe: function(f) {
-		var ret = new promhx_Stream(null);
+		var ret = new promhx_Stream();
 		this.catchError(function(e) {
 			var piped = f(e);
 			piped.then($bind(ret,ret._resolve));
@@ -1767,7 +1832,7 @@ promhx_Stream.prototype = $extend(promhx_base_AsyncBase.prototype,{
 		return this._end_promise.then(f);
 	}
 	,filter: function(f) {
-		var ret = new promhx_Stream(null);
+		var ret = new promhx_Stream();
 		this._update.push({ async : ret, linkf : function(x) {
 			if(f(x)) ret.handleResolve(x);
 		}});
@@ -1777,7 +1842,7 @@ promhx_Stream.prototype = $extend(promhx_base_AsyncBase.prototype,{
 		return ret;
 	}
 	,concat: function(s) {
-		var ret = new promhx_Stream(null);
+		var ret = new promhx_Stream();
 		this._update.push({ async : ret, linkf : $bind(ret,ret.handleResolve)});
 		promhx_base_AsyncBase.immediateLinkUpdate(this,ret,function(x) {
 			return x;
@@ -1794,7 +1859,7 @@ promhx_Stream.prototype = $extend(promhx_base_AsyncBase.prototype,{
 		return ret;
 	}
 	,merge: function(s) {
-		var ret = new promhx_Stream(null);
+		var ret = new promhx_Stream();
 		this._update.push({ async : ret, linkf : $bind(ret,ret.handleResolve)});
 		s._update.push({ async : ret, linkf : $bind(ret,ret.handleResolve)});
 		promhx_base_AsyncBase.immediateLinkUpdate(this,ret,function(x) {
@@ -1813,7 +1878,7 @@ var promhx_PublicStream = $hx_exports.promhx.PublicStream = function(def) {
 $hxClasses["promhx.PublicStream"] = promhx_PublicStream;
 promhx_PublicStream.__name__ = ["promhx","PublicStream"];
 promhx_PublicStream.publicstream = function(val) {
-	var ps = new promhx_PublicStream(null);
+	var ps = new promhx_PublicStream();
 	ps.handleResolve(val);
 	return ps;
 };
@@ -4404,7 +4469,7 @@ verb_eval_Eval.curveDerivativesGivenN = function(n,curve,u,numDerivs) {
 	var dim = controlPoints[0].length;
 	var du;
 	if(numDerivs < degree) du = numDerivs; else du = degree;
-	var CK = verb_core_Vec.zeros2d(numDerivs + 1,dim);
+	var CK = verb_core_Vec.zeros2d(du + 1,dim);
 	var knotSpan_index = verb_eval_Eval.knotSpanGivenN(n,degree,u,knots);
 	var nders = verb_eval_Eval.derivativeBasisFunctionsGivenNI(knotSpan_index,u,degree,du,knots);
 	var k = 0;
@@ -8398,3 +8463,8 @@ verb_exe_WorkerPool.basePath = "";
 verb_exe__$WorkerPool_Work.uuid = 0;
 verb_Verb.main();
 })(typeof console != "undefined" ? console : {log:function(){}}, verb, typeof window != "undefined" ? window : typeof global != "undefined" ? global : typeof self != "undefined" ? self : this);
+
+
+    return verb;
+
+});

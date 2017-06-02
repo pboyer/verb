@@ -17,9 +17,9 @@ class Ellipse extends EllipseArc {
     //* Length 3 array representing the xaxis
     //* Length 3 array representing the perpendicular yaxis
 
-    public function new(   center : Point,
-                            xaxis : Vector,
-                            yaxis : Vector ) {
+    public function new( center : Point,
+                         xaxis : Vector,
+                         yaxis : Vector ) {
         super( center, xaxis, yaxis, 0, Math.PI * 2 );
     }
 }

@@ -18,7 +18,7 @@ class SweptSurface extends NurbsSurface {
     //* The rail curve
 
     public function new( profile : ICurve, rail : ICurve ) {
-        super( Make.rationalTranslationalSurface( profile.asNurbs(), rail.asNurbs() ));
+        super( Make.rationalTranslationalSurface( profile.asNurbs( ), rail.asNurbs( ) ) );
 
         _profile = profile;
         _rail = rail;
@@ -29,11 +29,11 @@ class SweptSurface extends NurbsSurface {
 
     //The profile curve
 
-    public function profile() : ICurve { return _profile; }
+    public function profile( ) : ICurve { return _profile; }
 
     //The rail curve
 
-    public function rail() : ICurve { return _rail; }
+    public function rail( ) : ICurve { return _rail; }
 
 
 }

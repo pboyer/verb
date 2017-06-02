@@ -15,7 +15,7 @@ interface ICurve extends ISerializable {
     //
     //* A NurbsCurveData object representing the curve
 
-    function asNurbs() : NurbsCurveData;
+    function asNurbs( ) : NurbsCurveData;
 
     //Obtain the parametric domain of the curve
     //
@@ -23,7 +23,7 @@ interface ICurve extends ISerializable {
     //
     //* An Interval object containing the min and max of the domain
 
-    function domain() : Interval<Float>;
+    function domain( ) : Interval<Float>;
 
     //Evaluate a point on the curve
     //
@@ -35,7 +35,7 @@ interface ICurve extends ISerializable {
     //
     //* The evaluated point
 
-    function point(u : Float) : Point;
+    function point( u : Float ) : Point;
 
     //Evaluate the derivatives at a point on a curve
     //
@@ -48,5 +48,5 @@ interface ICurve extends ISerializable {
     //
     //* An array of derivative vectors
 
-    function derivatives(u : Float, numDerivs : Int = 1) : Array<Vector>;
+    function derivatives( u : Float, numDerivs : Int = 1 ) : Array<Vector>;
 }

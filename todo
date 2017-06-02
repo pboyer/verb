@@ -1,13 +1,24 @@
-Documentation generation - docco no longer works, always sucked anyways
-Update website
+Complete forward differencing algorithm
 
-Split
+    - degenerate cases (e.g. no interior points, cylinder)
+    - make UVS
+    - approximate normals
+    - exact normals
+    - tests (spheres, circles)
+	- rationalBezierSurfaceStepLength
+	 	* supports degree2?
+	 	*
+
+
+
+BRep Split
     Holes are not recognized
 
+BRep Bool
+	Not complete
+
 SweptSurface
-More efficient representation for surface tessellation, don't use 2d arrays
 More exact srf-srf intersection
-Marching surface-Surface intersection
 SurfaceClosestPoint occasionally fails when point is far from surface - need to check for wild derivatives
 Curve interpolation with sparse matrices
 Curve approximation

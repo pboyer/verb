@@ -25,21 +25,21 @@ class WorkerPool {
 
     public function new( numThreads : Int = 1, fileName : String = "verb.js" ) {
 
-        for (i in 0...numThreads){
+        for ( i in 0...numThreads ) {
             var w : Worker;
             try {
                 w = new Worker( basePath + fileName );
-            } catch (e : Dynamic ) {
-                w = new Worker( basePath + fileName.substring(0,-3) + ".min.js" );
+            } catch ( e : Dynamic ) {
+                w = new Worker( basePath + fileName.substring( 0, -3 ) + ".min.js" );
             }
 
-           _pool.push( w );
+            _pool.push( w );
         }
     }
 
     // The base path to look for verb's source code
 
-    public static var basePath  = "";
+    public static var basePath = "";
 
     // Add work to perform to the queue
 
@@ -49,40 +49,39 @@ class WorkerPool {
                              callback : Dynamic ) : Void {
 
         var work = new Work( className, methodName, args );
-        _callbacks.set(work.id, callback);
+        _callbacks.set( work.id, callback );
         _queue.push( work );
 
-        processQueue();
+        processQueue( );
     }
 
-    private function processQueue() {
+    private function processQueue( ) {
 
-        while (_queue.length > 0 && _pool.length > 0) {
+        while ( _queue.length > 0 && _pool.length > 0 ) {
 
-            var work = _queue.shift();
+            var work = _queue.shift( );
             var workId = work.id;
 
-            var worker = _pool.shift();
+            var worker = _pool.shift( );
 
-            _working.set(workId, worker);
+            _working.set( workId, worker );
 
             //upon completing your task...
-            worker.onmessage = function( e ){
+            worker.onmessage = function( e ) {
 
                 _working.remove( workId );
                 _pool.push( worker );
 
                 try {
-                    if ( _callbacks.exists( workId ) )
-                    {
+                    if ( _callbacks.exists( workId ) ) {
                         _callbacks.get( workId )( e.data.result );
                         _callbacks.remove( workId );
                     }
-                } catch(error : Dynamic) {
+                } catch ( error : Dynamic ) {
                     trace( error );
                 }
 
-                processQueue();
+                processQueue( );
             };
 
             worker.postMessage( work );
@@ -100,7 +99,7 @@ private class Work {
     public var args : Array<Dynamic>;
     public var id : Int;
 
-    public function new(className, methodName, args){
+    public function new( className, methodName, args ) {
         this.className = className;
         this.methodName = methodName;
         this.args = args;

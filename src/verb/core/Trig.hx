@@ -10,11 +10,11 @@ using verb.core.Vec;
 @:expose("core.Trig")
 class Trig {
 
-    public static function isPointInPlane( pt : Point, p : Plane, tol : Float ) : Bool{
+    public static function isPointInPlane( pt : Point, p : Plane, tol : Float ) : Bool {
         return Math.abs( pt.sub( p.origin ).dot( p.normal ) ) < tol;
     }
 
-    public static function distToSegment(a : Point, b : Point, c : Point){
+    public static function distToSegment( a : Point, b : Point, c : Point ) {
         var res = segmentClosestPoint( b, a, c, 0.0, 1.0 );
         return Vec.dist( b, res.pt );
     }
@@ -32,9 +32,9 @@ class Trig {
     //* pt
 
     public static function rayClosestPoint( pt, o, r ) {
-        var o2pt = Vec.sub(pt,o)
-        , do2ptr = Vec.dot(o2pt, r)
-        , proj = Vec.add(o, Vec.mul(do2ptr, r));
+        var o2pt = Vec.sub( pt, o )
+        , do2ptr = Vec.dot( o2pt, r )
+        , proj = Vec.add( o, Vec.mul( do2ptr, r ) );
 
         return proj;
     }
@@ -112,22 +112,22 @@ class Trig {
         var dif = Vec.sub( segpt1, segpt0 )
         , l = Vec.norm( dif );
 
-        if (l < Constants.EPSILON ) {
+        if ( l < Constants.EPSILON ) {
             return { u: u0, pt : segpt0 };
         }
 
         var o = segpt0
         , r = Vec.mul( 1 / l, dif )
-        , o2pt = Vec.sub(pt, o)
-        , do2ptr = Vec.dot(o2pt, r);
+        , o2pt = Vec.sub( pt, o )
+        , do2ptr = Vec.dot( o2pt, r );
 
-        if (do2ptr < 0){
-            return { u: u0,  pt : segpt0 };
-        } else if (do2ptr > l){
-            return { u: u1,  pt : segpt1 };
+        if ( do2ptr < 0 ) {
+            return { u: u0, pt : segpt0 };
+        } else if ( do2ptr > l ) {
+            return { u: u1, pt : segpt1 };
         }
 
-        return { 	u: u0 + (u1 - u0) * do2ptr / l, pt : Vec.add(o, Vec.mul( do2ptr, r ) ) };
+        return { u: u0 + (u1 - u0) * do2ptr / l, pt : Vec.add( o, Vec.mul( do2ptr, r ) ) };
 
     }
 

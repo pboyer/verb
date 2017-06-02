@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Curve step length</title>
+
+    <script src="../build/js/verb.js"></script>
+    <script src="js/three.min.js"></script>
+    <script src="js/verbToThreeConversion.js"></script>
+    <script src="js/OrbitControls.js"></script>
+    <script src="js/codemirror.js"></script>
+    <script src="js/javascript.js"></script>
+    <script src="js/threeBasic.js"></script>
+
+    <link href='https://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300' rel='stylesheet' type='text/css'>
+
+    <link rel="stylesheet" href="css/codemirror.css">
+    <link rel="stylesheet" href="css/example.css">
+    <link rel="stylesheet" href="css/colorforth.css">
+</head>
+<body>
+
+<div id="button">Show/Hide Code</div>
+<div id="viewer" class="col">
+    <div id="title"></div>
+</div>
+<div id="code-container" class="col scroll-y"></div>
+
+</body>
+<script id="script">
+
+	setupScene();
+
+    function asVector3(pts){
+        return pts.map(function(x){
+            return new THREE.Vector3(x[0],x[1],x[2]);
+        });
+    }
+
+    function asGeometry(threePts){
+        var geometry = new THREE.Geometry();
+        geometry.vertices.push.apply( geometry.vertices, threePts );
+        return geometry;
+    }
+
+    function tessellateRegular( crv, tol ){
+        return asGeometry( asVector3(  verb.eval.Tess.rationalCurveAdaptiveSample( crv, tol ) ) );
+    }
+
+    var pts = [ [0, 0, 0], [10, 20, 0], [20, 0, 0], [30, 0, 0], [60,20,0] ];
+    var crv = verb.eval.Make.rationalInterpCurve( pts, 3, false );
+
+    var tol = 2;
+	addCurveToScene( tessellateRegular(crv, tol ) );
+
+    var nc = new verb.geom.NurbsCurve( crv );
+
+	var lineMat2 = new THREE.LineBasicMaterial({ linewidth: 1, color: 0xaaaa00});
+	addCurveToScene( nc.toThreeGeometry(), lineMat2 );
+
+	// display the tolerance length
+	var pts = [ [50, 0, 0], [50, tol, 0 ] ];
+	var tolcrv = verb.geom.NurbsCurve.byPoints( pts, 1 );
+    addCurveToScene( tolcrv.toThreeGeometry() );
+
+	renderScene();
+
+</script>
+
+<script src="js/example.js"></script>
+
+</html>

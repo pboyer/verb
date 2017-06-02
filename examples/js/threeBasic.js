@@ -99,7 +99,7 @@ function addLineToScene(pts, mat){
 }
 
 function addMeshToScene(mesh, material, wireframe ){
-    material = material || new THREE.MeshNormalMaterial( { side: THREE.DoubleSide, wireframe: false, shading: THREE.SmoothShading, transparent: true, opacity: 0.4 } )
+    material = material || new THREE.MeshNormalMaterial( { side: THREE.DoubleSide, wireframe: false, shading: THREE.SmoothShading, transparent: false, opacity: 0.0 } )
 
 //    new THREE.MeshPhongMaterial({
 //                               specular: '#ffffff',
