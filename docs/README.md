@@ -16,7 +16,11 @@ You'll need to generate all of the md files, which are generated from the .hx fi
 > node gen.js
 ```
 
-Us mkdocs to generate the static html:
+Use mkdocs to generate the static html:
+
+```
+> mkdocs build
+```
 
 
 
