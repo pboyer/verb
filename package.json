@@ -8,7 +8,7 @@
     "url": "https://github.com/pboyer/verb.git"
   },
   "scripts": {
-    "test": "grunt -v test"
+    "test": "grunt -v mocha"
   },
   "engine": "node 7.0.0",
   "main": "build/js/verb.js",
