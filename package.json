@@ -1,6 +1,6 @@
 {
   "name": "verb-nurbs",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "author": "pboyer <peter.b.boyer@gmail.com>",
   "description": "A CAD library for the web",
   "repository": {
@@ -10,7 +10,7 @@
   "scripts": {
     "test": "grunt -v test"
   },
-  "engine": "node 4.2.1",
+  "engine": "node 7.0.0",
   "main": "build/js/verb.js",
   "keywords": [
     "NURBS",
