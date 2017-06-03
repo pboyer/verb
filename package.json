@@ -25,17 +25,17 @@
       "webworker-threads": "0.7.8"
   },
   "devDependencies": {
-    "benchmark": "^1.0.0",
+    "benchmark": "1.0.0",
     "grunt": "0.4.5",
-    "grunt-benchmark": "^0.3.0",
+    "grunt-benchmark": "0.3.0",
     "grunt-contrib-concat": "0.5.1",
     "grunt-contrib-uglify": "0.9.1",
-    "grunt-haxe": "^0.1.13",
-    "grunt-mocha-test": "^0.12.7",
-    "grunt-text-replace": "^0.4.0",
-    "mocha": "^2.2.4",
+    "grunt-haxe": "0.1.13",
+    "grunt-mocha-test": "0.12.7",
+    "grunt-text-replace": "0.4.0",
+    "mocha": "2.2.4",
     "should": "6.0.1",
-    "tess2": "^1.0.0"
+    "tess2": "1.0.0"
   },
   "license": "MIT"
 }
