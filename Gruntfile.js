@@ -72,6 +72,7 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['haxe', 'concat', 'replace'] );
 
   grunt.registerTask('build', build_steps);
+  grunt.registerTask('mocha', ['mochaTest']);
   grunt.registerTask('test', ['haxe', 'replace','concat', 'mochaTest']);
   grunt.registerTask('benchmarks', ['concat', 'benchmark']);
 

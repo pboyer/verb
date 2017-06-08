@@ -31,7 +31,6 @@
 
     // node.js context, but not WebWorker
     if ( isNode() && !isWebworker() ){
-        console.log(typeof window);
         Worker = require('webworker-threads').Worker;
     }
 

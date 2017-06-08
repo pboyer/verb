@@ -1,4 +1,4 @@
-# verb 2.0.0 docs
+# verb
 
 ## What is verb?
 
@@ -15,7 +15,7 @@ one.
 
 The library is split into four parts:
 
-* **verb.geom** - Geometric types that make it easy to work with NURBS. Includes most curve and surface types.
+* **verb.geom** - Geometric types that make it easy to work with NURBS. Includes many commonly used curve and surface types.
 * **verb.core** - Mathematical and geometric utilities that are shared throughout the library.
 * **verb.eval** - Fundamental NURBS algorithms for evaluation, intersection, analysis, and more.
 * **verb.exe** - Tools for managing multi-core evaluation on different platforms.
