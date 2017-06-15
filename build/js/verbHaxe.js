@@ -255,6 +255,12 @@ haxe__$Int64__$_$_$Int64.__name__ = ["haxe","_Int64","___Int64"];
 haxe__$Int64__$_$_$Int64.prototype = {
 	__class__: haxe__$Int64__$_$_$Int64
 };
+var haxe_Log = function() { };
+$hxClasses["haxe.Log"] = haxe_Log;
+haxe_Log.__name__ = ["haxe","Log"];
+haxe_Log.trace = function(v,infos) {
+	js_Boot.__trace(v,infos);
+};
 var haxe_Serializer = function() {
 	this.buf = new StringBuf();
 	this.cache = [];
@@ -989,6 +995,25 @@ js__$Boot_HaxeError.prototype = $extend(Error.prototype,{
 var js_Boot = function() { };
 $hxClasses["js.Boot"] = js_Boot;
 js_Boot.__name__ = ["js","Boot"];
+js_Boot.__unhtml = function(s) {
+	return s.split("&").join("&amp;").split("<").join("&lt;").split(">").join("&gt;");
+};
+js_Boot.__trace = function(v,i) {
+	var msg;
+	if(i != null) msg = i.fileName + ":" + i.lineNumber + ": "; else msg = "";
+	msg += js_Boot.__string_rec(v,"");
+	if(i != null && i.customParams != null) {
+		var _g = 0;
+		var _g1 = i.customParams;
+		while(_g < _g1.length) {
+			var v1 = _g1[_g];
+			++_g;
+			msg += "," + js_Boot.__string_rec(v1,"");
+		}
+	}
+	var d;
+	if(typeof(document) != "undefined" && (d = document.getElementById("haxe:trace")) != null) d.innerHTML += js_Boot.__unhtml(msg) + "<br/>"; else if(typeof console != "undefined" && console.log != null) console.log(msg);
+};
 js_Boot.getClass = function(o) {
 	if((o instanceof Array) && o.__enum__ == null) return Array; else {
 		var cl = o.__class__;
@@ -1868,7 +1893,7 @@ var verb_Verb = function() { };
 $hxClasses["verb.Verb"] = verb_Verb;
 verb_Verb.__name__ = ["verb","Verb"];
 verb_Verb.main = function() {
-	console.log("verb 2.1.0");
+	haxe_Log.trace("verb 2.1.0",{ fileName : "Verb.hx", lineNumber : 46, className : "verb.Verb", methodName : "main"});
 };
 var verb_core_ArrayExtensions = function() { };
 $hxClasses["verb.core.ArrayExtensions"] = verb_core_ArrayExtensions;
@@ -3244,6 +3269,60 @@ verb_core_Deserializer.deserialize = function(s) {
 	var unserializer = new haxe_Unserializer(s);
 	var r = unserializer.unserialize();
 	return r;
+};
+var verb_core_SurfaceBoundingBoxTree = function(surface,splitV,knotTolU,knotTolV) {
+	if(splitV == null) splitV = false;
+	this._boundingBox = null;
+	this._surface = surface;
+	if(knotTolU == null) knotTolU = verb_core_Vec.domain(surface.knotsU) / 16;
+	if(knotTolV == null) knotTolV = verb_core_Vec.domain(surface.knotsV) / 16;
+	var divisible = false;
+	if(splitV) divisible = verb_core_Vec.domain(this._surface.knotsV) > knotTolV; else divisible = verb_core_Vec.domain(this._surface.knotsU) > knotTolU;
+	if(!divisible) return;
+	var min;
+	var max;
+	if(splitV) {
+		min = verb_core_ArrayExtensions.first(this._surface.knotsV);
+		max = verb_core_ArrayExtensions.last(this._surface.knotsV);
+	} else {
+		min = verb_core_ArrayExtensions.first(this._surface.knotsU);
+		max = verb_core_ArrayExtensions.last(this._surface.knotsU);
+	}
+	var dom = max - min;
+	var pivot = (min + max) / 2.0 + dom * 0.1 * Math.random();
+	var srfs = verb_eval_Divide.surfaceSplit(this._surface,pivot,splitV);
+	this._children = new verb_core_Pair(new verb_core_SurfaceBoundingBoxTree(srfs[0],!splitV,knotTolU,knotTolV),new verb_core_SurfaceBoundingBoxTree(srfs[1],!splitV,knotTolU,knotTolV));
+};
+$hxClasses["verb.core.SurfaceBoundingBoxTree"] = verb_core_SurfaceBoundingBoxTree;
+verb_core_SurfaceBoundingBoxTree.__name__ = ["verb","core","SurfaceBoundingBoxTree"];
+verb_core_SurfaceBoundingBoxTree.__interfaces__ = [verb_eval_IBoundingBoxTree];
+verb_core_SurfaceBoundingBoxTree.prototype = {
+	split: function() {
+		return this._children;
+	}
+	,boundingBox: function() {
+		if(this._boundingBox == null) {
+			this._boundingBox = new verb_core_BoundingBox();
+			var _g = 0;
+			var _g1 = this._surface.controlPoints;
+			while(_g < _g1.length) {
+				var row = _g1[_g];
+				++_g;
+				this._boundingBox.addRange(verb_eval_Eval.dehomogenize1d(row));
+			}
+		}
+		return this._boundingBox;
+	}
+	,'yield': function() {
+		return this._surface;
+	}
+	,indivisible: function(tolerance) {
+		return this._children == null;
+	}
+	,empty: function() {
+		return false;
+	}
+	,__class__: verb_core_SurfaceBoundingBoxTree
 };
 var verb_core_Trig = $hx_exports.core.Trig = function() { };
 $hxClasses["verb.core.Trig"] = verb_core_Trig;
@@ -4799,6 +4878,435 @@ verb_eval_Eval.homogenize2d = function(controlPoints,weights) {
 		homo_controlPoints.push(verb_eval_Eval.homogenize1d(controlPoints[i1],weights1[i1]));
 	}
 	return homo_controlPoints;
+};
+var verb_eval_MarchStepState = $hxClasses["verb.eval.MarchStepState"] = { __ename__ : ["verb","eval","MarchStepState"], __constructs__ : ["OutOfBounds","InsideDomain","AtBoundary","CompleteLoop","CoincidentStartPoint"] };
+verb_eval_MarchStepState.OutOfBounds = ["OutOfBounds",0];
+verb_eval_MarchStepState.OutOfBounds.toString = $estr;
+verb_eval_MarchStepState.OutOfBounds.__enum__ = verb_eval_MarchStepState;
+verb_eval_MarchStepState.InsideDomain = ["InsideDomain",1];
+verb_eval_MarchStepState.InsideDomain.toString = $estr;
+verb_eval_MarchStepState.InsideDomain.__enum__ = verb_eval_MarchStepState;
+verb_eval_MarchStepState.AtBoundary = ["AtBoundary",2];
+verb_eval_MarchStepState.AtBoundary.toString = $estr;
+verb_eval_MarchStepState.AtBoundary.__enum__ = verb_eval_MarchStepState;
+verb_eval_MarchStepState.CompleteLoop = ["CompleteLoop",3];
+verb_eval_MarchStepState.CompleteLoop.toString = $estr;
+verb_eval_MarchStepState.CompleteLoop.__enum__ = verb_eval_MarchStepState;
+verb_eval_MarchStepState.CoincidentStartPoint = ["CoincidentStartPoint",4];
+verb_eval_MarchStepState.CoincidentStartPoint.toString = $estr;
+verb_eval_MarchStepState.CoincidentStartPoint.__enum__ = verb_eval_MarchStepState;
+var verb_eval_MarchStep = function(step,olduv0,olduv1,uv0,uv1,oldpoint,point,state,stepCount) {
+	this.stepCount = 0;
+	this.step = step;
+	this.olduv0 = olduv0;
+	this.olduv1 = olduv1;
+	this.uv0 = uv0;
+	this.uv1 = uv1;
+	this.oldpoint = oldpoint;
+	this.point = point;
+	this.state = state;
+	this.stepCount = stepCount;
+};
+$hxClasses["verb.eval.MarchStep"] = verb_eval_MarchStep;
+verb_eval_MarchStep.__name__ = ["verb","eval","MarchStep"];
+verb_eval_MarchStep.outOfBounds = function() {
+	return new verb_eval_MarchStep(null,null,null,null,null,null,null,verb_eval_MarchStepState.OutOfBounds,0);
+};
+verb_eval_MarchStep.init = function(pt) {
+	return new verb_eval_MarchStep(null,null,null,pt.uv0,pt.uv1,null,pt.point,verb_eval_MarchStepState.InsideDomain,0);
+};
+verb_eval_MarchStep.prototype = {
+	__class__: verb_eval_MarchStep
+};
+var verb_eval_ExpIntersect = $hx_exports.eval.ExpIntersect = function() { };
+$hxClasses["verb.eval.ExpIntersect"] = verb_eval_ExpIntersect;
+verb_eval_ExpIntersect.__name__ = ["verb","eval","ExpIntersect"];
+verb_eval_ExpIntersect.outsideDomain = function(surface,uv) {
+	var u = uv[0];
+	var v = uv[1];
+	return u < verb_core_ArrayExtensions.first(surface.knotsU) || v < verb_core_ArrayExtensions.first(surface.knotsV) || u > verb_core_ArrayExtensions.last(surface.knotsU) || v > verb_core_ArrayExtensions.last(surface.knotsV);
+};
+verb_eval_ExpIntersect.clampToDomain = function(surface,uv) {
+	var u = uv[0];
+	var v = uv[1];
+	if(u < verb_core_ArrayExtensions.first(surface.knotsU)) u = verb_core_ArrayExtensions.first(surface.knotsU);
+	if(u > verb_core_ArrayExtensions.last(surface.knotsU)) u = verb_core_ArrayExtensions.last(surface.knotsU);
+	if(v < verb_core_ArrayExtensions.first(surface.knotsV)) v = verb_core_ArrayExtensions.first(surface.knotsV);
+	if(v > verb_core_ArrayExtensions.last(surface.knotsV)) u = verb_core_ArrayExtensions.last(surface.knotsV);
+	return [u,v];
+};
+verb_eval_ExpIntersect.clampStep = function(surface,uv,step) {
+	var u = uv[0];
+	var v = uv[1];
+	var nu = u + step[0];
+	if(nu > verb_core_ArrayExtensions.last(surface.knotsU) + verb_core_Constants.EPSILON) step = verb_core_Vec.mul((verb_core_ArrayExtensions.last(surface.knotsU) - u) / step[0],step); else if(nu < verb_core_ArrayExtensions.first(surface.knotsU) - verb_core_Constants.EPSILON) step = verb_core_Vec.mul((verb_core_ArrayExtensions.first(surface.knotsU) - u) / step[0],step);
+	var nv = v + step[1];
+	if(nv > verb_core_ArrayExtensions.last(surface.knotsV) + verb_core_Constants.EPSILON) step = verb_core_Vec.mul((verb_core_ArrayExtensions.last(surface.knotsV) - v) / step[1],step); else if(nv < verb_core_ArrayExtensions.first(surface.knotsV) - verb_core_Constants.EPSILON) step = verb_core_Vec.mul((verb_core_ArrayExtensions.first(surface.knotsV) - v) / step[1],step);
+	return step;
+};
+verb_eval_ExpIntersect.march = function(surface0,surface1,prev,currentIndex,allStartPts,tol) {
+	var first = allStartPts[currentIndex];
+	var uv0 = prev.uv0;
+	var uv1 = prev.uv1;
+	var derivs0 = verb_eval_Eval.rationalSurfaceDerivatives(surface0,uv0[0],uv0[1],1);
+	var derivs1 = verb_eval_Eval.rationalSurfaceDerivatives(surface1,uv1[0],uv1[1],1);
+	var p = derivs0[0][0];
+	var q = derivs1[0][0];
+	var dfdu = derivs0[1][0];
+	var dfdv = derivs0[0][1];
+	var dgdu = derivs1[1][0];
+	var dgdv = derivs1[0][1];
+	var norm0 = verb_core_Vec.cross(dfdu,dfdv);
+	var norm1 = verb_core_Vec.cross(dgdu,dgdv);
+	var unitStep = verb_core_Vec.normalized(verb_core_Vec.cross(norm0,norm1));
+	var stepLength = verb_eval_ExpIntersect.INIT_STEP_LENGTH;
+	if(prev.oldpoint != null) {
+		var denom = Math.acos(verb_core_Vec.dot(verb_core_Vec.normalized(prev.step),unitStep));
+		if(Math.abs(denom) < verb_core_Constants.EPSILON) stepLength = verb_eval_ExpIntersect.LINEAR_STEP_LENGTH; else {
+			var radiusOfCurvature = verb_core_Vec.dist(prev.oldpoint,prev.point) / Math.acos(verb_core_Vec.dot(verb_core_Vec.normalized(prev.step),unitStep));
+			var theta = 2 * Math.acos(1 - tol * 4 / radiusOfCurvature);
+			stepLength = radiusOfCurvature * Math.tan(theta);
+		}
+	}
+	var step = verb_core_Vec.mul(stepLength,unitStep);
+	var x = verb_core_Vec.add(prev.point,step);
+	var pdif = verb_core_Vec.sub(x,p);
+	var qdif = verb_core_Vec.sub(x,q);
+	var rw = verb_core_Vec.cross(dfdu,norm0);
+	var rt = verb_core_Vec.cross(dfdv,norm0);
+	var su = verb_core_Vec.cross(dgdu,norm1);
+	var sv = verb_core_Vec.cross(dgdv,norm1);
+	var dw = verb_core_Vec.dot(rt,pdif) / verb_core_Vec.dot(rt,dfdu);
+	var dt = verb_core_Vec.dot(rw,pdif) / verb_core_Vec.dot(rw,dfdv);
+	var du = verb_core_Vec.dot(sv,qdif) / verb_core_Vec.dot(sv,dgdu);
+	var dv = verb_core_Vec.dot(su,qdif) / verb_core_Vec.dot(su,dgdv);
+	var stepuv0 = [dw,dt];
+	var stepuv1 = [du,dv];
+	var newuv0 = verb_core_Vec.add(uv0,stepuv0);
+	var newuv1 = verb_core_Vec.add(uv1,stepuv1);
+	var state = verb_eval_MarchStepState.InsideDomain;
+	if(verb_eval_ExpIntersect.outsideDomain(surface0,newuv0)) {
+		state = verb_eval_MarchStepState.AtBoundary;
+		var l = verb_core_Vec.norm(stepuv0);
+		stepuv0 = verb_eval_ExpIntersect.clampStep(surface0,uv0,stepuv0);
+		stepuv1 = verb_core_Vec.mul(verb_core_Vec.norm(stepuv0) / l,stepuv1);
+	}
+	if(verb_eval_ExpIntersect.outsideDomain(surface1,newuv1)) {
+		state = verb_eval_MarchStepState.AtBoundary;
+		var l1 = verb_core_Vec.norm(stepuv1);
+		stepuv1 = verb_eval_ExpIntersect.clampStep(surface1,uv1,stepuv1);
+		stepuv0 = verb_core_Vec.mul(verb_core_Vec.norm(stepuv1) / l1,stepuv0);
+	}
+	newuv0 = verb_core_Vec.add(uv0,stepuv0);
+	newuv1 = verb_core_Vec.add(uv1,stepuv1);
+	var relaxed = verb_eval_Intersect.surfacesAtPointWithEstimate(surface0,surface1,newuv0,newuv1,tol);
+	if(prev.stepCount > 5 && prev.olduv0 != null && verb_core_Trig.distToSegment(prev.point,first.point,relaxed.point) < 10 * tol) return new verb_eval_MarchStep(step,prev.uv0,prev.uv1,first.uv0,first.uv1,prev.point,first.point,verb_eval_MarchStepState.CompleteLoop,prev.stepCount + 1);
+	if(prev.stepCount > 5 && verb_eval_ExpIntersect.isCoincidentWithStartPoint(relaxed.point,currentIndex,allStartPts,10 * tol)) state = verb_eval_MarchStepState.CoincidentStartPoint;
+	return new verb_eval_MarchStep(step,prev.uv0,prev.uv1,relaxed.uv0,relaxed.uv1,prev.point,relaxed.point,state,prev.stepCount + 1);
+};
+verb_eval_ExpIntersect.isCoincidentWithStartPoint = function(point,currentIndex,allStartPts,tol) {
+	if(currentIndex == 0) return false;
+	var _g = 0;
+	while(_g < currentIndex) {
+		var i = _g++;
+		var dist = verb_core_Vec.distSquared(allStartPts[i].point,allStartPts[currentIndex].point);
+		if(dist < tol) {
+			haxe_Log.trace("Coincident start point!",{ fileName : "ExpIntersect.hx", lineNumber : 256, className : "verb.eval.ExpIntersect", methodName : "isCoincidentWithStartPoint"});
+			return true;
+		}
+	}
+	return false;
+};
+verb_eval_ExpIntersect.completeMarch = function(surface0,surface1,startIndex,allStartPts,tol) {
+	var start = allStartPts[startIndex];
+	var step = verb_eval_ExpIntersect.march(surface0,surface1,verb_eval_MarchStep.init(start),startIndex,allStartPts,tol);
+	if(step.state == verb_eval_MarchStepState.AtBoundary || step.state == verb_eval_MarchStepState.CoincidentStartPoint) return null;
+	var $final = [];
+	$final.push(start);
+	while(step.state != verb_eval_MarchStepState.CoincidentStartPoint && step.state != verb_eval_MarchStepState.AtBoundary && step.state != verb_eval_MarchStepState.CompleteLoop) {
+		$final.push(new verb_core_SurfaceSurfaceIntersectionPoint(step.uv0,step.uv1,step.point,-1));
+		if(step.state == verb_eval_MarchStepState.CoincidentStartPoint) return null;
+		step = verb_eval_ExpIntersect.march(surface0,surface1,step,startIndex,allStartPts,tol);
+	}
+	$final.push(new verb_core_SurfaceSurfaceIntersectionPoint(step.uv0,step.uv1,step.point,-1));
+	return $final;
+};
+verb_eval_ExpIntersect.surfaces = function(surface0,surface1,tol) {
+	var $final = [];
+	var startPts = verb_eval_ExpIntersect.intersectBoundaryCurves(surface0,surface1,tol);
+	var approxInner = verb_eval_ExpIntersect.approxInnerCriticalPts(surface0,surface1);
+	var refinedInner = verb_eval_ExpIntersect.refineInnerCriticalPts(surface0,surface1,approxInner,tol);
+	var b = true;
+	var _g = 0;
+	while(_g < refinedInner.length) {
+		var pair = refinedInner[_g];
+		++_g;
+		var res = verb_eval_Intersect.curveAndSurface(verb_eval_Make.surfaceIsocurve(surface0,pair.item0[0],false),surface1);
+		if(res.length == 0) continue;
+		if(!b) continue;
+		b = false;
+		var $int = new verb_core_SurfaceSurfaceIntersectionPoint([pair.item0[0],res[0].u],res[0].uv,res[0].curvePoint,-1);
+		startPts.push($int);
+	}
+	var i = 0;
+	while(i < startPts.length) {
+		haxe_Log.trace("starting at",{ fileName : "ExpIntersect.hx", lineNumber : 329, className : "verb.eval.ExpIntersect", methodName : "surfaces", customParams : [startPts[i].point]});
+		var res1 = verb_eval_ExpIntersect.completeMarch(surface0,surface1,i,startPts,tol);
+		if(res1 != null) {
+			$final.push(res1);
+			var x = verb_core_ArrayExtensions.last(res1);
+			startPts.splice(i,0,x);
+			haxe_Log.trace("inserting",{ fileName : "ExpIntersect.hx", lineNumber : 337, className : "verb.eval.ExpIntersect", methodName : "surfaces", customParams : [verb_core_ArrayExtensions.last(res1).point]});
+			i += 2;
+		}
+		i++;
+	}
+	var _g1 = [];
+	var _g11 = 0;
+	while(_g11 < $final.length) {
+		var pts = $final[_g11];
+		++_g11;
+		_g1.push(verb_eval_Make.rationalInterpCurve(pts.map(function(x1) {
+			return x1.point;
+		})));
+	}
+	return _g1;
+};
+verb_eval_ExpIntersect.refineInnerCriticalPts = function(surface0,surface1,approx,tol) {
+	return approx.map(function(x) {
+		return verb_eval_ExpIntersect.refineCriticalPt(surface0,surface1,x,tol);
+	});
+};
+verb_eval_ExpIntersect.refineCriticalPt = function(surface0,surface1,approx,tol) {
+	var obj = function(x) {
+		var d0 = verb_eval_Eval.rationalSurfaceDerivatives(surface0,x[0],x[1],1);
+		var d1 = verb_eval_Eval.rationalSurfaceDerivatives(surface1,x[2],x[3],1);
+		var n0 = verb_core_Vec.normalized(verb_core_Vec.cross(d0[1][0],d0[0][1]));
+		var n1 = verb_core_Vec.normalized(verb_core_Vec.cross(d1[1][0],d1[0][1]));
+		var vec = verb_core_Vec.sub(d0[0][0],d1[0][0]);
+		var dist = verb_core_Vec.normSquared(vec);
+		var vecnorm = verb_core_Vec.dot(vec,n1);
+		var normdot = verb_core_Vec.dot(n0,n1);
+		return dist - vecnorm * vecnorm + 1 - normdot * normdot;
+	};
+	var start = [approx.item0[0],approx.item0[1],approx.item1[0],approx.item1[1]];
+	var sol = verb_core_Minimizer.uncmin(obj,start,tol);
+	var $final = sol.solution;
+	return new verb_core_Pair([$final[0],$final[1]],[$final[2],$final[3]]);
+};
+verb_eval_ExpIntersect.verifyInnerCriticalPts = function(surface0,surface1,approx) {
+	return null;
+};
+verb_eval_ExpIntersect.boundingBoxLeaves = function(division) {
+	if(division.indivisible(0)) return [division["yield"]()];
+	var halves = division.split();
+	return verb_eval_ExpIntersect.boundingBoxLeaves(halves.item0).concat(verb_eval_ExpIntersect.boundingBoxLeaves(halves.item1));
+};
+verb_eval_ExpIntersect.approxInnerCriticalPts = function(surface0,surface1) {
+	var div0 = new verb_core_LazySurfaceBoundingBoxTree(surface0,false,0.6,0.6);
+	var div1 = new verb_core_LazySurfaceBoundingBoxTree(surface1,false,0.6,0.6);
+	var res = verb_eval_Intersect.boundingBoxTrees(div0,div1,0);
+	var numSamples = 4;
+	var criticalPts = [];
+	var _g = 0;
+	while(_g < res.length) {
+		var srfpair = res[_g];
+		++_g;
+		var a = verb_eval_ExpIntersect.approxSurfaceDelPhiField(srfpair.item0,srfpair.item1,numSamples,numSamples);
+		var f = a.delphi;
+		var uvs0 = a.uvs0;
+		var uvs1 = a.uvs1;
+		var _g2 = 1;
+		var _g1 = f.length;
+		while(_g2 < _g1) {
+			var i = _g2++;
+			var _g4 = 1;
+			var _g3 = f[i].length;
+			while(_g4 < _g3) {
+				var j = _g4++;
+				var num = verb_eval_ExpIntersect.approxRotationNumber([f[i][j - 1],f[i][j],f[i - 1][j],f[i - 1][j - 1]]);
+				if(num != 0) {
+					var midU0 = (uvs0[i][j][1] + uvs0[i][j - 1][1]) / 2;
+					var midV0 = (uvs0[i][j][0] + uvs0[i - 1][j][0]) / 2;
+					var midU1 = (uvs1[i][j][1] + uvs1[i][j - 1][1]) / 2;
+					var midV1 = (uvs1[i][j][0] + uvs1[i - 1][j][0]) / 2;
+					criticalPts.push(new verb_core_Pair([midU0,midV0],[midU1,midV1]));
+				}
+			}
+		}
+	}
+	return criticalPts;
+};
+verb_eval_ExpIntersect.approxRotationNumber = function(vs) {
+	var sum = 0.0;
+	var l = vs.length;
+	var _g1 = 1;
+	var _g = l + 1;
+	while(_g1 < _g) {
+		var i = _g1++;
+		var ang = verb_core_Vec.angleBetweenNormalized2d(vs[i - 1],vs[i % l]);
+		sum += Math.abs(ang);
+	}
+	return Math.floor(Math.abs(sum / (2 * Math.PI)));
+};
+verb_eval_ExpIntersect.approxSurfaceDelPhiField = function(surface0,surface1,divs_u,divs_v) {
+	var tess0 = verb_eval_ExpIntersect.sampleSurfaceRegular(surface0,divs_u,divs_v);
+	var tess1 = verb_eval_ExpIntersect.sampleSurfaceRegular(surface1,divs_u,divs_v);
+	var minuvs = [];
+	var _g1 = 0;
+	var _g = tess0.uvs.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		var minuvsrow = [];
+		minuvs.push(minuvsrow);
+		var _g3 = 0;
+		var _g2 = tess0.uvs[i].length;
+		while(_g3 < _g2) {
+			var j = _g3++;
+			var minDist = Infinity;
+			var minUV = [Infinity,Infinity];
+			var _g5 = 0;
+			var _g4 = tess1.uvs.length;
+			while(_g5 < _g4) {
+				var k = _g5++;
+				var _g7 = 0;
+				var _g6 = tess1.uvs[k].length;
+				while(_g7 < _g6) {
+					var l = _g7++;
+					var dist = verb_core_Vec.distSquared(tess0.points[i][j],tess0.points[k][l]);
+					if(dist < minDist) {
+						minDist = dist;
+						minUV = tess0.uvs[k][l];
+					}
+				}
+			}
+			minuvsrow.push(minUV);
+		}
+	}
+	var delphifield = [];
+	var _g11 = 0;
+	var _g8 = minuvs.length;
+	while(_g11 < _g8) {
+		var i1 = _g11++;
+		var delphirow = [];
+		delphifield.push(delphirow);
+		var _g31 = 0;
+		var _g21 = minuvs[i1].length;
+		while(_g31 < _g21) {
+			var j1 = _g31++;
+			var uv0 = tess0.uvs[i1][j1];
+			var uv1 = minuvs[i1][j1];
+			var derivs0 = verb_eval_Eval.rationalSurfaceDerivatives(surface0,uv0[0],uv0[1]);
+			var derivs1 = verb_eval_Eval.rationalSurfaceDerivatives(surface1,uv1[0],uv1[1]);
+			var n2 = verb_core_Vec.normalized(verb_core_Vec.cross(derivs1[1][0],derivs1[0][1]));
+			var ru = derivs0[1][0];
+			var rv = derivs0[0][1];
+			var delphi = verb_core_Vec.normalized([verb_core_Vec.dot(n2,ru),verb_core_Vec.dot(n2,rv)]);
+			delphirow.push(delphi);
+		}
+	}
+	return { uvs0 : tess0.uvs, uvs1 : minuvs, delphi : delphifield};
+};
+verb_eval_ExpIntersect.sampleSurfaceRegular = function(surface,divs_u,divs_v) {
+	if(divs_u < 1) divs_u = 1;
+	if(divs_v < 1) divs_v = 1;
+	var degreeU = surface.degreeU;
+	var degreeV = surface.degreeV;
+	var controlPoints = surface.controlPoints;
+	var knotsU = surface.knotsU;
+	var knotsV = surface.knotsV;
+	var offset = 0.005;
+	var u_span = verb_core_ArrayExtensions.last(knotsU) - verb_core_ArrayExtensions.first(knotsU) - 2 * offset;
+	var v_span = verb_core_ArrayExtensions.last(knotsV) - verb_core_ArrayExtensions.first(knotsV) - 2 * offset;
+	var minu = verb_core_ArrayExtensions.first(knotsU) + offset;
+	var minv = verb_core_ArrayExtensions.first(knotsV) + offset;
+	var span_u = u_span / divs_u;
+	var span_v = v_span / divs_v;
+	var points = [];
+	var uvs = [];
+	var _g1 = 0;
+	var _g = divs_u + 1;
+	while(_g1 < _g) {
+		var i = _g1++;
+		var uvrow = [];
+		uvs.push(uvrow);
+		var pointsrow = [];
+		points.push(pointsrow);
+		var pt_u = minu + i * span_u;
+		var _g3 = 0;
+		var _g2 = divs_v + 1;
+		while(_g3 < _g2) {
+			var j = _g3++;
+			var pt_v = minv + j * span_v;
+			uvrow.push([pt_u,pt_v]);
+			pointsrow.push(verb_eval_Eval.rationalSurfacePoint(surface,pt_u,pt_v));
+		}
+	}
+	return { uvs : uvs, points : points};
+};
+verb_eval_ExpIntersect.intersectBoundaryCurves = function(surface0,surface1,tol) {
+	var srf0bs = verb_eval_Make.surfaceBoundaryCurves(surface0);
+	var srf1bs = verb_eval_Make.surfaceBoundaryCurves(surface1);
+	var ints = [];
+	var _g1 = 0;
+	var _g = srf0bs.length;
+	while(_g1 < _g) {
+		var i = _g1++;
+		var crv = srf0bs[i];
+		var res = verb_eval_Intersect.curveAndSurface(crv,surface1,tol);
+		var _g2 = 0;
+		while(_g2 < res.length) {
+			var $int = res[_g2];
+			++_g2;
+			var uv;
+			switch(i) {
+			case 0:
+				uv = [verb_core_ArrayExtensions.first(surface0.knotsU),$int.u];
+				break;
+			case 1:
+				uv = [verb_core_ArrayExtensions.last(surface0.knotsU),$int.u];
+				break;
+			case 2:
+				uv = [$int.u,verb_core_ArrayExtensions.first(surface0.knotsV)];
+				break;
+			default:
+				uv = [$int.u,verb_core_ArrayExtensions.last(surface0.knotsV)];
+			}
+			var dist = verb_core_Vec.dist($int.curvePoint,$int.surfacePoint);
+			ints.push(new verb_core_SurfaceSurfaceIntersectionPoint(uv,$int.uv,$int.curvePoint,dist));
+		}
+	}
+	var _g11 = 0;
+	var _g3 = srf1bs.length;
+	while(_g11 < _g3) {
+		var i1 = _g11++;
+		var crv1 = srf1bs[i1];
+		var res1 = verb_eval_Intersect.curveAndSurface(crv1,surface0,tol);
+		var _g21 = 0;
+		while(_g21 < res1.length) {
+			var int1 = res1[_g21];
+			++_g21;
+			var uv1;
+			switch(i1) {
+			case 0:
+				uv1 = [verb_core_ArrayExtensions.first(surface1.knotsU),int1.u];
+				break;
+			case 1:
+				uv1 = [verb_core_ArrayExtensions.last(surface1.knotsU),int1.u];
+				break;
+			case 2:
+				uv1 = [int1.u,verb_core_ArrayExtensions.first(surface1.knotsV)];
+				break;
+			default:
+				uv1 = [int1.u,verb_core_ArrayExtensions.last(surface1.knotsV)];
+			}
+			var dist1 = verb_core_Vec.dist(int1.curvePoint,int1.surfacePoint);
+			ints.push(new verb_core_SurfaceSurfaceIntersectionPoint(int1.uv,uv1,int1.curvePoint,dist1));
+		}
+	}
+	return verb_core_ArrayExtensions.unique(ints,function(a,b) {
+		return Math.abs(a.uv0[0] - b.uv0[0]) < tol && Math.abs(a.uv0[1] - b.uv0[1]) < tol;
+	});
 };
 var verb_eval_Intersect = $hx_exports.eval.Intersect = function() { };
 $hxClasses["verb.eval.Intersect"] = verb_eval_Intersect;
@@ -6820,7 +7328,7 @@ verb_exe_WorkerPool.prototype = {
 						}
 					} catch( error ) {
 						if (error instanceof js__$Boot_HaxeError) error = error.val;
-						console.log(error);
+						haxe_Log.trace(error,{ fileName : "WorkerPool.hx", lineNumber : 82, className : "verb.exe.WorkerPool", methodName : "processQueue"});
 					}
 					_g.processQueue();
 				};
@@ -7658,6 +8166,8 @@ verb_core_Constants.EPSILON = 1e-10;
 verb_core_Constants.VERSION = "2.0.0";
 verb_eval_Analyze.Tvalues = [[],[],[-0.5773502691896257645091487805019574556476,0.5773502691896257645091487805019574556476],[0,-0.7745966692414833770358530799564799221665,0.7745966692414833770358530799564799221665],[-0.3399810435848562648026657591032446872005,0.3399810435848562648026657591032446872005,-0.8611363115940525752239464888928095050957,0.8611363115940525752239464888928095050957],[0,-0.5384693101056830910363144207002088049672,0.5384693101056830910363144207002088049672,-0.9061798459386639927976268782993929651256,0.9061798459386639927976268782993929651256],[0.6612093864662645136613995950199053470064,-0.6612093864662645136613995950199053470064,-0.2386191860831969086305017216807119354186,0.2386191860831969086305017216807119354186,-0.9324695142031520278123015544939946091347,0.9324695142031520278123015544939946091347],[0,0.4058451513773971669066064120769614633473,-0.4058451513773971669066064120769614633473,-0.7415311855993944398638647732807884070741,0.7415311855993944398638647732807884070741,-0.9491079123427585245261896840478512624007,0.9491079123427585245261896840478512624007],[-0.1834346424956498049394761423601839806667,0.1834346424956498049394761423601839806667,-0.5255324099163289858177390491892463490419,0.5255324099163289858177390491892463490419,-0.7966664774136267395915539364758304368371,0.7966664774136267395915539364758304368371,-0.9602898564975362316835608685694729904282,0.9602898564975362316835608685694729904282],[0,-0.8360311073266357942994297880697348765441,0.8360311073266357942994297880697348765441,-0.9681602395076260898355762029036728700494,0.9681602395076260898355762029036728700494,-0.3242534234038089290385380146433366085719,0.3242534234038089290385380146433366085719,-0.6133714327005903973087020393414741847857,0.6133714327005903973087020393414741847857],[-0.1488743389816312108848260011297199846175,0.1488743389816312108848260011297199846175,-0.4333953941292471907992659431657841622000,0.4333953941292471907992659431657841622000,-0.6794095682990244062343273651148735757692,0.6794095682990244062343273651148735757692,-0.8650633666889845107320966884234930485275,0.8650633666889845107320966884234930485275,-0.9739065285171717200779640120844520534282,0.9739065285171717200779640120844520534282],[0,-0.2695431559523449723315319854008615246796,0.2695431559523449723315319854008615246796,-0.5190961292068118159257256694586095544802,0.5190961292068118159257256694586095544802,-0.7301520055740493240934162520311534580496,0.7301520055740493240934162520311534580496,-0.8870625997680952990751577693039272666316,0.8870625997680952990751577693039272666316,-0.9782286581460569928039380011228573907714,0.9782286581460569928039380011228573907714],[-0.1252334085114689154724413694638531299833,0.1252334085114689154724413694638531299833,-0.3678314989981801937526915366437175612563,0.3678314989981801937526915366437175612563,-0.5873179542866174472967024189405342803690,0.5873179542866174472967024189405342803690,-0.7699026741943046870368938332128180759849,0.7699026741943046870368938332128180759849,-0.9041172563704748566784658661190961925375,0.9041172563704748566784658661190961925375,-0.9815606342467192506905490901492808229601,0.9815606342467192506905490901492808229601],[0,-0.2304583159551347940655281210979888352115,0.2304583159551347940655281210979888352115,-0.4484927510364468528779128521276398678019,0.4484927510364468528779128521276398678019,-0.6423493394403402206439846069955156500716,0.6423493394403402206439846069955156500716,-0.8015780907333099127942064895828598903056,0.8015780907333099127942064895828598903056,-0.9175983992229779652065478365007195123904,0.9175983992229779652065478365007195123904,-0.9841830547185881494728294488071096110649,0.9841830547185881494728294488071096110649],[-0.1080549487073436620662446502198347476119,0.1080549487073436620662446502198347476119,-0.3191123689278897604356718241684754668342,0.3191123689278897604356718241684754668342,-0.5152486363581540919652907185511886623088,0.5152486363581540919652907185511886623088,-0.6872929048116854701480198030193341375384,0.6872929048116854701480198030193341375384,-0.8272013150697649931897947426503949610397,0.8272013150697649931897947426503949610397,-0.9284348836635735173363911393778742644770,0.9284348836635735173363911393778742644770,-0.9862838086968123388415972667040528016760,0.9862838086968123388415972667040528016760],[0,-0.2011940939974345223006283033945962078128,0.2011940939974345223006283033945962078128,-0.3941513470775633698972073709810454683627,0.3941513470775633698972073709810454683627,-0.5709721726085388475372267372539106412383,0.5709721726085388475372267372539106412383,-0.7244177313601700474161860546139380096308,0.7244177313601700474161860546139380096308,-0.8482065834104272162006483207742168513662,0.8482065834104272162006483207742168513662,-0.9372733924007059043077589477102094712439,0.9372733924007059043077589477102094712439,-0.9879925180204854284895657185866125811469,0.9879925180204854284895657185866125811469],[-0.0950125098376374401853193354249580631303,0.0950125098376374401853193354249580631303,-0.2816035507792589132304605014604961064860,0.2816035507792589132304605014604961064860,-0.4580167776572273863424194429835775735400,0.4580167776572273863424194429835775735400,-0.6178762444026437484466717640487910189918,0.6178762444026437484466717640487910189918,-0.7554044083550030338951011948474422683538,0.7554044083550030338951011948474422683538,-0.8656312023878317438804678977123931323873,0.8656312023878317438804678977123931323873,-0.9445750230732325760779884155346083450911,0.9445750230732325760779884155346083450911,-0.9894009349916499325961541734503326274262,0.9894009349916499325961541734503326274262],[0,-0.1784841814958478558506774936540655574754,0.1784841814958478558506774936540655574754,-0.3512317634538763152971855170953460050405,0.3512317634538763152971855170953460050405,-0.5126905370864769678862465686295518745829,0.5126905370864769678862465686295518745829,-0.6576711592166907658503022166430023351478,0.6576711592166907658503022166430023351478,-0.7815140038968014069252300555204760502239,0.7815140038968014069252300555204760502239,-0.8802391537269859021229556944881556926234,0.8802391537269859021229556944881556926234,-0.9506755217687677612227169578958030214433,0.9506755217687677612227169578958030214433,-0.9905754753144173356754340199406652765077,0.9905754753144173356754340199406652765077],[-0.0847750130417353012422618529357838117333,0.0847750130417353012422618529357838117333,-0.2518862256915055095889728548779112301628,0.2518862256915055095889728548779112301628,-0.4117511614628426460359317938330516370789,0.4117511614628426460359317938330516370789,-0.5597708310739475346078715485253291369276,0.5597708310739475346078715485253291369276,-0.6916870430603532078748910812888483894522,0.6916870430603532078748910812888483894522,-0.8037049589725231156824174550145907971032,0.8037049589725231156824174550145907971032,-0.8926024664975557392060605911271455154078,0.8926024664975557392060605911271455154078,-0.9558239495713977551811958929297763099728,0.9558239495713977551811958929297763099728,-0.9915651684209309467300160047061507702525,0.9915651684209309467300160047061507702525],[0,-0.1603586456402253758680961157407435495048,0.1603586456402253758680961157407435495048,-0.3165640999636298319901173288498449178922,0.3165640999636298319901173288498449178922,-0.4645707413759609457172671481041023679762,0.4645707413759609457172671481041023679762,-0.6005453046616810234696381649462392798683,0.6005453046616810234696381649462392798683,-0.7209661773352293786170958608237816296571,0.7209661773352293786170958608237816296571,-0.8227146565371428249789224867127139017745,0.8227146565371428249789224867127139017745,-0.9031559036148179016426609285323124878093,0.9031559036148179016426609285323124878093,-0.9602081521348300308527788406876515266150,0.9602081521348300308527788406876515266150,-0.9924068438435844031890176702532604935893,0.9924068438435844031890176702532604935893],[-0.0765265211334973337546404093988382110047,0.0765265211334973337546404093988382110047,-0.2277858511416450780804961953685746247430,0.2277858511416450780804961953685746247430,-0.3737060887154195606725481770249272373957,0.3737060887154195606725481770249272373957,-0.5108670019508270980043640509552509984254,0.5108670019508270980043640509552509984254,-0.6360536807265150254528366962262859367433,0.6360536807265150254528366962262859367433,-0.7463319064601507926143050703556415903107,0.7463319064601507926143050703556415903107,-0.8391169718222188233945290617015206853296,0.8391169718222188233945290617015206853296,-0.9122344282513259058677524412032981130491,0.9122344282513259058677524412032981130491,-0.9639719272779137912676661311972772219120,0.9639719272779137912676661311972772219120,-0.9931285991850949247861223884713202782226,0.9931285991850949247861223884713202782226],[0,-0.1455618541608950909370309823386863301163,0.1455618541608950909370309823386863301163,-0.2880213168024010966007925160646003199090,0.2880213168024010966007925160646003199090,-0.4243421202074387835736688885437880520964,0.4243421202074387835736688885437880520964,-0.5516188358872198070590187967243132866220,0.5516188358872198070590187967243132866220,-0.6671388041974123193059666699903391625970,0.6671388041974123193059666699903391625970,-0.7684399634756779086158778513062280348209,0.7684399634756779086158778513062280348209,-0.8533633645833172836472506385875676702761,0.8533633645833172836472506385875676702761,-0.9200993341504008287901871337149688941591,0.9200993341504008287901871337149688941591,-0.9672268385663062943166222149076951614246,0.9672268385663062943166222149076951614246,-0.9937521706203895002602420359379409291933,0.9937521706203895002602420359379409291933],[-0.0697392733197222212138417961186280818222,0.0697392733197222212138417961186280818222,-0.2078604266882212854788465339195457342156,0.2078604266882212854788465339195457342156,-0.3419358208920842251581474204273796195591,0.3419358208920842251581474204273796195591,-0.4693558379867570264063307109664063460953,0.4693558379867570264063307109664063460953,-0.5876404035069115929588769276386473488776,0.5876404035069115929588769276386473488776,-0.6944872631866827800506898357622567712673,0.6944872631866827800506898357622567712673,-0.7878168059792081620042779554083515213881,0.7878168059792081620042779554083515213881,-0.8658125777203001365364256370193787290847,0.8658125777203001365364256370193787290847,-0.9269567721871740005206929392590531966353,0.9269567721871740005206929392590531966353,-0.9700604978354287271239509867652687108059,0.9700604978354287271239509867652687108059,-0.9942945854823992920730314211612989803930,0.9942945854823992920730314211612989803930],[0,-0.1332568242984661109317426822417661370104,0.1332568242984661109317426822417661370104,-0.2641356809703449305338695382833096029790,0.2641356809703449305338695382833096029790,-0.3903010380302908314214888728806054585780,0.3903010380302908314214888728806054585780,-0.5095014778460075496897930478668464305448,0.5095014778460075496897930478668464305448,-0.6196098757636461563850973116495956533871,0.6196098757636461563850973116495956533871,-0.7186613631319501944616244837486188483299,0.7186613631319501944616244837486188483299,-0.8048884016188398921511184069967785579414,0.8048884016188398921511184069967785579414,-0.8767523582704416673781568859341456716389,0.8767523582704416673781568859341456716389,-0.9329710868260161023491969890384229782357,0.9329710868260161023491969890384229782357,-0.9725424712181152319560240768207773751816,0.9725424712181152319560240768207773751816,-0.9947693349975521235239257154455743605736,0.9947693349975521235239257154455743605736],[-0.0640568928626056260850430826247450385909,0.0640568928626056260850430826247450385909,-0.1911188674736163091586398207570696318404,0.1911188674736163091586398207570696318404,-0.3150426796961633743867932913198102407864,0.3150426796961633743867932913198102407864,-0.4337935076260451384870842319133497124524,0.4337935076260451384870842319133497124524,-0.5454214713888395356583756172183723700107,0.5454214713888395356583756172183723700107,-0.6480936519369755692524957869107476266696,0.6480936519369755692524957869107476266696,-0.7401241915785543642438281030999784255232,0.7401241915785543642438281030999784255232,-0.8200019859739029219539498726697452080761,0.8200019859739029219539498726697452080761,-0.8864155270044010342131543419821967550873,0.8864155270044010342131543419821967550873,-0.9382745520027327585236490017087214496548,0.9382745520027327585236490017087214496548,-0.9747285559713094981983919930081690617411,0.9747285559713094981983919930081690617411,-0.9951872199970213601799974097007368118745,0.9951872199970213601799974097007368118745]];
 verb_eval_Analyze.Cvalues = [[],[],[1.0,1.0],[0.8888888888888888888888888888888888888888,0.5555555555555555555555555555555555555555,0.5555555555555555555555555555555555555555],[0.6521451548625461426269360507780005927646,0.6521451548625461426269360507780005927646,0.3478548451374538573730639492219994072353,0.3478548451374538573730639492219994072353],[0.5688888888888888888888888888888888888888,0.4786286704993664680412915148356381929122,0.4786286704993664680412915148356381929122,0.2369268850561890875142640407199173626432,0.2369268850561890875142640407199173626432],[0.3607615730481386075698335138377161116615,0.3607615730481386075698335138377161116615,0.4679139345726910473898703439895509948116,0.4679139345726910473898703439895509948116,0.1713244923791703450402961421727328935268,0.1713244923791703450402961421727328935268],[0.4179591836734693877551020408163265306122,0.3818300505051189449503697754889751338783,0.3818300505051189449503697754889751338783,0.2797053914892766679014677714237795824869,0.2797053914892766679014677714237795824869,0.1294849661688696932706114326790820183285,0.1294849661688696932706114326790820183285],[0.3626837833783619829651504492771956121941,0.3626837833783619829651504492771956121941,0.3137066458778872873379622019866013132603,0.3137066458778872873379622019866013132603,0.2223810344533744705443559944262408844301,0.2223810344533744705443559944262408844301,0.1012285362903762591525313543099621901153,0.1012285362903762591525313543099621901153],[0.3302393550012597631645250692869740488788,0.1806481606948574040584720312429128095143,0.1806481606948574040584720312429128095143,0.0812743883615744119718921581105236506756,0.0812743883615744119718921581105236506756,0.3123470770400028400686304065844436655987,0.3123470770400028400686304065844436655987,0.2606106964029354623187428694186328497718,0.2606106964029354623187428694186328497718],[0.2955242247147528701738929946513383294210,0.2955242247147528701738929946513383294210,0.2692667193099963550912269215694693528597,0.2692667193099963550912269215694693528597,0.2190863625159820439955349342281631924587,0.2190863625159820439955349342281631924587,0.1494513491505805931457763396576973324025,0.1494513491505805931457763396576973324025,0.0666713443086881375935688098933317928578,0.0666713443086881375935688098933317928578],[0.2729250867779006307144835283363421891560,0.2628045445102466621806888698905091953727,0.2628045445102466621806888698905091953727,0.2331937645919904799185237048431751394317,0.2331937645919904799185237048431751394317,0.1862902109277342514260976414316558916912,0.1862902109277342514260976414316558916912,0.1255803694649046246346942992239401001976,0.1255803694649046246346942992239401001976,0.0556685671161736664827537204425485787285,0.0556685671161736664827537204425485787285],[0.2491470458134027850005624360429512108304,0.2491470458134027850005624360429512108304,0.2334925365383548087608498989248780562594,0.2334925365383548087608498989248780562594,0.2031674267230659217490644558097983765065,0.2031674267230659217490644558097983765065,0.1600783285433462263346525295433590718720,0.1600783285433462263346525295433590718720,0.1069393259953184309602547181939962242145,0.1069393259953184309602547181939962242145,0.0471753363865118271946159614850170603170,0.0471753363865118271946159614850170603170],[0.2325515532308739101945895152688359481566,0.2262831802628972384120901860397766184347,0.2262831802628972384120901860397766184347,0.2078160475368885023125232193060527633865,0.2078160475368885023125232193060527633865,0.1781459807619457382800466919960979955128,0.1781459807619457382800466919960979955128,0.1388735102197872384636017768688714676218,0.1388735102197872384636017768688714676218,0.0921214998377284479144217759537971209236,0.0921214998377284479144217759537971209236,0.0404840047653158795200215922009860600419,0.0404840047653158795200215922009860600419],[0.2152638534631577901958764433162600352749,0.2152638534631577901958764433162600352749,0.2051984637212956039659240656612180557103,0.2051984637212956039659240656612180557103,0.1855383974779378137417165901251570362489,0.1855383974779378137417165901251570362489,0.1572031671581935345696019386238421566056,0.1572031671581935345696019386238421566056,0.1215185706879031846894148090724766259566,0.1215185706879031846894148090724766259566,0.0801580871597602098056332770628543095836,0.0801580871597602098056332770628543095836,0.0351194603317518630318328761381917806197,0.0351194603317518630318328761381917806197],[0.2025782419255612728806201999675193148386,0.1984314853271115764561183264438393248186,0.1984314853271115764561183264438393248186,0.1861610000155622110268005618664228245062,0.1861610000155622110268005618664228245062,0.1662692058169939335532008604812088111309,0.1662692058169939335532008604812088111309,0.1395706779261543144478047945110283225208,0.1395706779261543144478047945110283225208,0.1071592204671719350118695466858693034155,0.1071592204671719350118695466858693034155,0.0703660474881081247092674164506673384667,0.0703660474881081247092674164506673384667,0.0307532419961172683546283935772044177217,0.0307532419961172683546283935772044177217],[0.1894506104550684962853967232082831051469,0.1894506104550684962853967232082831051469,0.1826034150449235888667636679692199393835,0.1826034150449235888667636679692199393835,0.1691565193950025381893120790303599622116,0.1691565193950025381893120790303599622116,0.1495959888165767320815017305474785489704,0.1495959888165767320815017305474785489704,0.1246289712555338720524762821920164201448,0.1246289712555338720524762821920164201448,0.0951585116824927848099251076022462263552,0.0951585116824927848099251076022462263552,0.0622535239386478928628438369943776942749,0.0622535239386478928628438369943776942749,0.0271524594117540948517805724560181035122,0.0271524594117540948517805724560181035122],[0.1794464703562065254582656442618856214487,0.1765627053669926463252709901131972391509,0.1765627053669926463252709901131972391509,0.1680041021564500445099706637883231550211,0.1680041021564500445099706637883231550211,0.1540457610768102880814315948019586119404,0.1540457610768102880814315948019586119404,0.1351363684685254732863199817023501973721,0.1351363684685254732863199817023501973721,0.1118838471934039710947883856263559267358,0.1118838471934039710947883856263559267358,0.0850361483171791808835353701910620738504,0.0850361483171791808835353701910620738504,0.0554595293739872011294401653582446605128,0.0554595293739872011294401653582446605128,0.0241483028685479319601100262875653246916,0.0241483028685479319601100262875653246916],[0.1691423829631435918406564701349866103341,0.1691423829631435918406564701349866103341,0.1642764837458327229860537764659275904123,0.1642764837458327229860537764659275904123,0.1546846751262652449254180038363747721932,0.1546846751262652449254180038363747721932,0.1406429146706506512047313037519472280955,0.1406429146706506512047313037519472280955,0.1225552067114784601845191268002015552281,0.1225552067114784601845191268002015552281,0.1009420441062871655628139849248346070628,0.1009420441062871655628139849248346070628,0.0764257302548890565291296776166365256053,0.0764257302548890565291296776166365256053,0.0497145488949697964533349462026386416808,0.0497145488949697964533349462026386416808,0.0216160135264833103133427102664524693876,0.0216160135264833103133427102664524693876],[0.1610544498487836959791636253209167350399,0.1589688433939543476499564394650472016787,0.1589688433939543476499564394650472016787,0.1527660420658596667788554008976629984610,0.1527660420658596667788554008976629984610,0.1426067021736066117757461094419029724756,0.1426067021736066117757461094419029724756,0.1287539625393362276755157848568771170558,0.1287539625393362276755157848568771170558,0.1115666455473339947160239016817659974813,0.1115666455473339947160239016817659974813,0.0914900216224499994644620941238396526609,0.0914900216224499994644620941238396526609,0.0690445427376412265807082580060130449618,0.0690445427376412265807082580060130449618,0.0448142267656996003328381574019942119517,0.0448142267656996003328381574019942119517,0.0194617882297264770363120414644384357529,0.0194617882297264770363120414644384357529],[0.1527533871307258506980843319550975934919,0.1527533871307258506980843319550975934919,0.1491729864726037467878287370019694366926,0.1491729864726037467878287370019694366926,0.1420961093183820513292983250671649330345,0.1420961093183820513292983250671649330345,0.1316886384491766268984944997481631349161,0.1316886384491766268984944997481631349161,0.1181945319615184173123773777113822870050,0.1181945319615184173123773777113822870050,0.1019301198172404350367501354803498761666,0.1019301198172404350367501354803498761666,0.0832767415767047487247581432220462061001,0.0832767415767047487247581432220462061001,0.0626720483341090635695065351870416063516,0.0626720483341090635695065351870416063516,0.0406014298003869413310399522749321098790,0.0406014298003869413310399522749321098790,0.0176140071391521183118619623518528163621,0.0176140071391521183118619623518528163621],[0.1460811336496904271919851476833711882448,0.1445244039899700590638271665537525436099,0.1445244039899700590638271665537525436099,0.1398873947910731547221334238675831108927,0.1398873947910731547221334238675831108927,0.1322689386333374617810525744967756043290,0.1322689386333374617810525744967756043290,0.1218314160537285341953671771257335983563,0.1218314160537285341953671771257335983563,0.1087972991671483776634745780701056420336,0.1087972991671483776634745780701056420336,0.0934444234560338615532897411139320884835,0.0934444234560338615532897411139320884835,0.0761001136283793020170516533001831792261,0.0761001136283793020170516533001831792261,0.0571344254268572082836358264724479574912,0.0571344254268572082836358264724479574912,0.0369537897708524937999506682993296661889,0.0369537897708524937999506682993296661889,0.0160172282577743333242246168584710152658,0.0160172282577743333242246168584710152658],[0.1392518728556319933754102483418099578739,0.1392518728556319933754102483418099578739,0.1365414983460151713525738312315173965863,0.1365414983460151713525738312315173965863,0.1311735047870623707329649925303074458757,0.1311735047870623707329649925303074458757,0.1232523768105124242855609861548144719594,0.1232523768105124242855609861548144719594,0.1129322960805392183934006074217843191142,0.1129322960805392183934006074217843191142,0.1004141444428809649320788378305362823508,0.1004141444428809649320788378305362823508,0.0859416062170677274144436813727028661891,0.0859416062170677274144436813727028661891,0.0697964684245204880949614189302176573987,0.0697964684245204880949614189302176573987,0.0522933351526832859403120512732112561121,0.0522933351526832859403120512732112561121,0.0337749015848141547933022468659129013491,0.0337749015848141547933022468659129013491,0.0146279952982722006849910980471854451902,0.0146279952982722006849910980471854451902],[0.1336545721861061753514571105458443385831,0.1324620394046966173716424647033169258050,0.1324620394046966173716424647033169258050,0.1289057221880821499785953393997936532597,0.1289057221880821499785953393997936532597,0.1230490843067295304675784006720096548158,0.1230490843067295304675784006720096548158,0.1149966402224113649416435129339613014914,0.1149966402224113649416435129339613014914,0.1048920914645414100740861850147438548584,0.1048920914645414100740861850147438548584,0.0929157660600351474770186173697646486034,0.0929157660600351474770186173697646486034,0.0792814117767189549228925247420432269137,0.0792814117767189549228925247420432269137,0.0642324214085258521271696151589109980391,0.0642324214085258521271696151589109980391,0.0480376717310846685716410716320339965612,0.0480376717310846685716410716320339965612,0.0309880058569794443106942196418845053837,0.0309880058569794443106942196418845053837,0.0134118594871417720813094934586150649766,0.0134118594871417720813094934586150649766],[0.1279381953467521569740561652246953718517,0.1279381953467521569740561652246953718517,0.1258374563468282961213753825111836887264,0.1258374563468282961213753825111836887264,0.1216704729278033912044631534762624256070,0.1216704729278033912044631534762624256070,0.1155056680537256013533444839067835598622,0.1155056680537256013533444839067835598622,0.1074442701159656347825773424466062227946,0.1074442701159656347825773424466062227946,0.0976186521041138882698806644642471544279,0.0976186521041138882698806644642471544279,0.0861901615319532759171852029837426671850,0.0861901615319532759171852029837426671850,0.0733464814110803057340336152531165181193,0.0733464814110803057340336152531165181193,0.0592985849154367807463677585001085845412,0.0592985849154367807463677585001085845412,0.0442774388174198061686027482113382288593,0.0442774388174198061686027482113382288593,0.0285313886289336631813078159518782864491,0.0285313886289336631813078159518782864491,0.0123412297999871995468056670700372915759,0.0123412297999871995468056670700372915759]];
+verb_eval_ExpIntersect.INIT_STEP_LENGTH = 1e-3;
+verb_eval_ExpIntersect.LINEAR_STEP_LENGTH = 0.1;
 verb_exe_Dispatcher.THREADS = 1;
 verb_exe_Dispatcher._init = false;
 verb_exe_WorkerPool.basePath = "";

@@ -574,7 +574,7 @@ class Intersect {
     //
     //* an array of Pair objects extracted from the yield method of IBoundingBoxTree
 
-    private static function boundingBoxTrees<T1, T2>( ai : IBoundingBoxTree<T1>, bi : IBoundingBoxTree<T2>, tol : Float = 1e-9 )
+    public static function boundingBoxTrees<T1, T2>( ai : IBoundingBoxTree<T1>, bi : IBoundingBoxTree<T2>, tol : Float = 1e-9 )
         : Array<Pair<T1,T2>> {
 
         var atrees = [];
