@@ -17,12 +17,12 @@
     "geometry",
     "cad",
     "surface",
-    "curve", 
+    "curve",
     "spline",
     "mesh"
   ],
   "dependencies": {
-      "webworker-threads": "0.7.8"
+    "webworker-threads": "0.7.12"
   },
   "devDependencies": {
     "benchmark": "1.0.0",
