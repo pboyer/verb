@@ -1,5 +1,6 @@
 package verb.eval;
 
+import verb.eval.ExpIntersect;
 import verb.geom.NurbsSurface;
 import verb.core.Vec;
 using verb.core.Vec;
