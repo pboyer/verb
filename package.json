@@ -22,7 +22,7 @@
     "mesh"
   ],
   "dependencies": {
-    "webworker-threads": "0.7.12"
+    "webworker-threads": "0.7.17"
   },
   "devDependencies": {
     "benchmark": "1.0.0",
