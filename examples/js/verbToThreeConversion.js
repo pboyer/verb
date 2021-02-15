@@ -10,16 +10,15 @@
         return tessellateSurface( this );
     }
 
-    function asVector3(pts){
-        return pts.map(function(x){
-            return new THREE.Vector3(x[0],x[1],x[2]);
-        });
-    }
-
     function tessellateCurve( curve ){
-        var geometry = new THREE.Geometry();
-        geometry.vertices = asVector3( curve.tessellate() );
-        return geometry;
+      let geometry = new THREE.BufferGeometry();
+      let listPoints = curve.tessellate();
+      geometry.setAttribute(
+        "position",
+        new THREE.Float32BufferAttribute(asSingleArray(listPoints), 3)
+      );
+  
+      return geometry;
     }
 
     function asSingleArray(pts) {

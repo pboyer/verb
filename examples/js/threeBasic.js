@@ -99,7 +99,7 @@ function addLineToScene(pts, mat){
 }
 
 function addMeshToScene(mesh, material, wireframe ){
-    material = material || new THREE.MeshNormalMaterial( { side: THREE.DoubleSide, wireframe: false, shading: THREE.SmoothShading, transparent: true, opacity: 0.4 } )
+    material = material || new THREE.MeshNormalMaterial( { side: THREE.DoubleSide, wireframe: false, flatShading: true, transparent: true, opacity: 0.4 } )
 
 //    new THREE.MeshPhongMaterial({
 //                               specular: '#ffffff',
@@ -126,9 +126,7 @@ function asVector3(pts){
 }
 
 function asGeometry(threePts){
-    var geometry = new THREE.Geometry();
-    geometry.vertices.push.apply( geometry.vertices, threePts );
-    return geometry;
+    return new THREE.BufferGeometry().setFromPoints(threePts);
 }
 
 function benchmark(func, runs){
@@ -146,8 +144,8 @@ function pointsAsGeometry(pts){
 function addPointsToScene(pts){
 
     var geom = asGeometry( asVector3( pts ) );
-    var cloudMat2 = new THREE.PointCloudMaterial({ size: 6.5, sizeAttenuation: false, color: 0xffffff });
-    var cloud2 = new THREE.PointCloud( geom, cloudMat2 );
+    var cloudMat2 = new THREE.PointsMaterial({ size: 6.5, sizeAttenuation: false, color: 0xffffff });
+    var cloud2 = new THREE.Points( geom, cloudMat2 );
 
     scene.add( cloud2 );
 }
