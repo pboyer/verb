@@ -22,24 +22,38 @@
         return geometry;
     }
 
-    function tessellateSurface(srf) {
-
-        var tess = srf.tessellate();
-
-        var geometry = new THREE.Geometry();
-
-        geometry.vertices = asVector3( tess.points );
-
-        geometry.faces = tess.faces.map(function(faceIndices){
-            var normals = faceIndices.map(function(x){
-                var vn = tess.normals[x];
-                return new THREE.Vector3( vn[0], vn[1], vn[2] );
-            });
-
-            return new THREE.Face3(faceIndices[0],faceIndices[1],faceIndices[2], normals);
+    function asSingleArray(pts) {
+        var ptsArray = [];
+        pts.map(function (x) {
+          ptsArray.push(x[0], x[1], x[2]);
         });
-
-        return geometry;
+        return ptsArray;
     }
+
+    function tessellateSurface(srf) {
+        var tess = srf.tessellate();
+    
+        var geometry = new THREE.BufferGeometry();
+        var normals = [];
+        var indices = [];
+        tess.faces.map(function (faceIndices) {
+          faceIndices.map(function (x) {
+            var vn = tess.normals[x];
+            normals.push(vn[0], vn[1], vn[2]);
+          });
+          indices.push(faceIndices[0], faceIndices[1], faceIndices[2]);
+        });
+    
+        geometry.setIndex(indices);
+        geometry.setAttribute(
+          "normal",
+          new THREE.Float32BufferAttribute(normals, 3)
+        );
+        geometry.setAttribute(
+          "position",
+          new THREE.Float32BufferAttribute(asSingleArray(tess.points), 3)
+        );
+        return geometry;
+      }
 
 })(verb);
