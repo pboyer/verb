@@ -413,7 +413,7 @@ export declare module core
 
             u: number;
 
-            // uv: UV;
+            uv: Data.UV;
 
             curvePoint: Data.Point;
 
