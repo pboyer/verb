@@ -1,8 +1,10 @@
 {
   "name": "verb-nurbs",
-  "version": "2.1.0",
+  "version": "2.1.45",
   "author": "pboyer <peter.b.boyer@gmail.com>",
   "description": "A CAD library for the web",
+  "declaration": true,
+  "types": "typing/index.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/pboyer/verb.git"
@@ -10,7 +12,7 @@
   "scripts": {
     "test": "grunt -v mocha"
   },
-  "engine": "node 7.0.0",
+  "engine": "node 8.0.0",
   "main": "build/js/verb.js",
   "keywords": [
     "NURBS",
@@ -21,7 +23,7 @@
     "spline",
     "mesh"
   ],
-  "dependencies": {
+  "optionalDependencies": {
     "webworker-threads": "0.7.12"
   },
   "devDependencies": {
