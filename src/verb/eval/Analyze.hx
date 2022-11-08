@@ -374,7 +374,7 @@ class Analyze {
             }
         }
 
-        var maxits = 5
+        var maxits = 20
         , i = 0
         , e
         , eps1 = 0.0001
