@@ -4214,7 +4214,7 @@ verb_eval_Eval.curveRegularSamplePoints = function(crv,divs) {
 	var fddd_per2 = verb_core_Vec.mul(temp * t * 0.5,derivs[3]);
 	var fdd = verb_core_Vec.add(fdd_per2,fdd_per2);
 	var fddd = verb_core_Vec.add(fddd_per2,fddd_per2);
-	var fddd_per6 = verb_core_Vec.mul(0.33333333333333331,fddd_per2);
+	var fddd_per6 = verb_core_Vec.mul(0.333333333333333315,fddd_per2);
 	var pts = [];
 	var _g1 = 0;
 	var _g = divs + 1;
@@ -4238,7 +4238,7 @@ verb_eval_Eval.curveRegularSamplePoints2 = function(crv,divs) {
 	var fddd_per2 = verb_core_Vec.mul(temp * t * 0.5,derivs[3]);
 	var fdd = verb_core_Vec.add(fdd_per2,fdd_per2);
 	var fddd = verb_core_Vec.add(fddd_per2,fddd_per2);
-	var fddd_per6 = verb_core_Vec.mul(0.33333333333333331,fddd_per2);
+	var fddd_per6 = verb_core_Vec.mul(0.333333333333333315,fddd_per2);
 	var pts = [];
 	var _g1 = 0;
 	var _g = divs + 1;
@@ -5531,7 +5531,7 @@ verb_eval_Make.ellipseArc = function(center,xaxis,yaxis,startAngle,endAngle) {
 		knots[3] = knots[4] = 0.5;
 		break;
 	case 3:
-		knots[3] = knots[4] = 0.33333333333333331;
+		knots[3] = knots[4] = 0.333333333333333315;
 		knots[5] = knots[6] = 0.66666666666666663;
 		break;
 	case 4:
@@ -5611,7 +5611,7 @@ verb_eval_Make.revolvedSurface = function(profile,center,axis,theta) {
 	} else if(theta <= 3 * Math.PI / 2) {
 		narcs = 3;
 		knotsU = verb_core_Vec.zeros1d(6 + 2 * (narcs - 1));
-		knotsU[3] = knotsU[4] = 0.33333333333333331;
+		knotsU[3] = knotsU[4] = 0.333333333333333315;
 		knotsU[5] = knotsU[6] = 0.66666666666666663;
 	} else {
 		narcs = 4;
