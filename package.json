@@ -8,9 +8,9 @@
     "url": "https://github.com/pboyer/verb.git"
   },
   "scripts": {
-    "test": "grunt -v mocha"
+    "build": "haxe buildjs.hxml",
+    "test": "mocha"
   },
-  "engine": "node 7.0.0",
   "main": "build/js/verb.js",
   "keywords": [
     "NURBS",
@@ -22,20 +22,11 @@
     "mesh"
   ],
   "dependencies": {
-    "webworker-threads": "0.7.12"
+    "web-worker": "^1.3.0"
   },
   "devDependencies": {
-    "benchmark": "1.0.0",
-    "grunt": "0.4.5",
-    "grunt-benchmark": "0.3.0",
-    "grunt-contrib-concat": "0.5.1",
-    "grunt-contrib-uglify": "0.9.1",
-    "grunt-haxe": "0.1.13",
-    "grunt-mocha-test": "0.12.7",
-    "grunt-text-replace": "0.4.0",
-    "mocha": "2.2.4",
-    "should": "6.0.1",
-    "tess2": "1.0.0"
+    "mocha": "10.6.0",
+    "should": "^13.2.3"
   },
   "license": "MIT"
 }
