@@ -160,7 +160,7 @@ class Analyze {
         , maxv = surface.knotsV.last()
         , closedu = isRationalSurfaceClosed(surface)
         , closedv = isRationalSurfaceClosed(surface, false)
-        , cuv;
+        , cuv = [0.0, 0.0]; // FIXME: this is not correct
 
         //todo: divide surface instead of a full on tessellation
 
@@ -178,6 +178,8 @@ class Analyze {
                 cuv = tess.uvs[i];
             }
         }
+
+        // FIXME: what happens if cuv is never found?
 
         function f(uv : UV) : Array<Array<Point>> {
             return Eval.rationalSurfaceDerivatives( surface, uv[0], uv[1], 2 );
