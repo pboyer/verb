@@ -1,10 +1,11 @@
-var should = require('should')
-	, verb = require('../build/js/verb.js');
+var should = require('should');
+
+var verb = require('../build/js/verb.js');
 
 // necessary for multi-threading
 verb.exe.WorkerPool.basePath = process.cwd() + "/build/js/";
 
-console.log(verb.exe.WorkerPool.basePath);
+// console.log(verb.exe.WorkerPool.basePath);
 
 // some testing utilities
 function vecShouldBe( expected, test, tol ){
@@ -193,7 +194,6 @@ describe("verb.geom.NurbsCurve.divideByEqualArcLength",function(){
 		})
 
 	});
-
 });
 
 describe("verb.geom.NurbsCurve.divideByArcLength",function(){
@@ -243,7 +243,6 @@ describe("verb.geom.NurbsCurve.divideByArcLength",function(){
 		})
 
 	});
-
 });
 
 describe("verb.geom.NurbsCurve.closestParam",function(){
@@ -353,7 +352,6 @@ describe("verb.geom.NurbsCurve.split",function(){
 			done();
 		});
 	});
-
 });
 
 describe("verb.geom.NurbsCurve.transform",function(){
@@ -442,7 +440,6 @@ describe("verb.geom.Arc.point",function(){
 		});
 
 	});
-
 });
 
 describe("verb.geom.Arc.tessellate",function(){
@@ -962,7 +959,6 @@ describe("verb.geom.NurbsSurface.point",function(){
 		});
 
 	});
-
 });
 
 describe("verb.geom.NurbsSurface.normal",function(){
@@ -993,7 +989,6 @@ describe("verb.geom.NurbsSurface.normal",function(){
 		});
 
 	});
-
 });
 
 describe("verb.geom.NurbsSurface.derivatives",function(){
@@ -1030,7 +1025,6 @@ describe("verb.geom.NurbsSurface.derivatives",function(){
 			done();
 		});
 	});
-
 });
 
 describe("verb.geom.NurbsSurface.closestParam",function(){
@@ -1215,18 +1209,20 @@ describe("verb.geom.NurbsSurface.tessellate",function(){
 
 	});
 
-//	it('is correct for basic case async', function(done){
-//		surface.tessellateAsync( 0.5, true ).then(function(d){
-//			console.log("Hello");
-//
-//			d.faces.length.should.be.greaterThan( 2 );
-//			d.normals.length.should.be.greaterThan( 2 );
-//			d.points.length.should.be.greaterThan( 2 );
-//			d.uvs.length.should.be.greaterThan( 2 );
-//
-//			done();
-//		});
-//	});
+/*
+	it('is correct for basic case async', function(done){
+		surface.tessellateAsync( 0.5, true ).then(function(d){
+			console.log("Hello");
+
+			d.faces.length.should.be.greaterThan( 2 );
+			d.normals.length.should.be.greaterThan( 2 );
+			d.points.length.should.be.greaterThan( 2 );
+			d.uvs.length.should.be.greaterThan( 2 );
+
+			done();
+		});
+	});
+*/
 });
 
 describe("verb.geom.NurbsSurface.transform",function(){
@@ -1939,7 +1935,7 @@ describe("verb.geom.Intersect.curves",function(){
 
 	});
 
-	it('gives valid result for 2 planar degree 2 beziers', function(done){
+	it('gives valid result for 2 planar degree 2 beziers async', function(done){
 
 		verb.geom.Intersect.curvesAsync( curve1, curve2, verb.core.Constants.TOLERANCE )
 			.then(function(res){
@@ -1951,7 +1947,6 @@ describe("verb.geom.Intersect.curves",function(){
 				done();
 			});
 	});
-
 });
 
 describe("verb.geom.Intersect.curveAndSurface",function(){

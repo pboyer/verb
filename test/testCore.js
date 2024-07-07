@@ -1,7 +1,6 @@
-var should = require('should')
-	, verb = require('../build/js/verb.js');
+var should = require('should');
 
-console.log(verb);
+var verb = require('../build/js/verb.js');
 
 // necessary for multi-threading
 verb.exe.WorkerPool.basePath = process.cwd() + "/build/js/";
