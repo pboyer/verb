@@ -34,7 +34,9 @@ onmessage = function( e ) {
 
 
 // provide the Worker class for async library functions
-Worker = require("web-worker")
+if (typeof Worker === "undefined") {
+  Worker = require("web-worker")
+}
 
 // import and re-export the Javascript library
 const verb = require('./verbHaxe.js');
