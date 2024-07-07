@@ -37,7 +37,11 @@ verb compiles for:
 
 Install <a href="http://haxe.org/">haxe</a> and <a href="http://nodejs.org/">node.js</a>
 
-You should have installed **haxe 3.2.1** and **node.js 4.2.1**. If you're using OS X, ensure that you have installed XCode 7.
+You should have installed **haxe** and **node.js**.
+
+  haxe --version
+
+  node --version
 
 Install node.js dependencies:
 
@@ -47,15 +51,11 @@ Install haxe dependencies:
 
 	haxelib install promhx
 
-Install grunt:
-
-	npm install -g grunt-cli
-
 ## Using with JavaScript
 
 You can install verb with npm
     
-    npm install verb-nurbs
+  npm install verb-nurbs
     
 You can use verb with require.js (AMD) or browserify (commonjs) in the browser or in node.js.
 
@@ -67,14 +67,16 @@ You'll find many usage examples in the [examples directory](https://github.com/p
 
 Compile to javascript:
 
-	grunt build
+	npm run build
 
 Run all unit tests:
 
-	grunt test
+	npm run test
 
 ## Compiling for C&#35;
  
+If you're using OS X, ensure that you have installed XCode 7.
+
 Install [mono](http://www.mono-project.com/docs/getting-started/install/)
 
 Install hxcs:
@@ -88,6 +90,8 @@ Build:
 Output goes to build/cs.
 
 ## Compiling for C++
+
+If you're using OS X, ensure that you have installed XCode 7.
 
 Install hxcpp:
 
