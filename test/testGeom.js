@@ -225,7 +225,7 @@ describe("verb.geom.NurbsCurve.divideByArcLength",function(){
 
 	});
 
-	it('can divide straight curve async', function(){
+	it('can divide straight curve async', function(done){
 
 		crv.divideByArcLengthAsync( d ).then(function(res){
 
@@ -239,7 +239,7 @@ describe("verb.geom.NurbsCurve.divideByArcLength",function(){
 				s += d;
 
 			});
-
+			done();
 		})
 
 	});
@@ -316,13 +316,6 @@ describe("verb.geom.NurbsCurve.split",function(){
 	}
 
 	var crv = verb.geom.NurbsCurve.byKnotsControlPointsWeights( degree, knots, controlPoints, weights );
-
-	function cubicSplitAsync(u, done){
-
-		var res = crv.splitAsync(0.5);
-		check(u, res);
-
-	}
 
 	function check(u, res){
 
