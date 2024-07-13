@@ -4,7 +4,7 @@
 
 // provide window as required by the promhx library
 if (typeof window === "undefined") {
-  window = global;
+  var window = global;
 }
 
 // setup the promise handling for async method invocations
@@ -20,7 +20,7 @@ const lookup = function(className, methodName){
   return obj[ methodName ];
 }
 
-onmessage = function( e ) {
+const onmessage = function( e ) {
   if (!e.data || !e.data.className || !e.data.methodName) return;
 
   const method = lookup( e.data.className, e.data.methodName );
@@ -35,7 +35,7 @@ onmessage = function( e ) {
 
 // provide the Worker class for async library functions
 if (typeof Worker === "undefined") {
-  Worker = require("web-worker")
+  var Worker = require("web-worker")
 }
 
 // import and re-export the Javascript library
