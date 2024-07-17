@@ -1,17 +1,20 @@
 {
   "name": "verb-nurbs",
-  "version": "2.1.0",
+  "version": "3.0.0",
   "author": "pboyer <peter.b.boyer@gmail.com>",
   "description": "A CAD library for the web",
   "repository": {
     "type": "git",
     "url": "https://github.com/pboyer/verb.git"
   },
-  "scripts": {
-    "test": "grunt -v mocha"
-  },
-  "engine": "node 7.0.0",
   "main": "build/js/verb.js",
+  "unpkg": "build/js/verb.min.js",
+  "module": "build/js//verb.es.js",
+  "scripts": {
+    "build": "haxe buildjs.hxml",
+    "package": "rollup --config",
+    "test": "mocha"
+  },
   "keywords": [
     "NURBS",
     "geometry",
@@ -22,20 +25,16 @@
     "mesh"
   ],
   "dependencies": {
-    "webworker-threads": "0.7.12"
+    "web-worker": "^1.3.0"
   },
   "devDependencies": {
-    "benchmark": "1.0.0",
-    "grunt": "0.4.5",
-    "grunt-benchmark": "0.3.0",
-    "grunt-contrib-concat": "0.5.1",
-    "grunt-contrib-uglify": "0.9.1",
-    "grunt-haxe": "0.1.13",
-    "grunt-mocha-test": "0.12.7",
-    "grunt-text-replace": "0.4.0",
-    "mocha": "2.2.4",
-    "should": "6.0.1",
-    "tess2": "1.0.0"
+    "@rollup/plugin-commonjs": "^26.0.1",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@rollup/plugin-terser": "^0.4.4",
+    "mocha": "10.6.0",
+    "rollup": "^4.18.0",
+    "rollup-plugin-polyfill-node": "^0.13.0",
+    "should": "^13.2.3"
   },
   "license": "MIT"
 }
