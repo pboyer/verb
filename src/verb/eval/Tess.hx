@@ -354,7 +354,7 @@ class Tess {
 
 }
 
-@:expose("core.AdaptiveRefinementOptions")
+@:expose("eval.AdaptiveRefinementOptions")
 class AdaptiveRefinementOptions {
     public var normTol : Float = 2.5e-2;
     public var minDepth : Int = 0;
@@ -391,7 +391,7 @@ class AdaptiveRefinementOptions {
 //                        neighbors[0]
 //```
 
-@:expose("core.AdaptiveRefinementNode")
+@:expose("eval.AdaptiveRefinementNode")
 class AdaptiveRefinementNode {
 
     var srf : NurbsSurfaceData;
