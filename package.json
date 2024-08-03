@@ -1,6 +1,6 @@
 {
   "name": "verb-nurbs",
-  "version": "3.0.0",
+  "version": "3.0.1",
   "author": "pboyer <peter.b.boyer@gmail.com>",
   "description": "A CAD library for the web",
   "repository": {
@@ -31,7 +31,7 @@
     "@rollup/plugin-commonjs": "^26.0.1",
     "@rollup/plugin-node-resolve": "^15.2.3",
     "@rollup/plugin-terser": "^0.4.4",
-    "mocha": "10.6.0",
+    "mocha": "^10.6.0",
     "rollup": "^4.18.0",
     "rollup-plugin-polyfill-node": "^0.13.0",
     "should": "^13.2.3"

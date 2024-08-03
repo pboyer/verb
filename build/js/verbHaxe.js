@@ -177,8 +177,8 @@
 
 ;(function ($hx_exports, $global) { "use strict";
 $hx_exports["promhx"] = $hx_exports["promhx"] || {};
-$hx_exports["eval"] = $hx_exports["eval"] || {};
 $hx_exports["core"] = $hx_exports["core"] || {};
+$hx_exports["eval"] = $hx_exports["eval"] || {};
 $hx_exports["exe"] = $hx_exports["exe"] || {};
 $hx_exports["geom"] = $hx_exports["geom"] || {};
 var $hxClasses = {},$estr = function() { return js_Boot.__string_rec(this,''); },$hxEnums = $hxEnums || {},$_;
@@ -7560,7 +7560,7 @@ verb_eval_Tess.rationalSurfaceAdaptive = function(surface,options) {
 	var arrTrees = verb_eval_Tess.divideRationalSurfaceAdaptive(surface,options);
 	return verb_eval_Tess.triangulateAdaptiveRefinementNodeTree(arrTrees);
 };
-var verb_eval_AdaptiveRefinementOptions = $hx_exports["core"]["AdaptiveRefinementOptions"] = function() {
+var verb_eval_AdaptiveRefinementOptions = $hx_exports["eval"]["AdaptiveRefinementOptions"] = function() {
 	this.minDivsV = 1;
 	this.minDivsU = 1;
 	this.refine = true;
@@ -7573,7 +7573,7 @@ verb_eval_AdaptiveRefinementOptions.__name__ = "verb.eval.AdaptiveRefinementOpti
 verb_eval_AdaptiveRefinementOptions.prototype = {
 	__class__: verb_eval_AdaptiveRefinementOptions
 };
-var verb_eval_AdaptiveRefinementNode = $hx_exports["core"]["AdaptiveRefinementNode"] = function(srf,corners,neighbors) {
+var verb_eval_AdaptiveRefinementNode = $hx_exports["eval"]["AdaptiveRefinementNode"] = function(srf,corners,neighbors) {
 	this.srf = srf;
 	this.neighbors = neighbors == null ? [null,null,null,null] : neighbors;
 	this.corners = corners;
