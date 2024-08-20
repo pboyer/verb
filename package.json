@@ -1,6 +1,6 @@
 {
   "name": "verb-nurbs",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "author": "pboyer <peter.b.boyer@gmail.com>",
   "description": "A CAD library for the web",
   "repository": {
