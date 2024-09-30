@@ -1,8 +1,8 @@
 {
   "name": "verb-nurbs",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "author": "pboyer <peter.b.boyer@gmail.com>",
-  "description": "A CAD library for the web",
+  "description": "A library for creating and manipulating NURBS surfaces and curves in many languages",
   "repository": {
     "type": "git",
     "url": "https://github.com/pboyer/verb.git"
@@ -23,6 +23,23 @@
     "curve",
     "spline",
     "mesh"
+  ],
+  "files": [
+    "LICENSE",
+    "README.md",
+    "build",
+    "buildcpp.hxml",
+    "buildcs.hxml",
+    "buildjs.hxml",
+    "buildphp.hxml",
+    "buildpython.hxml",
+    "examples",
+    "package-lock.json",
+    "package.json",
+    "rollup.config.mjs",
+    "src",
+    "test",
+    "verb.iml"
   ],
   "dependencies": {
     "web-worker": "^1.3.0"
