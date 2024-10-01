@@ -70,6 +70,8 @@ class NurbsCurve extends SerializableBase implements ICurve {
     //Construct a NurbsCurve by interpolating a collection of points.  The resultant curve
     //will pass through all of the points.
     //
+    //Note: The points are not verified, and may produce a curve with invalid control points. For example, consecutive duplicate points.
+    //
     //**params**
     //
     //* An array of points
