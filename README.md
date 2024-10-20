@@ -30,6 +30,11 @@ You can install verb with
     
 Pre-compiled JavaScript can be found in [build/js](https://github.com/pboyer/verb/blob/master/build/js).
 
+In addition, this package is hosted at UNPKG, and can be imported directly into webpages.
+```
+<script language="javascript" src="https://unpkg.com/verb-nurbs"></script>
+```
+
 ### Examples
 
 You'll find many usage examples in the [examples directory](https://github.com/pboyer/verb/blob/master/examples) and amongst the [tests](https://github.com/pboyer/verb/tree/master/test).
