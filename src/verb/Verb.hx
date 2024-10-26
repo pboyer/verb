@@ -1,5 +1,8 @@
 package verb;
 
+// constants
+import verb.core.Constants;
+
 // geom
 
 import verb.geom.NurbsCurve;
@@ -42,6 +45,6 @@ import verb.eval.Check;
 
 class Verb {
 	public static function main():Void {
-		trace("verb 2.1.0");
+		trace(Constants.VERSION);
 	}
 }
