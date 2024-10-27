@@ -1,6 +1,9 @@
-[![Build Status](https://travis-ci.org/pboyer/verb.svg?branch=master)](https://travis-ci.org/pboyer/verb)
-
 # verb
+
+[![NPM version](https://badge.fury.io/js/verb-nurbs.svg)](https://badge.fury.io/js/verb-nurbs)
+[![NPM downloads](https://www.npmjs.com/package/verb-nurbs)](https://www.npmjs.com/package/verb-nurbs)
+[![Stability](https://img.shields.io/badge/stability-stable-success)](https://github.com/emersion/stability-badges#stable)
+[![License](https://img.shields.io/github/license/pboyer/verb)](https://github.com/pboyer/verb/blob/master/LICENSE)
 
 ### Open-source, cross-platform NURBS
 
