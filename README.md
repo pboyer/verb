@@ -1,6 +1,9 @@
-[![Build Status](https://travis-ci.org/pboyer/verb.svg?branch=master)](https://travis-ci.org/pboyer/verb)
-
 # verb
+
+[![NPM version](https://badge.fury.io/js/verb-nurbs.svg)](https://badge.fury.io/js/verb-nurbs)
+[![NPM downloads](https://img.shields.io/npm/dw/verb-nurbs)](https://www.npmjs.com/package/verb-nurbs)
+[![Stability](https://img.shields.io/badge/stability-stable-success)](https://github.com/emersion/stability-badges#stable)
+[![License](https://img.shields.io/github/license/pboyer/verb)](https://github.com/pboyer/verb/blob/master/LICENSE)
 
 ### Open-source, cross-platform NURBS
 
@@ -29,6 +32,11 @@ You can install verb with
     npm install verb-nurbs
     
 Pre-compiled JavaScript can be found in [build/js](https://github.com/pboyer/verb/blob/master/build/js).
+
+In addition, this package is hosted at UNPKG, and can be imported directly into webpages.
+```
+<script language="javascript" src="https://unpkg.com/verb-nurbs"></script>
+```
 
 ### Examples
 
