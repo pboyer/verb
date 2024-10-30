@@ -15,5 +15,5 @@ class Constants {
 
     //The current version of verb
     @:expose("VERSION")
-    public static var VERSION : String = "2.0.0";
+    public static var VERSION : String = "3.0.3";
 }
