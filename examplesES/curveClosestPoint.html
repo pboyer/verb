@@ -57,7 +57,7 @@ let w = 0
 for (let i = -10; i < 20; i += 4){
     for (let j = -10; j < 20; j += 4){
         for (let k = -10; k < 20; k += 4){
-            const p0 = [i, j, k ]
+            const p0 = [i, j, k]
 
             orbitpts.push( p0 )
 
@@ -70,6 +70,8 @@ for (let i = -10; i < 20; i += 4){
         }
     }
 }
+
+scene.addPoints(orbitpts)
 
 scene.render()
 </script>

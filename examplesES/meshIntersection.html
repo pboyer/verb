@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Mesh-Mesh Intersection</title>
+
+ <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three/examples/jsm/",
+        "verb": "https://unpkg.com/verb-nurbs@3.0.2/build/js/verb.es.js",
+        "web-worker": "https://unpkg.com/web-worker@1.3.0/browser.js",
+        "tessellate": "./js/tessellateThree.js",
+        "scene": "./js/sceneThree.js",
+        "codeViewer": "./js/codeViewer.js"
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="https://unpkg.com/@highlightjs/cdn-assets/styles/atom-one-dark.min.css">
+  <script src="https://unpkg.com/@highlightjs/cdn-assets/highlight.min.js"></script>
+
+  <link rel="stylesheet" href="css/example.css">
+</head>
+
+<body>
+  <div id="viewer">
+    <div id="title"></div>
+  </div>
+
+<script type="module" id="script">
+import * as THREE from 'three'
+import verb from 'verb'
+import { tessellateCurve, tessellateSurface } from 'tessellate'
+import { Scene } from 'scene'
+
+const scene = new Scene()
+
+function exTorusCylindricalSurface() {
+
+  // center, xaxis, yaxis, radius
+  let profile = new verb.geom.Circle( [5,0,0], [1,0,0], [0,0,1], 2 )
+
+  let base = [0,0,0]
+  let axis = [0,0,1]
+  let angle = 2 * Math.PI
+  let srf1 = new verb.geom.RevolvedSurface( profile, base, axis, angle )
+
+  base = [8,0,0]
+  axis = [-1,0,0]
+  let xaxis = [0,0,1]
+  let height = 16
+  let radius = 2
+
+  let srf2 = new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius )
+
+  return { srf1, srf2 }
+}
+
+const { srf1, srf2 } = exTorusCylindricalSurface()
+
+scene.addSurface( tessellateSurface( srf1 ), null, true )
+scene.addSurface( tessellateSurface( srf2 ), null, true )
+
+let tess1 = srf1.tessellate()
+let tess2 = srf2.tessellate()
+
+let results
+let runs = 1
+
+let d1 = Date.now()
+
+for (let i = 0 ; i < runs; i++){
+  results = verb.eval.Intersect.meshes( tess1, tess2 )
+}
+
+let d2 = Date.now()
+
+let numLengths = results.reduce(function(a,x){ return a + x.length-1; }, 0)
+
+console.log( "intersected in ", (d2 - d1) / runs, " ms and " + results.length + " polylines were discovered")
+console.log( numLengths + " edges were formed in total ")
+
+for (let i = 0; i < results.length; i++){
+  const points = results[i].map(function(x){ return x.point; })
+  const curve = verb.geom.NurbsCurve.byPoints( points, 3 )
+  scene.addCurve( tessellateCurve( curve ) )
+}
+
+scene.render()
+</script>
+
+<div id="button">Show/Hide Code</div>
+<pre><code id="code-container" class="language-javascript"></code></pre>
+
+<script type='module'>
+import { setupViewer } from 'codeViewer'
+
+setupViewer()
+
+hljs.highlightAll()
+</script>
+
+</body>
+
+</html>

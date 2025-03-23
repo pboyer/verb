@@ -2,7 +2,7 @@
 <html>
 
 <head>
-  <title>Surface</title>
+  <title>Surface Isocurve Extraction</title>
 
   <script async src="https://ga.jspm.io/npm:es-module-shims@2.0.10/dist/es-module-shims.js"></script>
 
@@ -24,8 +24,10 @@
   <script src="https://unpkg.com/@highlightjs/cdn-assets/highlight.min.js"></script>
 
   <link rel="stylesheet" href="css/example.css">
+
 </head>
 
+<body>
 <body>
   <div id="viewer">
     <div id="title"></div>
@@ -33,7 +35,7 @@
 
 <script type="module" id="script">
 import verb from 'verb'
-import { tessellateSurface } from 'tessellate'
+import { tessellateCurve, tessellateSurface } from 'tessellate'
 import { Scene } from 'scene'
 
 const scene = new Scene()
@@ -41,15 +43,22 @@ const scene = new Scene()
 const degree = 3
 const knots = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
 const pts = [
-  [ [0,   0, -10], [10,   0,  0], [20,   0,   0], [30,   0, 0] , [40,   0,   0], [50,   0,   0] ],
-  [ [0, -10,   0], [10, -10, 10], [20, -10,  10], [30, -10, 0] , [40, -10,   0], [50, -10,   0] ],
-  [ [0, -20,   0], [10, -20, 10], [20, -20,  10], [30, -20, 0] , [40, -20,  -2], [50, -20, -12] ],
-  [ [0, -30,   0], [10, -30,  0], [20, -30, -23], [30, -30, 0] , [40, -30,   0], [50, -30,   0] ],
-  [ [0, -40,   0], [10, -40,  0], [20, -40,   0], [30, -40, 4] , [40, -40, -20], [50, -40,   0] ],
-  [ [0, -50,  12], [10, -50,  0], [20, -50,  20], [30, -50, 0] , [50, -50, -10], [50, -50, -15] ],
+  [ [0, 0, -10], [10, 0, 0], [20, 0, 0], [30, 0, 0] , [40, 0, 0], [50, 0, 0] ],
+  [ [0, -10, 0], [10, -10, 10], [20, -10, 10], [30, -10, 0] , [40, -10, 0], [50, -10, 0]],
+  [ [0, -20, 0], [10, -20, 10], [20, -20, 10], [30, -20, 0] , [40, -20, -2], [50, -20, -12] ],
+  [ [0, -30, 0], [10, -30, 0], [20, -30, -23], [30, -30, 0] , [40, -30, 0], [50, -30, 0]     ],
+  [ [0, -40, 0], [10, -40, 0], [20, -40, 0], [30, -40, 4] , [40, -40, -20], [50, -40, 0]     ],
+  [ [0, -50, 12], [10, -50, 0], [20, -50, 20], [30, -50, 0] , [50, -50, -10], [50, -50, -15]     ]
 ]
 
 const srf = verb.geom.NurbsSurface.byKnotsControlPointsWeights( degree, degree, knots, knots, pts )
+
+const Vec = verb.core.Vec
+
+Vec.span( 0, 1.0, 0.025 ).forEach(function(u) {
+  const curve = srf.isocurve( u, true )
+  scene.addCurve( tessellateCurve( curve ) )
+})
 
 scene.addSurface( tessellateSurface( srf ) )
 
@@ -66,7 +75,5 @@ setupViewer()
 
 hljs.highlightAll()
 </script>
-
-</body>
 
 </html>

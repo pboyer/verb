@@ -10,3 +10,7 @@ And then the Three.js geometry is rendered.
 
 Please read through the examples if interested in specific VERB supplied functionality.
 
+```
+npx http-server 
+```
+
