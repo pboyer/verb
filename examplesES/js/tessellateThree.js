@@ -13,9 +13,8 @@ export function tessellateSurface( surface ) {
 
   geometry.setIndex( indices )
   geometry.setAttribute( 'position', new THREE.BufferAttribute( coords, 3, false ) )
-
-  //geometry.center()
-  geometry.scale( 0.1, 0.1, 0.1 )
+  geometry.computeVertexNormals()
+  geometry.normalizeNormals()
 
   return geometry
 }
@@ -28,8 +27,6 @@ export function tessellateCurve( curve ) {
   const geometry = new THREE.BufferGeometry()
 
   geometry.setAttribute( 'position', new THREE.BufferAttribute( coords, 3, false ) )
-
-  geometry.scale( 0.25, 0.25, 0.25 )
 
   return geometry
 }

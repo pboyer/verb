@@ -1,32 +1,34 @@
 import * as THREE from 'three'
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+
+const flatten = ( arr ) => arr.reduce(( acc, val ) => Array.isArray( val ) ? acc.concat( flatten( val ) ) : acc.concat( val ), [])
 
 export class Scene {
   constructor () {
     this.scene = new THREE.Scene()
 
     this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 )
-    this.camera.position.z = 5
+    this.camera.position.set( 0, 0, 5 )
 
     this.renderer = new THREE.WebGLRenderer()
     this.renderer.setSize( window.innerWidth, window.innerHeight )
 
+    this.controls = new OrbitControls( this.camera, this.renderer.domElement )
+
     this.meshs = []
 
-    const viewerElement = document.getElementById("viewer");
-    viewerElement.appendChild( this.renderer.domElement );
+    const viewerElement = document.getElementById("viewer")
+    viewerElement.appendChild( this.renderer.domElement )
 
-    const titleElement = document.getElementById("title");
-    titleElement.innerHTML += document.title;
+    const titleElement = document.getElementById("title")
+    titleElement.innerHTML += document.title
+
+    this.controls.update()
   }
 
   animate() {
     return f => {
-      if (this.meshs.length) {
-        this.meshs.forEach(( mesh ) => {
-          mesh.rotation.x += 0.005
-          mesh.rotation.y += 0.005
-        })
-      }
+      this.controls.update()
       this.renderer.render( this.scene, this.camera )
     }
   }
@@ -35,19 +37,12 @@ export class Scene {
     this.renderer.setAnimationLoop( this.animate() )
   }
 
-  addSurface( surface, material, wireframe = true ) {
-    material = material || new THREE.MeshBasicMaterial( { color: 0xff0000, side: THREE.DoubleSide, wireframe: false } )
+  addSurface( surface, material, wireframe = false ) {
+    material = material || new THREE.MeshNormalMaterial( { side: THREE.DoubleSide, wireframe, transparent: true, opacity: 0.4 } )
 
     let mesh = new THREE.Mesh( surface, material )
     this.meshs.push( mesh )
     this.scene.add( mesh )
-
-    if (wireframe) {
-      const material2 = new THREE.MeshBasicMaterial( { color: 0x000000, side: THREE.DoubleSide, wireframe: true } )
-      const mesh2 = new THREE.Mesh( surface, material2 )
-      this.meshs.push( mesh2 )
-      this.scene.add( mesh2 )
-    }
   }
 
   addCurve(curve, material) {
@@ -57,5 +52,17 @@ export class Scene {
 
     this.meshs.push( line )
     this.scene.add( line )
+  }
+
+  addPoints(points) {
+    const geometry = new THREE.BufferGeometry()
+    const positions = new Float32Array(flatten(points))
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3, false))
+
+    const material = new THREE.PointsMaterial({ size: 0.1, color: 0xffffff })
+
+    const cloud = new THREE.Points(geometry, material)
+
+    this.scene.add(cloud)
   }
 }
