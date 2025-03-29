@@ -32,18 +32,17 @@
   </div>
 
 <script type="module" id="script">
-import * as THREE from 'three'
 import verb from 'verb'
 import { tessellateCurve } from 'tessellate'
 import { Scene } from 'scene'
 
 const scene = new Scene()
 
-var arc =           new verb.geom.Arc([0,0,0], [1,0,0], [0,1,0], 5, 0, 3* Math.PI/2 );
-var circle =        new verb.geom.Circle([12,0,0], [1,0,0], [0,1,0], 5 );
-var ellipse =       new verb.geom.Ellipse([24,0,0], [5,0,0], [0,2,0] );
-var ellipseArc =    new verb.geom.EllipseArc([36,0,0], [5,0,0], [0,2,0], 0, 3* Math.PI/2 );
-var parabola =      new verb.geom.BezierCurve([[43,5,0], [48,-10,0], [51,5,0]] );
+let arc =        new verb.geom.Arc( [0,0,0], [1,0,0], [0,1,0], 5, 0, 3* Math.PI/2 )
+let circle =     new verb.geom.Circle( [12,0,0], [1,0,0], [0,1,0], 5 )
+let ellipse =    new verb.geom.Ellipse( [24,0,0], [5,0,0], [0,2,0] )
+let ellipseArc = new verb.geom.EllipseArc( [36,0,0], [5,0,0], [0,2,0], 0, 3* Math.PI/2 )
+let parabola =   new verb.geom.BezierCurve( [[43,5,0], [48,-10,0], [51,5,0]] )
 
 scene.addCurve( tessellateCurve( arc ) )
 scene.addCurve( tessellateCurve( circle ) )

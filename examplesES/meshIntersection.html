@@ -40,18 +40,17 @@ import { Scene } from 'scene'
 const scene = new Scene()
 
 function exTorusCylindricalSurface() {
-
   // center, xaxis, yaxis, radius
-  let profile = new verb.geom.Circle( [5,0,0], [1,0,0], [0,0,1], 2 )
+  let profile = new verb.geom.Circle( [5, 0, 0], [1, 0, 0], [0, 0, 1], 2 )
 
-  let base = [0,0,0]
-  let axis = [0,0,1]
+  let base = [0, 0, 0]
+  let axis = [0, 0, 1]
   let angle = 2 * Math.PI
   let srf1 = new verb.geom.RevolvedSurface( profile, base, axis, angle )
 
-  base = [8,0,0]
-  axis = [-1,0,0]
-  let xaxis = [0,0,1]
+  base = [ 8, 0, 0]
+  axis = [-1, 0, 0]
+  let xaxis = [0, 0, 1]
   let height = 16
   let radius = 2
 
@@ -73,19 +72,19 @@ let runs = 1
 
 let d1 = Date.now()
 
-for (let i = 0 ; i < runs; i++){
+for (let i = 0 ; i < runs; i++) {
   results = verb.eval.Intersect.meshes( tess1, tess2 )
 }
 
 let d2 = Date.now()
 
-let numLengths = results.reduce(function(a,x){ return a + x.length-1; }, 0)
+let numLengths = results.reduce( function(a, x) { return a + x.length-1; }, 0 )
 
-console.log( "intersected in ", (d2 - d1) / runs, " ms and " + results.length + " polylines were discovered")
-console.log( numLengths + " edges were formed in total ")
+console.log( "intersected in ", (d2 - d1) / runs, " ms and " + results.length + " polylines were discovered" )
+console.log( numLengths + " edges were formed in total " )
 
 for (let i = 0; i < results.length; i++){
-  const points = results[i].map(function(x){ return x.point; })
+  const points = results[i].map( function(x) { return x.point } )
   const curve = verb.geom.NurbsCurve.byPoints( points, 3 )
   scene.addCurve( tessellateCurve( curve ) )
 }

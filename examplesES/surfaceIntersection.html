@@ -42,20 +42,20 @@ function exNurbsSurfacePlane(){
   let degree = 3
   let knots = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
   let pts = [
-    [ [0, 0, -10], [10, 0, 0], [20, 0, 0], [30, 0, 0] , [40, 0, 0], [50, 0, 9] ],
-    [ [0, -10, 0], [10, -10, 10], [20, -10, 10], [30, -10, 0] , [40, -10, 0], [50, -10, 0]],
-    [ [0, -20, 0], [10, -20, 10], [20, -20, 10], [30, -20, 0] , [40, -20, -2], [50, -20, 0] ],
-    [ [0, -30, 0], [10, -30, 0], [20, -30, 0], [30, -30, 0] , [40, -30, 0], [50, -30, 0]     ],
-    [ [0, -40, 0], [10, -40, 0], [20, -40, 0], [30, -40, 4] , [40, -40, -20], [50, -40, 0]     ],
-    [ [0, -50, 12], [10, -50, 0], [20, -50, 0], [30, -50, 0] , [50, -50, 0], [50, -50, 15]     ],
+    [ [0,   0, -10], [10,   0,  0], [20,   0,  0], [30,   0, 0] , [40,   0,   0], [50,   0,  9] ],
+    [ [0, -10,   0], [10, -10, 10], [20, -10, 10], [30, -10, 0] , [40, -10,   0], [50, -10,  0] ],
+    [ [0, -20,   0], [10, -20, 10], [20, -20, 10], [30, -20, 0] , [40, -20,  -2], [50, -20,  0] ],
+    [ [0, -30,   0], [10, -30,  0], [20, -30,  0], [30, -30, 0] , [40, -30,   0], [50, -30,  0] ],
+    [ [0, -40,   0], [10, -40,  0], [20, -40,  0], [30, -40, 4] , [40, -40, -20], [50, -40,  0] ],
+    [ [0, -50,  12], [10, -50,  0], [20, -50,  0], [30, -50, 0] , [50, -50,   0], [50, -50, 15] ],
   ]
 
   const srf1 = new verb.geom.NurbsSurface.byKnotsControlPointsWeights( degree, degree, knots, knots, pts )
 
-  let p5 = [50,-50,3]
-  let p6 = [50,0,3]
-  let p7 = [0,0,3]
-  let p8 = [0,-50,5]
+  let p5 = [50, -50, 3]
+  let p6 = [50,   0, 3]
+  let p7 = [ 0,   0, 3]
+  let p8 = [ 0, -50, 5]
 
   const srf2 = verb.geom.NurbsSurface.byCorners( p5, p6, p7, p8 )
 
@@ -72,15 +72,15 @@ let runs = 1
 
 let d1 = Date.now()
 
-for (let i = 0 ; i < runs; i++){
+for (let i = 0 ; i < runs; i++) {
   results = verb.geom.Intersect.surfaces( srf1, srf2, 1e-6 )
 }
 
 let d2 = Date.now()
 
-console.log( "intersected in ", (d2 - d1) / runs, " ms and " + results.length + " curves were discovered")
+console.log( "intersected in ", (d2 - d1) / runs, " ms and " + results.length + " curves were discovered" )
 
-for (let i = 0; i < results.length; i++){
+for (let i = 0; i < results.length; i++) {
   scene.addCurve( tessellateCurve( results[i] ) )
 }
 
