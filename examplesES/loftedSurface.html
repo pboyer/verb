@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Surface Lofting</title>
+
+  <script async src="https://cdn.jsdelivr.net/npm/es-module-shims@2.0/dist/es-module-shims.min.js"></script>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.175/+esm",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.175/examples/jsm/",
+        "verb": "https://cdn.jsdelivr.net/npm/verb-nurbs@3.0/+esm",
+        "web-worker": "https://cdn.jsdelivr.net/npm/web-worker@1.5/+esm",
+        "tessellate": "./js/tessellateThree.js",
+        "scene": "./js/sceneThree.js",
+        "codeViewer": "./js/codeViewer.js"
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+
+  <link rel="stylesheet" href="css/example.css">
+</head>
+
+<body>
+  <div id="viewer">
+    <div id="title"></div>
+  </div>
+
+<script type="module" id="script">
+import verb from 'verb'
+import { tessellateCurve, tessellateSurface } from 'tessellate'
+import { Scene } from 'scene'
+
+const scene = new Scene()
+
+let c0 = verb.geom.NurbsCurve.byKnotsControlPointsWeights( 2, [0,0,0,1,1,1], [ [0,0,0], [10,0,0], [40,0,0] ], [ 1, 1, 1 ] )
+let c1 = verb.geom.NurbsCurve.byKnotsControlPointsWeights( 3, [0,0,0,0,1,1,1,1], [ [0,10,10], [10,5,10], [20,-5,10], [40,10,10] ], [ 1, 1, 1, 1 ] )
+let c2 = verb.geom.NurbsCurve.byKnotsControlPointsWeights( 3, [0,0,0,0,1,1,1,1], [ [0,0,20], [10,0,20], [20,5,20], [40,0,20] ], [ 1, 1, 1, 1, 1 ] )
+let c3 = verb.geom.NurbsCurve.byKnotsControlPointsWeights( 3, [0,0,0,0,1,1,1,1], [ [0,3,30], [10,-4,30], [20,10,30], [40,0,30] ], [ 1, 1, 1, 1, 1 ] )
+
+let curves = [c0, c1, c2, c3]
+let srf = verb.geom.NurbsSurface.byLoftingCurves( curves, 3 )
+
+scene.addSurface( tessellateSurface( srf ) )
+
+curves.forEach( function(c) { scene.addCurve( tessellateCurve( c ) ) } )
+
+scene.render()
+</script>
+
+<div id="button">Show/Hide Code</div>
+<pre><code id="code-container" class="language-javascript"></code></pre>
+
+<script type='module'>
+import { setupViewer } from 'codeViewer'
+
+setupViewer()
+
+hljs.highlightAll()
+</script>
+
+</body>
+
+</html>
