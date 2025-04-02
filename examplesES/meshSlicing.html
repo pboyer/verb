@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Mesh Slicing</title>
+
+  <script async src="https://cdn.jsdelivr.net/npm/es-module-shims@2.0/dist/es-module-shims.min.js"></script>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.175/+esm",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.175/examples/jsm/",
+        "verb": "https://cdn.jsdelivr.net/npm/verb-nurbs@3.0/+esm",
+        "web-worker": "https://cdn.jsdelivr.net/npm/web-worker@1.5/+esm",
+        "tessellate": "./js/tessellateThree.js",
+        "scene": "./js/sceneThree.js",
+        "codeViewer": "./js/codeViewer.js"
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+
+  <link rel="stylesheet" href="css/example.css">
+</head>
+
+<body>
+  <div id="viewer">
+    <div id="title"></div>
+  </div>
+
+<script type="module" id="script">
+import verb from 'verb'
+import { tessellateCurve, tessellateSurface } from 'tessellate'
+import { Scene } from 'scene'
+
+const scene = new Scene()
+
+const degree = 3
+const knots = [0, 0, 0, 0, 0.333, 0.666, 1, 1, 1, 1]
+const pts = [
+  [ [0,   0, -10], [10,   0,  0], [20,   0,   0], [30,   0, 0] , [40,   0,   0], [50,   0,  10] ],
+  [ [0, -10,   0], [10, -10, 10], [20, -10,  10], [30, -10, 0] , [40, -10,   0], [50, -10,   0] ],
+  [ [0, -20,   0], [10, -20, 10], [20, -20,  10], [30, -20, 0] , [40, -20,  -2], [50, -20, -12] ],
+  [ [0, -30,   0], [10, -30,  0], [20, -30, -23], [30, -30, 0] , [40, -30,   0], [50, -30,   0] ],
+  [ [0, -40,   0], [10, -40,  0], [20, -40,   0], [30, -40, 4] , [40, -40, -20], [50, -40,   0] ],
+  [ [0, -50,  12], [10, -50,  0], [20, -50,  20], [30, -50, 0] , [50, -50, -10], [50, -50, -15] ],
+]
+
+const srf = verb.geom.NurbsSurface.byKnotsControlPointsWeights( degree, degree, knots, knots, pts )
+
+scene.addSurface( tessellateSurface( srf ), null, true )
+
+let mesh = srf.tessellate()
+let results
+let runs = 1
+
+let d1 = Date.now()
+
+for (let i = 0 ; i < runs; i++) {
+  results = verb.eval.Intersect.meshSlices( mesh, -15, 15, 1 )
+}
+
+let d2 = Date.now()
+
+console.log( results.length," slices in ", (d2 - d1) / runs, " ms" )
+
+for (let i = 0; i < results.length; i++){
+  for (let j = 0; j < results[i].length; j++){
+    const points = results[i][j].map( function(x) { return x.point } )
+    if (points.length > 2) {
+      const curve = verb.geom.NurbsCurve.byPoints( points, 3 )
+      scene.addCurve( tessellateCurve( curve ) )
+    }
+  }
+}
+
+scene.render()
+</script>
+
+<div id="button">Show/Hide Code</div>
+<pre><code id="code-container" class="language-javascript"></code></pre>
+
+<script type='module'>
+import { setupViewer } from 'codeViewer'
+
+setupViewer()
+
+hljs.highlightAll()
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Cylindrical Surface</title>
+
+  <script async src="https://cdn.jsdelivr.net/npm/es-module-shims@2.0/dist/es-module-shims.min.js"></script>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.175/+esm",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.175/examples/jsm/",
+        "verb": "https://cdn.jsdelivr.net/npm/verb-nurbs@3.0/+esm",
+        "web-worker": "https://cdn.jsdelivr.net/npm/web-worker@1.5/+esm",
+        "tessellate": "./js/tessellateThree.js",
+        "scene": "./js/sceneThree.js",
+        "codeViewer": "./js/codeViewer.js"
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+
+  <link rel="stylesheet" href="css/example.css">
+</head>
+
+<body>
+  <div id="viewer">
+    <div id="title"></div>
+  </div>
+
+<script type="module" id="script">
+import verb from 'verb'
+import { tessellateSurface } from 'tessellate'
+import { Scene } from 'scene'
+
+const scene = new Scene()
+
+let axis = [-1, 0, 0]
+let xaxis = [0, 0, 1]
+let base = [8, 0, 1]
+let height = 16
+let radius = 2
+
+let srf = new verb.geom.CylindricalSurface( axis, xaxis, base, height, radius )
+
+scene.addSurface( tessellateSurface( srf ) )
+
+scene.render()
+</script>
+
+<div id="button">Show/Hide Code</div>
+<pre><code id="code-container" class="language-javascript"></code></pre>
+
+<script type='module'>
+import { setupViewer } from 'codeViewer'
+
+setupViewer()
+
+hljs.highlightAll()
+</script>
+
+</body>
+
+</html>
+
+
+

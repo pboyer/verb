@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Curve Reversal</title>
+
+  <script async src="https://cdn.jsdelivr.net/npm/es-module-shims@2.0/dist/es-module-shims.min.js"></script>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.175/+esm",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.175/examples/jsm/",
+        "verb": "https://cdn.jsdelivr.net/npm/verb-nurbs@3.0/+esm",
+        "web-worker": "https://cdn.jsdelivr.net/npm/web-worker@1.5/+esm",
+        "tessellate": "./js/tessellateThree.js",
+        "scene": "./js/sceneThree.js",
+        "codeViewer": "./js/codeViewer.js"
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+
+  <link rel="stylesheet" href="css/example.css">
+</head>
+
+<body>
+  <div id="viewer">
+    <div id="title"></div>
+  </div>
+
+<script type="module" id="script">
+import verb from 'verb'
+import { tessellateCurve } from 'tessellate'
+import { Scene } from 'scene'
+import * as THREE from 'three'
+
+const scene = new Scene()
+
+let c = new verb.geom.Arc( [0, 0, 0], [1, 0, 0], [0, 1, 0], 20, 0, Math.PI/ 2 )
+let cr = c.reverse() // returns a reversed copy
+let crr = cr.reverse() // returns the original
+
+// all curves will be coincident. comment out these lines in order to see the individual curves.
+scene.addCurve( tessellateCurve( c ), new THREE.LineBasicMaterial( { color: 0xff0000 } ) )
+scene.addCurve( tessellateCurve( cr ), new THREE.LineBasicMaterial( { color: 0x00ff00 } ) )
+scene.addCurve( tessellateCurve( crr ), new THREE.LineBasicMaterial( { color: 0x0000ff } ) )
+
+scene.render()
+</script>
+
+<div id="button">Show/Hide Code</div>
+<pre><code id="code-container" class="language-javascript"></code></pre>
+
+<script type='module'>
+import { setupViewer } from 'codeViewer'
+
+setupViewer()
+
+hljs.highlightAll()
+</script>
+
+</body>
+
+</html>

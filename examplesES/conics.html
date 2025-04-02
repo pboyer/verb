@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Conics</title>
+
+  <script async src="https://cdn.jsdelivr.net/npm/es-module-shims@2.0/dist/es-module-shims.min.js"></script>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.175/+esm",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.175/examples/jsm/",
+        "verb": "https://cdn.jsdelivr.net/npm/verb-nurbs@3.0/+esm",
+        "web-worker": "https://cdn.jsdelivr.net/npm/web-worker@1.5/+esm",
+        "tessellate": "./js/tessellateThree.js",
+        "scene": "./js/sceneThree.js",
+        "codeViewer": "./js/codeViewer.js"
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+
+  <link rel="stylesheet" href="css/example.css">
+</head>
+
+</body>
+  <div id="viewer">
+    <div id="title"></div>
+  </div>
+
+<script type="module" id="script">
+import verb from 'verb'
+import { tessellateCurve } from 'tessellate'
+import { Scene } from 'scene'
+
+const scene = new Scene()
+
+let arc =        new verb.geom.Arc( [0,0,0], [1,0,0], [0,1,0], 5, 0, 3* Math.PI/2 )
+let circle =     new verb.geom.Circle( [12,0,0], [1,0,0], [0,1,0], 5 )
+let ellipse =    new verb.geom.Ellipse( [24,0,0], [5,0,0], [0,2,0] )
+let ellipseArc = new verb.geom.EllipseArc( [36,0,0], [5,0,0], [0,2,0], 0, 3* Math.PI/2 )
+let parabola =   new verb.geom.BezierCurve( [[43,5,0], [48,-10,0], [51,5,0]] )
+
+scene.addCurve( tessellateCurve( arc ) )
+scene.addCurve( tessellateCurve( circle ) )
+scene.addCurve( tessellateCurve( ellipse ) )
+scene.addCurve( tessellateCurve( ellipseArc ) )
+scene.addCurve( tessellateCurve( parabola ) )
+
+scene.render()
+</script>
+
+<div id="button">Show/Hide Code</div>
+<pre><code id="code-container" class="language-javascript"></code></pre>
+
+<script type='module'>
+import { setupViewer } from 'codeViewer'
+
+setupViewer()
+
+hljs.highlightAll()
+</script>
+
+</body>
+
+</html>

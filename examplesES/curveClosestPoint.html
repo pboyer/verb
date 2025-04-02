@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Curve Closest Point</title>
+
+  <script async src="https://cdn.jsdelivr.net/npm/es-module-shims@2.0/dist/es-module-shims.min.js"></script>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.175/+esm",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.175/examples/jsm/",
+        "verb": "https://cdn.jsdelivr.net/npm/verb-nurbs@3.0/+esm",
+        "web-worker": "https://cdn.jsdelivr.net/npm/web-worker@1.5/+esm",
+        "tessellate": "./js/tessellateThree.js",
+        "scene": "./js/sceneThree.js",
+        "codeViewer": "./js/codeViewer.js"
+      }
+    }
+  </script>
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/styles/atom-one-dark.min.css">
+  <script src="https://cdn.jsdelivr.net/gh/highlightjs/cdn-release@11.9.0/build/highlight.min.js"></script>
+
+  <link rel="stylesheet" href="css/example.css">
+</head>
+
+<body>
+  <div id="viewer">
+    <div id="title"></div>
+  </div>
+
+<script type="module" id="script">
+import * as THREE from 'three'
+import verb from 'verb'
+import { tessellateCurve } from 'tessellate'
+import { Scene } from 'scene'
+
+const scene = new Scene()
+
+// render the curve
+const pts = [
+  [ 0,  0, -5],
+  [10,  0,  0],
+  [10, 10, -5],
+  [ 0, 10,  5],
+  [ 5,  5,  0],
+]
+const interpCurve = verb.geom.NurbsCurve.byPoints( pts, 3 )
+
+scene.addCurve( tessellateCurve( interpCurve ) )
+
+// render lines between points in space and closest points on the curve
+const cpMaterial = new THREE.LineBasicMaterial( { linewidth: 1, color: 0x0000aa } )
+
+const orbitpts = []
+let w = 0
+for (let i = -10; i < 20; i += 4){
+    for (let j = -10; j < 20; j += 4){
+        for (let k = -10; k < 20; k += 4){
+            const p0 = [i, j, k]
+
+            orbitpts.push( p0 )
+
+            const cp = interpCurve.closestPoint( p0 )
+
+            const cpLine = new verb.geom.Line( cp, p0 )
+            scene.addCurve( tessellateCurve( cpLine ), cpMaterial )
+
+            w++
+        }
+    }
+}
+
+scene.addPoints(orbitpts)
+
+scene.render()
+</script>
+
+<div id="button">Show/Hide Code</div>
+<pre><code id="code-container" class="language-javascript"></code></pre>
+
+<script type='module'>
+import { setupViewer } from 'codeViewer'
+
+setupViewer()
+
+hljs.highlightAll()
+</script>
+
+</body>
+
+</html>

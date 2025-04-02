@@ -1,0 +1,49 @@
+body {
+    margin: 0;
+    font-family: 'Source Sans Pro', sans-serif;
+    color: white;
+}
+
+.row, .col { overflow: hidden; position: absolute; }
+.row { left: 0; right: 0; }
+.col { top: 0; bottom: 0; }
+.scroll-x { overflow-x: auto; }
+.scroll-y { overflow-y: auto; }
+
+#viewer {
+    left: 0;
+    right: 0;
+}
+
+#button {
+    font-size: 15px;
+    color: white;
+    position: absolute;
+    background: green;
+    bottom: 20px;
+    padding: 10px;
+    left: 20px;
+    z-index: 2;
+}
+
+#button:hover{
+    background: grey;
+}
+
+#title {
+    font-size: 40px;
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    text-shadow: 0px 2px black;
+}
+
+#code-container {
+    padding: 20px;
+    background: rgba(0,0,0,0.75);
+    top: 80px;
+    position: absolute;
+    resize: none;
+    font-size: 14px;
+    display: none;
+}
