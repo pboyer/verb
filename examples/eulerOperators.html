@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="../build/js/verb.js"></script>
+    <script src="js/three.min.js"></script>
+    <script src="js/verbToThreeConversion.js"></script>
+    <script src="js/OrbitControls.js"></script>
+    <script src="js/threeBasic.js"></script>
+    <style> body {  margin: 0; } </style>
+</head>
+<body>
+<script>
+
+    function triangularLamina(){
+        var s = verb.topo.Solid.mvfs( [0,0,0] );
+
+        var e0 = s.f.l.e;
+        var v0 = s.v;
+        var f0 = s.f;
+
+        var nv0 = s.lmev( e0, e0, [10,0,0] );
+        nv1 = s.lmev( nv0.e, nv0.e, [10,10,0] );
+
+        console.log(v0.e.v.pt);
+        console.log(v0.e.nxt.nxt.v.pt);
+
+        var nf = s.lmef( v0.e, v0.e.nxt.nxt );
+
+        return s;
+    }
+
+    function triangularPrism(){
+        var s = triangularLamina();
+
+        var nvs = s.f.l.halfEdges().map(function(e){
+            return s.lmev( e, e, verb.core.Vec.add( e.v.pt, [0,0,10]) );
+        });
+
+        var nfs = nvs
+            .map(function(v){
+                return v.e;
+            })
+            .map(function(e){
+                var nf = s.lmef(e, e.nxt.nxt.nxt);
+                return nf;
+            });
+
+        return s;
+    }
+
+    function hollowPrism(){
+
+        var s = triangularPrism();
+
+        var tfl = s.faces().filter(function(x){
+            return verb.core.Vec.dot( x.normal(), [0,0,1] ) > 0;
+        });
+
+        var bf = s.faces().filter(function(x){
+            return verb.core.Vec.dot( x.normal(), [0,0,-1] ) > 0;
+        })[0];
+
+        var tf = tfl[0];
+        var e0 = tf.l.e.prv;
+
+        var nv = s.lmev( tf.l.e, tf.l.e, [2,1,10] );
+        var nl = s.lkemr(nv.e.prv);
+
+        var v0 = nl.e.v;
+
+        // make new face inside of this one
+        var nv1 = s.lmev( nl.e, nl.e, [9,1,10] );
+        var nv2 = s.lmev( nv1.e, nv1.e, [9,8,10] );
+        var nf = s.lmef( v0.e, v0.e.nxt.nxt );
+
+        // on each vertex of the outer loop of the new face, do an mev
+        var nvs = nf.l.halfEdges().map(function(e){
+            return s.lmev( e, e, verb.core.Vec.add( e.v.pt, [0,0,-10]) ); // this extends up to the top face
+        });
+
+        // now iterate around, introducing new faces on every side, now we're extruding the interior face
+        var nfs = nvs
+            .map(function(v){
+                return v.e;
+            })
+            .map(function(e){
+                return s.lmef(e, e.nxt.nxt.nxt);
+            });
+
+        s.lkfmrh( nf, bf );
+
+        return s;
+    }
+
+    function drawSolid(s){
+
+        s.faces().forEach(function(x){
+            addMeshToScene( x.toThreeGeometry(),
+                new THREE.MeshNormalMaterial(
+                    { side: THREE.FrontSide, wireframe: false, shading: THREE.SmoothShading, transparent: true, opacity: 0.95 } ));
+        });
+
+        s.halfEdges().forEach(function(x){
+            addLineToScene( [x.v.pt,x.nxt.v.pt] );
+        });
+
+        s.vertices().forEach(function(x){
+            addPointsToScene( [x.pt] );
+        });
+
+    }
+
+	threeSetup(true);
+
+    var pts = [];
+
+    var s = 32;
+    var w = 2 * Math.PI / s;
+    var r = 10;
+
+    for (var i = 0 ; i < s; i++){
+        pts.push( [ r * Math.cos( i*w ),  r * Math.sin( i*w ), 0 ] );
+    }
+
+    var pts = [[0,0,0], [10,0,0], [10,10,0], [0,10,0] ];
+
+    var s = verb.topo.Make.extrusion( pts, [0,0,10] );
+
+    console.log( "volume", verb.topo.Analyze.volume( s ) );
+    console.log( "area", verb.topo.Analyze.area( s ) );
+
+    var n = [ 1 / Math.sqrt(3), 1 / Math.sqrt(3), 1 / Math.sqrt(3) ];
+    var p = { n : n, o : [5,5,5] };
+
+    var r = verb.topo.Split.split( s, p );
+
+    drawSolid( r.item0 );
+    // drawSolid( r.item1 );
+
+	threeRender();
+
+</script>
+
+</body>
+
+</html>
